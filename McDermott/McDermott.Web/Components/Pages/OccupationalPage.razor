@@ -1,0 +1,83 @@
+@page "/occupational";
+
+@rendermode InteractiveServer
+
+<PageTitle>Occupational</PageTitle>
+
+<div class="wrapper">
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Occupational" />
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <DxGrid @ref="Grid"
+                                    Data="Occupationals"
+                                    PageSize="10"
+                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                    KeyFieldName="Id"
+                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                    EditModelSaving="OnSave"
+                                    DataItemDeleting="OnDelete"
+                                    EditMode="GridEditMode.EditForm"
+                                    PopupEditFormCssClass="pw-800"
+                                    PagerPosition="GridPagerPosition.Bottom"
+                                    PageSizeSelectorVisible="true"
+                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                    PageSizeSelectorAllRowsItemVisible="true"
+                                    PagerSwitchToInputBoxButtonCount="10"
+                                    FocusedRowEnabled="true"
+                                    PagerVisibleNumericButtonCount="10"
+                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                    ShowGroupPanel="false"
+                                    AutoExpandAllGroupRows="true"
+                                    ShowFilterRow="true"
+                                    CustomizeElement="Grid_CustomizeElement"
+                                    ShowSearchBox="true"
+                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                    KeyboardNavigationEnabled="true">
+                                <ToolbarTemplate>
+                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                        <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
+                                        <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
+                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="EditItemsEnabled" />`
+                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" />
+                                        <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
+                                            <Items>
+                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                            </Items>
+                                        </DxToolbarItem>
+                                        <DxToolbarItem Text="Upload" id="upload" IconCssClass="grid-toolbar-upload" />
+                                    </DxToolbar>
+                                </ToolbarTemplate>
+                                <Columns>
+                                    <DxGridSelectionColumn width="15px" />
+                                    <DxGridDataColumn FieldName="Name" Caption="Pekerjaan" />
+                                    <DxGridDataColumn FieldName="Description" Caption="Deskripsi" />
+                                </Columns>
+                                <EditFormTemplate Context="EditFormContext">
+
+                                    <DxFormLayout CssClass="w-100">
+                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Pekerjaan:" ColSpanMd="6">
+                                           <div class="pop-warning">
+                                                @EditFormContext.GetEditor("Name")
+                                            </div>
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Deskripsi:" ColSpanMd="6">
+                                            @EditFormContext.GetEditor("Description")
+                                        </DxFormLayoutItem>
+                                    </DxFormLayout>
+                                </EditFormTemplate>
+                            </DxGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

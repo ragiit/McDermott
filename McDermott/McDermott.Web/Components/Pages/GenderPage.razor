@@ -1,0 +1,56 @@
+﻿@page "/gender"
+@rendermode InteractiveServer
+
+<PageTitle>Gender</PageTitle>
+
+<div class="wrapper">
+
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Gender" />
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <DxGrid @ref="Grid"
+                                    Data="Genders"
+                                    PageSize="10"
+                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                    KeyFieldName="Id"
+                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                    EditModelSaving="OnSave"
+                                    DataItemDeleting="OnDelete"
+                                    EditMode="GridEditMode.EditForm"
+                                    PopupEditFormCssClass="pw-800"
+                                    PagerPosition="GridPagerPosition.Bottom"
+                                    PageSizeSelectorVisible="true"
+                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                    PageSizeSelectorAllRowsItemVisible="true"
+                                    PagerSwitchToInputBoxButtonCount="10"
+                                    PagerVisibleNumericButtonCount="10"
+                                    ShowGroupPanel="true"
+                                    AutoExpandAllGroupRows="true"
+                                    ShowFilterRow="true"
+                                    ShowSearchBox="true"
+                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                    KeyboardNavigationEnabled="true">
+                                <Columns>
+                                    <DxGridDataColumn FieldName="Name" SortIndex="0" /> 
+                                    <DxGridCommandColumn Width="160px" />
+                                </Columns>
+                                <EditFormTemplate Context="EditFormContext"> 
+                                    <DxFormLayout CssClass="w-100">
+                                        <DxFormLayoutItem Caption="Name:" ColSpanMd="12">
+                                            @EditFormContext.GetEditor("Name")
+                                        </DxFormLayoutItem> 
+                                    </DxFormLayout>
+                                </EditFormTemplate>
+                            </DxGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div> 

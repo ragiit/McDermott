@@ -1,0 +1,72 @@
+﻿@page "/city"
+@rendermode InteractiveServer
+
+<PageTitle>City</PageTitle>
+
+<div class="wrapper">
+
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="City" />
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <DxGrid @ref="Grid"
+                                    Data="Cities"
+                                    PageSize="10"
+                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                    KeyFieldName="Id"
+                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                    EditModelSaving="OnSave"
+                                    DataItemDeleting="OnDelete"
+                                    EditMode="GridEditMode.EditForm"
+                                    PopupEditFormCssClass="pw-800"
+                                    PagerPosition="GridPagerPosition.Bottom"
+                                    PageSizeSelectorVisible="true"
+                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                    PageSizeSelectorAllRowsItemVisible="true"
+                                    PagerSwitchToInputBoxButtonCount="10"
+                                    PagerVisibleNumericButtonCount="10"
+                                    ShowGroupPanel="true"
+                                    AutoExpandAllGroupRows="true"
+                                    ShowFilterRow="true"
+                                    ShowSearchBox="true"
+                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                    KeyboardNavigationEnabled="true">
+                                <Columns>
+                                    <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                    <DxGridDataColumn FieldName="Province.Name" Caption="Province" />
+                                    <DxGridCommandColumn Width="160px" />
+                                </Columns>
+                                <EditFormTemplate Context="EditFormContext">
+                                    @{
+                                        var a = (CityDto)EditFormContext.EditModel;
+                                    }
+                                    <DxFormLayout CssClass="w-100">
+                                        <DxFormLayoutItem Caption="Name:" ColSpanMd="6">
+                                            @EditFormContext.GetEditor("Name")
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Province:" ColSpanMd="6">
+                                            <DxComboBox Data="@Provinces"
+                                                        NullText="Select Province..."
+                                                        @bind-Value="@a.ProvinceId"
+                                                        TextFieldName="Name"
+                                                        ValueFieldName="Id">
+                                            </DxComboBox>
+                                        </DxFormLayoutItem>
+                                    </DxFormLayout>
+                                </EditFormTemplate>
+                            </DxGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+
+}

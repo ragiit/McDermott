@@ -1,0 +1,96 @@
+﻿@page "/country"
+@using static McDermott.Web.Helper
+@rendermode InteractiveServer
+
+<PageTitle>Country</PageTitle>
+
+<div class="wrapper">
+
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Country" />
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <DxGrid @ref="Grid"
+                                    Data="Countries"
+                                    PageSize="10"
+                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                    KeyFieldName="Id"
+                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                    EditModelSaving="OnSave"
+                                    DataItemDeleting="OnDelete"
+                                    EditMode="GridEditMode.EditForm"
+                                    PopupEditFormCssClass="pw-800"
+                                    PagerPosition="GridPagerPosition.Bottom"
+                                    PageSizeSelectorVisible="true"
+                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                    PageSizeSelectorAllRowsItemVisible="true"
+                                    PagerSwitchToInputBoxButtonCount="10"
+                                    FocusedRowEnabled="true"
+                                    PagerVisibleNumericButtonCount="10"
+                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                    ShowGroupPanel="true"
+                                    AutoExpandAllGroupRows="true"
+                                    ShowFilterRow="true"
+                                    CustomizeElement="Grid_CustomizeElement"
+                                    ShowSearchBox="true"
+                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                    KeyboardNavigationEnabled="true">
+                                <ToolbarTemplate>
+                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                        <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
+                                        <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
+                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems != null" />`
+                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" />
+                                        <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
+                                            <Items>
+                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                            </Items>
+                                        </DxToolbarItem>
+                                        <DxToolbarItem Text="Upload" id="upload" IconCssClass="grid-toolbar-upload" />
+                                    </DxToolbar>
+                                    @*  <DxComboBox Data="EnumEditModeDatas"
+                                    NullText="Select Grid Edit Mode..."
+                                    TextFieldName="@nameof(EnumEditModeData.DisplayName)"
+                                    ValueFieldName="@nameof(EnumEditModeData.Value)"
+                                    @bind-Value="@Value"
+                                    AllowUserInput="true" /> *@
+
+                                    <DxUpload Visible="@UploadVisible"
+                                              ExternalSelectButtonCssSelector="#upload"
+                                              ExternalDropZoneCssSelector="#upload"
+                                              ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+                                              SelectedFilesChanged="@SelectedFilesChangedAsync"
+                                              AllowedFileExtensions="@extentions"
+                                              MaxFileSize="15000000">
+                                    </DxUpload>
+                                </ToolbarTemplate>
+                                <Columns>
+                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                    <DxGridDataColumn FieldName="Code" />
+                                </Columns>
+                                <EditFormTemplate Context="EditFormContext">
+                                    <DxFormLayout CssClass="w-100">
+                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="6">
+                                            @EditFormContext.GetEditor("Name")  
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Code:" ColSpanMd="6">
+                                            @EditFormContext.GetEditor("Code")
+                                        </DxFormLayoutItem>
+                                    </DxFormLayout>
+                                </EditFormTemplate>
+                            </DxGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div> 
