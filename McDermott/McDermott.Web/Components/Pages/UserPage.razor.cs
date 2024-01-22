@@ -1,9 +1,10 @@
-﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.CityCommand;
+﻿using static McDermott.Application.Features.Commands.CityCommand;
 using static McDermott.Application.Features.Commands.CountryCommand;
+using static McDermott.Application.Features.Commands.DepartmentCommand;
 using static McDermott.Application.Features.Commands.DistrictCommand;
 using static McDermott.Application.Features.Commands.GenderCommand;
 using static McDermott.Application.Features.Commands.GroupCommand;
+using static McDermott.Application.Features.Commands.JobPositionCommand;
 using static McDermott.Application.Features.Commands.ProvinceCommand;
 using static McDermott.Application.Features.Commands.ReligionCommand;
 using static McDermott.Application.Features.Commands.UserCommand;
@@ -20,14 +21,19 @@ namespace McDermott.Web.Components.Pages
         private bool EditItemsEnabled { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private bool OnVacation { get; set; } = true;
+        private bool ShowForm { get; set; } = false;
+        private bool VisibleExpiredId { get; set; } = false;
         public List<CountryDto> Countries { get; private set; }
         public List<ProvinceDto> Provinces { get; private set; }
         public List<CityDto> Cities { get; private set; }
+
         public List<DistrictDto> Districts { get; private set; }
         public List<VillageDto> Villages { get; private set; }
         public List<GroupDto> Groups { get; private set; }
         public List<ReligionDto> Religions { get; private set; }
         public List<GenderDto> Genders { get; private set; }
+        public List<DepartmentDto> Departments { get; private set; }
+        public List<JobPositionDto> JobPositions { get; private set; }
 
         private List<string> IdentityTypes = new List<string>
         {
@@ -36,15 +42,27 @@ namespace McDermott.Web.Components.Pages
             "SIM",
             "VISA",
         };
+
         private List<string> MartialStatuss = new List<string>
         {
             "Single",
-            "Married" 
-        };
+            "Married"
 
-        private async Task LoadData()
+        }; private async Task LoadData()
+
         {
+            ShowForm = false;
             Users = await Mediator.Send(new GetUserQuery());
+        }
+
+        private void SelectedUserFormChanged(string ee)
+        {
+            UserForm.TypeId = ee;
+
+            if (ee.Contains("VISA"))
+                VisibleExpiredId = true;
+            else
+                VisibleExpiredId = false;
         }
 
         protected override async Task OnInitializedAsync()
@@ -57,6 +75,8 @@ namespace McDermott.Web.Components.Pages
             Groups = await Mediator.Send(new GetGroupQuery());
             Religions = await Mediator.Send(new GetReligionQuery());
             Genders = await Mediator.Send(new GetGenderQuery());
+            Departments = await Mediator.Send(new GetDepartmentQuery());
+            JobPositions = await Mediator.Send(new GetJobPositionQuery());
 
             await LoadData();
         }
@@ -64,6 +84,31 @@ namespace McDermott.Web.Components.Pages
         private async Task OnSave()
         {
             var a = UserForm;
+
+            if (UserForm.Id == 0)
+                await Mediator.Send(new CreateUserRequest(UserForm));
+            else
+                await Mediator.Send(new UpdateUserRequest(UserForm));
+
+            await LoadData();
+        }
+
+        private void OnCheckedPhysicionChanged(bool e)
+        {
+            UserForm.IsNurse = false;
+            UserForm.IsPhysicion = true;
+        }
+
+        private void OnCheckedNurseChanged(bool e)
+        {
+            UserForm.IsPhysicion = false;
+            UserForm.IsNurse = true;
+        }
+
+        private void OnCancel()
+        {
+            UserForm = new();
+            ShowForm = false;
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
@@ -118,18 +163,32 @@ namespace McDermott.Web.Components.Pages
         {
             if (fieldName == nameof(UserForm.Name))
             {
-                UserForm.Name = newValue.ToString();
-            } 
+                //UserForm = newValue.ToString();
+            }
         }
 
         private async Task NewItem_Click()
         {
-            await Grid.StartEditNewRowAsync();
+            ShowForm = true;
+        }
+
+        private void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+        {
+            var newEmployee = (UserDto)e.EditModel;
         }
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            try
+            {
+                UserForm = Users[FocusedRowVisibleIndex];
+                ShowForm = true;
+            }
+            catch (Exception e)
+            {
+                var zz = e;
+            }
+            //await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
         private void DeleteItem_Click()
@@ -142,7 +201,7 @@ namespace McDermott.Web.Components.Pages
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
             {
                 ExportSelectedRowsOnly = true,
-            }); ;
+            });
         }
 
         private async Task ExportCsvItem_Click()
@@ -160,7 +219,5 @@ namespace McDermott.Web.Components.Pages
                 ExportSelectedRowsOnly = true,
             });
         }
-
-
     }
 }

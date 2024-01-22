@@ -98,15 +98,24 @@ namespace McDermott.Application.Features.Queries
 
             public async Task<bool> Handle(CreateGroupMenuRequest request, CancellationToken cancellationToken)
             {
-                foreach (var item in request.GroupMenuDto)
+                try
                 {
-                    var a = item.Adapt<GroupMenu>();
-                    await _unitOfWork.Repository<GroupMenu>().AddAsync(a);
+                    foreach (var item in request.GroupMenuDto)
+                    {
+                        var a = item.Adapt<GroupMenu>();
+                        if (a.MenuId == 0) continue;
+                        a.Menu = null;
+                        await _unitOfWork.Repository<GroupMenu>().AddAsync(a);
+                    }
+
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    return true;
                 }
-
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                catch (Exception e)
+                {
+                    return false;
+                }
             }
         }
 
@@ -176,6 +185,15 @@ namespace McDermott.Application.Features.Queries
             public async Task<bool> Handle(DeleteGroupRequest request, CancellationToken cancellationToken)
             {
                 await _unitOfWork.Repository<Group>().DeleteAsync(request.Id);
+
+                var groupMenus = await _unitOfWork.Repository<GroupMenu>().GetAllAsync();
+                groupMenus = groupMenus.Where(x => x.GroupId == request.Id).ToList();
+
+                foreach (var item in groupMenus)
+                {
+                    await _unitOfWork.Repository<GroupMenu>().DeleteAsync(item.Id);
+                }
+
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return true;

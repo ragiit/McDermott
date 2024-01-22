@@ -20,7 +20,7 @@
 
             public CreateCountryRequest(CountryDto countryDto)
             {
-                CountryDto = countryDto;
+                this.CountryDto = countryDto;
             }
         }
 
@@ -30,7 +30,7 @@
 
             public UpdateCountryRequest(CountryDto countryDto)
             {
-                CountryDto = countryDto;
+                this.CountryDto = countryDto;
             }
         }
 

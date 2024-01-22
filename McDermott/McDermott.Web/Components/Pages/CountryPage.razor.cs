@@ -51,16 +51,16 @@ namespace McDermott.Web.Components.Pages
             }
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
         private bool EditItemsEnabled { get; set; }
 
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
+        }
+
+        private void ColumnChooserButton_Click()
+        {
+            Grid.ShowColumnChooser();
         }
 
         private async Task ExportXlsxItem_Click()
@@ -117,6 +117,11 @@ namespace McDermott.Web.Components.Pages
             {
                 Console.WriteLine($"Error reading Excel file: {ex.Message}");
             }
+        }
+
+        private void OnFileUploadStarted(FileUploadEventArgs e)
+        {
+            InvokeAsync(StateHasChanged);
         }
 
         private void UpdateEditItemsEnabled(bool enabled)

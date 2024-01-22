@@ -3,7 +3,6 @@
     public partial class Company : BaseAuditableEntity
     {
         public int CityId { get; set; }
-
         public int ProvinceId { get; set; }
         public int CountryId { get; set; }
 

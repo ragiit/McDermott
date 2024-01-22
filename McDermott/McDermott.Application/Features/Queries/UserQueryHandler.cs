@@ -16,6 +16,7 @@ namespace McDermott.Application.Features.Queries
             public async Task<List<UserDto>> Handle(GetUserQuery query, CancellationToken cancellationToken)
             {
                 return await _unitOfWork.Repository<User>().Entities
+                    .Include(x => x.Group)
                         .Select(User => User.Adapt<UserDto>())
                        .ToListAsync(cancellationToken);
             }
@@ -49,11 +50,25 @@ namespace McDermott.Application.Features.Queries
 
             public async Task<UserDto> Handle(CreateUserRequest request, CancellationToken cancellationToken)
             {
-                var result = await _unitOfWork.Repository<User>().AddAsync(request.UserDto.Adapt<User>());
+                try
+                {
+                    if (!request.UserDto.TypeId.Contains("VISA"))
+                        request.UserDto.ExpiredId = null;
 
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                    // nanti dihapus
+                    request.UserDto.UserName = request.UserDto.Email;
 
-                return result.Adapt<UserDto>();
+                    var result = await _unitOfWork.Repository<User>().AddAsync(request.UserDto.Adapt<User>());
+
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    return result.Adapt<UserDto>();
+                }
+                catch (Exception e)
+                {
+                    Console.Write("😋" + e.Message);
+                    throw;
+                }
             }
         }
 
@@ -68,6 +83,9 @@ namespace McDermott.Application.Features.Queries
 
             public async Task<bool> Handle(UpdateUserRequest request, CancellationToken cancellationToken)
             {
+                // nanti dihapus
+                request.UserDto.UserName = request.UserDto.Email;
+
                 await _unitOfWork.Repository<User>().UpdateAsync(request.UserDto.Adapt<User>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

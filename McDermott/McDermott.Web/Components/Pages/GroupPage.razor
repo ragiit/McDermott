@@ -14,50 +14,145 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <DxGrid @ref="Grid"
-                                    Data="Groups"
-                                    PageSize="10"
-                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                    KeyFieldName="Id"
-                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                    EditModelSaving="OnSave"
-                                    DataItemDeleting="OnDelete"
-                                    EditMode="GridEditMode.EditForm"
-                                    PopupEditFormCssClass="pw-800"
-                                    PagerPosition="GridPagerPosition.Bottom"
-                                    PageSizeSelectorVisible="true"
-                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                    PageSizeSelectorAllRowsItemVisible="true"
-                                    PagerSwitchToInputBoxButtonCount="10"
-                                    PagerVisibleNumericButtonCount="10"
-                                    ShowGroupPanel="true"
-                                    AutoExpandAllGroupRows="true"
-                                    ShowFilterRow="true"
-                                    ShowSearchBox="true"
-                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                    KeyboardNavigationEnabled="true">
-                                <Columns>
-                                    <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                    <DxGridCommandColumn/>
-                                </Columns>
-                                <EditFormTemplate Context="EditFormContext">
-                                    @{
-                                        var m = Menus;
-                                    }
-                                    <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem Caption="Name:" ColSpanMd="6">
-                                            @EditFormContext.GetEditor("Name")
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Menu:" ColSpanMd="6">
-                                            <DxTagBox Data="@Menus"
-                                                      HideSelectedItems="false"
-                                                      TextFieldName="@nameof(MenuDto.Name)"
-                                                      @bind-Values="@SelectedGroupMenus"
-                                                      CssClass="cw-480" />
-                                        </DxFormLayoutItem>
-                                    </DxFormLayout>
-                                </EditFormTemplate>
-                            </DxGrid>
+                            @if (!ShowForm)
+                            {
+                                <DxGrid @ref="Grid"
+                                        Data="Groups"
+                                        PageSize="10"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                        KeyFieldName="Id"
+                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                        EditModelSaving="OnSave"
+                                        DataItemDeleting="OnDelete"
+                                        PopupEditFormCssClass="pw-800"
+                                        PagerPosition="GridPagerPosition.Bottom"
+                                        PageSizeSelectorVisible="true"
+                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                        PageSizeSelectorAllRowsItemVisible="true"
+                                        PagerSwitchToInputBoxButtonCount="10"
+                                        FocusedRowEnabled="true"
+                                        PagerVisibleNumericButtonCount="10"
+                                        ShowGroupPanel="true"
+                                        AutoExpandAllGroupRows="true"
+                                        ShowFilterRow="true"
+                                        ShowSearchBox="true"
+                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                        KeyboardNavigationEnabled="true">
+                                    <ToolbarTemplate>
+                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                            <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
+                                            <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
+                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems != null" />`
+                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" />
+                                            <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
+                                                <Items>
+                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                </Items>
+                                            </DxToolbarItem>
+                                            <DxToolbarItem Text="Upload" id="upload" IconCssClass="grid-toolbar-upload" />
+                                        </DxToolbar>
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                    </Columns>
+                                </DxGrid>
+                            }
+                            else
+                            {
+                                <label for="tbOverview" class="demo-text cw-320 mb-1">
+                                    Group
+                                </label>
+                                <DxTextBox @bind-Text="@Group.Name"
+                                           InputId="tbOverview" />
+
+                                <DxGrid @ref="GridGropMenu"
+                                        CssClass="mt"
+                                        Data="GroupMenus"
+                                        PageSize="10"
+                                        @bind-SelectedDataItems="@SelectedDataItemsGroupMenu"
+                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                        KeyFieldName="Id"
+                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                        EditModelSaving="OnSaveGroupMenu"
+                                        DataItemDeleting="DeleteItemGrid_Click"
+                                        EditMode="GridEditMode.PopupEditForm"
+                                        PopupEditFormCssClass="pw-800"
+                                        PagerPosition="GridPagerPosition.Bottom"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        PageSizeSelectorVisible="true"
+                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                        PageSizeSelectorAllRowsItemVisible="true"
+                                        PagerSwitchToInputBoxButtonCount="10"
+                                        FocusedRowEnabled="true"
+                                        PagerVisibleNumericButtonCount="10"
+                                        ShowGroupPanel="true"
+                                        AutoExpandAllGroupRows="true"
+                                        ShowFilterRow="true"
+                                        ShowSearchBox="true"
+                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                        KeyboardNavigationEnabled="true">
+                                    <ToolbarTemplate>
+                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                            <DxToolbarItem Text="New" Click="NewItemGroup_Click" IconCssClass="grid-toolbar-new" />
+                                            <DxToolbarItem Text="Edit" Click="EditItemGroup_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsGroupEnabled" />
+                                            <DxToolbarItem Text="Delete" Click="DeleteItemGrid_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItemsGroupMenu != null" />`
+                                            <DxToolbarItem Text="Save" Click="SaveItemGroupMenuGrid_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItemsGroupMenu != null" />`
+                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" />
+                                            <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
+                                                <Items>
+                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                </Items>
+                                            </DxToolbarItem>
+                                            @* <DxToolbarItem Text="Upload" id="upload" IconCssClass="grid-toolbar-upload" /> *@
+                                        </DxToolbar>
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Create" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Read" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Update" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Delete" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Import" SortIndex="0" />
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (GroupMenuDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem Caption="Menu:" ColSpanMd="6">
+                                                <DxComboBox Data="@Menus"
+                                                            NullText="Select Menu..."
+                                                            @bind-Value="@a.MenuId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id">
+                                                </DxComboBox>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Create:" ColSpanMd="6">
+                                                @EditFormContext.GetEditor("Create")
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Read:" ColSpanMd="6">
+                                                @EditFormContext.GetEditor("Read")
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Update:" ColSpanMd="6">
+                                                @EditFormContext.GetEditor("Update")
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Delete:" ColSpanMd="6">
+                                                @EditFormContext.GetEditor("Delete")
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Create:" ColSpanMd="6">
+                                                @EditFormContext.GetEditor("Import")
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </DxGrid>
+                            }
                         </div>
                     </div>
                 </div>

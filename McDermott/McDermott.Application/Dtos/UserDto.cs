@@ -41,7 +41,7 @@ namespace McDermott.Application.Dtos
         public int? IdCardCityId { get; set; } // KTP City
         public int? IdCardDistrictId { get; set; } // KTP District
         public int? IdCardVillageId { get; set; } // KTP Village
-        public int? IdCardRtRw { get; set; } // KTP  RTRW
+        public string? IdCardRtRw { get; set; } // KTP  RTRW
         public int? IdCardZip { get; set; } // KTP Zip
         public string? DomicileAddress1 { get; set; }   // Domisili Alamat 1
         public string? DomicileAddress2 { get; set; }   // Domisili Alamat 2
@@ -50,7 +50,7 @@ namespace McDermott.Application.Dtos
         public int? DomicileCityId { get; set; } // Domisili City
         public int? DomicileDistrictId { get; set; } // Domisili District
         public int? DomicileVillageId { get; set; } // Domisili Village
-        public int? DomicileRtRw { get; set; } // Domisili RtRw
+        public string? DomicileRtRw { get; set; } // Domisili RtRw
         public int? DomicileZip { get; set; } // Domisili ZIp
         public string? BiologicalMother { get; set; } // Ibu Kandung
         public string? MotherNIK { get; set; }
@@ -87,5 +87,7 @@ namespace McDermott.Application.Dtos
         public bool? IsNurse { get; set; } = false;
         public string? EmployeeStatus { get; set; }
         public DateTime? JoinDate { get; set; }
+
+        public virtual GroupDto? Group { get; set; }
     }
 }

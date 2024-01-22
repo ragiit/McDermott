@@ -23,7 +23,7 @@
                                     CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                     EditModelSaving="OnSave"
                                     DataItemDeleting="OnDelete"
-                                    EditMode="GridEditMode.EditForm"
+                                    EditMode="GridEditMode.PopupEditForm"
                                     PopupEditFormCssClass="pw-800"
                                     PagerPosition="GridPagerPosition.Bottom"
                                     PageSizeSelectorVisible="true"
@@ -66,7 +66,7 @@
                                               ExternalSelectButtonCssSelector="#upload"
                                               ExternalDropZoneCssSelector="#upload"
                                               ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
-                                              SelectedFilesChanged="@SelectedFilesChangedAsync"
+                                              FileUploadStarted="@OnFileUploadStarted"
                                               AllowedFileExtensions="@extentions"
                                               MaxFileSize="15000000">
                                     </DxUpload>
@@ -79,7 +79,7 @@
                                 <EditFormTemplate Context="EditFormContext">
                                     <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="6">
-                                            @EditFormContext.GetEditor("Name")  
+                                            @EditFormContext.GetEditor("Name")
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem Caption="Code:" ColSpanMd="6">
                                             @EditFormContext.GetEditor("Code")
