@@ -1,1 +1,1 @@
-# McDermott.
+# McDermott
