@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.DistrictCommand;
+﻿using static McDermott.Application.Features.Commands.CountryCommand;
+using static McDermott.Application.Features.Commands.DistrictCommand;
 
 namespace McDermott.Application.Features.Queries
 {
@@ -87,6 +88,23 @@ namespace McDermott.Application.Features.Queries
             }
 
             public async Task<bool> Handle(DeleteDistrictRequest request, CancellationToken cancellationToken)
+            {
+                await _unitOfWork.Repository<District>().DeleteAsync(request.Id);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return true;
+            }
+        }
+        internal class DeleteListDistrictHandler : IRequestHandler<DeleteListDistrictRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public DeleteListDistrictHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(DeleteListDistrictRequest request, CancellationToken cancellationToken)
             {
                 await _unitOfWork.Repository<District>().DeleteAsync(request.Id);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

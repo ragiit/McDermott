@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.ProvinceCommand;
+﻿using static McDermott.Application.Features.Commands.CountryCommand;
+using static McDermott.Application.Features.Commands.ProvinceCommand;
 
 namespace McDermott.Application.Features.Queries
 {
@@ -32,6 +33,22 @@ namespace McDermott.Application.Features.Queries
             }
 
             public async Task<ProvinceDto> Handle(GetProvinceByIdQuery request, CancellationToken cancellationToken)
+            {
+                var result = await _unitOfWork.Repository<Province>().GetByIdAsync(request.Id);
+
+                return result.Adapt<ProvinceDto>();
+            }
+        }
+        internal class GetProvinceByCountryHandler : IRequestHandler<GetProvinceByCountry, ProvinceDto>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public GetProvinceByCountryHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<ProvinceDto> Handle(GetProvinceByCountry request, CancellationToken cancellationToken)
             {
                 var result = await _unitOfWork.Repository<Province>().GetByIdAsync(request.Id);
 
@@ -86,6 +103,23 @@ namespace McDermott.Application.Features.Queries
             }
 
             public async Task<bool> Handle(DeleteProvinceRequest request, CancellationToken cancellationToken)
+            {
+                await _unitOfWork.Repository<Province>().DeleteAsync(request.Id);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return true;
+            }
+        }
+        internal class DeleteListProvinceHandler : IRequestHandler<DeleteListProvinceRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public DeleteListProvinceHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(DeleteListProvinceRequest request, CancellationToken cancellationToken)
             {
                 await _unitOfWork.Repository<Province>().DeleteAsync(request.Id);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

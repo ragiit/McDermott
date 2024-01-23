@@ -10,79 +10,28 @@ namespace McDermott.Web.Components.Pages
         private List<string> extentions = new() { ".xlsx", ".xls" };
         private const string ExportFileName = "ExportResult";
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
+        private List<CountryDto> Countries = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; }
         private dynamic dd;
         private int Value { get; set; } = 0;
-
         private int FocusedRowVisibleIndex { get; set; }
-
+        private bool EditItemsEnabled { get; set; }
         public IGrid Grid { get; set; }
-        private List<CountryDto> Countries = new();
 
         protected override async Task OnInitializedAsync()
         {
             await LoadData();
+        }
+        private async Task LoadData()
+        {
+            SelectedDataItems = new ObservableRangeCollection<object>();
+            Countries = await Mediator.Send(new GetCountryQuery());
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
-
-        private async Task OnDelete(GridDataItemDeletingEventArgs e)
-        {
-            try
-            {
-                var aq = SelectedDataItems.Count;
-                if (SelectedDataItems is null)
-                {
-                    await Mediator.Send(new DeleteCountryRequest(((CountryDto)e.DataItem).Id));
-                }
-                else
-                {
-                    var a = SelectedDataItems.Adapt<List<CountryDto>>();
-                    await Mediator.Send(new DeleteListCountryRequest(a.Select(x => x.Id).ToList()));
-                }
-                await LoadData();
-            }
-            catch (Exception ee)
-            {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
-            }
-        }
-
-        private bool EditItemsEnabled { get; set; }
-
-        private async Task NewItem_Click()
-        {
-            await Grid.StartEditNewRowAsync();
-        }
-
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            }); ;
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        // private void ImportItem_Click()
-        // {
-        //     /// .....
-        // }
 
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
@@ -96,7 +45,50 @@ namespace McDermott.Web.Components.Pages
                 e.CssClass = "header-bold";
             }
         }
+        private void UpdateEditItemsEnabled(bool enabled)
+        {
+            EditItemsEnabled = enabled;
+        }
 
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+            UpdateEditItemsEnabled(true);
+        }
+        private async Task NewItem_Click()
+        {
+            await Grid.StartEditNewRowAsync();
+        }
+        private async Task EditItem_Click()
+        {
+            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+        }
+
+        private void DeleteItem_Click()
+        {
+            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        private void ColumnChooserButton_Click()
+        {
+            Grid.ShowColumnChooser();
+        }
+
+        private async Task ExportXlsxItem_Click()
+        {
+            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+        }
+
+        private async Task ExportXlsItem_Click()
+        {
+            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+        }
         private async Task ExportCsvItem_Click()
         {
             await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
@@ -124,27 +116,6 @@ namespace McDermott.Web.Components.Pages
             InvokeAsync(StateHasChanged);
         }
 
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
-        }
-
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
-        }
-
-        private async Task EditItem_Click()
-        {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-        }
-
-        private void DeleteItem_Click()
-        {
-            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
-        }
-
         public enum EducationType
         {
             [Display(Name = "Not Stated")]
@@ -162,13 +133,27 @@ namespace McDermott.Web.Components.Pages
             [Display(Name = "PhD")]
             PhD = 4
         }
-
-        private async Task LoadData()
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Countries = await Mediator.Send(new GetCountryQuery());
+            try
+            {
+                var aq = SelectedDataItems.Count;
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteCountryRequest(((CountryDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<CountryDto>>();
+                    await Mediator.Send(new DeleteListCountryRequest(a.Select(x => x.Id).ToList()));
+                }
+                await LoadData();
+            }
+            catch (Exception ee)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+            }
         }
-
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             var editModel = (CountryDto)e.EditModel;

@@ -2,6 +2,7 @@ using static McDermott.Application.Features.Commands.CityCommand;
 using static McDermott.Application.Features.Commands.CountryCommand;
 using static McDermott.Application.Features.Commands.ProvinceCommand;
 using static McDermott.Application.Features.Commands.CompanyCommand;
+using Blazored.LocalStorage;
 
 namespace McDermott.Web.Components.Pages
 {
@@ -56,6 +57,17 @@ namespace McDermott.Web.Components.Pages
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+        }
+
+        private async Task onChangeCountry(ChangedEventArgs args)
+        {
+            if (args.NewValue != null)
+            {
+                CountryDto selectedCountry = (CountryDto)args.NewValue;
+                // Update the list of cities based on the selected province
+                //Cities = await Mediator.Send(new GetProvinceByCountry());
+            }
+
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)

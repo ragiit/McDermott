@@ -43,5 +43,15 @@
                 Id = id;
             }
         }
+
+        public class DeleteListReligionRequest : IRequest<bool>
+        {
+            public List<int> Id { get; set; }
+
+            public DeleteListReligionRequest(List<int> id)
+            {
+                this.Id = id;
+            }
+        }
     }
 }

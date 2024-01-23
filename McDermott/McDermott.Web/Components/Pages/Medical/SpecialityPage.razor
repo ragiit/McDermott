@@ -1,4 +1,4 @@
-@page "/speciality"
+@page "/medical/speciality"
 @rendermode InteractiveServer
 
 <PageTitle>Speciality</PageTitle>
@@ -43,7 +43,7 @@
                                         <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
                                         <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
                                         <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="EditItemsEnabled" />`
-                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" />
+                                        @* <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" /> *@
                                         <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
                                             <Items>
                                                 <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
@@ -51,7 +51,7 @@
                                                 <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                             </Items>
                                         </DxToolbarItem>
-                                        <DxToolbarItem Text="Upload" id="upload" IconCssClass="grid-toolbar-upload" />
+                                        @* <DxToolbarItem Text="Upload" id="upload" IconCssClass="grid-toolbar-upload" /> *@
                                     </DxToolbar>
                                 </ToolbarTemplate>
                                 <Columns>
