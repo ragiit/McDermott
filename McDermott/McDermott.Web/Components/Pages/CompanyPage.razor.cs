@@ -61,11 +61,13 @@ namespace McDermott.Web.Components.Pages
 
         private async Task onChangeCountry(ChangedEventArgs args)
         {
-            CompanyForm.ProvinceId = null; // Reset selected province when country changes
-            CompanyForm.CityId = null; // Reset selected city when country changes
+            if (args.NewValue != null)
+            {
+                CountryDto selectedCountry = (CountryDto)args.NewValue;
+                // Update the list of cities based on the selected province
+                //Cities = await Mediator.Send(new GetProvinceByCountry());
+            }
 
-            Provinces = await Mediator.Send(new GetProvinceByCountry(args.Value));
-            Cities = new List<CityDto>();
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)

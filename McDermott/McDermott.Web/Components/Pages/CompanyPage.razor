@@ -100,30 +100,33 @@
                                                     <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
                                                         <Template>
                                                             <DxComboBox Data="@Provinces"
-                                                                        Value="@CompanyForm.ProvinceId"
                                                                         NullText="Select Province..."
                                                                         @bind-Value="@CompanyForm.ProvinceId"
+                                                                        @bind-Value:event="onChangeProvince"
                                                                         TextFieldName="Name"
                                                                         ValueFieldName="Id">
                                                             </DxComboBox>
                                                         </Template>
                                                     </DxGridLayoutItem>
+
+                                                    <!-- City Dropdown -->
                                                     <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
                                                         <Template>
                                                             <DxComboBox Data="@Cities"
-                                                                        Value="@CompanyForm.CityId"
                                                                         NullText="Select City..."
-                                                                        @bind-Value:event="@onChangeCity"
+                                                                        @bind-Value="@CompanyForm.CityId"
                                                                         TextFieldName="Name"
                                                                         ValueFieldName="Id">
                                                             </DxComboBox>
                                                         </Template>
-                                                    </DxGridLayoutItem>                                                    
+                                                    </DxGridLayoutItem>
+
+                                                    <!-- Country Dropdown -->
                                                     <DxGridLayoutItem Row="3" Column="0" CssClass="mt">
                                                         <Template>
                                                             <DxComboBox Data="@Countries"
-                                                                        Value="@CompanyForm.CountryId"
                                                                         NullText="Select Country..."
+                                                                        @bind-Value="@CompanyForm.CountryId"
                                                                         @bind-Value:event="@onChangeCountry"
                                                                         TextFieldName="Name"
                                                                         ValueFieldName="Id">

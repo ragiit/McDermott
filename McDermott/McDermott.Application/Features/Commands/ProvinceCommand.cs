@@ -14,7 +14,7 @@
             }
         }
 
-        public class GetProvinceByCountry : IRequest<Province>
+        public class GetProvinceByCountry : IRequest<ProvinceDto>
         {
             public int Id { get; set; }
             public GetProvinceByCountry(int id)

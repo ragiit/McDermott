@@ -39,6 +39,22 @@ namespace McDermott.Application.Features.Queries
                 return result.Adapt<ProvinceDto>();
             }
         }
+        internal class GetProvinceByCountryHandler : IRequestHandler<GetProvinceByCountry, ProvinceDto>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public GetProvinceByCountryHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<ProvinceDto> Handle(GetProvinceByCountry request, CancellationToken cancellationToken)
+            {
+                var result = await _unitOfWork.Repository<Province>().GetByIdAsync(request.Id);
+
+                return result.Adapt<ProvinceDto>();
+            }
+        }
 
         internal class CreateProvinceHandler : IRequestHandler<CreateProvinceRequest, ProvinceDto>
         {

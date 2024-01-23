@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <Folder Include="Authentication\" />
+    <Folder Include="Components\Pages\Config\" />
   </ItemGroup>
 
 </Project>
