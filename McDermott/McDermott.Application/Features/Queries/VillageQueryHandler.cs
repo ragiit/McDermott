@@ -84,10 +84,27 @@ namespace McDermott.Application.Features.Queries
 
             public DeleteVillageHandler(IUnitOfWork unitOfWork)
             {
-                _unitOfWork = unitOfWork;
+                _unitOfWork = unitOfWork; 
             }
 
             public async Task<bool> Handle(DeleteVillageRequest request, CancellationToken cancellationToken)
+            {
+                await _unitOfWork.Repository<Village>().DeleteAsync(request.Id);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return true;
+            }
+        }
+        internal class DeleteListVillageHandler : IRequestHandler<DeleteListVillageRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public DeleteListVillageHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(DeleteListVillageRequest request, CancellationToken cancellationToken)
             {
                 await _unitOfWork.Repository<Village>().DeleteAsync(request.Id);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

@@ -1,4 +1,5 @@
 ﻿using static McDermott.Application.Features.Commands.ReligionCommand;
+using static McDermott.Application.Features.Commands.SpecialityCommand;
 
 namespace McDermott.Application.Features.Queries
 {
@@ -85,6 +86,23 @@ namespace McDermott.Application.Features.Queries
             }
 
             public async Task<bool> Handle(DeleteReligionRequest request, CancellationToken cancellationToken)
+            {
+                await _unitOfWork.Repository<Religion>().DeleteAsync(request.Id);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return true;
+            }
+        }
+        internal class DeleteListReligionHandler : IRequestHandler<DeleteListReligionRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public DeleteListReligionHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(DeleteListReligionRequest request, CancellationToken cancellationToken)
             {
                 await _unitOfWork.Repository<Religion>().DeleteAsync(request.Id);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

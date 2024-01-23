@@ -1,4 +1,5 @@
 ﻿using static McDermott.Application.Features.Commands.CityCommand;
+using static McDermott.Application.Features.Commands.CountryCommand;
 
 namespace McDermott.Application.Features.Queries
 {
@@ -86,6 +87,23 @@ namespace McDermott.Application.Features.Queries
             }
 
             public async Task<bool> Handle(DeleteCityRequest request, CancellationToken cancellationToken)
+            {
+                await _unitOfWork.Repository<City>().DeleteAsync(request.Id);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return true;
+            }
+        }
+        internal class DeleteListCityHandler : IRequestHandler<DeleteListCityRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public DeleteListCityHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(DeleteListCityRequest request, CancellationToken cancellationToken)
             {
                 await _unitOfWork.Repository<City>().DeleteAsync(request.Id);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

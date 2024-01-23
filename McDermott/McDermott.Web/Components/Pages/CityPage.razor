@@ -16,37 +16,58 @@
                             <DxGrid @ref="Grid"
                                     Data="Cities"
                                     PageSize="10"
+                                    @bind-SelectedDataItems="@SelectedDataItems"
                                     FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                     KeyFieldName="Id"
                                     CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                     EditModelSaving="OnSave"
                                     DataItemDeleting="OnDelete"
-                                    EditMode="GridEditMode.EditForm"
+                                    EditMode="GridEditMode.PopupEditForm"
                                     PopupEditFormCssClass="pw-800"
                                     PagerPosition="GridPagerPosition.Bottom"
                                     PageSizeSelectorVisible="true"
                                     PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                     PageSizeSelectorAllRowsItemVisible="true"
                                     PagerSwitchToInputBoxButtonCount="10"
+                                    FocusedRowEnabled="true"
                                     PagerVisibleNumericButtonCount="10"
+                                    FocusedRowChanged="Grid_FocusedRowChanged"
                                     ShowGroupPanel="true"
                                     AutoExpandAllGroupRows="true"
                                     ShowFilterRow="true"
+                                    CustomizeElement="Grid_CustomizeElement"
                                     ShowSearchBox="true"
                                     SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                     KeyboardNavigationEnabled="true">
+                                <ToolbarTemplate>
+                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                        <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
+                                        <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
+                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems != null" />
+                                        <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
+                                            <Items>
+                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                            </Items>
+                                        </DxToolbarItem>
+
+                                    </DxToolbar>
+                                </ToolbarTemplate>
                                 <Columns>
+                                    <DxGridSelectionColumn Width="15px" />
                                     <DxGridDataColumn FieldName="Name" SortIndex="0" />
                                     <DxGridDataColumn FieldName="Province.Name" Caption="Province" />
-                                    <DxGridCommandColumn Width="160px" />
                                 </Columns>
                                 <EditFormTemplate Context="EditFormContext">
                                     @{
                                         var a = (CityDto)EditFormContext.EditModel;
                                     }
                                     <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem Caption="Name:" ColSpanMd="6">
-                                            @EditFormContext.GetEditor("Name")
+                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="6">
+                                            <div class="pop-warning">
+                                                @EditFormContext.GetEditor("Name")
+                                            </div>
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem Caption="Province:" ColSpanMd="6">
                                             <DxComboBox Data="@Provinces"

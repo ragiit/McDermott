@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
     <PackageReference Include="DevExpress.Blazor" Version="23.2.3" />
+    <PackageReference Include="DevExpress.Blazor.ProjectTemplates" Version="23.2.4" />
     <PackageReference Include="EPPlus" Version="7.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.1" />

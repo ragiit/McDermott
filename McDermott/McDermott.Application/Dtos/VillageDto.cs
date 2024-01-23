@@ -14,7 +14,7 @@ namespace McDermott.Application.Dtos
         [StringLength(200)]
         public string Name { get; set; } = string.Empty; // Kelurahan
 
-        [Required]
+        
         [StringLength(10)]
         public string PostalCode { get; set; } = string.Empty; // Kode Pos
 

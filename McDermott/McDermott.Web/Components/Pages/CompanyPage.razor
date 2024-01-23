@@ -100,6 +100,7 @@
                                                     <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
                                                         <Template>
                                                             <DxComboBox Data="@Provinces"
+                                                                        Value="@CompanyForm.ProvinceId"
                                                                         NullText="Select Province..."
                                                                         @bind-Value="@CompanyForm.ProvinceId"
                                                                         TextFieldName="Name"
@@ -110,21 +111,28 @@
                                                     <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
                                                         <Template>
                                                             <DxComboBox Data="@Cities"
+                                                                        Value="@CompanyForm.CityId"
                                                                         NullText="Select City..."
-                                                                        @bind-Value="@CompanyForm.CityId"
+                                                                        @bind-Value:event="@onChangeCity"
+                                                                        TextFieldName="Name"
+                                                                        ValueFieldName="Id">
+                                                            </DxComboBox>
+                                                        </Template>
+                                                    </DxGridLayoutItem>                                                    
+                                                    <DxGridLayoutItem Row="3" Column="0" CssClass="mt">
+                                                        <Template>
+                                                            <DxComboBox Data="@Countries"
+                                                                        Value="@CompanyForm.CountryId"
+                                                                        NullText="Select Country..."
+                                                                        @bind-Value:event="@onChangeCountry"
                                                                         TextFieldName="Name"
                                                                         ValueFieldName="Id">
                                                             </DxComboBox>
                                                         </Template>
                                                     </DxGridLayoutItem>
-                                                    <DxGridLayoutItem Row="3" Column="0" CssClass="mt">
+                                                    <DxGridLayoutItem Row="3" Column="1" CssClass="mt">
                                                         <Template>
-                                                            <DxComboBox Data="@Countries"
-                                                                        NullText="Select District..."
-                                                                        @bind-Value="@CompanyForm.CountryId"
-                                                                        TextFieldName="Name"
-                                                                        ValueFieldName="Id">
-                                                            </DxComboBox>
+                                                            <DxTextBox @bind-Text="CompanyForm.Zip" NullText="Pastel Code"></DxTextBox>
                                                         </Template>
                                                     </DxGridLayoutItem>
                                                     
@@ -135,12 +143,12 @@
                                 </DxFormLayoutGroup>
                             </DxFormLayout>
 
-                            <DxGridLayout ColumnSpacing="1">
-                                <Rows>
-                                    <DxGridLayoutRow />
+                            <DxGridLayout >
+                                <Rows>                      
                                     <DxGridLayoutRow />
                                 </Rows>
                                 <Columns>
+                                    <DxGridLayoutColumn />
                                     <DxGridLayoutColumn />
                                 </Columns>
                                 <Items>
@@ -155,12 +163,7 @@
                                                       Click="OnCancel"
                                                       CssClass="w-20 ml" />
                                         </Template>
-                                    </DxGridLayoutItem>
-                                    <DxGridLayoutItem Row="1" Column="0">
-                                        <Template>
-                                            
-                                        </Template>
-                                    </DxGridLayoutItem>
+                                    </DxGridLayoutItem>                                    
                                 </Items>
                             </DxGridLayout>
                         }

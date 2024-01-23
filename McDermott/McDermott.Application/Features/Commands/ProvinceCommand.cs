@@ -14,6 +14,15 @@
             }
         }
 
+        public class GetProvinceByCountry : IRequest<Province>
+        {
+            public int Id { get; set; }
+            public GetProvinceByCountry(int id)
+            {
+                Id = id;
+            }
+        }
+
         public class CreateProvinceRequest : IRequest<ProvinceDto>
         {
             public ProvinceDto ProvinceDto { get; set; }
@@ -41,6 +50,16 @@
             public DeleteProvinceRequest(int id)
             {
                 Id = id;
+            }
+        }
+
+        public class DeleteListProvinceRequest : IRequest<bool>
+        {
+            public List<int> Id { get; set; }
+
+            public DeleteListProvinceRequest(List<int> id)
+            {
+                this.Id = id;
             }
         }
     }

@@ -43,5 +43,14 @@
                 Id = id;
             }
         }
+        public class DeleteListDistrictRequest : IRequest<bool>
+        {
+            public List<int> Id { get; set; }
+
+            public DeleteListDistrictRequest(List<int> id)
+            {
+                this.Id = id;
+            }
+        }
     }
 }
