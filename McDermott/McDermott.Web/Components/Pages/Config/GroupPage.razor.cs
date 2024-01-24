@@ -15,28 +15,40 @@ namespace McDermott.Web.Components.Pages.Config
         public IGrid GridGropMenu { get; set; }
         private bool ShowForm { get; set; } = false;
         private bool EditItemsEnabled { get; set; }
-        private bool EditItemsGroupEnabled { get; set; }
+        private bool EditItemsGroupEnabled { get; set; } = false;
         private string GroupName { get; set; }
         private GroupDto Group { get; set; } = new();
-        private IReadOnlyList<object> SelectedDataItems { get; set; }
-        private IReadOnlyList<object> SelectedDataItemsGroupMenu { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedDataItemsGroupMenu { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
         private int FocusedRowVisibleIndexGroupMenu { get; set; }
         private List<GroupDto> Groups = new();
         private List<GroupMenuDto> GroupMenus = [];
+        private List<GroupMenuDto> DeletedGroupMenus = [];
         private List<MenuDto> Menus = [];
 
         [Required]
         private IEnumerable<MenuDto> SelectedGroupMenus = [];
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-        }
-
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-            await Mediator.Send(new DeleteGroupRequest(((GroupDto)e.DataItem).Id));
-            await LoadData();
+            try
+            {
+                if (SelectedDataItems.Count == 1)
+                {
+                    await Mediator.Send(new DeleteGroupRequest(SelectedDataItems[0].Adapt<GroupDto>().Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<GroupDto>>();
+                    await Mediator.Send(new DeleteListGroupMenuRequest(a.Select(x => x.Id).ToList()));
+                }
+                await LoadData();
+            }
+            catch (Exception ee)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+            }
         }
 
         protected override async Task OnInitializedAsync()
@@ -61,6 +73,12 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 Group = Groups[FocusedRowVisibleIndex];
                 ShowForm = true;
+
+                if (Group != null)
+                {
+                    DeletedGroupMenus = await Mediator.Send(new GetGroupMenuByGroupIdRequest(Group.Id));
+                    GroupMenus = await Mediator.Send(new GetGroupMenuByGroupIdRequest(Group.Id));
+                }
             }
             catch (Exception e)
             {
@@ -77,6 +95,11 @@ namespace McDermott.Web.Components.Pages.Config
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsGroupEnabled = enabled;
+        }
+
+        private void UpdateEditItemsGroupEnabled(bool enabled)
+        {
+            EditItemsEnabled = enabled;
         }
 
         private async Task NewItemGroup_Click()
@@ -107,20 +130,31 @@ namespace McDermott.Web.Components.Pages.Config
         private void DeleteItemGrid_Click()
         {
             GridGropMenu.ShowRowDeleteConfirmation(FocusedRowVisibleIndexGroupMenu);
-            GroupMenus.RemoveAt(FocusedRowVisibleIndexGroupMenu);
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndexGroupMenu = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
+            var state = GroupMenus.Count > 0 ? true : false;
+            UpdateEditItemsEnabled(state);
+        }
+
+        private void GridGroup_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            UpdateEditItemsGroupEnabled(true);
         }
 
         private async Task LoadData()
         {
+            SelectedDataItems = new ObservableRangeCollection<object>();
             Group = new();
             GroupMenus = new();
             Groups = await Mediator.Send(new GetGroupQuery());
+        }
+
+        private void LoadGroupMenu()
+        {
+            GroupMenus = new();
         }
 
         //private async Task OnSave(GridEditModelSavingEventArgs e)
@@ -172,9 +206,21 @@ namespace McDermott.Web.Components.Pages.Config
             });
         }
 
+        private void OnDeleteGroupMenu()
+        {
+            StateHasChanged();
+            var aaa = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>();
+            GroupMenus.RemoveAll(x => aaa.Select(z => z.MenuId).Contains(x.MenuId));
+            SelectedDataItemsGroupMenu = new ObservableRangeCollection<object>();
+        }
+
         private async Task OnSaveGroupMenu(GridEditModelSavingEventArgs e)
         {
             var groupMenu = (GroupMenuDto)e.EditModel;
+
+            if (GroupMenus.Where(x => x.MenuId == groupMenu.MenuId).Any())
+                return;
+
             var update = GroupMenus.FirstOrDefault(x => x.MenuId == groupMenu.MenuId);
             groupMenu.Menu = Menus.FirstOrDefault(x => x.Id == groupMenu.MenuId);
             if (update == null)
@@ -183,8 +229,16 @@ namespace McDermott.Web.Components.Pages.Config
             }
             else
             {
-                update = groupMenu;
+                var index = GroupMenus.IndexOf(update);
+                GroupMenus[index] = groupMenu;
             }
+        }
+
+        private void CancelItemGroupMenuGrid_Click()
+        {
+            GroupMenus = new();
+            SelectedDataItemsGroupMenu = new ObservableRangeCollection<object>();
+            ShowForm = false;
         }
 
         private async Task SaveItemGroupMenuGrid_Click()
@@ -232,12 +286,99 @@ namespace McDermott.Web.Components.Pages.Config
                     x.GroupId = group.Id;
                 });
 
+                for (int i = 0; i < GroupMenus.Count; i++)
+                {
+                    var check = Menus.FirstOrDefault(x => x.Id == GroupMenus[i].MenuId);
+                    var cekP = Menus.FirstOrDefault(x => x.Name == check!.ParentMenu);
+                    if (cekP is not null)
+                    {
+                        var cekLagi = GroupMenus.FirstOrDefault(x => x.MenuId == cekP.Id);
+                        if (cekLagi is null)
+                        {
+                            GroupMenus.Add(new GroupMenuDto
+                            {
+                                GroupId = group.Id,
+                                MenuId = cekP.Id,
+                                Menu = cekP
+                            });
+                        }
+                    }
+                }
+
                 await Mediator.Send(new CreateGroupMenuRequest(GroupMenus));
-
-                ShowForm = false;
-
-                await LoadData();
             }
+            else
+            {
+                var result = await Mediator.Send(new UpdateGroupRequest(Group));
+
+                var group = await Mediator.Send(new GetGroupByNameQuery(Group.Name));
+
+                await Mediator.Send(new DeleteGroupMenuByIdRequest(DeletedGroupMenus.Select(x => x.Id).ToList()));
+
+                var request = new List<GroupMenuDto>();
+
+                if (GroupMenus.Where(x => x.Menu.Name is "All").Any())
+                {
+                    Menus.ForEach(z =>
+                    {
+                        var all = GroupMenus.FirstOrDefault(x => x.Menu.Name is "All");
+                        request.Add(new GroupMenuDto
+                        {
+                            MenuId = z.Id,
+                            GroupId = group.Id,
+                            Create = all.Create,
+                            Read = all.Read,
+                            Update = all.Update,
+                            Delete = all.Delete,
+                            Import = all.Import,
+                        });
+                    });
+
+                    await Mediator.Send(new CreateGroupMenuRequest(request));
+
+                    ShowForm = false;
+
+                    NavigationManager.NavigateTo("config/group", true);
+
+                    await LoadData();
+
+                    return;
+                }
+
+                GroupMenus.ForEach(x =>
+                {
+                    x.GroupId = group.Id;
+                });
+
+                for (int i = 0; i < GroupMenus.Count; i++)
+                {
+                    var check = Menus.FirstOrDefault(x => x.Id == GroupMenus[i].MenuId);
+                    var cekP = Menus.FirstOrDefault(x => x.Name == check!.ParentMenu);
+                    if (cekP is not null)
+                    {
+                        var cekLagi = GroupMenus.FirstOrDefault(x => x.MenuId == cekP.Id);
+                        if (cekLagi is null)
+                        {
+                            GroupMenus.Add(new GroupMenuDto
+                            {
+                                GroupId = group.Id,
+                                MenuId = cekP.Id,
+                                Menu = cekP
+                            });
+                        }
+                    }
+                }
+
+                await Mediator.Send(new CreateGroupMenuRequest(GroupMenus)); 
+
+                await oLocal.SetItemAsync("Menu", string.Join(",", GroupMenus.Select(x => x.Menu?.Name)));
+
+                NavigationManager.NavigateTo("config/group", true);
+            }
+
+            ShowForm = false;
+
+            await LoadData();
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)

@@ -1,4 +1,5 @@
 ﻿using MapsterMapper;
+using static McDermott.Application.Features.Commands.CountryCommand;
 using static McDermott.Application.Features.Commands.GroupCommand;
 
 namespace McDermott.Application.Features.Queries
@@ -34,6 +35,7 @@ namespace McDermott.Application.Features.Queries
             public async Task<List<GroupMenuDto>> Handle(GetGroupMenuByGroupIdRequest request, CancellationToken cancellationToken)
             {
                 var a = await _unitOfWork.Repository<GroupMenu>().Entities
+                     .Include(x => x.Menu)
                      .Where(x => x.GroupId == request.GroupId)
                      .Select(x => x.Adapt<GroupMenuDto>())
                      .ToListAsync(cancellationToken);
@@ -104,7 +106,10 @@ namespace McDermott.Application.Features.Queries
                     {
                         var a = item.Adapt<GroupMenu>();
                         if (a.MenuId == 0) continue;
+
                         a.Menu = null;
+                        a.Id = 0;
+
                         await _unitOfWork.Repository<GroupMenu>().AddAsync(a);
                     }
 
@@ -184,19 +189,88 @@ namespace McDermott.Application.Features.Queries
 
             public async Task<bool> Handle(DeleteGroupRequest request, CancellationToken cancellationToken)
             {
-                await _unitOfWork.Repository<Group>().DeleteAsync(request.Id);
-
-                var groupMenus = await _unitOfWork.Repository<GroupMenu>().GetAllAsync();
-                groupMenus = groupMenus.Where(x => x.GroupId == request.Id).ToList();
-
-                foreach (var item in groupMenus)
+                try
                 {
-                    await _unitOfWork.Repository<GroupMenu>().DeleteAsync(item.Id);
+                    await _unitOfWork.Repository<Group>().DeleteAsync(request.Id);
+
+                    var groupMenus = await _unitOfWork.Repository<GroupMenu>().GetAllAsync();
+                    groupMenus = groupMenus.Where(x => x.GroupId == request.Id).ToList();
+
+                    foreach (var item in groupMenus)
+                    {
+                        await _unitOfWork.Repository<GroupMenu>().DeleteAsync(item.Id);
+                    }
+
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    return true;
                 }
+                catch (Exception e)
+                {
+                    throw;
+                }
+            }
+        }
 
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+        internal class DeleteGroupMenuByGroupIdHandler : IRequestHandler<DeleteGroupMenuByIdRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
 
-                return true;
+            public DeleteGroupMenuByGroupIdHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(DeleteGroupMenuByIdRequest request, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    await _unitOfWork.Repository<GroupMenu>().DeleteAsync(request.Id);
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    throw;
+                }
+            }
+        }
+
+        internal class DeleteListGroupMenuHandler : IRequestHandler<DeleteListGroupMenuRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public DeleteListGroupMenuHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(DeleteListGroupMenuRequest request, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    await _unitOfWork.Repository<Group>().DeleteAsync(request.Id);
+
+                    foreach (var item in request.Id)
+                    {
+                        var groupMenus = await _unitOfWork.Repository<GroupMenu>().GetAllAsync();
+                        groupMenus = groupMenus.Where(x => x.GroupId == item).ToList();
+
+                        foreach (var i in groupMenus)
+                        {
+                            await _unitOfWork.Repository<GroupMenu>().DeleteAsync(i.Id);
+                        }
+                    }
+
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    throw;
+                }
             }
         }
     }

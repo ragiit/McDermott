@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.UserCommand;
+﻿using static McDermott.Application.Features.Commands.CountryCommand;
+using static McDermott.Application.Features.Commands.UserCommand;
 
 namespace McDermott.Application.Features.Queries
 {
@@ -19,6 +20,24 @@ namespace McDermott.Application.Features.Queries
                     .Include(x => x.Group)
                         .Select(User => User.Adapt<UserDto>())
                        .ToListAsync(cancellationToken);
+            }
+        }
+
+        internal class DeleteListCountryHandler : IRequestHandler<DeleteListCountryRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public DeleteListCountryHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(DeleteListCountryRequest request, CancellationToken cancellationToken)
+            {
+                await _unitOfWork.Repository<Country>().DeleteAsync(request.Id);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return true;
             }
         }
 
@@ -86,7 +105,9 @@ namespace McDermott.Application.Features.Queries
                 // nanti dihapus
                 request.UserDto.UserName = request.UserDto.Email;
 
-                await _unitOfWork.Repository<User>().UpdateAsync(request.UserDto.Adapt<User>());
+                var user = request.UserDto.Adapt<User>();
+
+                await _unitOfWork.Repository<User>().UpdateAsync(user);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return true;

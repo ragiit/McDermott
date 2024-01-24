@@ -15,7 +15,7 @@ namespace McDermott.Application.Dtos
         [Required]
         public string Name { get; set; } = string.Empty;
 
-        [Required]
+        //[Required]
         public string UserName { get; set; } = string.Empty;
 
         [Required]
@@ -83,8 +83,41 @@ namespace McDermott.Application.Dtos
         public bool? IsUser { get; set; } = false;
         public bool? IsDoctor { get; set; } = false;
 
-        public bool? IsPhysicion { get; set; } = false;
-        public bool? IsNurse { get; set; } = false;
+        [Required]
+        public int NIP { get; set; }
+
+        public string? Legacy { get; set; }
+        public string? SAP { get; set; }
+        public string? Oracle { get; set; }
+        private bool _isPhysicion = false;
+        private bool _isNurse = false;
+
+        public bool IsPhysicion
+        {
+            get => _isPhysicion;
+            set
+            {
+                _isPhysicion = value;
+                if (value == true)
+                {
+                    _isNurse = false;
+                }
+            }
+        }
+
+        public bool IsNurse
+        {
+            get => _isNurse;
+            set
+            {
+                _isNurse = value;
+                if (value == true)
+                {
+                    _isPhysicion = false;
+                }
+            }
+        }
+
         public string? EmployeeStatus { get; set; }
         public DateTime? JoinDate { get; set; }
 

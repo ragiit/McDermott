@@ -14,6 +14,26 @@
             }
         }
 
+        public class DeleteListGroupMenuRequest : IRequest<bool>
+        {
+            public List<int> Id { get; set; }
+
+            public DeleteListGroupMenuRequest(List<int> id)
+            {
+                this.Id = id;
+            }
+        }
+
+        public class DeleteGroupMenuByIdRequest : IRequest<bool>
+        {
+            public List<int> Id { get; set; }
+
+            public DeleteGroupMenuByIdRequest(List<int> Id)
+            {
+                this.Id = Id;
+            }
+        }
+
         public class GetGroupMenuByGroupIdRequest : IRequest<List<GroupMenuDto>>
         {
             public int GroupId { get; set; }

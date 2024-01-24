@@ -14,10 +14,13 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class UserPage
     {
+        private bool Loading = true;
         public IGrid Grid { get; set; }
         private List<UserDto> Users = new();
         private UserDto UserForm = new();
         private IReadOnlyList<object>? SelectedDataItems { get; set; }
+        private object SelectedDataItem { get; set; }
+
         private bool EditItemsEnabled { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private bool OnVacation { get; set; } = true;
@@ -47,12 +50,16 @@ namespace McDermott.Web.Components.Pages.Config
         {
             "Single",
             "Married"
+        };
 
-        }; private async Task LoadData()
-
+        private async Task LoadData()
         {
             ShowForm = false;
             Users = await Mediator.Send(new GetUserQuery());
+
+            SelectedDataItem = Users.OrderBy(x => x.Name).FirstOrDefault();
+
+            Loading = false;
         }
 
         private void SelectedUserFormChanged(string ee)
@@ -63,6 +70,20 @@ namespace McDermott.Web.Components.Pages.Config
                 VisibleExpiredId = true;
             else
                 VisibleExpiredId = false;
+        }
+
+        private bool FormValidationState = true;
+
+        private async Task HandleValidSubmit()
+        {
+            FormValidationState = true;
+
+            await OnSave();
+        }
+
+        private async void HandleInvalidSubmit()
+        {
+            FormValidationState = false;
         }
 
         protected override async Task OnInitializedAsync()
@@ -83,7 +104,8 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task OnSave()
         {
-            var a = UserForm;
+            if (!FormValidationState)
+                return;
 
             if (UserForm.Id == 0)
                 await Mediator.Send(new CreateUserRequest(UserForm));
@@ -91,18 +113,6 @@ namespace McDermott.Web.Components.Pages.Config
                 await Mediator.Send(new UpdateUserRequest(UserForm));
 
             await LoadData();
-        }
-
-        private void OnCheckedPhysicionChanged(bool e)
-        {
-            UserForm.IsNurse = false;
-            UserForm.IsPhysicion = true;
-        }
-
-        private void OnCheckedNurseChanged(bool e)
-        {
-            UserForm.IsPhysicion = false;
-            UserForm.IsNurse = true;
         }
 
         private void OnCancel()
@@ -169,19 +179,15 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItem_Click()
         {
+            UserForm = new();
             ShowForm = true;
-        }
-
-        private void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
-        {
-            var newEmployee = (UserDto)e.EditModel;
         }
 
         private async Task EditItem_Click()
         {
             try
             {
-                UserForm = Users[FocusedRowVisibleIndex];
+                UserForm = SelectedDataItem as UserDto;
                 ShowForm = true;
             }
             catch (Exception e)

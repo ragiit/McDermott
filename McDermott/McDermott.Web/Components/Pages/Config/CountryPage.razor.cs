@@ -22,6 +22,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             await LoadData();
         }
+
         private async Task LoadData()
         {
             SelectedDataItems = new ObservableRangeCollection<object>();
@@ -45,6 +46,7 @@ namespace McDermott.Web.Components.Pages.Config
                 e.CssClass = "header-bold";
             }
         }
+
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsEnabled = enabled;
@@ -55,10 +57,12 @@ namespace McDermott.Web.Components.Pages.Config
             FocusedRowVisibleIndex = args.VisibleIndex;
             UpdateEditItemsEnabled(true);
         }
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
         }
+
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -89,6 +93,7 @@ namespace McDermott.Web.Components.Pages.Config
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task ExportCsvItem_Click()
         {
             await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
@@ -133,11 +138,11 @@ namespace McDermott.Web.Components.Pages.Config
             [Display(Name = "PhD")]
             PhD = 4
         }
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
             {
-                var aq = SelectedDataItems.Count;
                 if (SelectedDataItems is null)
                 {
                     await Mediator.Send(new DeleteCountryRequest(((CountryDto)e.DataItem).Id));
@@ -154,6 +159,7 @@ namespace McDermott.Web.Components.Pages.Config
                 await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
             }
         }
+
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             var editModel = (CountryDto)e.EditModel;
