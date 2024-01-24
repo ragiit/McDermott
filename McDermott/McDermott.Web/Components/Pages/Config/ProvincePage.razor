@@ -1,11 +1,11 @@
-﻿@page "/district"
+﻿@page "/config/province"
 @rendermode InteractiveServer
 
-<PageTitle>District</PageTitle>
+<PageTitle>Province</PageTitle>
 
 <div class="wrapper">
 
-    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="District" />
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Province" />
 
     <section class="content">
         <div class="container-fluid">
@@ -14,15 +14,15 @@
                     <div class="card">
                         <div class="card-body">
                             <DxGrid @ref="Grid"
-                                    Data="Districts"
+                                    Data="Provinces"
                                     PageSize="10"
-                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                     @bind-SelectedDataItems="@SelectedDataItems" 
                                     FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                     KeyFieldName="Id"
                                     CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                     EditModelSaving="OnSave"
                                     DataItemDeleting="OnDelete"
-                                    EditMode="GridEditMode.PopupEditForm"
+                                    EditMode="GridEditMode.EditForm"
                                     PopupEditFormCssClass="pw-800"
                                     PagerPosition="GridPagerPosition.Bottom"
                                     PageSizeSelectorVisible="true"
@@ -59,9 +59,9 @@
                                     TextFieldName="@nameof(EnumEditModeData.DisplayName)"
                                     ValueFieldName="@nameof(EnumEditModeData.Value)"
                                     @bind-Value="@Value"
-                                    AllowUserInput="true" /> 
+                                    AllowUserInput="true" /> *@
 
-                                     <DxUpload Visible="@UploadVisible"
+                                   @*  <DxUpload Visible="@UploadVisible"
                                               ExternalSelectButtonCssSelector="#upload"
                                               ExternalDropZoneCssSelector="#upload"
                                               ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
@@ -73,32 +73,27 @@
                                 <Columns>
                                     <DxGridSelectionColumn Width="15px" />
                                     <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                    <DxGridDataColumn FieldName="Province.Name" Caption="Province" />
-                                    <DxGridDataColumn FieldName="City.Name" Caption="City" />
+                                    <DxGridDataColumn FieldName="Code" SortIndex="0" />
+                                    <DxGridDataColumn FieldName="Country.Name" Caption="Country" />
                                     
                                 </Columns>
                                 <EditFormTemplate Context="EditFormContext">
                                     @{
-                                        var a = (DistrictDto)EditFormContext.EditModel;
+                                        var a = (ProvinceDto)EditFormContext.EditModel;
                                     }
                                     <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="6">
                                             <div class="pop-warning">
                                                 @EditFormContext.GetEditor("Name")
                                             </div>
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Province:" ColSpanMd="6">
-                                            <DxComboBox Data="@Provinces"
-                                                        NullText="Select Province..."
-                                                        @bind-Value="@a.ProvinceId"
-                                                        TextFieldName="Name"
-                                                        ValueFieldName="Id">
-                                            </DxComboBox>
+                                        <DxFormLayoutItem Caption="Code:" ColSpanMd="6">
+                                            @EditFormContext.GetEditor("Code")
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="City:" ColSpanMd="6">
-                                            <DxComboBox Data="@Cities"
-                                                        NullText="Select City..."
-                                                        @bind-Value="@a.CityId"
+                                        <DxFormLayoutItem Caption="Country:" ColSpanMd="6">
+                                            <DxComboBox Data="@Countries"
+                                                        NullText="Select Country..."
+                                                        @bind-Value="@a.CountryId"
                                                         TextFieldName="Name"
                                                         ValueFieldName="Id">
                                             </DxComboBox>

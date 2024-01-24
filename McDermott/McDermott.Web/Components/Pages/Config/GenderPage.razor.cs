@@ -1,6 +1,6 @@
 ﻿using static McDermott.Application.Features.Commands.GenderCommand;
 
-namespace McDermott.Web.Components.Pages
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class GenderPage
     {

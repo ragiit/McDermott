@@ -2,7 +2,7 @@
 using static McDermott.Application.Features.Commands.MenuCommand;
 using static McDermott.Application.Features.Commands.ProvinceCommand;
 
-namespace McDermott.Web.Components.Pages
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class MenuPage
     {

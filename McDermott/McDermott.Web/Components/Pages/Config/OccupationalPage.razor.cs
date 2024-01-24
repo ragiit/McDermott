@@ -1,7 +1,7 @@
 using DevExpress.Data.XtraReports.Native;
 using static McDermott.Application.Features.Commands.OccupationalCommand;
 
-namespace McDermott.Web.Components.Pages
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class OccupationalPage
     {

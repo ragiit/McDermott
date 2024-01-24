@@ -1,11 +1,11 @@
-﻿@page "/menu"
+﻿@page "/config/religion"
 @rendermode InteractiveServer
 
-<PageTitle>Menu</PageTitle>
+<PageTitle>Religion</PageTitle>
 
 <div class="wrapper">
 
-    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Menu" />
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Religion" />
 
     <section class="content">
         <div class="container-fluid">
@@ -14,7 +14,7 @@
                     <div class="card">
                         <div class="card-body">
                             <DxGrid @ref="Grid"
-                                    Data="Menus"
+                                    Data="Religions"
                                     PageSize="10"
                                     @bind-SelectedDataItems="@SelectedDataItems"
                                     FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -72,34 +72,16 @@
                                 </ToolbarTemplate>
                                 <Columns>
                                     <DxGridSelectionColumn Width="15px"/>
-                                    <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                    <DxGridDataColumn FieldName="ParentMenu" Caption="Parent" SortIndex="0" />
-                                    <DxGridDataColumn FieldName="Sequence" />
-                                    <DxGridDataColumn FieldName="Url" Caption="URL" />
+                                    <DxGridDataColumn FieldName="Name" SortIndex="0" /> 
                                     
                                 </Columns>
-                                <EditFormTemplate Context="EditFormContext">
-                                    @{
-                                        var a = (MenuDto)EditFormContext.EditModel;
-                                    }
+                                <EditFormTemplate Context="EditFormContext"> 
                                     <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem Caption="Name:" ColSpanMd="6">
-                                            @EditFormContext.GetEditor("Name")
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Parent Menu:" ColSpanMd="6">
-                                            <DxComboBox Data="@ParentMenuDto"
-                                                        NullText="Select Parent Menu..."
-                                                        @bind-Value="@a.ParentMenu"
-                                                        TextFieldName="Name"
-                                                        ValueFieldName="Name">
-                                            </DxComboBox>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Sequence:" ColSpanMd="6">
-                                            @EditFormContext.GetEditor("Sequence")
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="URL:" ColSpanMd="6">
-                                            @EditFormContext.GetEditor("Url")
-                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                            <div class="pop-warning">
+                                                @EditFormContext.GetEditor("Name")
+                                            </div>
+                                        </DxFormLayoutItem> 
                                     </DxFormLayout>
                                 </EditFormTemplate>
                             </DxGrid>

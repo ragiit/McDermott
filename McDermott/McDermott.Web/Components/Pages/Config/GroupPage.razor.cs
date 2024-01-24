@@ -6,7 +6,7 @@ using static McDermott.Application.Features.Commands.CountryCommand;
 using static McDermott.Application.Features.Commands.GroupCommand;
 using static McDermott.Application.Features.Commands.MenuCommand;
 
-namespace McDermott.Web.Components.Pages
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class GroupPage
     {

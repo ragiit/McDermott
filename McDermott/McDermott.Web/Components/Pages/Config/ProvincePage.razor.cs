@@ -1,39 +1,60 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.CityCommand;
-
-using static McDermott.Application.Features.Commands.DistrictCommand;
+using static McDermott.Application.Features.Commands.CountryCommand;
 using static McDermott.Application.Features.Commands.ProvinceCommand;
 
-namespace McDermott.Web.Components.Pages
+namespace McDermott.Web.Components.Pages.Config
 {
-    public partial class DistrictPage
+    public partial class ProvincePage
     {
         public IGrid Grid { get; set; }
-        private List<DistrictDto> Districts = new();
+
+        private List<CountryDto> Countries = new();
         private List<ProvinceDto> Provinces = new();
-        private List<CityDto> Cities = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; }
         private dynamic dd;
         private int Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
+        //public IGrid Grid { get; set; }
+
+        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        {
+            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+        }
+
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                var aq = SelectedDataItems.Count;
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteProvinceRequest(((ProvinceDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<ProvinceDto>>();
+                    await Mediator.Send(new DeleteListProvinceRequest(a.Select(x => x.Id).ToList()));
+                }
+                await LoadData();
+            }
+            catch (Exception ee)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+            }
+        }
 
         protected override async Task OnInitializedAsync()
         {
-            Provinces = await Mediator.Send(new GetProvinceQuery());
-            Cities = await Mediator.Send(new GetCityQuery());
+            Countries = await Mediator.Send(new GetCountryQuery());
             await LoadData();
         }
 
         private async Task LoadData()
         {
             SelectedDataItems = new ObservableRangeCollection<object>();
-            Districts = await Mediator.Send(new GetDistrictQuery());
-        }
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+            Provinces = await Mediator.Send(new GetProvinceQuery());
         }
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
@@ -46,11 +67,6 @@ namespace McDermott.Web.Components.Pages
                 e.Style = "background-color: rgba(0, 0, 0, 0.08)";
                 e.CssClass = "header-bold";
             }
-        }
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
         }
         private async Task NewItem_Click()
         {
@@ -65,17 +81,18 @@ namespace McDermott.Web.Components.Pages
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
-        //private void ColumnChooserButton_Click()
-        //{
-        //    Grid.ShowColumnChooser();
-        //}
+
+        private void ColumnChooserButton_Click()
+        {
+            Grid.ShowColumnChooser();
+        }
 
         private async Task ExportXlsxItem_Click()
         {
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
             {
                 ExportSelectedRowsOnly = true,
-            });
+            }); ;
         }
 
         private async Task ExportXlsItem_Click()
@@ -85,6 +102,7 @@ namespace McDermott.Web.Components.Pages
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task ExportCsvItem_Click()
         {
             await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
@@ -92,44 +110,39 @@ namespace McDermott.Web.Components.Pages
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsEnabled = enabled;
         }
 
-        private async Task OnDelete(GridDataItemDeletingEventArgs e)
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
-            try
-            {
-                var aq = SelectedDataItems.Count;
-                if (SelectedDataItems is null)
-                {
-                    await Mediator.Send(new DeleteDistrictRequest(((DistrictDto)e.DataItem).Id));
-                }
-                else
-                {
-                    var a = SelectedDataItems.Adapt<List<DistrictDto>>();
-                    await Mediator.Send(new DeleteListDistrictRequest(a.Select(x => x.Id).ToList()));
-                }
-                await LoadData();
-            }
-            catch (Exception ee)
-            {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
-            }
+            FocusedRowVisibleIndex = args.VisibleIndex;
+            UpdateEditItemsEnabled(true);
         }
-
+        //protected async Task SelectedFilesChangedAsync(IEnumerable<UploadFileInfo> files)
+        //{
+        //    UploadVisible = files.ToList().Count == 0;
+        //    try
+        //    {
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error reading Excel file: {ex.Message}");
+        //    }
+        //}
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (DistrictDto)e.EditModel;
+            var editModel = (ProvinceDto)e.EditModel;
 
             if (string.IsNullOrWhiteSpace(editModel.Name))
                 return;
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateDistrictRequest(editModel));
+                await Mediator.Send(new CreateProvinceRequest(editModel));
             else
-                await Mediator.Send(new UpdateDistrictRequest(editModel));
+                await Mediator.Send(new UpdateProvinceRequest(editModel));
 
             await LoadData();
         }
