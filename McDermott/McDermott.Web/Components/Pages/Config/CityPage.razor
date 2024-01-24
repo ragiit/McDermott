@@ -1,12 +1,11 @@
-﻿@page "/country"
-@using static McDermott.Web.Helper
+﻿@page "/config/city"
 @rendermode InteractiveServer
 
-<PageTitle>Country</PageTitle>
+<PageTitle>City</PageTitle>
 
 <div class="wrapper">
 
-    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Country" />
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="City" />
 
     <section class="content">
         <div class="container-fluid">
@@ -15,7 +14,7 @@
                     <div class="card">
                         <div class="card-body">
                             <DxGrid @ref="Grid"
-                                    Data="Countries"
+                                    Data="Cities"
                                     PageSize="10"
                                     @bind-SelectedDataItems="@SelectedDataItems"
                                     FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -44,8 +43,7 @@
                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                         <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
                                         <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
-                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems != null" />`
-                                        @* <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" /> *@
+                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems != null" />
                                         <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
                                             <Items>
                                                 <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
@@ -53,38 +51,31 @@
                                                 <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                             </Items>
                                         </DxToolbarItem>
-                                        @* <DxToolbarItem Text="Upload" id="upload" IconCssClass="grid-toolbar-upload" /> *@
-                                    </DxToolbar>
-                                    @*  <DxComboBox Data="EnumEditModeDatas"
-                                    NullText="Select Grid Edit Mode..."
-                                    TextFieldName="@nameof(EnumEditModeData.DisplayName)"
-                                    ValueFieldName="@nameof(EnumEditModeData.Value)"
-                                    @bind-Value="@Value"
-                                    AllowUserInput="true" /> 
 
-                                    <DxUpload Visible="@UploadVisible"
-                                              ExternalSelectButtonCssSelector="#upload"
-                                              ExternalDropZoneCssSelector="#upload"
-                                              ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
-                                              FileUploadStarted="@OnFileUploadStarted"
-                                              AllowedFileExtensions="@extentions"
-                                              MaxFileSize="15000000">
-                                    </DxUpload>*@
+                                    </DxToolbar>
                                 </ToolbarTemplate>
                                 <Columns>
                                     <DxGridSelectionColumn Width="15px" />
                                     <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                    <DxGridDataColumn FieldName="Code" />
+                                    <DxGridDataColumn FieldName="Province.Name" Caption="Province" />
                                 </Columns>
                                 <EditFormTemplate Context="EditFormContext">
+                                    @{
+                                        var a = (CityDto)EditFormContext.EditModel;
+                                    }
                                     <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="6">
                                             <div class="pop-warning">
                                                 @EditFormContext.GetEditor("Name")
                                             </div>
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Code:" ColSpanMd="6">
-                                            @EditFormContext.GetEditor("Code")
+                                        <DxFormLayoutItem Caption="Province:" ColSpanMd="6">
+                                            <DxComboBox Data="@Provinces"
+                                                        NullText="Select Province..."
+                                                        @bind-Value="@a.ProvinceId"
+                                                        TextFieldName="Name"
+                                                        ValueFieldName="Id">
+                                            </DxComboBox>
                                         </DxFormLayoutItem>
                                     </DxFormLayout>
                                 </EditFormTemplate>
@@ -95,4 +86,8 @@
             </div>
         </div>
     </section>
-</div> 
+</div>
+
+@code {
+
+}

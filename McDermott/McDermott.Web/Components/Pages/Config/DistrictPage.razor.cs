@@ -1,23 +1,35 @@
-﻿using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.ReligionCommand;
+﻿using DevExpress.Data.XtraReports.Native;
+using Microsoft.JSInterop;
+using static McDermott.Application.Features.Commands.CityCommand;
 
-namespace McDermott.Web.Components.Pages
+using static McDermott.Application.Features.Commands.DistrictCommand;
+using static McDermott.Application.Features.Commands.ProvinceCommand;
+
+namespace McDermott.Web.Components.Pages.Config
 {
-    public partial class ReligionPage
+    public partial class DistrictPage
     {
         public IGrid Grid { get; set; }
-        private List<ReligionDto> Religions = new();
+        private List<DistrictDto> Districts = new();
+        private List<ProvinceDto> Provinces = new();
+        private List<CityDto> Cities = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; }
+        private dynamic dd;
+        private int Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
+            Provinces = await Mediator.Send(new GetProvinceQuery());
+            Cities = await Mediator.Send(new GetCityQuery());
             await LoadData();
         }
+
         private async Task LoadData()
         {
-            Religions = await Mediator.Send(new GetReligionQuery());
+            SelectedDataItems = new ObservableRangeCollection<object>();
+            Districts = await Mediator.Send(new GetDistrictQuery());
         }
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
@@ -35,17 +47,11 @@ namespace McDermott.Web.Components.Pages
                 e.CssClass = "header-bold";
             }
         }
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
-        }
-
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
             UpdateEditItemsEnabled(true);
         }
-
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
@@ -59,6 +65,11 @@ namespace McDermott.Web.Components.Pages
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+        //private void ColumnChooserButton_Click()
+        //{
+        //    Grid.ShowColumnChooser();
+        //}
+
         private async Task ExportXlsxItem_Click()
         {
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
@@ -74,13 +85,16 @@ namespace McDermott.Web.Components.Pages
                 ExportSelectedRowsOnly = true,
             });
         }
-
         private async Task ExportCsvItem_Click()
         {
             await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
             {
                 ExportSelectedRowsOnly = true,
             });
+        }
+        private void UpdateEditItemsEnabled(bool enabled)
+        {
+            EditItemsEnabled = enabled;
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -90,12 +104,12 @@ namespace McDermott.Web.Components.Pages
                 var aq = SelectedDataItems.Count;
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteReligionRequest(((ReligionDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteDistrictRequest(((DistrictDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<ReligionDto>>();
-                    await Mediator.Send(new DeleteListReligionRequest(a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<DistrictDto>>();
+                    await Mediator.Send(new DeleteListDistrictRequest(a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
@@ -107,15 +121,15 @@ namespace McDermott.Web.Components.Pages
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (ReligionDto)e.EditModel;
+            var editModel = (DistrictDto)e.EditModel;
 
             if (string.IsNullOrWhiteSpace(editModel.Name))
                 return;
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateReligionRequest(editModel));
+                await Mediator.Send(new CreateDistrictRequest(editModel));
             else
-                await Mediator.Send(new UpdateReligionRequest(editModel));
+                await Mediator.Send(new UpdateDistrictRequest(editModel));
 
             await LoadData();
         }

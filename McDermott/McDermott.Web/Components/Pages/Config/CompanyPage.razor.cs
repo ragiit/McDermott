@@ -4,7 +4,7 @@ using static McDermott.Application.Features.Commands.ProvinceCommand;
 using static McDermott.Application.Features.Commands.CompanyCommand;
 using Blazored.LocalStorage;
 
-namespace McDermott.Web.Components.Pages
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CompanyPage
     {

@@ -10,7 +10,7 @@ using static McDermott.Application.Features.Commands.ReligionCommand;
 using static McDermott.Application.Features.Commands.UserCommand;
 using static McDermott.Application.Features.Commands.VillageCommand;
 
-namespace McDermott.Web.Components.Pages
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class UserPage
     {

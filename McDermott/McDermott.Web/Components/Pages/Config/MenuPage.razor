@@ -1,11 +1,11 @@
-@page "/occupational";
-
+﻿@page "/config/menu"
 @rendermode InteractiveServer
 
-<PageTitle>Occupational</PageTitle>
+<PageTitle>Menu</PageTitle>
 
 <div class="wrapper">
-    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Occupational" />
+
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Menu" />
 
     <section class="content">
         <div class="container-fluid">
@@ -14,7 +14,7 @@
                     <div class="card">
                         <div class="card-body">
                             <DxGrid @ref="Grid"
-                                    Data="Occupationals"
+                                    Data="Menus"
                                     PageSize="10"
                                     @bind-SelectedDataItems="@SelectedDataItems"
                                     FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -32,7 +32,7 @@
                                     FocusedRowEnabled="true"
                                     PagerVisibleNumericButtonCount="10"
                                     FocusedRowChanged="Grid_FocusedRowChanged"
-                                    ShowGroupPanel="false"
+                                    ShowGroupPanel="true"
                                     AutoExpandAllGroupRows="true"
                                     ShowFilterRow="true"
                                     CustomizeElement="Grid_CustomizeElement"
@@ -43,7 +43,7 @@
                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                         <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
                                         <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
-                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="EditItemsEnabled" />`
+                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems != null" />`
                                         @* <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" /> *@
                                         <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
                                             <Items>
@@ -54,22 +54,51 @@
                                         </DxToolbarItem>
                                         @* <DxToolbarItem Text="Upload" id="upload" IconCssClass="grid-toolbar-upload" /> *@
                                     </DxToolbar>
+                                    @*  <DxComboBox Data="EnumEditModeDatas"
+                                    NullText="Select Grid Edit Mode..."
+                                    TextFieldName="@nameof(EnumEditModeData.DisplayName)"
+                                    ValueFieldName="@nameof(EnumEditModeData.Value)"
+                                    @bind-Value="@Value"
+                                    AllowUserInput="true" />
+
+                                    <DxUpload Visible="@UploadVisible"
+                                    ExternalSelectButtonCssSelector="#upload"
+                                    ExternalDropZoneCssSelector="#upload"
+                                    ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+                                    FileUploadStarted="@OnFileUploadStarted"
+                                    AllowedFileExtensions="@extentions"
+                                    MaxFileSize="15000000">
+                                    </DxUpload>*@
                                 </ToolbarTemplate>
                                 <Columns>
-                                    <DxGridSelectionColumn width="15px" />
-                                    <DxGridDataColumn FieldName="Name" Caption="Pekerjaan" />
-                                    <DxGridDataColumn FieldName="Description" Caption="Deskripsi" />
+                                    <DxGridSelectionColumn Width="15px"/>
+                                    <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                    <DxGridDataColumn FieldName="ParentMenu" Caption="Parent" SortIndex="0" />
+                                    <DxGridDataColumn FieldName="Sequence" />
+                                    <DxGridDataColumn FieldName="Url" Caption="URL" />
+                                    
                                 </Columns>
                                 <EditFormTemplate Context="EditFormContext">
-
+                                    @{
+                                        var a = (MenuDto)EditFormContext.EditModel;
+                                    }
                                     <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Pekerjaan:" ColSpanMd="6">
-                                           <div class="pop-warning">
-                                                @EditFormContext.GetEditor("Name")
-                                            </div>
+                                        <DxFormLayoutItem Caption="Name:" ColSpanMd="6">
+                                            @EditFormContext.GetEditor("Name")
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Deskripsi:" ColSpanMd="6">
-                                            @EditFormContext.GetEditor("Description")
+                                        <DxFormLayoutItem Caption="Parent Menu:" ColSpanMd="6">
+                                            <DxComboBox Data="@ParentMenuDto"
+                                                        NullText="Select Parent Menu..."
+                                                        @bind-Value="@a.ParentMenu"
+                                                        TextFieldName="Name"
+                                                        ValueFieldName="Name">
+                                            </DxComboBox>
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Sequence:" ColSpanMd="6">
+                                            @EditFormContext.GetEditor("Sequence")
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="URL:" ColSpanMd="6">
+                                            @EditFormContext.GetEditor("Url")
                                         </DxFormLayoutItem>
                                     </DxFormLayout>
                                 </EditFormTemplate>
@@ -80,4 +109,4 @@
             </div>
         </div>
     </section>
-</div>
+</div> 
