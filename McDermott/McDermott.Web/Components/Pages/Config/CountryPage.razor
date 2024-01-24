@@ -44,7 +44,7 @@
                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                         <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
                                         <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
-                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems != null" />`
+                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems.Count > 0" />`
                                         @* <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" /> *@
                                         <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
                                             <Items>
@@ -60,7 +60,7 @@
                                     TextFieldName="@nameof(EnumEditModeData.DisplayName)"
                                     ValueFieldName="@nameof(EnumEditModeData.Value)"
                                     @bind-Value="@Value"
-                                    AllowUserInput="true" /> 
+                                    AllowUserInput="true" />
 
                                     <DxUpload Visible="@UploadVisible"
                                               ExternalSelectButtonCssSelector="#upload"

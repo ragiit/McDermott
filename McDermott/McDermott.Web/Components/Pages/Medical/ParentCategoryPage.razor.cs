@@ -1,7 +1,5 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using MediatR;
-using Microsoft.JSInterop;
-using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.JSInterop;
+using DevExpress.Data.XtraReports.Native;
 using static McDermott.Application.Features.Commands.ParentCategoryCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
@@ -117,23 +115,23 @@ namespace McDermott.Web.Components.Pages.Medical
             InvokeAsync(StateHasChanged);
         }
 
-        public enum EducationType
-        {
-            [Display(Name = "Not Stated")]
-            NoInfo = 0,
+        //public enum EducationType
+        //{
+        //    [Display(Name = "Not Stated")]
+        //    NoInfo = 0,
 
-            [Display(Name = "High school")]
-            School = 1,
+        //    [Display(Name = "High school")]
+        //    School = 1,
 
-            [Display(Name = "College")]
-            College = 2,
+        //    [Display(Name = "College")]
+        //    College = 2,
 
-            [Display(Name = "University Degree")]
-            UniversityDegree = 3,
+        //    [Display(Name = "University Degree")]
+        //    UniversityDegree = 3,
 
-            [Display(Name = "PhD")]
-            PhD = 4
-        }
+        //    [Display(Name = "PhD")]
+        //    PhD = 4
+        //}
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -171,3 +169,4 @@ namespace McDermott.Web.Components.Pages.Medical
         }
     }
 }
+

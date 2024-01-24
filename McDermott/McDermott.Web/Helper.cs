@@ -3,7 +3,7 @@ using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using static McDermott.Web.Components.Pages.Config.CountryPage;
+
 
 namespace McDermott.Web
 {
@@ -28,6 +28,15 @@ namespace McDermott.Web
                             .First()
                             .GetCustomAttribute<TAttribute>();
         }
+
+        //[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
+        //public class DateInPastAttribute : ValidationAttribute
+        //{
+        //    public override bool IsValid(object value)
+        //    {
+        //        return (DateTime)value <= DateTime.Today;
+        //    }
+        //}
 
         public static async Task<User> GetUserInfo(this ILocalStorageService o)
         {

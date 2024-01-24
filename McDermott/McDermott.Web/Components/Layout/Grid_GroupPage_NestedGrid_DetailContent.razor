@@ -1,0 +1,74 @@
+﻿@using static McDermott.Application.Features.Commands.GroupCommand
+
+<DxGrid Data="GroupMenus"
+        @ref="Grid"
+        PageSize="5"
+        ShowSearchBox="true"
+        ShowGroupPanel="true"
+        AutoExpandAllGroupRows="true" KeyboardNavigationEnabled="true">
+    <ToolbarTemplate>
+        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" />
+            <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
+                <Items>
+                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                </Items>
+            </DxToolbarItem>
+        </DxToolbar>
+    </ToolbarTemplate>
+    <Columns>
+        <DxGridDataColumn FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
+        <DxGridDataColumn FieldName="Create" />
+        <DxGridDataColumn FieldName="Read" />
+        <DxGridDataColumn FieldName="Update" />
+        <DxGridDataColumn FieldName="Delete" />
+        <DxGridDataColumn FieldName="Import" />
+    </Columns>
+</DxGrid>
+
+@code {
+    [Parameter]
+    public GroupDto Group { get; set; }
+    private List<GroupMenuDto> GroupMenus = [];
+    private IGrid Grid { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (Group != null)
+        {
+            GroupMenus = await Mediator.Send(new GetGroupMenuByGroupIdRequest(Group.Id));
+        }
+    }
+
+    private void ColumnChooserButton_Click()
+    {
+        Grid.ShowColumnChooser();
+    }
+
+    private async Task ExportXlsxItem_Click()
+    {
+        await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            }); ;
+    }
+
+    private async Task ExportCsvItem_Click()
+    {
+        await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
+            {
+                ExportSelectedRowsOnly = true,
+            });
+    }
+
+    private async Task ExportXlsItem_Click()
+    {
+        await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+    }
+}

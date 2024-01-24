@@ -16,6 +16,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McDermott.Persistence", "McDermott.Persistence\McDermott.Persistence.csproj", "{694DA318-C73F-4DA0-9F9A-92B2CADBE5E6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McDermott.Web", "McDermott.Web\McDermott.Web.csproj", "{9618F4E6-123D-4C5E-93EA-78EC87F4FD23}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BB1FC57B-326E-428E-84DD-86C2DBC02A1C} = {BB1FC57B-326E-428E-84DD-86C2DBC02A1C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

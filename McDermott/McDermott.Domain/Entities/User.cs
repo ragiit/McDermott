@@ -69,6 +69,10 @@
         public bool? IsNurse { get; set; }
         public string? EmployeeStatus { get; set; }
         public DateTime? JoinDate { get; set; }
+        public int NIP { get; set; }
+        public string? Legacy { get; set; }
+        public string? SAP { get; set; }
+        public string? Oracle { get; set; }
 
         public virtual Group? Group { get; set; }
         public virtual Gender? Gender { get; set; }
