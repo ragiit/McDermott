@@ -20,7 +20,7 @@
                                     CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                     EditModelSaving="OnSave"
                                     DataItemDeleting="OnDelete"
-                                    EditMode="GridEditMode.PopupEditForm"
+                                    EditMode="GridEditMode.EditForm"
                                     PopupEditFormCssClass="pw-800"
                                     PagerPosition="GridPagerPosition.Bottom"
                                     PageSizeSelectorVisible="true"
@@ -42,7 +42,13 @@
                                         <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
                                         <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
                                         <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="EditItemsEnabled" />`
-
+                                        <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
+                                            <Items>
+                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                            </Items>
+                                        </DxToolbarItem>
                                     </DxToolbar>
                                 </ToolbarTemplate>
                                 <Columns>
@@ -54,121 +60,129 @@
 
                         @if (ShowForm)
                         {
-                            <DxFormLayout Data="CompanyForm" ItemUpdating="@((pair)=>OnItemUpdating(pair.Key, pair.Value))">
-                                <DxFormLayoutGroup Caption="Company Information" ColSpanMd="12">
-                                    <DxFormLayoutItem caption="Name: ">
-                                        <DxTextBox @bind-Text="@CompanyForm.Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name Company" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem caption="Email: ">
-                                        <DxTextBox @bind-Text="@CompanyForm.Email" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Email Company" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem caption="Phone: ">
-                                        <DxTextBox @bind-Value="@CompanyForm.Phone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Phone Company" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem caption="Website: ">
-                                        <DxTextBox @bind-Text="@CompanyForm.Website" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Website Company" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem caption="VAT: ">
-                                        <DxTextBox @bind-Text="@CompanyForm.VAT" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="VAT" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem caption="Domicile Address:" ColSpanMd="12">
+                            <EditForm Model="@CompanyForm"
+                                      OnValidSubmit="@HandleValidSubmit"
+                                      OnInvalidSubmit="@HandleInvalidSubmit"
+                                      Context="EditFormContext">
+                                <DataAnnotationsValidator />
+
+                                <DxFormLayout Data="@CompanyForm" ItemUpdating="@((pair)=>OnItemUpdating(pair.Key, pair.Value))">
+                                    <DxFormLayoutGroup Caption="Company Information" ColSpanMd="12">
+                                        <DxFormLayoutItem caption="Name: ">
+                                            <DxTextBox @bind-Text="@CompanyForm.Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name Company" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem caption="Email: ">
+                                            <DxTextBox @bind-Text="@CompanyForm.Email" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Email Company" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem caption="Phone: ">
+                                            <DxTextBox @bind-Value="@CompanyForm.Phone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Phone Company" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem caption="Website: ">
+                                            <DxTextBox @bind-Text="@CompanyForm.Website" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Website Company" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem caption="VAT: ">
+                                            <DxTextBox @bind-Text="@CompanyForm.VAT" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="VAT" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem caption="Domicile Address:" ColSpanMd="12">
+                                            <Template>
+                                                <DxGridLayout>
+                                                    <Rows>
+                                                        <DxGridLayoutRow />
+                                                        <DxGridLayoutRow />
+                                                        <DxGridLayoutRow />
+                                                        <DxGridLayoutRow />
+                                                        <DxGridLayoutRow />
+                                                        <DxGridLayoutRow />
+                                                    </Rows>
+                                                    <Columns>
+                                                        <DxGridLayoutColumn />
+                                                        <DxGridLayoutColumn />
+                                                    </Columns>
+                                                    <Items>
+                                                        <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
+                                                            <Template>
+                                                                <DxTextBox @bind-Text="@CompanyForm.Street1" NullText="Street 1..."></DxTextBox>
+                                                            </Template>
+                                                        </DxGridLayoutItem>
+                                                        <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
+                                                            <Template>
+                                                                <DxTextBox @bind-Text="@CompanyForm.Street2" CssClass="mt" NullText="Street 2..."></DxTextBox>
+                                                            </Template>
+                                                        </DxGridLayoutItem>
+                                                        <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
+                                                            <Template>
+                                                                <DxComboBox Data="@Countries"
+                                                                            NullText="Select Country..."
+                                                                            @bind-Value="@CompanyForm.CountryId"
+                                                                            TextFieldName="Name"
+                                                                            ValueFieldName="Id">
+                                                                </DxComboBox>
+                                                            </Template>
+                                                        </DxGridLayoutItem>
+
+                                                        <!-- City Dropdown -->
+                                                        <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
+                                                            <Template>
+                                                                <DxComboBox Data="@Provinces.Where(x=>x.CountryId == CompanyForm.CountryId)"
+                                                                            NullText="Select Province..."
+                                                                            @bind-Value="@CompanyForm.ProvinceId"
+                                                                            TextFieldName="Name"
+                                                                            ValueFieldName="Id">
+                                                                </DxComboBox>
+                                                            </Template>
+                                                        </DxGridLayoutItem>
+
+                                                        <!-- Country Dropdown -->
+                                                        <DxGridLayoutItem Row="3" Column="0" CssClass="mt">
+                                                            <Template>
+                                                                <DxComboBox Data="@Cities.Where(x=>x.ProvinceId ==CompanyForm.ProvinceId)"
+                                                                            NullText="Select City..."
+                                                                            @bind-Value="@CompanyForm.CityId"
+                                                                            TextFieldName="Name"
+                                                                            ValueFieldName="Id">
+                                                                </DxComboBox>
+                                                            </Template>
+                                                        </DxGridLayoutItem>
+                                                        <DxGridLayoutItem Row="3" Column="1" CssClass="mt">
+                                                            <Template>
+                                                                <DxTextBox @bind-Text="CompanyForm.Zip" NullText="Postal Code"></DxTextBox>
+                                                            </Template>
+                                                        </DxGridLayoutItem>
+
+                                                    </Items>
+                                                </DxGridLayout>
+                                            </Template>
+                                        </DxFormLayoutItem>
+                                    </DxFormLayoutGroup>
+                                    <DxFormLayoutItem>
                                         <Template>
                                             <DxGridLayout>
                                                 <Rows>
-                                                    <DxGridLayoutRow />
-                                                    <DxGridLayoutRow />
-                                                    <DxGridLayoutRow />
-                                                    <DxGridLayoutRow />
-                                                    <DxGridLayoutRow />
                                                     <DxGridLayoutRow />
                                                 </Rows>
                                                 <Columns>
                                                     <DxGridLayoutColumn />
                                                     <DxGridLayoutColumn />
                                                 </Columns>
-                                               <Items>
-                                                    <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
+                                                <Items>
+                                                    <DxGridLayoutItem Row="0" Column="1">
                                                         <Template>
-                                                            <DxTextBox @bind-Text="@CompanyForm.Street1" NullText="Street 1..."></DxTextBox>
+                                                            <DxButton RenderStyle="@ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained"
+                                                                      Text="Save"
+                                                                      SubmitFormOnClick="true"
+                                                                      CssClass="w-20 ml" />
+                                                            <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
+                                                                      Text="Cancel"
+                                                                      Click="OnCancel"
+                                                                      CssClass="w-20 ml" />
                                                         </Template>
                                                     </DxGridLayoutItem>
-                                                    <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
-                                                        <Template>
-                                                            <DxTextBox @bind-Text="@CompanyForm.Street2" CssClass="mt" NullText="Street 2..."></DxTextBox>
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-                                                    <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
-                                                        <Template>
-                                                            <DxComboBox Data="@Provinces"
-                                                                        NullText="Select Province..."
-                                                                        @bind-Value="@CompanyForm.ProvinceId"
-                                                                        @bind-Value:event="onChangeProvince"
-                                                                        TextFieldName="Name"
-                                                                        ValueFieldName="Id">
-                                                            </DxComboBox>
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-
-                                                    <!-- City Dropdown -->
-                                                    <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
-                                                        <Template>
-                                                            <DxComboBox Data="@Cities"
-                                                                        NullText="Select City..."
-                                                                        @bind-Value="@CompanyForm.CityId"
-                                                                        TextFieldName="Name"
-                                                                        ValueFieldName="Id">
-                                                            </DxComboBox>
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-
-                                                    <!-- Country Dropdown -->
-                                                    <DxGridLayoutItem Row="3" Column="0" CssClass="mt">
-                                                        <Template>
-                                                            <DxComboBox Data="@Countries"
-                                                                        NullText="Select Country..."
-                                                                        @bind-Value="@CompanyForm.CountryId"
-                                                                        @bind-Value:event="@onChangeCountry"
-                                                                        TextFieldName="Name"
-                                                                        ValueFieldName="Id">
-                                                            </DxComboBox>
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-                                                    <DxGridLayoutItem Row="3" Column="1" CssClass="mt">
-                                                        <Template>
-                                                            <DxTextBox @bind-Text="CompanyForm.Zip" NullText="Pastel Code"></DxTextBox>
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-                                                    
                                                 </Items>
                                             </DxGridLayout>
                                         </Template>
                                     </DxFormLayoutItem>
-                                </DxFormLayoutGroup>
-                            </DxFormLayout>
-
-                            <DxGridLayout >
-                                <Rows>                      
-                                    <DxGridLayoutRow />
-                                </Rows>
-                                <Columns>
-                                    <DxGridLayoutColumn />
-                                    <DxGridLayoutColumn />
-                                </Columns>
-                                <Items>
-                                    <DxGridLayoutItem Row="0" Column="1">
-                                        <Template>
-                                            <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
-                                                      Text="Save"
-                                                      Click="OnSave"
-                                                      CssClass="w-20 ml" />
-                                            <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
-                                                      Text="Cancel"
-                                                      Click="OnCancel"
-                                                      CssClass="w-20 ml" />
-                                        </Template>
-                                    </DxGridLayoutItem>                                    
-                                </Items>
-                            </DxGridLayout>
+                                </DxFormLayout>
+                            </EditForm>
                         }
                     </div>
                 </div>

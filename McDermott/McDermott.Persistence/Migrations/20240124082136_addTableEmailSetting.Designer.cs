@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240124082136_addTableEmailSetting")]
+    partial class addTableEmailSetting
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -180,47 +183,6 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("Countries");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.CronisCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<int?>("DiagnosisId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DiagnosisId");
-
-                    b.ToTable("CronisCategories");
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.Degree", b =>
                 {
                     b.Property<int>("Id")
@@ -281,87 +243,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Departments");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.Diagnosis", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CronisCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DiseaseCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Diagnoses");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.DiseaseCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("DiagnosisId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<int>("ParentCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DiagnosisId");
-
-                    b.ToTable("DiseaseCategories");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.District", b =>
@@ -695,42 +576,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Occupationals");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.ParentCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("DiseaseCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DiseaseCategoryId");
-
-                    b.ToTable("ParentCategories");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Province", b =>
@@ -1201,22 +1046,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Province");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.CronisCategory", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.Diagnosis", null)
-                        .WithMany("CronisKategory")
-                        .HasForeignKey("DiagnosisId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.DiseaseCategory", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.Diagnosis", null)
-                        .WithMany("DiseaseCategory")
-                        .HasForeignKey("DiagnosisId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.District", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.City", "City")
@@ -1253,14 +1082,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Group");
 
                     b.Navigation("Menu");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.ParentCategory", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.DiseaseCategory", null)
-                        .WithMany("ParentCategory")
-                        .HasForeignKey("DiseaseCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Province", b =>
@@ -1435,18 +1256,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Companies");
 
                     b.Navigation("Provinces");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.Diagnosis", b =>
-                {
-                    b.Navigation("CronisKategory");
-
-                    b.Navigation("DiseaseCategory");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.DiseaseCategory", b =>
-                {
-                    b.Navigation("ParentCategory");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Province", b =>

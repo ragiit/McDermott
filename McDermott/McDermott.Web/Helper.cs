@@ -3,7 +3,7 @@ using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using static McDermott.Web.Components.Pages.CountryPage;
+using static McDermott.Web.Components.Pages.Config.CountryPage;
 
 namespace McDermott.Web
 {

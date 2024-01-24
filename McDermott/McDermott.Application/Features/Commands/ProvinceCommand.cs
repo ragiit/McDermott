@@ -3,6 +3,7 @@
     public class ProvinceCommand
     {
         public class GetProvinceQuery : IRequest<List<ProvinceDto>>;
+       
 
         public class GetProvinceByIdQuery : IRequest<ProvinceDto>
         {
@@ -14,12 +15,13 @@
             }
         }
 
-        public class GetProvinceByCountry : IRequest<ProvinceDto>
+        public class GetProvinceByCountry : IRequest<List<ProvinceDto>>
         {
-            public int Id { get; set; }
-            public GetProvinceByCountry(int id)
+            public int? CountryId { get; set; }
+
+            public GetProvinceByCountry(int? countryId)
             {
-                Id = id;
+                CountryId = countryId;
             }
         }
 
