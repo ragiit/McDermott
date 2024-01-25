@@ -11,10 +11,11 @@ namespace McDermott.Persistence.Context
             : base(options)
         { }
 
-        //public DbSet<Stadium> Stadiums => Set<Stadium>();
+        #region DbSet
 
         //Configure
         public DbSet<City> Cities { get; set; }
+
         public DbSet<Country> Countries { get; set; }
         public DbSet<District> Districts { get; set; }
         public DbSet<Gender> Genders { get; set; }
@@ -36,7 +37,10 @@ namespace McDermott.Persistence.Context
         //Medical
         public DbSet<DiseaseCategory> DiseaseCategories { get; set; }
         public DbSet<CronisCategory> CronisCategories { get; set; }
-        public DbSet<Diagnosis> Diagnoses {  get; set; }
+        public DbSet<Diagnosis> Diagnoses { get; set; }
+        public DbSet<HealthCenter> HealthCenters { get; set; }
+
+        #endregion DbSet
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
