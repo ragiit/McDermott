@@ -10,12 +10,12 @@ namespace McDermott.Application.Dtos
     public partial class DiseaseCategoryDto:IMapFrom<DiseaseCategory>
     {
         public int Id { get; set; }
-        public int? ParentCategoryId { get; set; }
+        public string? ParentCategory { get; set; }
 
         [Required]
         [StringLength(200)]
         public string Name { get; set; }
 
-        public ParentCategory? ParentCategory { get; set; }
+       
     }
 }

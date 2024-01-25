@@ -19,12 +19,12 @@ namespace McDermott.Web.Components.Pages.Config
         private bool FormValidationState = false;
 
 
-        private List<CompanyDto> Companys = new();
-        private List<CountryDto> Countries { get; set; }
-        private List<ProvinceDto> Provinces { get; set; }
-        public List<CityDto> Cities { get; set; }       
+        public List<CompanyDto> Companys = new();
+        public List<CountryDto> Countries { get; set; }
+        public List<ProvinceDto> Provinces { get; set; }
+        public List<CityDto> Cities { get; set; }
         // public List<CurrencyDto> Currencys {get; private set;}
-       
+
 
         private async Task LoadData()
         {
@@ -37,7 +37,7 @@ namespace McDermott.Web.Components.Pages.Config
             Countries = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Cities = await Mediator.Send(new GetCityQuery());
-           
+
             await LoadData();
         }
 
@@ -50,13 +50,12 @@ namespace McDermott.Web.Components.Pages.Config
         {
             FormValidationState = false;
         }
-        private async Task OnSave()           
+        private async Task OnSave()
         {
             if (!FormValidationState)
-            {
                 return;
-            }
-                
+
+
             if (CompanyForm.Id == 0)
                 await Mediator.Send(new CreateCompanyRequest(CompanyForm));
             else
@@ -129,6 +128,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItem_Click()
         {
+            CompanyForm = new();
             ShowForm = true;
         }
 

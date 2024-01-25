@@ -34,7 +34,6 @@ namespace McDermott.Persistence.Context
         public DbSet<EmailSetting> EmailSettings { get; set; }
 
         //Medical
-        public DbSet<ParentCategory> ParentCategories { get; set; }
         public DbSet<DiseaseCategory> DiseaseCategories { get; set; }
         public DbSet<CronisCategory> CronisCategories { get; set; }
         public DbSet<Diagnosis> Diagnoses {  get; set; }

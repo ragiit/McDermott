@@ -11,8 +11,8 @@ namespace McDermott.Domain.Entities
         [StringLength(300)]
         public string Name { get; set; }
 
-        public int ParentCategoryId { get; set; }
+        public String ParentCategory { get; set; }
 
-        public virtual List<ParentCategory>? ParentCategory { get; set; }
+        
     }
 }

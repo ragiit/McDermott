@@ -20,7 +20,7 @@
                                     CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                     EditModelSaving="OnSave"
                                     DataItemDeleting="OnDelete"
-                                    EditMode="GridEditMode.EditForm"
+                                    EditMode="GridEditMode.PopupEditForm"
                                     PopupEditFormCssClass="pw-800"
                                     PagerPosition="GridPagerPosition.Bottom"
                                     PageSizeSelectorVisible="true"
@@ -60,22 +60,22 @@
 
                         @if (ShowForm)
                         {
-                            <EditForm Model="@CompanyForm"
-                                      OnValidSubmit="@HandleValidSubmit"
-                                      OnInvalidSubmit="@HandleInvalidSubmit"
-                                      Context="EditFormContext">
+                            <EditForm Model="@CompanyForm" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
+                                      OnInvalidSubmit="@HandleInvalidSubmit">
                                 <DataAnnotationsValidator />
 
-                                <DxFormLayout Data="@CompanyForm" ItemUpdating="@((pair)=>OnItemUpdating(pair.Key, pair.Value))">
+                                <DxFormLayout CssClass="mt">
+
                                     <DxFormLayoutGroup Caption="Company Information" ColSpanMd="12">
+
                                         <DxFormLayoutItem caption="Name: ">
-                                            <DxTextBox @bind-Text="@CompanyForm.Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name Company" />
+                                            <DxTextBox @bind-Text="@CompanyForm.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name Company" />
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem caption="Email: ">
-                                            <DxTextBox @bind-Text="@CompanyForm.Email" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Email Company" />
+                                            <DxTextBox @bind-Text="@CompanyForm.Email" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Email Company" />
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem caption="Phone: ">
-                                            <DxTextBox @bind-Value="@CompanyForm.Phone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Phone Company" />
+                                            <DxTextBox @bind-Text="@CompanyForm.Phone" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Phone Company" />
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem caption="Website: ">
                                             <DxTextBox @bind-Text="@CompanyForm.Website" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Website Company" />
@@ -153,35 +153,33 @@
                                                 </DxGridLayout>
                                             </Template>
                                         </DxFormLayoutItem>
+
+
                                     </DxFormLayoutGroup>
-                                    <DxFormLayoutItem>
-                                        <Template>
-                                            <DxGridLayout>
-                                                <Rows>
-                                                    <DxGridLayoutRow />
-                                                </Rows>
-                                                <Columns>
-                                                    <DxGridLayoutColumn />
-                                                    <DxGridLayoutColumn />
-                                                </Columns>
-                                                <Items>
-                                                    <DxGridLayoutItem Row="0" Column="1">
-                                                        <Template>
-                                                            <DxButton RenderStyle="@ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained"
-                                                                      Text="Save"
-                                                                      SubmitFormOnClick="true"
-                                                                      CssClass="w-20 ml" />
-                                                            <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
-                                                                      Text="Cancel"
-                                                                      Click="OnCancel"
-                                                                      CssClass="w-20 ml" />
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-                                                </Items>
-                                            </DxGridLayout>
-                                        </Template>
-                                    </DxFormLayoutItem>
                                 </DxFormLayout>
+                                <DxGridLayout>
+                                    <Rows>
+                                        <DxGridLayoutRow />
+                                    </Rows>
+                                    <Columns>
+                                        <DxGridLayoutColumn />
+                                        <DxGridLayoutColumn />
+                                    </Columns>
+                                    <Items>
+                                        <DxGridLayoutItem Row="0" Column="1">
+                                            <Template>
+                                                <DxButton RenderStyle="@ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained"
+                                                          Text="Save"
+                                                          SubmitFormOnClick="true"
+                                                          CssClass="w-20 ml" />
+                                                <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
+                                                          Text="Cancel"
+                                                          Click="OnCancel"
+                                                          CssClass="w-20 ml" />
+                                            </Template>
+                                        </DxGridLayoutItem>
+                                    </Items>
+                                </DxGridLayout>
                             </EditForm>
                         }
                     </div>
