@@ -13,6 +13,7 @@ namespace McDermott.Persistence.Context
 
         //public DbSet<Stadium> Stadiums => Set<Stadium>();
 
+        //Configure
         public DbSet<City> Cities { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<District> Districts { get; set; }
@@ -30,6 +31,13 @@ namespace McDermott.Persistence.Context
         public DbSet<Menu> Menus { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMenu> GroupMenus { get; set; }
+        public DbSet<EmailSetting> EmailSettings { get; set; }
+
+        //Medical
+        public DbSet<ParentCategory> ParentCategories { get; set; }
+        public DbSet<DiseaseCategory> DiseaseCategories { get; set; }
+        public DbSet<CronisCategory> CronisCategories { get; set; }
+        public DbSet<Diagnosis> Diagnoses {  get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240124091451_addTableMedical")]
+    partial class addTableMedical
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -992,9 +995,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("JoinDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Legacy")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("MartialStatus")
                         .HasColumnType("nvarchar(max)");
 
@@ -1003,9 +1003,6 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<string>("MotherNIK")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("NIP")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1026,9 +1023,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("Npwp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Oracle")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1038,9 +1032,6 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<int?>("ReligionId")
                         .HasColumnType("int");
-
-                    b.Property<string>("SAP")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("SipExp")
                         .HasColumnType("datetime2");

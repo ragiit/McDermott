@@ -3,23 +3,28 @@ using static McDermott.Application.Features.Commands.CountryCommand;
 using static McDermott.Application.Features.Commands.ProvinceCommand;
 using static McDermott.Application.Features.Commands.CompanyCommand;
 using Blazored.LocalStorage;
+using System.ComponentModel.DataAnnotations;
 
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CompanyPage
     {
         public IGrid Grid { get; set; }
-        private List<CompanyDto> Companys = new();
         private CompanyDto CompanyForm = new();
         private IReadOnlyList<object>? SelectedDataItems { get; set; }
         private bool EditItemsEnabled { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private bool OnVacation { get; set; } = true;
         private bool ShowForm { get; set; } = false;
-        public List<CountryDto> Countries { get; set; }
-        public List<ProvinceDto> Provinces { get; set; }
-        public List<CityDto> Cities { get; set; }
+        private bool FormValidationState = false;
+
+
+        private List<CompanyDto> Companys = new();
+        private List<CountryDto> Countries { get; set; }
+        private List<ProvinceDto> Provinces { get; set; }
+        public List<CityDto> Cities { get; set; }       
         // public List<CurrencyDto> Currencys {get; private set;}
+       
 
         private async Task LoadData()
         {
@@ -32,14 +37,26 @@ namespace McDermott.Web.Components.Pages.Config
             Countries = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Cities = await Mediator.Send(new GetCityQuery());
-
+           
             await LoadData();
         }
 
-        private async Task OnSave()
+        private async Task HandleValidSubmit()
         {
-            var a = CompanyForm;
-
+            FormValidationState = true;
+            await OnSave();
+        }
+        private async Task HandleInvalidSubmit()
+        {
+            FormValidationState = false;
+        }
+        private async Task OnSave()           
+        {
+            if (!FormValidationState)
+            {
+                return;
+            }
+                
             if (CompanyForm.Id == 0)
                 await Mediator.Send(new CreateCompanyRequest(CompanyForm));
             else
@@ -57,17 +74,6 @@ namespace McDermott.Web.Components.Pages.Config
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private async Task onChangeCountry(ChangedEventArgs args)
-        {
-            if (args.NewValue != null)
-            {
-                CountryDto selectedCountry = (CountryDto)args.NewValue;
-                // Update the list of cities based on the selected province
-                //Cities = await Mediator.Send(new GetProvinceByCountry());
-            }
-
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)

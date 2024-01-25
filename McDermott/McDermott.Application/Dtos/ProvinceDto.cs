@@ -16,5 +16,7 @@ namespace McDermott.Application.Dtos
         public string Code { get; set; } = string.Empty; // State Code
 
         public CountryDto? Country { get; set; }
+
+        
     }
 }

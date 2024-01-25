@@ -164,4 +164,6 @@ namespace McDermott.Web.Components.Pages.Medical
             await LoadData();
         }
     }
+
+    
 }
