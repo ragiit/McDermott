@@ -65,6 +65,8 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task NewItem_Click()
         {
             ShowForm = true;
+            GroupMenus = [];
+            Group = new();
         }
 
         private async Task EditItem_Click()
@@ -141,6 +143,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private void GridGroup_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
+            FocusedRowVisibleIndex = args.VisibleIndex;
             UpdateEditItemsGroupEnabled(true);
         }
 
@@ -369,7 +372,7 @@ namespace McDermott.Web.Components.Pages.Config
                     }
                 }
 
-                await Mediator.Send(new CreateGroupMenuRequest(GroupMenus)); 
+                await Mediator.Send(new CreateGroupMenuRequest(GroupMenus));
 
                 await oLocal.SetItemAsync("Menu", string.Join(",", GroupMenus.Select(x => x.Menu?.Name)));
 

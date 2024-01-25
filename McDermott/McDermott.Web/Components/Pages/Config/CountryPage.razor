@@ -45,7 +45,7 @@
                                         <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
                                         <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
                                         <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems.Count > 0" />`
-                                        @* <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" /> *@
+                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" />
                                         <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
                                             <Items>
                                                 <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
@@ -63,12 +63,12 @@
                                     AllowUserInput="true" />
 
                                     <DxUpload Visible="@UploadVisible"
-                                              ExternalSelectButtonCssSelector="#upload"
-                                              ExternalDropZoneCssSelector="#upload"
-                                              ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
-                                              FileUploadStarted="@OnFileUploadStarted"
-                                              AllowedFileExtensions="@extentions"
-                                              MaxFileSize="15000000">
+                                    ExternalSelectButtonCssSelector="#upload"
+                                    ExternalDropZoneCssSelector="#upload"
+                                    ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+                                    FileUploadStarted="@OnFileUploadStarted"
+                                    AllowedFileExtensions="@extentions"
+                                    MaxFileSize="15000000">
                                     </DxUpload>*@
                                 </ToolbarTemplate>
                                 <Columns>
