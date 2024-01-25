@@ -16,6 +16,7 @@ namespace McDermott.Application.Features.Queries
             public async Task<List<DepartmentDto>> Handle(GetDepartmentQuery query, CancellationToken cancellationToken)
             {
                 return await _unitOfWork.Repository<Department>().Entities
+                    .Include(x => x.Company)
                         .Select(Department => Department.Adapt<DepartmentDto>())
                        .ToListAsync(cancellationToken);
             }

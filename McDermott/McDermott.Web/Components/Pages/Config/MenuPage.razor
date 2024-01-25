@@ -14,7 +14,7 @@
                     <div class="card">
                         <div class="card-body">
                             <DxGrid @ref="Grid"
-                                    Data="Menus"
+                                    Data="Menus.OrderBy(x => x.ParentMenu == null).ThenBy(x => x.Sequence.ToInt32())"
                                     PageSize="10"
                                     @bind-SelectedDataItems="@SelectedDataItems"
                                     FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -71,22 +71,22 @@
                                     </DxUpload>*@
                                 </ToolbarTemplate>
                                 <Columns>
-                                    <DxGridSelectionColumn Width="15px"/>
+                                    <DxGridSelectionColumn Width="15px" />
                                     <DxGridDataColumn FieldName="Name" SortIndex="0" />
                                     <DxGridDataColumn FieldName="ParentMenu" Caption="Parent" SortIndex="0" />
                                     <DxGridDataColumn FieldName="Sequence" />
                                     <DxGridDataColumn FieldName="Url" Caption="URL" />
-                                    
+
                                 </Columns>
                                 <EditFormTemplate Context="EditFormContext">
                                     @{
                                         var a = (MenuDto)EditFormContext.EditModel;
                                     }
                                     <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem Caption="Name:" ColSpanMd="6">
+                                        <DxFormLayoutItem Caption="Name:" ColSpanMd="12">
                                             @EditFormContext.GetEditor("Name")
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Parent Menu:" ColSpanMd="6">
+                                        <DxFormLayoutItem Caption="Parent Menu:" ColSpanMd="12">
                                             <DxComboBox Data="@ParentMenuDto"
                                                         NullText="Select Parent Menu..."
                                                         @bind-Value="@a.ParentMenu"
@@ -94,10 +94,10 @@
                                                         ValueFieldName="Name">
                                             </DxComboBox>
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Sequence:" ColSpanMd="6">
+                                        <DxFormLayoutItem Caption="Sequence:" ColSpanMd="12">
                                             @EditFormContext.GetEditor("Sequence")
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="URL:" ColSpanMd="6">
+                                        <DxFormLayoutItem Caption="URL:" ColSpanMd="12">
                                             @EditFormContext.GetEditor("Url")
                                         </DxFormLayoutItem>
                                     </DxFormLayout>

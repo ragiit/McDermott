@@ -12,7 +12,7 @@ namespace McDermott.Application.Dtos
 
         public string? Icon { get; set; }
         public string? ParentMenu { get; set; }
-        public string? Sequence { get; set; }
+        public int? Sequence { get; set; }
         public string? Html { get; set; }
         public string? Url { get; set; }
     }

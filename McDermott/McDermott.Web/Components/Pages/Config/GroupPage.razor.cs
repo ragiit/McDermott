@@ -10,6 +10,7 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class GroupPage
     {
+        private bool PanelVisible { get; set; } = true;
         private int Id { get; set; }
         public IGrid Grid { get; set; }
         public IGrid GridGropMenu { get; set; }
@@ -18,6 +19,8 @@ namespace McDermott.Web.Components.Pages.Config
         private bool EditItemsGroupEnabled { get; set; } = false;
         private string GroupName { get; set; }
         private GroupDto Group { get; set; } = new();
+        private object SelectedDataItem { get; set; }
+
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private IReadOnlyList<object> SelectedDataItemsGroupMenu { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
@@ -73,7 +76,8 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                Group = Groups[FocusedRowVisibleIndex];
+                var a = SelectedDataItem as GroupDto;
+                Group = Groups.FirstOrDefault(x => x.Id == a.Id);
                 ShowForm = true;
 
                 if (Group != null)
@@ -140,7 +144,10 @@ namespace McDermott.Web.Components.Pages.Config
             var state = GroupMenus.Count > 0 ? true : false;
             UpdateEditItemsEnabled(state);
         }
-
+        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        {
+            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+        }
         private void GridGroup_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
@@ -149,10 +156,16 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData()
         {
+            PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Group = new();
             GroupMenus = new();
             Groups = await Mediator.Send(new GetGroupQuery());
+
+
+            SelectedDataItem = Groups.OrderBy(x => x.Name).FirstOrDefault();
+
+            PanelVisible = false;
         }
 
         private void LoadGroupMenu()

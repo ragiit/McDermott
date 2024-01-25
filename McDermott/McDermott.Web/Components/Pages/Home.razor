@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using System.Drawing
 
 <PageTitle>Home</PageTitle>
 
@@ -9,6 +10,70 @@
         <h1><label>Hello, world!</label></h1>
 
         Welcome to your new app.
+
+        <br />
+
+        <DxPieChart Data="@SalesData"
+                    CustomizeSeriesPoint="CustomizeSeriesPoint"
+                    T="SaleInfo2">
+            <DxPieChartSeries T="SaleInfo2"
+                              TArgument="string"
+                              TValue="double"
+                              ValueField="si => si.Amount"
+                              ArgumentField="si => si.Region"
+                              SummaryMethod="Enumerable.Sum"
+                              Name="Region Sales">
+                <DxChartSeriesLabel Visible="showLabels"
+                                    Position="RelativePosition.Inside"
+                                    ValueFormat="ChartElementFormat.Thousands(0)"
+                                    BackgroundColor="Color.Transparent" />
+                <DxChartSeriesLegendItem Visible="false" />
+            </DxPieChartSeries>
+            <DxPieChartSeries T="SaleInfo2"
+                              TArgument="string"
+                              TValue="double"
+                              ValueField="si => si.Amount"
+                              ArgumentField="si => si.City"
+                              SummaryMethod="Enumerable.Sum"
+                              Name="City Sales">
+                <DxChartSeriesLabel Visible="showLabels"
+                                    Position="RelativePosition.Inside"
+                                    ValueFormat="ChartElementFormat.Thousands(0)"
+                                    BackgroundColor="Color.Transparent" />
+            </DxPieChartSeries>
+            <DxChartTooltip Enabled="true"
+                            Position="RelativePosition.Outside">
+                <div style="margin: 0.75rem">
+                    <div class="fw-bold">@context.Point.Argument</div>
+                    <div>Sales: @($"${context.Point.Value:#,0.}")</div>
+                </div>
+            </DxChartTooltip>
+            <DxChartTitle Text="Top Sales Worldwide">
+                <DxChartSubTitle Text="USD" />
+            </DxChartTitle>
+            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Center"
+                           VerticalAlignment="VerticalEdge.Bottom"
+                           Position="RelativePosition.Outside"
+                           Orientation="Orientation.Horizontal" />
+        </DxPieChart>
+
+        <DxChart Data="@SalesData2">
+            <DxChartBubbleSeries Name="United States"
+                                 Filter="@((SaleInfo s) => s.Country == "United States")"
+                                 ArgumentField="@(s => s.Date.DayOfWeek.ToString())"
+                                 ValueField="@(s => s.Date.Year)"
+                                 SizeField="@(s => s.Amount)"
+                                 Color="@(Color.FromArgb(208, 208, 208))"
+                                 SummaryMethod="Enumerable.Max" />
+            <DxChartBubbleSeries Name="Canada"
+                                 Filter="@((SaleInfo s) => s.Country == "Canada")"
+                                 ArgumentField="@(s => s.Date.DayOfWeek.ToString())"
+                                 ValueField="@(s => s.Date.Year)"
+                                 SizeField="@(s => s.Amount)"
+                                 Color="@(Color.FromArgb(252, 58, 48))"
+                                 SummaryMethod="Enumerable.Max" />
+            <DxChartLegend Position="RelativePosition.Outside" HorizontalAlignment="HorizontalAlignment.Right" />
+        </DxChart>
     </div>
 </div>
 @* <div class="card">
@@ -65,3 +130,235 @@
 @* @code {
     DateTime SelectedDate { get; set; } = DateTime.Now;
     } *@
+
+@code {
+    IEnumerable<SaleInfo> SalesData2;
+
+    List<SaleInfo2> SalesData = new List<SaleInfo2>
+{
+    new SaleInfo2
+    {
+        Amount = 1000,
+        City = "Asia",
+        Country = "Asia",
+        Date = DateTime.Now,
+        OrderId = 1,
+        Region = "Asia"
+    },
+    new SaleInfo2
+    {
+        Amount = 1500,
+        City = "New York",
+        Country = "North America",
+        Date = DateTime.Now.AddDays(-5),
+        OrderId = 2,
+        Region = "North America"
+    },
+    new SaleInfo2
+    {
+        Amount = 800,
+        City = "Rio de Janeiro",
+        Country = "South America",
+        Date = DateTime.Now.AddDays(-10),
+        OrderId = 3,
+        Region = "South America"
+    },
+    new SaleInfo2
+    {
+        Amount = 1200,
+        City = "London",
+        Country = "Europe",
+        Date = DateTime.Now.AddDays(-15),
+        OrderId = 4,
+        Region = "Europe"
+    },
+    new SaleInfo2
+    {
+        Amount = 2000,
+        City = "Beijing",
+        Country = "Asia",
+        Date = DateTime.Now.AddDays(-20),
+        OrderId = 5,
+        Region = "Asia"
+    },
+    new SaleInfo2
+    {
+        Amount = 1700,
+        City = "Vancouver",
+        Country = "North America",
+        Date = DateTime.Now.AddDays(-25),
+        OrderId = 6,
+        Region = "North America"
+    },
+    new SaleInfo2
+    {
+        Amount = 900,
+        City = "Berlin",
+        Country = "Europe",
+        Date = DateTime.Now.AddDays(-30),
+        OrderId = 7,
+        Region = "Europe"
+    },
+    new SaleInfo2
+    {
+        Amount = 1100,
+        City = "Seoul",
+        Country = "Asia",
+        Date = DateTime.Now.AddDays(-35),
+        OrderId = 8,
+        Region = "Asia"
+    }
+    // Add more SaleInfo items as needed
+};
+
+    bool showLabels = true;
+    Dictionary<object, Color> palette = new() {
+        { "North America", Color.FromArgb(0, 123, 255) },
+        { "South America", Color.FromArgb(40, 167, 69) },
+        { "Europe", Color.FromArgb(220, 53, 69) },
+        { "Asia", Color.FromArgb(23, 162, 184) },
+        { "New York", Color.FromArgb(0, 111, 230) },
+        { "Los Angeles", Color.FromArgb(0, 117, 242) },
+        { "Denver", Color.FromArgb(0, 123, 255) },
+        { "Vancouver", Color.FromArgb(76, 163, 255) },
+        { "Edmonton", Color.FromArgb(153, 202, 255) },
+        { "Rio de Janeiro", Color.FromArgb(36, 150, 62) },
+        { "Buenos Aires", Color.FromArgb(40, 167, 69) },
+        { "Asuncion", Color.FromArgb(148, 229, 166) },
+        { "London", Color.FromArgb(209, 36, 53) },
+        { "Berlin", Color.FromArgb(219, 45, 62) },
+        { "Madrid", Color.FromArgb(227, 91, 104) },
+        { "Moscow", Color.FromArgb(240, 168, 175) },
+        { "Beijing", Color.FromArgb(21, 146, 166) },
+        { "Tokyo", Color.FromArgb(23, 162, 184) },
+        { "Seoul", Color.FromArgb(137, 226, 240) }
+    };
+    void CustomizeSeriesPoint(ChartSeriesPointCustomizationSettings settings)
+    {
+        settings.PointAppearance.Color = palette[settings.Point.Argument];
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        SalesData2 = await Sales.GetSalesAsync();
+
+    }
+
+    public class SaleInfo2
+    {
+        public int OrderId { get; set; }
+        public string Region { get; set; }
+        public string Country { get; set; }
+        public string City { get; set; }
+        public int Amount { get; set; }
+        public DateTime Date { get; set; }
+    }
+    public class SaleInfo
+    {
+        public int OrderId { get; set; }
+        public string Region { get; set; }
+        public string Country { get; set; }
+        public string City { get; set; }
+        public int Amount { get; set; }
+        public DateTime Date { get; set; }
+    }
+    public class Sales
+    {
+        static IList<SaleInfo> dataSource;
+        static Sales()
+        {
+            CreateDataSource();
+        }
+
+        public static Task<IQueryable<SaleInfo>> GetSalesAsync()
+        {
+            return Task.FromResult(dataSource.AsQueryable());
+        }
+
+        static void CreateDataSource()
+        {
+            dataSource = new List<SaleInfo> {
+        new SaleInfo {
+                OrderId = 10248,
+                Region = "North America",
+                Country = "United States",
+                City = "New York",
+                Amount = 1740,
+                Date = DateTime.Parse("2017/01/06")
+            },
+            new SaleInfo {
+                OrderId = 10249,
+                Region = "North America",
+                Country = "United States",
+                City = "Los Angeles",
+                Amount = 850,
+                Date = DateTime.Parse("2017/01/13")
+            },
+            new SaleInfo {
+                OrderId = 10250,
+                Region = "North America",
+                Country = "United States",
+                City = "Denver",
+                Amount = 2235,
+                Date = DateTime.Parse("2017/01/07")
+            },
+            new SaleInfo {
+                OrderId = 10251,
+                Region = "North America",
+                Country = "Canada",
+                City = "Vancouver",
+                Amount = 1965,
+                Date = DateTime.Parse("2017/01/03")
+            },
+            new SaleInfo {
+                OrderId = 10252,
+                Region = "North America",
+                Country = "Canada",
+                City = "Edmonton",
+                Amount = 880,
+                Date = DateTime.Parse("2017/01/10")
+            },
+            new SaleInfo {
+                OrderId = 10253,
+                Region = "South America",
+                Country = "Brazil",
+                City = "Rio de Janeiro",
+                Amount = 5260,
+                Date = DateTime.Parse("2017/01/17")
+            },
+            new SaleInfo {
+                OrderId = 10254,
+                Region = "South America",
+                Country = "Argentina",
+                City = "Buenos Aires",
+                Amount = 2790,
+                Date = DateTime.Parse("2017/01/21")
+            },
+            new SaleInfo {
+                OrderId = 10255,
+                Region = "South America",
+                Country = "Paraguay",
+                City = "Asuncion",
+                Amount = 3140,
+                Date = DateTime.Parse("2017/01/01")
+            },
+            new SaleInfo {
+                OrderId = 10256,
+                Region = "Europe",
+                Country = "United Kingdom",
+                City = "London",
+                Amount = 6175,
+                Date = DateTime.Parse("2017/01/24")
+            },
+            new SaleInfo {
+                OrderId = 10257,
+                Region = "Europe",
+                Country = "Germany",
+                City = "Berlin",
+                Amount = 4575,
+                Date = DateTime.Parse("2017/01/11")
+            },
+            // ...
+    };
+        }
+    }
+}

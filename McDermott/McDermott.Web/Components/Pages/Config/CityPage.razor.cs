@@ -7,11 +7,14 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CityPage
     {
+        private bool PanelVisible { get; set; } = true;
+
         public IGrid Grid { get; set; }
         private List<CityDto> Cities = new();
         private List<ProvinceDto> Provinces = new();
-        //private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
+
         private IReadOnlyList<object> SelectedDataItems { get; set; }
+
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
 
@@ -20,14 +23,18 @@ namespace McDermott.Web.Components.Pages.Config
             Provinces = await Mediator.Send(new GetProvinceQuery());
             await LoadData();
         }
+
         private async Task LoadData()
         {
             Cities = await Mediator.Send(new GetCityQuery());
+            PanelVisible = false;
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
+
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -40,27 +47,33 @@ namespace McDermott.Web.Components.Pages.Config
                 e.CssClass = "header-bold";
             }
         }
+
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsEnabled = enabled;
         }
+
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
             UpdateEditItemsEnabled(true);
         }
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
         }
+
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
+
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+
         private async Task ExportXlsxItem_Click()
         {
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
@@ -68,6 +81,7 @@ namespace McDermott.Web.Components.Pages.Config
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task ExportXlsItem_Click()
         {
             await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
@@ -75,6 +89,7 @@ namespace McDermott.Web.Components.Pages.Config
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task ExportCsvItem_Click()
         {
             await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
@@ -82,6 +97,7 @@ namespace McDermott.Web.Components.Pages.Config
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -100,9 +116,10 @@ namespace McDermott.Web.Components.Pages.Config
             }
             catch (Exception ee)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message);
             }
         }
+
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             var editModel = (CityDto)e.EditModel;

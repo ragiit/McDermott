@@ -13,7 +13,7 @@
     <!-- Google Font: Source Sans Pro -->
     @*  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"> *@
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="AdminLTE/plugins/fontawesome-free/css/all.min.css">
+    @* <link rel="stylesheet" href="AdminLTE/plugins/fontawesome-free/css/all.min.css"> *@
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <!-- Tempusdominus Bootstrap 4 -->
@@ -30,6 +30,8 @@
     <link rel="stylesheet" href="AdminLTE/plugins/daterangepicker/daterangepicker.css">
     <!-- summernote -->
     <link rel="stylesheet" href="AdminLTE/plugins/summernote/summernote-bs4.min.css">
+
+    <link rel="stylesheet" href="fontawesome/css/all.css" />
 
     @*...*@
     @* Bootstrap 5 *@
@@ -63,19 +65,20 @@
             color: red;
         }
 
-        .pop-warning:hover::after{
-            content: "*Form ini wajib di isi";            
+        .pop-warning:hover::after {
+            content: "*Form ini wajib di isi";
             position: absolute;
-            color:#EF0F0F;
-            font-style:italic;
+            color: #EF0F0F;
+            font-style: italic;
             border-radius: 5px;
             margin-top: 2px;
             margin-left: 5px;
             white-space: nowrap;
         }
+
         .required-caption:hover .pop-warning {
-        display: block;
-    }
+            display: block;
+        }
     </style>
 
 </head>

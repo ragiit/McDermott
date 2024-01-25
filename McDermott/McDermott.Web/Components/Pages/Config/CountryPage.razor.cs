@@ -7,6 +7,7 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CountryPage
     {
+        private bool PanelVisible { get; set; } = true;
         private List<string> extentions = new() { ".xlsx", ".xls" };
         private const string ExportFileName = "ExportResult";
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
@@ -27,6 +28,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             SelectedDataItems = new ObservableRangeCollection<object>();
             Countries = await Mediator.Send(new GetCountryQuery());
+            PanelVisible = false;
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)

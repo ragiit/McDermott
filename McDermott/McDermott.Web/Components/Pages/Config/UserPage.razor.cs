@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.CityCommand;
+﻿using DevExpress.Data.XtraReports.Native;
+using static McDermott.Application.Features.Commands.CityCommand;
 using static McDermott.Application.Features.Commands.CountryCommand;
 using static McDermott.Application.Features.Commands.DepartmentCommand;
 using static McDermott.Application.Features.Commands.DistrictCommand;
@@ -15,10 +16,11 @@ namespace McDermott.Web.Components.Pages.Config
     public partial class UserPage
     {
         private bool Loading = true;
+        private bool PanelVisible { get; set; } = true;
         public IGrid Grid { get; set; }
         private List<UserDto> Users = new();
         private UserDto UserForm = new();
-        private IReadOnlyList<object>? SelectedDataItems { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private object SelectedDataItem { get; set; }
 
         private bool EditItemsEnabled { get; set; }
@@ -55,11 +57,13 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task LoadData()
         {
             ShowForm = false;
+            PanelVisible = true;
             Users = await Mediator.Send(new GetUserQuery());
 
             SelectedDataItem = Users.OrderBy(x => x.Name).FirstOrDefault();
 
             Loading = false;
+            PanelVisible = false;
         }
 
         private void SelectedUserFormChanged(string ee)
@@ -187,7 +191,8 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                UserForm = SelectedDataItem as UserDto;
+                var a = SelectedDataItem as UserDto;
+                UserForm = Users.FirstOrDefault(x => x.Id == a.Id);
                 ShowForm = true;
             }
             catch (Exception e)
