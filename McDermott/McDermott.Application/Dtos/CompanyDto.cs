@@ -41,10 +41,10 @@ namespace McDermott.Application.Dtos
         public string Logo { get; set; } = string.Empty;
 
         //Jon Table
-        public CityDto? City { get; set; }
+        //public CityDto? City { get; set; }
 
-        public ProvinceDto? Province { get; set; }
-        public CountryDto? Country { get; set; }
+        //public ProvinceDto? Province { get; set; }
+        //public CountryDto? Country { get; set; }
         //public Currency? Currency { get; set; }
     }
 }
