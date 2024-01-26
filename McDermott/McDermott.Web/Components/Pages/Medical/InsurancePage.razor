@@ -24,7 +24,6 @@
                                         Data="Insurances"
                                         PageSize="10"
                                         @bind-SelectedDataItems="@SelectedDataItems"
-                                        @bind-SelectedDataItem="@SelectedDataItem"
                                         FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                         KeyFieldName="Id"
                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
@@ -52,7 +51,7 @@
                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                             <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
                                             <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
-                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems.Count > 0 || SelectedDataItems != null" />
+                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems.Count > 0" />
                                             <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
                                                 <Items>
                                                     <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />

@@ -1,4 +1,5 @@
-﻿using McDermott.Application.Dtos;
+﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Application.Dtos;
 using static McDermott.Application.Features.Commands.MenuCommand;
 using static McDermott.Application.Features.Commands.ProvinceCommand;
 
@@ -9,9 +10,10 @@ namespace McDermott.Web.Components.Pages.Config
         public IGrid Grid { get; set; }
         private List<MenuDto> Menus = new();
         private List<MenuDto> ParentMenuDto = new();
-        private IReadOnlyList<object> SelectedDataItems { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -36,6 +38,7 @@ namespace McDermott.Web.Components.Pages.Config
             Menus = await Mediator.Send(new GetMenuQuery());
             Menus = [.. Menus.OrderBy(x => x.ParentMenu == null).ThenBy(x => x.Sequence!.ToInt32())];
         }
+
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -48,6 +51,7 @@ namespace McDermott.Web.Components.Pages.Config
                 e.CssClass = "header-bold";
             }
         }
+
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsEnabled = enabled;
@@ -63,15 +67,22 @@ namespace McDermott.Web.Components.Pages.Config
         {
             await Grid.StartEditNewRowAsync();
         }
+
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+        }
+
+        private void ColumnChooserButton_Click()
+        {
+            Grid.ShowColumnChooser();
         }
 
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+
         private async Task ExportXlsxItem_Click()
         {
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
@@ -95,6 +106,7 @@ namespace McDermott.Web.Components.Pages.Config
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             var editModel = (MenuDto)e.EditModel;

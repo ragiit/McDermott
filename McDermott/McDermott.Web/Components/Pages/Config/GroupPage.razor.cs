@@ -19,7 +19,6 @@ namespace McDermott.Web.Components.Pages.Config
         private bool EditItemsGroupEnabled { get; set; } = false;
         private string GroupName { get; set; }
         private GroupDto Group { get; set; } = new();
-        private object SelectedDataItem { get; set; }
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private IReadOnlyList<object> SelectedDataItemsGroupMenu { get; set; } = new ObservableRangeCollection<object>();
@@ -76,8 +75,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                var a = SelectedDataItem as GroupDto;
-                Group = Groups.FirstOrDefault(x => x.Id == a.Id);
+                Group = SelectedDataItems[0].Adapt<GroupDto>();
                 ShowForm = true;
 
                 if (Group != null)
@@ -118,21 +116,6 @@ namespace McDermott.Web.Components.Pages.Config
             await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenu);
         }
 
-        //private async Task OnSave(GridEditModelSavingEventArgs e)
-        //{
-        //    var editModel = (CountryDto)e.EditModel;
-
-        //    if (string.IsNullOrWhiteSpace(editModel.Name))
-        //        return;
-
-        //    if (editModel.Id == 0)
-        //        await Mediator.Send(new CreateCountryRequest(editModel));
-        //    else
-        //        await Mediator.Send(new UpdateCountryRequest(editModel));
-
-        //    await LoadData();
-        //}
-
         private void DeleteItemGrid_Click()
         {
             GridGropMenu.ShowRowDeleteConfirmation(FocusedRowVisibleIndexGroupMenu);
@@ -144,10 +127,12 @@ namespace McDermott.Web.Components.Pages.Config
             var state = GroupMenus.Count > 0 ? true : false;
             UpdateEditItemsEnabled(state);
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
+
         private void GridGroup_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
@@ -161,10 +146,6 @@ namespace McDermott.Web.Components.Pages.Config
             Group = new();
             GroupMenus = new();
             Groups = await Mediator.Send(new GetGroupQuery());
-
-
-            SelectedDataItem = Groups.OrderBy(x => x.Name).FirstOrDefault();
-
             PanelVisible = false;
         }
 

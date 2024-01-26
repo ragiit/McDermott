@@ -11,7 +11,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private List<CountryDto> Countries = new();
         private List<ProvinceDto> Provinces = new();
-        private IReadOnlyList<object> SelectedDataItems { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private dynamic dd;
         private int Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
@@ -56,6 +56,7 @@ namespace McDermott.Web.Components.Pages.Config
             SelectedDataItems = new ObservableRangeCollection<object>();
             Provinces = await Mediator.Send(new GetProvinceQuery());
         }
+
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -68,10 +69,12 @@ namespace McDermott.Web.Components.Pages.Config
                 e.CssClass = "header-bold";
             }
         }
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
         }
+
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -121,6 +124,7 @@ namespace McDermott.Web.Components.Pages.Config
             FocusedRowVisibleIndex = args.VisibleIndex;
             UpdateEditItemsEnabled(true);
         }
+
         //protected async Task SelectedFilesChangedAsync(IEnumerable<UploadFileInfo> files)
         //{
         //    UploadVisible = files.ToList().Count == 0;

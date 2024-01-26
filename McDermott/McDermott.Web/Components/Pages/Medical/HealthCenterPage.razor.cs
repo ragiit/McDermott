@@ -16,7 +16,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private List<string> Types = new List<string>
         {
-            "McDermott"
+            "Clinic"
         };
 
         #region Default Grid
@@ -95,17 +95,15 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
-
-        private void DeleteItem_Click()
-        {
-            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
-        }
-
         private void ColumnChooserButton_Click()
         {
             Grid.ShowColumnChooser();
         }
 
+        private void DeleteItem_Click()
+        {
+            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        } 
         private async Task ExportXlsxItem_Click()
         {
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()

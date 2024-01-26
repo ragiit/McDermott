@@ -8,7 +8,7 @@ namespace McDermott.Web.Components.Pages.Config
         private List<string> extentions = new() { ".xlsx", ".xls" };
         private const string ExportFileName = "ExportResult";
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
-        private IReadOnlyList<object>? SelectedDataItems { get; set; }
+        private IReadOnlyList<object>? SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         //private IEnumerable<GridSelect> a { get; set; }
         private dynamic dd;

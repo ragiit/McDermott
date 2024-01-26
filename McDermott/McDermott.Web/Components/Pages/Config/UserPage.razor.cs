@@ -21,7 +21,6 @@ namespace McDermott.Web.Components.Pages.Config
         private List<UserDto> Users = new();
         private UserDto UserForm = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-        private object SelectedDataItem { get; set; }
 
         private bool EditItemsEnabled { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
@@ -59,9 +58,6 @@ namespace McDermott.Web.Components.Pages.Config
             ShowForm = false;
             PanelVisible = true;
             Users = await Mediator.Send(new GetUserQuery());
-
-            SelectedDataItem = Users.OrderBy(x => x.Name).FirstOrDefault();
-
             Loading = false;
             PanelVisible = false;
         }
@@ -191,8 +187,8 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                var a = SelectedDataItem as UserDto;
-                UserForm = Users.FirstOrDefault(x => x.Id == a.Id);
+                var user = SelectedDataItems[0].Adapt<UserDto>();
+                UserForm = user;
                 ShowForm = true;
             }
             catch (Exception e)

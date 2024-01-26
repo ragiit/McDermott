@@ -17,7 +17,7 @@ namespace McDermott.Web.Components.Pages.Config
         private List<VillageDto> Villages = new();
         private List<CityDto> Cities = new();
 
-        private IReadOnlyList<object> SelectedDataItems { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private dynamic dd;
         private int Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
@@ -42,6 +42,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
+
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsEnabled = enabled;
@@ -52,6 +53,7 @@ namespace McDermott.Web.Components.Pages.Config
             FocusedRowVisibleIndex = args.VisibleIndex;
             UpdateEditItemsEnabled(true);
         }
+
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -64,10 +66,12 @@ namespace McDermott.Web.Components.Pages.Config
                 e.CssClass = "header-bold";
             }
         }
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
         }
+
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -78,10 +82,10 @@ namespace McDermott.Web.Components.Pages.Config
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        //private void ColumnChooserButton_Click()
-        //{
-        //    Grid.ShowColumnChooser();
-        //}
+        private void ColumnChooserButton_Click()
+        {
+            Grid.ShowColumnChooser();
+        }
 
         private async Task ExportXlsxItem_Click()
         {
@@ -98,6 +102,7 @@ namespace McDermott.Web.Components.Pages.Config
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task ExportCsvItem_Click()
         {
             await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions

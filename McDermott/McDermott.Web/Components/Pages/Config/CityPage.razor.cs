@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using DevExpress.Data.XtraReports.Native;
+using Microsoft.JSInterop;
 using static McDermott.Application.Features.Commands.CityCommand;
 using static McDermott.Application.Features.Commands.CountryCommand;
 using static McDermott.Application.Features.Commands.ProvinceCommand;
@@ -13,7 +14,7 @@ namespace McDermott.Web.Components.Pages.Config
         private List<CityDto> Cities = new();
         private List<ProvinceDto> Provinces = new();
 
-        private IReadOnlyList<object> SelectedDataItems { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
@@ -67,6 +68,11 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+        }
+
+        private void ColumnChooserButton_Click()
+        {
+            Grid.ShowColumnChooser();
         }
 
         private void DeleteItem_Click()

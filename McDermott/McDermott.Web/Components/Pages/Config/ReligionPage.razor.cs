@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using DevExpress.Data.XtraReports.Native;
+using Microsoft.JSInterop;
 using static McDermott.Application.Features.Commands.ReligionCommand;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -7,7 +8,7 @@ namespace McDermott.Web.Components.Pages.Config
     {
         public IGrid Grid { get; set; }
         private List<ReligionDto> Religions = new();
-        private IReadOnlyList<object> SelectedDataItems { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
 
@@ -15,14 +16,17 @@ namespace McDermott.Web.Components.Pages.Config
         {
             await LoadData();
         }
+
         private async Task LoadData()
         {
             Religions = await Mediator.Send(new GetReligionQuery());
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
+
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -35,6 +39,7 @@ namespace McDermott.Web.Components.Pages.Config
                 e.CssClass = "header-bold";
             }
         }
+
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsEnabled = enabled;
@@ -50,15 +55,22 @@ namespace McDermott.Web.Components.Pages.Config
         {
             await Grid.StartEditNewRowAsync();
         }
+
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+        }
+
+        private void ColumnChooserButton_Click()
+        {
+            Grid.ShowColumnChooser();
         }
 
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+
         private async Task ExportXlsxItem_Click()
         {
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()

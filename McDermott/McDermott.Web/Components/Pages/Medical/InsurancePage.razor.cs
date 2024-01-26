@@ -25,7 +25,6 @@ namespace McDermott.Web.Components.Pages.Medical
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-        private object SelectedDataItem { get; set; }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
@@ -36,7 +35,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             try
             {
-                if (SelectedDataItems is null || SelectedDataItem is not null)
+                if (SelectedDataItems is null)
                 {
                     await Mediator.Send(new DeleteInsuranceRequest(((InsuranceDto)e.DataItem).Id));
                 }
@@ -141,7 +140,6 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Insurances = await Mediator.Send(new GetInsuranceQuery());
-            SelectedDataItem = Insurances.OrderBy(x => x.Name).FirstOrDefault();
             PanelVisible = false;
         }
 
