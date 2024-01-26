@@ -2,7 +2,7 @@
 
 namespace McDermott.Application.Dtos
 {
-    public partial class CronisCategoryDto:IMapFrom<CronisCategory>
+    public partial class CronisCategoryDto:IMapFrom<ChronisCategory>
     {
         public int Id { get; set; }
 

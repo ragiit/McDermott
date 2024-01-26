@@ -2,18 +2,18 @@
 {
     public partial class Company : BaseAuditableEntity
     {
-        public int CityId { get; set; }
-        public int ProvinceId { get; set; }
-        public int CountryId { get; set; }
+        public int? CityId { get; set; }
+        public int? ProvinceId { get; set; }
+        public int? CountryId { get; set; }
 
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
 
         [StringLength(20)]
-        public string Phone { get; set; } = string.Empty;
+        public string? Phone { get; set; } = string.Empty;
 
         [StringLength(200)]
-        public string Email { get; set; } = string.Empty;
+        public string? Email { get; set; } = string.Empty;
 
         [StringLength(500)]
         public string? Website { get; set; }

@@ -12,6 +12,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.vscode
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -42,6 +43,7 @@ bld/
 
 # Visual Studio 2017 auto generated files
 Generated\ Files/
+McDermott/.vs
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

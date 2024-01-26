@@ -12,6 +12,7 @@ namespace McDermott.Web.Components.Pages.Config
         public IGrid Grid { get; set; }
         private CompanyDto CompanyForm = new();
         private IReadOnlyList<object>? SelectedDataItems { get; set; }
+        private object SelectedDataItem { get; set; }
         private bool EditItemsEnabled { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private bool OnVacation { get; set; } = true;
@@ -134,8 +135,16 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task EditItem_Click()
         {
-            var a = FocusedRowVisibleIndex;
-            //await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            try
+            {
+                var a = SelectedDataItem as CompanyDto;
+                CompanyForm = Companys.FirstOrDefault(x => x.Id == a.Id);
+                ShowForm = true;
+            }
+            catch (Exception e)
+            {
+                var zz = e;
+            }
         }
 
         private void DeleteItem_Click()
