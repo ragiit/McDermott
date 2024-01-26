@@ -1,4 +1,5 @@
-﻿using DevExpress.Data.XtraReports.Native;
+﻿using DevExpress.Blazor.Internal;
+using DevExpress.Data.XtraReports.Native;
 using McDermott.Domain.Entities;
 using Microsoft.JSInterop;
 using System.ComponentModel.DataAnnotations;
@@ -14,6 +15,7 @@ namespace McDermott.Web.Components.Pages.Config
         private int Id { get; set; }
         public IGrid Grid { get; set; }
         public IGrid GridGropMenu { get; set; }
+        private bool IsAddMenu { get; set; } = false;
         private bool ShowForm { get; set; } = false;
         private bool EditItemsEnabled { get; set; }
         private bool EditItemsGroupEnabled { get; set; } = false;
@@ -108,11 +110,13 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItemGroup_Click()
         {
+            IsAddMenu = true;
             await GridGropMenu.StartEditNewRowAsync();
         }
 
         private async Task EditItemGroup_Click()
         {
+            IsAddMenu = false;
             await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenu);
         }
 
@@ -176,7 +180,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private void ColumnChooserButton_Click()
         {
-            Grid.ShowColumnChooser();
+            GridGropMenu.ShowColumnChooser();
         }
 
         private async Task ExportXlsxItem_Click()
@@ -218,17 +222,32 @@ namespace McDermott.Web.Components.Pages.Config
             if (GroupMenus.Where(x => x.MenuId == groupMenu.MenuId).Any())
                 return;
 
-            var update = GroupMenus.FirstOrDefault(x => x.MenuId == groupMenu.MenuId);
-            groupMenu.Menu = Menus.FirstOrDefault(x => x.Id == groupMenu.MenuId);
-            if (update == null)
+            GroupMenuDto updateMenu = new();
+
+            if (IsAddMenu)
+            {
+                updateMenu = GroupMenus.FirstOrDefault(x => x.MenuId == groupMenu.MenuId)!;
+                groupMenu.Menu = Menus.FirstOrDefault(x => x.Id == groupMenu.MenuId);
+            }
+            else
+            {
+                var q = SelectedDataItemsGroupMenu[0].Adapt<GroupMenuDto>();
+
+                updateMenu = GroupMenus.FirstOrDefault(x => x.MenuId == q.MenuId)!;
+                groupMenu.Menu = Menus.FirstOrDefault(x => x.Id == groupMenu.MenuId);
+            }
+
+            if (IsAddMenu)
             {
                 GroupMenus.Add(groupMenu);
             }
             else
             {
-                var index = GroupMenus.IndexOf(update);
+                var index = GroupMenus.IndexOf(updateMenu!);
                 GroupMenus[index] = groupMenu;
             }
+
+            SelectedDataItemsGroupMenu = new ObservableRangeCollection<object>();
         }
 
         private void CancelItemGroupMenuGrid_Click()

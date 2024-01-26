@@ -67,13 +67,14 @@
 
         .pop-warning:hover::after {
             content: "*Form ini wajib di isi";
-            position: absolute;
+            position: fixed;
             color: #EF0F0F;
             font-style: italic;
             border-radius: 5px;
             margin-top: 2px;
             margin-left: 5px;
             white-space: nowrap;
+            z-index: 1;
         }
 
         .required-caption:hover .pop-warning {

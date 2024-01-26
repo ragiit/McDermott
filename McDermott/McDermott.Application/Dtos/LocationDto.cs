@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos
 {
-    public partial class DiseaseCategoryDto : IMapFrom<DiseaseCategory>
+    public class LocationDto : IMapFrom<Location>
     {
         public int Id { get; set; }
-        public string? ParentCategory { get; set; }
 
         [Required]
         [StringLength(200)]

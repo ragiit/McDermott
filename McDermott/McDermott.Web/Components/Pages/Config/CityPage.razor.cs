@@ -27,6 +27,8 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData()
         {
+            PanelVisible = true; 
+            SelectedDataItems = new ObservableRangeCollection<object>();
             Cities = await Mediator.Send(new GetCityQuery());
             PanelVisible = false;
         }

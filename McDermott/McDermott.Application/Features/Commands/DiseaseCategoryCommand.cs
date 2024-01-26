@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace McDermott.Application.Features.Commands
 {
-    public class DiseaseCadegoryCommand
+    public class DiseaseCategoryCommand
     {
         public class GetDiseaseCategoryQuery : IRequest<List<DiseaseCategoryDto>>;
 

@@ -35,6 +35,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData()
         {
+            SelectedDataItems = new ObservableRangeCollection<object>();
             Menus = await Mediator.Send(new GetMenuQuery());
             Menus = [.. Menus.OrderBy(x => x.ParentMenu == null).ThenBy(x => x.Sequence!.ToInt32())];
         }

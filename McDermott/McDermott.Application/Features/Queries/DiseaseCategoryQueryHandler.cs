@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.DiseaseCadegoryCommand;
+using static McDermott.Application.Features.Commands.DiseaseCategoryCommand;
 
 namespace McDermott.Application.Features.Queries
 {

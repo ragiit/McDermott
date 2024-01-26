@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace McDermott.Domain.Entities
 {
-    public partial class DiseaseCategory: BaseAuditableEntity
+    public partial class DiseaseCategory : BaseAuditableEntity
     {
         [StringLength(300)]
         public string Name { get; set; }
 
-        public String ParentCategory { get; set; }
-
-        
+        public string? ParentCategory { get; set; }
     }
 }

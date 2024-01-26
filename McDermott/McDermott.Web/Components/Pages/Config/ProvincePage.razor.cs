@@ -54,6 +54,7 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task LoadData()
         {
             SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = new ObservableRangeCollection<object>();
             Provinces = await Mediator.Send(new GetProvinceQuery());
         }
 

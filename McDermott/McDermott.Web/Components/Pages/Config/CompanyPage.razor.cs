@@ -4,6 +4,7 @@ using static McDermott.Application.Features.Commands.ProvinceCommand;
 using static McDermott.Application.Features.Commands.CompanyCommand;
 using Blazored.LocalStorage;
 using System.ComponentModel.DataAnnotations;
+using DevExpress.Data.XtraReports.Native;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -11,7 +12,7 @@ namespace McDermott.Web.Components.Pages.Config
     {
         public IGrid Grid { get; set; }
         private CompanyDto CompanyForm = new();
-        private IReadOnlyList<object>? SelectedDataItems { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private object SelectedDataItem { get; set; }
         private bool EditItemsEnabled { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
@@ -19,13 +20,11 @@ namespace McDermott.Web.Components.Pages.Config
         private bool ShowForm { get; set; } = false;
         private bool FormValidationState = false;
 
-
         public List<CompanyDto> Companys = new();
         public List<CountryDto> Countries { get; set; }
         public List<ProvinceDto> Provinces { get; set; }
         public List<CityDto> Cities { get; set; }
         // public List<CurrencyDto> Currencys {get; private set;}
-
 
         private async Task LoadData()
         {
@@ -35,6 +34,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
+            SelectedDataItems = new ObservableRangeCollection<object>();
             Countries = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Cities = await Mediator.Send(new GetCityQuery());
@@ -42,25 +42,14 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadData();
         }
 
-        private async Task HandleValidSubmit()
+        private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            FormValidationState = true;
-            await OnSave();
-        }
-        private async Task HandleInvalidSubmit()
-        {
-            FormValidationState = false;
-        }
-        private async Task OnSave()
-        {
-            if (!FormValidationState)
-                return;
+            var editModel = (CompanyDto)e.EditModel;
 
-
-            if (CompanyForm.Id == 0)
-                await Mediator.Send(new CreateCompanyRequest(CompanyForm));
+            if (editModel.Id == 0)
+                await Mediator.Send(new CreateCompanyRequest(editModel));
             else
-                await Mediator.Send(new CreateCompanyRequest(CompanyForm));
+                await Mediator.Send(new UpdateCompanyRequest(editModel));
 
             await LoadData();
         }
@@ -129,22 +118,12 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItem_Click()
         {
-            CompanyForm = new();
-            ShowForm = true;
+            await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
-            try
-            {
-                var a = SelectedDataItem as CompanyDto;
-                CompanyForm = Companys.FirstOrDefault(x => x.Id == a.Id);
-                ShowForm = true;
-            }
-            catch (Exception e)
-            {
-                var zz = e;
-            }
+            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
         private void DeleteItem_Click()

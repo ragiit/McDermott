@@ -54,11 +54,18 @@ namespace McDermott.Application.Features.Queries
 
             public async Task<CompanyDto> Handle(CreateCompanyRequest request, CancellationToken cancellationToken)
             {
-                var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDto.Adapt<Company>());
+                try
+                {
+                    var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDto.Adapt<Company>());
 
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return result.Adapt<CompanyDto>();
+                    return result.Adapt<CompanyDto>();
+                }
+                catch (Exception e)
+                {
+                    throw;
+                }
             }
         }
 
@@ -100,20 +107,20 @@ namespace McDermott.Application.Features.Queries
 
         internal class DeleteListCompanyHandler : IRequestHandler<DeleteListCompanyRequest, bool>
         {
-           private readonly IUnitOfWork _unitOfWork;
+            private readonly IUnitOfWork _unitOfWork;
 
-           public DeleteListCompanyHandler(IUnitOfWork unitOfWork)
-           {
-               _unitOfWork = unitOfWork;
-           }
+            public DeleteListCompanyHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
 
-           public async Task<bool> Handle(DeleteListCompanyRequest request, CancellationToken cancellationToken)
-           {
-               await _unitOfWork.Repository<Company>().DeleteAsync(request.Id);
-               await _unitOfWork.SaveChangesAsync(cancellationToken);
+            public async Task<bool> Handle(DeleteListCompanyRequest request, CancellationToken cancellationToken)
+            {
+                await _unitOfWork.Repository<Company>().DeleteAsync(request.Id);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-               return true;
-           }
+                return true;
+            }
         }
     }
 }

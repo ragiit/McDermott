@@ -135,6 +135,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             PanelVisible = true;
 
+            SelectedDataItems = new ObservableRangeCollection<object>();
             Services = await Mediator.Send(new GetServiceQuery());
 
             PanelVisible = false;

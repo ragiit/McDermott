@@ -19,6 +19,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData()
         {
+            SelectedDataItems = new ObservableRangeCollection<object>();
             Religions = await Mediator.Send(new GetReligionQuery());
         }
 

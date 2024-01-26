@@ -1,12 +1,11 @@
-﻿@page "/medical/cronis-category"
-@using static McDermott.Web.Helper
+﻿@page "/medical/diagnosis"
 @rendermode InteractiveServer
 
-<PageTitle>Chronic Category</PageTitle>
+<PageTitle>Diagnosis</PageTitle>
 
 <div class="wrapper">
 
-    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Chronic Category" />
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Diagnosis" />
 
     <section class="content">
         <div class="container-fluid">
@@ -20,8 +19,9 @@
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
+
                                 <DxGrid @ref="Grid"
-                                        Data="Chronises"
+                                        Data="Diagnoses"
                                         PageSize="10"
                                         @bind-SelectedDataItems="@SelectedDataItems"
                                         FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -32,11 +32,11 @@
                                         EditMode="GridEditMode.PopupEditForm"
                                         PopupEditFormCssClass="pw-800"
                                         PagerPosition="GridPagerPosition.Bottom"
-                                        AllowSelectRowByClick="true"
                                         PageSizeSelectorVisible="true"
                                         PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                         PageSizeSelectorAllRowsItemVisible="true"
                                         PagerSwitchToInputBoxButtonCount="10"
+                                        AllowSelectRowByClick="true"
                                         FocusedRowEnabled="true"
                                         PagerVisibleNumericButtonCount="10"
                                         FocusedRowChanged="Grid_FocusedRowChanged"
@@ -50,8 +50,8 @@
                                     <ToolbarTemplate>
                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                             <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                            <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Chronises.Count > 0" />
-                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Chronises.Count > 0" />
+                                            <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Diagnoses.Count > 0" />
+                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Diagnoses.Count > 0" />
                                             <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                             <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
                                                 <Items>
@@ -66,11 +66,13 @@
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
                                         <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                        <DxGridDataColumn FieldName="Description" />
+                                        <DxGridDataColumn FieldName="Code"  />
+                                        <DxGridDataColumn FieldName="DiseaseCategory.Name" Caption="Disease Category" />
+                                        @* <DxGridDataColumn FieldName="CronisKategory.Name" Caption="Chronic Category" /> *@
                                     </Columns>
                                     <EditFormTemplate Context="EditFormContext">
                                         @{
-                                            var a = (CronisCategoryDto)EditFormContext.EditModel;
+                                            var a = (DiagnosisDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
@@ -78,8 +80,24 @@
                                                     @EditFormContext.GetEditor("Name")
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Description:" ColSpanMd="12">
-                                                <DxMemo @bind-Text="@a.Description" Rows="4" />
+                                             <DxFormLayoutItem  Caption="Code:" ColSpanMd="12">
+                                                    @EditFormContext.GetEditor("Code")
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Disease Category:" ColSpanMd="12">
+                                                <DxComboBox Data="@Diseases"
+                                                            NullText="Select Disease..."
+                                                            @bind-Value="@a.DiseaseCategoryId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id">
+                                                </DxComboBox>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Chronic Category:" ColSpanMd="12">
+                                                <DxComboBox Data="@Cronises"
+                                                            NullText="Select Chronic..."
+                                                            @bind-Value="@a.CronisCategoryId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id">
+                                                </DxComboBox>
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>
@@ -89,6 +107,6 @@
                     </div>
                 </div>
             </div>
-        </div>
+            </div>
     </section>
 </div>

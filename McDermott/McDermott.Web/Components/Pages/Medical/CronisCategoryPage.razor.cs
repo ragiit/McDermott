@@ -1,18 +1,18 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-//using MediatR;
-//using Microsoft.JSInterop;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.JSInterop;
 using static McDermott.Application.Features.Commands.CronisCategoryCommand;
+using System.ComponentModel.DataAnnotations;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
-    public partial class ChronisCategoryPage
+    public partial class CronisCategoryPage
     {
+        private bool PanelVisible { get; set; } = true;
         private List<string> extentions = new() { ".xlsx", ".xls" };
         private const string ExportFileName = "ExportResult";
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
         private List<CronisCategoryDto> Chronises = new();
-        private IReadOnlyList<object> SelectedDataItems { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private dynamic dd;
         private int Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
@@ -26,8 +26,10 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task LoadData()
         {
+            PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Chronises = await Mediator.Send(new GetCronisCategoryQuery());
+            PanelVisible = false;
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)

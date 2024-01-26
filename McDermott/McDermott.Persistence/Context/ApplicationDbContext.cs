@@ -43,8 +43,12 @@ namespace McDermott.Persistence.Context
         public DbSet<Building> Buildings { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Insurance> Insurances { get; set; }
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<BuildingLocation> BuildingLocations { get; set; }
 
         #endregion DbSet
+
+        #region MyRegion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -244,5 +248,7 @@ namespace McDermott.Persistence.Context
             //}
             return SaveChangesAsync().GetAwaiter().GetResult();
         }
+
+        #endregion MyRegion
     }
 }

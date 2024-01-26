@@ -1,60 +1,46 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using Microsoft.JSInterop;
 using static McDermott.Application.Features.Commands.DiseaseCategoryCommand;
+using static McDermott.Application.Features.Commands.CronisCategoryCommand;
+using static McDermott.Application.Features.Commands.DiagnosisCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
-    public partial class DiseaseCategoryPage
+    public partial class DiagnosisPage
     {
         private bool PanelVisible { get; set; } = true;
+
         public IGrid Grid { get; set; }
-        private List<DiseaseCategoryDto> DiseaseCategorys = new();
-        private List<DiseaseCategoryDto> ParentCategoryDto = new();
+        private List<DiagnosisDto> Diagnoses = new();
+        private List<DiseaseCategoryDto> Diseases = new();
+        private List<CronisCategoryDto> Cronises = new();
+
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private async Task OnDelete(GridDataItemDeletingEventArgs e)
-        {
-            try
-            {
-                if (SelectedDataItems is null)
-                {
-                    await Mediator.Send(new DeleteDiseaseCategoryRequest(((DiseaseCategoryDto)e.DataItem).Id));
-                }
-                else
-                {
-                    var a = SelectedDataItems.Adapt<List<DiseaseCategoryDto>>();
-                    await Mediator.Send(new DeleteListDiseaseCategoryRequest(a.Select(x => x.Id).ToList()));
-                }
-                await LoadData();
-            }
-            catch (Exception ee)
-            {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message);
-            }
-        }
-
         protected override async Task OnInitializedAsync()
         {
-            var q = await Mediator.Send(new GetDiseaseCategoryQuery());
-            ParentCategoryDto = [.. q.Where(x => x.ParentCategory == null || x.ParentCategory == "")];
+            var a = await Mediator.Send(new GetDiseaseCategoryQuery());
+            Diseases = [.. a.Where(x => x.ParentCategory != null || x.ParentCategory != "")];
+            Cronises = await Mediator.Send(new GetCronisCategoryQuery());
 
             await LoadData();
+
         }
 
         private async Task LoadData()
         {
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
-            DiseaseCategorys = await Mediator.Send(new GetDiseaseCategoryQuery());
-            DiseaseCategorys = [.. DiseaseCategorys.OrderBy(x => x.ParentCategory == null)];
+            Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
             PanelVisible = false;
+        }
+
+        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        {
+            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
 
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
@@ -91,14 +77,14 @@ namespace McDermott.Web.Components.Pages.Medical
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
-        private void DeleteItem_Click()
-        {
-            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
-        }
-
         private void ColumnChooserButton_Click()
         {
             Grid.ShowColumnChooser();
+        }
+
+        private void DeleteItem_Click()
+        {
+            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
         private async Task ExportXlsxItem_Click()
@@ -124,18 +110,39 @@ namespace McDermott.Web.Components.Pages.Medical
                 ExportSelectedRowsOnly = true,
             });
         }
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                var aq = SelectedDataItems.Count;
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteDiagnosisRequest(((DiagnosisDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<DiagnosisDto>>();
+                    await Mediator.Send(new DeleteListDiagnosisRequest(a.Select(x => x.Id).ToList()));
+                }
+                await LoadData();
+            }
+            catch (Exception ee)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message);
+            }
+        }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (DiseaseCategoryDto)e.EditModel;
+            var editModel = (DiagnosisDto)e.EditModel;
 
             if (string.IsNullOrWhiteSpace(editModel.Name))
                 return;
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateDiseaseCategoryRequest(editModel));
+                await Mediator.Send(new CreateDiagnosisRequest(editModel));
             else
-                await Mediator.Send(new UpdateDiseaseCategoryRequest(editModel));
+                await Mediator.Send(new UpdateDiagnosisRequest(editModel));
 
             await LoadData();
         }

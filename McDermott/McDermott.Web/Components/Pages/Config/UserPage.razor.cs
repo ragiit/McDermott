@@ -57,6 +57,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             ShowForm = false;
             PanelVisible = true;
+            SelectedDataItems = new ObservableRangeCollection<object>();
             Users = await Mediator.Send(new GetUserQuery());
             Loading = false;
             PanelVisible = false;
