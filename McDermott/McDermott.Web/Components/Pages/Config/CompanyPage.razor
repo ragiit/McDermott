@@ -15,6 +15,7 @@
                                     Data="Companys"
                                     PageSize="10"
                                     @bind-SelectedDataItems="@SelectedDataItems"
+                                    @bind-SelectedDataItem="@SelectedDataItem"
                                     FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                     KeyFieldName="Id"
                                     CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
@@ -40,7 +41,7 @@
                                 <ToolbarTemplate>
                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                         <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
-                                        <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
+                                        <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit"  Enabled="SelectedDataItem != null && Companys.Count > 0" />
                                         <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="EditItemsEnabled" />`
                                         <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
                                             <Items>
@@ -72,10 +73,10 @@
                                             <DxTextBox @bind-Text="@CompanyForm.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name Company" />
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem caption="Email: ">
-                                            <DxTextBox @bind-Text="@CompanyForm.Email" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Email Company" />
+                                            <DxTextBox @bind-Text="@CompanyForm.Email"  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Email Company" />
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem caption="Phone: ">
-                                            <DxTextBox @bind-Text="@CompanyForm.Phone" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Phone Company" />
+                                            <DxTextBox @bind-Text="@CompanyForm.Phone"  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Phone Company" />
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem caption="Website: ">
                                             <DxTextBox @bind-Text="@CompanyForm.Website" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Website Company" />

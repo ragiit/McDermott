@@ -1,0 +1,85 @@
+﻿@page "/medical/cronis-category"
+@using static McDermott.Web.Helper
+@rendermode InteractiveServer
+
+<PageTitle>Chronic Category</PageTitle>
+
+<div class="wrapper">
+
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Chronic Category" />
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <DxGrid @ref="Grid"
+                                    Data="Cronises"
+                                    PageSize="10"
+                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                    KeyFieldName="Id"
+                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                    EditModelSaving="OnSave"
+                                    DataItemDeleting="OnDelete"
+                                    EditMode="GridEditMode.PopupEditForm"
+                                    PopupEditFormCssClass="pw-800"
+                                    PagerPosition="GridPagerPosition.Bottom"
+                                    PageSizeSelectorVisible="true"
+                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                    PageSizeSelectorAllRowsItemVisible="true"
+                                    PagerSwitchToInputBoxButtonCount="10"
+                                    FocusedRowEnabled="true"
+                                    PagerVisibleNumericButtonCount="10"
+                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                    ShowGroupPanel="true"
+                                    AutoExpandAllGroupRows="true"
+                                    ShowFilterRow="true"
+                                    CustomizeElement="Grid_CustomizeElement"
+                                    ShowSearchBox="true"
+                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                    KeyboardNavigationEnabled="true">
+                                <ToolbarTemplate>
+                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                        <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
+                                        <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
+                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems.Count > 0" />`
+                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" />
+                                        <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
+                                            <Items>
+                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                            </Items>
+                                        </DxToolbarItem>
+                                    </DxToolbar>
+                                </ToolbarTemplate>
+                                <Columns>
+                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                    <DxGridDataColumn FieldName="Description" />
+                                </Columns>
+                                <EditFormTemplate Context="EditFormContext">
+                                    @{
+                                        var a = (ChronisCategoryDto)EditFormContext.EditModel;
+                                    }
+                                    <DxFormLayout CssClass="w-100">
+                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                            <div class="pop-warning">
+                                                @EditFormContext.GetEditor("Name")
+                                            </div>
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Description:" ColSpanMd="12" >
+                                            <DxMemo @bind-Text="@a.Description" Rows="4"/>
+                                        </DxFormLayoutItem>
+                                    </DxFormLayout>
+                                </EditFormTemplate>
+                            </DxGrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

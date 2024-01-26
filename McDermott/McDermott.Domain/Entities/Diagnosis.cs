@@ -14,6 +14,6 @@ namespace McDermott.Domain.Entities
         public int CronisCategoryId { get; set; }
 
         public virtual List<DiseaseCategory> DiseaseCategory { get; set; }
-        public virtual List<CronisCategory>CronisKategory { get; set; }
+        public virtual List<ChronisCategory>CronisKategory { get; set; }
     }
 }
