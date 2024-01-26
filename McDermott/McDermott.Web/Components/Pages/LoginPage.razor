@@ -110,6 +110,8 @@
                 var ids = groups.Select(x => x.MenuId).ToList();
                 List<MenuDto> DetailMenuDtos = menus.Where(x => x.ParentMenu != null && ids.Contains(x.Id)).OrderBy(x => x.Sequence).ToList();
 
+                var menu = Helper.HashWithSHA256(string.Join(",", DetailMenuDtos.Select(x => x.Name)));
+
                 await oLocal.SetItemAsync("Menu", string.Join(",", DetailMenuDtos.Select(x => x.Name)));
             }
             else

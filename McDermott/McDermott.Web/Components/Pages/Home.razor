@@ -7,73 +7,73 @@
 <div class="content-header">
     <div class="container-fluid">
 
-        <h1><label>Hello, world!</label></h1>
+        <h1><label>Hello!</label></h1>
 
         Welcome to your new app.
 
         <br />
 
-        <DxPieChart Data="@SalesData"
-                    CustomizeSeriesPoint="CustomizeSeriesPoint"
-                    T="SaleInfo2">
-            <DxPieChartSeries T="SaleInfo2"
-                              TArgument="string"
-                              TValue="double"
-                              ValueField="si => si.Amount"
-                              ArgumentField="si => si.Region"
-                              SummaryMethod="Enumerable.Sum"
-                              Name="Region Sales">
-                <DxChartSeriesLabel Visible="showLabels"
-                                    Position="RelativePosition.Inside"
-                                    ValueFormat="ChartElementFormat.Thousands(0)"
-                                    BackgroundColor="Color.Transparent" />
-                <DxChartSeriesLegendItem Visible="false" />
-            </DxPieChartSeries>
-            <DxPieChartSeries T="SaleInfo2"
-                              TArgument="string"
-                              TValue="double"
-                              ValueField="si => si.Amount"
-                              ArgumentField="si => si.City"
-                              SummaryMethod="Enumerable.Sum"
-                              Name="City Sales">
-                <DxChartSeriesLabel Visible="showLabels"
-                                    Position="RelativePosition.Inside"
-                                    ValueFormat="ChartElementFormat.Thousands(0)"
-                                    BackgroundColor="Color.Transparent" />
-            </DxPieChartSeries>
-            <DxChartTooltip Enabled="true"
-                            Position="RelativePosition.Outside">
-                <div style="margin: 0.75rem">
-                    <div class="fw-bold">@context.Point.Argument</div>
-                    <div>Sales: @($"${context.Point.Value:#,0.}")</div>
-                </div>
-            </DxChartTooltip>
-            <DxChartTitle Text="Top Sales Worldwide">
-                <DxChartSubTitle Text="USD" />
-            </DxChartTitle>
-            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Center"
-                           VerticalAlignment="VerticalEdge.Bottom"
-                           Position="RelativePosition.Outside"
-                           Orientation="Orientation.Horizontal" />
+        @* <DxPieChart Data="@SalesData"
+        CustomizeSeriesPoint="CustomizeSeriesPoint"
+        T="SaleInfo2">
+        <DxPieChartSeries T="SaleInfo2"
+        TArgument="string"
+        TValue="double"
+        ValueField="si => si.Amount"
+        ArgumentField="si => si.Region"
+        SummaryMethod="Enumerable.Sum"
+        Name="Region Sales">
+        <DxChartSeriesLabel Visible="showLabels"
+        Position="RelativePosition.Inside"
+        ValueFormat="ChartElementFormat.Thousands(0)"
+        BackgroundColor="Color.Transparent" />
+        <DxChartSeriesLegendItem Visible="false" />
+        </DxPieChartSeries>
+        <DxPieChartSeries T="SaleInfo2"
+        TArgument="string"
+        TValue="double"
+        ValueField="si => si.Amount"
+        ArgumentField="si => si.City"
+        SummaryMethod="Enumerable.Sum"
+        Name="City Sales">
+        <DxChartSeriesLabel Visible="showLabels"
+        Position="RelativePosition.Inside"
+        ValueFormat="ChartElementFormat.Thousands(0)"
+        BackgroundColor="Color.Transparent" />
+        </DxPieChartSeries>
+        <DxChartTooltip Enabled="true"
+        Position="RelativePosition.Outside">
+        <div style="margin: 0.75rem">
+        <div class="fw-bold">@context.Point.Argument</div>
+        <div>Sales: @($"${context.Point.Value:#,0.}")</div>
+        </div>
+        </DxChartTooltip>
+        <DxChartTitle Text="Top Sales Worldwide">
+        <DxChartSubTitle Text="USD" />
+        </DxChartTitle>
+        <DxChartLegend HorizontalAlignment="HorizontalAlignment.Center"
+        VerticalAlignment="VerticalEdge.Bottom"
+        Position="RelativePosition.Outside"
+        Orientation="Orientation.Horizontal" />
         </DxPieChart>
 
         <DxChart Data="@SalesData2">
-            <DxChartBubbleSeries Name="United States"
-                                 Filter="@((SaleInfo s) => s.Country == "United States")"
-                                 ArgumentField="@(s => s.Date.DayOfWeek.ToString())"
-                                 ValueField="@(s => s.Date.Year)"
-                                 SizeField="@(s => s.Amount)"
-                                 Color="@(Color.FromArgb(208, 208, 208))"
-                                 SummaryMethod="Enumerable.Max" />
-            <DxChartBubbleSeries Name="Canada"
-                                 Filter="@((SaleInfo s) => s.Country == "Canada")"
-                                 ArgumentField="@(s => s.Date.DayOfWeek.ToString())"
-                                 ValueField="@(s => s.Date.Year)"
-                                 SizeField="@(s => s.Amount)"
-                                 Color="@(Color.FromArgb(252, 58, 48))"
-                                 SummaryMethod="Enumerable.Max" />
-            <DxChartLegend Position="RelativePosition.Outside" HorizontalAlignment="HorizontalAlignment.Right" />
-        </DxChart>
+        <DxChartBubbleSeries Name="United States"
+        Filter="@((SaleInfo s) => s.Country == "United States")"
+        ArgumentField="@(s => s.Date.DayOfWeek.ToString())"
+        ValueField="@(s => s.Date.Year)"
+        SizeField="@(s => s.Amount)"
+        Color="@(Color.FromArgb(208, 208, 208))"
+        SummaryMethod="Enumerable.Max" />
+        <DxChartBubbleSeries Name="Canada"
+        Filter="@((SaleInfo s) => s.Country == "Canada")"
+        ArgumentField="@(s => s.Date.DayOfWeek.ToString())"
+        ValueField="@(s => s.Date.Year)"
+        SizeField="@(s => s.Amount)"
+        Color="@(Color.FromArgb(252, 58, 48))"
+        SummaryMethod="Enumerable.Max" />
+        <DxChartLegend Position="RelativePosition.Outside" HorizontalAlignment="HorizontalAlignment.Right" />
+        </DxChart> *@
     </div>
 </div>
 @* <div class="card">

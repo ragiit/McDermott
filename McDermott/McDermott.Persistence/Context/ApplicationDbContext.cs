@@ -42,6 +42,7 @@ namespace McDermott.Persistence.Context
         public DbSet<HealthCenter> HealthCenters { get; set; }
         public DbSet<Building> Buildings { get; set; }
         public DbSet<Service> Services { get; set; }
+        public DbSet<Insurance> Insurances { get; set; }
 
         #endregion DbSet
 

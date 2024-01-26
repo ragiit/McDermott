@@ -3,13 +3,23 @@ using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-
+using System.Security.Cryptography;
+using System.Text;
 
 namespace McDermott.Web
 {
     public static class Helper
     {
         public static User? UserLogin { get; set; }
+
+        public static string HashWithSHA256(string data)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(data));
+                return Convert.ToBase64String(hashedBytes);
+            }
+        }
 
         public class EnumEditModeData
         {

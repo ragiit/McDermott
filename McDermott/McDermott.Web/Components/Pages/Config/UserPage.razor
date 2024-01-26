@@ -1,4 +1,4 @@
-﻿@page "/config/user"
+﻿    @page "/config/user"
 @using static McDermott.Web.Helper
 @rendermode InteractiveServer
 
@@ -15,62 +15,64 @@
                     <div class="card">
                         @if (!ShowForm)
                         {
-                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                            IsContentBlocked="true"
-                                            ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="false"
-                                            Text="Fetching Data...">
-                                <DxGrid @ref="Grid"
-                                        Data="Users"
-                                        PageSize="10"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        @bind-SelectedDataItem="@SelectedDataItem"
-                                        AllowSelectRowByClick="true"
-                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                        KeyFieldName="Id"
-                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                        EditModelSaving="OnSave"
-                                        DataItemDeleting="OnDelete"
-                                        FocusedRowEnabled="true"
-                                        PopupEditFormCssClass="pw-800"
-                                        PagerPosition="GridPagerPosition.Bottom"
-                                        PageSizeSelectorVisible="true"
-                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        PageSizeSelectorAllRowsItemVisible="true"
-                                        PagerSwitchToInputBoxButtonCount="10"
-                                        PagerVisibleNumericButtonCount="10"
-                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                        ShowGroupPanel="true"
-                                        AutoExpandAllGroupRows="true"
-                                        ShowFilterRow="true"
-                                        ShowSearchBox="true"
-                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                        KeyboardNavigationEnabled="true">
-                                    <ToolbarTemplate>
-                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                            <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                            <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItem != null && Users.Count > 0" />
-                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems != null && Users.Count > 0" />
-                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                            <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
-                                                <Items>
-                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                </Items>
-                                            </DxToolbarItem>
-                                            <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                        </DxToolbar>
-                                    </ToolbarTemplate>
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                        <DxGridDataColumn FieldName="Email" />
-                                        <DxGridDataColumn FieldName="Group.Name" Caption="Group" />
-                                    </Columns>
-                                </DxGrid>
-                            </DxLoadingPanel>
+                            <div class="card-body">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <DxGrid @ref="Grid"
+                                            Data="Users"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            @bind-SelectedDataItem="@SelectedDataItem"
+                                            AllowSelectRowByClick="true"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            EditModelSaving="OnSave"
+                                            DataItemDeleting="OnDelete"
+                                            FocusedRowEnabled="true"
+                                            PopupEditFormCssClass="pw-800"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            PagerVisibleNumericButtonCount="10"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            ShowFilterRow="true"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItem != null && Users.Count > 0" />
+                                                <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems != null && Users.Count > 0" />
+                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                                <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Email" />
+                                            <DxGridDataColumn FieldName="Group.Name" Caption="Group" />
+                                        </Columns>
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                            </div>
                         }
 
                         @if (ShowForm)
@@ -86,18 +88,18 @@
                                         <DxFormLayoutItem Caption="Email:">
                                             <DxTextBox @bind-Text="@UserForm.Email" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Email" />
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="NIP:">
-                                            <DxSpinEdit @bind-Value="@UserForm.NIP" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="NIP" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Legacy:">
-                                            <DxTextBox @bind-Text="@UserForm.Legacy" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Legacy" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Oracle:">
-                                            <DxTextBox @bind-Text="@UserForm.Oracle" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Oracle" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="SAP:">
-                                            <DxTextBox @bind-Text="@UserForm.SAP" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="SAP" />
-                                        </DxFormLayoutItem>
+                                        @*  <DxFormLayoutItem Caption="NIP:">
+                                    <DxSpinEdit @bind-Value="@UserForm.NIP" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="NIP" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Legacy:">
+                                    <DxTextBox @bind-Text="@UserForm.Legacy" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Legacy" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Oracle:">
+                                    <DxTextBox @bind-Text="@UserForm.Oracle" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Oracle" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="SAP:">
+                                    <DxTextBox @bind-Text="@UserForm.SAP" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="SAP" />
+                                    </DxFormLayoutItem> *@
                                         <DxFormLayoutItem Caption="Mobile Phone:">
                                             <DxSpinEdit @bind-Value="@UserForm.MobilePhone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Mobile Phone" />
                                         </DxFormLayoutItem>
@@ -441,6 +443,18 @@
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem Caption="BPJS KS Number:">
                                             <DxSpinEdit @bind-Value="@UserForm.NoBpjsKs" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="BPJS KS Number" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="NIP:">
+                                            <DxSpinEdit @bind-Value="@UserForm.NIP" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="NIP" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Legacy:">
+                                            <DxTextBox @bind-Text="@UserForm.Legacy" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Legacy" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Oracle:">
+                                            <DxTextBox @bind-Text="@UserForm.Oracle" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Oracle" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="SAP:">
+                                            <DxTextBox @bind-Text="@UserForm.SAP" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="SAP" />
                                         </DxFormLayoutItem>
                                     </DxFormLayoutGroup>
                                 </DxFormLayout>

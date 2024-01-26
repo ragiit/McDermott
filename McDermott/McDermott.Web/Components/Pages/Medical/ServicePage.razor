@@ -58,7 +58,7 @@
                                     <DxGridSelectionColumn Width="15px" />
                                     <DxGridDataColumn FieldName="Name" SortIndex="0" />
                                     <DxGridDataColumn FieldName="Code" />
-                                    <DxGridDataColumn FieldName="Quota"   />
+                                    <DxGridDataColumn FieldName="Quota" />
                                 </Columns>
                                 <EditFormTemplate Context="EditFormContext">
                                     @{
@@ -70,11 +70,11 @@
                                             @EditFormContext.GetEditor("Name")
                                         </DxFormLayoutItem>
 
-                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Code:" ColSpanMd="12">
+                                        <DxFormLayoutItem Caption="Code:" ColSpanMd="12">
                                             @EditFormContext.GetEditor("Code")
                                         </DxFormLayoutItem>
 
-                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Quota:" ColSpanMd="12">
+                                        <DxFormLayoutItem Caption="Quota:" ColSpanMd="12">
                                             @EditFormContext.GetEditor("Quota")
                                         </DxFormLayoutItem>
 
