@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace McDermott.Domain.Entities
 {
-    public partial class ChronisCategory:BaseAuditableEntity
+    public partial class CronisCategory:BaseAuditableEntity
     {
         [StringLength(250)]
         public string Name { get;set; }
