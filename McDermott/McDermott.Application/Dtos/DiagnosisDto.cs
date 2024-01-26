@@ -15,6 +15,6 @@ namespace McDermott.Application.Dtos
         public string Code { get; set; }
 
         public DiseaseCategory? DiseaseCategory { get; set; }
-        public ChronisCategory? CronisCategory { get; set; }
+        public CronisCategory? CronisCategory { get; set; }
     }
 }

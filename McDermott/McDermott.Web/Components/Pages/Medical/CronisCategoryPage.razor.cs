@@ -2,7 +2,7 @@
 //using MediatR;
 //using Microsoft.JSInterop;
 using System.ComponentModel.DataAnnotations;
-using static McDermott.Application.Features.Commands.ChronisCategoryCommand;
+using static McDermott.Application.Features.Commands.CronisCategoryCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -11,7 +11,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private List<string> extentions = new() { ".xlsx", ".xls" };
         private const string ExportFileName = "ExportResult";
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
-        private List<ChronisCategoryDto> Chronises = new();
+        private List<CronisCategoryDto> Chronises = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; }
         private dynamic dd;
         private int Value { get; set; } = 0;
@@ -27,7 +27,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task LoadData()
         {
             SelectedDataItems = new ObservableRangeCollection<object>();
-            Chronises = await Mediator.Send(new GetChronisCategoryQuery());
+            Chronises = await Mediator.Send(new GetCronisCategoryQuery());
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
@@ -146,12 +146,12 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteChronisCategoryRequest(((ChronisCategoryDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteCronisCategoryRequest(((CronisCategoryDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<ChronisCategoryDto>>();
-                    await Mediator.Send(new DeleteListChronisCategoryRequest(a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<CronisCategoryDto>>();
+                    await Mediator.Send(new DeleteListCronisCategoryRequest(a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
@@ -163,15 +163,15 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (ChronisCategoryDto)e.EditModel;
+            var editModel = (CronisCategoryDto)e.EditModel;
 
             if (string.IsNullOrWhiteSpace(editModel.Name))
                 return;
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateChronisCategoryRequest(editModel));
+                await Mediator.Send(new CreateCronisCategoryRequest(editModel));
             else
-                await Mediator.Send(new UpdateChronisCategoryRequest(editModel));
+                await Mediator.Send(new UpdateCronisCategoryRequest(editModel));
 
             await LoadData();
         }

@@ -1,12 +1,12 @@
-﻿using static McDermott.Application.Features.Commands.DiseasCategoryCommand;
+﻿using static McDermott.Application.Features.Commands.DiseaseCadegoryCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class DiseaseCategoryPage
     {
         public IGrid Grid { get; set; }
-        private List<DiseasCategoryDto> DiseaseCategorys = new();
-        private List<DiseasCategoryDto> ParentCategoryDto = new();
+        private List<DiseaseCategoryDto> DiseaseCategorys = new();
+        private List<DiseaseCategoryDto> ParentCategoryDto = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
@@ -17,7 +17,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-            await Mediator.Send(new DeleteDiseaseCategoryRequest(((DiseasCategoryDto)e.DataItem).Id));
+            await Mediator.Send(new DeleteDiseaseCategoryRequest(((DiseaseCategoryDto)e.DataItem).Id));
             await LoadData();
         }
 
@@ -95,7 +95,7 @@ namespace McDermott.Web.Components.Pages.Medical
         }
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (DiseasCategoryDto)e.EditModel;
+            var editModel = (DiseaseCategoryDto)e.EditModel;
 
             if (string.IsNullOrWhiteSpace(editModel.Name))
                 return;
