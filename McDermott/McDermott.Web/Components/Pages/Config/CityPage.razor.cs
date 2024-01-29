@@ -1,4 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Web.Components.Layout;
 using Microsoft.JSInterop;
 using static McDermott.Application.Features.Commands.CityCommand;
 using static McDermott.Application.Features.Commands.CountryCommand;
@@ -8,6 +9,7 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CityPage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
         private bool PanelVisible { get; set; } = true;
 
         public IGrid Grid { get; set; }
@@ -27,7 +29,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData()
         {
-            PanelVisible = true; 
+            PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Cities = await Mediator.Send(new GetCityQuery());
             PanelVisible = false;
@@ -62,8 +64,9 @@ namespace McDermott.Web.Components.Pages.Config
             UpdateEditItemsEnabled(true);
         }
 
-        private async Task NewItem_Click()
+        private async Task NewItem_Click(IGrid context)
         {
+            var a = context;
             await Grid.StartEditNewRowAsync();
         }
 

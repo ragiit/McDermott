@@ -3,6 +3,8 @@
 
 <PageTitle>Gender</PageTitle>
 
+<BaseAuthorizationLayout />
+
 <div class="wrapper">
 
     <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Gender" />
@@ -36,14 +38,14 @@
                                     SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                     KeyboardNavigationEnabled="true">
                                 <Columns>
-                                    <DxGridDataColumn FieldName="Name" SortIndex="0" /> 
+                                    <DxGridDataColumn FieldName="Name" SortIndex="0" />
                                     <DxGridCommandColumn Width="160px" />
                                 </Columns>
-                                <EditFormTemplate Context="EditFormContext"> 
+                                <EditFormTemplate Context="EditFormContext">
                                     <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem Caption="Name:" ColSpanMd="12">
                                             @EditFormContext.GetEditor("Name")
-                                        </DxFormLayoutItem> 
+                                        </DxFormLayoutItem>
                                     </DxFormLayout>
                                 </EditFormTemplate>
                             </DxGrid>

@@ -13,78 +13,235 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <DxGrid @ref="Grid"
-                                    Data="Buildings"
-                                    PageSize="10"
-                                    @bind-SelectedDataItems="@SelectedDataItems"
-                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                    KeyFieldName="Id"
-                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                    EditModelSaving="OnSave"
-                                    DataItemDeleting="OnDelete"
-                                    EditMode="GridEditMode.PopupEditForm"
-                                    PopupEditFormCssClass="pw-800"
-                                    PagerPosition="GridPagerPosition.Bottom"
-                                    PageSizeSelectorVisible="true"
-                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                    PageSizeSelectorAllRowsItemVisible="true"
-                                    PagerSwitchToInputBoxButtonCount="10"
-                                    FocusedRowEnabled="true"
-                                    PagerVisibleNumericButtonCount="10"
-                                    FocusedRowChanged="Grid_FocusedRowChanged"
-                                    ShowGroupPanel="true"
-                                    AutoExpandAllGroupRows="true"
-                                    ShowFilterRow="true"
-                                    CustomizeElement="Grid_CustomizeElement"
-                                    ShowSearchBox="true"
-                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                    KeyboardNavigationEnabled="true">
-                                <ToolbarTemplate>
-                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                        <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                        <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Buildings.Count > 0" />
-                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Buildings.Count > 0" />
-                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                        <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
-                                            <Items>
-                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                            </Items>
-                                        </DxToolbarItem>
-                                        <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                    </DxToolbar>
-                                </ToolbarTemplate>
-                                <Columns>
-                                    <DxGridSelectionColumn Width="15px" />
-                                    <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                    <DxGridDataColumn FieldName="Code" />
-                                    @* <DxGridDataColumn FieldName="HealthCenter.Name" Caption="Health Center" /> *@
-                                </Columns>
-                                <EditFormTemplate Context="EditFormContext">
-                                    @{
-                                        var a = (BuildingDto)EditFormContext.EditModel;
-                                    }
-                                    <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Code:" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@a.Code" NullText="Name" ShowValidationIcon="true" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Health Center:" ColSpanMd="12">
-                                            <Template>
-                                                <DxComboBox Data="@HealthCenters"
-                                                            NullText="Select Health Center..."
-                                                            @bind-Value="@a.HealthCenterId"
+                            @* <DxGrid @ref="Grid"
+                            Data="Buildings"
+                            PageSize="10"
+                            @bind-SelectedDataItems="@SelectedDataItems"
+                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                            KeyFieldName="Id"
+                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                            EditModelSaving="OnSave"
+                            DataItemDeleting="OnDelete"
+                            EditMode="GridEditMode.PopupEditForm"
+                            PopupEditFormCssClass="pw-800"
+                            PagerPosition="GridPagerPosition.Bottom"
+                            PageSizeSelectorVisible="true"
+                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                            PageSizeSelectorAllRowsItemVisible="true"
+                            PagerSwitchToInputBoxButtonCount="10"
+                            FocusedRowEnabled="true"
+                            PagerVisibleNumericButtonCount="10"
+                            FocusedRowChanged="Grid_FocusedRowChanged"
+                            ShowGroupPanel="true"
+                            AutoExpandAllGroupRows="true"
+                            ShowFilterRow="true"
+                            CustomizeElement="Grid_CustomizeElement"
+                            ShowSearchBox="true"
+                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                            KeyboardNavigationEnabled="true">
+                            <ToolbarTemplate>
+                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                            <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                            <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Buildings.Count > 0" />
+                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Buildings.Count > 0" />
+                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                            <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                            <Items>
+                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                            </Items>
+                            </DxToolbarItem>
+                            <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                            </DxToolbar>
+                            </ToolbarTemplate>
+                            <Columns>
+                            <DxGridSelectionColumn Width="15px" />
+                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                            <DxGridDataColumn FieldName="Code" />
+                            </Columns>
+                            <EditFormTemplate Context="EditFormContext">
+                            @{
+                            var a = (BuildingDto)EditFormContext.EditModel;
+                            }
+                            <DxFormLayout CssClass="w-100">
+                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Code:" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@a.Code" NullText="Name" ShowValidationIcon="true" />
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Health Center:" ColSpanMd="12">
+                            <Template>
+                            <DxComboBox Data="@HealthCenters"
+                            NullText="Select Health Center..."
+                            @bind-Value="@a.HealthCenterId"
+                            TextFieldName="Name"
+                            ValueFieldName="Id">
+                            </DxComboBox>
+                            </Template>
+                            </DxFormLayoutItem>
+                            </DxFormLayout>
+                            </EditFormTemplate>
+                            </DxGrid> *@
+
+                            @if (!ShowForm)
+                            {
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <DxGrid @ref="Grid"
+                                            Data="Buildings"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            AllowSelectRowByClick="true"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            EditModelSaving="OnSave"
+                                            DataItemDeleting="OnDelete"
+                                            FocusedRowEnabled="true"
+                                            PopupEditFormCssClass="pw-800"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            PagerVisibleNumericButtonCount="10"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            ShowFilterRow="true"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Buildings.Count > 0" />
+                                                <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Buildings.Count > 0" />
+                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                                <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                          @*   <DxGridDataColumn FieldName="Code" SortIndex="0" /> *@
+                                            <DxGridDataColumn FieldName="HealthCenter.Name" Caption="Health Center" SortIndex="0" />
+                                        </Columns>
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                            }
+                            else
+                            {
+                                <label for="tbOverview" class="demo-text cw-320 mb-1">
+                                    Building
+                                </label>
+
+                                <DxTextBox @bind-Text="@Building.Name"
+                                           NullText="Building"
+                                           InputId="tbOverview" />
+
+                             @*    <label for="tbOverview3" class="demo-text cw-320 mb-1 mt-2">
+                                    Code
+                                </label>
+
+                                <DxTextBox @bind-Text="@Building.Code"
+                                           NullText="Code"
+                                           InputId="tbOverview3" /> *@
+
+                                <label for="tbOverview2" class="demo-text cw-320 mb-1 mt-2">
+                                    Health Center
+                                </label>
+
+                                <DxComboBox Data="@HealthCenters"
+                                            NullText="Select Health Center..."
+                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                            @bind-Value="@Building.HealthCenterId"
+                                            TextFieldName="Name"
+                                            InputId="tbOverview2"
+                                            ValueFieldName="Id">
+                                </DxComboBox>
+
+                                <br />
+
+                                <DxGrid @ref="GridBuildingLocation"
+                                        Data="BuildingLocations"
+                                        @bind-SelectedDataItems="@SelectedBuildingLocationDataItems"
+                                        PageSize="10"
+                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                        KeyFieldName="LocationId"
+                                        SelectionMode="GridSelectionMode.Multiple"
+                                        AllowSelectRowByClick="true"
+                                        EditModelSaving="OnSaveBuildingLocation"
+                                        DataItemDeleting="OnDeleteBuildingLocation"
+                                        EditMode="GridEditMode.PopupEditForm"
+                                        PopupEditFormCssClass="pw-800"
+                                        PagerPosition="GridPagerPosition.Bottom"
+                                        PageSizeSelectorVisible="true"
+                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                        PageSizeSelectorAllRowsItemVisible="true"
+                                        PagerSwitchToInputBoxButtonCount="10"
+                                        FocusedRowEnabled="true"
+                                        PagerVisibleNumericButtonCount="10"
+                                        FocusedRowChanged="GridBuildingLocation_FocusedRowChanged"
+                                        ShowGroupPanel="true"
+                                        AutoExpandAllGroupRows="true"
+                                        ShowFilterRow="true"
+                                        ShowSearchBox="true"
+                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                        KeyboardNavigationEnabled="true">
+                                    <ToolbarTemplate>
+                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                            <DxToolbarItem Text="New" Click="NewItemBuildingLocation_Click" IconCssClass="fa-solid fa-plus" />
+                                            <DxToolbarItem Text="Edit" Click="EditItemBuildingLocation_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedBuildingLocationDataItems.Count > 0 && BuildingLocations.Count > 0" />
+                                            <DxToolbarItem Text="Delete" Click="DeleteItemBuildingLocation_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedBuildingLocationDataItems.Count > 0 && BuildingLocations.Count > 0" />
+                                            <DxToolbarItem Text="Save" Click="SaveItemBuildingLocationGrid_Click" Enabled="BuildingLocations.Count > 0" />
+                                            <DxToolbarItem Text="Cancel" Click="CancelItemBuildingLocationGrid_Click" />
+                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                            <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                <Items>
+                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItemBuildingLocation_Click" />
+                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItemBuildingLocation_Click" />
+                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItemBuildingLocation_Click" />
+                                                </Items>
+                                            </DxToolbarItem>
+                                            <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                        </DxToolbar>
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Location.Name" Caption="Location" SortIndex="0" />
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (BuildingLocationDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem Caption="Location:" ColSpanMd="12">
+                                                <DxComboBox Data="@Locations"
+                                                            NullText="Select Location..."
+                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                            @bind-Value="@a.LocationId"
                                                             TextFieldName="Name"
                                                             ValueFieldName="Id">
                                                 </DxComboBox>
-                                            </Template>
-                                        </DxFormLayoutItem>
-                                    </DxFormLayout>
-                                </EditFormTemplate>
-                            </DxGrid>
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </DxGrid>
+                            }
                         </div>
                     </div>
                 </div>

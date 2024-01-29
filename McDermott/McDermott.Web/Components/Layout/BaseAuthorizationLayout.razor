@@ -1,0 +1,79 @@
+﻿@using Newtonsoft.Json
+@implements IAsyncDisposable
+
+@code {
+    [Parameter]
+    public bool IsAccess { get; set; } = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await Load();
+        }
+        catch { }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            try
+            {
+                await Load();
+            }
+            catch { }
+        }
+    }
+
+    private async Task Load()
+    {
+        try
+        {
+            dynamic user = await oLocal.GetItemAsync<string>("dotnet");
+            var menu = await oLocal.GetItemAsync<string>("dotnet2");
+
+            if (string.IsNullOrWhiteSpace(user) || string.IsNullOrEmpty(menu))
+            {
+                await oLocal.ClearAsync();
+                NavigationManager.NavigateTo("login", true);
+
+                return;
+            }
+
+            menu = Helper.Decrypt(menu);
+
+            var menus = JsonConvert.DeserializeObject<List<GroupMenuDto>>(menu);
+            var url = NavigationManager.Uri;
+
+            var z = menus?.Where(x => x.Menu.Url != null && x.Menu.Url.Contains(url.Replace(NavigationManager.BaseUri, ""))).FirstOrDefault();
+
+            if (z is null && !url.Contains("home"))
+            {
+                IsAccess = false;
+                NavigationManager.NavigateTo("home", true);
+                return;
+            }
+
+            IsAccess = true;
+        }
+        catch (JSDisconnectedException ex)
+        {
+            // Ignore
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            GC.SuppressFinalize(this);
+        }
+        catch (JSDisconnectedException ex)
+        {
+            // Ignore
+        }
+    }
+}

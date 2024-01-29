@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 
 <PageTitle>Province</PageTitle>
+<BaseAuthorizationLayout />
 
 <div class="wrapper">
 
@@ -16,7 +17,7 @@
                             <DxGrid @ref="Grid"
                                     Data="Provinces"
                                     PageSize="10"
-                                     @bind-SelectedDataItems="@SelectedDataItems"
+                                    @bind-SelectedDataItems="@SelectedDataItems"
                                     FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                     KeyFieldName="Id"
                                     CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
@@ -62,13 +63,13 @@
                                     @bind-Value="@Value"
                                     AllowUserInput="true" /> *@
 
-                                   @*  <DxUpload Visible="@UploadVisible"
-                                              ExternalSelectButtonCssSelector="#upload"
-                                              ExternalDropZoneCssSelector="#upload"
-                                              ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
-                                              FileUploadStarted="@OnFileUploadStarted"
-                                              AllowedFileExtensions="@extentions"
-                                              MaxFileSize="15000000">
+                                    @*  <DxUpload Visible="@UploadVisible"
+                                    ExternalSelectButtonCssSelector="#upload"
+                                    ExternalDropZoneCssSelector="#upload"
+                                    ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+                                    FileUploadStarted="@OnFileUploadStarted"
+                                    AllowedFileExtensions="@extentions"
+                                    MaxFileSize="15000000">
                                     </DxUpload> *@
                                 </ToolbarTemplate>
                                 <Columns>
@@ -108,4 +109,4 @@
             </div>
         </div>
     </section>
-</div> 
+</div>

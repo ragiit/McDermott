@@ -105,7 +105,7 @@ namespace McDermott.Application.Features.Queries
                     foreach (var item in request.GroupMenuDto)
                     {
                         var a = item.Adapt<GroupMenu>();
-                        if (a.MenuId == 0) continue;
+                        if (a.MenuId == 0) continue; // kalo menunya itu "All"
 
                         a.Menu = null;
                         a.Id = 0;

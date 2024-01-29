@@ -9,6 +9,7 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class DistrictPage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
         public IGrid Grid { get; set; }
         private List<DistrictDto> Districts = new();
         private List<ProvinceDto> Provinces = new();

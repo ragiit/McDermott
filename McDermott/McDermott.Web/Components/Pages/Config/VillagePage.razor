@@ -3,6 +3,8 @@
 
 <PageTitle>Village</PageTitle>
 
+<BaseAuthorizationLayout />
+
 <div class="wrapper">
 
     <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Village" />
@@ -63,16 +65,16 @@
                                     AllowUserInput="true" /> *@
 
                                     @* <DxUpload Visible="@UploadVisible"
-                                              ExternalSelectButtonCssSelector="#upload"
-                                              ExternalDropZoneCssSelector="#upload"
-                                              ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
-                                              FileUploadStarted="@OnFileUploadStarted"
-                                              AllowedFileExtensions="@extentions"
-                                              MaxFileSize="15000000">
+                                    ExternalSelectButtonCssSelector="#upload"
+                                    ExternalDropZoneCssSelector="#upload"
+                                    ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+                                    FileUploadStarted="@OnFileUploadStarted"
+                                    AllowedFileExtensions="@extentions"
+                                    MaxFileSize="15000000">
                                     </DxUpload> *@
                                 </ToolbarTemplate>
                                 <Columns>
-                                    <DxGridSelectionColumn Width="15px"/>
+                                    <DxGridSelectionColumn Width="15px" />
                                     <DxGridDataColumn FieldName="Name" SortIndex="0" />
                                     <DxGridDataColumn FieldName="PostalCode" SortIndex="0" />
                                     <DxGridDataColumn FieldName="Province.Name" Caption="Province" />

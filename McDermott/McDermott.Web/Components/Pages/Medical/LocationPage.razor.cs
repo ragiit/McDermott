@@ -1,22 +1,20 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Domain.Entities;
 using Microsoft.JSInterop;
 using static McDermott.Application.Features.Commands.CityCommand;
 using static McDermott.Application.Features.Commands.CountryCommand;
-using static McDermott.Application.Features.Commands.HealthCenterCommand;
+using static McDermott.Application.Features.Commands.LocationCommand;
 using static McDermott.Application.Features.Commands.ProvinceCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
-    public partial class HealthCenterPage
+    public partial class LocationPage
     {
-        private List<HealthCenterDto> HealthCenters = [];
-        public List<CountryDto> Countries = [];
-        public List<CityDto> Cities = [];
-        public List<ProvinceDto> Provinces = [];
+        public List<LocationDto> Locations = [];
 
         private List<string> Types = new List<string>
         {
-            "Clinic"
+            "Vendor Location", "View", "Internal Location", "Customer Location", "Inventory Loss", "Production", "Transit Location"
         };
 
         #region Default Grid
@@ -38,12 +36,12 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteHealthCenterRequest(((HealthCenterDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteLocationRequest(((LocationDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<HealthCenterDto>>();
-                    await Mediator.Send(new DeleteListHealthCenterRequest(a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<LocationDto>>();
+                    await Mediator.Send(new DeleteListLocationRequest(a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
@@ -55,15 +53,15 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (HealthCenterDto)e.EditModel;
+            var editModel = (LocationDto)e.EditModel;
 
             if (string.IsNullOrWhiteSpace(editModel.Name))
                 return;
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateHealthCenterRequest(editModel));
+                await Mediator.Send(new CreateLocationRequest(editModel));
             else
-                await Mediator.Send(new UpdateHealthCenterRequest(editModel));
+                await Mediator.Send(new UpdateLocationRequest(editModel));
 
             await LoadData();
         }
@@ -133,11 +131,6 @@ namespace McDermott.Web.Components.Pages.Medical
 
         protected override async Task OnInitializedAsync()
         {
-            PanelVisible = true;
-            Countries = await Mediator.Send(new GetCountryQuery());
-            Provinces = await Mediator.Send(new GetProvinceQuery());
-            Cities = await Mediator.Send(new GetCityQuery());
-
             await LoadData();
         }
 
@@ -145,7 +138,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
-            HealthCenters = await Mediator.Send(new GetHealthCenterQuery());
+            Locations = await Mediator.Send(new GetLocationQuery());
             PanelVisible = false;
         }
 

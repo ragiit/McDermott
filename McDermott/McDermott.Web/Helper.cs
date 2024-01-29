@@ -1,6 +1,8 @@
 ﻿using Blazored.LocalStorage;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -18,6 +20,53 @@ namespace McDermott.Web
             {
                 byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(data));
                 return Convert.ToBase64String(hashedBytes);
+            }
+        }
+
+        public static string Encrypt(string plainText, string key = "mysmallkey123456")
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(key);
+                aesAlg.IV = new byte[16]; // IV harus unik, tetapi tidak perlu rahasia
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(plainText);
+                        }
+                    }
+                    return Convert.ToBase64String(msEncrypt.ToArray());
+                }
+            }
+        }
+
+        public static string Decrypt(string cipherText, string key = "mysmallkey123456")
+        {
+            byte[] cipherBytes = Convert.FromBase64String(cipherText);
+
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Encoding.UTF8.GetBytes(key);
+                aesAlg.IV = new byte[16]; // IV harus sama dengan yang digunakan saat enkripsi
+
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msDecrypt = new MemoryStream(cipherBytes))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+                            return srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
             }
         }
 
@@ -50,7 +99,14 @@ namespace McDermott.Web
 
         public static async Task<User> GetUserInfo(this ILocalStorageService o)
         {
-            return await o.GetItemAsync<User>("Info");
+            var data = await o.GetItemAsync<string>("dotnet");
+            if (!string.IsNullOrEmpty(data))
+            {
+                data = Decrypt(data);
+                return JsonConvert.DeserializeObject<User>(data)!;
+            }
+
+            return new User();
         }
 
         //public static async Task<List<MenuDto>> GetUserMenuInfo(this ILocalStorageService o)

@@ -1,11 +1,11 @@
-﻿@page "/patient/family-relation"
+﻿@page "/medical/location"
 @rendermode InteractiveServer
 
-<PageTitle>Family Relation</PageTitle>
+<PageTitle>Location</PageTitle>
 
 <div class="wrapper">
 
-    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Family Relation" />
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Location" />
 
     <section class="content">
         <div class="container-fluid">
@@ -21,7 +21,7 @@
                                             Text="Fetching Data...">
 
                                 <DxGrid @ref="Grid"
-                                        Data="Familys"
+                                        Data="Locations"
                                         PageSize="10"
                                         @bind-SelectedDataItems="@SelectedDataItems"
                                         FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -50,8 +50,8 @@
                                     <ToolbarTemplate>
                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                             <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                            <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Familys.Count > 0" />
-                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Familys.Count > 0" />
+                                            <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Locations.Count > 0" />
+                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Locations.Count > 0" />
                                             <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                             <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
                                                 <Items>
@@ -66,11 +66,11 @@
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
                                         <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                        <DxGridDataColumn FieldName="Relation" Caption="Inverse Relation" />
+                                        <DxGridDataColumn FieldName="Type" />
                                     </Columns>
                                     <EditFormTemplate Context="EditFormContext">
                                         @{
-                                            var a = (FamilyDto)EditFormContext.EditModel;
+                                            var a = (LocationDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
@@ -78,12 +78,8 @@
                                                     @EditFormContext.GetEditor("Name")
                                                 </div>
                                             </DxFormLayoutItem>
-
-                                            <DxFormLayoutItem Caption="Inverse Relation:" ColSpanMd="12">
-                                                <DxComboBox Data="@Relation"
-                                                            NullText="Select Relation..."
-                                                            @bind-Value="@a.Relation">
-                                                </DxComboBox>
+                                            <DxFormLayoutItem Caption="Type:" ColSpanMd="12">
+                                                <DxComboBox Data="@Types" @bind-Value="@a.Type" NullText="Types" ShowValidationIcon="true" />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>
@@ -96,3 +92,7 @@
         </div>
     </section>
 </div>
+
+@code {
+
+}

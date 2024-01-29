@@ -1,4 +1,5 @@
 ﻿using McDermott.Domain.Entities;
+using Newtonsoft.Json;
 using static McDermott.Application.Features.Commands.GroupCommand;
 using static McDermott.Application.Features.Commands.MenuCommand;
 
@@ -14,10 +15,7 @@ namespace McDermott.Web.Components.Layout
 
         private async Task OnClickLogout()
         {
-            await oLocal.ClearAsync(); // clear local storeageadkjfshdfhsdf
-
-            // var a = (CustomAuthenticationStateProvider)AuthenticationStateProvider;
-            // await a.UpdateAuthenticationState(null);
+            await oLocal.ClearAsync();
 
             NavigationManager.NavigateTo("/login", true);
         }
@@ -35,7 +33,7 @@ namespace McDermott.Web.Components.Layout
         {
             try
             {
-                User = await oLocal.GetItemAsync<User>("Info");
+                User = await oLocal.GetUserInfo();
                 _isInitComplete = true;
             }
             catch { }
@@ -55,11 +53,6 @@ namespace McDermott.Web.Components.Layout
                 currentUrl = NavigationManager.Uri;
 
                 await LoadUser();
-                // Tunggu selama 2 detik
-                //await Task.Delay(2000);
-                // Setelah 2 detik, sembunyikan elemen preloader
-
-                // Refresh tampilan
 
                 var user = await oLocal.GetUserInfo();
 
@@ -79,7 +72,19 @@ namespace McDermott.Web.Components.Layout
 
                 HeaderMenuDtos = [.. menus.Where(x => x.ParentMenu == null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
                 DetailMenuDtos = [.. menus.Where(x => x.ParentMenu != null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
-                var z = "asd";
+
+                if (user.GroupId is not null)
+                {
+                    var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((int)user.GroupId));
+
+                    var encrypt = Helper.Encrypt(JsonConvert.SerializeObject(g));
+
+                    await oLocal.SetItemAsync("dotnet2", encrypt);
+                }
+                else
+                {
+                    await oLocal.SetItemAsync("dotnet2", new List<string>());
+                }
 
                 showPreloader = false;
 

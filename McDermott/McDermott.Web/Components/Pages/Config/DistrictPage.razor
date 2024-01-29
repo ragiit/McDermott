@@ -3,114 +3,116 @@
 
 <PageTitle>District</PageTitle>
 
-<div class="wrapper">
+<BaseAuthorizationLayout />
 
-    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="District" />
+    <div class="wrapper">
 
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <DxGrid @ref="Grid"
-                                    Data="Districts"
-                                    PageSize="10"
-                                    @bind-SelectedDataItems="@SelectedDataItems"
-                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                    KeyFieldName="Id"
-                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                    EditModelSaving="OnSave"
-                                    DataItemDeleting="OnDelete"
-                                    EditMode="GridEditMode.PopupEditForm"
-                                    PopupEditFormCssClass="pw-800"
-                                    PagerPosition="GridPagerPosition.Bottom"
-                                    PageSizeSelectorVisible="true"
-                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                    PageSizeSelectorAllRowsItemVisible="true"
-                                    PagerSwitchToInputBoxButtonCount="10"
-                                    FocusedRowEnabled="true"
-                                    AllowSelectRowByClick="true"
-                                    PagerVisibleNumericButtonCount="10"
-                                    FocusedRowChanged="Grid_FocusedRowChanged"
-                                    ShowGroupPanel="true"
-                                    AutoExpandAllGroupRows="true"
-                                    ShowFilterRow="true"
-                                    CustomizeElement="Grid_CustomizeElement"
-                                    ShowSearchBox="true"
-                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                    KeyboardNavigationEnabled="true">
-                                <ToolbarTemplate>
-                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                        <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                        <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Districts.Count > 0" />
-                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Districts.Count > 0" />
-                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                        <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
-                                            <Items>
-                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                            </Items>
-                                        </DxToolbarItem>
-                                        <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                    </DxToolbar>
-                                    @*  <DxComboBox Data="EnumEditModeDatas"
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="District" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <DxGrid @ref="Grid"
+                                        Data="Districts"
+                                        PageSize="10"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                        KeyFieldName="Id"
+                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                        EditModelSaving="OnSave"
+                                        DataItemDeleting="OnDelete"
+                                        EditMode="GridEditMode.PopupEditForm"
+                                        PopupEditFormCssClass="pw-800"
+                                        PagerPosition="GridPagerPosition.Bottom"
+                                        PageSizeSelectorVisible="true"
+                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                        PageSizeSelectorAllRowsItemVisible="true"
+                                        PagerSwitchToInputBoxButtonCount="10"
+                                        FocusedRowEnabled="true"
+                                        AllowSelectRowByClick="true"
+                                        PagerVisibleNumericButtonCount="10"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        ShowGroupPanel="true"
+                                        AutoExpandAllGroupRows="true"
+                                        ShowFilterRow="true"
+                                        CustomizeElement="Grid_CustomizeElement"
+                                        ShowSearchBox="true"
+                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                        KeyboardNavigationEnabled="true">
+                                    <ToolbarTemplate>
+                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                            <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                            <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Districts.Count > 0" />
+                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Districts.Count > 0" />
+                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                            <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                <Items>
+                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                </Items>
+                                            </DxToolbarItem>
+                                            <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                        </DxToolbar>
+                                        @*  <DxComboBox Data="EnumEditModeDatas"
                                     NullText="Select Grid Edit Mode..."
                                     TextFieldName="@nameof(EnumEditModeData.DisplayName)"
                                     ValueFieldName="@nameof(EnumEditModeData.Value)"
                                     @bind-Value="@Value"
                                     AllowUserInput="true" />
 
-                                     <DxUpload Visible="@UploadVisible"
-                                              ExternalSelectButtonCssSelector="#upload"
-                                              ExternalDropZoneCssSelector="#upload"
-                                              ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
-                                              FileUploadStarted="@OnFileUploadStarted"
-                                              AllowedFileExtensions="@extentions"
-                                              MaxFileSize="15000000">
+                                    <DxUpload Visible="@UploadVisible"
+                                    ExternalSelectButtonCssSelector="#upload"
+                                    ExternalDropZoneCssSelector="#upload"
+                                    ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+                                    FileUploadStarted="@OnFileUploadStarted"
+                                    AllowedFileExtensions="@extentions"
+                                    MaxFileSize="15000000">
                                     </DxUpload> *@
-                                </ToolbarTemplate>
-                                <Columns>
-                                    <DxGridSelectionColumn Width="15px" />
-                                    <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                    <DxGridDataColumn FieldName="Province.Name" Caption="Province" />
-                                    <DxGridDataColumn FieldName="City.Name" Caption="City" />
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Province.Name" Caption="Province" />
+                                        <DxGridDataColumn FieldName="City.Name" Caption="City" />
 
-                                </Columns>
-                                <EditFormTemplate Context="EditFormContext">
-                                    @{
-                                        var a = (DistrictDto)EditFormContext.EditModel;
-                                    }
-                                    <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
-                                            <div class="pop-warning">
-                                                @EditFormContext.GetEditor("Name")
-                                            </div>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Province:" ColSpanMd="6">
-                                            <DxComboBox Data="@Provinces"
-                                                        NullText="Select Province..."
-                                                        @bind-Value="@a.ProvinceId"
-                                                        TextFieldName="Name"
-                                                        ValueFieldName="Id">
-                                            </DxComboBox>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="City:" ColSpanMd="6">
-                                            <DxComboBox Data="@Cities"
-                                                        NullText="Select City..."
-                                                        @bind-Value="@a.CityId"
-                                                        TextFieldName="Name"
-                                                        ValueFieldName="Id">
-                                            </DxComboBox>
-                                        </DxFormLayoutItem>
-                                    </DxFormLayout>
-                                </EditFormTemplate>
-                            </DxGrid>
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (DistrictDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                                <div class="pop-warning">
+                                                    @EditFormContext.GetEditor("Name")
+                                                </div>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Province:" ColSpanMd="6">
+                                                <DxComboBox Data="@Provinces"
+                                                            NullText="Select Province..."
+                                                            @bind-Value="@a.ProvinceId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id">
+                                                </DxComboBox>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="City:" ColSpanMd="6">
+                                                <DxComboBox Data="@Cities"
+                                                            NullText="Select City..."
+                                                            @bind-Value="@a.CityId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id">
+                                                </DxComboBox>
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </DxGrid>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-</div> 
+        </section>
+    </div> 
