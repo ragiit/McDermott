@@ -7,9 +7,9 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CountryPage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
         private bool PanelVisible { get; set; } = true;
-        private List<string> extentions = new() { ".xlsx", ".xls" };
-        private const string ExportFileName = "ExportResult";
+        private bool IsAccess { get; set; }
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
         private List<CountryDto> Countries = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; }
@@ -21,6 +21,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
+            AuthorizationLayout = new();
             await LoadData();
         }
 

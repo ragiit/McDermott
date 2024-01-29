@@ -2,6 +2,9 @@
 @using McDermott.Domain.Entities
 @using McDermott.Persistence.Context
 @using Microsoft.EntityFrameworkCore
+@using System.Security.Cryptography
+@using System.Text
+@using Newtonsoft.Json
 @using static McDermott.Application.Features.Commands.GroupCommand
 @using static McDermott.Application.Features.Commands.MenuCommand
 
@@ -101,25 +104,13 @@
             // await _protectedSessionStorage.SetAsync("UserSession", b);
             // await _protectedSessionStorage.SetAsync("UserMenuSession", DetailMenuDtos);
 
-            await oLocal.SetItemAsync("Info", user);
+            string serialize = JsonConvert.SerializeObject(user);
+            var encrypt = Helper.Encrypt(serialize);
 
-            if (user.GroupId is not null)
-            {
-                var groups = await Mediator.Send(new GetGroupMenuByGroupIdRequest((int)user?.GroupId));
-                var menus = await Mediator.Send(new GetMenuQuery());
-                var ids = groups.Select(x => x.MenuId).ToList();
-                List<MenuDto> DetailMenuDtos = menus.Where(x => x.ParentMenu != null && ids.Contains(x.Id)).OrderBy(x => x.Sequence).ToList();
+            await oLocal.SetItemAsync("dotnet", encrypt);
 
-                var menu = Helper.HashWithSHA256(string.Join(",", DetailMenuDtos.Select(x => x.Name)));
+            NavigationManager.NavigateTo("home", forceLoad: true);
 
-                await oLocal.SetItemAsync("Menu", string.Join(",", DetailMenuDtos.Select(x => x.Name)));
-            }
-            else
-            {
-                await oLocal.SetItemAsync("Menu", new List<string>());
-            }
-
-            NavigationManager.NavigateTo("", forceLoad: true);
             // isSuccess = true;
         }
         else
@@ -132,4 +123,5 @@
             // isSuccess = false;
         }
     }
+
 }

@@ -1,4 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Web.Components.Layout;
 using static McDermott.Application.Features.Commands.CityCommand;
 using static McDermott.Application.Features.Commands.CountryCommand;
 using static McDermott.Application.Features.Commands.DepartmentCommand;
@@ -15,6 +16,8 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class UserPage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
+
         private bool Loading = true;
         private bool PanelVisible { get; set; } = true;
         public IGrid Grid { get; set; }

@@ -1,4 +1,5 @@
 ﻿using static McDermott.Application.Features.Commands.BuildingCommand;
+using static McDermott.Application.Features.Commands.GroupCommand;
 
 namespace McDermott.Application.Features.Queries
 {
@@ -19,6 +20,81 @@ namespace McDermott.Application.Features.Queries
                     .Include(x => x.HealthCenter)
                         .Select(Building => Building.Adapt<BuildingDto>())
                        .ToListAsync(cancellationToken);
+            }
+        }
+
+        internal class GetBuildingLocationsByBuildingIdQuery : IRequestHandler<GetBuildingLocationByBuildingIdRequest, List<BuildingLocationDto>>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public GetBuildingLocationsByBuildingIdQuery(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<List<BuildingLocationDto>> Handle(GetBuildingLocationByBuildingIdRequest request, CancellationToken cancellationToken)
+            {
+                var a = await _unitOfWork.Repository<BuildingLocation>().Entities
+                     .Include(x => x.Location)
+                     .Where(x => x.BuildingId == request.BuildingId)
+                     .Select(x => x.Adapt<BuildingLocationDto>())
+                     .ToListAsync(cancellationToken);
+
+                return a;
+            }
+        }
+
+        internal class DeleteBuildingLocationByBuildingIdHandler : IRequestHandler<DeleteBuildingLocationByIdRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public DeleteBuildingLocationByBuildingIdHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(DeleteBuildingLocationByIdRequest request, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    await _unitOfWork.Repository<BuildingLocation>().DeleteAsync(request.Id);
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    throw;
+                }
+            }
+        }
+
+        internal class CreateBuildingLocationHandler : IRequestHandler<CreateBuildingLocationRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public CreateBuildingLocationHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(CreateBuildingLocationRequest request, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    foreach (var item in request.BuildingLocationDtos)
+                    {
+                        await _unitOfWork.Repository<BuildingLocation>().AddAsync(item.Adapt<BuildingLocation>());
+                    }
+
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
             }
         }
 
@@ -87,10 +163,26 @@ namespace McDermott.Application.Features.Queries
 
             public async Task<bool> Handle(DeleteBuildingRequest request, CancellationToken cancellationToken)
             {
-                await _unitOfWork.Repository<Building>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                try
+                {
+                    await _unitOfWork.Repository<Building>().DeleteAsync(request.Id);
 
-                return true;
+                    var a = await _unitOfWork.Repository<BuildingLocation>().GetAllAsync();
+                    a = a.Where(x => x.BuildingId == request.Id).ToList();
+
+                    foreach (var item in a)
+                    {
+                        await _unitOfWork.Repository<BuildingLocation>().DeleteAsync(item.Id);
+                    }
+
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    throw;
+                }
             }
         }
 
@@ -106,6 +198,18 @@ namespace McDermott.Application.Features.Queries
             public async Task<bool> Handle(DeleteListBuildingRequest request, CancellationToken cancellationToken)
             {
                 await _unitOfWork.Repository<Building>().DeleteAsync(request.Id);
+
+                foreach (var item in request.Id)
+                {
+                    var a = await _unitOfWork.Repository<BuildingLocation>().GetAllAsync();
+                    a = a.Where(x => x.BuildingId == item).ToList();
+
+                    foreach (var i in a)
+                    {
+                        await _unitOfWork.Repository<BuildingLocation>().DeleteAsync(i.Id);
+                    }
+                }
+
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return true;

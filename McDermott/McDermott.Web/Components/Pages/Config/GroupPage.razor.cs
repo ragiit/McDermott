@@ -11,6 +11,7 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class GroupPage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
         private bool PanelVisible { get; set; } = true;
         private int Id { get; set; }
         public IGrid Grid { get; set; }

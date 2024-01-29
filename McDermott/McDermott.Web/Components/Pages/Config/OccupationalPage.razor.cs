@@ -1,10 +1,13 @@
 using DevExpress.Data.XtraReports.Native;
+using McDermott.Web.Components.Layout;
 using static McDermott.Application.Features.Commands.OccupationalCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class OccupationalPage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
+
         private List<string> extentions = new() { ".xlsx", ".xls" };
         private const string ExportFileName = "ExportResult";
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();

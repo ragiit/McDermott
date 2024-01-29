@@ -15,137 +15,146 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <DxGrid @ref="Grid"
-                                    Data="HealthCenters"
-                                    PageSize="10"
-                                    @bind-SelectedDataItems="@SelectedDataItems"
-                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                    KeyFieldName="Id"
-                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                    EditModelSaving="OnSave"
-                                    DataItemDeleting="OnDelete"
-                                    EditMode="GridEditMode.PopupEditForm"
-                                    PopupEditFormCssClass="pw-800"
-                                    PagerPosition="GridPagerPosition.Bottom"
-                                    PageSizeSelectorVisible="true"
-                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                    PageSizeSelectorAllRowsItemVisible="true"
-                                    PagerSwitchToInputBoxButtonCount="10"
-                                    FocusedRowEnabled="true"
-                                    PagerVisibleNumericButtonCount="10"
-                                    FocusedRowChanged="Grid_FocusedRowChanged"
-                                    ShowGroupPanel="true"
-                                    AutoExpandAllGroupRows="true"
-                                    ShowFilterRow="true"
-                                    CustomizeElement="Grid_CustomizeElement"
-                                    ShowSearchBox="true"
-                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                    KeyboardNavigationEnabled="true">
-                                <ToolbarTemplate>
-                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                        <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
-                                        <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
-                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems.Count > 0" />
-                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" />
-                                        <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
-                                            <Items>
-                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                            </Items>
-                                        </DxToolbarItem>
-                                    </DxToolbar>
-                                </ToolbarTemplate>
-                                <Columns>
-                                    <DxGridSelectionColumn Width="15px" />
-                                    <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                    <DxGridDataColumn FieldName="Street1" Caption="Street" />
-                                    <DxGridDataColumn FieldName="WebsiteLink" Caption="Website Link" />
-                                </Columns>
-                                <EditFormTemplate Context="EditFormContext">
-                                    @{
-                                        var a = (HealthCenterDto)EditFormContext.EditModel;
-                                    }
-                                    <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="6">
-                                            <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Type:" ColSpanMd="6">
-                                            <DxComboBox Data="@Types" @bind-Value="@a.Type" NullText="Types" ShowValidationIcon="true" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Phone:" ColSpanMd="6">
-                                            <DxTextBox @bind-Text="@a.Phone" NullText="Phone" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Mobile:" ColSpanMd="6">
-                                            <DxTextBox @bind-Text="@a.Mobile" NullText="Mobile" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Email:" ColSpanMd="6">
-                                            <DxTextBox @bind-Text="@a.Email" NullText="Email" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Website Link:" ColSpanMd="6">
-                                            <DxTextBox @bind-Text="@a.WebsiteLink" NullText="Website Link" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Address:" ColSpanMd="12">
-                                            <Template>
-                                                <DxGridLayout>
-                                                    <Rows>
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                    </Rows>
-                                                    <Columns>
-                                                        <DxGridLayoutColumn />
-                                                        <DxGridLayoutColumn />
-                                                    </Columns>
-                                                    <Items>
-                                                        <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
-                                                            <Template>
-                                                                <DxTextBox @bind-Text="@a.Street1" NullText="Street1" />
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
-                                                            <Template>
-                                                                <DxTextBox @bind-Text="@a.Street2" NullText="Street2" />
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
-                                                            <Template>
-                                                                <DxComboBox Data="@Provinces"
-                                                                            NullText="Select Province..."
-                                                                            @bind-Value="@a.ProvinceId"
-                                                                            TextFieldName="Name"
-                                                                            ValueFieldName="Id">
-                                                                </DxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
-                                                            <Template>
-                                                                <DxComboBox Data="@Cities.Where(x => x.ProvinceId == a.ProvinceId)"
-                                                                            NullText="Select City..."
-                                                                            @bind-Value="@a.CityId"
-                                                                            TextFieldName="Name"
-                                                                            ValueFieldName="Id">
-                                                                </DxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="3" Column="0" ColumnSpan="12" CssClass="mt">
-                                                            <Template>
-                                                                <DxComboBox Data="@Countries.Where(x => a.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == a.ProvinceId)?.CountryId)"
-                                                                            NullText="Select Country..."
-                                                                            @bind-Value="@a.CountryId"
-                                                                            TextFieldName="Name"
-                                                                            ValueFieldName="Id">
-                                                                </DxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                    </Items>
-                                                </DxGridLayout>
-                                            </Template>
-                                        </DxFormLayoutItem>
-                                    </DxFormLayout>
-                                </EditFormTemplate>
-                            </DxGrid>
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <DxGrid @ref="Grid"
+                                        Data="HealthCenters"
+                                        PageSize="10"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                        KeyFieldName="Id"
+                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                        EditModelSaving="OnSave"
+                                        DataItemDeleting="OnDelete"
+                                        EditMode="GridEditMode.PopupEditForm"
+                                        PopupEditFormCssClass="pw-800"
+                                        PagerPosition="GridPagerPosition.Bottom"
+                                        PageSizeSelectorVisible="true"
+                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                        PageSizeSelectorAllRowsItemVisible="true"
+                                        PagerSwitchToInputBoxButtonCount="10"
+                                        FocusedRowEnabled="true"
+                                        PagerVisibleNumericButtonCount="10"
+                                        AllowSelectRowByClick="true"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        ShowGroupPanel="true"
+                                        AutoExpandAllGroupRows="true"
+                                        ShowFilterRow="true"
+                                        CustomizeElement="Grid_CustomizeElement"
+                                        ShowSearchBox="true"
+                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                        KeyboardNavigationEnabled="true">
+                                    <ToolbarTemplate>
+                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                            <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                            <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && HealthCenters.Count > 0" />
+                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && HealthCenters.Count > 0" />
+                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                            <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                <Items>
+                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                </Items>
+                                            </DxToolbarItem>
+                                            <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                        </DxToolbar>
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Street1" Caption="Street" />
+                                        <DxGridDataColumn FieldName="WebsiteLink" Caption="Website Link" />
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (HealthCenterDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="6">
+                                                <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Type:" ColSpanMd="6">
+                                                <DxComboBox Data="@Types" @bind-Value="@a.Type" NullText="Types" ShowValidationIcon="true" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Phone:" ColSpanMd="6">
+                                                <DxTextBox @bind-Text="@a.Phone" NullText="Phone" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Mobile:" ColSpanMd="6">
+                                                <DxTextBox @bind-Text="@a.Mobile" NullText="Mobile" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Email:" ColSpanMd="6">
+                                                <DxTextBox @bind-Text="@a.Email" NullText="Email" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Website Link:" ColSpanMd="6">
+                                                <DxTextBox @bind-Text="@a.WebsiteLink" NullText="Website Link" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Address:" ColSpanMd="12">
+                                                <Template>
+                                                    <DxGridLayout>
+                                                        <Rows>
+                                                            <DxGridLayoutRow />
+                                                            <DxGridLayoutRow />
+                                                            <DxGridLayoutRow />
+                                                            <DxGridLayoutRow />
+                                                        </Rows>
+                                                        <Columns>
+                                                            <DxGridLayoutColumn />
+                                                            <DxGridLayoutColumn />
+                                                        </Columns>
+                                                        <Items>
+                                                            <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
+                                                                <Template>
+                                                                    <DxTextBox @bind-Text="@a.Street1" NullText="Street1" />
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
+                                                                <Template>
+                                                                    <DxTextBox @bind-Text="@a.Street2" NullText="Street2" />
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
+                                                                <Template>
+                                                                    <DxComboBox Data="@Provinces"
+                                                                                NullText="Select Province..."
+                                                                                @bind-Value="@a.ProvinceId"
+                                                                                TextFieldName="Name"
+                                                                                ValueFieldName="Id">
+                                                                    </DxComboBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
+                                                                <Template>
+                                                                    <DxComboBox Data="@Cities.Where(x => x.ProvinceId == a.ProvinceId)"
+                                                                                NullText="Select City..."
+                                                                                @bind-Value="@a.CityId"
+                                                                                TextFieldName="Name"
+                                                                                ValueFieldName="Id">
+                                                                    </DxComboBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="3" Column="0" ColumnSpan="12" CssClass="mt">
+                                                                <Template>
+                                                                    <DxComboBox Data="@Countries.Where(x => a.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == a.ProvinceId)?.CountryId)"
+                                                                                NullText="Select Country..."
+                                                                                @bind-Value="@a.CountryId"
+                                                                                TextFieldName="Name"
+                                                                                ValueFieldName="Id">
+                                                                    </DxComboBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                        </Items>
+                                                    </DxGridLayout>
+                                                </Template>
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </DxGrid>
+                            </DxLoadingPanel>
                         </div>
                     </div>
                 </div>

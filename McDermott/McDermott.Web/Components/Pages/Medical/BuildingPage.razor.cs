@@ -4,6 +4,8 @@ using Microsoft.JSInterop;
 using static McDermott.Application.Features.Commands.BuildingCommand;
 using static McDermott.Application.Features.Commands.ProvinceCommand;
 using static McDermott.Application.Features.Commands.HealthCenterCommand;
+using static McDermott.Application.Features.Commands.LocationCommand;
+using static McDermott.Application.Features.Commands.GroupCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -11,13 +13,23 @@ namespace McDermott.Web.Components.Pages.Medical
     {
         private List<HealthCenterDto> HealthCenters = [];
         public List<BuildingDto> Buildings = [];
+        public List<LocationDto> Locations = [];
+        public BuildingDto Building = new();
+        public List<BuildingLocationDto> BuildingLocations = [];
+        public List<BuildingLocationDto> DeletedBuildingLocations = [];
 
         #region Default Grid
 
+        private bool PanelVisible { get; set; } = true;
+        private bool IsAddMenu { get; set; } = false;
+        private bool ShowForm { get; set; } = false;
         public IGrid Grid { get; set; }
+        public IGrid GridBuildingLocation { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
+        private int FocusedRowBuildingLocationVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedBuildingLocationDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
@@ -28,9 +40,9 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             try
             {
-                if (SelectedDataItems is null)
+                if (SelectedDataItems.Count == 1)
                 {
-                    await Mediator.Send(new DeleteBuildingRequest(((BuildingDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteBuildingRequest(SelectedDataItems[0].Adapt<BuildingDto>().Id));
                 }
                 else
                 {
@@ -39,10 +51,14 @@ namespace McDermott.Web.Components.Pages.Medical
                 }
                 await LoadData();
             }
-            catch (Exception ee)
-            {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
-            }
+            catch { }
+        }
+
+        private async Task OnDeleteBuildingLocation(GridDataItemDeletingEventArgs e)
+        {
+            var aaa = SelectedBuildingLocationDataItems.Adapt<List<BuildingLocationDto>>();
+            BuildingLocations.RemoveAll(x => aaa.Select(z => z.LocationId).Contains(x.LocationId));
+            SelectedBuildingLocationDataItems = new ObservableRangeCollection<object>();
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
@@ -60,10 +76,43 @@ namespace McDermott.Web.Components.Pages.Medical
             await LoadData();
         }
 
+        private async Task OnSaveBuildingLocation(GridEditModelSavingEventArgs e)
+        {
+            var buildingLocation = (BuildingLocationDto)e.EditModel;
+
+            if (BuildingLocations.Where(x => x.LocationId == buildingLocation.LocationId).Any())
+                return;
+
+            BuildingLocationDto updateBuilding = new();
+
+            if (IsAddMenu)
+            {
+                updateBuilding = BuildingLocations.FirstOrDefault(x => x.LocationId == buildingLocation.LocationId)!;
+                buildingLocation.Location = Locations.FirstOrDefault(x => x.Id == buildingLocation.LocationId);
+                BuildingLocations.Add(buildingLocation);
+            }
+            else
+            {
+                var q = SelectedBuildingLocationDataItems[0].Adapt<BuildingLocationDto>();
+
+                updateBuilding = BuildingLocations.FirstOrDefault(x => x.LocationId == buildingLocation.LocationId)!;
+                buildingLocation.Location = Locations.FirstOrDefault(x => x.Id == buildingLocation.LocationId);
+                var index = BuildingLocations.IndexOf(updateBuilding!);
+                BuildingLocations[index] = buildingLocation;
+            }
+
+            SelectedBuildingLocationDataItems = new ObservableRangeCollection<object>();
+        }
+
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
             EditItemsEnabled = true;
+        }
+
+        private void GridBuildingLocation_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowBuildingLocationVisibleIndex = args.VisibleIndex;
         }
 
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
@@ -81,17 +130,38 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task NewItem_Click()
         {
-            await Grid.StartEditNewRowAsync();
+            ShowForm = true;
+            BuildingLocations = [];
+            Building = new();
         }
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            try
+            {
+                Building = SelectedDataItems[0].Adapt<BuildingDto>();
+                ShowForm = true;
+
+                if (Building != null)
+                {
+                    DeletedBuildingLocations = await Mediator.Send(new GetBuildingLocationByBuildingIdRequest(Building.Id));
+                    BuildingLocations = await Mediator.Send(new GetBuildingLocationByBuildingIdRequest(Building.Id));
+                }
+            }
+            catch { }
         }
 
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        private void CancelItemBuildingLocationGrid_Click()
+        {
+            BuildingLocations = new();
+            Building = new();
+            SelectedBuildingLocationDataItems = new ObservableRangeCollection<object>();
+            ShowForm = false;
         }
 
         private void ColumnChooserButton_Click()
@@ -125,15 +195,107 @@ namespace McDermott.Web.Components.Pages.Medical
 
         protected override async Task OnInitializedAsync()
         {
+            PanelVisible = true;
             HealthCenters = await Mediator.Send(new GetHealthCenterQuery());
+            Locations = await Mediator.Send(new GetLocationQuery());
 
             await LoadData();
         }
 
         private async Task LoadData()
         {
+            PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Buildings = await Mediator.Send(new GetBuildingQuery());
+            PanelVisible = false;
+        }
+
+        private async Task NewItemBuildingLocation_Click()
+        {
+            IsAddMenu = true;
+            await GridBuildingLocation.StartEditNewRowAsync();
+        }
+
+        private async Task EditItemBuildingLocation_Click()
+        {
+            IsAddMenu = false;
+            await GridBuildingLocation.StartEditRowAsync(FocusedRowBuildingLocationVisibleIndex);
+        }
+
+        private void DeleteItemBuildingLocation_Click()
+        {
+            GridBuildingLocation.ShowRowDeleteConfirmation(FocusedRowBuildingLocationVisibleIndex);
+        }
+
+        private async Task SaveItemBuildingLocationGrid_Click()
+        {
+            var a = BuildingLocations;
+
+            if (a is null) return;
+
+            if (Building.Id == 0)
+            {
+                var result = await Mediator.Send(new CreateBuildingRequest(Building));
+
+                await Mediator.Send(new DeleteBuildingLocationByIdRequest(DeletedBuildingLocations.Select(x => x.Id).ToList()));
+
+                a.ForEach(x =>
+                {
+                    x.Id = 0;
+                    x.BuildingId = result.Id;
+                    x.Location = null;
+                });
+
+                await Mediator.Send(new CreateBuildingLocationRequest(a));
+            }
+            else
+            {
+                var result = await Mediator.Send(new UpdateBuildingRequest(Building));
+
+                await Mediator.Send(new DeleteBuildingLocationByIdRequest(DeletedBuildingLocations.Select(x => x.Id).ToList()));
+
+                a.ForEach(x =>
+                {
+                    x.Id = 0;
+                    x.BuildingId = Building.Id;
+                    x.Location = null;
+                });
+
+                await Mediator.Send(new CreateBuildingLocationRequest(a));
+            }
+
+            ShowForm = false;
+
+            await LoadData();
+        }
+
+        private void ColumnChooserButtonBuildingLocation_Click()
+        {
+            GridBuildingLocation.ShowColumnChooser();
+        }
+
+        private async Task ExportXlsxItemBuildingLocation_Click()
+        {
+            await GridBuildingLocation.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+        }
+
+        private async Task ExportXlsItemBuildingLocation_Click()
+        {
+            await GridBuildingLocation.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+        }
+
+        private async Task ExportCsvItemBuildingLocation_Click()
+        {
+            await GridBuildingLocation.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
+            {
+                ExportSelectedRowsOnly = true,
+            });
         }
 
         #endregion Default Grid

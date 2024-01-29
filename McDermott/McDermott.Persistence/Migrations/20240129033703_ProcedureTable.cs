@@ -72,13 +72,13 @@ namespace McDermott.Persistence.Migrations
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Diagnoses_DiseaseCategories_DiseaseCategoryId",
-                table: "Diagnoses",
-                column: "DiseaseCategoryId",
-                principalTable: "DiseaseCategories",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+            //migrationBuilder.AddForeignKey(
+            //    name: "FK_Diagnoses_DiseaseCategories_DiseaseCategoryId",
+            //    table: "Diagnoses",
+            //    column: "DiseaseCategoryId",
+            //    principalTable: "DiseaseCategories",
+            //    principalColumn: "Id",
+            //    onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />

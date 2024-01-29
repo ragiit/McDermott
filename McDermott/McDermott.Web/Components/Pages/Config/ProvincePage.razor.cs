@@ -7,6 +7,8 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class ProvincePage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
+
         public IGrid Grid { get; set; }
 
         private List<CountryDto> Countries = new();
@@ -16,6 +18,7 @@ namespace McDermott.Web.Components.Pages.Config
         private int Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
+        private bool IsAccess { get; set; }
         //public IGrid Grid { get; set; }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
@@ -47,6 +50,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
+            AuthorizationLayout = new();
             Countries = await Mediator.Send(new GetCountryQuery());
             await LoadData();
         }

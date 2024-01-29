@@ -5,11 +5,14 @@ using static McDermott.Application.Features.Commands.CompanyCommand;
 using Blazored.LocalStorage;
 using System.ComponentModel.DataAnnotations;
 using DevExpress.Data.XtraReports.Native;
+using McDermott.Web.Components.Layout;
 
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CompanyPage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
+
         public IGrid Grid { get; set; }
         private CompanyDto CompanyForm = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();

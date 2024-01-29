@@ -4,6 +4,7 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class GenderPage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
         public IGrid Grid { get; set; }
         private List<GenderDto> Genders = new();
 

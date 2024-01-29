@@ -7,6 +7,8 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class MenuPage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
+
         public IGrid Grid { get; set; }
         private List<MenuDto> Menus = new();
         private List<MenuDto> ParentMenuDto = new();

@@ -5,11 +5,14 @@ using static McDermott.Application.Features.Commands.DistrictCommand;
 using static McDermott.Application.Features.Commands.VillageCommand;
 using DevExpress.Data.XtraReports.Native;
 using Microsoft.JSInterop;
+using McDermott.Web.Components.Layout;
 
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class VillagePage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
+
         public IGrid Grid { get; set; }
         private List<CountryDto> Countrys = new();
         private List<ProvinceDto> Provinces = new();

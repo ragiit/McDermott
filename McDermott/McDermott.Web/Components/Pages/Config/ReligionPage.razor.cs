@@ -6,6 +6,8 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class ReligionPage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
+
         public IGrid Grid { get; set; }
         private List<ReligionDto> Religions = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();

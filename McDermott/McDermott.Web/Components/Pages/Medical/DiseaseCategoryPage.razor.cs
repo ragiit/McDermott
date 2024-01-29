@@ -41,10 +41,7 @@ namespace McDermott.Web.Components.Pages.Medical
         }
 
         protected override async Task OnInitializedAsync()
-        {
-            var q = await Mediator.Send(new GetDiseaseCategoryQuery());
-            ParentCategoryDto = [.. q.Where(x => x.ParentCategory == null || x.ParentCategory == "")];
-
+        { 
             await LoadData();
         }
 
@@ -54,6 +51,8 @@ namespace McDermott.Web.Components.Pages.Medical
             SelectedDataItems = new ObservableRangeCollection<object>();
             DiseaseCategorys = await Mediator.Send(new GetDiseaseCategoryQuery());
             DiseaseCategorys = [.. DiseaseCategorys.OrderBy(x => x.ParentCategory == null)];
+            var q = await Mediator.Send(new GetDiseaseCategoryQuery());
+            ParentCategoryDto = [.. q.Where(x => x.ParentCategory == null || x.ParentCategory == "")];
             PanelVisible = false;
         }
 

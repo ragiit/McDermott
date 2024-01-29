@@ -4,6 +4,7 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class EmailSettingPage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
         private bool PanelVisible { get; set; } = true;
 
         public IGrid Grid { get; set; }
