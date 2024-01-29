@@ -24,15 +24,16 @@ namespace McDermott.Web.Components.Pages.Medical
             "Berat"
         };
 
-        private async Task LoadData()
-        {
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Procedures = await Mediator.Send(new GetProcedureQuery());
-        }
-
         protected override async Task OnInitializedAsync()
         {
             await LoadData();
+        }
+        private async Task LoadData()
+        {
+            PanelVisible = true;
+            SelectedDataItems = new ObservableRangeCollection<object>();
+            Procedures = await Mediator.Send(new GetProcedureQuery());
+            PanelVisible = false;
         }
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
@@ -73,6 +74,10 @@ namespace McDermott.Web.Components.Pages.Medical
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+        private void ColumnChooserButton_Click()
+        {
+            Grid.ShowColumnChooser();
         }
         private async Task ExportXlsxItem_Click()
         {
