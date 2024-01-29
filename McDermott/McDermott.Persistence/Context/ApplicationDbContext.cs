@@ -46,6 +46,9 @@ namespace McDermott.Persistence.Context
         public DbSet<Location> Locations { get; set; }
         public DbSet<BuildingLocation> BuildingLocations { get; set; }
 
+        //Patiente
+        public DbSet<Family> families { get; set; }
+
         #endregion DbSet
 
         #region MyRegion

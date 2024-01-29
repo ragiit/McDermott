@@ -1,27 +1,26 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Domain.Entities;
-using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.ProcedureCommand;
-
-namespace McDermott.Web.Components.Pages.Medical
+using static McDermott.Application.Features.Commands.FamilyCommand;
+namespace McDermott.Web.Components.Pages.Patient
 {
-    public partial class ProcedurePage
+    public partial class FamilyPage
     {
         private bool PanelVisible { get; set; } = true;
 
         public IGrid Grid { get; set; }
-        private List<ProcedureDto> Procedures = new();
+        private List<FamilyDto> Familys = new();
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
 
-        private List<string> Classification = new List<string>
+        private List<string> Relation = new List<string>
         {
-            "Easy",
-            "Medium",
-            "Hard"
+            "Sibling",
+            "Parents",
+            "Childer",
+            "Wife",
+            "Husband"
         };
 
         protected override async Task OnInitializedAsync()
@@ -32,7 +31,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
-            Procedures = await Mediator.Send(new GetProcedureQuery());
+            Familys = await Mediator.Send(new GetFamilyQuery());
             PanelVisible = false;
         }
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
@@ -84,7 +83,7 @@ namespace McDermott.Web.Components.Pages.Medical
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
             {
                 ExportSelectedRowsOnly = true,
-            }); ;
+            }); 
         }
 
         private async Task ExportXlsItem_Click()
@@ -105,26 +104,26 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             if (SelectedDataItems is null)
             {
-                await Mediator.Send(new DeleteProcedureRequest(((ProcedureDto)e.DataItem).Id));
+                await Mediator.Send(new DeleteFamilyRequest(((FamilyDto)e.DataItem).Id));
             }
             else
             {
-                var a = SelectedDataItems.Adapt<List<ProcedureDto>>();
-                await Mediator.Send(new DeleteListProcedureRequest(a.Select(x => x.Id).ToList()));
+                var a = SelectedDataItems.Adapt<List<FamilyDto>>();
+                await Mediator.Send(new DeleteListFamilyRequest(a.Select(x => x.Id).ToList()));
             }
             await LoadData();
         }
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (ProcedureDto)e.EditModel;
+            var editModel = (FamilyDto)e.EditModel;
 
             if (string.IsNullOrWhiteSpace(editModel.Name))
                 return;
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateProcedureRequest(editModel));
+                await Mediator.Send(new CreateFamilyRequest(editModel));
             else
-                await Mediator.Send(new UpdateProcedureRequest(editModel));
+                await Mediator.Send(new UpdateFamilyRequest(editModel));
 
             await LoadData();
         }
