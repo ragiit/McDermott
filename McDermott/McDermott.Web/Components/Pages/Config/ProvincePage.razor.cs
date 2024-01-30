@@ -7,19 +7,14 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class ProvincePage
     {
-        private BaseAuthorizationLayout AuthorizationLayout = new();
-
         public IGrid Grid { get; set; }
 
         private List<CountryDto> Countries = new();
         private List<ProvinceDto> Provinces = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-        private dynamic dd;
         private int Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
-        private bool IsAccess { get; set; }
-        //public IGrid Grid { get; set; }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
@@ -50,9 +45,30 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
-            AuthorizationLayout = new();
+            try
+            {
+                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+            }
+            catch { }
+
             Countries = await Mediator.Send(new GetCountryQuery());
             await LoadData();
+        }
+
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                }
+                catch { }
+            }
         }
 
         private async Task LoadData()

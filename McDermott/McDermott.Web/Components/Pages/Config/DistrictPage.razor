@@ -3,8 +3,8 @@
 
 <PageTitle>District</PageTitle>
 
-<BaseAuthorizationLayout />
-
+@if (IsAccess)
+{
     <div class="wrapper">
 
         <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="District" />
@@ -115,4 +115,5 @@
                 </div>
             </div>
         </section>
-    </div> 
+    </div>
+} 

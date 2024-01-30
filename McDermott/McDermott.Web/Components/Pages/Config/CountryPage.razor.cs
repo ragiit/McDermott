@@ -8,11 +8,9 @@ namespace McDermott.Web.Components.Pages.Config
     public partial class CountryPage
     {
         private bool PanelVisible { get; set; } = true;
-        private bool IsAccess { get; set; }
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
         private List<CountryDto> Countries = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; }
-        private dynamic dd;
         private int Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
@@ -20,8 +18,29 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
-         
+            try
+            {
+                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+            }
+            catch { }
+
             await LoadData();
+        }
+
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                }
+                catch { }
+            }
         }
 
         private async Task LoadData()

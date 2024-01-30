@@ -5,7 +5,7 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class EmailSettingPage
     {
-        private BaseAuthorizationLayout AuthorizationLayout = new();
+     
         private bool PanelVisible { get; set; } = true;
         private string textPopUp = "";
 
@@ -24,8 +24,29 @@ namespace McDermott.Web.Components.Pages.Config
             "SSL/TLS"
         };
 
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                }
+                catch { }
+            }
+        }
+
         protected override async Task OnInitializedAsync()
         {
+            try
+            {
+                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+            }
+            catch { }
             await LoadData();
         }
         private async Task LoadData()

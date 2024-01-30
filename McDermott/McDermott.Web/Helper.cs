@@ -2,6 +2,7 @@
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
@@ -96,6 +97,43 @@ namespace McDermott.Web
         //        return (DateTime)value <= DateTime.Today;
         //    }
         //}
+
+        public static async Task<bool> CheckAccessUser(this NavigationManager NavigationManager, ILocalStorageService oLocal)
+        {
+            try
+            {
+                dynamic user = await oLocal.GetItemAsync<string>("dotnet");
+                var menu = await oLocal.GetItemAsync<string>("dotnet2");
+
+                if (string.IsNullOrWhiteSpace(user) || string.IsNullOrEmpty(menu))
+                {
+                    await oLocal.ClearAsync();
+
+                    NavigationManager.NavigateTo("login", true);
+
+                    return false;
+                }
+
+                menu = Helper.Decrypt(menu);
+
+                var menus = JsonConvert.DeserializeObject<List<GroupMenuDto>>(menu);
+                var url = NavigationManager.Uri;
+
+                var z = menus?.Where(x => x.Menu.Url != null && x.Menu.Url.Contains(url.Replace(NavigationManager.BaseUri, ""))).FirstOrDefault();
+
+                if (z is null && !url.Contains("home"))
+                {
+                    NavigationManager.NavigateTo("home", true);
+                    return false;
+                }
+
+                return true;
+            }
+            catch (JSDisconnectedException ex)
+            {
+                return false;
+            }
+        }
 
         public static async Task<User> GetUserInfo(this ILocalStorageService o)
         {
