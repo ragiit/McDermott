@@ -15,6 +15,7 @@ namespace McDermott.Web.Components.Pages.Config
         public IGrid Grid { get; set; }
         private List<CityDto> Cities = new();
         private List<ProvinceDto> Provinces = new();
+        private GroupMenuDto UserAccessCRUID = new();
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
@@ -25,7 +26,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
             }
             catch { }
 
@@ -43,7 +46,9 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 try
                 {
-                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
                 }
                 catch { }
             }

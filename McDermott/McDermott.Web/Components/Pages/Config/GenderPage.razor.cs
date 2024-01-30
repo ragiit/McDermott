@@ -4,7 +4,7 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class GenderPage
     {
-        private BaseAuthorizationLayout AuthorizationLayout = new();
+        private GroupMenuDto UserAccessCRUID = new();
         public IGrid Grid { get; set; }
         private List<GenderDto> Genders = new();
 
@@ -23,7 +23,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
             }
             catch { }
 
@@ -40,7 +42,9 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 try
                 {
-                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
                 }
                 catch { }
             }

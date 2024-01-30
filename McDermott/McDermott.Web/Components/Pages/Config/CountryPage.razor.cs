@@ -14,13 +14,16 @@ namespace McDermott.Web.Components.Pages.Config
         private int Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
+        private GroupMenuDto UserAccessCRUID = new();
         public IGrid Grid { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
             try
             {
-                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
             }
             catch { }
 
@@ -37,7 +40,9 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 try
                 {
-                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
                 }
                 catch { }
             }

@@ -25,6 +25,7 @@ namespace McDermott.Web.Components.Pages.Config
         public List<CountryDto> Countries { get; set; }
         public List<ProvinceDto> Provinces { get; set; }
         public List<CityDto> Cities { get; set; }
+        private GroupMenuDto UserAccessCRUID = new();
         // public List<CurrencyDto> Currencys {get; private set;}
 
         private async Task LoadData()
@@ -37,7 +38,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
             }
             catch { }
 
@@ -59,7 +62,9 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 try
                 {
-                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
                 }
                 catch { }
             }

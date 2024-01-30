@@ -5,7 +5,7 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class EmailSettingPage
     {
-     
+        private GroupMenuDto UserAccessCRUID = new();
         private bool PanelVisible { get; set; } = true;
         private string textPopUp = "";
 
@@ -34,7 +34,9 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 try
                 {
-                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
                 }
                 catch { }
             }
@@ -44,11 +46,14 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
             }
             catch { }
             await LoadData();
         }
+
         private async Task LoadData()
         {
             PanelVisible = true;
@@ -56,10 +61,12 @@ namespace McDermott.Web.Components.Pages.Config
             EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
             PanelVisible = false;
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
+
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsEnabled = enabled;
@@ -70,6 +77,7 @@ namespace McDermott.Web.Components.Pages.Config
             FocusedRowVisibleIndex = args.VisibleIndex;
             UpdateEditItemsEnabled(true);
         }
+
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -82,6 +90,7 @@ namespace McDermott.Web.Components.Pages.Config
                 e.CssClass = "header-bold";
             }
         }
+
         private async Task NewItem_Click()
         {
             textPopUp = "Tambah Data";
@@ -98,10 +107,12 @@ namespace McDermott.Web.Components.Pages.Config
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+
         private void ColumnChooserButton_Click()
         {
             Grid.ShowColumnChooser();
         }
+
         private async Task ExportXlsxItem_Click()
         {
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
@@ -117,6 +128,7 @@ namespace McDermott.Web.Components.Pages.Config
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task ExportCsvItem_Click()
         {
             await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
@@ -124,6 +136,7 @@ namespace McDermott.Web.Components.Pages.Config
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             if (SelectedDataItems is null)
@@ -137,6 +150,7 @@ namespace McDermott.Web.Components.Pages.Config
             }
             await LoadData();
         }
+
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             var editModel = (EmailSettingDto)e.EditModel;
