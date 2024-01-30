@@ -11,8 +11,6 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CompanyPage
     {
-        private BaseAuthorizationLayout AuthorizationLayout = new();
-
         public IGrid Grid { get; set; }
         private CompanyDto CompanyForm = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
@@ -37,12 +35,34 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
+            try
+            {
+                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+            }
+            catch { }
+
             SelectedDataItems = new ObservableRangeCollection<object>();
             Countries = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Cities = await Mediator.Send(new GetCityQuery());
 
             await LoadData();
+        }
+
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                }
+                catch { }
+            }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)

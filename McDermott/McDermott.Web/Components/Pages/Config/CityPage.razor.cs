@@ -23,8 +23,30 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
+            try
+            {
+                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+            }
+            catch { }
+
             Provinces = await Mediator.Send(new GetProvinceQuery());
             await LoadData();
+        }
+
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                }
+                catch { }
+            }
         }
 
         private async Task LoadData()

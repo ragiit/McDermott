@@ -6,6 +6,7 @@ using static McDermott.Application.Features.Commands.VillageCommand;
 using DevExpress.Data.XtraReports.Native;
 using Microsoft.JSInterop;
 using McDermott.Web.Components.Layout;
+using McDermott.Domain.Entities;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -14,25 +15,45 @@ namespace McDermott.Web.Components.Pages.Config
         private BaseAuthorizationLayout AuthorizationLayout = new();
 
         public IGrid Grid { get; set; }
-        private List<CountryDto> Countrys = new();
         private List<ProvinceDto> Provinces = new();
         private List<DistrictDto> Districts = new();
         private List<VillageDto> Villages = new();
+        private List<CountryDto> Countrys = new();
         private List<CityDto> Cities = new();
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-        private dynamic dd;
-        private int Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
-        private bool EditItemsEnabled { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
+            try
+            {
+                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+            }
+            catch { }
+
             Countrys = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Districts = await Mediator.Send(new GetDistrictQuery());
             Cities = await Mediator.Send(new GetCityQuery());
             await LoadData();
+        }
+
+        private bool IsAccess = false;
+        private bool EditItemsEnabled;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                }
+                catch { }
+            }
         }
 
         private async Task LoadData()

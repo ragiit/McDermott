@@ -11,7 +11,6 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class GroupPage
     {
-        private BaseAuthorizationLayout AuthorizationLayout = new();
         private bool PanelVisible { get; set; } = true;
         private int Id { get; set; }
         public IGrid Grid { get; set; }
@@ -58,6 +57,12 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
+            try
+            {
+                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+            }
+            catch { }
+
             Menus = await Mediator.Send(new GetMenuQuery());
             Menus.Insert(0, new MenuDto
             {
@@ -65,6 +70,22 @@ namespace McDermott.Web.Components.Pages.Config
                 Name = "All",
             });
             await LoadData();
+        }
+
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                }
+                catch { }
+            }
         }
 
         private async Task NewItem_Click()

@@ -25,7 +25,29 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
+            try
+            {
+                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+            }
+            catch { }
+
             await LoadData();
+        }
+
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                }
+                catch { }
+            }
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
