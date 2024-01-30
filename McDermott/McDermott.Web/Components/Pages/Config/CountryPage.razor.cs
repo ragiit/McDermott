@@ -7,7 +7,6 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CountryPage
     {
-        private BaseAuthorizationLayout AuthorizationLayout = new();
         private bool PanelVisible { get; set; } = true;
         private bool IsAccess { get; set; }
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
@@ -21,7 +20,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
-            AuthorizationLayout = new();
+         
             await LoadData();
         }
 

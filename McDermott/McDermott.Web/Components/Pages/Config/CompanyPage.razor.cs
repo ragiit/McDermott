@@ -11,8 +11,6 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CompanyPage
     {
-        private BaseAuthorizationLayout AuthorizationLayout = new();
-
         public IGrid Grid { get; set; }
         private CompanyDto CompanyForm = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
