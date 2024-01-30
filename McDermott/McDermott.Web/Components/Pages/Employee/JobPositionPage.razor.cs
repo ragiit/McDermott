@@ -12,6 +12,7 @@ namespace McDermott.Web.Components.Pages.Employee
 
         #region Default Grid
 
+        private GroupMenuDto UserAccessCRUID = new();
         private bool PanelVisible { get; set; } = true;
         public IGrid Grid { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
@@ -124,9 +125,35 @@ namespace McDermott.Web.Components.Pages.Employee
 
         protected override async Task OnInitializedAsync()
         {
+            try
+            {
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
+            }
+            catch { }
+
             Departments = await Mediator.Send(new GetDepartmentQuery());
 
             await LoadData();
+        }
+
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
+                }
+                catch { }
+            }
         }
 
         private async Task LoadData()

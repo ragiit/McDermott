@@ -19,6 +19,7 @@ namespace McDermott.Web.Components.Pages.Employee
 
         #region Default Grid
 
+        private GroupMenuDto UserAccessCRUID = new();
         private bool PanelVisible { get; set; } = true;
         public IGrid Grid { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
@@ -134,6 +135,14 @@ namespace McDermott.Web.Components.Pages.Employee
 
         protected override async Task OnInitializedAsync()
         {
+            try
+            {
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
+            }
+            catch { }
+
             PanelVisible = true;
 
             SelectedDataItems = new ObservableRangeCollection<object>();
@@ -150,6 +159,24 @@ namespace McDermott.Web.Components.Pages.Employee
             ParentDepartments = await Mediator.Send(new GetDepartmentQuery());
 
             PanelVisible = false;
+        }
+
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
+                }
+                catch { }
+            }
         }
 
         #endregion Default Grid

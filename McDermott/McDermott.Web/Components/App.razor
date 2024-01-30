@@ -87,6 +87,25 @@
 <body class="hold-transition sidebar-mini layout-fixed">
     <Routes @rendermode="InteractiveServer" />
     <script src="_framework/blazor.web.js"></script>
+    <script>
+        window.BlazorHelpers = {
+            setTimeout: function (callback, timeout) {
+                return setTimeout(callback, timeout);
+            }
+        };
+
+        window.blazorLocalStorage = {
+            getItem: function (key) {
+                return localStorage.getItem(key);
+            },
+            setItem: function (key, value) {
+                localStorage.setItem(key, value);
+            },
+            removeItem: function (key) {
+                localStorage.removeItem(key);
+            }
+        };
+    </script>
     <!-- jQuery -->
     <script src="AdminLTE/plugins/jquery/jquery.min.js"></script>
     <!-- jQuery UI 1.11.4 -->

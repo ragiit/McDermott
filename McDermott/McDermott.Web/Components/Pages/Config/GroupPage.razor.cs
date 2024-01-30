@@ -246,7 +246,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             var groupMenu = (GroupMenuDto)e.EditModel;
 
-            if (GroupMenus.Where(x => x.MenuId == groupMenu.MenuId).Any())
+            if (!GroupMenus.Where(x => x.MenuId == groupMenu.MenuId).Any())
                 return;
 
             GroupMenuDto updateMenu = new();

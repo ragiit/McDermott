@@ -1,14 +1,18 @@
 ﻿@page "/login"
+@using McDermott.Application.Features.Services
 @using McDermott.Domain.Entities
-@using McDermott.Persistence.Context
+@using McDermott.Persistence.Context 
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
 @using System.Security.Cryptography
 @using System.Text
 @using Newtonsoft.Json
+@using System.Security.Claims
 @using static McDermott.Application.Features.Commands.GroupCommand
 @using static McDermott.Application.Features.Commands.MenuCommand
 
 @inject ApplicationDbContext DataContext
+@inject CustomAuthenticationStateProvider CustomAuth
 
 <PageTitle>Login</PageTitle>
 
@@ -108,6 +112,25 @@
             var encrypt = Helper.Encrypt(serialize);
 
             await oLocal.SetItemAsync("dotnet", encrypt);
+
+            var a = (CustomAuthenticationStateProvider)CustomAuth;
+            await a.UpdateAuthState(new User
+            {
+                Name = "A"
+            });
+
+            // var claims = new List<Claim>
+            //     {
+            //         new Claim("CustomClaimType", "CustomClaimValue")
+            //     };
+
+            // var userIdentity = new ClaimsIdentity(claims, "login");
+
+            // ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
+
+            // // Serialize principal
+            // var authenticationState = new AuthenticationState(principal);
+            // AuthenticationStateProvider.NotifyAuthenticationStateChanged(Task.FromResult(authenticationState));
 
             NavigationManager.NavigateTo("", forceLoad: true);
 

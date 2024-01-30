@@ -13,101 +13,110 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <DxGrid @ref="Grid"
-                                    Data="Departments"
-                                    PageSize="10"
-                                    @bind-SelectedDataItems="@SelectedDataItems"
-                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                    KeyFieldName="Id"
-                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                    EditModelSaving="OnSave"
-                                    DataItemDeleting="OnDelete"
-                                    EditMode="GridEditMode.PopupEditForm"
-                                    PopupEditFormCssClass="pw-800"
-                                    PagerPosition="GridPagerPosition.Bottom"
-                                    PageSizeSelectorVisible="true"
-                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                    PageSizeSelectorAllRowsItemVisible="true"
-                                    PagerSwitchToInputBoxButtonCount="10"
-                                    FocusedRowEnabled="true"
-                                    PagerVisibleNumericButtonCount="10"
-                                    FocusedRowChanged="Grid_FocusedRowChanged"
-                                    ShowGroupPanel="true"
-                                    AutoExpandAllGroupRows="true"
-                                    ShowFilterRow="true"
-                                    CustomizeElement="Grid_CustomizeElement"
-                                    ShowSearchBox="true"
-                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                    KeyboardNavigationEnabled="true">
-                                <ToolbarTemplate>
-                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                        <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="grid-toolbar-new" />
-                                        <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsEnabled" />
-                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems.Count > 0" />
-                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" />
-                                        <DxToolbarItem Text="Export" IconCssClass="grid-toolbar-export">
-                                            <Items>
-                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                            </Items>
-                                        </DxToolbarItem>
-                                    </DxToolbar>
-                                </ToolbarTemplate>
-                                <Columns>
-                                    <DxGridSelectionColumn Width="15px" />
-                                    <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                    <DxGridDataColumn FieldName="ParentName" Caption="Parent" />
-                                    <DxGridDataColumn FieldName="Company.Name" Caption="Company" />
-                                    <DxGridDataColumn FieldName="Manager" />
-                                    <DxGridDataColumn FieldName="DepartmentCategory" Caption="Category" />
-                                </Columns>
-                                <EditFormTemplate Context="EditFormContext">
-                                    @{
-                                        var a = (DepartmentDto)EditFormContext.EditModel;
-                                    }
-                                    <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
-                                        </DxFormLayoutItem>
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <DxGrid @ref="Grid"
+                                        Data="Departments"
+                                        PageSize="10"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                        KeyFieldName="Id"
+                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                        EditModelSaving="OnSave"
+                                        DataItemDeleting="OnDelete"
+                                        EditMode="GridEditMode.PopupEditForm"
+                                        PopupEditFormCssClass="pw-800"
+                                        PagerPosition="GridPagerPosition.Bottom"
+                                        PageSizeSelectorVisible="true"
+                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                        PageSizeSelectorAllRowsItemVisible="true"
+                                        PagerSwitchToInputBoxButtonCount="10"
+                                        FocusedRowEnabled="true"
+                                        PagerVisibleNumericButtonCount="10"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        ShowGroupPanel="true"
+                                        AutoExpandAllGroupRows="true"
+                                        ShowFilterRow="true"
+                                        CustomizeElement="Grid_CustomizeElement"
+                                        ShowSearchBox="true"
+                                        AllowSelectRowByClick="true"
+                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                        KeyboardNavigationEnabled="true">
+                                    <ToolbarTemplate>
+                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Departments.Count > 0" />
+                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Departments.Count > 0" />
+                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                            <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                <Items>
+                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                </Items>
+                                            </DxToolbarItem>
+                                            <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                        </DxToolbar>
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="ParentName" Caption="Parent" />
+                                        <DxGridDataColumn FieldName="Company.Name" Caption="Company" />
+                                        <DxGridDataColumn FieldName="Manager" />
+                                        <DxGridDataColumn FieldName="DepartmentCategory" Caption="Category" />
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (DepartmentDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
+                                            </DxFormLayoutItem>
 
-                                        <DxFormLayoutItem Caption="Parent Department:" ColSpanMd="12">
-                                            <Template>
-                                                <DxComboBox Data="@ParentDepartments"
-                                                            NullText="Select Parent Department..."
-                                                            FilteringMode="@DataGridFilteringMode.Contains"
-                                                            @bind-Value="@a.ParentId"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id">
-                                                </DxComboBox>
-                                            </Template>
-                                        </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Parent Department:" ColSpanMd="12">
+                                                <Template>
+                                                    <DxComboBox Data="@ParentDepartments"
+                                                                NullText="Select Parent Department..."
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
+                                                                @bind-Value="@a.ParentId"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id">
+                                                    </DxComboBox>
+                                                </Template>
+                                            </DxFormLayoutItem>
 
-                                        <DxFormLayoutItem Caption="Company:" ColSpanMd="12">
-                                            <Template>
-                                                <DxComboBox Data="@Companies"
-                                                            NullText="Select Company..."
-                                                            FilteringMode="@DataGridFilteringMode.Contains"
-                                                            @bind-Value="@a.CompanyId"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id">
-                                                </DxComboBox>
-                                            </Template>
-                                        </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Company:" ColSpanMd="12">
+                                                <Template>
+                                                    <DxComboBox Data="@Companies"
+                                                                NullText="Select Company..."
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
+                                                                @bind-Value="@a.CompanyId"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id">
+                                                    </DxComboBox>
+                                                </Template>
+                                            </DxFormLayoutItem>
 
-                                        <DxFormLayoutItem Caption="Manager:" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@a.Manager" NullText="Manager" ShowValidationIcon="true" />
-                                        </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Manager:" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Manager" NullText="Manager" ShowValidationIcon="true" />
+                                            </DxFormLayoutItem>
 
-                                        <DxFormLayoutItem Caption="Department Category:" ColSpanMd="12">
-                                            <Template>
-                                                <DxComboBox NullText="Select Department Category..." FilteringMode="@DataGridFilteringMode.Contains" Data="@DepartmentCategories" @bind-Value="@a.DepartmentCategory" />
-                                            </Template>
-                                        </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Department Category:" ColSpanMd="12">
+                                                <Template>
+                                                    <DxComboBox NullText="Select Department Category..." FilteringMode="@DataGridFilteringMode.Contains" Data="@DepartmentCategories" @bind-Value="@a.DepartmentCategory" />
+                                                </Template>
+                                            </DxFormLayoutItem>
 
-                                    </DxFormLayout>
-                                </EditFormTemplate>
-                            </DxGrid>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </DxGrid>
+                            </DxLoadingPanel>
                         </div>
                     </div>
                 </div>

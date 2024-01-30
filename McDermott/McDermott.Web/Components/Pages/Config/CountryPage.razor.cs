@@ -7,13 +7,11 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CountryPage
     {
-        private bool PanelVisible { get; set; } = true;
-        private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
         private List<CountryDto> Countries = new();
-        private IReadOnlyList<object> SelectedDataItems { get; set; }
-        private int Value { get; set; } = 0;
+
+        private bool PanelVisible { get; set; } = true;
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
-        private bool EditItemsEnabled { get; set; }
         private GroupMenuDto UserAccessCRUID = new();
         public IGrid Grid { get; set; }
 
@@ -73,15 +71,9 @@ namespace McDermott.Web.Components.Pages.Config
             }
         }
 
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
-        }
-
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
         }
 
         private async Task NewItem_Click()
@@ -147,24 +139,6 @@ namespace McDermott.Web.Components.Pages.Config
             InvokeAsync(StateHasChanged);
         }
 
-        public enum EducationType
-        {
-            [Display(Name = "Not Stated")]
-            NoInfo = 0,
-
-            [Display(Name = "High school")]
-            School = 1,
-
-            [Display(Name = "College")]
-            College = 2,
-
-            [Display(Name = "University Degree")]
-            UniversityDegree = 3,
-
-            [Display(Name = "PhD")]
-            PhD = 4
-        }
-
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -182,23 +156,26 @@ namespace McDermott.Web.Components.Pages.Config
             }
             catch (Exception ee)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
             }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (CountryDto)e.EditModel;
+            try
+            {
+                var editModel = (CountryDto)e.EditModel;
 
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
+                if (string.IsNullOrWhiteSpace(editModel.Name))
+                    return;
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateCountryRequest(editModel));
-            else
-                await Mediator.Send(new UpdateCountryRequest(editModel));
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateCountryRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateCountryRequest(editModel));
 
-            await LoadData();
+                await LoadData();
+            }
+            catch { }
         }
     }
 }

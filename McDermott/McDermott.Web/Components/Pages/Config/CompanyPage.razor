@@ -1,10 +1,7 @@
 @page "/config/companies";
-@using static McDermott.Web.Helper
 @rendermode InteractiveServer
 
 <PageTitle>Company</PageTitle>
-
-<BaseAuthorizationLayout />
 
 <div class="wrapper">
     <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Company" />
@@ -61,11 +58,11 @@
                                 <DxGridSelectionColumn width="15px" />
                                 <DxGridDataColumn FieldName="Name" Caption="Name Company" SortIndex="0" />
                             </Columns>
-                            <EditFormTemplate Context="EditFormContext" >
+                            <EditFormTemplate Context="EditFormContext">
                                 @{
                                     var a = (CompanyDto)EditFormContext.EditModel;
                                 }
-                                <DxFormLayout CssClass="mt" >
+                                <DxFormLayout CssClass="mt">
                                     <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem caption="Name: " ColSpanMd="12">
                                             <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name Company" />
