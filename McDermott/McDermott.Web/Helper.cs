@@ -98,7 +98,7 @@ namespace McDermott.Web
         //    }
         //}
 
-        public static async Task<bool> CheckAccessUser(this NavigationManager NavigationManager, ILocalStorageService oLocal)
+        public static async Task<(bool, GroupMenuDto)> CheckAccessUser(this NavigationManager NavigationManager, ILocalStorageService oLocal)
         {
             try
             {
@@ -111,7 +111,7 @@ namespace McDermott.Web
 
                     NavigationManager.NavigateTo("login", true);
 
-                    return false;
+                    return (false, new());
                 }
 
                 menu = Helper.Decrypt(menu);
@@ -121,17 +121,17 @@ namespace McDermott.Web
 
                 var z = menus?.Where(x => x.Menu.Url != null && x.Menu.Url.Contains(url.Replace(NavigationManager.BaseUri, ""))).FirstOrDefault();
 
-                if (z is null && !url.Contains("home"))
+                if (z is null && url != NavigationManager.BaseUri)
                 {
-                    NavigationManager.NavigateTo("home", true);
-                    return false;
+                    NavigationManager.NavigateTo("", true);
+                    return (false, new());
                 }
 
-                return true;
+                return (true, z!);
             }
             catch (JSDisconnectedException ex)
             {
-                return false;
+                return (false, new());
             }
         }
 

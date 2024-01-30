@@ -6,7 +6,7 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class OccupationalPage
     {
-        private BaseAuthorizationLayout AuthorizationLayout = new();
+        private GroupMenuDto UserAccessCRUID = new();
 
         private List<string> extentions = new() { ".xlsx", ".xls" };
         private const string ExportFileName = "ExportResult";
@@ -27,7 +27,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
             }
             catch { }
 
@@ -44,7 +46,9 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 try
                 {
-                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
                 }
                 catch { }
             }

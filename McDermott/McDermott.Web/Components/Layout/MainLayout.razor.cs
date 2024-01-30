@@ -50,7 +50,7 @@ namespace McDermott.Web.Components.Layout
         {
             try
             {
-                currentUrl = NavigationManager.Uri;
+                currentUrl = NavigationManager.Uri; 
 
                 await LoadUser();
 

@@ -11,6 +11,7 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class GroupPage
     {
+        private GroupMenuDto UserAccessCRUID = new();
         private bool PanelVisible { get; set; } = true;
         private int Id { get; set; }
         public IGrid Grid { get; set; }
@@ -59,7 +60,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
             }
             catch { }
 
@@ -82,7 +85,9 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 try
                 {
-                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
                 }
                 catch { }
             }
