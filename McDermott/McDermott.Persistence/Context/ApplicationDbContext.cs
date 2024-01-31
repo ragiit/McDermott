@@ -1,12 +1,7 @@
-﻿using McDermott.Application.Features.Services;
-using McDermott.Domain.Common;
+﻿using McDermott.Domain.Common;
 using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System.ComponentModel.Design;
 using System.Reflection;
 
 namespace McDermott.Persistence.Context
@@ -15,8 +10,7 @@ namespace McDermott.Persistence.Context
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
-            : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
         {
             _httpContextAccessor = httpContextAccessor;
         }
@@ -59,6 +53,10 @@ namespace McDermott.Persistence.Context
 
         //Patiente
         public DbSet<Family> families { get; set; }
+
+        public DbSet<DoctorSchedule> DoctorSchedules { get; set; }
+        public DbSet<DoctorScheduleDetail> DoctorScheduleDetails { get; set; }
+        public DbSet<DoctorScheduleSlot> DoctorScheduleSlots { get; set; }
 
         #endregion DbSet
 

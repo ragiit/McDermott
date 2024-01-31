@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace McDermott.Domain.Entities
+namespace McDermott.Application.Dtos
 {
-    public partial class DoctorSchedule : BaseAuditableEntity
+    public class DoctorScheduleDto : IMapFrom<DoctorSchedule>
     {
+        public int Id { get; set; }
+
+        [Required]
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
 
@@ -15,6 +19,6 @@ namespace McDermott.Domain.Entities
 
         public List<int>? PhysicionIds { get; set; }
 
-        public virtual Service? Service { get; set; }
+        public ServiceDto? Service { get; set; }
     }
 }
