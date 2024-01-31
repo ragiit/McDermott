@@ -16,6 +16,8 @@
                         <div class="card">
                             <div class="card-body">
                                 <DxGrid @ref="Grid"
+                                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                        TextWrapEnabled="false"
                                         Data="Menus.OrderBy(x => x.ParentMenu == null).ThenBy(x => x.Sequence.ToInt32())"
                                         PageSize="10"
                                         @bind-SelectedDataItems="@SelectedDataItems"
