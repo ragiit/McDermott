@@ -18,6 +18,7 @@ namespace McDermott.Application.Dtos
         public int ServiceId { get; set; }
 
         public List<int>? PhysicionIds { get; set; }
+        public string Physicions { get; set; } = string.Empty;
 
         public ServiceDto? Service { get; set; }
     }

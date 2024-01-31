@@ -246,18 +246,21 @@ namespace McDermott.Web.Components.Pages.Config
         {
             var groupMenu = (GroupMenuDto)e.EditModel;
 
-            if (!GroupMenus.Where(x => x.MenuId == groupMenu.MenuId).Any())
-                return;
-
             GroupMenuDto updateMenu = new();
 
             if (IsAddMenu)
             {
+                if (GroupMenus.Where(x => x.MenuId == groupMenu.MenuId).Any())
+                    return;
+
                 updateMenu = GroupMenus.FirstOrDefault(x => x.MenuId == groupMenu.MenuId)!;
                 groupMenu.Menu = Menus.FirstOrDefault(x => x.Id == groupMenu.MenuId);
             }
             else
             {
+                if (!GroupMenus.Where(x => x.MenuId == groupMenu.MenuId).Any())
+                    return;
+
                 var q = SelectedDataItemsGroupMenu[0].Adapt<GroupMenuDto>();
 
                 updateMenu = GroupMenus.FirstOrDefault(x => x.MenuId == q.MenuId)!;

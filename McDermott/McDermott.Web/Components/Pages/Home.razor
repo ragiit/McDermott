@@ -260,7 +260,7 @@
         var bb = aa.User.Identity.Name;
         SalesData2 = await Sales.GetSalesAsync();
 
-        var hour = DateTime.UtcNow.Hour;
+        var hour = DateTime.Now.Hour;
 
         if (hour < 12)
             Greeting = "Good Morning!";

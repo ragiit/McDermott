@@ -17,11 +17,9 @@ namespace McDermott.Domain.Entities
         [StringLength(200)]
         public string DayOfWeek { get; set; } = string.Empty;
 
-        [StringLength(200)]
-        public string WorkFrom { get; set; } = string.Empty;
+        public TimeSpan WorkFrom { get; set; }
 
-        [StringLength(200)]
-        public string WorkTo { get; set; } = string.Empty;
+        public TimeSpan WorkTo { get; set; }
 
         public int Quota { get; set; } = 0;
         public bool UpdateToBpjs { get; set; } = false;

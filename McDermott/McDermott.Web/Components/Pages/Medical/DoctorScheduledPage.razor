@@ -1,0 +1,211 @@
+﻿@page "/medical/doctor-scheduled"
+@rendermode InteractiveServer
+
+<PageTitle>McDermott - Master Data Doctor Scheduled</PageTitle>
+
+<div class="wrapper">
+
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Doctor Scheduled" />
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+
+                            @if (!ShowForm)
+                            {
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <DxGrid @ref="Grid"
+                                            Data="DoctorSchedules"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            AllowSelectRowByClick="true"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            EditModelSaving="OnSave"
+                                            DataItemDeleting="OnDelete"
+                                            FocusedRowEnabled="true"
+                                            PopupEditFormCssClass="pw-800"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            PagerVisibleNumericButtonCount="10"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            ShowFilterRow="true"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && DoctorSchedules.Count > 0" />
+                                                <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && DoctorSchedules.Count > 0" />
+                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                                <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Service.Name" Caption="Service" />
+                                            <DxGridDataColumn FieldName="Physicions" />
+                                        </Columns>
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                            }
+                            else
+                            {
+                                <label for="tbOverview" class="demo-text cw-320 mb-1">
+                                    Name
+                                </label>
+
+                                <DxTextBox @bind-Text="@DoctorSchedule.Name"
+                                           NullText="Name"
+                                           InputId="tbOverview" />
+
+                                <label for="tbOverview3" class="demo-text cw-320 mb-1 mt-2">
+                                    Service
+                                </label>
+
+                                <DxComboBox Data="@Services"
+                                            NullText="Select Service"
+                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                            @bind-Value="@DoctorSchedule.ServiceId"
+                                            TextFieldName="Name"
+                                            InputId="tbOverview3"
+                                            ValueFieldName="Id">
+                                </DxComboBox>
+
+                                <label for="tbOverview2" class="demo-text cw-320 mb-1 mt-2">
+                                    Physicion
+                                </label>
+
+                                <DxTagBox Data="@Users"
+                                          FilteringMode="@DataGridFilteringMode.Contains"
+                                          @bind-Values="@SelectedPhysicions"
+                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                          TextFieldName="Name"
+                                          CssClass="cw-480"
+                                          NullText="Select Physicion"
+                                          InputId="tbOverview2" />
+
+                                <br />
+
+                                <DxGrid @ref="GridDoctorScheduleDetail"
+                                        Data="DoctorScheduleDetails"
+                                        @bind-SelectedDataItems="@SelectedDoctorScheduleDetailDataItems"
+                                        PageSize="10"
+                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                        KeyFieldName="Name"
+                                        SelectionMode="GridSelectionMode.Multiple"
+                                        AllowSelectRowByClick="true"
+                                        EditModelSaving="OnSaveDoctorScheduleDetail"
+                                        DataItemDeleting="OnDeleteDoctorScheduleDetail"
+                                        EditMode="GridEditMode.PopupEditForm"
+                                        PopupEditFormCssClass="pw-800"
+                                        PagerPosition="GridPagerPosition.Bottom"
+                                        PageSizeSelectorVisible="true"
+                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                        PageSizeSelectorAllRowsItemVisible="true"
+                                        PagerSwitchToInputBoxButtonCount="10"
+                                        FocusedRowEnabled="true"
+                                        PagerVisibleNumericButtonCount="10"
+                                        FocusedRowChanged="GridDoctorScheduleDetail_FocusedRowChanged"
+                                        ShowGroupPanel="true"
+                                        AutoExpandAllGroupRows="true"
+                                        ShowFilterRow="true"
+                                        ShowSearchBox="true"
+                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                        KeyboardNavigationEnabled="true">
+                                    <ToolbarTemplate>
+                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                            <DxToolbarItem Text="New" Click="NewItemDoctorScheduleDetail_Click" IconCssClass="fa-solid fa-plus" />
+                                            <DxToolbarItem Text="Edit" Click="EditItemDoctorScheduleDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDoctorScheduleDetailDataItems.Count > 0 && DoctorScheduleDetails.Count > 0" />
+                                            <DxToolbarItem Text="Delete" Click="DeleteItemDoctorScheduleDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDoctorScheduleDetailDataItems.Count > 0 && DoctorScheduleDetails.Count > 0" />
+                                            <DxToolbarItem Text="Save" Click="SaveItemDoctorScheduleDetailGrid_Click" Enabled="DoctorScheduleDetails.Count > 0" />
+                                            <DxToolbarItem Text="Cancel" Click="CancelItemDoctorScheduleDetailGrid_Click" />
+                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                            <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                <Items>
+                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItemDoctorScheduleDetail_Click" />
+                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItemDoctorScheduleDetail_Click" />
+                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItemDoctorScheduleDetail_Click" />
+                                                </Items>
+                                            </DxToolbarItem>
+                                            <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                        </DxToolbar>
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="DayOfWeek" Caption="Day of Week" />
+                                        <DxGridDataColumn FieldName="WorkFromFormatString" Caption="Work From" />
+                                        <DxGridDataColumn FieldName="WorkToFormatString" Caption="Work To" />
+                                        <DxGridDataColumn FieldName="Service.Name" Caption="Service" />
+                                        <DxGridDataColumn FieldName="Quota" />
+                                        <DxGridDataColumn FieldName="UpdateToBpjs" Caption="Update to BPJS" />
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (DoctorScheduleDetailDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                                <div class="pop-warning">
+                                                    <DxTextBox @bind-Text="@a.Name" NullText="Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Day of Week:" ColSpanMd="12">
+                                                <DxComboBox Data="@DayOfWeeks" @bind-Value="@a.DayOfWeek" FilteringMode="@DataGridFilteringMode.Contains" NullText="Day of Weeks" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Work From:" ColSpanMd="12">
+                                                <DxTimeEdit @bind-Time="@a.WorkFrom"
+                                                            Format="@DisplayFormat"
+                                                            DisplayFormat="@DisplayFormat"
+                                                            CssClass="cw-320" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Work To:" ColSpanMd="12">
+                                                <DxTimeEdit @bind-Time="@a.WorkTo"
+                                                            Format="@DisplayFormat"
+                                                            DisplayFormat="@DisplayFormat"
+                                                            CssClass="cw-320" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Service:" ColSpanMd="12">
+                                                <DxComboBox Data="@Services" @bind-Value="@a.ServiceId" ValueFieldName="Id" TextFieldName="Name" NullText="Service" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Quota:" ColSpanMd="12">
+                                                <DxSpinEdit @bind-Value="@a.Quota" NullText="Quota" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Update to BPJS:" ColSpanMd="3">
+                                                <DxCheckBox @bind-Checked="a.UpdateToBpjs" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </DxGrid>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div> 
