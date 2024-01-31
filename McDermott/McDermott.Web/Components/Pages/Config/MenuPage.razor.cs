@@ -148,6 +148,8 @@ namespace McDermott.Web.Components.Pages.Config
             else
                 await Mediator.Send(new UpdateMenuRequest(editModel));
 
+            NavigationManager.NavigateTo("config/menu", true);
+
             await LoadData();
         }
     }

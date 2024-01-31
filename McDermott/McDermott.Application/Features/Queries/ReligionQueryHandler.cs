@@ -18,7 +18,8 @@ namespace McDermott.Application.Features.Queries
             {
                 return await _unitOfWork.Repository<Religion>().Entities
                         .Select(Religion => Religion.Adapt<ReligionDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 
@@ -93,6 +94,7 @@ namespace McDermott.Application.Features.Queries
                 return true;
             }
         }
+
         internal class DeleteListReligionHandler : IRequestHandler<DeleteListReligionRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;

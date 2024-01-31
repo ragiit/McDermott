@@ -17,7 +17,8 @@ namespace McDermott.Application.Features.Queries
             {
                 return await _unitOfWork.Repository<HealthCenter>().Entities
                         .Select(HealthCenter => HealthCenter.Adapt<HealthCenterDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 

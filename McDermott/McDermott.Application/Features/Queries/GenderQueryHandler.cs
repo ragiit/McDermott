@@ -17,7 +17,8 @@ namespace McDermott.Application.Features.Queries
             {
                 return await _unitOfWork.Repository<Gender>().Entities
                         .Select(Gender => Gender.Adapt<GenderDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 

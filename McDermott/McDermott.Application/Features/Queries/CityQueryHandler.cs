@@ -19,7 +19,8 @@ namespace McDermott.Application.Features.Queries
                 return await _unitOfWork.Repository<City>().Entities
                         .Include(x => x.Province)
                         .Select(City => City.Adapt<CityDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 
@@ -94,6 +95,7 @@ namespace McDermott.Application.Features.Queries
                 return true;
             }
         }
+
         internal class DeleteListCityHandler : IRequestHandler<DeleteListCityRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;

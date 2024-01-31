@@ -22,7 +22,8 @@ namespace McDermott.Application.Features.Queries
             {
                 return await _unitOfWork.Repository<Family>().Entities
                         .Select(Family => Family.Adapt<FamilyDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 

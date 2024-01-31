@@ -50,7 +50,7 @@ namespace McDermott.Web.Components.Layout
         {
             try
             {
-                currentUrl = NavigationManager.Uri; 
+                currentUrl = NavigationManager.Uri;
 
                 await LoadUser();
 
@@ -72,19 +72,6 @@ namespace McDermott.Web.Components.Layout
 
                 HeaderMenuDtos = [.. menus.Where(x => x.ParentMenu == null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
                 DetailMenuDtos = [.. menus.Where(x => x.ParentMenu != null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
-
-                if (user.GroupId is not null)
-                {
-                    var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((int)user.GroupId));
-
-                    var encrypt = Helper.Encrypt(JsonConvert.SerializeObject(g));
-
-                    await oLocal.SetItemAsync("dotnet2", encrypt);
-                }
-                else
-                {
-                    await oLocal.SetItemAsync("dotnet2", new List<string>());
-                }
 
                 showPreloader = false;
 

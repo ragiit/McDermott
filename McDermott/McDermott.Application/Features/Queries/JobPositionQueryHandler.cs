@@ -16,9 +16,10 @@ namespace McDermott.Application.Features.Queries
             public async Task<List<JobPositionDto>> Handle(GetJobPositionQuery query, CancellationToken cancellationToken)
             {
                 return await _unitOfWork.Repository<JobPosition>().Entities
-                    .Include(x => x.Department)
+                        .Include(x => x.Department)
                         .Select(JobPosition => JobPosition.Adapt<JobPositionDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 

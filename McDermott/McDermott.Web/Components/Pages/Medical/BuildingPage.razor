@@ -1,7 +1,7 @@
 ﻿@page "/medical/building"
 @rendermode InteractiveServer
 
-<PageTitle>Building</PageTitle>
+<PageTitle>McDermott - Master Data McDermott - Master Data Building</PageTitle>
 
 <div class="wrapper">
 
@@ -137,7 +137,7 @@
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                          @*   <DxGridDataColumn FieldName="Code" SortIndex="0" /> *@
+                                            @*   <DxGridDataColumn FieldName="Code" SortIndex="0" /> *@
                                             <DxGridDataColumn FieldName="HealthCenter.Name" Caption="Health Center" SortIndex="0" />
                                         </Columns>
                                     </DxGrid>
@@ -153,13 +153,13 @@
                                            NullText="Building"
                                            InputId="tbOverview" />
 
-                             @*    <label for="tbOverview3" class="demo-text cw-320 mb-1 mt-2">
-                                    Code
-                                </label>
+                                @*    <label for="tbOverview3" class="demo-text cw-320 mb-1 mt-2">
+                            Code
+                            </label>
 
-                                <DxTextBox @bind-Text="@Building.Code"
-                                           NullText="Code"
-                                           InputId="tbOverview3" /> *@
+                            <DxTextBox @bind-Text="@Building.Code"
+                            NullText="Code"
+                            InputId="tbOverview3" /> *@
 
                                 <label for="tbOverview2" class="demo-text cw-320 mb-1 mt-2">
                                     Health Center

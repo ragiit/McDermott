@@ -19,7 +19,8 @@ namespace McDermott.Application.Features.Queries
             {
                 return await _unitOfWork.Repository<Group>().Entities
                         .Select(Group => Group.Adapt<GroupDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 

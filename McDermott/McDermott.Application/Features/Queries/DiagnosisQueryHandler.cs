@@ -25,8 +25,9 @@ namespace McDermott.Application.Features.Queries
                     return await _unitOfWork.Repository<Diagnosis>().Entities
                         .Include(x => x.DiseaseCategory)
                         .Include(x => x.CronisKategory)
-                       .Select(Diagnosis => Diagnosis.Adapt<DiagnosisDto>())
-                      .ToListAsync(cancellationToken);
+                        .Select(Diagnosis => Diagnosis.Adapt<DiagnosisDto>())
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
                 }
                 catch (Exception ee)
                 {

@@ -22,7 +22,8 @@ namespace McDermott.Application.Features.Queries
             {
                 return await _unitOfWork.Repository<DiseaseCategory>().Entities
                         .Select(DiseaseCategory => DiseaseCategory.Adapt<DiseaseCategoryDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 

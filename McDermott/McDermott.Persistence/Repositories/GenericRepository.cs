@@ -25,19 +25,26 @@ namespace McDermott.Persistence.Repositories
         public async Task<List<T>> AddAsync(List<T> entity)
         {
             await _dbContext.Set<T>().AddRangeAsync(entity);
+
             return entity;
         }
 
         public Task UpdateAsync(T entity)
         {
             T exist = _dbContext.Set<T>().Find(entity.Id);
+
+            entity.CreatedBy = exist.CreatedBy;
+            entity.CreatedDate = exist.CreatedDate;
+
             _dbContext.Entry(exist).CurrentValues.SetValues(entity);
+
             return Task.CompletedTask;
         }
 
         public async Task DeleteAsync(int id)
         {
             var entity = await _dbContext.Set<T>().FindAsync(id);
+
             _dbContext.Set<T>().Remove(entity!);
         }
 
