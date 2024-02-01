@@ -8,17 +8,43 @@ namespace McDermott.Web.Components.Pages.Medical
         private List<string> extentions = new() { ".xlsx", ".xls" };
         private const string ExportFileName = "ExportResult";
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
-        private IReadOnlyList<object>? SelectedDataItems { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private dynamic dd;
         private int Value { get; set; } = 0;
-
+        private bool PanelVisible { get; set; } = true;
+        private string textPopUp = "";
         private int FocusedRowVisibleIndex { get; set; }
 
         public IGrid Grid { get; set; }
         private List<SpecialityDto> Specialitys = new();
+        private bool IsAccess = false;
+        private GroupMenuDto UserAccessCRUID = new();
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
+                }
+                catch { }
+            }
+        }
 
         protected override async Task OnInitializedAsync()
         {
+            try
+            {
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
+            }
+            catch { }
             await LoadData();
         }
 
@@ -50,6 +76,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task NewItem_Click()
         {
+            textPopUp = "Add Data Speciality";
             await Grid.StartEditNewRowAsync();
         }
 
@@ -122,6 +149,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task EditItem_Click()
         {
+            textPopUp = "Edit Data Speciality";
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
@@ -132,8 +160,10 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task LoadData()
         {
+            PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Specialitys = await Mediator.Send(new GetSpecialityQuery());
+            PanelVisible = false;
         }
 
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)

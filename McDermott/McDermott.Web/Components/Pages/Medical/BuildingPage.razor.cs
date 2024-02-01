@@ -19,7 +19,7 @@ namespace McDermott.Web.Components.Pages.Medical
         public List<BuildingLocationDto> DeletedBuildingLocations = [];
 
         #region Default Grid
-
+        private GroupMenuDto UserAccessCRUID = new();
         private bool PanelVisible { get; set; } = true;
         private bool IsAddMenu { get; set; } = false;
         private bool ShowForm { get; set; } = false;
@@ -30,7 +30,42 @@ namespace McDermott.Web.Components.Pages.Medical
         private bool EditItemsEnabled { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private IReadOnlyList<object> SelectedBuildingLocationDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private bool IsAccess = false;
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
+                }
+                catch { }
+            }
+        }
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
+            }
+            catch { }
+            await LoadData();
+        }
+
+        private async Task LoadData()
+        {
+            PanelVisible = true;
+            SelectedDataItems = new ObservableRangeCollection<object>();
+            Buildings = await Mediator.Send(new GetBuildingQuery());
+            PanelVisible = false;
+        }
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -193,22 +228,6 @@ namespace McDermott.Web.Components.Pages.Medical
             });
         }
 
-        protected override async Task OnInitializedAsync()
-        {
-            PanelVisible = true;
-            HealthCenters = await Mediator.Send(new GetHealthCenterQuery());
-            Locations = await Mediator.Send(new GetLocationQuery());
-
-            await LoadData();
-        }
-
-        private async Task LoadData()
-        {
-            PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Buildings = await Mediator.Send(new GetBuildingQuery());
-            PanelVisible = false;
-        }
 
         private async Task NewItemBuildingLocation_Click()
         {

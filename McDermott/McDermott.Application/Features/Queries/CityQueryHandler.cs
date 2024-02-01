@@ -18,6 +18,7 @@ namespace McDermott.Application.Features.Queries
             {
                 return await _unitOfWork.Repository<City>().Entities
                         .Include(x => x.Province)
+                        .AsNoTracking()
                         .Select(City => City.Adapt<CityDto>())
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);

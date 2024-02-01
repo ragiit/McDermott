@@ -1,31 +1,34 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using McDermott.Domain.Entities;
-using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.ProcedureCommand;
+using static McDermott.Application.Features.Commands.UserCommand;
+using static McDermott.Application.Features.Commands.EmailTemplateCommand;
 
-namespace McDermott.Web.Components.Pages.Medical
+namespace McDermott.Web.Components.Pages.Config
 {
-    public partial class ProcedurePage
+    public partial class EmailTemplatePage
     {
+        private BaseAuthorizationLayout AuthorizationLayout = new();
+        private bool IsAccess { get; set; } = false;
         private bool PanelVisible { get; set; } = true;
-
+        private bool PopupVisible { get; set; } = false;
+        private string textPopUp = "";
+        DateTime DateTimeValue { get; set; } = DateTime.Now;
         public IGrid Grid { get; set; }
-        private List<ProcedureDto> Procedures = new();
+        private List<EmailTemplateDto> EmailTemplates = new();
+        private EmailTemplateDto EmailFormTemplate = new();
+        private GroupMenuDto UserAccessCRUID = new();
+
+        private User? User = new();
+        private string? userBy;
+        private List<UserDto> ToPartner;
+        private List<string>? Cc;
+        private IEnumerable<UserDto> CcBy = [];
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
-        private GroupMenuDto UserAccessCRUID = new();
-        private bool IsAccess = false;
 
-        private List<string> Classification = new List<string>
-        {
-            "Easy",
-            "Medium",
-            "Hard"
-        };
-  
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -50,29 +53,45 @@ namespace McDermott.Web.Components.Pages.Medical
                 UserAccessCRUID = result.Item2;
             }
             catch { }
+            //var by = 
+
+            EmailTemplates = await Mediator.Send(new GetEmailTemplateQuery());
             await LoadData();
         }
+
+        private async Task LoadUser()
+        {
+            try
+            {
+                EmailFormTemplate.Schendule = DateTime.Now;
+                var Partner = await Mediator.Send(new GetUserQuery());
+                Cc = [.. Partner.Select(x=>x.Email)];
+                ToPartner = [.. Partner.Where(x=>x.IsPatient == true).ToList()];
+                User = await oLocal.GetUserInfo();
+                userBy = User.Name;
+                EmailFormTemplate.ById = User.Id;
+                //_isInitComplete = true;
+            }
+            catch
+            {
+
+            }
+        }
+
         private async Task LoadData()
         {
+            PopupVisible = false;
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
-            Procedures = await Mediator.Send(new GetProcedureQuery());
+            EmailTemplates = await Mediator.Send(new GetEmailTemplateQuery());
             PanelVisible = false;
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
-        }
 
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
-        }
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -85,30 +104,52 @@ namespace McDermott.Web.Components.Pages.Medical
                 e.CssClass = "header-bold";
             }
         }
+
+        private void UpdateEditItemsEnabled(bool enabled)
+        {
+            EditItemsEnabled = enabled;
+        }
+
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+            UpdateEditItemsEnabled(true);
+        }
+
         private async Task NewItem_Click()
         {
+            await LoadUser();
+            EmailFormTemplate = new();
+            PopupVisible = true;
+            textPopUp = "Form Template Email";
             await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
+            await LoadUser();
+            EmailFormTemplate = new();
+            PopupVisible = true;
+            textPopUp = "Edit Form Template Email";
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+        }
+
+        private void ColumnChooserButton_Click()
+        {
+            Grid.ShowColumnChooser();
         }
 
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
+
         private async Task ExportXlsxItem_Click()
         {
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
             {
                 ExportSelectedRowsOnly = true,
-            }); ;
+            });
         }
 
         private async Task ExportXlsItem_Click()
@@ -118,6 +159,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task ExportCsvItem_Click()
         {
             await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
@@ -125,32 +167,17 @@ namespace McDermott.Web.Components.Pages.Medical
                 ExportSelectedRowsOnly = true,
             });
         }
-        private async Task OnDelete(GridDataItemDeletingEventArgs e)
+
+        private async Task OnDelete()
         {
-            if (SelectedDataItems is null)
+            try
             {
-                await Mediator.Send(new DeleteProcedureRequest(((ProcedureDto)e.DataItem).Id));
+                await LoadData();
             }
-            else
-            {
-                var a = SelectedDataItems.Adapt<List<ProcedureDto>>();
-                await Mediator.Send(new DeleteListProcedureRequest(a.Select(x => x.Id).ToList()));
-            }
-            await LoadData();
+            catch { }
         }
-        private async Task OnSave(GridEditModelSavingEventArgs e)
-        {
-            var editModel = (ProcedureDto)e.EditModel;
 
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateProcedureRequest(editModel));
-            else
-                await Mediator.Send(new UpdateProcedureRequest(editModel));
-
-            await LoadData();
-        }
     }
+
 }

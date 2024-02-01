@@ -13,36 +13,23 @@ namespace McDermott.Web.Components.Pages.Medical
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
+        private GroupMenuDto UserAccessCRUID = new();
+        private bool IsAccess = false;
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
+            await base.OnAfterRenderAsync(firstRender);
 
-        private async Task OnDelete(GridDataItemDeletingEventArgs e)
-        {
-            try
+            if (firstRender)
             {
-                if (SelectedDataItems is null)
+                try
                 {
-                    await Mediator.Send(new DeleteDiseaseCategoryRequest(((DiseaseCategoryDto)e.DataItem).Id));
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
                 }
-                else
-                {
-                    var a = SelectedDataItems.Adapt<List<DiseaseCategoryDto>>();
-                    await Mediator.Send(new DeleteListDiseaseCategoryRequest(a.Select(x => x.Id).ToList()));
-                }
-                await LoadData();
+                catch { }
             }
-            catch (Exception ee)
-            {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message);
-            }
-        }
-
-        protected override async Task OnInitializedAsync()
-        { 
-            await LoadData();
         }
 
         private async Task LoadData()
@@ -55,6 +42,26 @@ namespace McDermott.Web.Components.Pages.Medical
             ParentCategoryDto = [.. q.Where(x => x.ParentCategory == null || x.ParentCategory == "")];
             PanelVisible = false;
         }
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
+            }
+            catch { }
+            await LoadData();
+        }
+
+
+        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        {
+            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+        }
+
+       
+
 
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
@@ -123,7 +130,26 @@ namespace McDermott.Web.Components.Pages.Medical
                 ExportSelectedRowsOnly = true,
             });
         }
-
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteDiseaseCategoryRequest(((DiseaseCategoryDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<DiseaseCategoryDto>>();
+                    await Mediator.Send(new DeleteListDiseaseCategoryRequest(a.Select(x => x.Id).ToList()));
+                }
+                await LoadData();
+            }
+            catch (Exception ee)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message);
+            }
+        }
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             var editModel = (DiseaseCategoryDto)e.EditModel;
