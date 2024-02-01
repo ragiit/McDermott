@@ -26,6 +26,7 @@ namespace McDermott.Application.Features.Queries
                         .Include(x => x.DiseaseCategory)
                         .Include(x => x.CronisKategory)
                        .Select(Diagnosis => Diagnosis.Adapt<DiagnosisDto>())
+                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
                 }
                 catch (Exception ee)

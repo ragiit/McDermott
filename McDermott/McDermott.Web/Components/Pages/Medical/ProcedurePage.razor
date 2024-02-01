@@ -1,100 +1,102 @@
 ﻿@page "/medical/procedure"
 @rendermode InteractiveServer
+@if (IsAccess)
+{
+    <PageTitle>Procedure ICD-9</PageTitle>
+    <div class="wrapper">
 
-<PageTitle>Procedure ICD-9</PageTitle>
-<div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Procedure ICD-9" />
 
-    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Procedure ICD-9" />
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                IsContentBlocked="true"
+                                ApplyBackgroundShading="true"
+                                IndicatorAreaVisible="false"
+                                Text="Fetching Data...">
 
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                            IsContentBlocked="true"
-                                            ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="false"
-                                            Text="Fetching Data...">
-
-                                <DxGrid @ref="Grid"
-                                        Data="Procedures"
-                                        PageSize="10"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                        KeyFieldName="Id"
-                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                        EditModelSaving="OnSave"
-                                        DataItemDeleting="OnDelete"
-                                        EditMode="GridEditMode.PopupEditForm"
-                                        PopupEditFormCssClass="pw-800"
-                                        PagerPosition="GridPagerPosition.Bottom"
-                                        PageSizeSelectorVisible="true"
-                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        PageSizeSelectorAllRowsItemVisible="true"
-                                        PagerSwitchToInputBoxButtonCount="10"
-                                        AllowSelectRowByClick="true"
-                                        FocusedRowEnabled="true"
-                                        PagerVisibleNumericButtonCount="10"
-                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                        ShowGroupPanel="true"
-                                        AutoExpandAllGroupRows="true"
-                                        ShowFilterRow="true"
-                                        CustomizeElement="Grid_CustomizeElement"
-                                        ShowSearchBox="true"
-                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                        KeyboardNavigationEnabled="true">
-                                    <ToolbarTemplate>
-                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                            <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                            <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Procedures.Count > 0" />
-                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Procedures.Count > 0" />
-                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                            <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
-                                                <Items>
-                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                </Items>
-                                            </DxToolbarItem>
-                                            <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                        </DxToolbar>
-                                    </ToolbarTemplate>
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                        <DxGridDataColumn FieldName="Code_Test" Caption="Code ICD-9" />
-                                        <DxGridDataColumn FieldName="Classification" Caption="Classification" />
-                                    </Columns>
-                                    <EditFormTemplate Context="EditFormContext">
-                                        @{
-                                            var a = (ProcedureDto)EditFormContext.EditModel;
-                                        }
-                                        <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Action Name:" ColSpanMd="12">
-                                                <div class="pop-warning">
-                                                    @EditFormContext.GetEditor("Name")
-                                                </div>
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem  Caption="ICD-9:" ColSpanMd="12">
-                                                @EditFormContext.GetEditor("Code_Test")
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Classification:" ColSpanMd="12">
-                                                <DxComboBox Data="@Classification"
-                                                            NullText="Select Classification..."
-                                                            @bind-Value="@a.Classification" >
-                                                </DxComboBox>
-                                            </DxFormLayoutItem>
-                                        </DxFormLayout>
-                                    </EditFormTemplate>
-                                </DxGrid>
-                            </DxLoadingPanel>
+                                    <DxGrid @ref="Grid"
+                                    Data="Procedures"
+                                    PageSize="10"
+                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                    KeyFieldName="Id"
+                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                    EditModelSaving="OnSave"
+                                    DataItemDeleting="OnDelete"
+                                    EditMode="GridEditMode.PopupEditForm"
+                                    PopupEditFormCssClass="pw-800"
+                                    PagerPosition="GridPagerPosition.Bottom"
+                                    PageSizeSelectorVisible="true"
+                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                    PageSizeSelectorAllRowsItemVisible="true"
+                                    PagerSwitchToInputBoxButtonCount="10"
+                                    AllowSelectRowByClick="true"
+                                    FocusedRowEnabled="true"
+                                    PagerVisibleNumericButtonCount="10"
+                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                    ShowGroupPanel="true"
+                                    AutoExpandAllGroupRows="true"
+                                    ShowFilterRow="true"
+                                    CustomizeElement="Grid_CustomizeElement"
+                                    ShowSearchBox="true"
+                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                    KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Procedures.Count > 0" />
+                                                <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Procedures.Count > 0" />
+                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                                <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Code_Test" Caption="Code ICD-9" />
+                                            <DxGridDataColumn FieldName="Classification" Caption="Classification" />
+                                        </Columns>
+                                        <EditFormTemplate Context="EditFormContext">
+                                            @{
+                                                var a = (ProcedureDto)EditFormContext.EditModel;
+                                            }
+                                            <DxFormLayout CssClass="w-100">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Action Name:" ColSpanMd="12">
+                                                    <div class="pop-warning">
+                                                        @EditFormContext.GetEditor("Name")
+                                                    </div>
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem  Caption="ICD-9:" ColSpanMd="12">
+                                                    @EditFormContext.GetEditor("Code_Test")
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Classification:" ColSpanMd="12">
+                                                    <DxComboBox Data="@Classification"
+                                                    NullText="Select Classification..."
+                                                    @bind-Value="@a.Classification" >
+                                                    </DxComboBox>
+                                                </DxFormLayoutItem>
+                                            </DxFormLayout>
+                                        </EditFormTemplate>
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-</div>
+        </section>
+    </div>
+}

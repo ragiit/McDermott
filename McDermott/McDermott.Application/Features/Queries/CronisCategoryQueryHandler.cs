@@ -22,6 +22,7 @@ namespace McDermott.Application.Features.Queries
             {
                 return await _unitOfWork.Repository<CronisCategory>().Entities
                         .Select(CronisCategory => CronisCategory.Adapt<CronisCategoryDto>())
+                        .AsNoTracking()
                        .ToListAsync(cancellationToken);
             }
         }

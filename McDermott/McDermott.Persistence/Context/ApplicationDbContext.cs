@@ -33,6 +33,7 @@ namespace McDermott.Persistence.Context
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMenu> GroupMenus { get; set; }
         public DbSet<EmailSetting> EmailSettings { get; set; }
+        public DbSet<EmailTemplate> EmailTemplates { get; set; }
 
         //Medical
         public DbSet<DiseaseCategory> DiseaseCategories { get; set; }

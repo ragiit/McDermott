@@ -18,6 +18,7 @@ namespace McDermott.Web.Components.Pages.Medical
         public IGrid Grid { get; set; }
         private List<SpecialityDto> Specialitys = new();
         private bool IsAccess = false;
+        private GroupMenuDto UserAccessCRUID = new();
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -27,7 +28,9 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 try
                 {
-                    IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
                 }
                 catch { }
             }
@@ -37,7 +40,9 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             try
             {
-                IsAccess = await NavigationManager.CheckAccessUser(oLocal);
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
             }
             catch { }
             await LoadData();

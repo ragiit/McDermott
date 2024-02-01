@@ -1,12 +1,15 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using static McDermott.Application.Features.Commands.EmailSettingCommand;
 
+
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class EmailSettingPage
     {
         private GroupMenuDto UserAccessCRUID = new();
         private bool PanelVisible { get; set; } = true;
+
+
         private string textPopUp = "";
 
         public IGrid Grid { get; set; }
@@ -164,6 +167,11 @@ namespace McDermott.Web.Components.Pages.Config
                 await Mediator.Send(new UpdateEmailSettingRequest(editModel));
 
             await LoadData();
+        }
+
+        private async Task TestConnect(GridEditModelSavingEventArgs e)
+        {
+            var SmtpConnection = (EmailSettingDto)e.EditModel;
         }
     }
 }

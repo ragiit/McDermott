@@ -19,9 +19,37 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
+        private bool IsAccess = false;
+
+        private GroupMenuDto UserAccessCRUID = new();
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
+                }
+                catch { }
+            }
+        }
 
         protected override async Task OnInitializedAsync()
         {
+
+            try
+            {
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
+            }
+            catch { }
+
             var a = await Mediator.Send(new GetDiseaseCategoryQuery());
             Diseases = [.. a.Where(x => x.ParentCategory != null || x.ParentCategory != "")];
             Cronises = await Mediator.Send(new GetCronisCategoryQuery());

@@ -18,6 +18,7 @@ namespace McDermott.Application.Features.Queries
                 return await _unitOfWork.Repository<Department>().Entities
                     .Include(x => x.Company)
                         .Select(Department => Department.Adapt<DepartmentDto>())
+                        .AsNoTracking()
                        .ToListAsync(cancellationToken);
             }
         }

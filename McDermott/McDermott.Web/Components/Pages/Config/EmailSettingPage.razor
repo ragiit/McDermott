@@ -1,135 +1,160 @@
 ﻿@page "/config/email-setting"
 @rendermode InteractiveServer
 
+
 <PageTitle>Email Setting</PageTitle>
 <style>
     .my-style {
         min-width: 50%;
     }
 </style>
-<div class="wrapper">
+@if (IsAccess)
+{
+    <div class="wrapper">
 
-    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Email Setting" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Email Setting" />
 
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                            IsContentBlocked="true"
-                                            ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="false"
-                                            Text="Fetching Data...">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
 
-                                <DxGrid @ref="Grid"
-                                        Data="EmailSettings"
-                                        PageSize="10"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                        KeyFieldName="Id"
-                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                        EditModelSaving="OnSave"
-                                        DataItemDeleting="OnDelete"
-                                        EditMode="GridEditMode.PopupEditForm"
-                                        PopupEditFormCssClass="my-style"
-                                        PagerPosition="GridPagerPosition.Bottom"
-                                        PageSizeSelectorVisible="true"
-                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        PageSizeSelectorAllRowsItemVisible="true"
-                                        PagerSwitchToInputBoxButtonCount="10"
-                                        AllowSelectRowByClick="true"
-                                        FocusedRowEnabled="true"
-                                        PagerVisibleNumericButtonCount="10"
-                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                        ShowGroupPanel="true"
-                                        AutoExpandAllGroupRows="true"
-                                        PopupEditFormHeaderText="@textPopUp"
-                                        ShowFilterRow="true"
-                                        CustomizeElement="Grid_CustomizeElement"
-                                        ShowSearchBox="true"
-                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                        KeyboardNavigationEnabled="true">
-                                    <ToolbarTemplate>
-                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && EmailSettings.Count > 0" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && EmailSettings.Count > 0" />
-                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                            <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
-                                                <Items>
-                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                </Items>
-                                            </DxToolbarItem>
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                        </DxToolbar>
-                                    </ToolbarTemplate>
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn FieldName="Sequence" Caption="Priority" SortIndex="0" />
-                                        <DxGridDataColumn FieldName="Description" Caption="Description" />
-                                        <DxGridDataColumn FieldName="Smtp_Host" Caption="SMTP Server" />
-                                        <DxGridDataColumn FieldName="Smtp_user" Caption="Username" />
-                                        <DxGridDataColumn FieldName="Smtp_Encryption" Caption="Connection Scurity" />
-                                    </Columns>
-                                    <EditFormTemplate Context="EditFormContext">
-                                        @{
-                                            var a = (EmailSettingDto)EditFormContext.EditModel;
-                                        }
-                                        <DxFormLayout CssClass="mt-auto col-lg">
-                                            <DxFormLayoutGroup ColSpanLg="12">
-                                                <DxFormLayoutItem ColSpanMd="6" Caption="Description:">
-                                                    <DxTextBox @bind-Text="@a.Description" NullText="Descriptio" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                    <DxGrid @ref="Grid"
+                                            Data="EmailSettings"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            
+                                            DataItemDeleting="OnDelete"
+                                            EditMode="GridEditMode.PopupEditForm"
+                                            PopupEditFormCssClass="my-style"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            AllowSelectRowByClick="true"
+                                            FocusedRowEnabled="true"
+                                            PagerVisibleNumericButtonCount="10"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            PopupEditFormHeaderText="@textPopUp"
+                                            ShowFilterRow="true"
+                                            CustomizeElement="Grid_CustomizeElement"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && EmailSettings.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && EmailSettings.Count > 0" />
+                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="Sequence" Caption="Priority" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Description" Caption="Description" />
+                                            <DxGridDataColumn FieldName="Smtp_Host" Caption="SMTP Server" />
+                                            <DxGridDataColumn FieldName="Smtp_user" Caption="Username" />
+                                            <DxGridDataColumn FieldName="Smtp_Encryption" Caption="Connection Scurity" />
+                                        </Columns>
+                                        <EditFormTemplate Context="EditFormContext">
+                                            @{
+                                                var a = (EmailSettingDto)EditFormContext.EditModel;
+                                                if (a.Smpt_Encryption == "TLS (STARTTLS)")
+                                                {
+                                                    a.Smpt_Port = 25;
+                                                }
+                                                else if (a.Smpt_Encryption == "SSL/TLS")
+                                                {
+                                                    a.Smpt_Port = 465;
+                                                }
+                                                else if (a.Smpt_Encryption == "none")
+                                                {
+                                                    a.Smpt_Port = null;
+                                                }
+                                            }
+                                            <DxFormLayout CssClass="mt-auto col-lg">
+                                                <DxFormLayoutGroup ColSpanLg="12">
+                                                    <DxFormLayoutItem ColSpanMd="6" Caption="Description:">
+                                                        <DxTextBox @bind-Text="@a.Description" NullText="Descriptio" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="6" Caption="Priority:">
+                                                        <DxSpinEdit @bind-Value="@a.Sequence" NullText="Priority" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayoutGroup>
+                                                <DxFormLayoutGroup Caption="Connection Information" ColSpanMd="12">
+                                                    <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Server:">
+                                                        <DxTextBox @bind-Text="@a.Smpt_Host" NullText="SMPTP Server" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Port:">
+                                                        <DxSpinEdit @bind-Value="@a.Smpt_Port" NullText="SMTP PORT" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayoutGroup>
+                                                <DxFormLayoutGroup Caption="Security And Authentication" ColSpanMd="12">
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Conection Scurity:">
+                                                        <Template>
+                                                            <DxComboBox Data="@Stts_Ecrypt"
+                                                                        NullText="Select Ecrypt..."
+                                                                        @bind-Value="@a.Smpt_Encryption">
+                                                            </DxComboBox>
+                                                        </Template>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Username:">
+                                                        <DxTextBox @bind-Text="@a.Smpt_User" NullText="Username" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Password:">
+                                                        <DxTextBox @bind-Text="@a.Smpt_Pass"
+                                                                   NullText="Password"
+                                                                   Password="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   InputId="tbPassword" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayoutGroup>
+                                            </DxFormLayout>
+                                            <DxFormLayout CssClass="col-12">
+                                                <DxFormLayoutItem ColSpanMd="5">
+                                                    <DxButton IconCssClass="fa-solid fa-wifi"
+                                                              RenderStyleMode="@ButtonRenderStyleMode.Outline"
+                                                              Text="Test Conenction"
+                                                              onclick="@TestConnect"
+                                                              CssClass="w-20 ml" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="6" Caption="Priority:">
-                                                    <DxSpinEdit @bind-Value="@a.Sequence" NullText="Priority" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                <DxFormLayoutItem ColSpanMd="6">
+                                                    <p>Sucess</p>
                                                 </DxFormLayoutItem>
-                                            </DxFormLayoutGroup>
-                                            <DxFormLayoutGroup Caption="Connection Information" ColSpanMd="12">
-                                                <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Server:">
-                                                    <DxTextBox @bind-Text="@a.Smpt_Host" NullText="SMPTP Server" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Port:">
-                                                    <DxSpinEdit @bind-Value="@a.Smpt_Port" NullText="SMTP PORT" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                </DxFormLayoutItem>
-                                            </DxFormLayoutGroup>
-                                            <DxFormLayoutGroup Caption="Security And Authentication" ColSpanMd="12">
-                                                <DxFormLayoutItem ColSpanMd="12" Caption="Conection Scurity:">
-                                                    <Template>
-                                                        <DxComboBox Data="@Stts_Ecrypt"
-                                                                    NullText="Select Ecrypt..."
-                                                                    @bind-Value="@a.Smpt_Encryption">
-                                                        </DxComboBox>
-                                                    </Template>
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="12" Caption="Username:">
-                                                    <DxTextBox @bind-Text="@a.Smpt_User" NullText="Username" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="12" Caption="Password:">
-                                                    <DxTextBox @bind-Text="@a.Smpt_Pass"
-                                                               NullText="Password"
-                                                               Password="true"
-                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               InputId="tbPassword" />
-                                                </DxFormLayoutItem>
-                                            </DxFormLayoutGroup>
-                                        </DxFormLayout>
-                                        <DxButton IconCssClass="fa-solid fa-wifi"
-                                            RenderStyleMode="@ButtonRenderStyleMode.Outline"
-                                                  Text="Test Conenction"
-                                                  SubmitFormOnClick="true"
-                                                  CssClass="w-20 ml" />
-                                    </EditFormTemplate>
-                                </DxGrid>
-                            </DxLoadingPanel>
+                                            </DxFormLayout>
+
+                                        </EditFormTemplate>
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-</div>
+        </section>
+    </div>
+
+}
