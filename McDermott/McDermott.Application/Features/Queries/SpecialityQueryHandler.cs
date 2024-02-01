@@ -17,7 +17,8 @@ namespace McDermott.Application.Features.Queries
             {
                 return await _unitOfWork.Repository<Speciality>().Entities
                         .Select(Speciality => Speciality.Adapt<SpecialityDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 

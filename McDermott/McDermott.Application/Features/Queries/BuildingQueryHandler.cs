@@ -17,9 +17,10 @@ namespace McDermott.Application.Features.Queries
             public async Task<List<BuildingDto>> Handle(GetBuildingQuery query, CancellationToken cancellationToken)
             {
                 return await _unitOfWork.Repository<Building>().Entities
-                    .Include(x => x.HealthCenter)
+                        .Include(x => x.HealthCenter)
                         .Select(Building => Building.Adapt<BuildingDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 
@@ -34,13 +35,12 @@ namespace McDermott.Application.Features.Queries
 
             public async Task<List<BuildingLocationDto>> Handle(GetBuildingLocationByBuildingIdRequest request, CancellationToken cancellationToken)
             {
-                var a = await _unitOfWork.Repository<BuildingLocation>().Entities
+                return await _unitOfWork.Repository<BuildingLocation>().Entities
                      .Include(x => x.Location)
                      .Where(x => x.BuildingId == request.BuildingId)
                      .Select(x => x.Adapt<BuildingLocationDto>())
+                     .AsNoTracking()
                      .ToListAsync(cancellationToken);
-
-                return a;
             }
         }
 

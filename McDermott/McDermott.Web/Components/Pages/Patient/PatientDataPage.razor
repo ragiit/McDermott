@@ -1,7 +1,275 @@
 ﻿@page "/patient/patient-data"
+@using System.ComponentModel.DataAnnotations
 @using static McDermott.Web.Helper
 @rendermode InteractiveServer
 
-@code{
+<PageTitle>Patient Data</PageTitle>
+<McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Patient Data" />
+<div class="wrapper">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <DxFormLayout CssClass="mt">
+                            <DxFormLayoutGroup Caption="New Form Patien" ColSpanMd="12">
+                                <DxFormLayout CssClass="w-100">
+                                    <DxFormLayoutItem Caption="Name:" BeginRow="true" ColSpanMd="12">
+                                        <DxTextBox @bind-Text="@Name" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Medical record:" BeginRow="true" ColSpanMd="6">
+                                        <DxSpinEdit @bind-Value="@YearsWorked" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Tanggal Lahir:" ColSpanMd="6">
+                                        <DxDateEdit @bind-Date="@BirthDate" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Jenis Kelamin:" BeginRow="true">
+                                        <DxComboBox Data="@Data"
+                                                    FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Age:" ColSpanMd="6">
+                                        <DxSpinEdit @bind-Value="@YearsWorked" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Primary care Doctor:" BeginRow="true">
+                                        <DxComboBox Data="@Data"
+                                                    FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Departements:" >
+                                        <DxComboBox Data="@Data"
+                                                    FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Tittle:" BeginRow="true">
+                                        <DxComboBox Data="@Data"
+                                                    FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Branch:">
+                                        <DxComboBox Data="@Data"
+                                                    FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                    </DxFormLayoutItem>
+                                    
+                                    <DxFormLayoutItem Caption="Tags:">
+                                        <DxComboBox Data="@Data"
+                                                    FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                    </DxFormLayoutItem>
+                                    
+                                    @* <DxFormLayoutItem Caption="No.Telepon:" BeginRow="true" ColSpanMd="6">
+                                        <DxSpinEdit @bind-Value="@YearsWorked" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="No.Handphone:" BeginRow="true" ColSpanMd="6">
+                                        <DxSpinEdit @bind-Value="@YearsWorked" />
+                                    </DxFormLayoutItem> *@
+                                    
+                                </DxFormLayout>
+                            </DxFormLayoutGroup>
+                        </DxFormLayout>
+                        
+                      
+                    
 
-}
+                           
+
+
+
+
+
+
+
+                              
+
+                        <DxFormLayout CssClass="w-100">
+                            <DxFormLayoutTabPages @bind-ActiveTabIndex="@ActiveTabIndex">
+                                <DxFormLayoutTabPage Caption="General Information">
+                                    <DxFormLayoutItem Caption="KTP Address:" ColSpanMd="12" BeginRow="true">
+                                        <Template>
+                                            <DxGridLayout>
+                                                <Rows>
+                                                    <DxGridLayoutRow />
+                                                    <DxGridLayoutRow />
+                                                    <DxGridLayoutRow />
+                                                    <DxGridLayoutRow />
+                                                </Rows>
+                                                <Columns>
+                                                    <DxGridLayoutColumn />
+                                                    <DxGridLayoutColumn />
+                                                </Columns>
+                                                <Items>
+                                                    <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
+                                                        <Template>
+                                                            <DxTextBox NullText="Street 1..." />
+                                                        </Template>
+                                                    </DxGridLayoutItem>
+                                                    <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
+                                                        <Template>
+                                                            <DxTextBox CssClass="mt" NullText="Street 2..." />
+                                                        </Template>
+                                                    </DxGridLayoutItem>
+                                                    <DxGridLayoutItem Row="2" Column="0" ColumnSpan="12">
+                                                        <Template>
+                                                            <DxTextBox CssClass="mt" NullText="RT/RW" />
+                                                        </Template>
+                                                    </DxGridLayoutItem>
+                                                    <DxGridLayoutItem Row="3" Column="0" CssClass="mt">
+                                                        <Template>
+                                                            <DxComboBox Data="@Data"
+                                                                        NullText="Select Province..."
+                                                                        FilteringMode="DataGridFilteringMode.Contains" @bind-Value="@bindData">
+                                                            </DxComboBox>
+                                                        </Template>
+                                                    </DxGridLayoutItem>
+                                                    <DxGridLayoutItem Row="3" Column="1" CssClass="mt ml">
+                                                        <Template>
+                                                            <DxComboBox Data="@Data"
+                                                                        NullText="Select City..."
+                                                                        FilteringMode="DataGridFilteringMode.Contains" @bind-Value="@bindData">
+                                                            </DxComboBox>
+                                                        </Template>
+                                                    </DxGridLayoutItem>
+                                                </Items>
+                                            </DxGridLayout>
+                                        </Template>
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Nationality:" BeginRow="true" ColSpanMd="12">
+                                        <DxComboBox Data="@Data"
+                                                    FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Nomor KTP:" ColSpanMd="6">
+                                        <DxSpinEdit @bind-Value="@YearsWorked" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Nomor Kartu KK:" ColSpanMd="6">
+                                        <DxSpinEdit @bind-Value="@YearsWorked" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Passport Number:" ColSpanMd="6">
+                                        <DxSpinEdit @bind-Value="@YearsWorked" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Email:" ColSpanMd="6">
+                                        <DxTextBox @bind-Text="@Name" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Phone:" ColSpanMd="6">
+                                        <DxSpinEdit @bind-Value="@YearsWorked" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Mobile:" ColSpanMd="6">
+                                        <DxSpinEdit @bind-Value="@YearsWorked" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Pekerjaan:" ColSpanMd="6">
+                                        <DxTextBox @bind-Text="@Position" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Education:" ColSpanMd="6">
+                                        <DxTextBox @bind-Text="@Position" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Agama:" ColSpanMd="6">
+                                        <DxTextBox @bind-Text="@Position" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Martial Status:" ColSpanMd="6">
+                                        <DxTextBox @bind-Text="@Position" />
+                                    </DxFormLayoutItem>
+
+                                    @* <DxFormLayoutGroup caption=" informasi pribadi" ColSpanMd="12">
+                                        <DxFormLayoutItem Caption="Jenis Kelamin:" ColSpanMd="6">
+                                            <DxComboBox Data="@Data"
+                                                        FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Status Perkawinan:" ColSpanMd="6">
+                                            <DxComboBox Data="@Data"
+                                                        FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Tempat Lahir:" ColSpanMd="6">
+                                            <DxComboBox Data="@Data"
+                                                        FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Kebangsaan:" ColSpanMd="6">
+                                            <DxComboBox Data="@Data"
+                                                        FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Tanggal Lahir:" ColSpanMd="6">
+                                            <DxDateEdit @bind-Date="@BirthDate" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Agama:" ColSpanMd="6">
+                                            <DxComboBox Data="@Data"
+                                                        FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Umur:" BeginRow="true" ColSpanMd="6">
+                                            <DxSpinEdit @bind-Value="@YearsWorked" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Pendidikan:" ColSpanMd="6">
+                                            <DxComboBox Data="@Data"
+                                                        FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Golongan Darah:" ColSpanMd="6">
+                                            <DxComboBox Data="@Data"
+                                                        FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                        </DxFormLayoutItem><DxFormLayoutItem Caption="Pekerjaan:" ColSpanMd="6">
+                                            <DxComboBox Data="@Data"
+                                                        FilteringMode="DataGridFilteringMode.Contains" @bind-Value="bindData" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Suku:" BeginRow="true" ColSpanMd="6">
+                                            <DxTextBox @bind-Text="@Name" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Bahasa Yang dikuasai:" BeginRow="true" ColSpanMd="6">
+                                            <DxTextBox @bind-Text="@Name" />
+                                        </DxFormLayoutItem>
+                                    </DxFormLayoutGroup>
+
+                                    <DxFormLayoutGroup Caption="Kontak Darurat" ColSpanMd="6">
+                                        <DxFormLayoutItem Caption="Nama :" BeginRow="true" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@Name" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="No. Telepon :" BeginRow="true" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@Name" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Email :" BeginRow="true" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@Name" />
+                                        </DxFormLayoutItem>
+                                    </DxFormLayoutGroup>
+
+                                    <DxFormLayoutGroup Caption="Penanggung Jawab" ColSpanMd="6">
+                                        <DxFormLayoutItem Caption="Nama :" BeginRow="true" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@Name" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="No. Telepon :" BeginRow="true" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@Name" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Email :" BeginRow="true" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@Name" />
+                                        </DxFormLayoutItem>
+                                    </DxFormLayoutGroup> *@
+                                </DxFormLayoutTabPage>
+
+                                <DxFormLayoutTabPage Caption="Work Information">
+                                    <DxFormLayoutItem Caption="Position:">
+                                        <DxTextBox @bind-Text="@Position" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Hire Date:">
+                                        <DxDateEdit @bind-Date="@HireDate" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Notes:">
+                                        <DxTextBox @bind-Text="@Notes" />
+                                    </DxFormLayoutItem>
+                                </DxFormLayoutTabPage>
+                            </DxFormLayoutTabPages>
+                        </DxFormLayout>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    string Name { get; set; } = "Nancy Davolio";
+    string Email { get; set; } = "NancyDavolio@sample.com";
+    DateTime BirthDate { get; set; } = DateTime.Now.AddYears(-20);
+    int YearsWorked { get; set; } = 3;
+    bool OnVacation { get; set; } = true;
+    int ActiveTabIndex { get; set; } = 1;
+    string FirstName { get; set; } = "Nancy";
+    string LastName { get; set; } = "Davolio";
+    string Position { get; set; } = "Sales Representative";
+    DateTime HireDate { get; set; } = DateTime.Now.AddYears(-2);
+    string Notes { get; set; } = "Education includes a BA in psychology.";
+
+    private string bindData { get; set; }
+    private List<string> Data = new List<string>
+    {
+        "Megalodon", "Ganjar"
+    };
+} 

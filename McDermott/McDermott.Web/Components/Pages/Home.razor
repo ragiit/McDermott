@@ -1,19 +1,28 @@
 ﻿@page "/"
 @using System.Drawing
+@using Microsoft.AspNetCore.Components.Authorization
 
-<PageTitle>Home</PageTitle>
+<PageTitle>McDermott - Home</PageTitle>
 
 <!-- Content Header (Page header) -->
-<div class="content-header">
-    <div class="container-fluid">
+@if (IsAccess)
+{
+    <div class="content-header">
+        <div class="container-fluid">
 
-        <h1><label>Hello!</label></h1>
+            <h1><label>Home</label></h1>
+            <Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+                <Authorized>
+                    <p>Welcome, @context.User.Identity.Name. @Greeting</p>
+                </Authorized>
+                <NotAuthorized>
+                    <p>Welcome, Anonymous!</p>
+                </NotAuthorized>
+            </Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
 
-        Welcome to your new app.
+            <br />
 
-        <br />
-
-        @* <DxPieChart Data="@SalesData"
+            @* <DxPieChart Data="@SalesData"
         CustomizeSeriesPoint="CustomizeSeriesPoint"
         T="SaleInfo2">
         <DxPieChartSeries T="SaleInfo2"
@@ -74,8 +83,9 @@
         SummaryMethod="Enumerable.Max" />
         <DxChartLegend Position="RelativePosition.Outside" HorizontalAlignment="HorizontalAlignment.Right" />
         </DxChart> *@
+        </div>
     </div>
-</div>
+}
 @* <div class="card">
     <div class="card-body">
         <div class="container">
@@ -237,10 +247,53 @@
     {
         settings.PointAppearance.Color = palette[settings.Point.Argument];
     }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; }
+
+    private GroupMenuDto UserAccessCRUID = new();
+    private string Greeting = "";
+
     protected override async Task OnInitializedAsync()
     {
+        var aa = await AuthenticationState;
+        var bb = aa.User.Identity.Name;
         SalesData2 = await Sales.GetSalesAsync();
 
+        var hour = DateTime.Now.Hour;
+
+        if (hour < 12)
+            Greeting = "Good Morning!";
+        else if (hour < 17)
+            Greeting = "Good Afternoon!";
+        else
+            Greeting = "Good Evening!";
+
+        try
+        {
+            var result = await NavigationManager.CheckAccessUser(oLocal);
+            IsAccess = result.Item1;
+            UserAccessCRUID = result.Item2;
+        }
+        catch { }
+    }
+
+    private bool IsAccess = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            try
+            {
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
+            }
+            catch { }
+        }
     }
 
     public class SaleInfo2

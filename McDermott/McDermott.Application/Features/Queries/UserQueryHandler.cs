@@ -17,9 +17,10 @@ namespace McDermott.Application.Features.Queries
             public async Task<List<UserDto>> Handle(GetUserQuery query, CancellationToken cancellationToken)
             {
                 return await _unitOfWork.Repository<User>().Entities
-                    .Include(x => x.Group)
+                        .Include(x => x.Group)
                         .Select(User => User.Adapt<UserDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 

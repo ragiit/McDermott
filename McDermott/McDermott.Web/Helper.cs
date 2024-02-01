@@ -17,34 +17,26 @@ namespace McDermott.Web
 
         public static string HashWithSHA256(string data)
         {
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(data));
-                return Convert.ToBase64String(hashedBytes);
-            }
+            byte[] hashedBytes = SHA256.HashData(Encoding.UTF8.GetBytes(data));
+            return Convert.ToBase64String(hashedBytes);
         }
 
         public static string Encrypt(string plainText, string key = "mysmallkey123456")
         {
-            using (Aes aesAlg = Aes.Create())
+            using Aes aesAlg = Aes.Create();
+            aesAlg.Key = Encoding.UTF8.GetBytes(key);
+            aesAlg.IV = new byte[16]; // IV harus unik, tetapi tidak perlu rahasia
+
+            ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+            MemoryStream memoryStream = new();
+            using MemoryStream msEncrypt = memoryStream;
+            using (CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write))
             {
-                aesAlg.Key = Encoding.UTF8.GetBytes(key);
-                aesAlg.IV = new byte[16]; // IV harus unik, tetapi tidak perlu rahasia
-
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-                using (MemoryStream msEncrypt = new MemoryStream())
-                {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                        {
-                            swEncrypt.Write(plainText);
-                        }
-                    }
-                    return Convert.ToBase64String(msEncrypt.ToArray());
-                }
+                using StreamWriter swEncrypt = new(csEncrypt);
+                swEncrypt.Write(plainText);
             }
+            return Convert.ToBase64String(msEncrypt.ToArray());
         }
 
         public static string Decrypt(string cipherText, string key = "mysmallkey123456")

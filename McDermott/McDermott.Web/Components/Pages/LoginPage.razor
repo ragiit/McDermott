@@ -1,16 +1,20 @@
 ﻿@page "/login"
+@using McDermott.Application.Features.Services
 @using McDermott.Domain.Entities
 @using McDermott.Persistence.Context
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
 @using System.Security.Cryptography
 @using System.Text
 @using Newtonsoft.Json
+@using System.Security.Claims
 @using static McDermott.Application.Features.Commands.GroupCommand
 @using static McDermott.Application.Features.Commands.MenuCommand
 
 @inject ApplicationDbContext DataContext
+@inject CustomAuthenticationStateProvider CustomAuth
 
-<PageTitle>Login</PageTitle>
+<PageTitle>McDermott - Master Data Login</PageTitle>
 
 <div class="hold-transition login-page">
     <div class="login-box">
@@ -109,7 +113,36 @@
 
             await oLocal.SetItemAsync("dotnet", encrypt);
 
+            if (user.GroupId is not null)
+            {
+                var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((int)user.GroupId));
+
+                var encryptMenu = Helper.Encrypt(JsonConvert.SerializeObject(g));
+
+                await oLocal.SetItemAsync("dotnet2", encryptMenu);
+            }
+            else
+            {
+                await oLocal.SetItemAsync("dotnet2", new List<string>());
+            }
+
+            var a = (CustomAuthenticationStateProvider)CustomAuth;
+            await a.UpdateAuthState(user);
+
             NavigationManager.NavigateTo("", forceLoad: true);
+
+            // var claims = new List<Claim>
+            //     {
+            //         new Claim("CustomClaimType", "CustomClaimValue")
+            //     };
+
+            // var userIdentity = new ClaimsIdentity(claims, "login");
+
+            // ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
+
+            // // Serialize principal
+            // var authenticationState = new AuthenticationState(principal);
+            // AuthenticationStateProvider.NotifyAuthenticationStateChanged(Task.FromResult(authenticationState));
 
             // isSuccess = true;
         }

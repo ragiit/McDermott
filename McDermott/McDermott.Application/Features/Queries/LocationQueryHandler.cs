@@ -17,7 +17,8 @@ namespace McDermott.Application.Features.Queries
             {
                 return await _unitOfWork.Repository<Location>().Entities
                         .Select(Location => Location.Adapt<LocationDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 

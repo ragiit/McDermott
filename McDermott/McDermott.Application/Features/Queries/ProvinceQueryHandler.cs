@@ -19,6 +19,7 @@ namespace McDermott.Application.Features.Queries
                 return await _unitOfWork.Repository<Province>().Entities
                         .Include(x => x.Country)
                         .Select(Province => Province.Adapt<ProvinceDto>())
+                        .AsNoTracking()
                         .ToListAsync(cancellationToken);
             }
         }
@@ -39,6 +40,7 @@ namespace McDermott.Application.Features.Queries
                 return result.Adapt<ProvinceDto>();
             }
         }
+
         internal class GetProvinceByCountryHandler : IRequestHandler<GetProvinceByCountry, List<ProvinceDto>>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -50,7 +52,7 @@ namespace McDermott.Application.Features.Queries
 
             public async Task<List<ProvinceDto>> Handle(GetProvinceByCountry request, CancellationToken cancellationToken)
             {
-                var result = await _unitOfWork.Repository<Province>().GetByIdAsync(request.CountryId??0);
+                var result = await _unitOfWork.Repository<Province>().GetByIdAsync(request.CountryId ?? 0);
 
                 return result.Adapt<List<ProvinceDto>>();
             }
@@ -110,6 +112,7 @@ namespace McDermott.Application.Features.Queries
                 return true;
             }
         }
+
         internal class DeleteListProvinceHandler : IRequestHandler<DeleteListProvinceRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;

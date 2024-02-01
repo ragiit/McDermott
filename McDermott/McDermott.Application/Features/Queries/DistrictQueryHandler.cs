@@ -20,7 +20,8 @@ namespace McDermott.Application.Features.Queries
                         .Include(x => x.City)
                         .Include(x => x.Province)
                         .Select(District => District.Adapt<DistrictDto>())
-                       .ToListAsync(cancellationToken);
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
             }
         }
 
@@ -95,6 +96,7 @@ namespace McDermott.Application.Features.Queries
                 return true;
             }
         }
+
         internal class DeleteListDistrictHandler : IRequestHandler<DeleteListDistrictRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;

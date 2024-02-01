@@ -92,6 +92,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
+            PanelVisible = true;
             try
             {
                 var result = await NavigationManager.CheckAccessUser(oLocal);

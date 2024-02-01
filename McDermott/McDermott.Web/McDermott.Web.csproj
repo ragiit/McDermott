@@ -36,10 +36,6 @@
     <ProjectReference Include="..\McDermott.Persistence\McDermott.Persistence.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Authentication\" />
-  </ItemGroup>
-
   
 
 </Project>

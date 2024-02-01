@@ -20,6 +20,7 @@ namespace McDermott.Application.Features.Queries
                         .Include(x => x.Province)
                         .Include(x => x.District)
                         .Select(Village => Village.Adapt<VillageDto>())
+                        .AsNoTracking()
                         .ToListAsync(cancellationToken);
             }
         }
@@ -84,7 +85,7 @@ namespace McDermott.Application.Features.Queries
 
             public DeleteVillageHandler(IUnitOfWork unitOfWork)
             {
-                _unitOfWork = unitOfWork; 
+                _unitOfWork = unitOfWork;
             }
 
             public async Task<bool> Handle(DeleteVillageRequest request, CancellationToken cancellationToken)
@@ -95,6 +96,7 @@ namespace McDermott.Application.Features.Queries
                 return true;
             }
         }
+
         internal class DeleteListVillageHandler : IRequestHandler<DeleteListVillageRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;

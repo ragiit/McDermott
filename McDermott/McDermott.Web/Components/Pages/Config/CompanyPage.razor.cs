@@ -11,26 +11,22 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CompanyPage
     {
-        public IGrid Grid { get; set; }
         private CompanyDto CompanyForm = new();
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-        private object SelectedDataItem { get; set; }
-        private bool EditItemsEnabled { get; set; }
-        private int FocusedRowVisibleIndex { get; set; }
-        private bool OnVacation { get; set; } = true;
-        private bool ShowForm { get; set; } = false;
-        private bool FormValidationState = false;
 
         public List<CompanyDto> Companys = new();
         public List<CountryDto> Countries { get; set; }
         public List<ProvinceDto> Provinces { get; set; }
         public List<CityDto> Cities { get; set; }
         private GroupMenuDto UserAccessCRUID = new();
-        // public List<CurrencyDto> Currencys {get; private set;}
+
+        #region Default Grid Components
+
+        public IGrid Grid { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private int FocusedRowVisibleIndex { get; set; }
 
         private async Task LoadData()
         {
-            ShowForm = false;
             Companys = await Mediator.Send(new GetCompanyQuery());
         }
 
@@ -72,20 +68,18 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (CompanyDto)e.EditModel;
+            try
+            {
+                var editModel = (CompanyDto)e.EditModel;
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateCompanyRequest(editModel));
-            else
-                await Mediator.Send(new UpdateCompanyRequest(editModel));
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateCompanyRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateCompanyRequest(editModel));
 
-            await LoadData();
-        }
-
-        private void OnCancel()
-        {
-            CompanyForm = new();
-            ShowForm = false;
+                await LoadData();
+            }
+            catch { }
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
@@ -95,16 +89,23 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-            if (SelectedDataItems is null)
+            try
             {
-                await Mediator.Send(new DeleteCompanyRequest(((CompanyDto)e.DataItem).Id));
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteCompanyRequest(((CompanyDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<CompanyDto>>();
+                    await Mediator.Send(new DeleteListCompanyRequest(a.Select(x => x.Id).ToList()));
+                }
+
+                await LoadData();
             }
-            else
+            catch
             {
-                var a = SelectedDataItems.Adapt<List<CompanyDto>>();
-                await Mediator.Send(new DeleteListCompanyRequest(a.Select(x => x.Id).ToList()));
             }
-            await LoadData();
         }
 
         private void ColumnChooserButton_Click()
@@ -112,15 +113,9 @@ namespace McDermott.Web.Components.Pages.Config
             Grid.ShowColumnChooser();
         }
 
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
-        }
-
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
         }
 
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
@@ -133,14 +128,6 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 e.Style = "background-color: rgba(0, 0, 0, 0.08)";
                 e.CssClass = "header-bold";
-            }
-        }
-
-        private void OnItemUpdating(string fieldName, object newValue)
-        {
-            if (fieldName == nameof(CompanyForm.Name))
-            {
-                CompanyForm.Name = newValue.ToString();
             }
         }
 
@@ -182,5 +169,7 @@ namespace McDermott.Web.Components.Pages.Config
                 ExportSelectedRowsOnly = true,
             });
         }
+
+        #endregion Default Grid Components
     }
 }

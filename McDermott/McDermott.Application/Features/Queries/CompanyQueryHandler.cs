@@ -20,9 +20,8 @@ namespace McDermott.Application.Features.Queries
                         .Include(x => x.Country)
                         .Include(x => x.Province)
                         .Include(x => x.City)
-                        // .Include(x=>x.Currency)
-                        .AsNoTracking()
                         .Select(Company => Company.Adapt<CompanyDto>())
+                        .AsNoTracking()
                         .ToListAsync(cancellationToken);
             }
         }

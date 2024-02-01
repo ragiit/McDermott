@@ -17,6 +17,7 @@ namespace McDermott.Application.Features.Queries
             {
                 return await _unitOfWork.Repository<Insurance>().Entities
                         .Select(Insurance => Insurance.Adapt<InsuranceDto>())
+                        .AsNoTracking()
                         .ToListAsync(cancellationToken);
             }
         }

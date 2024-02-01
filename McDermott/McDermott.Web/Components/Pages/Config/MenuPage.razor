@@ -1,7 +1,7 @@
 ﻿@page "/config/menu"
 @rendermode InteractiveServer
 
-<PageTitle>Menu</PageTitle>
+<PageTitle>McDermott - Master Data Menu</PageTitle>
 
 @if (IsAccess)
 {
@@ -16,6 +16,8 @@
                         <div class="card">
                             <div class="card-body">
                                 <DxGrid @ref="Grid"
+                                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                        TextWrapEnabled="false"
                                         Data="Menus.OrderBy(x => x.ParentMenu == null).ThenBy(x => x.Sequence.ToInt32())"
                                         PageSize="10"
                                         @bind-SelectedDataItems="@SelectedDataItems"

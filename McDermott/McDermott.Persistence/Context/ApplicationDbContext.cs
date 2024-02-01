@@ -1,5 +1,6 @@
 ﻿using McDermott.Domain.Common;
 using McDermott.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -7,9 +8,12 @@ namespace McDermott.Persistence.Context
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        { }
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
 
         #region DbSet
 
@@ -37,6 +41,7 @@ namespace McDermott.Persistence.Context
 
         //Medical
         public DbSet<DiseaseCategory> DiseaseCategories { get; set; }
+
         public DbSet<Procedure> Procedures { get; set; }
         public DbSet<CronisCategory> CronisCategories { get; set; }
         public DbSet<Diagnosis> Diagnoses { get; set; }
@@ -49,6 +54,10 @@ namespace McDermott.Persistence.Context
 
         //Patiente
         public DbSet<Family> families { get; set; }
+
+        public DbSet<DoctorSchedule> DoctorSchedules { get; set; }
+        public DbSet<DoctorScheduleDetail> DoctorScheduleDetails { get; set; }
+        public DbSet<DoctorScheduleSlot> DoctorScheduleSlots { get; set; }
 
         #endregion DbSet
 
@@ -205,26 +214,28 @@ namespace McDermott.Persistence.Context
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
-            var entries = ChangeTracker.Entries<BaseEntity>();
+            var currentUser = _httpContextAccessor.HttpContext.User.Identity.Name ?? "";
 
-            //foreach (var entry in entries)
-            //{
-            //    var user = Helper.UserLogin;
-            //    var now = DateTime.Now;
+            var entries = ChangeTracker.Entries<BaseAuditableEntity>();
 
-            //    switch (entry.State)
-            //    {
-            //        case EntityState.Added:
-            //            entry.Entity.CreatedBy = user.Name;
-            //            entry.Entity.CreatedOn = now;
-            //            break;
+            foreach (var entry in entries)
+            {
+                var now = DateTime.Now;
 
-            //        case EntityState.Modified:
-            //            entry.Entity.LastUpdatedBy = user.Name;
-            //            entry.Entity.LastUpdatedOn = now;
-            //            break;
-            //    }
-            //}
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.Entity.CreatedBy = currentUser;
+                        entry.Entity.CreatedDate = now;
+                        break;
+
+                    case EntityState.Modified:
+                        entry.Entity.UpdatedBy = currentUser;
+                        entry.Entity.UpdatedDate = now;
+                        break;
+                }
+            }
+
             return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
 

@@ -9,13 +9,14 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CityPage
     {
-        private BaseAuthorizationLayout AuthorizationLayout = new();
-        private bool PanelVisible { get; set; } = true;
-
-        public IGrid Grid { get; set; }
-        private List<CityDto> Cities = new();
-        private List<ProvinceDto> Provinces = new();
+        private List<CityDto> Cities = [];
+        private List<ProvinceDto> Provinces = [];
         private GroupMenuDto UserAccessCRUID = new();
+
+        #region Default Grid Components
+
+        private bool PanelVisible { get; set; } = true;
+        public IGrid Grid { get; set; }
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
@@ -80,20 +81,13 @@ namespace McDermott.Web.Components.Pages.Config
             }
         }
 
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
-        }
-
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
         }
 
         private async Task NewItem_Click(IGrid context)
         {
-            var a = context;
             await Grid.StartEditNewRowAsync();
         }
 
@@ -140,7 +134,6 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                var aq = SelectedDataItems.Count;
                 if (SelectedDataItems is null)
                 {
                     await Mediator.Send(new DeleteCityRequest(((CityDto)e.DataItem).Id));
@@ -152,25 +145,28 @@ namespace McDermott.Web.Components.Pages.Config
                 }
                 await LoadData();
             }
-            catch (Exception ee)
-            {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message);
-            }
+            catch { }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (CityDto)e.EditModel;
+            try
+            {
+                var editModel = (CityDto)e.EditModel;
 
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
+                if (string.IsNullOrWhiteSpace(editModel.Name))
+                    return;
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateCityRequest(editModel));
-            else
-                await Mediator.Send(new UpdateCityRequest(editModel));
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateCityRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateCityRequest(editModel));
 
-            await LoadData();
+                await LoadData();
+            }
+            catch { }
         }
+
+        #endregion Default Grid Components
     }
 }
