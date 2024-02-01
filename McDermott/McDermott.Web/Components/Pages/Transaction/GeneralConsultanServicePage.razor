@@ -1,0 +1,127 @@
+﻿@page "/transaction/general-consultan-service"
+@rendermode InteractiveServer
+<PageTitle>McDermott - Master Data General Consultan Service</PageTitle>
+
+@if (IsAccess)
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="General Consultan Service" />
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                <ToolbarTemplate>
+                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                        <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                        <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanServices.Count > 0" />
+                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanServices.Count > 0" />
+                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                        <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                            <Items>
+                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                            </Items>
+                                        </DxToolbarItem>
+                                        <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                    </DxToolbar>
+                                </ToolbarTemplate>
+                            </div>
+                            <div class="card-body">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <DxGrid @ref="Grid"
+                                            Data="GeneralConsultanServices"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            DataItemDeleting="OnDelete"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            AllowSelectRowByClick="true"
+                                            FocusedRowEnabled="true"
+                                            PagerVisibleNumericButtonCount="10"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            ShowFilterRow="true"
+                                            CustomizeElement="Grid_CustomizeElement"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                                <DxPopup @bind-Visible="@PopupVisible" HeaderText="@textPopUp" HeaderCssClass="fw-bold" Width="70%">
+                                    <EditForm Model="@FormRegis" Context="EditFormContext">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <DxFormLayout CssClass="mt ">
+                                                    <DxFormLayoutItem Caption="Patient" ColSpanMd="12">
+                                                        <DxComboBox Data="@IsPatient" NullText="Select Partner..."
+                                                                    @bind-Value="@FormRegis.PatientId"
+                                                                    TextFieldName="Name"
+                                                                    ValueFieldName="Id"></DxComboBox>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="No. RM"  ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="@FormRegis.NoRM" NullText="No RM" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption ="Identity Number" ColSpanMd="12">
+                                                        <DxTextBox  @bind-Text="@FormRegis.IdentityNumber" NullText="Identity Number"/>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="BirthDay" ColSpanMd="12">
+                                                        <DxDateEdit @bind-Date="@FormRegis.BirthDay" NullText="Birthday" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Register Type" ColSpanMd="12">
+                                                            <DxComboBox Data="@RegisType"
+                                                                        NullText="Select Regis Type..."
+                                                                        @bind-Value="@FormRegis.TypeRegistration">
+                                                            </DxComboBox>
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <DxFormLayout CssClass="mt ">
+                                                    
+                                                    <DxFormLayoutItem Caption="Docter" ColSpanMd="12">
+                                                        <DxComboBox Data="@IsPratition"
+                                                                    NullText="Docter"
+                                                                    @bind-Value="@FormRegis.PratitionerId"></DxComboBox>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Medical type" ColSpanMd="12">
+                                                        <DxComboBox Data="@Services"
+                                                                    NullText="Medical Type.."
+                                                                    @bind-Value="@FormRegis.ServiceId"></DxComboBox>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Insurance type" ColSpanMd="12">
+                                                        <DxComboBox Data="@Insurances"
+                                                                    NullText="Insurance Type.."
+                                                                    @bind-Value="@FormRegis.InsuranceId"></DxComboBox>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Schendule">
+                                                        
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                        </div>
+                                    </EditForm>
+                                </DxPopup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}

@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240201075735_AddTableGeneralConsultanServices")]
+    partial class AddTableGeneralConsultanServices
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -812,8 +815,8 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("BirthDay")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly?>("BirthDay")
+                        .HasColumnType("date");
 
                     b.Property<int?>("ClassType")
                         .HasColumnType("int");
@@ -824,8 +827,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DateSchendule")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly?>("DateSchendule")
+                        .HasColumnType("date");
 
                     b.Property<string>("IdentityNumber")
                         .HasColumnType("nvarchar(max)");
@@ -839,13 +842,13 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int?>("PatientId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PratitionerId")
+                    b.Property<int?>("PratititonerId")
                         .HasColumnType("int");
 
                     b.Property<int?>("ServiceId")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan?>("TimeSchendule")
+                    b.Property<TimeOnly?>("TimeSchendule")
                         .HasColumnType("time");
 
                     b.Property<string>("TypeRegistration")
@@ -862,8 +865,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("InsuranceId");
 
                     b.HasIndex("PatientId");
-
-                    b.HasIndex("PratitionerId");
 
                     b.HasIndex("ServiceId");
 
@@ -1930,11 +1931,6 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.User", "Pratitioner")
-                        .WithMany()
-                        .HasForeignKey("PratitionerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.Service", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId")
@@ -1943,8 +1939,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Insurance");
 
                     b.Navigation("Patient");
-
-                    b.Navigation("Pratitioner");
 
                     b.Navigation("Service");
                 });

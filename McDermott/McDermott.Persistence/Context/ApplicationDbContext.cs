@@ -59,6 +59,9 @@ namespace McDermott.Persistence.Context
         public DbSet<DoctorScheduleDetail> DoctorScheduleDetails { get; set; }
         public DbSet<DoctorScheduleSlot> DoctorScheduleSlots { get; set; }
 
+        //Transaction
+        public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
+
         #endregion DbSet
 
         #region MyRegion
