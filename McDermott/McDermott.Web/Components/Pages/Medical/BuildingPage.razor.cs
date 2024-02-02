@@ -19,6 +19,7 @@ namespace McDermott.Web.Components.Pages.Medical
         public List<BuildingLocationDto> DeletedBuildingLocations = [];
 
         #region Default Grid
+
         private GroupMenuDto UserAccessCRUID = new();
         private bool PanelVisible { get; set; } = true;
         private bool IsAddMenu { get; set; } = false;
@@ -47,10 +48,12 @@ namespace McDermott.Web.Components.Pages.Medical
                 catch { }
             }
         }
+
         protected override async Task OnInitializedAsync()
         {
             try
             {
+                HealthCenters = await Mediator.Send(new GetHealthCenterQuery());
                 var result = await NavigationManager.CheckAccessUser(oLocal);
                 IsAccess = result.Item1;
                 UserAccessCRUID = result.Item2;
@@ -66,6 +69,7 @@ namespace McDermott.Web.Components.Pages.Medical
             Buildings = await Mediator.Send(new GetBuildingQuery());
             PanelVisible = false;
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -227,7 +231,6 @@ namespace McDermott.Web.Components.Pages.Medical
                 ExportSelectedRowsOnly = true,
             });
         }
-
 
         private async Task NewItemBuildingLocation_Click()
         {

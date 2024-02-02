@@ -73,6 +73,19 @@ namespace McDermott.Web.Components.Layout
                 HeaderMenuDtos = [.. menus.Where(x => x.ParentMenu == null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
                 DetailMenuDtos = [.. menus.Where(x => x.ParentMenu != null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
 
+                if (user.GroupId is not null)
+                {
+                    var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((int)user.GroupId));
+
+                    var encryptMenu = Helper.Encrypt(JsonConvert.SerializeObject(g));
+
+                    await oLocal.SetItemAsync("dotnet2", encryptMenu);
+                }
+                else
+                {
+                    await oLocal.SetItemAsync("dotnet2", new List<string>());
+                }
+
                 showPreloader = false;
 
                 StateHasChanged();

@@ -1,6 +1,8 @@
-﻿    @page "/config/user"
+﻿@page "/config/user"
+@using System.Security.Claims
 @using static McDermott.Web.Helper
 @rendermode InteractiveServer
+@inject IHttpContextAccessor _httpContextAccessor
 
 <PageTitle>McDermott - Master Data User</PageTitle>
 
@@ -53,7 +55,7 @@
                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0 && !IsDeleted" />
                                                     <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                     <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
                                                         <Items>
@@ -108,7 +110,7 @@
                                                 <DxSpinEdit @bind-Value="@UserForm.HomePhoneNumber" NullText="Home Phone Number" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Religion:">
-                                                <DxComboBox Data="@Religions" @bind-Value="@UserForm.ReligionId" TextFieldName="Name" ValueFieldName="Id" />
+                                                <DxComboBox Data="@Religions" NullText="Religion" @bind-Value="@UserForm.ReligionId" TextFieldName="Name" ValueFieldName="Id" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="NPWP:">
                                                 <DxTextBox @bind-Text="@UserForm.Npwp" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="NPWP" />
@@ -138,7 +140,7 @@
                                                 <DxSpinEdit @bind-Value="@UserForm.EmergencyPhone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Phone" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Gender:">
-                                                <DxComboBox Data="@Genders" @bind-Value="@UserForm.GenderId" TextFieldName="Name" ValueFieldName="Id" />
+                                                <DxComboBox Data="@Genders" NullText="Gender" @bind-Value="@UserForm.GenderId" TextFieldName="Name" ValueFieldName="Id" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Martial Status:">
                                                 <DxComboBox Data="@MartialStatuss" @bind-Value="@UserForm.MartialStatus"></DxComboBox>
@@ -362,7 +364,7 @@
                                         <DxFormLayoutGroup Caption="User" ColSpanMd="12" Visible="@Convert.ToBoolean(UserForm.IsUser)">
                                             <Items>
                                                 <DxFormLayoutItem Caption="Password:">
-                                                    <DxTextBox Password="true" @bind-Text="@UserForm.Password" />
+                                                    <DxTextBox Password="true" @bind-Text="@UserForm.Password" NullText="Password" />
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem Caption="Group:">
                                                     <DxComboBox Data="@Groups"
@@ -440,7 +442,7 @@
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Join Date:">
-                                                <DxDateEdit @bind-Date="@UserForm.JoinDate" Mask="@DateTimeMask.ShortDate" />
+                                                <DxDateEdit @bind-Date="@UserForm.JoinDate" Mask="@DateTimeMask.ShortDate" NullText="Join Date" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="BPJS KS Number:">
                                                 <DxSpinEdit @bind-Value="@UserForm.NoBpjsKs" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="BPJS KS Number" />
@@ -473,10 +475,12 @@
                                                         <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
                                                                   Text="Save"
                                                                   SubmitFormOnClick="true"
+                                                                   IconCssClass="fa-solid fa-floppy-disk"
                                                                   CssClass="w-20 ml" />
                                                         <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
                                                                   Text="Cancel"
                                                                   Click="OnCancel"
+                                                                  IconCssClass="fa-solid fa-rotate-left"
                                                                   CssClass="w-20 ml" />
                                                     </Template>
                                                 </DxGridLayoutItem>

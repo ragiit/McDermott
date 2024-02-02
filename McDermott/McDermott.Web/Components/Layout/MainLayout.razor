@@ -1,11 +1,19 @@
 ﻿@using McDermott.Domain.Entities
 @inherits LayoutComponentBase
 
+<style>
+    .p {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
 <div class="wrapper">
 
     @if (User == null)
     {
-        <McDermott.Web.Components.Pages.LoginPage></McDermott.Web.Components.Pages.LoginPage>
+        <McDermott.Web.Components.Pages.LoginPage />
     }
     else @if (!currentUrl.Contains("login"))
     {
@@ -139,7 +147,7 @@
                                     {
                                         <i class="nav-icon fas fa-book"></i>
                                     }
-                                    <p>
+                                    <p class="overflow-hidden">
                                         @h.Name
                                         <i class="fas fa-angle-left right"></i>
                                     </p>
@@ -152,7 +160,7 @@
                                         <li class="nav-item">
                                             <NavLink href="@url" class="nav-link">
                                                 <i class="far fa-circle nav-icon"></i>
-                                                <p class="overflow-hidden text-truncate">@d.Name</p>
+                                                <p>@d.Name</p>
                                             </NavLink>
                                         </li>
                                     </ul>

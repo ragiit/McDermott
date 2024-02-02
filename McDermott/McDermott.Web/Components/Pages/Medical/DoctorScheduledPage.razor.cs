@@ -1,9 +1,13 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using Microsoft.AspNetCore.Components;
+using Microsoft.CodeAnalysis.Text;
+using System;
 using System.Globalization;
 using static McDermott.Application.Features.Commands.BuildingCommand;
 using static McDermott.Application.Features.Commands.DoctorScheduleCommand;
 using static McDermott.Application.Features.Commands.ServiceCommand;
 using static McDermott.Application.Features.Commands.UserCommand;
+using static McDermott.Web.Components.Pages.Medical.DoctorScheduledPage;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -32,10 +36,45 @@ namespace McDermott.Web.Components.Pages.Medical
         private IEnumerable<UserDto> Users = [];
         private IEnumerable<UserDto> SelectedPhysicions = [];
         private List<DoctorScheduleDto> DoctorSchedules = [];
+        private List<DoctorScheduleDto> Schedules = new List<DoctorScheduleDto>();
+        private IEnumerable<DoctorScheduleDto> SelectedSchedules = [];
         private DoctorScheduleDto DoctorSchedule = new();
 
         private List<DoctorScheduleDetailDto> DoctorScheduleDetails = [];
         public List<DoctorScheduleDetailDto> DeletedDoctorSchedules = [];
+
+        private DateTime StartDate = DateTime.Now;
+        private DateTime EndDate = DateTime.Now;
+
+        private int newId = 0;
+        private string PhysicionName { get; set; }
+
+        private int Value
+        {
+            get => newId;
+            set
+            {
+                Names.Clear();
+                int newId = value; InvokeAsync(StateHasChanged);
+                this.newId = value;
+
+                var item = Schedules.FirstOrDefault(x => x.Id == newId);
+
+                PhysicionName = item.Physicions;
+
+                var n = item.Physicions.Split(",");
+
+                foreach (var item1 in n)
+                {
+                    if (Names.Contains(item1))
+                        continue;
+
+                    Names.Add(item1);
+                }
+
+                SelectedNames = Names.Distinct();
+            }
+        }
 
         #region Default Grid
 
@@ -63,22 +102,76 @@ namespace McDermott.Web.Components.Pages.Medical
 
             Services = await Mediator.Send(new GetServiceQuery());
 
+            await LoadData();
+        }
+
+        private List<string> Names { get; set; } = new();
+        private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
+        private DoctorScheduleDto tt { get; set; } = new();
+
+        private string selectedItem;
+
+        private List<Item> dataSource = new List<Item>
+    {
+        new Item { Id = 1, Name = "Item 1" },
+        new Item { Id = 2, Name = "Item 2" },
+        new Item { Id = 3, Name = "Item 3" }
+    };
+
+        // Event handler untuk ComboBox
+
+        public class Item
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        private void ComboBoxValueChanged(string newValue)
+        {
+            // Lakukan sesuatu ketika nilai combobox berubah
+            Console.WriteLine("Nilai combobox berubah menjadi: " + newValue);
+        }
+
+        private void SelectedItemsChanged(IEnumerable<DoctorScheduleDto> e)
+        {
+            Names.Clear();
+            foreach (var item in e)
+            {
+                var n = item.Physicions.Split(",");
+
+                foreach (var item1 in n)
+                {
+                    if (Names.Contains(item1))
+                        continue;
+
+                    Names.Add(item1);
+                }
+            }
+
+            SelectedNames = Names.Distinct();
+        }
+
+        private async Task LoadData()
+        {
+            PanelVisible = true;
+
             var users = await Mediator.Send(new GetUserQuery());
             Users = users.Where(x => x.IsDoctor == true && x.IsPhysicion == true).AsEnumerable();
+
+            DoctorSchedules.Clear();
 
             var doctorSchedules = await Mediator.Send(new GetDoctorScheduleQuery());
             doctorSchedules.ForEach(x => x.Physicions = string.Join(", ", users.Where(z => x.PhysicionIds != null && x.PhysicionIds.Contains(z.Id)).Select(z => z.Name).ToList()));
 
             DoctorSchedules = doctorSchedules;
 
-            await LoadData();
-        }
+            Schedules = doctorSchedules;
 
-        private async Task LoadData()
-        {
-            PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Buildings = await Mediator.Send(new GetBuildingQuery());
+
+            tt = Schedules[0];
+
             PanelVisible = false;
         }
 
@@ -109,17 +202,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (BuildingDto)e.EditModel;
-
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
-
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateBuildingRequest(editModel));
-            else
-                await Mediator.Send(new UpdateBuildingRequest(editModel));
-
-            await LoadData();
+            Console.WriteLine("Megalodon Ganjar");
         }
 
         private async Task OnSaveDoctorScheduleDetail(GridEditModelSavingEventArgs e)
@@ -182,6 +265,11 @@ namespace McDermott.Web.Components.Pages.Medical
             ShowForm = true;
             DoctorSchedules = [];
             DoctorSchedule = new();
+        }
+
+        private async Task GenerateScheduleDoctor_Click()
+        {
+            await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()

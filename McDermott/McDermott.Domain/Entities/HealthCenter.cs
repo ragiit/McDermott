@@ -20,8 +20,10 @@ namespace McDermott.Domain.Entities
         public string? Street2 { get; set; }
         public string? WebsiteLink { get; set; }
 
-        public City? City { get; set; }
-        public Province? Province { get; set; }
-        public Country? Country { get; set; }
+        public virtual City? City { get; set; }
+        public virtual Province? Province { get; set; }
+        public virtual Country? Country { get; set; }
+
+        public virtual List<Building>? Buildings { get; set; }
     }
 }

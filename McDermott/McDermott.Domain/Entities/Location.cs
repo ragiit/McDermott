@@ -13,5 +13,7 @@ namespace McDermott.Domain.Entities
 
         [StringLength(200)]
         public string Type { get; set; } = string.Empty;
+
+        public virtual List<BuildingLocation>? BuildingLocations { get; set; }
     }
 }

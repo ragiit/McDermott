@@ -90,7 +90,7 @@
                                                     @EditFormContext.GetEditor("Name")
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Province:" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="Province:" ColSpanMd="12">
                                                 <DxComboBox Data="@Provinces"
                                                             NullText="Select Province..."
                                                             @bind-Value="@a.ProvinceId"
@@ -98,7 +98,7 @@
                                                             ValueFieldName="Id">
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="City:" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="City:" ColSpanMd="12">
                                                 <DxComboBox Data="@Cities"
                                                             NullText="Select City..."
                                                             @bind-Value="@a.CityId"
