@@ -90,6 +90,9 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <DxFormLayout CssClass="mt ">
+                                                    <DxFormLayoutItem Caption="Admission Queue" ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="@FormRegis.AdmissionQueue"/>
+                                                    </DxFormLayoutItem>
                                                     <DxFormLayoutItem Caption="Patient" ColSpanMd="12">
                                                         <DxComboBox Data="@IsPatient" NullText="Select Partner..."
                                                                     @bind-Value="@FormRegis.PatientId"
@@ -97,18 +100,25 @@
                                                                     ValueFieldName="Id"></DxComboBox>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem Caption="No. RM" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@FormRegis.NoRM" NullText="No RM" />
+                                                        <p>@FormRegis.NoRM </p>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem Caption="Identity Number" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" NullText="Identity Number" />
+                                                        @* <DxTextBox @bind-Text="@FormRegis.IdentityNumber" NullText="Identity Number" /> *@
+                                                        <p>@FormRegis.IdentityNumber</p>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem Caption="BirthDay" ColSpanMd="12">
-                                                        <DxDateEdit @bind-Date="@FormRegis.BirthDay" NullText="Birthday" />
+                                                        <p>@age</p>
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem Caption="Register Type" ColSpanMd="12">
+                                                    <DxFormLayoutItem Caption="Registration" ColSpanMd="12">
                                                         <DxComboBox Data="@RegisType"
-                                                                    NullText="Select Regis Type..."
+                                                                    NullText="Select Registration..."
                                                                     @bind-Value="@FormRegis.TypeRegistration">
+                                                        </DxComboBox>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Method" ColSpanMd="12">
+                                                        <DxComboBox Data="@Method"
+                                                                    NullText="Select Method..."
+                                                                    @bind-Value="@FormRegis.Method">
                                                         </DxComboBox>
                                                     </DxFormLayoutItem>
                                                 </DxFormLayout>
@@ -121,15 +131,15 @@
                                                                     NullText="Docter"
                                                                     @bind-Value="@FormRegis.PratitionerId" TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem Caption="Medical type" ColSpanMd="12">
+                                                    <DxFormLayoutItem Caption="Service" ColSpanMd="12">
                                                         <DxComboBox Data="@Services"
-                                                                    NullText="Medical Type.."
+                                                                    NullText="Service.."
                                                                     @bind-Value="@FormRegis.ServiceId" TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem Caption="Insurance type" ColSpanMd="12">
+                                                    <DxFormLayoutItem Caption="Payment Methode" ColSpanMd="12">
                                                         <DxComboBox Data="@Insurances"
-                                                                    NullText="Insurance Type.."
-                                                                    @bind-Value="@FormRegis.InsuranceId" TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
+                                                                    NullText="Payment Method.."
+                                                                    @bind-Value="@FormRegis.InsuranceId" TextFieldName="Name" ValueFieldName="Id" ch></DxComboBox>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem Caption="Schendule Date" ColSpanMd="12">
                                                         <DxDateEdit @bind-Date="@FormRegis.DateSchendule" Mask="@DateTimeMask.ShortDate" NullText="Tanggal"></DxDateEdit>

@@ -15,6 +15,10 @@ namespace McDermott.Application.Dtos
         public int? ServiceId { get; set; }
         public int? PratitionerId { get; set; }
         public int? ClassType { get; set; }
+        public int? Status { get; set; }
+        public string? Method { get; set; }
+        public string? AdmissionQueue { get; set; }
+        public string? Payment { get; set; }
         public string? NoRM { get; set; } = string.Empty;
         public string? IdentityNumber { get; set; } = string.Empty;
         public string? TypeRegistration { get; set; } = string.Empty;

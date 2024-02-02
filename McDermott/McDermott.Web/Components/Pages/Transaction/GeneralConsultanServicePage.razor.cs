@@ -33,6 +33,12 @@ namespace McDermott.Web.Components.Pages.Transaction
             "IGD"
         };
 
+        private List<string> Method = new List<string>
+        {
+            "MCU",
+            "Oil & Gas"
+        };
+
         #endregion Data Statis
 
         #region Grid Setting
