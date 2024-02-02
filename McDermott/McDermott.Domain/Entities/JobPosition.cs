@@ -8,5 +8,7 @@
         public string Name { get; set; } = string.Empty;
 
         public Department? Department { get; set; }
+
+        public virtual List<User>? Users { get; set; }  
     }
 }

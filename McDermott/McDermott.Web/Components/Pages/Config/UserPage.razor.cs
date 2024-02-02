@@ -1,5 +1,6 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using McDermott.Web.Components.Layout;
+using System.Security.Claims;
 using static McDermott.Application.Features.Commands.CityCommand;
 using static McDermott.Application.Features.Commands.CountryCommand;
 using static McDermott.Application.Features.Commands.DepartmentCommand;
@@ -28,6 +29,7 @@ namespace McDermott.Web.Components.Pages.Config
         private bool EditItemsEnabled { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private bool OnVacation { get; set; } = true;
+        private bool IsDeleted { get; set; } = true;
         private bool ShowForm { get; set; } = false;
         private bool VisibleExpiredId { get; set; } = false;
         public List<CountryDto> Countries { get; private set; }
@@ -183,6 +185,11 @@ namespace McDermott.Web.Components.Pages.Config
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
+            if (args.DataItem is not null)
+            {
+                IsDeleted = (bool)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(((UserDto)args.DataItem).Id.ToString())!;
+            }
+
             FocusedRowVisibleIndex = args.VisibleIndex;
             UpdateEditItemsEnabled(true);
         }

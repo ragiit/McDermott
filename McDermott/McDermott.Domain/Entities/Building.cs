@@ -17,5 +17,8 @@ namespace McDermott.Domain.Entities
         public string Code { get; set; } = string.Empty;
 
         public virtual HealthCenter? HealthCenter { get; set; }
+
+        public virtual List<BuildingLocation>? BuildingLocations { get; set; }
+
     }
 }

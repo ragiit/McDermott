@@ -87,15 +87,15 @@
                                             var a = (VillageDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="6">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
                                                 <div class="pop-warning">
                                                     @EditFormContext.GetEditor("Name")
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Postal Code:" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="Postal Code:" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("PostalCode")
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Province:" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="Province:" ColSpanMd="12">
                                                 <DxComboBox Data="@Provinces"
                                                             NullText="Select Province..."
                                                             @bind-Value="@a.ProvinceId"
@@ -103,7 +103,7 @@
                                                             ValueFieldName="Id">
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="City:" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="City:" ColSpanMd="12">
                                                 <DxComboBox Data="@Cities"
                                                             NullText="Select City..."
                                                             @bind-Value="@a.CityId"
@@ -111,7 +111,7 @@
                                                             ValueFieldName="Id">
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="District:" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="District:" ColSpanMd="12">
                                                 <DxComboBox Data="@Districts"
                                                             NullText="Select District..."
                                                             @bind-Value="@a.DistrictId"

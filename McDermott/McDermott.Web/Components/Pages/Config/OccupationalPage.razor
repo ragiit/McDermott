@@ -60,18 +60,18 @@
                                     </ToolbarTemplate>
                                     <Columns>
                                         <DxGridSelectionColumn width="15px" />
-                                        <DxGridDataColumn FieldName="Name" Caption="Pekerjaan" />
-                                        <DxGridDataColumn FieldName="Description" Caption="Deskripsi" />
+                                        <DxGridDataColumn FieldName="Name" Caption="Occupational" />
+                                        <DxGridDataColumn FieldName="Description" Caption="Description" />
                                     </Columns>
                                     <EditFormTemplate Context="EditFormContext">
 
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Pekerjaan:" ColSpanMd="6">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Occupational:" ColSpanMd="12">
                                                 <div class="pop-warning">
                                                     @EditFormContext.GetEditor("Name")
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Deskripsi:" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="Description:" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("Description")
                                             </DxFormLayoutItem>
                                         </DxFormLayout>

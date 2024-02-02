@@ -12,5 +12,7 @@
         public virtual List<District>? Districts { get; set; }
 
         public virtual List<Company>? Companies { get; set; }
+        public virtual List<Village>? Villages { get; set; }
+        public virtual List<HealthCenter>? HealthCenters { get; set; } 
     }
 }

@@ -85,12 +85,12 @@
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="6">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
                                                     <div class="pop-warning">
                                                         @EditFormContext.GetEditor("Name")
                                                     </div>
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Code:" ColSpanMd="6">
+                                                <DxFormLayoutItem Caption="Code:" ColSpanMd="12">
                                                     @EditFormContext.GetEditor("Code")
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>

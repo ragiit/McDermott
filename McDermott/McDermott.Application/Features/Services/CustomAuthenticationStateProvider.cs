@@ -36,6 +36,7 @@ namespace McDermott.Application.Features.Services
 
                 var claimPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Name)
                 }, "CustomAuth"));
 
@@ -81,6 +82,7 @@ namespace McDermott.Application.Features.Services
                 //await _sessionStorage.SetItemAsync("us", user);
                 claims = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Name)
                 }, "CustomAuth"));
             }

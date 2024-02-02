@@ -34,6 +34,7 @@
                                             DataItemDeleting="OnDelete"
                                             FocusedRowEnabled="true"
                                             PopupEditFormCssClass="pw-800"
+                                            EditMode="GridEditMode.PopupEditForm"
                                             PagerPosition="GridPagerPosition.Bottom"
                                             PageSizeSelectorVisible="true"
                                             PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
@@ -61,6 +62,8 @@
                                                     </Items>
                                                 </DxToolbarItem>
                                                 <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+
+                                                <DxToolbarItem Text="Generate Schedule Doctor" Click="GenerateScheduleDoctor_Click" BeginGroup="true" IconCssClass="fa-solid fa-calendar-days" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
@@ -69,6 +72,51 @@
                                             <DxGridDataColumn FieldName="Service.Name" Caption="Service" />
                                             <DxGridDataColumn FieldName="Physicions" />
                                         </Columns>
+                                        <EditFormTemplate Context="EditFormContext">
+                                            @{
+                                                var a = DateTime.Now;
+                                            }
+                                            <DxFormLayout CssClass="w-100">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Schedule Name:" ColSpanMd="12">
+
+                                                    @*   <DxComboBox Data="@Schedules"
+                                                NullText="Select Schedule..."
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                @bind-Value="@Value"
+                                                TextFieldName="Name"
+                                                ValueFieldName="Id">
+                                                </DxComboBox> *@
+
+                                                    <DxTagBox Data="@Schedules"
+                                                              FilteringMode="@DataGridFilteringMode.Contains"
+                                                              @bind-Values="@SelectedSchedules"
+                                                              NullText="Select Schedules..."
+                                                              TextFieldName="Name"
+                                                              SelectedItemsChanged="(IEnumerable<DoctorScheduleDto> e) => SelectedItemsChanged(e)"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem Caption="Physicians:" ColSpanMd="12">
+                                                    <DxTagBox Data="@Names"
+                                                              FilteringMode="@DataGridFilteringMode.Contains"
+                                                              @bind-Values="@SelectedNames"
+                                                              ReadOnly="true"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+
+                                                    @* <DxTextBox ReadOnly="true" @bind-Text="PhysicionName" InputCssClass="fw-bold" /> *@
+
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem Caption="Start Date:" ColSpanMd="12">
+                                                    <DxDateEdit @bind-Date="@StartDate" MinDate="DateTime.Now" Mask="@DateTimeMask.ShortDate" />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem Caption="End Date:" ColSpanMd="12">
+                                                    <DxDateEdit @bind-Date="@EndDate" MinDate="DateTime.Now" Mask="@DateTimeMask.ShortDate" />
+                                                </DxFormLayoutItem>
+                                            </DxFormLayout>
+                                        </EditFormTemplate>
                                     </DxGrid>
                                 </DxLoadingPanel>
                             }
@@ -141,8 +189,8 @@
                                             <DxToolbarItem Text="New" Click="NewItemDoctorScheduleDetail_Click" IconCssClass="fa-solid fa-plus" />
                                             <DxToolbarItem Text="Edit" Click="EditItemDoctorScheduleDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDoctorScheduleDetailDataItems.Count > 0 && DoctorScheduleDetails.Count > 0" />
                                             <DxToolbarItem Text="Delete" Click="DeleteItemDoctorScheduleDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDoctorScheduleDetailDataItems.Count > 0 && DoctorScheduleDetails.Count > 0" />
-                                            <DxToolbarItem Text="Save" Click="SaveItemDoctorScheduleDetailGrid_Click" Enabled="DoctorScheduleDetails.Count > 0" />
-                                            <DxToolbarItem Text="Cancel" Click="CancelItemDoctorScheduleDetailGrid_Click" />
+                                            <DxToolbarItem Text="Save" IconCssClass="fa-solid fa-floppy-disk" Click="SaveItemDoctorScheduleDetailGrid_Click" Enabled="DoctorScheduleDetails.Count > 0" />
+                                            <DxToolbarItem Text="Cancel" IconCssClass="fa-solid fa-rotate-left" Click="CancelItemDoctorScheduleDetailGrid_Click" />
                                             <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                             <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
                                                 <Items>

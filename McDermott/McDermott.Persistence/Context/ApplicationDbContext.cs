@@ -74,7 +74,42 @@ namespace McDermott.Persistence.Context
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
-            }
+            } 
+
+            //modelBuilder.Entity<EmailTemplate>()
+            //  .HasMany(m => m.ToPartner)
+            //  .OnDelete(DeleteBehavior.Cascade);
+
+            // Contoh: Aturan cascade delete untuk hubungan many-to-many
+            //modelBuilder.Entity<Province>()
+            //  .HasMany(m => m.Districts)
+            //  .WithOne(c => c.Province)
+            //  .OnDelete(DeleteBehavior.Cascade);
+
+            //modelBuilder.Entity<Province>()
+            //.HasMany(m => m.Cities)
+            //.WithOne(c => c.Province)
+            //.OnDelete(DeleteBehavior.Cascade);
+
+            //modelBuilder.Entity<Province>()
+            //.HasMany(m => m.Companies)
+            //.WithOne(c => c.Province)
+            //.OnDelete(DeleteBehavior.Cascade);
+
+            //base.OnModelCreating(modelBuilder);
+            //modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
+            //var entityTypes = modelBuilder.Model
+            //    .GetEntityTypes()
+            //    .ToList();
+
+            //var foreignKeys = entityTypes
+            //.SelectMany(e => e.GetForeignKeys().Where(f => f.DeleteBehavior == DeleteBehavior.Cascade));
+
+            //foreach (var foreignKey in foreignKeys)
+            //{
+            //    foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+            //}
 
             //modelBuilder.Entity<Menu>().HasData(new Menu
             //{
