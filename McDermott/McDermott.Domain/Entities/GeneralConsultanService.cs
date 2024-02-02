@@ -18,7 +18,8 @@ namespace McDermott.Domain.Entities
         public DateTime? BirthDay { get; set; }
         public string? TypeRegistration { get; set; }
         public DateTime? DateSchendule { get; set; }
-        public TimeSpan? TimeSchendule { get; set; }
+        public TimeSpan? WorkFrom { get; set; }
+        public TimeSpan? WorkTo { get; set; }
 
         public virtual User? Patient { get; set; }
         public virtual User? Pratitioner { get; set; }

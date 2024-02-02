@@ -1,14 +1,12 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using static McDermott.Application.Features.Commands.EmailSettingCommand;
 
-
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class EmailSettingPage
     {
         private GroupMenuDto UserAccessCRUID = new();
         private bool PanelVisible { get; set; } = true;
-
 
         private string textPopUp = "";
 
