@@ -1,6 +1,8 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using McDermott.Domain.Entities;
 using MediatR;
+using System.Globalization;
+using static McDermott.Application.Features.Commands.CompanyCommand;
 using static McDermott.Application.Features.Commands.DoctorScheduleCommand;
 using static McDermott.Application.Features.Commands.GeneralConsultanServiceCommand;
 using static McDermott.Application.Features.Commands.InsuranceCommand;
@@ -11,29 +13,45 @@ namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class GeneralConsultanServicePage
     {
+        #region Relation Data
+
         private List<GeneralConsultanServiceDto> GeneralConsultanServices = new();
-        private List<string> IsPatient = new();
-        private List<string> IsPratition = new();
-        private List<string> Insurances = new();
-        private List<string> Services = new();
+        private List<UserDto> IsPatient = new();
 
-        private GeneralConsultanServiceDto FormRegis = new();
-        private BaseAuthorizationLayout AuthorizationLayout = new();
-        private bool IsAccess { get; set; } = false;
-        private bool PanelVisible { get; set; } = true;
-        private bool PopupVisible { get; set; } = false;
-        private string textPopUp = "";
-        public IGrid Grid { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private List<UserDto> IsPratition = new();
+        private List<InsuranceDto> Insurances = new();
+        private List<ServiceDto> Services = new();
+        private List<DoctorScheduleDto> DoctorSchedules = new();
 
-        private int FocusedRowVisibleIndex { get; set; }
-        private bool EditItemsEnabled { get; set; }
-        private GroupMenuDto UserAccessCRUID = new();
+        #endregion Relation Data
+
+        #region Data Statis
+
         private List<string> RegisType = new List<string>
         {
             "Rawat Jalan",
             "IGD"
         };
+
+        #endregion Data Statis
+
+        #region Grid Setting
+
+        private GeneralConsultanServiceDto FormRegis = new();
+        private BaseAuthorizationLayout AuthorizationLayout = new();
+        private bool IsAccess { get; set; } = false;
+        private bool PanelVisible { get; set; } = true;
+        private bool showForm { get; set; } = false;
+        private string textPopUp = "";
+        private string DisplayFormat { get; } = string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator) ? "HH:mm" : "h:mm tt";
+        public IGrid Grid { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private int FocusedRowVisibleIndex { get; set; }
+        private bool EditItemsEnabled { get; set; }
+        private GroupMenuDto UserAccessCRUID = new();
+
+        #endregion Grid Setting
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -49,6 +67,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 catch { }
             }
         }
+
         protected override async Task OnInitializedAsync()
         {
             try
@@ -58,7 +77,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 UserAccessCRUID = result.Item2;
             }
             catch { }
-            //var by = 
+            //var by =
 
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
             await LoadData();
@@ -68,33 +87,31 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             var user = await Mediator.Send(new GetUserQuery());
             //patient
-            IsPatient = [.. user.Where(x => x.IsPatient == true).Select(x => x.Name).ToList()];
+            IsPatient = [.. user.Where(x => x.IsPatient == true).ToList()];
 
             //IsDocter
-            IsPratition = [.. user.Where(x => x.IsDoctor == true).Select(x => x.Name).ToList()];
+            IsPratition = [.. user.Where(x => x.IsDoctor == true).ToList()];
 
             //Insurance
-            var Insurance = await Mediator.Send(new GetInsuranceQuery());
-            Insurances = [.. Insurance.Select(x => x.Name).ToList()];
+
+            Insurances = await Mediator.Send(new GetInsuranceQuery());
 
             //Medical Type
-            var service = await Mediator.Send(new GetServiceQuery());
-            Services = [.. service.Select(x => x.Name).ToList()];
 
+            Services = await Mediator.Send(new GetServiceQuery());
             //Schendule
             var schendule = await Mediator.Send(new GetDoctorScheduleQuery());
-
-            //Register Type
-
         }
+
         private async Task LoadData()
         {
-            PopupVisible = false;
+            showForm = false;
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
             PanelVisible = false;
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -127,17 +144,23 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task NewItem_Click()
         {
             await SelectData();
-            PopupVisible = true;
+            showForm = true;
             textPopUp = "Add Data Registration";
             await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
-
-            PopupVisible = true;
-            textPopUp = "Edit Form Template Email";
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            try
+            {
+                var General = SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>();
+                FormRegis = General;
+                await SelectData();
+                showForm = true;
+                textPopUp = "Edit Data Registration";
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            }
+            catch { }
         }
 
         private void ColumnChooserButton_Click()
@@ -174,16 +197,44 @@ namespace McDermott.Web.Components.Pages.Transaction
             });
         }
 
-        private async Task OnDelete()
+        private void OnCancel()
+        {
+            FormRegis = new();
+            showForm = false;
+        }
+
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
             {
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteGeneralConsultanServiceRequest(((GeneralConsultanServiceDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<GeneralConsultanServiceDto>>();
+                    await Mediator.Send(new DeleteListGeneralConsultanServiceRequest(a.Select(x => x.Id).ToList()));
+                }
                 await LoadData();
             }
             catch { }
         }
 
+        private async Task OnSave()
+        {
+            try
+            {
+                var edit = FormRegis;
+                if (FormRegis.Id == 0)
+                    await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                else
+                    await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
 
+                FormRegis = new();
+                await LoadData();
+            }
+            catch { }
+        }
     }
 }
-
