@@ -21,10 +21,10 @@ namespace McDermott.Application.Dtos
         public string? Payment { get; set; }
         public string? NoRM { get; set; } = string.Empty;
         public string? IdentityNumber { get; set; } = string.Empty;
-        public string? TypeRegistration { get; set; } = string.Empty;
+        public string? TypeRegistration { get; set; }
 
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
-        public DateTime? BirthDay { get; set; } = DateTime.Now;
+        public int? Age { get; set; } 
 
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime? DateSchendule { get; set; } = DateTime.Now;

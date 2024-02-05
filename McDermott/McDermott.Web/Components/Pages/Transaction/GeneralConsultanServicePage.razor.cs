@@ -2,6 +2,7 @@
 using McDermott.Domain.Entities;
 using MediatR;
 using System.Globalization;
+using static Azure.Core.HttpHeader;
 using static McDermott.Application.Features.Commands.CompanyCommand;
 using static McDermott.Application.Features.Commands.DoctorScheduleCommand;
 using static McDermott.Application.Features.Commands.GeneralConsultanServiceCommand;
@@ -17,27 +18,46 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private List<GeneralConsultanServiceDto> GeneralConsultanServices = new();
         private List<UserDto> IsPatient = new();
+        private List<UserDto> patients = new List<UserDto>();
+        private int PatientIds = new();
+        private IEnumerable<GeneralConsultanServiceDto> SelectPatient = [];
 
         private List<UserDto> IsPratition = new();
-        private List<InsuranceDto> Insurances = new();
+        private List<string> Insurances = new();
         private List<ServiceDto> Services = new();
-        private List<DoctorScheduleDto> DoctorSchedules = new();
+        private List<DoctorScheduleDto> DoctorSchedules = new List<DoctorScheduleDto>();
 
         #endregion Relation Data
 
         #region Data Statis
 
+        private List<string> Payments = new List<string>
+        {
+            "Personal",
+            "Corporate",
+            "Insurance",
+            "BPJS"
+        };
+
         private List<string> RegisType = new List<string>
         {
-            "Rawat Jalan",
+            "Out Patient Care",
             "IGD"
         };
 
         private List<string> Method = new List<string>
         {
             "MCU",
-            "Oil & Gas"
+            "Gas And Oil"
         };
+
+        private int PatientsId = 0;
+
+        private int PractitionerId = 0;
+
+        private int Age = 0;
+        private DateTime? Birthdate { get; set; }
+        private string IdentityNum { get; set; }
 
         #endregion Data Statis
 
@@ -51,6 +71,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private string textPopUp = "";
         private string DisplayFormat { get; } = string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator) ? "HH:mm" : "h:mm tt";
         public IGrid Grid { get; set; }
+        private int ActiveTabIndex { get; set; } = 1;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
@@ -89,22 +110,57 @@ namespace McDermott.Web.Components.Pages.Transaction
             await LoadData();
         }
 
+        private int Value
+        {
+            get => PatientsId;
+            set
+            {
+                //Names.Clear();
+                int PatientsId = value; InvokeAsync(StateHasChanged);
+                this.PatientsId = value;
+
+                var item = patients.FirstOrDefault(x => x.Id == PatientsId);
+
+                DateTime currentDate = DateTime.UtcNow;
+                Birthdate = item.DateOfBirth;
+                Age = currentDate.Year - Birthdate!.Value.Year;
+
+                FormRegis.Age = Age;
+                FormRegis.IdentityNumber = item.NoId.ToString();
+                FormRegis.PatientId = item.Id;
+            }
+        }
+
+        private int SelectedService
+        {
+            get => PractitionerId;
+            set
+            {
+                int PractitionerId = value; InvokeAsync(StateHasChanged);
+                this.PractitionerId = value;
+
+                //List<string> item = DoctorSchedules.Where(x => x.PhysicionIds == PractitionerId).ToList();
+            }
+        }
+
         private async Task SelectData()
         {
             var user = await Mediator.Send(new GetUserQuery());
+
             //patient
-            IsPatient = [.. user.Where(x => x.IsPatient == true).ToList()];
+            patients = [.. user.Where(x => x.IsPatient == true).ToList()];
+            PatientIds = IsPatient.Select(x => x.Id).FirstOrDefault();
 
             //IsDocter
             IsPratition = [.. user.Where(x => x.IsDoctor == true).ToList()];
 
             //Insurance
-
-            Insurances = await Mediator.Send(new GetInsuranceQuery());
+            var Insurancess = await Mediator.Send(new GetInsuranceQuery());
+            Insurances = [.. Insurancess.Select(x => x.Name).ToList()];
 
             //Medical Type
-
             Services = await Mediator.Send(new GetServiceQuery());
+
             //Schendule
             var schendule = await Mediator.Send(new GetDoctorScheduleQuery());
         }
