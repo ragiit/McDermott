@@ -134,21 +134,27 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private void SelectedItemsChanged(IEnumerable<DoctorScheduleDto> e)
         {
-            Names.Clear();
-            foreach (var item in e)
+            SelectedNames = new List<string>();
+
+            if (e is not null)
             {
-                var n = item.Physicions.Split(",");
+                Names.Clear();
 
-                foreach (var item1 in n)
+                foreach (var item in e)
                 {
-                    if (Names.Contains(item1))
-                        continue;
+                    var n = item.Physicions.Split(",");
 
-                    Names.Add(item1);
+                    foreach (var item1 in n)
+                    {
+                        if (Names.Contains(item1))
+                            continue;
+
+                        Names.Add(item1);
+                    }
                 }
-            }
 
-            SelectedNames = Names.Distinct();
+                SelectedNames = Names.Distinct();
+            }
         }
 
         private async Task LoadData()
