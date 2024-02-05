@@ -13,7 +13,6 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-
                             @if (!ShowForm)
                             {
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
@@ -26,6 +25,7 @@
                                             Data="DoctorSchedules"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
+                                            RowClick="OnRowClick"
                                             AllowSelectRowByClick="true"
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                             KeyFieldName="Id"
@@ -73,10 +73,12 @@
                                             <DxGridDataColumn FieldName="Physicions" />
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
-                                            @{
-                                                var a = DateTime.Now;
-                                            }
                                             <DxFormLayout CssClass="w-100">
+
+                                                @* <DxLoadingPanel @bind-Visible="LoadingGenerateScheduleDoctor"
+                                            IsContentBlocked="true"
+                                            CssClass="w-100"
+                                            ApplyBackgroundShading="true"> *@
                                                 <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Schedule Name:" ColSpanMd="12">
 
                                                     @*   <DxComboBox Data="@Schedules"
@@ -94,7 +96,6 @@
                                                               TextFieldName="Name"
                                                               SelectedItemsChanged="(IEnumerable<DoctorScheduleDto> e) => SelectedItemsChanged(e)"
                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-
                                                 </DxFormLayoutItem>
 
                                                 <DxFormLayoutItem Caption="Physicians:" ColSpanMd="12">
@@ -115,6 +116,7 @@
                                                 <DxFormLayoutItem Caption="End Date:" ColSpanMd="12">
                                                     <DxDateEdit @bind-Date="@EndDate" MinDate="DateTime.Now" Mask="@DateTimeMask.ShortDate" />
                                                 </DxFormLayoutItem>
+                                                @* </DxLoadingPanel> *@
                                             </DxFormLayout>
                                         </EditFormTemplate>
                                     </DxGrid>

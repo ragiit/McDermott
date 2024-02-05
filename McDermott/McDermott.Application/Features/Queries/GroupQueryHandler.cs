@@ -35,13 +35,11 @@ namespace McDermott.Application.Features.Queries
 
             public async Task<List<GroupMenuDto>> Handle(GetGroupMenuByGroupIdRequest request, CancellationToken cancellationToken)
             {
-                var a = await _unitOfWork.Repository<GroupMenu>().Entities
+                return await _unitOfWork.Repository<GroupMenu>().Entities
                      .Include(x => x.Menu)
                      .Where(x => x.GroupId == request.GroupId)
                      .Select(x => x.Adapt<GroupMenuDto>())
-                     .ToListAsync(cancellationToken);
-
-                return a;
+                     .ToListAsync(cancellationToken); 
             }
         }
 

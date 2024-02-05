@@ -1,0 +1,17 @@
+﻿
+<DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                CssClass="w-100"
+                IndicatorVisible="indicatorVisible"
+                IndicatorAreaVisible="indicatorAreaVisible"
+                Visible="true"
+                Text="Processing..."
+                TextAlignment="textAlignment">
+    <div style="min-height: 250px;"></div>
+</DxLoadingPanel>
+
+@code {
+    bool indicatorVisible = true;
+    bool indicatorAreaVisible = true;
+
+    LoadingPanelTextAlignment textAlignment = LoadingPanelTextAlignment.Right;
+}

@@ -10,8 +10,7 @@ namespace McDermott.Application.Dtos
     public class DoctorScheduleDto : IMapFrom<DoctorSchedule>
     {
         public int Id { get; set; }
-
-        [Required]
+         
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
 
