@@ -210,7 +210,6 @@
                                         <DxGridDataColumn FieldName="DayOfWeek" Caption="Day of Week" />
                                         <DxGridDataColumn FieldName="WorkFromFormatString" Caption="Work From" />
                                         <DxGridDataColumn FieldName="WorkToFormatString" Caption="Work To" />
-                                        <DxGridDataColumn FieldName="Service.Name" Caption="Service" />
                                         <DxGridDataColumn FieldName="Quota" />
                                         <DxGridDataColumn FieldName="UpdateToBpjs" Caption="Update to BPJS" />
                                     </Columns>
@@ -238,9 +237,6 @@
                                                             Format="@DisplayFormat"
                                                             DisplayFormat="@DisplayFormat"
                                                             CssClass="cw-320" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Service:" ColSpanMd="12">
-                                                <DxComboBox Data="@Services" @bind-Value="@a.ServiceId" ValueFieldName="Id" TextFieldName="Name" NullText="Service" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Quota:" ColSpanMd="12">
                                                 <DxSpinEdit @bind-Value="@a.Quota" NullText="Quota" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />

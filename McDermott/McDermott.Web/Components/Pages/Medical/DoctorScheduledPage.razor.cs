@@ -84,7 +84,8 @@ namespace McDermott.Web.Components.Pages.Medical
 
         #region Default Grid
 
-        private string DisplayFormat { get; } = string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator) ? "HH:mm" : "h:mm tt";
+        //private string DisplayFormat { get; } = string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator) ? "HH:mm" : "h:mm tt";
+        private string DisplayFormat { get; } = "HH:mm";
 
         private bool PanelVisible { get; set; } = true;
         private bool LoadingGenerateScheduleDoctor { get; set; } = false;
@@ -347,21 +348,20 @@ namespace McDermott.Web.Components.Pages.Medical
                 if (DoctorScheduleDetails.Where(x => x.Name == DoctorScheduleDetail.Name).Any())
                     return;
 
-                updateBuilding = DoctorScheduleDetails.FirstOrDefault(x => x.ServiceId == DoctorScheduleDetail.ServiceId)!;
-                DoctorScheduleDetail.Service = Services.FirstOrDefault(x => x.Id == DoctorScheduleDetail.ServiceId);
                 DoctorScheduleDetails.Add(DoctorScheduleDetail);
             }
             else
             {
                 var q = SelectedDoctorScheduleDetailDataItems[0].Adapt<DoctorScheduleDetailDto>();
-                var check = DoctorScheduleDetails.FirstOrDefault(x => x.Name == q.Name);
+                var check = DoctorScheduleDetails.FirstOrDefault(x => x.Name == DoctorScheduleDetail.Name);
 
-                if (check is not null && check.Name != DoctorScheduleDetail.Name)
+                if (check is not null && q.Name != DoctorScheduleDetail.Name)
                     return;
 
                 updateBuilding = DoctorScheduleDetails.FirstOrDefault(x => x.Name == q.Name)!;
-                DoctorScheduleDetail.Service = Services.FirstOrDefault(x => x.Id == DoctorScheduleDetail.ServiceId);
+
                 var index = DoctorScheduleDetails.IndexOf(updateBuilding!);
+
                 DoctorScheduleDetails[index] = DoctorScheduleDetail;
             }
 
@@ -392,10 +392,10 @@ namespace McDermott.Web.Components.Pages.Medical
             }
         }
 
-        private async Task NewItem_Click()
+        private void NewItem_Click()
         {
             ShowForm = true;
-            DoctorSchedules = [];
+            DoctorScheduleDetails.Clear();
             DoctorSchedule = new();
         }
 
@@ -505,7 +505,6 @@ namespace McDermott.Web.Components.Pages.Medical
                 x.Id = 0;
                 x.DoctorSchedule = null;
                 x.DoctorScheduleId = DoctorSchedule.Id == 0 ? result.Id : DoctorSchedule.Id;
-                x.Service = null;
             });
 
             await Mediator.Send(new CreateDoctorScheduleDetailRequest(DoctorScheduleDetails));
