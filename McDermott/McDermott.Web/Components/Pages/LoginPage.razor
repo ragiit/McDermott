@@ -71,29 +71,29 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var result = await NavigationManager.CheckAccessUser(oLocal);
-            IsAccess = result.Item1;
-            UserAccessCRUID = result.Item2;
-        }
-        catch { }
+        // try
+        // {
+        //     var result = await NavigationManager.CheckAccessUser(oLocal);
+        //     IsAccess = result.Item1;
+        //     UserAccessCRUID = result.Item2;
+        // }
+        // catch { }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnAfterRenderAsync(firstRender);
+        // await base.OnAfterRenderAsync(firstRender);
 
-        if (firstRender)
-        {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
-        }
+        // if (firstRender)
+        // {
+        //     try
+        //     {
+        //         var result = await NavigationManager.CheckAccessUser(oLocal);
+        //         IsAccess = result.Item1;
+        //         UserAccessCRUID = result.Item2;
+        //     }
+        //     catch { }
+        // }
     }
 
     private void ClickLogin()

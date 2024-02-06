@@ -9,7 +9,7 @@ namespace McDermott.Web.Components.Pages.Patient
 
         public IGrid Grid { get; set; }
         private List<FamilyDto> Familys = new();
-        private List<string> relations = new();
+        private List<FamilyDto> relations = new();
         private string? relation { get; set; } = string.Empty;
         private string? name { get; set; } = string.Empty;
 
@@ -28,7 +28,7 @@ namespace McDermott.Web.Components.Pages.Patient
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Familys = await Mediator.Send(new GetFamilyQuery());
-            relations = [.. Familys.Where(x => x.Relation == null || x.Relation == "").Select(x => x.Name).ToList()];
+            relations = [.. Familys.Where(x => x.Relation == null || x.Relation == "").ToList()];
             PanelVisible = false;
         }
 
