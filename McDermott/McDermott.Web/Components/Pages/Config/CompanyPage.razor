@@ -2,153 +2,272 @@
 @rendermode InteractiveServer
 
 <PageTitle>McDermott - Master Data Company</PageTitle>
+@if (IsAccess)
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Company" />
 
-<div class="wrapper">
-    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Company" />
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            @if (!showForm && !isDetail)
+                            {
+                                <div class="card-body">
+                                    <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                    IsContentBlocked="true"
+                                                    ApplyBackgroundShading="true"
+                                                    IndicatorAreaVisible="false"
+                                                    Text="Fetching Data...">
+                                        <DxGrid @ref="Grid"
+                                                Data="Companys"
+                                                PageSize="10"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                KeyFieldName="Id"
+                                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                                EditModelSaving="OnSave"
+                                                DataItemDeleting="OnDelete"
+                                                PopupEditFormCssClass="pw-800"
+                                                PagerPosition="GridPagerPosition.Bottom"
+                                                PageSizeSelectorVisible="true"
+                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                PageSizeSelectorAllRowsItemVisible="true"
+                                                PagerSwitchToInputBoxButtonCount="10"
+                                                FocusedRowEnabled="true"
+                                                PagerVisibleNumericButtonCount="10"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                ShowGroupPanel="true"
+                                                PopupEditFormHeaderText="textPopUp"
+                                                AutoExpandAllGroupRows="true"
+                                                ShowFilterRow="true"
+                                                CustomizeElement="Grid_CustomizeElement"
+                                                ShowSearchBox="true"
+                                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                                RowDoubleClick="OnRowDoubleClick"
+                                                AllowSelectRowByClick="true"
+                                                KeyboardNavigationEnabled="true">
+                                            <ToolbarTemplate>
+                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Companys.Count > 0" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Companys.Count > 0" />
+                                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                    <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                        <Items>
+                                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                        </Items>
+                                                    </DxToolbarItem>
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                                </DxToolbar>
+                                            </ToolbarTemplate>
+                                            <Columns>
+                                                <DxGridSelectionColumn width="15px" />
+                                                <DxGridDataColumn FieldName="Name" Caption="Name Company" SortIndex="0" />
+                                            </Columns>
+                                        </DxGrid>
+                                    </DxLoadingPanel>
+                                </div>
+                            }
+                            else if (showForm && !isDetail)
+                            {
+                                <EditForm Model="@formCompanies" Context="EditFormContext">
+                                    <DataAnnotationsValidator />
+                                    <div class="card-body">
+                                        <DxFormLayout CssClass="mt">
+                                            <DxFormLayoutItem caption="Name: " ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@formCompanies.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name Company" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem caption="Email: ">
+                                                <DxTextBox @bind-Text="@formCompanies.Email" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Email Company" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem caption="Phone: ">
+                                                <DxTextBox @bind-Text="@formCompanies.Phone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Phone Company" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem caption="Website: ">
+                                                <DxTextBox @bind-Text="@formCompanies.Website" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Website Company" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem caption="VAT: ">
+                                                <DxTextBox @bind-Text="@formCompanies.VAT" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="VAT" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Address:" ColSpanMd="12">
+                                                <Template>
+                                                    <DxGridLayout>
+                                                        <Rows>
+                                                            <DxGridLayoutRow />
+                                                            <DxGridLayoutRow />
+                                                            <DxGridLayoutRow />
+                                                            <DxGridLayoutRow />
+                                                        </Rows>
+                                                        <Columns>
+                                                            <DxGridLayoutColumn />
+                                                            <DxGridLayoutColumn />
+                                                        </Columns>
+                                                        <Items>
+                                                            <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
+                                                                <Template>
+                                                                    <DxTextBox @bind-Text="@formCompanies.Street1" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Street 1" />
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
+                                                                <Template>
+                                                                    <DxTextBox @bind-Text="@formCompanies.Street2" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Street 2" />
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
+                                                                <Template>
+                                                                    <DxComboBox Data="@Provinces"
+                                                                                NullText="Select Province..."
+                                                                                @bind-Value="@formCompanies.ProvinceId"
+                                                                                TextFieldName="Name"
+                                                                                ValueFieldName="Id">
+                                                                    </DxComboBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
+                                                                <Template>
+                                                                    <DxComboBox Data="@Cities.Where(x => x.ProvinceId == formCompanies.ProvinceId)"
+                                                                                NullText="Select City..."
+                                                                                @bind-Value="@formCompanies.CityId"
+                                                                                TextFieldName="Name"
+                                                                                ValueFieldName="Id">
+                                                                    </DxComboBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="3" Column="0" CssClass="mt">
+                                                                <Template>
+                                                                    <DxComboBox Data="@Countries.Where(x => formCompanies.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == formCompanies.ProvinceId)?.CountryId)"
+                                                                                NullText="Select Country..."
+                                                                                @bind-Value="@formCompanies.CountryId"
+                                                                                TextFieldName="Name"
+                                                                                ValueFieldName="Id">
+                                                                    </DxComboBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="3" Column="1" CssClass="ml">
+                                                                <Template>
+                                                                    <DxTextBox @bind-Text="@formCompanies.Zip" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Postal Code" />
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                        </Items>
+                                                    </DxGridLayout>
+                                                </Template>
+                                            </DxFormLayoutItem>
 
-    <div class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="card">
-                    <div class="card-body">
-                        <DxGrid @ref="Grid"
-                                Data="Companys"
-                                PageSize="10"
-                                @bind-SelectedDataItems="@SelectedDataItems"
-                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                KeyFieldName="Id"
-                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                EditModelSaving="OnSave"
-                                DataItemDeleting="OnDelete"
-                                EditMode="GridEditMode.PopupEditForm"
-                                PopupEditFormCssClass="pw-800"
-                                PagerPosition="GridPagerPosition.Bottom"
-                                PageSizeSelectorVisible="true"
-                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                PageSizeSelectorAllRowsItemVisible="true"
-                                PagerSwitchToInputBoxButtonCount="10"
-                                AllowSelectRowByClick="true"
-                                FocusedRowEnabled="true"
-                                PagerVisibleNumericButtonCount="10"
-                                FocusedRowChanged="Grid_FocusedRowChanged"
-                                ShowGroupPanel="true"
-                                AutoExpandAllGroupRows="true"
-                                ShowFilterRow="true"
-                                CustomizeElement="Grid_CustomizeElement"
-                                ShowSearchBox="true"
-                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                KeyboardNavigationEnabled="true">
-                            <ToolbarTemplate>
-                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Companys.Count > 0" />
-                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Companys.Count > 0" />
-                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                    <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
-                                        <Items>
-                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                        </Items>
-                                    </DxToolbarItem>
-                                    <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                </DxToolbar>
-                            </ToolbarTemplate>
-                            <Columns>
-                                <DxGridSelectionColumn width="15px" />
-                                <DxGridDataColumn FieldName="Name" Caption="Name Company" SortIndex="0" />
-                            </Columns>
-                            <EditFormTemplate Context="EditFormContext">
-                                @{
-                                    var a = (CompanyDto)EditFormContext.EditModel;
-                                }
-                                <DxFormLayout CssClass="mt">
-                                    <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem caption="Name: " ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name Company" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem caption="Email: ">
-                                            <DxTextBox @bind-Text="@a.Email" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Email Company" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem caption="Phone: ">
-                                            <DxTextBox @bind-Text="@a.Phone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Phone Company" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem caption="Website: ">
-                                            <DxTextBox @bind-Text="@a.Website" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Website Company" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem caption="VAT: ">
-                                            <DxTextBox @bind-Text="@a.VAT" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="VAT" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Address:" ColSpanMd="12">
-                                            <Template>
-                                                <DxGridLayout>
-                                                    <Rows>
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                    </Rows>
-                                                    <Columns>
-                                                        <DxGridLayoutColumn />
-                                                        <DxGridLayoutColumn />
-                                                    </Columns>
-                                                    <Items>
-                                                        <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
-                                                            <Template>
-                                                                <DxTextBox @bind-Text="@a.Street1" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Street 1" />
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
-                                                            <Template>
-                                                                <DxTextBox @bind-Text="@a.Street2" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Street 2" />
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
-                                                            <Template>
-                                                                <DxComboBox Data="@Provinces"
-                                                                            NullText="Select Province..."
-                                                                            @bind-Value="@a.ProvinceId"
-                                                                            TextFieldName="Name"
-                                                                            ValueFieldName="Id">
-                                                                </DxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
-                                                            <Template>
-                                                                <DxComboBox Data="@Cities.Where(x => x.ProvinceId == a.ProvinceId)"
-                                                                            NullText="Select City..."
-                                                                            @bind-Value="@a.CityId"
-                                                                            TextFieldName="Name"
-                                                                            ValueFieldName="Id">
-                                                                </DxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="3" Column="0" CssClass="mt">
-                                                            <Template>
-                                                                <DxComboBox Data="@Countries.Where(x => a.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == a.ProvinceId)?.CountryId)"
-                                                                            NullText="Select Country..."
-                                                                            @bind-Value="@a.CountryId"
-                                                                            TextFieldName="Name"
-                                                                            ValueFieldName="Id">
-                                                                </DxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="3" Column="1" CssClass="ml">
-                                                            <Template>
-                                                                <DxTextBox @bind-Text="@a.Zip" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Postal Code" />
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                    </Items>
-                                                </DxGridLayout>
-                                            </Template>
-                                        </DxFormLayoutItem>
-                                    </DxFormLayout>
-                                </DxFormLayout>
-                            </EditFormTemplate>
-                        </DxGrid>
+                                        </DxFormLayout>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="row  justify-content-end">
+                                            <div class="col-auto align-self-end">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnCancel"></DxButton>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </EditForm>
+                            }
+                            else if (!showForm && isDetail)
+                            {
+                                <div class="card-header">
+                                    <div class="row  justify-content-beetween">
+                                        <div class="col-4 align-self-start">
+                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Edit" SubmitFormOnClick="true" Click="EditItem_Click"></DxButton>
+                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancel"></DxButton>
+                                        </div>
+                                    </div>
+                                </div>
+                                @* @if() *@
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h4 class="align-content-center">Information Detail Company</h4>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4 justify-content-md-around">
+                                        <div class="col-lg-10">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>Name</label>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <p>:</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p>@DetailCompanies.Name</p>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+
+                                                    <div class="row">
+
+                                                        <div class="col-md-4">
+                                                            <label>Email</label>
+                                                        </div>
+                                                        <div class="col-md">
+                                                            <p>:</p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p>@DetailCompanies.Email</p>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label>Phone Number</label>
+                                                        </div>
+                                                        <div class="col-md">
+                                                            <p>:</p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p>@DetailCompanies.Phone</p>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <div class="col-md-3">
+                                                            <label>Vat</label>
+                                                        </div>
+                                                        <div class="col-md">
+                                                            <p>:</p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p>@DetailCompanies.VAT</p>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label>Website</label>
+                                                        </div>
+                                                        <div class="col-md">
+                                                            <p>:</p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p>@DetailCompanies.Website</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>Adddress</label>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <p>:</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p>@DetailCompanies.Street1, @DetailCompanies.Street2, @DetailCompanies.ProvinceId</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div> 
+}
