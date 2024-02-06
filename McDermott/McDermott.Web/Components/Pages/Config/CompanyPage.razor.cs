@@ -6,6 +6,7 @@ using Blazored.LocalStorage;
 using System.ComponentModel.DataAnnotations;
 using DevExpress.Data.XtraReports.Native;
 using McDermott.Web.Components.Layout;
+using McDermott.Domain.Entities;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -14,6 +15,8 @@ namespace McDermott.Web.Components.Pages.Config
         private CompanyDto CompanyForm = new();
 
         public List<CompanyDto> Companys = new();
+        public CompanyDto formCompanies = new();
+        public CompanyDto DetailCompanies = new();
         public List<CountryDto> Countries { get; set; }
         public List<ProvinceDto> Provinces { get; set; }
         public List<CityDto> Cities { get; set; }
@@ -21,13 +24,21 @@ namespace McDermott.Web.Components.Pages.Config
 
         #region Default Grid Components
 
+        private bool showForm { get; set; } = false;
+        private bool isDetail { get; set; } = false;
+        private string textPopUp = "";
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
+        private bool PanelVisible { get; set; } = true;
 
         private async Task LoadData()
         {
+            showForm = false;
+            PanelVisible = true;
             Companys = await Mediator.Send(new GetCompanyQuery());
+            //DetailCompanies = [.. Companys.ToList()];
+            PanelVisible = false;
         }
 
         protected override async Task OnInitializedAsync()
@@ -66,11 +77,26 @@ namespace McDermott.Web.Components.Pages.Config
             }
         }
 
-        private async Task OnSave(GridEditModelSavingEventArgs e)
+        private void OnCancel()
+        {
+            formCompanies = new();
+            showForm = false;
+            isDetail = false;
+        }
+
+        private async Task OnRowDoubleClick(GridRowClickEventArgs e)
+        {
+            showForm = false;
+            isDetail = true;
+            var company = SelectedDataItems[0].Adapt<CompanyDto>();
+            DetailCompanies = company;
+        }
+
+        private async Task OnSave()
         {
             try
             {
-                var editModel = (CompanyDto)e.EditModel;
+                var editModel = formCompanies;
 
                 if (editModel.Id == 0)
                     await Mediator.Send(new CreateCompanyRequest(editModel));
@@ -133,12 +159,19 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItem_Click()
         {
+            isDetail = false;
+            showForm = true;
+            textPopUp = "Add Data Companies";
             await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            var company = SelectedDataItems[0].Adapt<CompanyDto>();
+            formCompanies = company;
+            showForm = true;
+            isDetail = false;
+            textPopUp = "Edit Data Companies";
         }
 
         private void DeleteItem_Click()
