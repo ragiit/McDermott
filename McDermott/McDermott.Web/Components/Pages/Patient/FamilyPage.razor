@@ -76,14 +76,15 @@
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
                                                 <div class="pop-warning">
-                                                    @EditFormContext.GetEditor("Name")
+                                                    <DxTextBox NullText="Name" @bind-Text="@a.Name" />
                                                 </div>
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem Caption="Inverse Relation:" ColSpanMd="12">
-                                                <DxComboBox Data="@Relation"
+                                                <DxComboBox Data="@relations"
                                                             NullText="Select Relation..."
-                                                            @bind-Value="@a.Relation">
+                                                            @bind-Value="@relation"
+                                                            >
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
                                         </DxFormLayout>

@@ -154,15 +154,17 @@
                                              </div>
                                              <div class="col-md-6">
                                                  <DxFormLayout CssClass="mt ">
-                                                     <DxFormLayoutItem Caption="Docter" ColSpanMd="12">
+                                                   @*   <DxFormLayoutItem Caption="Docter" ColSpanMd="12">
                                                          <DxComboBox Data="@IsPratition"
                                                                      NullText="Docter"
-                                                                     @bind-Value="@FormRegis.PratitionerId" TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
-                                                     </DxFormLayoutItem>
+                                                                     @bind-Value="@FormRegis.PratitionerId"                                                                     
+                                                                     ValueChanged="@((DoctorScheduleDto Docter)=> SelectedService(Docter))"
+                                                                     InputId="CbDoctoreName"></DxComboBox>
+                                                     </DxFormLayoutItem> *@
                                                      <DxFormLayoutItem Caption="Service" ColSpanMd="12">
-                                                         <DxComboBox Data="@Services"
+                                                         <DxComboBox Data="@Names"
                                                                      NullText="Service.."
-                                                                     @bind-Value="@FormRegis.ServiceId" TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
+                                                                     @bind-Value="@SelectedNames" TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
                                                      </DxFormLayoutItem>
                                                      <DxFormLayoutItem Caption="Payment Methode" ColSpanMd="12">
                                                          <DxComboBox Data="@Payments"

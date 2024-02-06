@@ -1,8 +1,9 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using McDermott.Domain.Entities;
-using MediatR;
+using Microsoft.AspNetCore.Components;
+using Microsoft.CodeAnalysis.Text;
+using System;
 using System.Globalization;
-using static Azure.Core.HttpHeader;
 using static McDermott.Application.Features.Commands.CompanyCommand;
 using static McDermott.Application.Features.Commands.DoctorScheduleCommand;
 using static McDermott.Application.Features.Commands.GeneralConsultanServiceCommand;
@@ -25,7 +26,10 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<UserDto> IsPratition = new();
         private List<string> Insurances = new();
         private List<ServiceDto> Services = new();
-        private List<DoctorScheduleDto> DoctorSchedules = new List<DoctorScheduleDto>();
+
+        private IEnumerable<DoctorScheduleDto> SelectedSchedules = [];
+        private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
+        private List<string> Names { get; set; } = new();
 
         #endregion Relation Data
 
@@ -131,16 +135,12 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private int SelectedService
+        private void SelectedService(DoctorScheduleDto docter)
         {
-            get => PractitionerId;
-            set
-            {
-                int PractitionerId = value; InvokeAsync(StateHasChanged);
-                this.PractitionerId = value;
-
-                //List<string> item = DoctorSchedules.Where(x => x.PhysicionIds == PractitionerId).ToList();
-            }
+            //var selectedServices = DoctorScheduleDto
+            //    .Where(service => PhysicionIds.Any(physicionId =>
+            //        physicions.Any(physicion => physicion.Id == physicionId && service.PhysicionIds.Contains(physicionId.Id))))
+            //    .ToList();
         }
 
         private async Task SelectData()
