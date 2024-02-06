@@ -28,7 +28,7 @@ namespace McDermott.Web.Components.Pages.Patient
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Familys = await Mediator.Send(new GetFamilyQuery());
-            relations = [.. Familys.Where(x => x.Relation == null || x.Relation == "").Select(x => x.Name)];
+            relations = [.. Familys.Where(x => x.Relation == null || x.Relation == "").Select(x => x.Name).ToList()];
             PanelVisible = false;
         }
 
