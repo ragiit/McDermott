@@ -13,6 +13,10 @@ namespace McDermott.Domain.Entities
         public int? ServiceId { get; set; }
         public int? PratitionerId { get; set; }
         public int? ClassType { get; set; }
+        public int? Status { get; set; }
+        public string? Method { get; set; }
+        public string? AdmissionQueue { get; set; }
+        public string? Payment {  get; set; }
         public string? NoRM { get; set; }
         public string? IdentityNumber { get; set; }
         public DateTime? BirthDay { get; set; }

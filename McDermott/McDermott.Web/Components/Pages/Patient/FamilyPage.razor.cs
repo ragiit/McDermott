@@ -1,5 +1,6 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using static McDermott.Application.Features.Commands.FamilyCommand;
+
 namespace McDermott.Web.Components.Pages.Patient
 {
     public partial class FamilyPage
@@ -8,36 +9,34 @@ namespace McDermott.Web.Components.Pages.Patient
 
         public IGrid Grid { get; set; }
         private List<FamilyDto> Familys = new();
+        private List<FamilyDto> relations = new();
+        private string? relation { get; set; } = string.Empty;
+        private string? name { get; set; } = string.Empty;
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
 
-        private List<string> Relation = new List<string>
-        {
-            "Sibling",
-            "Parents",
-            "Childer",
-            "Wife",
-            "Husband"
-        };
-
         protected override async Task OnInitializedAsync()
         {
             await LoadData();
         }
+
         private async Task LoadData()
         {
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Familys = await Mediator.Send(new GetFamilyQuery());
+            relations = [.. Familys.Where(x => x.Relation == null || x.Relation == "").ToList()];
             PanelVisible = false;
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
+
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsEnabled = enabled;
@@ -48,6 +47,7 @@ namespace McDermott.Web.Components.Pages.Patient
             FocusedRowVisibleIndex = args.VisibleIndex;
             UpdateEditItemsEnabled(true);
         }
+
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -60,13 +60,16 @@ namespace McDermott.Web.Components.Pages.Patient
                 e.CssClass = "header-bold";
             }
         }
+
         private async Task NewItem_Click()
         {
+            relation = string.Empty;
             await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
+            relation = string.Empty;
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
@@ -74,16 +77,18 @@ namespace McDermott.Web.Components.Pages.Patient
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+
         private void ColumnChooserButton_Click()
         {
             Grid.ShowColumnChooser();
         }
+
         private async Task ExportXlsxItem_Click()
         {
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
             {
                 ExportSelectedRowsOnly = true,
-            }); 
+            });
         }
 
         private async Task ExportXlsItem_Click()
@@ -93,6 +98,7 @@ namespace McDermott.Web.Components.Pages.Patient
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task ExportCsvItem_Click()
         {
             await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
@@ -100,6 +106,7 @@ namespace McDermott.Web.Components.Pages.Patient
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             if (SelectedDataItems is null)
@@ -113,18 +120,47 @@ namespace McDermott.Web.Components.Pages.Patient
             }
             await LoadData();
         }
+
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             var editModel = (FamilyDto)e.EditModel;
+            name = editModel.Name;
 
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
+            //var invers = Familys.Where(x => x.Name == relation).Select(x => x.Id).FirstOrDefault();
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateFamilyRequest(editModel));
+            if (relation == null || relation == "")
+            {
+                if (string.IsNullOrWhiteSpace(editModel.Name))
+                    return;
+
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateFamilyRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateFamilyRequest(editModel));
+            }
             else
-                await Mediator.Send(new UpdateFamilyRequest(editModel));
+            {
+                editModel.Relation = relation + "-" + name;
+                if (string.IsNullOrWhiteSpace(editModel.Name))
+                    return;
 
+                if (editModel.Id == 0)
+                {
+                    await Mediator.Send(new CreateFamilyRequest(editModel));
+
+                    var invers = Familys.Where(x => x.Name == relation).Select(x => x.Id).FirstOrDefault();
+
+                    editModel.Id = invers;
+                    editModel.Name = relation;
+                    editModel.Relation = name + "-" + relation;
+                    await Mediator.Send(new UpdateFamilyRequest(editModel));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateFamilyRequest(editModel));
+                }
+            }
+            relations.Clear();
             await LoadData();
         }
     }
