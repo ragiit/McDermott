@@ -1,0 +1,80 @@
+﻿@using static McDermott.Application.Features.Commands.UserCommand
+@using static McDermott.Application.Features.Commands.DoctorScheduleCommand
+
+<DxGrid Data="DoctorSchedules"
+        @ref="Grid"
+        PageSize="5"
+        ShowSearchBox="true"
+        AutoExpandAllGroupRows="true" KeyboardNavigationEnabled="true">
+    <Columns>
+        <DxGridDataColumn FieldName="Name" Caption="Name" SortIndex="0" />
+        <DxGridDataColumn FieldName="Service.Name" Caption="Service" SortIndex="0" />
+    </Columns>
+    <DetailRowTemplate>
+        <GridDoctorScheduleSlotNestedGridDetailContent2 DoctorScheduleDtos="(DoctorScheduleDto)context.DataItem" />
+    </DetailRowTemplate>
+</DxGrid>
+
+@code {
+    private IGrid Grid { get; set; }
+
+    [Parameter]
+    public DoctorScheduleDto DoctorSchedule { get; set; } = new();
+
+    [Parameter]
+    public List<int> DoctorScheduleIds { get; set; } = [];
+
+    private List<GridDetailDoctorSchedulePhysicians> DoctorScheduleSlots { get; set; } = [];
+
+    public class GridDetailDoctorSchedulePhysicians
+    {
+        public int DoctorScheduleId { get; set; }
+        public string Physician { get; set; } = string.Empty;
+    }
+
+    public List<DoctorScheduleDto> DoctorSchedules { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (DoctorScheduleIds is not null)
+        {
+            var result = new List<DoctorScheduleDto>();
+
+            foreach (var id in DoctorScheduleIds)
+            {
+                result.Add(await Mediator.Send(new GetDoctorScheduleByIdQuery(id)));
+            }
+
+            DoctorSchedules = result;
+        }
+    }
+
+    private void ColumnChooserButton_Click()
+    {
+        Grid.ShowColumnChooser();
+    }
+
+    private async Task ExportXlsxItem_Click()
+    {
+        await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            }); ;
+    }
+
+    private async Task ExportCsvItem_Click()
+    {
+        await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
+            {
+                ExportSelectedRowsOnly = true,
+            });
+    }
+
+    private async Task ExportXlsItem_Click()
+    {
+        await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+    }
+}

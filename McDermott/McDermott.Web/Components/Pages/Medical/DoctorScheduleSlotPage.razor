@@ -1,0 +1,80 @@
+﻿@page "/medical/doctor-schedule-slot"
+@using McDermott.Web.Components.Layout
+@using static McDermott.Application.Features.Commands.MenuCommand
+@rendermode InteractiveServer
+
+<PageTitle>McDermott - Doctor Schedule Slot</PageTitle>
+
+@if (IsAccess)
+{
+    <div class="wrapper">
+
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Doctor Schedule Slots" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+
+                                    <DxGrid @ref="Grid"
+                                            Data="DoctorScheduleGrids"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            AllowSelectRowByClick="true"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="PhysicionId"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            FocusedRowEnabled="true"
+                                            DataItemDeleting="OnDelete"
+                                            PopupEditFormCssClass="pw-800"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            PagerVisibleNumericButtonCount="10"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            AutoExpandAllGroupRows="true"
+                                            ShowFilterRow="true"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem Text="Edit" Click="Edit_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && DoctorScheduleGrids.Count > 0" />
+                                                <DxToolbarItem Text="Delete" Click="Delete_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && DoctorScheduleGrids.Count > 0" />
+
+                                                <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="Physicion" Caption="Physicion" SortIndex="0" />
+                                        </Columns>
+                                        <DetailRowTemplate>
+                                            <GridDoctorScheduleSlotNestedGridDetailContent DoctorScheduleIds="((DoctorScheduleGrid)context.DataItem).DoctorScheduleIds" />
+                                        </DetailRowTemplate>
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}

@@ -1,0 +1,61 @@
+﻿@using static McDermott.Application.Features.Commands.UserCommand
+@using static McDermott.Application.Features.Commands.DoctorScheduleCommand
+
+<DxGrid Data="DoctorScheduleSlots"
+        @ref="Grid"
+        PageSize="5"
+        ShowSearchBox="true"
+        AutoExpandAllGroupRows="true" KeyboardNavigationEnabled="true">
+    <Columns>
+        <DxGridDataColumn FieldName="StartDate" SortIndex="0" />
+        <DxGridDataColumn FieldName="WorkFromFormatString" Caption="Work From" />
+        <DxGridDataColumn FieldName="WorkToFormatString" Caption="Work To" />
+    </Columns>
+
+</DxGrid>
+
+@code {
+    private IGrid Grid { get; set; }
+
+    [Parameter]
+    public DoctorScheduleDto DoctorScheduleDtos { get; set; } = new();
+
+    private List<DoctorScheduleSlotDto> DoctorScheduleSlots = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (DoctorScheduleDtos is not null)
+        {
+            DoctorScheduleSlots = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(DoctorScheduleDtos.Id));
+        }
+    }
+
+    private void ColumnChooserButton_Click()
+    {
+        Grid.ShowColumnChooser();
+    }
+
+    private async Task ExportXlsxItem_Click()
+    {
+        await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            }); ;
+    }
+
+    private async Task ExportCsvItem_Click()
+    {
+        await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
+            {
+                ExportSelectedRowsOnly = true,
+            });
+    }
+
+    private async Task ExportXlsItem_Click()
+    {
+        await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+    }
+}

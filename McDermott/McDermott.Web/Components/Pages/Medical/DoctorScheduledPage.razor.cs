@@ -1,7 +1,11 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using Microsoft.AspNetCore.Components;
 using Microsoft.CodeAnalysis.Text;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.JSInterop;
+using OfficeOpenXml.Packaging.Ionic.Zlib;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using static McDermott.Application.Features.Commands.BuildingCommand;
 using static McDermott.Application.Features.Commands.DoctorScheduleCommand;
@@ -30,18 +34,20 @@ namespace McDermott.Web.Components.Pages.Medical
         };
 
         //public List<DoctorScheduleDetailDto> DoctorScheduleDetails = [];
-        public List<DoctorScheduleDetailDto> DeletedDoctorScheduleDetails = [];
 
         private List<ServiceDto> Services = [];
         private IEnumerable<UserDto> Users = [];
         private IEnumerable<UserDto> SelectedPhysicions = [];
         private List<DoctorScheduleDto> DoctorSchedules = [];
         private List<DoctorScheduleDto> Schedules = new List<DoctorScheduleDto>();
+
+        [Required]
         private IEnumerable<DoctorScheduleDto> SelectedSchedules = [];
+
         private DoctorScheduleDto DoctorSchedule = new();
 
         private List<DoctorScheduleDetailDto> DoctorScheduleDetails = [];
-        public List<DoctorScheduleDetailDto> DeletedDoctorSchedules = [];
+        public List<DoctorScheduleDetailDto> DeletedDoctorScheduleDetails = [];
 
         private DateTime StartDate = DateTime.Now;
         private DateTime EndDate = DateTime.Now;
@@ -81,6 +87,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private string DisplayFormat { get; } = string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator) ? "HH:mm" : "h:mm tt";
 
         private bool PanelVisible { get; set; } = true;
+        private bool LoadingGenerateScheduleDoctor { get; set; } = false;
         private bool IsAddMenu { get; set; } = false;
         private bool ShowForm { get; set; } = false;
         public IGrid Grid { get; set; }
@@ -176,8 +183,6 @@ namespace McDermott.Web.Components.Pages.Medical
             SelectedDataItems = new ObservableRangeCollection<object>();
             Buildings = await Mediator.Send(new GetBuildingQuery());
 
-            tt = Schedules[0];
-
             PanelVisible = false;
         }
 
@@ -187,28 +192,148 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 if (SelectedDataItems.Count == 1)
                 {
-                    await Mediator.Send(new DeleteBuildingRequest(SelectedDataItems[0].Adapt<BuildingDto>().Id));
+                    await Mediator.Send(new DeleteDoctorScheduleRequest(SelectedDataItems[0].Adapt<DoctorScheduleDto>().Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<BuildingDto>>();
-                    await Mediator.Send(new DeleteListBuildingRequest(a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<DoctorScheduleDto>>();
+                    await Mediator.Send(new DeleteListDoctorScheduleRequest(a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
             catch { }
         }
 
-        private async Task OnDeleteDoctorScheduleDetail(GridDataItemDeletingEventArgs e)
+        private void OnDeleteDoctorScheduleDetail(GridDataItemDeletingEventArgs e)
         {
             var aaa = SelectedDoctorScheduleDetailDataItems.Adapt<List<DoctorScheduleDetailDto>>();
-            //DoctorScheduleDetails.RemoveAll(x => aaa.Select(z => z.LocationId).Contains(x.LocationId));
+            DoctorScheduleDetails.RemoveAll(x => aaa.Select(z => z.Name).Contains(x.Name));
             SelectedDoctorScheduleDetailDataItems = new ObservableRangeCollection<object>();
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            Console.WriteLine("Megalodon Ganjar");
+            try
+            {
+                if (SelectedSchedules.IsNullOrEmpty())
+                    return;
+
+                #region MyRegion
+
+                //var addedSlots = new List<DoctorScheduleSlotDto>();
+                //var addedDetails = new List<DoctorScheduleDetailDto>();
+                //var result = new List<DoctorScheduleSlotDto>();
+
+                //for (DateTime date = StartDate; date < EndDate; date = date.Date.AddDays(1))
+                //{
+                //    var currentdate = date;
+                //    foreach (DoctorScheduleDto doctorSchedule in SelectedSchedules)
+                //    {
+                //        if (addedSlots.Any(x => x.DoctorScheduleId == doctorSchedule.Id))
+                //        {
+                //            if (!addedSlots.Any(x => x.DoctorScheduleId == doctorSchedule.Id && x.StartDate.Date == date.Date))
+                //            {
+                //                var checkDayOfWeek = addedDetails.FirstOrDefault(x => x.DoctorScheduleId == doctorSchedule.Id && x.DayOfWeek.Trim().Equals(date.DayOfWeek.ToString().Trim()));
+
+                //                if (checkDayOfWeek is not null)
+                //                {
+                //                    result.Add(new DoctorScheduleSlotDto
+                //                    {
+                //                        DoctorScheduleId = doctorSchedule.Id,
+                //                        StartDate = date.Date
+                //                    });
+                //                }
+                //            }
+                //            continue;
+                //        }
+
+                //        var checkSlotTemp = addedSlots.FirstOrDefault(x => x.DoctorScheduleId == doctorSchedule.Id && x.StartDate.Date == date.Date);
+
+                //        if (checkSlotTemp is null)
+                //        {
+                //            var scheduleSlots = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(doctorSchedule.Id));
+                //            addedSlots.AddRange(scheduleSlots);
+
+                //            var details = await Mediator.Send(new GetDoctorScheduleDetailByScheduleIdQuery(doctorSchedule.Id));
+                //            addedDetails.AddRange(details);
+
+                //            if (scheduleSlots.FirstOrDefault(x => x.DoctorScheduleId == doctorSchedule.Id && x.StartDate.Date == date.Date) is not null)
+                //                continue;
+
+                //            var checkDayOfWeek = addedDetails.FirstOrDefault(x => x.DoctorScheduleId == doctorSchedule.Id && x.DayOfWeek.Trim().Equals(date.DayOfWeek.ToString().Trim()));
+
+                //            if (checkDayOfWeek is not null)
+                //            {
+                //                result.Add(new DoctorScheduleSlotDto
+                //                {
+                //                    DoctorScheduleId = doctorSchedule.Id,
+                //                    StartDate = date.Date
+                //                });
+                //            }
+                //        }
+                //    }
+                //}
+
+                #endregion MyRegion
+
+                #region MyRegion
+
+                var addedSlots = new List<DoctorScheduleSlotDto>();
+                var addedDetails = new List<DoctorScheduleDetailDto>();
+                var result = new List<DoctorScheduleSlotDto>();
+
+                for (DateTime date = StartDate; date < EndDate; date = date.Date.AddDays(1))
+                {
+                    foreach (DoctorScheduleDto doctorSchedule in SelectedSchedules)
+                    {
+                        if (!addedSlots.Any(x => x.DoctorScheduleId == doctorSchedule.Id))
+                        {
+                            var scheduleSlots = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(doctorSchedule.Id));
+                            addedSlots.AddRange(scheduleSlots);
+
+                            var details = await Mediator.Send(new GetDoctorScheduleDetailByScheduleIdQuery(doctorSchedule.Id));
+                            addedDetails.AddRange(details);
+
+                            if (scheduleSlots.FirstOrDefault(x => x.DoctorScheduleId == doctorSchedule.Id && x.StartDate.Date == date.Date) is not null)
+                                continue;
+                        }
+
+                        var checkSlotTemp = addedSlots.FirstOrDefault(x => x.DoctorScheduleId == doctorSchedule.Id && x.StartDate.Date == date.Date);
+
+                        if (checkSlotTemp is null)
+                        {
+                            var checkDayOfWeek = addedDetails.Where(x => x.DoctorScheduleId == doctorSchedule.Id && x.DayOfWeek.Trim().Equals(date.DayOfWeek.ToString().Trim())).ToList();
+
+                            if (checkDayOfWeek is not null && checkDayOfWeek.Count > 0)
+                            {
+                                checkDayOfWeek.ForEach(x =>
+                                {
+                                    result.Add(new DoctorScheduleSlotDto
+                                    {
+                                        WorkFrom = x.WorkFrom,
+                                        WorkTo = x.WorkTo,
+                                        DoctorScheduleId = doctorSchedule.Id,
+                                        StartDate = date.Date
+                                    });
+                                });
+                            }
+                        }
+                    }
+                }
+
+                #endregion MyRegion
+
+                await Mediator.Send(new CreateDoctorScheduleSlotRequest(result));
+            }
+            catch { }
+        }
+
+        private async Task OnRowClick(GridRowClickEventArgs e)
+        {
+            var a = e.Grid.GetRowValue(e.VisibleIndex, "Name");
+            var b = e.Grid.GetRowValue(e.VisibleIndex, "Id");
+            var c = e.Grid.GetRowValue(e.VisibleIndex, "Service");
+            // await JsRuntime.InvokeVoidAsync("alert", $"{a} {b} {c}"); // Alert
         }
 
         private async Task OnSaveDoctorScheduleDetail(GridEditModelSavingEventArgs e)
@@ -228,12 +353,13 @@ namespace McDermott.Web.Components.Pages.Medical
             }
             else
             {
-                if (!DoctorScheduleDetails.Where(x => x.Name == DoctorScheduleDetail.Name).Any())
+                var q = SelectedDoctorScheduleDetailDataItems[0].Adapt<DoctorScheduleDetailDto>();
+                var check = DoctorScheduleDetails.FirstOrDefault(x => x.Name == q.Name);
+
+                if (check is not null && check.Name != DoctorScheduleDetail.Name)
                     return;
 
-                var q = SelectedDoctorScheduleDetailDataItems[0].Adapt<DoctorScheduleDetailDto>();
-
-                updateBuilding = DoctorScheduleDetails.FirstOrDefault(x => x.Name == DoctorScheduleDetail.Name)!;
+                updateBuilding = DoctorScheduleDetails.FirstOrDefault(x => x.Name == q.Name)!;
                 DoctorScheduleDetail.Service = Services.FirstOrDefault(x => x.Id == DoctorScheduleDetail.ServiceId);
                 var index = DoctorScheduleDetails.IndexOf(updateBuilding!);
                 DoctorScheduleDetails[index] = DoctorScheduleDetail;
@@ -287,7 +413,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
                 if (DoctorSchedule != null)
                 {
-                    DeletedDoctorSchedules = await Mediator.Send(new GetDoctorScheduleDetailByScheduleIdQuery(DoctorSchedule.Id));
+                    DeletedDoctorScheduleDetails = await Mediator.Send(new GetDoctorScheduleDetailByScheduleIdQuery(DoctorSchedule.Id));
                     DoctorScheduleDetails = await Mediator.Send(new GetDoctorScheduleDetailByScheduleIdQuery(DoctorSchedule.Id));
                     var a = Users.Where(x => DoctorSchedule.PhysicionIds != null && DoctorSchedule.PhysicionIds.Contains(x.Id)).ToList();
                     SelectedPhysicions = a;
@@ -377,6 +503,7 @@ namespace McDermott.Web.Components.Pages.Medical
             DoctorScheduleDetails.ForEach(x =>
             {
                 x.Id = 0;
+                x.DoctorSchedule = null;
                 x.DoctorScheduleId = DoctorSchedule.Id == 0 ? result.Id : DoctorSchedule.Id;
                 x.Service = null;
             });

@@ -14,6 +14,16 @@
             }
         }
 
+        public class GetDoctorScheduleSlotByDoctorScheduleIdRequest : IRequest<List<DoctorScheduleSlotDto>>
+        {
+            public int DoctorScheduleId { get; set; }
+
+            public GetDoctorScheduleSlotByDoctorScheduleIdRequest(int DoctorScheduleId)
+            {
+                this.DoctorScheduleId = DoctorScheduleId;
+            }
+        }
+
         public class GetDoctorScheduleDetailByScheduleIdQuery : IRequest<List<DoctorScheduleDetailDto>>
         {
             public int DoctorScheduleId { get; set; }
@@ -31,6 +41,16 @@
             public CreateDoctorScheduleDetailRequest(List<DoctorScheduleDetailDto> DoctorScheduleDetailDtos)
             {
                 this.DoctorScheduleDetailDtos = DoctorScheduleDetailDtos;
+            }
+        }
+
+        public class CreateDoctorScheduleSlotRequest : IRequest<bool>
+        {
+            public List<DoctorScheduleSlotDto> DoctorScheduleSlotDto { get; set; }
+
+            public CreateDoctorScheduleSlotRequest(List<DoctorScheduleSlotDto> DoctorScheduleSlotDto)
+            {
+                this.DoctorScheduleSlotDto = DoctorScheduleSlotDto;
             }
         }
 

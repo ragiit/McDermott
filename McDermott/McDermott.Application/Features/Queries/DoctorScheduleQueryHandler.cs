@@ -25,6 +25,107 @@ namespace McDermott.Application.Features.Queries
             }
         }
 
+        internal class GetDoctorScheduleSlotByDoctorScheduleIdQuery : IRequestHandler<GetDoctorScheduleSlotByDoctorScheduleIdRequest, List<DoctorScheduleSlotDto>>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public GetDoctorScheduleSlotByDoctorScheduleIdQuery(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<List<DoctorScheduleSlotDto>> Handle(GetDoctorScheduleSlotByDoctorScheduleIdRequest request, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    return await _unitOfWork.Repository<DoctorScheduleSlot>().Entities
+                            .Include(x => x.DoctorSchedule)
+                            .Where(x => x.DoctorScheduleId == request.DoctorScheduleId)
+                            .Select(x => x.Adapt<DoctorScheduleSlotDto>())
+                            .AsNoTracking()
+                            .ToListAsync(cancellationToken); 
+                }
+                catch
+                {
+                    return [];
+                }
+            }
+        }
+
+        internal class DeleteDoctorScheduleHandler : IRequestHandler<DeleteDoctorScheduleRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public DeleteDoctorScheduleHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(DeleteDoctorScheduleRequest request, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    await _unitOfWork.Repository<DoctorSchedule>().DeleteAsync(request.Id);
+
+                    var doctorScheduleDetailsa = await _unitOfWork.Repository<DoctorScheduleDetail>().GetAllAsync();
+                    var doctorScheduleSlots = await _unitOfWork.Repository<DoctorScheduleSlot>().GetAllAsync();
+
+                    foreach (var item in doctorScheduleDetailsa.Where(x => x.DoctorScheduleId == request.Id).ToList())
+                    {
+                        await _unitOfWork.Repository<DoctorScheduleDetail>().DeleteAsync(item.Id);
+                    }
+
+                    foreach (var item in doctorScheduleSlots.Where(x => x.DoctorScheduleId == request.Id).ToList())
+                    {
+                        await _unitOfWork.Repository<DoctorScheduleSlot>().DeleteAsync(item.Id);
+                    }
+
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    throw;
+                }
+            }
+        }
+
+        internal class DeleteListDoctorScheduleHandler : IRequestHandler<DeleteListDoctorScheduleRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public DeleteListDoctorScheduleHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(DeleteListDoctorScheduleRequest request, CancellationToken cancellationToken)
+            {
+                await _unitOfWork.Repository<DoctorSchedule>().DeleteAsync(request.Id);
+
+                foreach (var item1 in request.Id)
+                {
+                    var doctorScheduleDetailsa = await _unitOfWork.Repository<DoctorScheduleDetail>().GetAllAsync();
+                    var doctorScheduleSlots = await _unitOfWork.Repository<DoctorScheduleSlot>().GetAllAsync();
+
+                    foreach (var item in doctorScheduleDetailsa.Where(x => x.DoctorScheduleId == item1).ToList())
+                    {
+                        await _unitOfWork.Repository<DoctorScheduleDetail>().DeleteAsync(item.Id);
+                    }
+
+                    foreach (var item in doctorScheduleSlots.Where(x => x.DoctorScheduleId == item1).ToList())
+                    {
+                        await _unitOfWork.Repository<DoctorScheduleSlot>().DeleteAsync(item.Id);
+                    }
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return true;
+            }
+        }
+
         internal class CreateDoctorScheduleDetailHandler : IRequestHandler<CreateDoctorScheduleDetailRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -42,6 +143,35 @@ namespace McDermott.Application.Features.Queries
                     {
                         await _unitOfWork.Repository<DoctorScheduleDetail>().AddAsync(item.Adapt<DoctorScheduleDetail>());
                     }
+
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+            }
+        }
+
+        internal class CreateDoctorScheduleSlotRequestHandler : IRequestHandler<CreateDoctorScheduleSlotRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public CreateDoctorScheduleSlotRequestHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<bool> Handle(CreateDoctorScheduleSlotRequest request, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    request.DoctorScheduleSlotDto.ForEach(async x =>
+                    {
+                        await _unitOfWork.Repository<DoctorScheduleSlot>().AddAsync(x.Adapt<DoctorScheduleSlot>());
+                    });
 
                     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -111,7 +241,7 @@ namespace McDermott.Application.Features.Queries
 
             public async Task<DoctorScheduleDto> Handle(GetDoctorScheduleByIdQuery request, CancellationToken cancellationToken)
             {
-                var result = await _unitOfWork.Repository<DoctorSchedule>().GetByIdAsync(request.Id);
+                var result = await _unitOfWork.Repository<DoctorSchedule>().Entities.Include(x => x.Service).AsNoTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
 
                 return result.Adapt<DoctorScheduleDto>();
             }

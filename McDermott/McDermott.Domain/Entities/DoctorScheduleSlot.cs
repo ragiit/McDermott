@@ -10,6 +10,9 @@ namespace McDermott.Domain.Entities
     {
         public int DoctorScheduleId { get; set; }
         public DateTime StartDate { get; set; }
+        public TimeSpan WorkFrom { get; set; }  
+
+        public TimeSpan WorkTo { get; set; }  
 
         public virtual DoctorSchedule? DoctorSchedule { get; set; }
     }
