@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240206021611_RemoveServiceColumnDoctorScheduleDetail")]
+    partial class RemoveServiceColumnDoctorScheduleDetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -600,9 +603,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int>("DoctorScheduleId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PhysicianId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -621,8 +621,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DoctorScheduleId");
-
-                    b.HasIndex("PhysicianId");
 
                     b.ToTable("DoctorScheduleSlots");
                 });
@@ -818,9 +816,6 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdmissionQueue")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("BirthDay")
                         .HasColumnType("datetime2");
 
@@ -842,25 +837,16 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int?>("InsuranceId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Method")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("NoRM")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("PatientId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Payment")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("PratitionerId")
                         .HasColumnType("int");
 
                     b.Property<int?>("ServiceId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("TypeRegistration")
@@ -1918,14 +1904,7 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("McDermott.Domain.Entities.User", "Physician")
-                        .WithMany()
-                        .HasForeignKey("PhysicianId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("DoctorSchedule");
-
-                    b.Navigation("Physician");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.EmailTemplate", b =>

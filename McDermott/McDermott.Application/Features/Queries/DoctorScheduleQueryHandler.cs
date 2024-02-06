@@ -220,8 +220,7 @@ namespace McDermott.Application.Features.Queries
 
             public async Task<List<DoctorScheduleDetailDto>> Handle(GetDoctorScheduleDetailByScheduleIdQuery query, CancellationToken cancellationToken)
             {
-                return await _unitOfWork.Repository<DoctorScheduleDetail>().Entities
-                     .Include(x => x.Service)
+                return await _unitOfWork.Repository<DoctorScheduleDetail>().Entities 
                      .Include(x => x.DoctorSchedule)
                      .Where(x => x.DoctorScheduleId == query.DoctorScheduleId)
                      .Select(x => x.Adapt<DoctorScheduleDetailDto>())

@@ -52,32 +52,41 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             PanelVisible = true;
 
-            var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
-
-            var users = await Mediator.Send(new GetUserQuery());
-
-            schedules.ForEach(schedule =>
+            try
             {
-                var physicions = schedule.PhysicionIds;
+                var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
 
-                physicions!.ForEach(physicions =>
+                var users = await Mediator.Send(new GetUserQuery());
+
+                foreach (var schedule in schedules)
                 {
-                    var doctorScheduleGrids = DoctorScheduleGrids.FirstOrDefault(x => x.PhysicionId == physicions);
-                    if (doctorScheduleGrids is null)
+                    var physicions = schedule.PhysicionIds;
+
+                    foreach (var physicion in physicions!)
                     {
-                        DoctorScheduleGrids.Add(new DoctorScheduleGrid
+                        var doctorScheduleGrids = DoctorScheduleGrids.FirstOrDefault(x => x.PhysicionId == physicion);
+                        if (doctorScheduleGrids is null)
                         {
-                            PhysicionId = physicions,
-                            Physicion = users.FirstOrDefault(x => x.Id == physicions)!.Name,
-                            DoctorScheduleIds = [schedule.Id],
-                        });
+                            var a = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(schedule.Id));
+
+                            if (a.Count > 0)
+                            { 
+                                DoctorScheduleGrids.Add(new DoctorScheduleGrid
+                                {
+                                    PhysicionId = physicion,
+                                    Physicion = users.FirstOrDefault(x => x.Id == physicion)!.Name,
+                                    DoctorScheduleIds = [schedule.Id],
+                                });
+                            }
+                        }
+                        else
+                        {
+                            doctorScheduleGrids.DoctorScheduleIds.Add(schedule.Id);
+                        }
                     }
-                    else
-                    {
-                        doctorScheduleGrids.DoctorScheduleIds.Add(schedule.Id);
-                    }
-                });
-            });
+                }
+            }
+            catch { }
 
             PanelVisible = false;
         }

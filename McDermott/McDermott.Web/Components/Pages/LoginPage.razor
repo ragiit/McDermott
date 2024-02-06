@@ -14,7 +14,7 @@
 @inject ApplicationDbContext DataContext
 @inject CustomAuthenticationStateProvider CustomAuth
 
-<PageTitle>McDermott - Master Data Login</PageTitle>
+<PageTitle>McDermott - Login</PageTitle>
 
 <div class="hold-transition login-page">
     <div class="login-box">
@@ -56,15 +56,46 @@
 
                         <div class="col-auto align-self-end">
                             <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Sign In" SubmitFormOnClick="true" />
-                        </div> 
+                        </div>
                     </div>
-                </form> 
-            </div> 
-        </div> 
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
 @code {
+
+    private GroupMenuDto UserAccessCRUID = new();
+    private bool IsAccess = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await NavigationManager.CheckAccessUser(oLocal);
+            IsAccess = result.Item1;
+            UserAccessCRUID = result.Item2;
+        }
+        catch { }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            try
+            {
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
+            }
+            catch { }
+        }
+    }
+
     private void ClickLogin()
     {
         NavigationManager.NavigateTo("/", true);

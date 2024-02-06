@@ -11,6 +11,7 @@ namespace McDermott.Application.Dtos
     {
         public int Id { get; set; }
         public int DoctorScheduleId { get; set; }
+        public int? PhysicianId { get; set; }
         public DateTime StartDate { get; set; }
         public TimeSpan WorkFrom { get; set; } = DateTime.Now.TimeOfDay;
 
@@ -21,6 +22,8 @@ namespace McDermott.Application.Dtos
 
         public string WorkToFormatString
         { get { return WorkTo.ToString(string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator) ? @"HH\:mm" : @"hh\:mm"); } }
+
         public DoctorScheduleDto? DoctorSchedule { get; set; }
+        public UserDto? Physician { get; set; }
     }
 }
