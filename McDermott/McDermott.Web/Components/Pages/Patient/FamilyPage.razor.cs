@@ -28,7 +28,7 @@ namespace McDermott.Web.Components.Pages.Patient
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Familys = await Mediator.Send(new GetFamilyQuery());
-            relations = [.. Familys.Select(x => $"{x.Name} {x.Relation}").ToList()];
+            relations = [.. Familys.Where(x => x.Relation == null || x.Relation == "").Select(x => x.Name)];
             PanelVisible = false;
         }
 
@@ -63,11 +63,13 @@ namespace McDermott.Web.Components.Pages.Patient
 
         private async Task NewItem_Click()
         {
+            relation = string.Empty;
             await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
+            relation = string.Empty;
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
@@ -124,6 +126,8 @@ namespace McDermott.Web.Components.Pages.Patient
             var editModel = (FamilyDto)e.EditModel;
             name = editModel.Name;
 
+            //var invers = Familys.Where(x => x.Name == relation).Select(x => x.Id).FirstOrDefault();
+
             if (relation == null || relation == "")
             {
                 if (string.IsNullOrWhiteSpace(editModel.Name))
@@ -141,11 +145,22 @@ namespace McDermott.Web.Components.Pages.Patient
                     return;
 
                 if (editModel.Id == 0)
+                {
                     await Mediator.Send(new CreateFamilyRequest(editModel));
-                else
-                    await Mediator.Send(new UpdateFamilyRequest(editModel));
-            }
 
+                    var invers = Familys.Where(x => x.Name == relation).Select(x => x.Id).FirstOrDefault();
+
+                    editModel.Id = invers;
+                    editModel.Name = relation;
+                    editModel.Relation = name + "-" + relation;
+                    await Mediator.Send(new UpdateFamilyRequest(editModel));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateFamilyRequest(editModel));
+                }
+            }
+            relations.Clear();
             await LoadData();
         }
     }

@@ -17,6 +17,8 @@ namespace McDermott.Application.Dtos
 
         [StringLength(100)]
         public string? Relation {  get; set; }
+
+       
     }
 }
 
