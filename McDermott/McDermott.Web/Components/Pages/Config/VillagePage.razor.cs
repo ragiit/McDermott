@@ -8,6 +8,7 @@ using Microsoft.JSInterop;
 using McDermott.Web.Components.Layout;
 using McDermott.Domain.Entities;
 using McDermott.Application.Dtos.Config;
+using McDermott.Web.Extentions;
 
 namespace McDermott.Web.Components.Pages.Config
 {

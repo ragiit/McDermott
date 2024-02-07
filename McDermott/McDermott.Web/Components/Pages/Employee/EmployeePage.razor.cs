@@ -1,24 +1,56 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using McDermott.Application.Dtos.Config;
+using McDermott.Domain.Entities;
+using McDermott.Web.Extentions;
 using System.Security.Claims;
+using static McDermott.Application.Features.Commands.Employee.EmployeeCommand;
 
 namespace McDermott.Web.Components.Pages.Employee
 {
     public partial class EmployeePage
     {
+        private List<UserDto> Users = [];
+        public List<CityDto> Cities = [];
+        public List<CountryDto> Countries = [];
+        public List<ProvinceDto> Provinces = [];
+        public List<DistrictDto> Districts = [];
+        public List<VillageDto> Villages = [];
+        public List<DepartmentDto> Departments = [];
+        public List<JobPositionDto> JobPositions = [];
+        public List<ReligionDto> Religions = [];
+        public List<GenderDto> Genders = [];
+
+        private UserDto UserForm = new();
         private GroupMenuDto UserAccessCRUID = new();
+
         private bool PanelVisible = false;
+        private bool FormValidationState = true;
         private bool IsAccess = false;
         private bool ShowForm { get; set; } = false;
-        public IGrid Grid { get; set; }
-        private List<UserDto> Users = new();
-        private int FocusedRowVisibleIndex { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private bool IsDeleted { get; set; } = true;
+        private int FocusedRowVisibleIndex { get; set; }
+
+        public IGrid Grid { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+
+        private List<string> IdentityTypes = new()
+        {
+            "KTP",
+            "Paspor",
+            "SIM",
+            "VISA",
+        };
+
+        private List<string> MartialStatuss = new()
+        {
+            "Single",
+            "Married"
+        };
 
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+
             try
             {
                 var result = await NavigationManager.CheckAccessUser(oLocal);
@@ -26,6 +58,27 @@ namespace McDermott.Web.Components.Pages.Employee
                 UserAccessCRUID = result.Item2;
             }
             catch { }
+
+            Countries = await Mediator.Send(new GetCountryQuery());
+            Provinces = await Mediator.Send(new GetProvinceQuery());
+            Cities = await Mediator.Send(new GetCityQuery());
+            Districts = await Mediator.Send(new GetDistrictQuery());
+            Villages = await Mediator.Send(new GetVillageQuery());
+            Religions = await Mediator.Send(new GetReligionQuery());
+            Genders = await Mediator.Send(new GetGenderQuery());
+            Departments = await Mediator.Send(new GetDepartmentQuery());
+            JobPositions = await Mediator.Send(new GetJobPositionQuery());
+
+            await LoadData();
+        }
+
+        private async Task LoadData()
+        {
+            PanelVisible = true;
+
+            Users = await Mediator.Send(new GetUserEmployeeQuery());
+
+            PanelVisible = false;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -46,8 +99,41 @@ namespace McDermott.Web.Components.Pages.Employee
 
         #region Grid
 
+        private async Task HandleValidSubmit()
+        {
+            FormValidationState = true;
+
+            await OnSave();
+        }
+
+        private void HandleInvalidSubmit()
+        {
+            FormValidationState = false;
+        }
+
+        private void OnCancel()
+        {
+            UserForm = new();
+            ShowForm = false;
+        }
+
         private async Task OnSave()
         {
+            if (!FormValidationState)
+                return;
+
+            UserForm.IsEmployee = true;
+            UserForm.IsDoctor = false;
+            UserForm.IsNurse = false;
+            UserForm.IsPhysicion = false;
+            UserForm.IsUser = false;
+
+            if (UserForm.Id == 0)
+                await Mediator.Send(new CreateUserRequest(UserForm));
+            else
+                await Mediator.Send(new UpdateUserRequest(UserForm));
+
+            await LoadData();
         }
 
         private void ColumnChooserButton_Click()
@@ -65,26 +151,37 @@ namespace McDermott.Web.Components.Pages.Employee
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
-        private void OnDelete()
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
+            if (SelectedDataItems is null)
+            {
+                await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
+            }
+            else
+            {
+                var a = SelectedDataItems.Adapt<List<UserDto>>();
+
+                int userActive = (int)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
+
+                await Mediator.Send(new DeleteListUserRequest(a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
+            }
+            await LoadData();
         }
 
         private async Task NewItem_Click()
         {
+            UserForm = new();
+            ShowForm = true;
         }
 
-        private async Task EditItem_Click()
+        private void EditItem_Click()
         {
             try
-            {
-                var user = SelectedDataItems[0].Adapt<UserDto>();
+            { 
+                UserForm = SelectedDataItems[0].Adapt<UserDto>();
                 ShowForm = true;
             }
-            catch (Exception e)
-            {
-                var zz = e;
-            }
-            //await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            catch { }
         }
 
         private void DeleteItem_Click()

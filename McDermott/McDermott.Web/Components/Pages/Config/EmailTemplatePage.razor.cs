@@ -3,6 +3,7 @@ using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Config.UserCommand;
 using static McDermott.Application.Features.Commands.Config.EmailTemplateCommand;
 using McDermott.Application.Dtos.Config;
+using McDermott.Web.Extentions;
 
 namespace McDermott.Web.Components.Pages.Config
 {

@@ -1,6 +1,7 @@
 ﻿using DevExpress.Blazor.Internal;
 using DevExpress.Data.XtraReports.Native;
 using McDermott.Domain.Entities;
+using McDermott.Web.Extentions;
 using Microsoft.JSInterop;
 using System.ComponentModel.DataAnnotations;
 

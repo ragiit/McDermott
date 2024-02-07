@@ -7,6 +7,7 @@ using static McDermott.Application.Features.Commands.Medical.LocationCommand;
 using static McDermott.Application.Features.Commands.Config.ProvinceCommand;
 using McDermott.Application.Dtos.Config;
 using McDermott.Application.Dtos.Medical;
+using McDermott.Web.Extentions;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

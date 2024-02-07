@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Config
+﻿using McDermott.Web.Extentions;
+
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class GenderPage
     {

@@ -2,6 +2,7 @@
 using McDermott.Application.Dtos.Config;
 using McDermott.Application.Dtos.Medical;
 using McDermott.Domain.Entities;
+using McDermott.Web.Extentions;
 using Microsoft.JSInterop;
 using static McDermott.Application.Features.Commands.Config.CompanyCommand;
 using static McDermott.Application.Features.Commands.Medical.ServiceCommand;

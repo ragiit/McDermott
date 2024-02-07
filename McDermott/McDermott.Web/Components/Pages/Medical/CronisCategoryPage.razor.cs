@@ -4,6 +4,7 @@ using static McDermott.Application.Features.Commands.Medical.CronisCategoryComma
 using System.ComponentModel.DataAnnotations;
 using McDermott.Application.Dtos.Config;
 using McDermott.Application.Dtos.Medical;
+using McDermott.Web.Extentions;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
