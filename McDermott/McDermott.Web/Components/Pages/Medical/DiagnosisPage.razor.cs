@@ -1,8 +1,10 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.DiseaseCategoryCommand;
-using static McDermott.Application.Features.Commands.CronisCategoryCommand;
-using static McDermott.Application.Features.Commands.DiagnosisCommand;
+using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
+using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
+using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
+using McDermott.Application.Dtos.Config;
+using McDermott.Application.Dtos.Medical;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

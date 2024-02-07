@@ -1,10 +1,12 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using McDermott.Domain.Entities;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.CityCommand;
-using static McDermott.Application.Features.Commands.CountryCommand;
-using static McDermott.Application.Features.Commands.LocationCommand;
-using static McDermott.Application.Features.Commands.ProvinceCommand;
+using static McDermott.Application.Features.Commands.Config.CityCommand;
+using static McDermott.Application.Features.Commands.Config.CountryCommand;
+using static McDermott.Application.Features.Commands.Medical.LocationCommand;
+using static McDermott.Application.Features.Commands.Config.ProvinceCommand;
+using McDermott.Application.Dtos.Config;
+using McDermott.Application.Dtos.Medical;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

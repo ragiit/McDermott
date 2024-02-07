@@ -1,15 +1,6 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
-using Microsoft.CodeAnalysis.Text;
-using System;
 using System.Globalization;
-using static McDermott.Application.Features.Commands.CompanyCommand;
-using static McDermott.Application.Features.Commands.DoctorScheduleCommand;
-using static McDermott.Application.Features.Commands.GeneralConsultanServiceCommand;
-using static McDermott.Application.Features.Commands.InsuranceCommand;
-using static McDermott.Application.Features.Commands.ServiceCommand;
-using static McDermott.Application.Features.Commands.UserCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {

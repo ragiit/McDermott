@@ -1,7 +1,9 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Application.Dtos.Config;
+using McDermott.Application.Dtos.Employee;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.CompanyCommand;
-using static McDermott.Application.Features.Commands.DepartmentCommand;
+using static McDermott.Application.Features.Commands.Config.CompanyCommand;
+using static McDermott.Application.Features.Commands.Employee.DepartmentCommand;
 
 namespace McDermott.Web.Components.Pages.Employee
 {

@@ -1,5 +1,6 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Razor.Language.Extensions;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.JSInterop;
@@ -7,11 +8,6 @@ using OfficeOpenXml.Packaging.Ionic.Zlib;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-using static McDermott.Application.Features.Commands.BuildingCommand;
-using static McDermott.Application.Features.Commands.DoctorScheduleCommand;
-using static McDermott.Application.Features.Commands.ServiceCommand;
-using static McDermott.Application.Features.Commands.UserCommand;
-using static McDermott.Web.Components.Pages.Medical.DoctorScheduledPage;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -114,6 +110,7 @@ namespace McDermott.Web.Components.Pages.Medical
         }
 
         private List<string> Names { get; set; } = new();
+        private List<string> DeletedNames { get; set; } = new();
         private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
         private DoctorScheduleDto tt { get; set; } = new();
 
@@ -216,7 +213,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             try
             {
-                if (SelectedSchedules.IsNullOrEmpty())
+                if (SelectedSchedules.IsNullOrEmpty() && EndDate.Date > StartDate.Date)
                     return;
 
                 #region MyRegion
@@ -283,44 +280,150 @@ namespace McDermott.Web.Components.Pages.Medical
                 var addedDetails = new List<DoctorScheduleDetailDto>();
                 var result = new List<DoctorScheduleSlotDto>();
 
-                for (DateTime date = StartDate; date < EndDate; date = date.Date.AddDays(1))
+                // Memuat data yang dibutuhkan sebelum loop tanggal
+                var doctorDetailsDict = new Dictionary<int, List<DoctorScheduleDetailDto>>();
+                var doctorSlotsDict = new Dictionary<int, List<DoctorScheduleSlotDto>>();
+
+                foreach (DoctorScheduleDto doctorSchedule in SelectedSchedules)
+                {
+                    var doctorScheduleId = doctorSchedule.Id;
+                    var doctorSlots = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(doctorScheduleId));
+                    var doctorDetails = await Mediator.Send(new GetDoctorScheduleDetailByScheduleIdQuery(doctorScheduleId));
+
+                    doctorSlotsDict[doctorScheduleId] = doctorSlots;
+                    doctorDetailsDict[doctorScheduleId] = doctorDetails;
+                }
+
+                for (DateTime date = StartDate; date <= EndDate; date = date.Date.AddDays(1))
                 {
                     foreach (DoctorScheduleDto doctorSchedule in SelectedSchedules)
                     {
-                        if (!addedSlots.Any(x => x.DoctorScheduleId == doctorSchedule.Id))
+                        var doctorScheduleId = doctorSchedule.Id;
+                        var doctorSlots = doctorSlotsDict[doctorScheduleId];
+                        var doctorDetails = doctorDetailsDict[doctorScheduleId];
+
+                        // Check apakah slot untuk tanggal tersebut sudah ada
+                        if (doctorSlots.Any(x => x.DoctorScheduleId == doctorScheduleId && x.StartDate.Date == date.Date))
+                            continue;
+
+                        // Mendapatkan detail jadwal dokter untuk hari tersebut
+                        var details = doctorDetails.Where(x => x.DoctorScheduleId == doctorScheduleId && x.DayOfWeek.Trim().Equals(date.DayOfWeek.ToString().Trim())).ToList();
+
+                        // Jika ada detail jadwal, tambahkan slot baru ke hasil
+                        if (details.Count > 0)
                         {
-                            var scheduleSlots = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(doctorSchedule.Id));
-                            addedSlots.AddRange(scheduleSlots);
-
-                            var details = await Mediator.Send(new GetDoctorScheduleDetailByScheduleIdQuery(doctorSchedule.Id));
-                            addedDetails.AddRange(details);
-
-                            if (scheduleSlots.FirstOrDefault(x => x.DoctorScheduleId == doctorSchedule.Id && x.StartDate.Date == date.Date) is not null)
-                                continue;
-                        }
-
-                        var checkSlotTemp = addedSlots.FirstOrDefault(x => x.DoctorScheduleId == doctorSchedule.Id && x.StartDate.Date == date.Date);
-
-                        if (checkSlotTemp is null)
-                        {
-                            var checkDayOfWeek = addedDetails.Where(x => x.DoctorScheduleId == doctorSchedule.Id && x.DayOfWeek.Trim().Equals(date.DayOfWeek.ToString().Trim())).ToList();
-
-                            if (checkDayOfWeek is not null && checkDayOfWeek.Count > 0)
+                            foreach (var physicion in doctorSchedule.PhysicionIds!)
                             {
-                                checkDayOfWeek.ForEach(x =>
+                                foreach (var detail in details)
                                 {
                                     result.Add(new DoctorScheduleSlotDto
                                     {
-                                        WorkFrom = x.WorkFrom,
-                                        WorkTo = x.WorkTo,
-                                        DoctorScheduleId = doctorSchedule.Id,
+                                        WorkFrom = detail.WorkFrom,
+                                        WorkTo = detail.WorkTo,
+                                        DoctorScheduleId = doctorScheduleId,
+                                        PhysicianId = physicion,
                                         StartDate = date.Date
                                     });
-                                });
+                                }
                             }
                         }
                     }
                 }
+
+                //for (DateTime date = StartDate; date <= EndDate; date = date.Date.AddDays(1))
+                //{
+                //    int tempId = 0;
+                //    var doctorDetails = new List<DoctorScheduleDetailDto>();
+                //    var doctorSlots = new List<DoctorScheduleSlotDto>();
+
+                //    foreach (DoctorScheduleDto doctorSchedule in SelectedSchedules)
+                //    {
+                //        if (tempId == 0)
+                //        {
+                //            doctorSlots = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(doctorSchedule.Id));
+
+                //            doctorDetails = await Mediator.Send(new GetDoctorScheduleDetailByScheduleIdQuery(doctorSchedule.Id));
+                //        }
+
+                //        if (doctorSlots.FirstOrDefault(x => x.DoctorScheduleId == doctorSchedule.Id && x.StartDate.Date == date.Date) is not null)
+                //            continue;
+
+                //        var details = doctorDetails.Where(x => x.DoctorScheduleId == doctorSchedule.Id && x.DayOfWeek.Trim().Equals(date.DayOfWeek.ToString().Trim())).ToList();
+
+                //        if (details.Count > 0)
+                //        {
+                //            foreach (var physicion in doctorSchedule.PhysicionIds!)
+                //            {
+                //                foreach (var detail in details)
+                //                {
+                //                    result.Add(new DoctorScheduleSlotDto
+                //                    {
+                //                        WorkFrom = detail.WorkFrom,
+                //                        WorkTo = detail.WorkTo,
+                //                        DoctorScheduleId = doctorSchedule.Id,
+                //                        PhysicianId = physicion,
+                //                        StartDate = date.Date
+                //                    });
+                //                }
+                //            }
+                //        }
+
+                //        tempId = 0;
+
+                //        //if (!addedSlots.Any(x => x.DoctorScheduleId == doctorSchedule.Id))
+                //        //{
+                //        //    var scheduleSlots = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(doctorSchedule.Id));
+                //        //    addedSlots.AddRange(scheduleSlots);
+
+                //        //    var details = await Mediator.Send(new GetDoctorScheduleDetailByScheduleIdQuery(doctorSchedule.Id));
+                //        //    addedDetails.AddRange(details.Distinct());
+                //        //    addedDetails.Distinct();
+
+                //        //    if (scheduleSlots.FirstOrDefault(x => x.DoctorScheduleId == doctorSchedule.Id && x.StartDate.Date == date.Date) is not null)
+                //        //        continue;
+                //        //}
+
+                //        //var checkSlotTemp = addedSlots.FirstOrDefault(x => x.DoctorScheduleId == doctorSchedule.Id && x.StartDate.Date == date.Date);
+
+                //        //if (checkSlotTemp is null)
+                //        //{
+                //        //    var checkDayOfWeek = addedDetails.Where(x => x.DoctorScheduleId == doctorSchedule.Id && x.DayOfWeek.Trim().Equals(date.DayOfWeek.ToString().Trim())).ToList();
+
+                //        //    if (checkDayOfWeek is not null && checkDayOfWeek.Count > 0)
+                //        //    {
+                //        //        foreach (var p in doctorSchedule.PhysicionIds!)
+                //        //        {
+                //        //            foreach (var c in checkDayOfWeek.Distinct())
+                //        //            {
+                //        //                result.Add(new DoctorScheduleSlotDto
+                //        //                {
+                //        //                    WorkFrom = c.WorkFrom,
+                //        //                    WorkTo = c.WorkTo,
+                //        //                    DoctorScheduleId = doctorSchedule.Id,
+                //        //                    PhysicianId = p,
+                //        //                    StartDate = date.Date
+                //        //                });
+                //        //            }
+                //        //        }
+
+                //        //        //doctorSchedule.PhysicionIds!.ForEach(physicionId =>
+                //        //        //{
+                //        //        //    checkDayOfWeek.ForEach(x =>
+                //        //        //    {
+                //        //        //        result.Add(new DoctorScheduleSlotDto
+                //        //        //        {
+                //        //        //            WorkFrom = x.WorkFrom,
+                //        //        //            WorkTo = x.WorkTo,
+                //        //        //            DoctorScheduleId = doctorSchedule.Id,
+                //        //        //            PhysicianId = physicionId,
+                //        //        //            StartDate = date.Date
+                //        //        //        });
+                //        //        //    });
+                //        //        //});
+                //        //    }
+                //        //}
+                //    }
+                //}
 
                 #endregion MyRegion
 
@@ -506,6 +609,8 @@ namespace McDermott.Web.Components.Pages.Medical
                 x.DoctorSchedule = null;
                 x.DoctorScheduleId = DoctorSchedule.Id == 0 ? result.Id : DoctorSchedule.Id;
             });
+
+            await Mediator.Send(new DeleteDoctorScheduleSlotByPhysicionIdRequest(DoctorSchedule.PhysicionIds, DoctorSchedule.Id));
 
             await Mediator.Send(new CreateDoctorScheduleDetailRequest(DoctorScheduleDetails));
 

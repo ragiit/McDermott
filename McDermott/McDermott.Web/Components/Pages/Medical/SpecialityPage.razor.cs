@@ -1,5 +1,4 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using static McDermott.Application.Features.Commands.SpecialityCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -194,6 +193,4 @@ namespace McDermott.Web.Components.Pages.Medical
             await LoadData();
         }
     }
-
-    
 }

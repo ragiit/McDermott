@@ -1,7 +1,4 @@
-﻿@using static McDermott.Application.Features.Commands.UserCommand
-@using static McDermott.Application.Features.Commands.DoctorScheduleCommand
-
-<DxGrid Data="DoctorScheduleSlots"
+﻿<DxGrid Data="DoctorScheduleSlots"
         @ref="Grid"
         PageSize="5"
         ShowSearchBox="true"
@@ -27,7 +24,7 @@
     {
         if (DoctorScheduleDtos is not null)
         {
-            DoctorScheduleSlots = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(DoctorScheduleDtos.Id));
+            DoctorScheduleSlots = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(DoctorScheduleDtos.Id, DoctorScheduleDtos.Physicions.ToInt32()));
         }
     }
 

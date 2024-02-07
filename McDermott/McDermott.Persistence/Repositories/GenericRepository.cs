@@ -2,6 +2,7 @@
 using McDermott.Domain.Common;
 using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace McDermott.Persistence.Repositories
 {
@@ -48,6 +49,19 @@ namespace McDermott.Persistence.Repositories
             _dbContext.Set<T>().Remove(entity!);
         }
 
+        public async Task DeleteAsync(Expression<Func<T, bool>> predicate)
+        {
+            var entity = await _dbContext.Set<T>()
+                                         .Where(predicate)
+                                         .ToListAsync();
+            if (entity != null)
+            {
+                _dbContext.Set<T>().RemoveRange(entity);
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+
         public async Task DeleteAsync(List<int> ids)
         {
             foreach (var id in ids)
@@ -62,6 +76,15 @@ namespace McDermott.Persistence.Repositories
             return await _dbContext
                 .Set<T>()
                 .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbContext
+                .Set<T>()
+                .AsNoTracking()
+                .Where(predicate)
                 .ToListAsync();
         }
 

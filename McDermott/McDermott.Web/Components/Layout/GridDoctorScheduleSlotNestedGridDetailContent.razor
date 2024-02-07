@@ -1,7 +1,4 @@
-﻿@using static McDermott.Application.Features.Commands.UserCommand
-@using static McDermott.Application.Features.Commands.DoctorScheduleCommand
-
-<DxGrid Data="DoctorSchedules"
+﻿<DxGrid Data="DoctorSchedules"
         @ref="Grid"
         PageSize="5"
         ShowSearchBox="true"
@@ -20,18 +17,10 @@
     private IGrid Grid { get; set; }
 
     [Parameter]
-    public DoctorScheduleDto DoctorSchedule { get; set; } = new();
+    public int PhysicianId { get; set; } = new();
 
     [Parameter]
     public List<int> DoctorScheduleIds { get; set; } = [];
-
-    private List<GridDetailDoctorSchedulePhysicians> DoctorScheduleSlots { get; set; } = [];
-
-    public class GridDetailDoctorSchedulePhysicians
-    {
-        public int DoctorScheduleId { get; set; }
-        public string Physician { get; set; } = string.Empty;
-    }
 
     public List<DoctorScheduleDto> DoctorSchedules { get; set; } = [];
 
@@ -43,12 +32,20 @@
 
             foreach (var id in DoctorScheduleIds)
             {
-                result.Add(await Mediator.Send(new GetDoctorScheduleByIdQuery(id)));
+                var doctorSchedule = await Mediator.Send(new GetDoctorScheduleByIdQuery(id));
+                if (doctorSchedule.Id == id && doctorSchedule.PhysicionIds!.Contains(PhysicianId))
+                {
+                    doctorSchedule.Physicions = PhysicianId.ToString();
+
+                    result.Add(doctorSchedule);
+                }
             }
 
             DoctorSchedules = result;
         }
     }
+
+    #region  MyRegion
 
     private void ColumnChooserButton_Click()
     {
@@ -78,4 +75,6 @@
                 ExportSelectedRowsOnly = true,
             });
     }
+
+    #endregion
 }

@@ -1,17 +1,6 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using McDermott.Web.Components.Layout;
 using System.Security.Claims;
-using static McDermott.Application.Features.Commands.CityCommand;
-using static McDermott.Application.Features.Commands.CountryCommand;
-using static McDermott.Application.Features.Commands.DepartmentCommand;
-using static McDermott.Application.Features.Commands.DistrictCommand;
-using static McDermott.Application.Features.Commands.GenderCommand;
-using static McDermott.Application.Features.Commands.GroupCommand;
-using static McDermott.Application.Features.Commands.JobPositionCommand;
-using static McDermott.Application.Features.Commands.ProvinceCommand;
-using static McDermott.Application.Features.Commands.ReligionCommand;
-using static McDermott.Application.Features.Commands.UserCommand;
-using static McDermott.Application.Features.Commands.VillageCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {

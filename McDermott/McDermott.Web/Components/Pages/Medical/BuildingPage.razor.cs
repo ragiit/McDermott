@@ -1,11 +1,4 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Domain.Entities;
-using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.BuildingCommand;
-using static McDermott.Application.Features.Commands.ProvinceCommand;
-using static McDermott.Application.Features.Commands.HealthCenterCommand;
-using static McDermott.Application.Features.Commands.LocationCommand;
-using static McDermott.Application.Features.Commands.GroupCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

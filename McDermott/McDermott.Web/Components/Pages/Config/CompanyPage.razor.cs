@@ -1,12 +1,14 @@
-using static McDermott.Application.Features.Commands.CityCommand;
-using static McDermott.Application.Features.Commands.CountryCommand;
-using static McDermott.Application.Features.Commands.ProvinceCommand;
-using static McDermott.Application.Features.Commands.CompanyCommand;
+using static McDermott.Application.Features.Commands.Config.CityCommand;
+using static McDermott.Application.Features.Commands.Config.CountryCommand;
+using static McDermott.Application.Features.Commands.Config.ProvinceCommand;
+using static McDermott.Application.Features.Commands.Config.CompanyCommand;
 using Blazored.LocalStorage;
 using System.ComponentModel.DataAnnotations;
 using DevExpress.Data.XtraReports.Native;
 using McDermott.Web.Components.Layout;
 using McDermott.Domain.Entities;
+using McDermott.Application.Dtos.Config;
+using McDermott.Application.Dtos.Employee;
 
 namespace McDermott.Web.Components.Pages.Config
 {

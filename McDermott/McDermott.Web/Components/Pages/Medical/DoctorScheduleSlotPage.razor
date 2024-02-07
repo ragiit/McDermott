@@ -1,6 +1,6 @@
 ﻿@page "/medical/doctor-schedule-slot"
 @using McDermott.Web.Components.Layout
-@using static McDermott.Application.Features.Commands.MenuCommand
+@using static McDermott.Application.Features.Commands.Config.MenuCommand
 @rendermode InteractiveServer
 
 <PageTitle>McDermott - Doctor Schedule Slot</PageTitle>
@@ -57,7 +57,7 @@
                                             <DxGridDataColumn FieldName="Physicion" Caption="Physicion" SortIndex="0" />
                                         </Columns>
                                         <DetailRowTemplate>
-                                            <GridDoctorScheduleSlotNestedGridDetailContent DoctorScheduleIds="((DoctorScheduleGrid)context.DataItem).DoctorScheduleIds" />
+                                            <GridDoctorScheduleSlotNestedGridDetailContent PhysicianId="((DoctorScheduleGrid)context.DataItem).PhysicionId" DoctorScheduleIds="((DoctorScheduleGrid)context.DataItem).DoctorScheduleIds" />
                                         </DetailRowTemplate>
                                     </DxGrid>
                                 </DxLoadingPanel>

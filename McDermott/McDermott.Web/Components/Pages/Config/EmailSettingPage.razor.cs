@@ -1,5 +1,6 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using static McDermott.Application.Features.Commands.EmailSettingCommand;
+using McDermott.Application.Dtos.Config;
+using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {

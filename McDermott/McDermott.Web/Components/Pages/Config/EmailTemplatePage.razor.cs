@@ -1,7 +1,8 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.UserCommand;
-using static McDermott.Application.Features.Commands.EmailTemplateCommand;
+using static McDermott.Application.Features.Commands.Config.UserCommand;
+using static McDermott.Application.Features.Commands.Config.EmailTemplateCommand;
+using McDermott.Application.Dtos.Config;
 
 namespace McDermott.Web.Components.Pages.Config
 {

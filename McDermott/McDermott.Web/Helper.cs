@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using McDermott.Application.Dtos.Config;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.IdentityModel.Tokens;
