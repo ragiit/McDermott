@@ -59,6 +59,23 @@ namespace McDermott.Application.Features.Queries
             }
         }
 
+        internal class GetUserByEmailPasswordQueryHandler : IRequestHandler<GetUserByEmailPasswordQuery, UserDto>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public GetUserByEmailPasswordQueryHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<UserDto> Handle(GetUserByEmailPasswordQuery request, CancellationToken cancellationToken)
+            {
+                var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Email.Equals(request.UserDto.Email) && x.Password.Equals(request.UserDto.Password));
+
+                return result.Adapt<List<UserDto>>().FirstOrDefault()!;
+            }
+        }
+
         internal class CreateUserHandler : IRequestHandler<CreateUserRequest, UserDto>
         {
             private readonly IUnitOfWork _unitOfWork;

@@ -57,7 +57,7 @@
                                             <DxGridDataColumn FieldName="Physicion" Caption="Physicion" SortIndex="0" />
                                         </Columns>
                                         <DetailRowTemplate>
-                                            <GridDoctorScheduleSlotNestedGridDetailContent DoctorScheduleIds="((DoctorScheduleGrid)context.DataItem).DoctorScheduleIds" />
+                                            <GridDoctorScheduleSlotNestedGridDetailContent PhysicianId="((DoctorScheduleGrid)context.DataItem).PhysicionId" DoctorScheduleIds="((DoctorScheduleGrid)context.DataItem).DoctorScheduleIds" />
                                         </DetailRowTemplate>
                                     </DxGrid>
                                 </DxLoadingPanel>

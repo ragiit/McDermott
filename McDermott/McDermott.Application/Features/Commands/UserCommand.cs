@@ -1,7 +1,10 @@
-﻿namespace McDermott.Application.Features.Commands
+﻿using McDermott.Application.Dtos;
+
+namespace McDermott.Application.Features.Commands
 {
     public class UserCommand
     {
+        #region Get
         public class GetUserQuery : IRequest<List<UserDto>>;
 
         public class GetUserByIdQuery : IRequest<UserDto>
@@ -14,6 +17,19 @@
             }
         }
 
+        public class GetUserByEmailPasswordQuery : IRequest<UserDto>
+        {
+            public UserDto UserDto { get; set; }
+
+            public GetUserByEmailPasswordQuery(UserDto UserDto)
+            {
+                this.UserDto = UserDto;
+            }
+        }
+
+        #endregion
+
+        #region Create
         public class CreateUserRequest : IRequest<UserDto>
         {
             public UserDto UserDto { get; set; }
@@ -23,7 +39,9 @@
                 this.UserDto = UserDto;
             }
         }
+        #endregion
 
+        #region Update
         public class UpdateUserRequest : IRequest<bool>
         {
             public UserDto UserDto { get; set; }
@@ -33,7 +51,9 @@
                 this.UserDto = UserDto;
             }
         }
+        #endregion
 
+        #region Delete
         public class DeleteUserRequest : IRequest<bool>
         {
             public int Id { get; set; }
@@ -53,5 +73,6 @@
                 this.Id = id;
             }
         }
+        #endregion 
     }
 }

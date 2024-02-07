@@ -23,12 +23,13 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 if (SelectedDataItems.Count == 1)
                 {
-                    await Mediator.Send(new DeleteDoctorScheduleRequest(SelectedDataItems[0].Adapt<DoctorScheduleDto>().Id));
+                    await Mediator.Send(new DeleteDoctorScheduleSlotByScheduleIdPhysicionIdRequest(SelectedDataItems[0].Adapt<DoctorScheduleGrid>().DoctorScheduleIds, SelectedDataItems[0].Adapt<DoctorScheduleGrid>().PhysicionId));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<DoctorScheduleDto>>();
-                    await Mediator.Send(new DeleteListDoctorScheduleRequest(a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<DoctorScheduleGrid>>();
+
+                    await Mediator.Send(new DeleteListDoctorScheduleSlotByScheduleIdPhysicionIdRequest(a.SelectMany(d => d.DoctorScheduleIds).ToList(), a.Select(d => d.PhysicionId).ToList()));
                 }
                 await LoadData();
             }
@@ -54,6 +55,8 @@ namespace McDermott.Web.Components.Pages.Medical
 
             try
             {
+                DoctorScheduleGrids.Clear();
+
                 var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
 
                 var users = await Mediator.Send(new GetUserQuery());
@@ -65,12 +68,12 @@ namespace McDermott.Web.Components.Pages.Medical
                     foreach (var physicion in physicions!)
                     {
                         var doctorScheduleGrids = DoctorScheduleGrids.FirstOrDefault(x => x.PhysicionId == physicion);
-                        if (doctorScheduleGrids is null)
-                        {
-                            var a = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(schedule.Id));
 
-                            if (a.Count > 0)
-                            { 
+                        var a = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(schedule.Id, physicion));
+                        if (a.Count > 0)
+                        {
+                            if (doctorScheduleGrids is null)
+                            {
                                 DoctorScheduleGrids.Add(new DoctorScheduleGrid
                                 {
                                     PhysicionId = physicion,
@@ -78,10 +81,13 @@ namespace McDermott.Web.Components.Pages.Medical
                                     DoctorScheduleIds = [schedule.Id],
                                 });
                             }
-                        }
-                        else
-                        {
-                            doctorScheduleGrids.DoctorScheduleIds.Add(schedule.Id);
+                            else
+                            {
+                                if (schedule.PhysicionIds!.Contains(physicion))
+                                {
+                                    doctorScheduleGrids.DoctorScheduleIds.Add(schedule.Id);
+                                }
+                            }
                         }
                     }
                 }

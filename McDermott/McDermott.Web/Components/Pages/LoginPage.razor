@@ -8,10 +8,10 @@
 @using System.Text
 @using Newtonsoft.Json
 @using System.Security.Claims
+@using static McDermott.Application.Features.Commands.UserCommand
 @using static McDermott.Application.Features.Commands.GroupCommand
 @using static McDermott.Application.Features.Commands.MenuCommand
 
-@inject ApplicationDbContext DataContext
 @inject CustomAuthenticationStateProvider CustomAuth
 
 <PageTitle>McDermott - Login</PageTitle>
@@ -32,40 +32,87 @@
                 @text
                 </div> *@
 
-                <form>
-                    <div class="input-group mb-3">
-                        <input @bind="User.Email" id="exampleInputEmail1" type="email" class="form-control" placeholder="Email">
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-envelope"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="input-group mb-3">
-                        <input @bind="User.Password" type="password" class="form-control" placeholder="Password">
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-lock"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="button" @onclick="OnLogin" class="btn btn-block btn-primary">
-                        Sign in
-                    </button>
-                    <div class="row  justify-content-end">
+                @*   <form>
+                <div class="input-group mb-3">
+                <input @bind="User.Email" id="exampleInputEmail1" type="email" class="form-control" placeholder="Email">
+                <div class="input-group-append">
+                <div class="input-group-text">
+                <span class="fas fa-envelope"></span>
+                </div>
+                </div>
 
-                        <div class="col-auto align-self-end">
-                            <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Sign In" SubmitFormOnClick="true" />
+                </div>
+                <div class="input-group mb-3">
+                <input @bind="User.Password" type="password" class="form-control" placeholder="Password">
+                <div class="input-group-append">
+                <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+                </div>
+                </div>
+                </div>
+                <button type="button" @onclick="OnLogin" class="btn btn-block btn-primary">
+                Sign in
+                </button>
+
+                </form> *@
+
+                <DxFormLayout CssClass="mt-auto col-md">
+                    <DxFormLayoutItem ColSpanMd="12" BeginRow="true">
+                        <label for="EmailId" class="demo-text mb-1">
+                            Email:
+                        </label>
+                        <DxMaskedInput Value="@User.Email"
+                                       Mask="@EmailMask"
+                                       NullText="mail@domain.com"
+                                       InputId="EmailId"
+                                       ValueChanged="@((string value) => OnEmailChanged(value))"
+                                       MaskMode="MaskMode.RegEx">
+                            <Buttons>
+                                <DxEditorButton IconCssClass="fa-solid fa-envelope" />
+                            </Buttons>
+                            <ChildContent>
+                                <DxRegExMaskProperties MaskAutoCompleteMode="@MaskAutoCompleteMode.Strong"
+                                                       Placeholder="@('_')"
+                                                       PlaceholdersVisible="true" />
+                            </ChildContent>
+                        </DxMaskedInput>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12" BeginRow="true">
+                        <label for="PasswordId" class="demo-text mb-1">
+                            Password:
+                        </label>
+                        <DxTextBox @bind-Text="@User.Password"
+                                   InputId="PasswordId"
+                                   NullText="Password"
+                                   Password="true">
+                            <Buttons>
+                                <DxEditorButton IconCssClass="fa-solid fa-lock" />
+                            </Buttons>
+                        </DxTextBox>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12" BeginRow="true">
+                        <div class="row  justify-content-end">
+                            <div class="col-auto align-self-end">
+                                <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline" Click="OnLogin" IconCssClass="fa-solid fa-right-to-bracket" Text="Sign In" SubmitFormOnClick="true" />
+                            </div>
                         </div>
-                    </div>
-                </form>
+                    </DxFormLayoutItem>
+                </DxFormLayout>
             </div>
         </div>
     </div>
 </div>
 
 @code {
-
+    #region MaskedInput
+    string EmailMask { get; set; } = @"(\w|[.-])+@(\w|-)+\.(\w|-){2,4}";
+    string EmailLink { get; set; } = "mailto:test@example.com";
+    void OnEmailChanged(string email)
+    {
+        User.Email = email;
+        EmailLink = $"mailto:{email}";
+    }
+    #endregion
     private GroupMenuDto UserAccessCRUID = new();
     private bool IsAccess = false;
 
@@ -101,15 +148,15 @@
         NavigationManager.NavigateTo("/", true);
     }
 
-    private User? User = new User
-        {
-            Email = "admin@example.com",
-            Password = "123"
-        };
+    private User User = new User
+    {
+        // Email = "admin@example.com",
+        // Password = "123"
+    };
 
     private async Task OnLogin()
     {
-        var user = await DataContext.Users.FirstOrDefaultAsync(x => x.Email == User.Email && x.Password == User.Password);
+        var user = await Mediator.Send(new GetUserByEmailPasswordQuery(User.Adapt<UserDto>()));
         if (user is not null && !string.IsNullOrWhiteSpace(User!.Email) && !string.IsNullOrWhiteSpace(User.Password))
         {
             // Helper.UserLogin = user;
@@ -159,7 +206,7 @@
             }
 
             var a = (CustomAuthenticationStateProvider)CustomAuth;
-            await a.UpdateAuthState(user);
+            await a.UpdateAuthState(user.Adapt<User>());
 
             NavigationManager.NavigateTo("", forceLoad: true);
 

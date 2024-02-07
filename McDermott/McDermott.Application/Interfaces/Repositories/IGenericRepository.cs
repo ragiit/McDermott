@@ -1,4 +1,5 @@
 ﻿using McDermott.Domain.Common.Interfaces;
+using System.Linq.Expressions;
 
 namespace McDermott.Application.Interfaces.Repositories
 {
@@ -7,8 +8,10 @@ namespace McDermott.Application.Interfaces.Repositories
         IQueryable<T> Entities { get; }
 
         Task<T> GetByIdAsync(int id);
+         
 
         Task<List<T>> GetAllAsync();
+        Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate);
 
         Task<T> AddAsync(T entity);
 
@@ -19,6 +22,7 @@ namespace McDermott.Application.Interfaces.Repositories
         Task UpdateAsync(List<T> entity);
 
         Task DeleteAsync(int id);
+        Task DeleteAsync(Expression<Func<T, bool>> predicate);
 
         Task DeleteAsync(List<int> id);
     }

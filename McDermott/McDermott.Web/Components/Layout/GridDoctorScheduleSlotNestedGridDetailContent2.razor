@@ -27,7 +27,7 @@
     {
         if (DoctorScheduleDtos is not null)
         {
-            DoctorScheduleSlots = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(DoctorScheduleDtos.Id));
+            DoctorScheduleSlots = await Mediator.Send(new GetDoctorScheduleSlotByDoctorScheduleIdRequest(DoctorScheduleDtos.Id, DoctorScheduleDtos.Physicions.ToInt32()));
         }
     }
 
