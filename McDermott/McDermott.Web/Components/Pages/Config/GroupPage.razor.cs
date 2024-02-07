@@ -3,9 +3,6 @@ using DevExpress.Data.XtraReports.Native;
 using McDermott.Domain.Entities;
 using Microsoft.JSInterop;
 using System.ComponentModel.DataAnnotations;
-using static McDermott.Application.Features.Commands.CountryCommand;
-using static McDermott.Application.Features.Commands.GroupCommand;
-using static McDermott.Application.Features.Commands.MenuCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {

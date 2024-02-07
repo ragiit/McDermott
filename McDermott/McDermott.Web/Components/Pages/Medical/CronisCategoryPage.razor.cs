@@ -1,7 +1,9 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.CronisCategoryCommand;
+using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
 using System.ComponentModel.DataAnnotations;
+using McDermott.Application.Dtos.Config;
+using McDermott.Application.Dtos.Medical;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

@@ -1,7 +1,7 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Application.Dtos;
-using static McDermott.Application.Features.Commands.MenuCommand;
-using static McDermott.Application.Features.Commands.ProvinceCommand;
+using McDermott.Application.Dtos.Config;
+using static McDermott.Application.Features.Commands.Config.MenuCommand;
+using static McDermott.Application.Features.Commands.Config.ProvinceCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {

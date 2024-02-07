@@ -1,8 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.DoctorScheduleCommand;
-using static McDermott.Application.Features.Commands.UserCommand;
-using static McDermott.Web.Components.Pages.Medical.DoctorScheduleSlotPage;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

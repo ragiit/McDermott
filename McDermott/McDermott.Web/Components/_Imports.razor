@@ -17,3 +17,16 @@
 @inject IMediator Mediator
 @inject NavigationManager NavigationManager
 @inject Blazored.LocalStorage.ILocalStorageService oLocal
+
+@using static McDermott.Web.Helper
+
+@using Newtonsoft.Json
+
+@using McDermott.Application.Dtos.Config
+@using McDermott.Application.Dtos.Medical
+
+@using static McDermott.Web.Components.Pages.Medical.DoctorScheduleSlotPage
+@using static McDermott.Application.Features.Commands.Config.UserCommand
+@using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand
+@using static McDermott.Application.Features.Commands.Config.GroupCommand
+@using static McDermott.Application.Features.Commands.Config.MenuCommand   

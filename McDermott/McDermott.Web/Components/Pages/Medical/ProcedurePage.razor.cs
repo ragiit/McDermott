@@ -1,7 +1,9 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Application.Dtos.Config;
+using McDermott.Application.Dtos.Medical;
 using McDermott.Domain.Entities;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.ProcedureCommand;
+using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

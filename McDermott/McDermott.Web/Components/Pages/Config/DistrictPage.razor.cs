@@ -1,9 +1,10 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Application.Dtos.Config;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.CityCommand;
+using static McDermott.Application.Features.Commands.Config.CityCommand;
 
-using static McDermott.Application.Features.Commands.DistrictCommand;
-using static McDermott.Application.Features.Commands.ProvinceCommand;
+using static McDermott.Application.Features.Commands.Config.DistrictCommand;
+using static McDermott.Application.Features.Commands.Config.ProvinceCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {

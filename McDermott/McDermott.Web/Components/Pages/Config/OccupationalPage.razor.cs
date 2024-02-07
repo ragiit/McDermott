@@ -1,6 +1,7 @@
 using DevExpress.Data.XtraReports.Native;
+using McDermott.Application.Dtos.Config;
 using McDermott.Web.Components.Layout;
-using static McDermott.Application.Features.Commands.OccupationalCommand;
+using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {

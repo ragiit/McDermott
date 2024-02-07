@@ -1,7 +1,9 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.JobPositionCommand;
-using static McDermott.Application.Features.Commands.DepartmentCommand;
+using static McDermott.Application.Features.Commands.Employee.JobPositionCommand;
+using static McDermott.Application.Features.Commands.Employee.DepartmentCommand;
+using McDermott.Application.Dtos.Config;
+using McDermott.Application.Dtos.Employee;
 
 namespace McDermott.Web.Components.Pages.Employee
 {

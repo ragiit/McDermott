@@ -1,9 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.CityCommand;
-using static McDermott.Application.Features.Commands.CountryCommand;
-using static McDermott.Application.Features.Commands.HealthCenterCommand;
-using static McDermott.Application.Features.Commands.ProvinceCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -15,12 +11,12 @@ namespace McDermott.Web.Components.Pages.Medical
         public List<ProvinceDto> Provinces = [];
         private GroupMenuDto UserAccessCRUID = new();
         private bool IsAccess = false;
+
         private List<string> Types = new List<string>
         {
             "Clinic"
         };
 
-       
         #region Default Grid
 
         private bool PanelVisible { get; set; } = true;
@@ -28,6 +24,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -43,6 +40,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 catch { }
             }
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;

@@ -8,11 +8,6 @@ using OfficeOpenXml.Packaging.Ionic.Zlib;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-using static McDermott.Application.Features.Commands.BuildingCommand;
-using static McDermott.Application.Features.Commands.DoctorScheduleCommand;
-using static McDermott.Application.Features.Commands.ServiceCommand;
-using static McDermott.Application.Features.Commands.UserCommand;
-using static McDermott.Web.Components.Pages.Medical.DoctorScheduledPage;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

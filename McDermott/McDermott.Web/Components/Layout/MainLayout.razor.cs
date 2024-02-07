@@ -1,7 +1,5 @@
 ﻿using McDermott.Domain.Entities;
 using Newtonsoft.Json;
-using static McDermott.Application.Features.Commands.GroupCommand;
-using static McDermott.Application.Features.Commands.MenuCommand;
 
 namespace McDermott.Web.Components.Layout
 {
