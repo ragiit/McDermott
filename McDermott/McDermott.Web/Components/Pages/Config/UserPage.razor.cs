@@ -1,5 +1,6 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using McDermott.Web.Components.Layout;
+using McDermott.Web.Extentions;
 using System.Security.Claims;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -21,19 +22,18 @@ namespace McDermott.Web.Components.Pages.Config
         private bool IsDeleted { get; set; } = true;
         private bool ShowForm { get; set; } = false;
         private bool VisibleExpiredId { get; set; } = false;
-        public List<CountryDto> Countries { get; private set; }
-        public List<ProvinceDto> Provinces { get; private set; }
-        public List<CityDto> Cities { get; private set; }
+        public List<CountryDto> Countries = [];
+        public List<ProvinceDto> Provinces = [];
+        public List<CityDto> Cities = [];
+        public List<DistrictDto> Districts = [];
+        public List<VillageDto> Villages = [];
+        public List<GroupDto> Groups = [];
+        public List<ReligionDto> Religions = [];
+        public List<GenderDto> Genders = [];
+        public List<DepartmentDto> Departments = [];
+        public List<JobPositionDto> JobPositions = [];
 
-        public List<DistrictDto> Districts { get; private set; }
-        public List<VillageDto> Villages { get; private set; }
-        public List<GroupDto> Groups { get; private set; }
-        public List<ReligionDto> Religions { get; private set; }
-        public List<GenderDto> Genders { get; private set; }
-        public List<DepartmentDto> Departments { get; private set; }
-        public List<JobPositionDto> JobPositions { get; private set; }
-
-        private List<string> IdentityTypes = new List<string>
+        private List<string> IdentityTypes = new()
         {
             "KTP",
             "Paspor",
@@ -41,7 +41,7 @@ namespace McDermott.Web.Components.Pages.Config
             "VISA",
         };
 
-        private List<string> MartialStatuss = new List<string>
+        private List<string> MartialStatuss = new()
         {
             "Single",
             "Married"
@@ -157,7 +157,10 @@ namespace McDermott.Web.Components.Pages.Config
             else
             {
                 var a = SelectedDataItems.Adapt<List<UserDto>>();
-                await Mediator.Send(new DeleteListUserRequest(a.Select(x => x.Id).ToList()));
+
+                int userActive = (int)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
+
+                await Mediator.Send(new DeleteListUserRequest(a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
             }
             await LoadData();
         }
@@ -210,12 +213,11 @@ namespace McDermott.Web.Components.Pages.Config
             ShowForm = true;
         }
 
-        private async Task EditItem_Click()
+        private void EditItem_Click()
         {
             try
             {
-                var user = SelectedDataItems[0].Adapt<UserDto>();
-                UserForm = user;
+                UserForm = SelectedDataItems[0].Adapt<UserDto>();
                 ShowForm = true;
             }
             catch (Exception e)

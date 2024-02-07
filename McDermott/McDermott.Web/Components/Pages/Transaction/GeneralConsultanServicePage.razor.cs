@@ -1,4 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Web.Extentions;
 using Microsoft.AspNetCore.Components;
 using System.Globalization;
 

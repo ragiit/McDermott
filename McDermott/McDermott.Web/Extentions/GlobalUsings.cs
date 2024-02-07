@@ -3,6 +3,7 @@ global using McDermott.Application.Dtos;
 global using Mapster;
 global using McDermott.Web.Components.Layout;
 
+global using McDermott.Web.Extentions;
 
 global using McDermott.Application.Dtos.Config;
 global using McDermott.Application.Dtos.Medical;

@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace McDermott.Web
+namespace McDermott.Web.Extentions
 {
     public static class Helper
     {
@@ -107,7 +107,7 @@ namespace McDermott.Web
                     return (false, new());
                 }
 
-                menu = Helper.Decrypt(menu);
+                menu = Decrypt(menu);
 
                 var menus = JsonConvert.DeserializeObject<List<GroupMenuDto>>(menu);
                 var url = NavigationManager.Uri;

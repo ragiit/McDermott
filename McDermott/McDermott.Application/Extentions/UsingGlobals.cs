@@ -8,6 +8,7 @@ global using System.ComponentModel.DataAnnotations;
 
 global using McDermott.Application.Dtos.Medical;
 global using McDermott.Application.Dtos.Config;
+global using McDermott.Application.Dtos.Employee;
 
 global using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand;
 global using static McDermott.Application.Features.Commands.Config.GenderCommand;
@@ -16,3 +17,5 @@ global using static McDermott.Application.Features.Commands.Medical.HealthCenter
 global using static McDermott.Application.Features.Commands.Medical.BuildingCommand;
 global using static McDermott.Application.Features.Commands.Medical.SpecialityCommand;
 global using static McDermott.Application.Features.Commands.Config.ReligionCommand;
+global using static McDermott.Application.Features.Commands.Config.UserCommand;
+global using static McDermott.Application.Features.Commands.Employee.EmployeeCommand;
