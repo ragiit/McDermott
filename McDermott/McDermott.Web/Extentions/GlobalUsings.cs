@@ -23,6 +23,7 @@ global using static McDermott.Application.Features.Commands.Config.GroupCommand;
 global using static McDermott.Application.Features.Commands.Medical.BuildingCommand;  
 global using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceCommand;
+global using static McDermott.Application.Features.Commands.Transaction.KioskCommand;
 global using static McDermott.Application.Features.Commands.Medical.InsuranceCommand;
 global using static McDermott.Application.Features.Commands.Medical.ServiceCommand; 
 global using static McDermott.Application.Features.Commands.Config.GenderCommand;  

@@ -1,0 +1,104 @@
+﻿@page "/transaction/kiosk"
+@rendermode InteractiveServer
+<PageTitle>McDermott - Transaction Kiosk</PageTitle>
+
+<div class="wrapper">
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Kiosk" />
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+
+                            @* <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                            <Items>
+                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="NewItem_Click" IconCssClass="fa-solid fa-pen-to-square" />
+                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="NewItem_Click" IconCssClass="fa-solid fa-trash" />
+
+                            </Items>
+                            </DxToolbar> *@
+
+                        </div>
+                        <div class="card-body">
+                            <EditForm Model="@FormKios" Context="EditFormContext">
+                                <DxFormLayout CssClass="mt w-100">
+                                    <DxFormLayoutItem Caption="Search type" ColSpanMd="12">
+                                        <DxComboBox Data="@type" NullText="Search type .."
+                                                    @bind-Value="@FormKios.Type"></DxComboBox>
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Number" ColSpanMd="12">
+                                        <Template>
+                                            <DxGridLayout>
+                                                <Rows>
+                                                    <DxGridLayoutRow />
+                                                </Rows>
+                                                <Columns>
+                                                    <DxGridLayoutColumn Width="25fr" />
+                                                    <DxGridLayoutColumn Width="5fr" />
+                                                </Columns>
+                                                <Items>
+                                                    <DxGridLayoutItem Row="0" Column="0" CssClass="mt ">
+                                                        <Template>
+                                                            <DxTextBox @bind-Text="@FormKios.NumberType" NullText="Number Type..." CssClass=""></DxTextBox>
+                                                        </Template>
+                                                    </DxGridLayoutItem>
+                                                    <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                        <Template>
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search" SubmitFormOnClick="true" Click="OnSearch"></DxButton>
+                                                        </Template>
+                                                    </DxGridLayoutItem>
+                                                </Items>
+                                            </DxGridLayout>
+                                        </Template>
+                                    </DxFormLayoutItem>
+                                    @if (showForm)
+                                    {
+                                        <DxFormLayoutItem Caption="Patient" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@NamePatient" NullText="Patient..." ReadOnly style="background-color:#949494" />
+                                         </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Insurance" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@FormKios.Insurance" NullText="Insurance..." ReadOnly style="background-color:#949494" />
+                                         </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Stage BPJS" ColSpanMd="12">
+                                            @if (FormKios.Insurance == "BPJS")
+                                            {
+                                                <p> <i class="fa-solid fa-circle-check" style="color: #20fc03;"></i> Active</p>
+                                            }
+                                            else
+                                            {
+                                                <p><i class="fa-solid fa-circle-xmark" style="color: #ec091f;"></i> Non Active</p>
+                                            }
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Service" ColSpanMd="12">
+                                            <DxComboBox Data="@Services" @bind-Value="@Serviced" NullText="Select Service.." ValueFieldName="Id" TextFieldName="Name" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Physician" ColSpanMd="12">
+                                            <DxComboBox Data="@Physicians" @bind-Value="@FormKios.PhysicianId" NullText="Select Physician.." ValueFieldName="Id" TextFieldName="Name" />
+                                        </DxFormLayoutItem>
+                                    }
+                                    else
+                                    {
+                                        @* <Alert Color="@alertColor" Dismissable="false"> <Icon Name="@alertIconName" class="me-2"></Icon>@alertMessage </Alert> *@
+                                    }
+                                </DxFormLayout>
+                            </EditForm>
+                        </div>
+                        @if (showForm)
+                        {
+                            <div class="card-footer">
+                                <div class="row  justify-content-end">
+                                    <div class="col-auto align-self-end">
+                                        <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

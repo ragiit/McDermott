@@ -59,6 +59,35 @@ namespace McDermott.Application.Features.Queries.Config
                 return result.Adapt<List<UserDto>>().FirstOrDefault()!;
             }
         }
+
+        internal class GetUserForKioskQueryhandler : IRequestHandler<GetDataUserForKioskQuery, List<UserDto>>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public GetUserForKioskQueryhandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<List<UserDto>> Handle(GetDataUserForKioskQuery request, CancellationToken cancellationToken)
+            {
+               List<UserDto>  data = new List<UserDto>();
+                if (request.Types == "Legacy")
+                {
+                    var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Legacy!.Equals(request.Number));
+                    data = result.Adapt<List<UserDto>>().ToList();
+                }else if(request.Types == "Oracle")
+                {
+                    var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Oracle!.Equals(request.Number));
+                    data = result.Adapt<List<UserDto>>().ToList();
+                }else if(request.Types == "SAP")
+                {
+                    var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.SAP!.Equals(request.Number));
+                    data = result.Adapt<List<UserDto>>().ToList();
+                }
+                return data;
+            }
+        }
         #endregion
 
         #region Create

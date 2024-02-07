@@ -75,6 +75,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #endregion Grid Setting
 
+
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);

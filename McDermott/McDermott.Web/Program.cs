@@ -14,6 +14,7 @@ DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
 builder.Services.AddBlazoredLocalStorage();
 
+
 builder.Services.AddPersistenceLayer(builder.Configuration);
 
 var app = builder.Build();
