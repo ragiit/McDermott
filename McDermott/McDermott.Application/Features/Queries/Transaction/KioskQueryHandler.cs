@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.KioskCommand;
+using McDermott.Application.Dtos.Transaction;
+using static McDermott.Application.Features.Commands.Transaction.KioskCommand;
 
-namespace McDermott.Application.Features.Queries
+namespace McDermott.Application.Features.Queries.Transaction
 {
     public class KioskQueryHandler
     {
@@ -22,8 +23,8 @@ namespace McDermott.Application.Features.Queries
             {
                 return await _unitOfWork.Repository<Kiosk>().Entities
                         .Include(x => x.Patient)
-                        .Include(x=>x.Service)
-                        .Include(x=>x.Physician)
+                        .Include(x => x.Service)
+                        .Include(x => x.Physician)
                         .AsNoTracking()
                         .Select(Kiosk => Kiosk.Adapt<KioskDto>())
                         .AsNoTracking()

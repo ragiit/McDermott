@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using McDermott.Application.Dtos.Transaction;
 
-namespace McDermott.Application.Features.Commands
+namespace McDermott.Application.Features.Commands.Transaction
 {
     public class KioskCommand
     {
@@ -55,7 +56,7 @@ namespace McDermott.Application.Features.Commands
 
             public DeleteListKioskRequest(List<int> id)
             {
-                this.Id = id;
+                Id = id;
             }
         }
     }
