@@ -10,7 +10,7 @@ namespace McDermott.Application.Dtos.Transaction
     public partial class KioskDto : IMapFrom<Kiosk>
     {
         public int Id { get; set; }
-        public string? Type { get; set; } = string.Empty;
+        public string? Type { get; set; } 
         [Required]
         [StringLength(150)]
         public string? NumberType { get; set; } = string.Empty;

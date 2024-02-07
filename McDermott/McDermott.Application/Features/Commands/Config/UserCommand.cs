@@ -27,6 +27,20 @@ namespace McDermott.Application.Features.Commands.Config
             }
         }
 
+        public class GetDataUserForKioskQuery : IRequest<List<UserDto>>
+        {
+            public UserDto userDto { get; set; }
+            public string Types {  get; set; }
+            public string Number {  get; set; }
+
+            public GetDataUserForKioskQuery(string Types, string Number)
+            {
+                this.userDto = userDto;
+                this.Types = Types;
+                this.Number = Number;
+            }
+        }
+
         #endregion
 
         #region Create

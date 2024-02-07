@@ -1,5 +1,7 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using McDermott.Domain.Entities;
+using System.Linq;
+using static McDermott.Web.Components.Pages.Medical.DoctorScheduledPage;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -8,9 +10,11 @@ namespace McDermott.Web.Components.Pages.Transaction
         #region Relation Data
 
         public List<KioskDto> Kiosks = new();
-        public List<ServiceDto> Service = new();
+        public List<ServiceDto> Services = new();
         public List<UserDto> Patients = new();
         public List<UserDto> Physician = new();
+        public List<DoctorScheduleDto> Physicians = [];
+        public List<DoctorScheduleDto> DoctorSchedules = new();
 
         #endregion Relation Data
 
@@ -35,12 +39,34 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<string> type = new List<string>
         {
             "NIP",
-            "Oracel",
+            "Oracle",
             "SAP",
             "NIP"
         };
 
+        private string? NamePatient { get; set; } = string.Empty;
+
         private KioskDto FormKios = new();
+        private int ServicedId = 0;
+        private List<string> Names { get; set; } = new List<string>();
+        private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
+        private string PhysicionName { get; set; }
+
+        private int Serviced
+        {
+            get => ServicedId;
+            set
+            {
+                int ServicedId = value; InvokeAsync(StateHasChanged);
+                this.ServicedId = value;
+
+                Names.Clear();
+
+                var item = DoctorSchedules.Where(x => x.ServiceId == ServicedId).ToList();
+                item.ForEach(x => x.Physicions = string.Join(", ", Physician.Where(z => x.PhysicionIds != null && x.PhysicionIds.Contains(z.Id)).Select(z => z.Name).ToList()));
+                Physicians = item;
+            }
+        }
 
         #endregion Data Static And Variable Additional
 
@@ -81,8 +107,11 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             showForm = false;
             PanelVisible = true;
+            Physician = await Mediator.Send(new GetUserQuery());
             SelectedDataItems = new ObservableRangeCollection<object>();
             Kiosks = await Mediator.Send(new GetKioskQuery());
+            Services = await Mediator.Send(new GetServiceQuery());
+            DoctorSchedules = await Mediator.Send(new GetDoctorScheduleQuery());
             PanelVisible = false;
         }
 
@@ -143,14 +172,16 @@ namespace McDermott.Web.Components.Pages.Transaction
             catch { }
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        #region Button Export, Import And Colmn Chooser
+
+        private void ColumnChooserButton_Click()
+        {
+            Grid.ShowColumnChooser();
         }
 
         private async Task ExportXlsxItem_Click()
@@ -177,10 +208,33 @@ namespace McDermott.Web.Components.Pages.Transaction
             });
         }
 
+        #endregion Button Export, Import And Colmn Chooser
+
         private void OnCancel()
         {
             FormKios = new();
             showForm = false;
+        }
+
+        private async Task OnSearch()
+        {
+            var types = FormKios.Type;
+            var InputSearch = FormKios.NumberType;
+            Patients = await Mediator.Send(new GetDataUserForKioskQuery(types, InputSearch));
+            if (Patients != null)
+            {
+                showForm = true;
+                NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
+                FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
+                FormKios.Insurance = "Personal";
+            }
+            else
+            {
+                showForm = false;
+                //AlertColor alertColor = AlertColor.Primary;
+                //IconName alertIconName = IconName.CheckCircleFill;
+                //string alertMessage = "A simple alert - check it out!";
+            }
         }
 
         #endregion Button Function
