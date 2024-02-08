@@ -1,11 +1,8 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
-using McDermott.Application.Dtos.Config;
-using McDermott.Application.Dtos.Medical;
-using McDermott.Web.Extentions;
+using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -44,7 +41,6 @@ namespace McDermott.Web.Components.Pages.Medical
 
         protected override async Task OnInitializedAsync()
         {
-
             try
             {
                 var result = await NavigationManager.CheckAccessUser(oLocal);
@@ -58,7 +54,6 @@ namespace McDermott.Web.Components.Pages.Medical
             Cronises = await Mediator.Send(new GetCronisCategoryQuery());
 
             await LoadData();
-
         }
 
         private async Task LoadData()
@@ -141,6 +136,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try

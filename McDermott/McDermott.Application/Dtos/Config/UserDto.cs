@@ -17,18 +17,17 @@ namespace McDermott.Application.Dtos.Config
         public string Email { get; set; } = string.Empty;
 
         public string Password { get; set; } = string.Empty;
-
-        public int? NoRm { get; set; }
+         
         public int? GenderId { get; set; }
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
 
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
-        public DateTime? DateOfBirth { get; set; } = DateTime.UtcNow;
+        public DateTime? DateOfBirth { get; set; }
 
         public string? TypeId { get; set; } = "KTP"; // Jenis Identitas
         public int? NoId { get; set; } // No Identitas
-        public DateTime? ExpiredId { get; set; } = DateTime.UtcNow;  // Expired Identitas
+        public DateTime? ExpiredId { get; set; } 
         public string? IdCardAddress1 { get; set; } // KTP Alamat 1
         public string? IdCardAddress2 { get; set; } // KTP Alamat 1
         public int? IdCardCountryId { get; set; } // KTP Negara
@@ -70,6 +69,7 @@ namespace McDermott.Application.Dtos.Config
         public string? EmergencyEmail { get; set; }
         public int? EmergencyPhone { get; set; }
         public string? BloodType { get; set; }
+        public string? NoRm { get; set; } = "-";
         public string? DoctorCode { get; set; }
         public string? EmployeeCode { get; set; }
         public int? DegreeId { get; set; }
@@ -77,6 +77,8 @@ namespace McDermott.Application.Dtos.Config
         public bool? IsPatient { get; set; } = false;
         public bool? IsUser { get; set; } = false;
         public bool? IsDoctor { get; set; } = false;
+        public bool? IsEmployeeRelation { get; set; } = false;
+        public string? EmployeeType { get; set; }
 
         [Required]
         public int NIP { get; set; }

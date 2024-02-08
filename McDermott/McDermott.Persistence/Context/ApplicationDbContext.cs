@@ -75,8 +75,8 @@ namespace McDermott.Persistence.Context
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
-            } 
-
+            }
+             
             //modelBuilder.Entity<EmailTemplate>()
             //  .HasMany(m => m.ToPartner)
             //  .OnDelete(DeleteBehavior.Cascade);

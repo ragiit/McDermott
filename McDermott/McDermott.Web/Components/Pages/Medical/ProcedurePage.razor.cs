@@ -1,9 +1,4 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Application.Dtos.Config;
-using McDermott.Application.Dtos.Medical;
-using McDermott.Domain.Entities;
-using McDermott.Web.Extentions;
-using Microsoft.JSInterop;
 using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
@@ -28,7 +23,7 @@ namespace McDermott.Web.Components.Pages.Medical
             "Medium",
             "Hard"
         };
-  
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -44,6 +39,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 catch { }
             }
         }
+
         protected override async Task OnInitializedAsync()
         {
             try
@@ -55,6 +51,7 @@ namespace McDermott.Web.Components.Pages.Medical
             catch { }
             await LoadData();
         }
+
         private async Task LoadData()
         {
             PanelVisible = true;
@@ -62,10 +59,12 @@ namespace McDermott.Web.Components.Pages.Medical
             Procedures = await Mediator.Send(new GetProcedureQuery());
             PanelVisible = false;
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
+
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsEnabled = enabled;
@@ -76,6 +75,7 @@ namespace McDermott.Web.Components.Pages.Medical
             FocusedRowVisibleIndex = args.VisibleIndex;
             UpdateEditItemsEnabled(true);
         }
+
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -88,6 +88,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 e.CssClass = "header-bold";
             }
         }
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
@@ -102,10 +103,12 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+
         private void ColumnChooserButton_Click()
         {
             Grid.ShowColumnChooser();
         }
+
         private async Task ExportXlsxItem_Click()
         {
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
@@ -121,6 +124,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task ExportCsvItem_Click()
         {
             await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
@@ -128,6 +132,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             if (SelectedDataItems is null)
@@ -141,6 +146,7 @@ namespace McDermott.Web.Components.Pages.Medical
             }
             await LoadData();
         }
+
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             var editModel = (ProcedureDto)e.EditModel;

@@ -1,5 +1,4 @@
 ﻿using McDermott.Domain.Entities;
-using McDermott.Web.Extentions;
 using Newtonsoft.Json;
 
 namespace McDermott.Web.Components.Layout

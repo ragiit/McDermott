@@ -1,13 +1,13 @@
-﻿@page "/employee/employees"
+﻿@page "/medical/practitioner"
 @inject IHttpContextAccessor _httpContextAccessor
 
-<PageTitle>McDermott - Master Data Employee</PageTitle>
+<PageTitle>McDermott - Master Data Practitioner</PageTitle>
 
 @if (IsAccess)
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Employees" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Practitioners" />
 
         <section class="content">
             <div class="container-fluid">
@@ -67,11 +67,10 @@
                                             </ToolbarTemplate>
                                             <Columns>
                                                 <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn FieldName="NIP" SortIndex="0" />
-                                                <DxGridDataColumn FieldName="Name" />
+                                                <DxGridDataColumn FieldName="Name" SortIndex="0"/>
                                                 <DxGridDataColumn FieldName="Email" />
-                                                <DxGridDataColumn FieldName="JobPosition.Name" Caption="Job Position" />
-                                                <DxGridDataColumn FieldName="Department.Name" Caption="Department" />
+                                                <DxGridDataColumn FieldName="SipNo" Caption="SIP" />
+                                                <DxGridDataColumn FieldName="StrNo" Caption="STR" />
                                             </Columns>
                                         </DxGrid>
                                     </DxLoadingPanel>
@@ -121,7 +120,7 @@
                                                 <DxTextBox @bind-Text="@UserForm.EmergencyEmail" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Email" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Date of Birth:">
-                                                <DxDateEdit @bind-Date="@UserForm.DateOfBirth" NullText="Date of Birth" Mask="@DateTimeMask.ShortDate" />
+                                                <DxDateEdit @bind-Date="@UserForm.DateOfBirth" Mask="@DateTimeMask.ShortDate" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Emergency Phone:">
                                                 <DxSpinEdit @bind-Value="@UserForm.EmergencyPhone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Phone" />
@@ -130,7 +129,7 @@
                                                 <DxComboBox Data="@Genders" NullText="Gender" @bind-Value="@UserForm.GenderId" TextFieldName="Name" ValueFieldName="Id" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Martial Status:">
-                                                <DxComboBox Data="@MartialStatuss" NullText="Select Martial Status..." @bind-Value="@UserForm.MartialStatus"></DxComboBox>
+                                                <DxComboBox Data="@MartialStatuss" @bind-Value="@UserForm.MartialStatus"></DxComboBox>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="KTP Address:" ColSpanMd="12">
                                                 <Template>
@@ -304,46 +303,47 @@
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
 
-                                        <DxFormLayoutGroup Caption="Employee" ColSpanMd="12">
-                                            <DxFormLayoutItem Caption="Job Position:">
-                                                <DxComboBox Data="@JobPositions"
-                                                            NullText="Select Job Position..."
-                                                            @bind-Value="@UserForm.JobPositionId"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id">
-                                                </DxComboBox>
+                                        <DxFormLayoutGroup Caption="Practitioner License" ColSpanMd="12">
+                                            <DxGridLayout ColumnSpacing="3">
+                                                <Rows>
+                                                    <DxGridLayoutRow />
+                                                </Rows>
+                                                <Columns>
+                                                    <DxGridLayoutColumn />
+                                                    <DxGridLayoutColumn />
+                                                </Columns>
+                                                <Items>
+                                                    <DxGridLayoutItem Row="0" Column="0">
+                                                        <Template>
+                                                            <DxFormLayoutItem Caption="Physicion:">
+                                                                <DxCheckBox @bind-Checked="@UserForm.IsPhysicion" />
+                                                            </DxFormLayoutItem>
+                                                        </Template>
+                                                    </DxGridLayoutItem>
+                                                    <DxGridLayoutItem Row="0" Column="1" CssClass="layout-margin-l">
+                                                        <Template>
+                                                            <DxFormLayoutItem Caption="Nurse:">
+                                                                <DxCheckBox @bind-Checked="@UserForm.IsNurse" />
+                                                            </DxFormLayoutItem>
+                                                        </Template>
+                                                    </DxGridLayoutItem>
+                                                </Items>
+                                            </DxGridLayout>
+
+                                            <DxFormLayoutItem Caption="Sip Number:">
+                                                <DxTextBox @bind-Text="@UserForm.SipNo" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Sip Number" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="BPJS TK Number:">
-                                                <DxSpinEdit @bind-Value="@UserForm.NoBpjsTk" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="BPJS TK Number" />
+                                            <DxFormLayoutItem Caption="Str Number:">
+                                                <DxTextBox @bind-Text="@UserForm.StrNo" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Str Number" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Department:">
-                                                <DxComboBox Data="@Departments"
-                                                            NullText="Select Department..."
-                                                            @bind-Value="@UserForm.DepartmentId"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id">
-                                                </DxComboBox>
+                                            <DxFormLayoutItem Caption="Sip File:">
+                                                <DxTextBox @bind-Text="@UserForm.SipFile" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Sip File" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Join Date:">
-                                                <DxDateEdit @bind-Date="@UserForm.JoinDate" Mask="@DateTimeMask.ShortDate" NullText="Join Date" />
+                                            <DxFormLayoutItem Caption="Str Expired:">
+                                                <DxDateEdit @bind-Date="@UserForm.StrExp" Mask="@DateTimeMask.ShortDate" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="BPJS KS Number:">
-                                                <DxSpinEdit @bind-Value="@UserForm.NoBpjsKs" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="BPJS KS Number" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="NIP:">
-                                                <DxSpinEdit @bind-Value="@UserForm.NIP" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="NIP" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Legacy:">
-                                                <DxTextBox @bind-Text="@UserForm.Legacy" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Legacy" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Oracle:">
-                                                <DxTextBox @bind-Text="@UserForm.Oracle" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Oracle" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="SAP:">
-                                                <DxTextBox @bind-Text="@UserForm.SAP" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="SAP" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Employee Type:">
-                                                <DxComboBox Data="@EmployeeTypes" @bind-Value="@UserForm.EmployeeType" NullText="Select Employee Type..." />
+                                            <DxFormLayoutItem Caption="Sip Expired:">
+                                                <DxDateEdit @bind-Date="@UserForm.SipExp" Mask="@DateTimeMask.ShortDate" />
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>

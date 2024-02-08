@@ -9,7 +9,7 @@ namespace McDermott.Application.Dtos.Employee
 {
     public class DepartmentDto : IMapFrom<Department>
     {
-        public int Id { get; set; }
+        public int Id { get; set; } 
 
         [StringLength(200)]
         [Required]
@@ -22,8 +22,7 @@ namespace McDermott.Application.Dtos.Employee
 
         public int? CompanyId { get; set; }
         public string? DepartmentCategory { get; set; }
-
         public string? Manager { get; set; }
-        public virtual CompanyDto? Company { get; set; }
+        public virtual CompanyDto? Company { get; set; } 
     }
 }

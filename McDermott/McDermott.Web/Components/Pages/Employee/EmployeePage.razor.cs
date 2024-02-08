@@ -1,9 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Application.Dtos.Config;
-using McDermott.Domain.Entities;
-using McDermott.Web.Extentions;
 using System.Security.Claims;
-using static McDermott.Application.Features.Commands.Employee.EmployeeCommand;
 
 namespace McDermott.Web.Components.Pages.Employee
 {
@@ -47,6 +43,14 @@ namespace McDermott.Web.Components.Pages.Employee
             "Married"
         };
 
+        private List<string> EmployeeTypes = new()
+        {
+            "Employee",
+            "Pre Employee",
+            "Nurse",
+            "Doctor",
+        };
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -76,6 +80,8 @@ namespace McDermott.Web.Components.Pages.Employee
         {
             PanelVisible = true;
 
+            ShowForm = false;
+
             Users = await Mediator.Send(new GetUserEmployeeQuery());
 
             PanelVisible = false;
@@ -98,6 +104,12 @@ namespace McDermott.Web.Components.Pages.Employee
         }
 
         #region Grid
+
+        private void OnRowDoubleClick(GridRowClickEventArgs e)
+        {
+            UserForm = SelectedDataItems[0].Adapt<UserDto>();
+            ShowForm = true;
+        }
 
         private async Task HandleValidSubmit()
         {
@@ -177,7 +189,7 @@ namespace McDermott.Web.Components.Pages.Employee
         private void EditItem_Click()
         {
             try
-            { 
+            {
                 UserForm = SelectedDataItems[0].Adapt<UserDto>();
                 ShowForm = true;
             }
@@ -187,6 +199,11 @@ namespace McDermott.Web.Components.Pages.Employee
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        private async Task Refresh_Click()
+        {
+            await LoadData();
         }
 
         private async Task ExportXlsxItem_Click()

@@ -1,9 +1,10 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using Microsoft.AspNetCore.Components;
 using System.Security.Claims;
 
-namespace McDermott.Web.Components.Pages.Patient
+namespace McDermott.Web.Components.Pages.Medical
 {
-    public partial class PatientDataPage
+    public partial class PractitionerPage
     {
         private List<UserDto> Users = [];
         public List<CityDto> Cities = [];
@@ -74,7 +75,7 @@ namespace McDermott.Web.Components.Pages.Patient
 
             ShowForm = false;
 
-            Users = await Mediator.Send(new GetUserPatientQuery());
+            Users = await Mediator.Send(new GetUserPractitionerQuery());
 
             PanelVisible = false;
         }
@@ -93,41 +94,6 @@ namespace McDermott.Web.Components.Pages.Patient
                 }
                 catch { }
             }
-        }
-
-        public string Alert { get; set; } = "";
-        public int TabIndex { get; set; } = -1;
-        private bool IsClicked { get; set; } = false;
-
-        private async Task OnTabClick(TabClickEventArgs e)
-        {
-            IsClicked = true;
-            TabIndex = e.TabIndex;
-            Alert = $"{e.TabIndex} tab has been clicked";
-
-            switch (TabIndex)
-            {
-                case 0:
-                    await LoadData2();
-                    break;
-
-                case 1:
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        private List<UserDto> Users2 = [];
-
-        private async Task LoadData2()
-        {
-            PanelVisible = true;
-
-            Users2 = await Mediator.Send(new GetUserPatientQuery());
-
-            PanelVisible = false;
         }
 
         #region Grid
@@ -156,40 +122,18 @@ namespace McDermott.Web.Components.Pages.Patient
             ShowForm = false;
         }
 
-        private void OnClickSmartButton(string text)
-        {
-            TabIndex = text.ToInt32();
-        }
-
         private async Task OnSave()
         {
             if (!FormValidationState)
                 return;
 
             UserForm.IsEmployee = false;
-            UserForm.IsPatient = true;
+            UserForm.IsPatient = false;
             UserForm.IsUser = false;
-            UserForm.IsDoctor = false;
-            UserForm.IsNurse = false;
-            UserForm.IsPhysicion = false;
+            UserForm.IsDoctor = true;
 
             if (UserForm.Id == 0)
-            {
-                var date = DateTime.Now;
-                var lastId = Users.ToList().LastOrDefault();
-
-                if (lastId is null)
-                {
-                    UserForm.NoRm = $"{date.Day}-{date.Month}-{date.Year}-0001";
-                }
-                else
-                {
-                    int id = lastId!.NoRm!.Substring(lastId.NoRm.Length - 4).ToInt32();
-                    UserForm.NoRm = $"{date.Day}-{date.Month}-{date.Year}-{(++id).ToString("d4")}";
-                }
-
                 await Mediator.Send(new CreateUserRequest(UserForm));
-            }
             else
                 await Mediator.Send(new UpdateUserRequest(UserForm));
 

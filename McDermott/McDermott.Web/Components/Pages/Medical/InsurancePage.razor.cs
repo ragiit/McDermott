@@ -1,13 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Domain.Entities;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.Config.CityCommand;
-using static McDermott.Application.Features.Commands.Config.CountryCommand;
-using static McDermott.Application.Features.Commands.Medical.InsuranceCommand;
-using static McDermott.Application.Features.Commands.Config.ProvinceCommand;
-using McDermott.Application.Dtos.Config;
-using McDermott.Application.Dtos.Medical;
-using McDermott.Web.Extentions;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -46,6 +38,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 catch { }
             }
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
