@@ -1,12 +1,75 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CityPage
     {
+        DxUpload MyUpload { get; set; }
+
         private List<CityDto> Cities = [];
         private List<ProvinceDto> Provinces = [];
         private GroupMenuDto UserAccessCRUID = new();
+
+        private async Task SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
+        {
+            //foreach (var file in files)
+            //{
+            //    if (file.Type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            //    {
+            //        using (var stream = new MemoryStream())
+            //        {
+            //            stream.Position = 0;
+
+            //            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            //            // Gunakan EPPlus untuk membaca data Excel dari MemoryStream
+            //            using (var package = new ExcelPackage(stream))
+            //            {
+            //                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Ambil worksheet pertama
+
+            //                int rowCount = worksheet.Dimension.Rows;
+            //                int colCount = worksheet.Dimension.Columns;
+
+            //                // Lakukan sesuatu dengan data dari file Excel
+            //                for (int row = 1; row <= rowCount; row++)
+            //                {
+            //                    for (int col = 1; col <= colCount; col++)
+            //                    {
+            //                        var cellValue = worksheet.Cells[row, col].Value;
+            //                        // Lakukan sesuatu dengan nilai sel, misalnya, simpan ke dalam struktur data atau tampilkan di UI.
+            //                        Console.WriteLine(cellValue);
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+
+            // Refresh tampilan setelah selesai
+            InvokeAsync(StateHasChanged);
+        }
+
+        private void OnFileUploadStarted(FileUploadEventArgs e)
+        {
+            try
+            {
+                var a = e;
+
+                InvokeAsync(StateHasChanged);
+            }
+            catch (Exception ee)
+            {
+                throw;
+            }
+        }
+
+        private void woi()
+        {
+            var a = "asd";
+        }
 
         #region Default Grid Components
 
