@@ -153,6 +153,11 @@
 
     private async Task OnLogin()
     {
+        // toastService.ShowSuccess("Success"); 
+        // toastService.ShowInfo("Info"); 
+        // toastService.ShowWarning("Warning"); 
+        // toastService.ShowError("Error");   
+
         var user = await Mediator.Send(new GetUserByEmailPasswordQuery(User.Adapt<UserDto>()));
         if (user is not null && !string.IsNullOrWhiteSpace(User!.Email) && !string.IsNullOrWhiteSpace(User.Password))
         {
@@ -224,7 +229,7 @@
         }
         else
         {
-
+            toastService.ShowError("Invalid Email or Password!");
             // if (string.IsNullOrWhiteSpace(User.Email) || string.IsNullOrWhiteSpace(User.Password))
             // {
             //     text = "Please insert the Email and Password";

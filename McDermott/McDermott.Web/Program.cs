@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Blazored.Toast;
 using McDermott.Application.Extentions;
 using McDermott.Persistence.Extensions;
 using McDermott.Web.Components;
@@ -13,7 +14,7 @@ builder.Services.AddApplicationLayer();
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
 builder.Services.AddBlazoredLocalStorage();
-
+builder.Services.AddBlazoredToast();
 
 builder.Services.AddPersistenceLayer(builder.Configuration);
 
