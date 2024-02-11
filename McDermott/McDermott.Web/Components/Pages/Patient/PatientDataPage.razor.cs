@@ -74,7 +74,11 @@ namespace McDermott.Web.Components.Pages.Patient
 
             ShowForm = false;
 
-            UserForm.PatientAllergy.UserId = (int)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
+            try
+            {
+                UserForm.PatientAllergy.UserId = (int)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
+            }
+            catch { }
 
             Users = await Mediator.Send(new GetUserPatientQuery());
 
@@ -181,8 +185,8 @@ namespace McDermott.Web.Components.Pages.Patient
                 var lastId = Users.ToList().LastOrDefault();
 
                 UserForm.NoRm = lastId is null
-                    ? $"{date:dd-MM-yyyy}-0001"
-                    : $"{date:dd-MM-yyyy}-{(int.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):d4}";
+                         ? $"{date:dd-MM-yyyy}-0001"
+                         : $"{date:dd-MM-yyyy}-{(int.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
 
                 var result = await Mediator.Send(new CreateUserRequest(UserForm));
                 UserForm.PatientAllergy.UserId = result.Id;
