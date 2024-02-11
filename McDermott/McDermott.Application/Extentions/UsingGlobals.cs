@@ -9,6 +9,7 @@ global using System.ComponentModel.DataAnnotations;
 global using McDermott.Application.Dtos.Medical;
 global using McDermott.Application.Dtos.Config;
 global using McDermott.Application.Dtos.Employee;
+global using McDermott.Application.Dtos.Patient;
 
 global using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand;
 global using static McDermott.Application.Features.Commands.Config.GenderCommand;

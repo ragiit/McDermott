@@ -9,19 +9,18 @@
 @using Microsoft.JSInterop
 @using McDermott.Web
 @using McDermott.Web.Components
-@using DevExpress.Blazor 
+@using DevExpress.Blazor
 @using McDermott.Web.Components.Layout
 @using Blazored.Toast
 @using Blazored.Toast.Services
 
-
+@inject IHttpContextAccessor _httpContextAccessor
 @inject IToastService toastService
 @inject IJSRuntime JsRuntime
 @inject IMediator Mediator
 @inject Blazored.LocalStorage.ILocalStorageService oLocal
 
 @inject NavigationManager NavigationManager
-
 
 @using static McDermott.Web.Extentions.Helper
 

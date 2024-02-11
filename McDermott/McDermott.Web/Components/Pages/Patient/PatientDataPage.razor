@@ -20,12 +20,12 @@
                                     <div class="w-100">
                                         <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
                                             <Items>
-                                               @*  <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
-                                                               IconCssClass="fa-solid fa-user"
-                                                               Text="@($"Employee Relation dihapus")" />
-                                                <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
-                                                               IconCssClass="fa-solid fa-users"
-                                                               Text="@($"Family Relation ini tab dibawah ")" /> *@
+                                                @*  <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
+                                        IconCssClass="fa-solid fa-user"
+                                        Text="@($"Employee Relation dihapus")" />
+                                        <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
+                                        IconCssClass="fa-solid fa-users"
+                                        Text="@($"Family Relation ini tab dibawah ")" /> *@
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-virus-slash"
                                                                Text="@($"Data General Examination")" />
@@ -452,6 +452,29 @@
                                                     </Items>
                                                 </DxGridLayout>
                                             </div>
+                                        </DxFormLayoutGroup>
+
+                                        <DxFormLayoutGroup Caption="Allergy Data" ColSpanMd="12">
+                                            <Items>
+                                                <DxFormLayoutItem ColSpanMd="12" Caption="Farmacologi:">
+                                                    <DxMemo @bind-Text="@UserForm.PatientAllergy.Farmacology"
+                                                            NullText="Farmacologi"
+                                                            ShowValidationIcon="true"
+                                                            Rows="2" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem ColSpanMd="12" Caption="Weather:">
+                                                    <DxMemo @bind-Text="@UserForm.PatientAllergy.Weather"
+                                                            ShowValidationIcon="true"
+                                                            NullText="Weather"
+                                                            Rows="2" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem ColSpanMd="12" Caption="Food:">
+                                                    <DxMemo @bind-Text="@UserForm.PatientAllergy.Food"
+                                                            ShowValidationIcon="true"
+                                                            NullText="Food"
+                                                            Rows="2" />
+                                                </DxFormLayoutItem>
+                                            </Items>
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>
                                     <div class="ml-2 mt-1 mb-2 mr-3">

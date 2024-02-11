@@ -17,7 +17,7 @@ namespace McDermott.Application.Dtos.Config
         public string Email { get; set; } = string.Empty;
 
         public string Password { get; set; } = string.Empty;
-         
+
         public int? GenderId { get; set; }
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
@@ -27,7 +27,7 @@ namespace McDermott.Application.Dtos.Config
 
         public string? TypeId { get; set; } = "KTP"; // Jenis Identitas
         public int? NoId { get; set; } // No Identitas
-        public DateTime? ExpiredId { get; set; } 
+        public DateTime? ExpiredId { get; set; }
         public string? IdCardAddress1 { get; set; } // KTP Alamat 1
         public string? IdCardAddress2 { get; set; } // KTP Alamat 1
         public int? IdCardCountryId { get; set; } // KTP Negara
@@ -121,5 +121,6 @@ namespace McDermott.Application.Dtos.Config
         public virtual GroupDto? Group { get; set; }
         public virtual JobPositionDto? JobPosition { get; set; }
         public virtual DepartmentDto? Department { get; set; }
+        public virtual PatientAllergyDto PatientAllergy { get; set; } = new();
     }
 }
