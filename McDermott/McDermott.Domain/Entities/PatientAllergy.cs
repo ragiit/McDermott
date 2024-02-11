@@ -8,7 +8,7 @@ namespace McDermott.Domain.Entities
 {
     public class PatientAllergy : BaseAuditableEntity
     {
-        public int PatientId { get; set; }  
+        public int UserId { get; set; }
         public string? Farmacology { get; set; }
         public string? Weather { get; set; }
         public string? Food { get; set; }
