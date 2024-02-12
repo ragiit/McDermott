@@ -32,6 +32,7 @@
     <link rel="stylesheet" href="AdminLTE/plugins/summernote/summernote-bs4.min.css">
 
     <link rel="stylesheet" href="fontawesome/css/all.css" />
+    <link rel="stylesheet" href="_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.bs5.css" />
 
     @*...*@
     @* Bootstrap 5 *@
@@ -53,6 +54,7 @@
     @*...*@
 
     @* Blazor Bootstrap *@
+    <link rel="stylesheet" href="~/lib/quill/dist/quill.bubble.css"/>
 
 
     @DxResourceManager.RegisterScripts()
@@ -115,6 +117,9 @@
             }
         };
     </script>
+    <script src="lib/quill/dist/quill.min.js"></script>
+    <script src="_content/Blazored.TextEditor/quill-blot-formatter.min.js"></script>
+    <script src="_content/Blazored.TextEditor/Blazored-BlazorQuill.js"></script>
     <!-- jQuery -->
     <script src="AdminLTE/plugins/jquery/jquery.min.js"></script>
     <!-- jQuery UI 1.11.4 -->

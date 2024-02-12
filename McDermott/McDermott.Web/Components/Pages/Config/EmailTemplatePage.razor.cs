@@ -4,6 +4,7 @@ using static McDermott.Application.Features.Commands.Config.UserCommand;
 using static McDermott.Application.Features.Commands.Config.EmailTemplateCommand;
 using McDermott.Application.Dtos.Config;
 using McDermott.Web.Extentions;
+using Blazored.TextEditor;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -14,7 +15,8 @@ namespace McDermott.Web.Components.Pages.Config
         private bool PanelVisible { get; set; } = true;
         private bool PopupVisible { get; set; } = false;
         private string textPopUp = "";
-        DateTime DateTimeValue { get; set; } = DateTime.Now;
+        private BlazoredTextEditor QuillHtml;
+        private DateTime DateTimeValue { get; set; } = DateTime.Now;
         public IGrid Grid { get; set; }
         private List<EmailTemplateDto> EmailTemplates = new();
         private EmailTemplateDto EmailFormTemplate = new();
@@ -46,6 +48,7 @@ namespace McDermott.Web.Components.Pages.Config
                 catch { }
             }
         }
+
         protected override async Task OnInitializedAsync()
         {
             try
@@ -55,7 +58,7 @@ namespace McDermott.Web.Components.Pages.Config
                 UserAccessCRUID = result.Item2;
             }
             catch { }
-            //var by = 
+            //var by =
 
             EmailTemplates = await Mediator.Send(new GetEmailTemplateQuery());
             await LoadData();
@@ -67,8 +70,8 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 EmailFormTemplate.Schendule = DateTime.Now;
                 var Partner = await Mediator.Send(new GetUserQuery());
-                Cc = [.. Partner.Select(x=>x.Email)];
-                ToPartner = [.. Partner.Where(x=>x.IsPatient == true).ToList()];
+                Cc = [.. Partner.Select(x => x.Email)];
+                ToPartner = [.. Partner.Where(x => x.IsPatient == true).ToList()];
                 User = await oLocal.GetUserInfo();
                 userBy = User.Name;
                 EmailFormTemplate.ById = User.Id;
@@ -76,7 +79,6 @@ namespace McDermott.Web.Components.Pages.Config
             }
             catch
             {
-
             }
         }
 
@@ -178,8 +180,5 @@ namespace McDermott.Web.Components.Pages.Config
             }
             catch { }
         }
-
-
     }
-
 }

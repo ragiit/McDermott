@@ -1,24 +1,49 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using McDermott.Application.Dtos.Config;
 using McDermott.Web.Extentions;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
+using System.Net;
+using System.Net.Mail;
 using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class EmailSettingPage
     {
-        private GroupMenuDto UserAccessCRUID = new();
-        private bool PanelVisible { get; set; } = true;
+        #region Relatio Data
 
-        private string textPopUp = "";
+        private List<EmailSettingDto> EmailSettings = new();
+        private EmailSettingDto FormEmails = new();
+
+        #endregion Relatio Data
+
+        #region Auth
+
+        private bool IsAccess = false;
+        private GroupMenuDto UserAccessCRUID = new();
+
+        #endregion Auth
+
+        private readonly SmtpClient? _smtpClient;
+
+        #region Grid Setting
+
+        private bool PanelVisible { get; set; } = true;
+        private bool PopUpVisible { get; set; } = false;
+
+        private string TextPopUp = "";
+        private bool ShowForm { get; set; } = false;
 
         public IGrid Grid { get; set; }
-        private List<EmailSettingDto> EmailSettings = new();
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
+
+        #endregion Grid Setting
+
+        #region Data static
 
         private List<string> Stts_Ecrypt = new List<string>
         {
@@ -27,7 +52,9 @@ namespace McDermott.Web.Components.Pages.Config
             "SSL/TLS"
         };
 
-        private bool IsAccess = false;
+        #endregion Data static
+
+        #region Async Data And Auth Render
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -65,6 +92,10 @@ namespace McDermott.Web.Components.Pages.Config
             PanelVisible = false;
         }
 
+        #endregion Async Data And Auth Render
+
+        #region Config Grid
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -94,15 +125,21 @@ namespace McDermott.Web.Components.Pages.Config
             }
         }
 
+        #endregion Config Grid
+
+        #region Button Setting
+
         private async Task NewItem_Click()
         {
-            textPopUp = "Tambah Data";
+            PopUpVisible = true;
+            TextPopUp = "Tambah Data";
             await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
-            textPopUp = "Edit Data";
+            PopUpVisible = false;
+            TextPopUp = "Edit Data";
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
@@ -140,6 +177,10 @@ namespace McDermott.Web.Components.Pages.Config
             });
         }
 
+        #endregion Button Setting
+
+        #region function Delete
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             if (SelectedDataItems is null)
@@ -153,6 +194,10 @@ namespace McDermott.Web.Components.Pages.Config
             }
             await LoadData();
         }
+
+        #endregion function Delete
+
+        #region Save Function
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
@@ -169,9 +214,23 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadData();
         }
 
-        private async Task TestConnect(GridEditModelSavingEventArgs e)
+        #endregion Save Function
+
+        private async Task TestConnect()
         {
-            var SmtpConnection = (EmailSettingDto)e.EditModel;
+            try
+            {
+                using (SmtpClient smtp = new SmtpClient(FormEmails.Smpt_Host, FormEmails.Smpt_Port))
+                {
+                    smtp.Credentials = new NetworkCredential(FormEmails.Smpt_User, FormEmails.Smpt_Pass);
+                    smtp.EnableSsl = false;
+                    //smtp.Send();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
     }
 }

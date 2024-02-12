@@ -33,9 +33,8 @@
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                             KeyFieldName="Id"
                                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-
                                             DataItemDeleting="OnDelete"
-                                            EditMode="GridEditMode.PopupEditForm"
+                                            EditMode="GridEditMode.EditForm"
                                             PopupEditFormCssClass="my-style"
                                             PagerPosition="GridPagerPosition.Bottom"
                                             PageSizeSelectorVisible="true"
@@ -48,7 +47,6 @@
                                             FocusedRowChanged="Grid_FocusedRowChanged"
                                             ShowGroupPanel="true"
                                             AutoExpandAllGroupRows="true"
-                                            PopupEditFormHeaderText="@textPopUp"
                                             ShowFilterRow="true"
                                             CustomizeElement="Grid_CustomizeElement"
                                             ShowSearchBox="true"
@@ -59,15 +57,6 @@
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && EmailSettings.Count > 0" />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && EmailSettings.Count > 0" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
@@ -78,37 +67,44 @@
                                             <DxGridDataColumn FieldName="Smtp_user" Caption="Username" />
                                             <DxGridDataColumn FieldName="Smtp_Encryption" Caption="Connection Scurity" />
                                         </Columns>
-                                        <EditFormTemplate Context="EditFormContext">
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                                <DxPopup @bind-Visible="@PopUpVisible"
+                                         HeaderText="@TextPopUp"
+                                         Width="60%"
+                                         Height="90%">
+                                    <BodyTemplate Context="PopupContext">
+                                        <div style="padding-top: 1rem; padding-bottom: 1rem">
                                             @{
-                                                var a = (EmailSettingDto)EditFormContext.EditModel;
-                                                if (a.Smpt_Encryption == "TLS (STARTTLS)")
+
+                                                if (FormEmails.Smpt_Encryption == "TLS (STARTTLS)")
                                                 {
-                                                    a.Smpt_Port = 25;
+                                                    FormEmails.Smpt_Port = 25;
                                                 }
-                                                else if (a.Smpt_Encryption == "SSL/TLS")
+                                                else if (FormEmails.Smpt_Encryption == "SSL/TLS")
                                                 {
-                                                    a.Smpt_Port = 465;
+                                                    FormEmails.Smpt_Port = 465;
                                                 }
-                                                else if (a.Smpt_Encryption == "none")
+                                                else if (FormEmails.Smpt_Encryption == "none")
                                                 {
-                                                    a.Smpt_Port = null;
+                                                    FormEmails.Smpt_Port = 0;
                                                 }
                                             }
-                                            <DxFormLayout CssClass="mt-auto col-lg">
-                                                <DxFormLayoutGroup ColSpanLg="12">
+                                            <DxFormLayout CssClass="mt">
+                                                <DxFormLayoutGroup Caption="Configuration Email" ColSpanLg="12">
                                                     <DxFormLayoutItem ColSpanMd="6" Caption="Description:">
-                                                        <DxTextBox @bind-Text="@a.Description" NullText="Descriptio" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        <DxTextBox @bind-Text="@FormEmails.Description" NullText="Description..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem ColSpanMd="6" Caption="Priority:">
-                                                        <DxSpinEdit @bind-Value="@a.Sequence" NullText="Priority" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        <DxSpinEdit @bind-Value="@FormEmails.Sequence" NullText="Priority" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                     </DxFormLayoutItem>
                                                 </DxFormLayoutGroup>
                                                 <DxFormLayoutGroup Caption="Connection Information" ColSpanMd="12">
                                                     <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Server:">
-                                                        <DxTextBox @bind-Text="@a.Smpt_Host" NullText="SMPTP Server" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        <DxTextBox @bind-Text="@FormEmails.Smpt_Host" NullText="SMPTP Server" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Port:">
-                                                        <DxSpinEdit @bind-Value="@a.Smpt_Port" NullText="SMTP PORT" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        <DxSpinEdit @bind-Value="@FormEmails.Smpt_Port" NullText="SMTP PORT" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                     </DxFormLayoutItem>
                                                 </DxFormLayoutGroup>
                                                 <DxFormLayoutGroup Caption="Security And Authentication" ColSpanMd="12">
@@ -116,15 +112,15 @@
                                                         <Template>
                                                             <DxComboBox Data="@Stts_Ecrypt"
                                                                         NullText="Select Ecrypt..."
-                                                                        @bind-Value="@a.Smpt_Encryption">
+                                                                        @bind-Value="@FormEmails.Smpt_Encryption">
                                                             </DxComboBox>
                                                         </Template>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem ColSpanMd="12" Caption="Username:">
-                                                        <DxTextBox @bind-Text="@a.Smpt_User" NullText="Username" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        <DxTextBox @bind-Text="@FormEmails.Smpt_User" NullText="Username" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem ColSpanMd="12" Caption="Password:">
-                                                        <DxTextBox @bind-Text="@a.Smpt_Pass"
+                                                        <DxTextBox @bind-Text="@FormEmails.Smpt_Pass"
                                                                    NullText="Password"
                                                                    Password="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -145,9 +141,9 @@
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
 
-                                        </EditFormTemplate>
-                                    </DxGrid>
-                                </DxLoadingPanel>
+                                        </div>
+                                    </BodyTemplate>
+                                </DxPopup>
                             </div>
                         </div>
                     </div>
