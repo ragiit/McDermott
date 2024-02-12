@@ -45,13 +45,13 @@
                                                                IconCssClass="fa-solid fa-syringe"
                                                                Text="@($"Data wellness")" />
 
-                                                <DxToolbarItem Text="Data Alergi" BeginGroup="true" Alignment="ToolbarItemAlignment.Right" IconCssClass="fa-solid fa-virus">
-                                                    <Items>
-                                                        <DxToolbarItem IconCssClass="fa-solid fa-syringe" Text="Farmacologi" GroupName="Farmacologi" />
-                                                        <DxToolbarItem IconCssClass="fa-solid fa-syringe" Text="Cuaca" GroupName="Cuaca" />
-                                                        <DxToolbarItem IconCssClass="fa-solid fa-syringe" Text="Makanan" GroupName="Makanan" />
-                                                    </Items>
-                                                </DxToolbarItem>
+                                                @*   <DxToolbarItem Text="Data Alergi" BeginGroup="true" Alignment="ToolbarItemAlignment.Right" IconCssClass="fa-solid fa-virus">
+                                        <Items>
+                                        <DxToolbarItem IconCssClass="fa-solid fa-syringe" Text="Farmacologi" GroupName="Farmacologi" />
+                                        <DxToolbarItem IconCssClass="fa-solid fa-syringe" Text="Cuaca" GroupName="Cuaca" />
+                                        <DxToolbarItem IconCssClass="fa-solid fa-syringe" Text="Makanan" GroupName="Makanan" />
+                                        </Items>
+                                        </DxToolbarItem> *@
                                             </Items>
                                         </DxToolbar>
                                         @*
@@ -106,7 +106,7 @@
                                                                 <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
                                                                 <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0 && !IsDeleted" />
                                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                                <DxToolbarItem Text="Column Chooser" BeginGroup="true" Click="ColumnChooserButton_Click" IconCssClass="fa-solid fa-table-columns" />
                                                                 <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
                                                                     <Items>
                                                                         <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
@@ -114,7 +114,7 @@
                                                                         <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                                     </Items>
                                                                 </DxToolbarItem>
-                                                                @* <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" /> *@
+                                                                @* <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" /> *@
                                                             </DxToolbar>
                                                         </ToolbarTemplate>
                                                         <Columns>
@@ -184,15 +184,15 @@
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0 && !IsDeleted" />
                                                     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                    <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                    <DxToolbarItem Text="Column Chooser" BeginGroup="true" Click="ColumnChooserButton_Click" IconCssClass="fa-solid fa-table-columns" />
+                                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
                                                         <Items>
                                                             <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
                                                             <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
                                                             <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                         </Items>
                                                     </DxToolbarItem>
-                                                    @* <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" /> *@
+                                                    @* <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" /> *@
                                                 </DxToolbar>
                                             </ToolbarTemplate>
                                             <Columns>
@@ -216,16 +216,40 @@
                                                 <DxTextBox @bind-Text="@UserForm.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Email:">
-                                                <DxTextBox @bind-Text="@UserForm.Email" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Email" />
+                                                <DxMaskedInput @bind-Value="@UserForm.Email"
+                                                               Mask="@EmailMask"
+                                                               ShowValidationIcon="true"
+                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                               NullText="mail@domain.com"
+                                                               MaskMode="MaskMode.RegEx">
+                                                    <Buttons>
+                                                        <DxEditorButton IconCssClass="fa-solid fa-envelope" />
+                                                    </Buttons>
+                                                    <ChildContent>
+                                                        <DxRegExMaskProperties MaskAutoCompleteMode="@MaskAutoCompleteMode.Strong"
+                                                                               Placeholder="@('_')"
+                                                                               PlaceholdersVisible="true" />
+                                                    </ChildContent>
+                                                </DxMaskedInput>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Medical Record:">
                                                 <p>@UserForm.NoRm</p>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Mobile Phone:">
-                                                <DxSpinEdit @bind-Value="@UserForm.MobilePhone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Mobile Phone" />
+                                                <DxMaskedInput @bind-Value="@UserForm.MobilePhone"
+                                                               ShowValidationIcon="true"
+                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                               NullText="Mobile Phone">
+                                                    <DxTextMaskProperties Placeholder="Placeholder" />
+                                                </DxMaskedInput>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Home Phone Number:">
-                                                <DxSpinEdit @bind-Value="@UserForm.HomePhoneNumber" NullText="Home Phone Number" />
+                                                <DxMaskedInput @bind-Value="@UserForm.HomePhoneNumber"
+                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                               ShowValidationIcon="true"
+                                                               NullText="Home Mobile Phone">
+                                                    <DxTextMaskProperties Placeholder="Placeholder" />
+                                                </DxMaskedInput>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Religion:">
                                                 <DxComboBox Data="@Religions" NullText="Religion" @bind-Value="@UserForm.ReligionId" TextFieldName="Name" ValueFieldName="Id" />
@@ -234,7 +258,12 @@
                                                 <DxTextBox @bind-Text="@UserForm.Npwp" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="NPWP" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Identity Number:">
-                                                <DxSpinEdit @bind-Value="@UserForm.NoId" NullText="Identity Number" />
+                                                <DxMaskedInput @bind-Value="@UserForm.NoId"
+                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                               ShowValidationIcon="true"
+                                                               NullText="Identity Number">
+                                                    <DxTextMaskProperties Placeholder="Placeholder" />
+                                                </DxMaskedInput>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Identity Type:">
                                                 <DxComboBox Data="@IdentityTypes" @bind-Value="@UserForm.TypeId"></DxComboBox>
@@ -255,7 +284,12 @@
                                                 <DxDateEdit @bind-Date="@UserForm.DateOfBirth" NullText="Date of Birth" MaxDate="DateTime.Now" Mask="@DateTimeMask.ShortDate" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Emergency Phone:">
-                                                <DxSpinEdit @bind-Value="@UserForm.EmergencyPhone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Phone" />
+                                                <DxMaskedInput @bind-Value="@UserForm.EmergencyPhone"
+                                                               NullText="Emergency Phone"
+                                                               ShowValidationIcon="true"
+                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                    <DxTextMaskProperties Placeholder="Placeholder" />
+                                                </DxMaskedInput>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Gender:">
                                                 <DxComboBox Data="@Genders" NullText="Gender" @bind-Value="@UserForm.GenderId" TextFieldName="Name" ValueFieldName="Id" />

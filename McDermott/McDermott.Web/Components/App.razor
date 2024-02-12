@@ -53,12 +53,8 @@
     @*...*@
 
     @* Blazor Bootstrap *@
-     
 
     <link href="McDermott.Web.styles.css" rel="stylesheet">
-
-
-
 
     @DxResourceManager.RegisterScripts()
 
@@ -102,6 +98,10 @@
     <Routes @rendermode="InteractiveServer" />
     <script src="_framework/blazor.web.js"></script>
     <script>
+        window.clickInputFile = function () {
+            document.getElementById('fileInput').click();
+        }
+
         window.BlazorHelpers = {
             setTimeout: function (callback, timeout) {
                 return setTimeout(callback, timeout);

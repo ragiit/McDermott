@@ -8,7 +8,32 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
+    .a {
+        z-index: -1;
+    }
 </style>
+
+<div class="a">
+
+<BlazoredToasts Position="ToastPosition.TopRight"
+                Timeout="5"
+                IconType="IconType.FontAwesome"
+                ShowProgressBar="true"
+
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                InfoIcon="fa fa-info-circle"
+                WarningIcon="fa fa-warning"
+                ErrorIcon="fa fa-bug">
+    <CloseButtonContent>
+        <div>
+            <span>&times;</span>
+        </div>
+    </CloseButtonContent>
+</BlazoredToasts>
+
+</div>
 
 <div class="wrapper">
 
@@ -224,20 +249,4 @@
     }
 
 </div>
-<!-- ./wrapper --> 
-
-<BlazoredToasts Position="ToastPosition.TopRight"
-                Timeout="5"
-                IconType="IconType.FontAwesome"
-                ShowProgressBar="true"
-                SuccessClass="success-toast-override"
-                SuccessIcon="fa fa-thumbs-up"
-                InfoIcon="fa fa-info-circle"
-                WarningIcon="fa fa-warning"
-                ErrorIcon="fa fa-bug">
-    <CloseButtonContent>
-        <div>
-            <span>&times;</span>
-        </div>
-    </CloseButtonContent>
-</BlazoredToasts>
+<!-- ./wrapper -->
