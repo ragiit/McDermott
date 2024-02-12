@@ -75,7 +75,7 @@
                                                                 ApplyBackgroundShading="true"
                                                                 IndicatorAreaVisible="false"
                                                                 Text="Fetching Data...">
-                                                    <DxGrid @ref="Grid"
+                                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
                                                             Data="Users2"
                                                             PageSize="10"
                                                             @bind-SelectedDataItems="@SelectedDataItems"
@@ -153,7 +153,7 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
-                                        <DxGrid @ref="Grid"
+                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
                                                 Data="Users"
                                                 PageSize="10"
                                                 @bind-SelectedDataItems="@SelectedDataItems"

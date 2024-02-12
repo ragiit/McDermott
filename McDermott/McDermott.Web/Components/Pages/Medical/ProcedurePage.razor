@@ -19,7 +19,7 @@
                                 IndicatorAreaVisible="false"
                                 Text="Fetching Data...">
 
-                                    <DxGrid @ref="Grid"
+                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
                                     Data="Procedures"
                                     PageSize="10"
                                     @bind-SelectedDataItems="@SelectedDataItems"
