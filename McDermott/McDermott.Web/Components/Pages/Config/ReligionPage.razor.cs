@@ -1,8 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Application.Dtos.Config;
-using McDermott.Web.Extentions;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.Config.ReligionCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {

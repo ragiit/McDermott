@@ -1,7 +1,4 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Domain.Entities;
-using System.Linq;
-using static McDermott.Web.Components.Pages.Medical.DoctorScheduledPage;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {

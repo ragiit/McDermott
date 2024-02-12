@@ -1,5 +1,4 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Web.Extentions;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

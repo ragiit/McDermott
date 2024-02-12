@@ -1,5 +1,4 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Web.Extentions;
 using Microsoft.AspNetCore.Components;
 using System.Globalization;
 
@@ -74,8 +73,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private GroupMenuDto UserAccessCRUID = new();
 
         #endregion Grid Setting
-
-
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {

@@ -1,4 +1,5 @@
 ﻿using McDermott.Application.Dtos.Config;
+using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Config.CountryCommand;
 using static McDermott.Application.Features.Commands.Config.UserCommand;
 
@@ -162,10 +163,18 @@ namespace McDermott.Application.Features.Queries.Config
 
             public async Task<bool> Handle(DeleteUserRequest request, CancellationToken cancellationToken)
             {
-                await _unitOfWork.Repository<User>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                try
+                {
+                    await _unitOfWork.Repository<User>().DeleteAsync(request.Id);
+                    await _unitOfWork.Repository<PatientAllergy>().DeleteAsync(x => x.UserId == request.Id);
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return true;
+                    return true;
+                }
+                catch (Exception e )
+                {
+                    return false;
+                }
             }
         }
 
@@ -180,10 +189,18 @@ namespace McDermott.Application.Features.Queries.Config
 
             public async Task<bool> Handle(DeleteListUserRequest request, CancellationToken cancellationToken)
             {
-                await _unitOfWork.Repository<User>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                try
+                {
+                    await _unitOfWork.Repository<User>().DeleteAsync(request.Id);
+                    await _unitOfWork.Repository<PatientAllergy>().DeleteAsync(x => request.Id.Contains(x.UserId));
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return true;
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
             }
         }
 

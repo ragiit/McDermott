@@ -9,7 +9,7 @@
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
 
-        public int? NoRm { get; set; }
+        public string? NoRm { get; set; }
         public int? GenderId { get; set; }
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
@@ -67,6 +67,8 @@
         public bool? IsDoctor { get; set; }
         public bool? IsPhysicion { get; set; }
         public bool? IsNurse { get; set; }
+        public bool? IsEmployeeRelation { get; set; }
+        public string? EmployeeType { get; set; }
         public string? EmployeeStatus { get; set; }
         public DateTime? JoinDate { get; set; }
         public int NIP { get; set; }

@@ -6,44 +6,44 @@
 <div class="wrapper">
     <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Speciality" />
 
-        <section class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col">
-                        <div class="card">
-                            <div class="card-body">
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                IsContentBlocked="true"
-                                ApplyBackgroundShading="true"
-                                IndicatorAreaVisible="false"
-                                Text="Fetching Data...">
-                                    <DxGrid @ref="Grid"
-                                    Data="Specialitys"
-                                    PageSize="10"
-                                    @bind-SelectedDataItems="@SelectedDataItems"
-                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                    KeyFieldName="Id"
-                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                    EditModelSaving="OnSave"
-                                    DataItemDeleting="OnDelete"
-                                    EditMode="GridEditMode.EditForm"
-                                    PopupEditFormCssClass="pw-800"
-                                    PagerPosition="GridPagerPosition.Bottom"
-                                    PageSizeSelectorVisible="true"
-                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                    PageSizeSelectorAllRowsItemVisible="true"
-                                    PagerSwitchToInputBoxButtonCount="10"
-                                    FocusedRowEnabled="true"
-                                    PagerVisibleNumericButtonCount="10"
-                                    FocusedRowChanged="Grid_FocusedRowChanged"
-                                    ShowGroupPanel="false"
-                                    AutoExpandAllGroupRows="true"
-                                    ShowFilterRow="true"
-                                    CustomizeElement="Grid_CustomizeElement"
-                                    ShowSearchBox="true"
-                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                    KeyboardNavigationEnabled="true">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <DxGrid @ref="Grid"
+                                        Data="Specialitys"
+                                        PageSize="10"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                        KeyFieldName="Id"
+                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                        EditModelSaving="OnSave"
+                                        DataItemDeleting="OnDelete"
+                                        EditMode="GridEditMode.EditForm"
+                                        PopupEditFormCssClass="pw-800"
+                                        PagerPosition="GridPagerPosition.Bottom"
+                                        PageSizeSelectorVisible="true"
+                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                        PageSizeSelectorAllRowsItemVisible="true"
+                                        PagerSwitchToInputBoxButtonCount="10"
+                                        FocusedRowEnabled="true"
+                                        PagerVisibleNumericButtonCount="10"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        ShowGroupPanel="false"
+                                        AutoExpandAllGroupRows="true"
+                                        ShowFilterRow="true"
+                                        CustomizeElement="Grid_CustomizeElement"
+                                        ShowSearchBox="true"
+                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                        KeyboardNavigationEnabled="true">
                                     <ToolbarTemplate>
                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                             <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
@@ -60,35 +60,34 @@
                                             <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
                                         </DxToolbar>
                                     </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn width="15px" />
-                                            <DxGridDataColumn FieldName="Name" Caption="Speciality" SortIndex="0" />
-                                            <!-- <DxGridDataColumn FieldName="Code"  Caption="Code" Width="0" MinWidth="0" /> -->
-                                        </Columns>
-                                        <EditFormTemplate Context="EditFormContext">
+                                    <Columns>
+                                        <DxGridSelectionColumn width="15px" />
+                                        <DxGridDataColumn FieldName="Name" Caption="Speciality" SortIndex="0" />
+                                        <!-- <DxGridDataColumn FieldName="Code"  Caption="Code" Width="0" MinWidth="0" /> -->
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
 
-                                            @{
-                                                var a = (SpecialityDto)EditFormContext.EditModel;
-                                            }
-                                            <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem Caption="Description:" CaptionCssClass="required-caption" ColSpanMd="6">
-                                                    <div class="pop-warning">
-                                                        @EditFormContext.GetEditor("Name")
-                                                    </div>
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Code:" ColSpanMd="6">
-                                                    <!-- @EditFormContext.GetEditor("Code") -->
-                                                    <DxTextBox @bind-Text="@a.Code" />
-                                                </DxFormLayoutItem>
-                                            </DxFormLayout>
-                                        </EditFormTemplate>
-                                    </DxGrid>
-                                </DxLoadingPanel>
-                            </div>
+                                        @{
+                                            var a = (SpecialityDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem Caption="Description:" CaptionCssClass="required-caption" ColSpanMd="6">
+                                                <div class="pop-warning">
+                                                    @EditFormContext.GetEditor("Name")
+                                                </div>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Code:" ColSpanMd="6">
+                                                <!-- @EditFormContext.GetEditor("Code") -->
+                                                <DxTextBox @bind-Text="@a.Code" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </DxGrid>
+                            </DxLoadingPanel>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-    </div>
-}
+        </div>
+    </section>
+</div> 

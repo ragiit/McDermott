@@ -1,13 +1,7 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Razor.Language.Extensions;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.JSInterop;
-using OfficeOpenXml.Packaging.Ionic.Zlib;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -507,6 +501,24 @@ namespace McDermott.Web.Components.Pages.Medical
             await Grid.StartEditNewRowAsync();
         }
 
+        private async Task OnRowDoubleClick()
+        {
+            try
+            {
+                DoctorSchedule = SelectedDataItems[0].Adapt<DoctorScheduleDto>();
+                ShowForm = true;
+
+                if (DoctorSchedule != null)
+                {
+                    DeletedDoctorScheduleDetails = await Mediator.Send(new GetDoctorScheduleDetailByScheduleIdQuery(DoctorSchedule.Id));
+                    DoctorScheduleDetails = await Mediator.Send(new GetDoctorScheduleDetailByScheduleIdQuery(DoctorSchedule.Id));
+                    var a = Users.Where(x => DoctorSchedule.PhysicionIds != null && DoctorSchedule.PhysicionIds.Contains(x.Id)).ToList();
+                    SelectedPhysicions = a;
+                }
+            }
+            catch { }
+        }
+
         private async Task EditItem_Click()
         {
             try
@@ -523,6 +535,11 @@ namespace McDermott.Web.Components.Pages.Medical
                 }
             }
             catch { }
+        }
+
+        private async Task Refresh_Click()
+        {
+            await LoadData();
         }
 
         private void DeleteItem_Click()

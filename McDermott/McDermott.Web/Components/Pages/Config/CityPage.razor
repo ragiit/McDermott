@@ -62,9 +62,30 @@
                                                         <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                     </Items>
                                                 </DxToolbarItem>
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Import"   id="upload" Text="Import" IconCssClass="fa-solid fa-file-import" />
+                                                @* <DxUpload Name="myFile" ExternalSelectButtonCssSelector="#ToolBarSelectBtn" SelectedFilesChanged="@SelectedFilesChanged"></DxUpload> *@
                                             </DxToolbar>
+
+                                          @*   <DxUpload ExternalSelectButtonCssSelector="#upload"
+                                                      ExternalDropZoneCssSelector="#upload"
+                                                      Visible="false"
+                                                      ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+                                               
+                                                      FileUploaded="OnFileUploaded"
+                                                      MaxFileSize="15000000"
+                                                      @ref="MyUpload">
+
+                                            </DxUpload> *@
+                                            <DxUpload Name="myFile"
+                                                      ExternalSelectButtonCssSelector="#upload"
+                                                      ExternalDropZoneCssSelector="#upload"
+                                                      SelectedFilesChanged="@SelectedFilesChanged"
+                                                      FileUploadStarted="@OnFileUploadStarted"
+                                                      AcceptedFileTypes="@(new List<string> { ".xlxs" })"
+                                                      UploadUrl="test">
+                                            </DxUpload>
                                         </ToolbarTemplate>
+
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="Name" SortIndex="0" />

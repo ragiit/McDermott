@@ -30,3 +30,7 @@ global using static McDermott.Application.Features.Commands.Config.GenderCommand
 global using static McDermott.Application.Features.Commands.Config.MenuCommand;
 global using static McDermott.Application.Features.Commands.Medical.HealthCenterCommand;
 global using static McDermott.Application.Features.Commands.Medical.SpecialityCommand;
+global using static McDermott.Application.Features.Commands.Patient.PatientCommand;
+global using static McDermott.Application.Features.Commands.Medical.PractitionerCommand;
+global using static McDermott.Application.Features.Commands.Config.CompanyCommand;
+global using static McDermott.Application.Features.Commands.Employee.EmployeeCommand;

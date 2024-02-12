@@ -40,22 +40,16 @@
     @* Bootstrap 4 *@
     <link href="_content/DevExpress.Blazor.Themes/office-white.bs4.min.css" asp-append-version="true" rel="stylesheet" />
 
-    @* Bootstrap 5  PURPLE *@
-    @* <link href="_content/DevExpress.Blazor.Themes/purple.bs5.min.css" asp-append-version="true" rel="stylesheet" /> *@
-    @* Bootstrap 4 *@
-    @* <link href="_content/DevExpress.Blazor.Themes/purple.bs4.min.css" asp-append-version="true" rel="stylesheet" /> *@
-
-    @* <link href="~/css/site.css" rel="stylesheet" /> *@
-    @*...*@
-    @* bootstrap-external for Bootstrap 5 *@
+   
     <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css" />
     @* bootstrap-external for Bootstrap 4 *@
     <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs4.min.css" />
     @*...*@
 
     @* Blazor Bootstrap *@
-    <link rel="stylesheet" href="~/lib/quill/dist/quill.bubble.css"/>
 
+
+    <link href="McDermott.Web.styles.css" rel="stylesheet">
 
     @DxResourceManager.RegisterScripts()
 
@@ -92,7 +86,6 @@
             display: block;
         }
     </style>
-
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -117,9 +110,7 @@
             }
         };
     </script>
-    <script src="lib/quill/dist/quill.min.js"></script>
-    <script src="_content/Blazored.TextEditor/quill-blot-formatter.min.js"></script>
-    <script src="_content/Blazored.TextEditor/Blazored-BlazorQuill.js"></script>
+   
     <!-- jQuery -->
     <script src="AdminLTE/plugins/jquery/jquery.min.js"></script>
     <!-- jQuery UI 1.11.4 -->
@@ -193,5 +184,4 @@
     }
     </script> *@
 </body>
-
 </html>

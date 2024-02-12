@@ -7,7 +7,7 @@
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="User" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Employees" />
 
         <section class="content">
             <div class="container-fluid">
@@ -37,6 +37,7 @@
                                                 PagerPosition="GridPagerPosition.Bottom"
                                                 PageSizeSelectorVisible="true"
                                                 PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                RowDoubleClick="OnRowDoubleClick"
                                                 PageSizeSelectorAllRowsItemVisible="true"
                                                 PagerSwitchToInputBoxButtonCount="10"
                                                 PagerVisibleNumericButtonCount="10"
@@ -52,6 +53,7 @@
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0 && !IsDeleted" />
+                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                     <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                     <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
                                                         <Items>
@@ -60,7 +62,7 @@
                                                             <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                         </Items>
                                                     </DxToolbarItem>
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                                    @* <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" /> *@
                                                 </DxToolbar>
                                             </ToolbarTemplate>
                                             <Columns>
@@ -119,7 +121,7 @@
                                                 <DxTextBox @bind-Text="@UserForm.EmergencyEmail" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Email" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Date of Birth:">
-                                                <DxDateEdit @bind-Date="@UserForm.DateOfBirth" Mask="@DateTimeMask.ShortDate" />
+                                                <DxDateEdit @bind-Date="@UserForm.DateOfBirth" NullText="Date of Birth" Mask="@DateTimeMask.ShortDate" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Emergency Phone:">
                                                 <DxSpinEdit @bind-Value="@UserForm.EmergencyPhone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Phone" />
@@ -128,7 +130,7 @@
                                                 <DxComboBox Data="@Genders" NullText="Gender" @bind-Value="@UserForm.GenderId" TextFieldName="Name" ValueFieldName="Id" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Martial Status:">
-                                                <DxComboBox Data="@MartialStatuss" @bind-Value="@UserForm.MartialStatus"></DxComboBox>
+                                                <DxComboBox Data="@MartialStatuss" NullText="Select Martial Status..." @bind-Value="@UserForm.MartialStatus"></DxComboBox>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="KTP Address:" ColSpanMd="12">
                                                 <Template>
@@ -340,10 +342,13 @@
                                             <DxFormLayoutItem Caption="SAP:">
                                                 <DxTextBox @bind-Text="@UserForm.SAP" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="SAP" />
                                             </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Employee Type:">
+                                                <DxComboBox Data="@EmployeeTypes" @bind-Value="@UserForm.EmployeeType" NullText="Select Employee Type..." />
+                                            </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>
-                                    <div class="ml-2 mt-1 mb-2">
-                                        <div class="row  justify-content-end">
+                                    <div class="ml-2 mt-1 mb-2 mr-3">
+                                        <div class="row justify-content-end">
                                             <div class="col-auto align-self-end">
                                                 <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
                                                           Text="Save"

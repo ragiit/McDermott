@@ -1,14 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Config.CountryCommand;
-using static McDermott.Application.Features.Commands.Config.ProvinceCommand;
-using static McDermott.Application.Features.Commands.Config.CityCommand;
-using static McDermott.Application.Features.Commands.Config.DistrictCommand;
-using static McDermott.Application.Features.Commands.Config.VillageCommand;
-using DevExpress.Data.XtraReports.Native;
+﻿using DevExpress.Data.XtraReports.Native;
 using Microsoft.JSInterop;
-using McDermott.Web.Components.Layout;
-using McDermott.Domain.Entities;
-using McDermott.Application.Dtos.Config;
-using McDermott.Web.Extentions;
 
 namespace McDermott.Web.Components.Pages.Config
 {

@@ -1,5 +1,4 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Application.Dtos.Config;
 using static McDermott.Application.Features.Commands.Patient.FamilyCommand;
 
 namespace McDermott.Web.Components.Pages.Patient

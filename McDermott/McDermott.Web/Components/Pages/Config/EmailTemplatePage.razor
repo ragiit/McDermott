@@ -20,148 +20,118 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
-                                                Text="Fetching Data...">
-                                    <DxGrid @ref="Grid"
-                                            Data="EmailTemplates"
-                                            PageSize="10"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            DataItemDeleting="OnDelete"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            AllowSelectRowByClick="true"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            ShowFilterRow="true"
-                                            PopupEditFormHeaderText="@textPopUp"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
-                                        <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && EmailTemplates.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && EmailTemplates.Count > 0" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                            </DxToolbar>
-                                        </ToolbarTemplate>
-                                    </DxGrid>
-                                    <DxPopup @bind-Visible="@PopupVisible" HeaderText="@textPopUp" HeaderCssClass="fw-bold" Width="50%">
-                                        <EditForm Model="@EmailFormTemplate" Context="EditFormContext">
-                                            <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem ColSpanMd="12">
-                                                    <label>Subject</label>
-                                                    <DxTextBox @bind-Text="@EmailFormTemplate.Subject" NullText="Subject" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="12">
-                                                    <label for="by">By</label>
-                                                    <DxTextBox ReadOnly="true" Enabled="false" @bind-Text="@userBy" InputCssClass="fw-bold" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="12">
-                                                    <label>From</label>
-                                                    <DxTextBox @bind-Text="@EmailFormTemplate.From" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="12">
-                                                    <label>To</label>
-                                                    <DxTextBox @bind-Text="@EmailFormTemplate.To" NullText="mail@mail.com" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="12">
-                                                    <label>Cc</label>
-                                                     <DxTagBox Data="@Cc"
-                                                              NullText="Select Cc..."
-                                                             FilteringMode="@DataGridFilteringMode.Contains"
-                                                              @bind-Values="@CcBy"
-                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                              CssClass="cw-480"
-                                                              InputId="tbCustomTags" /> 
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="12">
-                                                    <label>To Partner</label>
-                                                    <DxComboBox Data="@ToPartner"
-                                                                NullText="Select Partner..."
-                                                                @bind-Value="@EmailFormTemplate.ToPartnerId"
-                                                                TextFieldName="Name"
-                                                                ValueFieldName="Id">
-                                                    </DxComboBox>
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="12">
-                                                    <label>Schendule</label>
-                                                    <DxDateEdit @bind-Date="@EmailFormTemplate.Schendule"/>
-                                                   
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="12">
-                                                    <label>Body</label>
-                                                   <BlazoredTextEditor @ref="QuillHtml" >
-                                                        @* <ToolbarContent> *@
-                                                            @* <select class="ql-header">
-                                                                <option selected=""></option>
-                                                                <option value="1"></option>
-                                                                <option value="2"></option>
-                                                                <option value="3"></option>
-                                                                <option value="4"></option>
-                                                                <option value="5"></option>
-                                                            </select>
-                                                            <span class="ql-formats">
-                                                                <button class="ql-bold"></button>
-                                                                <button class="ql-italic"></button>
-                                                                <button class="ql-underline"></button>
-                                                                <button class="ql-strike"></button>
-                                                            </span>
-                                                            <span class="ql-formats">
-                                                                <select class="ql-color"></select>
-                                                                <select class="ql-background"></select>
-                                                            </span>
-                                                            <span class="ql-formats">
-                                                                <button class="ql-list" value="ordered"></button>
-                                                                <button class="ql-list" value="bullet"></button>
-                                                            </span>
-                                                            <span class="ql-formats">
-                                                                <button class="ql-link"></button>
-                                                            </span>
-                                                            <span class="ql-formats">
-                                                                <button class="ql-video"></button>
-                                                            </span>
+                                @if (!showForm)
+                                {
+                                    <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                    IsContentBlocked="true"
+                                                    ApplyBackgroundShading="true"
+                                                    IndicatorAreaVisible="false"
+                                                    Text="Fetching Data...">
+                                        <DxGrid @ref="Grid"
+                                                Data="EmailTemplates"
+                                                PageSize="10"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                KeyFieldName="Id"
+                                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                                DataItemDeleting="OnDelete"
+                                                PagerPosition="GridPagerPosition.Bottom"
+                                                PageSizeSelectorVisible="true"
+                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                PageSizeSelectorAllRowsItemVisible="true"
+                                                PagerSwitchToInputBoxButtonCount="10"
+                                                AllowSelectRowByClick="true"
+                                                FocusedRowEnabled="true"
+                                                PagerVisibleNumericButtonCount="10"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                ShowGroupPanel="true"
+                                                AutoExpandAllGroupRows="true"
+                                                ShowFilterRow="true"
+                                                PopupEditFormHeaderText="@textPopUp"
+                                                CustomizeElement="Grid_CustomizeElement"
+                                                ShowSearchBox="true"
+                                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                                KeyboardNavigationEnabled="true">
+                                            <ToolbarTemplate>
+                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && EmailTemplates.Count > 0" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && EmailTemplates.Count > 0" />
+                                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                    <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                        <Items>
+                                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                        </Items>
+                                                    </DxToolbarItem>
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                                </DxToolbar>
+                                            </ToolbarTemplate>
+                                        </DxGrid>
+                                    </DxLoadingPanel>
+                                }
+                                else @if(showForm){
+                            <EditForm Model="@EmailFormTemplate" Context="EditFormContext">
+                                <DxFormLayout CssClass="w-100">
+                                    <DxFormLayoutItem ColSpanMd="12">
+                                        <label>Subject</label>
+                                        <DxTextBox @bind-Text="@EmailFormTemplate.Subject" NullText="Subject" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem ColSpanMd="12">
+                                        <label for="by">By</label>
+                                        <DxTextBox ReadOnly="true" Enabled="false" @bind-Text="@userBy" InputCssClass="fw-bold" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem ColSpanMd="12">
+                                        <label>From</label>
+                                        <DxTextBox @bind-Text="@EmailFormTemplate.From" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem ColSpanMd="12">
+                                        <label>To</label>
+                                        <DxTextBox @bind-Text="@EmailFormTemplate.To" NullText="mail@mail.com" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem ColSpanMd="12">
+                                        <label>Cc</label>
+                                        <DxTagBox Data="@Cc"
+                                                  NullText="Select Cc..."
+                                                  FilteringMode="@DataGridFilteringMode.Contains"
+                                                  @bind-Values="@CcBy"
+                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                  CssClass="cw-480"
+                                                  InputId="tbCustomTags" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem ColSpanMd="12">
+                                        <label>To Partner</label>
+                                        <DxComboBox Data="@ToPartner"
+                                                    NullText="Select Partner..."
+                                                    @bind-Value="@EmailFormTemplate.ToPartnerId"
+                                                    TextFieldName="Name"
+                                                    ValueFieldName="Id">
+                                        </DxComboBox>
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem ColSpanMd="12">
+                                        <label>Schendule</label>
+                                        <DxDateEdit @bind-Date="@EmailFormTemplate.Schendule" />
 
-                                                        </ToolbarContent> *@
-                                                   </BlazoredTextEditor>
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem ColSpanMd="12">
+                                        <label>Body</label>
+                                        <DxRichEdit DocumentContent="@DocumentContent" CssClass="w-100 ch-720" />
 
-                                                    
-                                                </DxFormLayoutItem>
-                                            </DxFormLayout>
-                                            <DxFormLayout CssClass="w-100">
-                                                <DxButton SubmitFormOnClick="true" Text="Send"></DxButton>
-                                            </DxFormLayout>
-                                        </EditForm>
-                                    </DxPopup>
-                                </DxLoadingPanel>
-                            </div>
+
+                                    </DxFormLayoutItem>
+                                </DxFormLayout>
+                                <DxFormLayout CssClass="w-100">
+                                    <DxButton SubmitFormOnClick="true" Text="Send"></DxButton>
+                                </DxFormLayout>
+                            </EditForm>
+                            }
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-    </div>
+        </div>
+    </section>
+</div>
 }
-

@@ -1,6 +1,4 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Web.Components.Layout;
-using McDermott.Web.Extentions;
 using System.Security.Claims;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -213,6 +211,19 @@ namespace McDermott.Web.Components.Pages.Config
             ShowForm = true;
         }
 
+        private void OnRowDoubleClick()
+        {
+            try
+            {
+                UserForm = SelectedDataItems[0].Adapt<UserDto>();
+                ShowForm = true;
+            }
+            catch (Exception e)
+            {
+                var zz = e;
+            }
+        }
+
         private void EditItem_Click()
         {
             try
@@ -230,6 +241,11 @@ namespace McDermott.Web.Components.Pages.Config
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        private async Task Refresh_Click()
+        {
+            await LoadData();
         }
 
         private async Task ExportXlsxItem_Click()

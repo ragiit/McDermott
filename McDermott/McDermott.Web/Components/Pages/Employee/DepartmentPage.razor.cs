@@ -1,10 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Application.Dtos.Config;
-using McDermott.Application.Dtos.Employee;
-using McDermott.Web.Extentions;
 using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.Config.CompanyCommand;
-using static McDermott.Application.Features.Commands.Employee.DepartmentCommand;
 
 namespace McDermott.Web.Components.Pages.Employee
 {
@@ -13,12 +8,60 @@ namespace McDermott.Web.Components.Pages.Employee
         public List<DepartmentDto> Departments = [];
         public List<DepartmentDto> ParentDepartments = [];
         public List<CompanyDto> Companies = [];
+        private List<UserDto> Users = [];
 
         private List<string> DepartmentCategories = new()
         {
             "Department",
             "Unit",
         };
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
+            }
+            catch { }
+
+            PanelVisible = true;
+
+            SelectedDataItems = new ObservableRangeCollection<object>();
+            Companies = await Mediator.Send(new GetCompanyQuery());
+
+            await LoadData();
+        }
+
+        private async Task LoadData()
+        {
+            PanelVisible = true;
+
+            Users = await Mediator.Send(new GetUserEmployeeQuery());
+            Departments = await Mediator.Send(new GetDepartmentQuery());
+            ParentDepartments = await Mediator.Send(new GetDepartmentQuery());
+
+            PanelVisible = false;
+        }
+
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    var result = await NavigationManager.CheckAccessUser(oLocal);
+                    IsAccess = result.Item1;
+                    UserAccessCRUID = result.Item2;
+                }
+                catch { }
+            }
+        }
 
         #region Default Grid
 
@@ -134,52 +177,6 @@ namespace McDermott.Web.Components.Pages.Employee
             {
                 ExportSelectedRowsOnly = true,
             });
-        }
-
-        protected override async Task OnInitializedAsync()
-        {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
-
-            PanelVisible = true;
-
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Companies = await Mediator.Send(new GetCompanyQuery());
-
-            await LoadData();
-        }
-
-        private async Task LoadData()
-        {
-            PanelVisible = true;
-
-            Departments = await Mediator.Send(new GetDepartmentQuery());
-            ParentDepartments = await Mediator.Send(new GetDepartmentQuery());
-
-            PanelVisible = false;
-        }
-
-        private bool IsAccess = false;
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
-                }
-                catch { }
-            }
         }
 
         #endregion Default Grid

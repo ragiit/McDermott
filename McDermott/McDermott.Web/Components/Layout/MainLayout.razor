@@ -1,4 +1,5 @@
-﻿@using McDermott.Domain.Entities
+﻿@using Blazored.Toast.Configuration
+@using McDermott.Domain.Entities
 @inherits LayoutComponentBase
 
 <style>
@@ -223,4 +224,20 @@
     }
 
 </div>
-<!-- ./wrapper -->
+<!-- ./wrapper --> 
+
+<BlazoredToasts Position="ToastPosition.TopRight"
+                Timeout="5"
+                IconType="IconType.FontAwesome"
+                ShowProgressBar="true"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                InfoIcon="fa fa-info-circle"
+                WarningIcon="fa fa-warning"
+                ErrorIcon="fa fa-bug">
+    <CloseButtonContent>
+        <div>
+            <span>&times;</span>
+        </div>
+    </CloseButtonContent>
+</BlazoredToasts>

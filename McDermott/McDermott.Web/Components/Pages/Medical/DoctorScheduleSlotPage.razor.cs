@@ -1,6 +1,4 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Domain.Entities;
-using McDermott.Web.Extentions;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

@@ -54,6 +54,7 @@ namespace McDermott.Persistence.Context
 
         //Patiente
         public DbSet<Family> families { get; set; }
+        public DbSet<PatientAllergy> PatientAllergies { get; set; }
 
         public DbSet<DoctorSchedule> DoctorSchedules { get; set; }
         public DbSet<DoctorScheduleDetail> DoctorScheduleDetails { get; set; }
@@ -62,6 +63,7 @@ namespace McDermott.Persistence.Context
         //Transaction
         public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
         public DbSet<Kiosk> Kiosks { get; set; }
+        public DbSet<Counter> Counters { get; set; }
 
         #endregion DbSet
 
@@ -75,8 +77,8 @@ namespace McDermott.Persistence.Context
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
-            } 
-
+            }
+             
             //modelBuilder.Entity<EmailTemplate>()
             //  .HasMany(m => m.ToPartner)
             //  .OnDelete(DeleteBehavior.Cascade);

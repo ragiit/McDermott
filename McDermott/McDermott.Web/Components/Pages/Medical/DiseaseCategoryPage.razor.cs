@@ -1,7 +1,4 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Application.Dtos.Config;
-using McDermott.Application.Dtos.Medical;
-using McDermott.Web.Extentions;
 using Microsoft.JSInterop;
 using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 
@@ -45,6 +42,7 @@ namespace McDermott.Web.Components.Pages.Medical
             ParentCategoryDto = [.. q.Where(x => x.ParentCategory == null || x.ParentCategory == "")];
             PanelVisible = false;
         }
+
         protected override async Task OnInitializedAsync()
         {
             try
@@ -57,14 +55,10 @@ namespace McDermott.Web.Components.Pages.Medical
             await LoadData();
         }
 
-
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
-
-       
-
 
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
@@ -133,6 +127,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 ExportSelectedRowsOnly = true,
             });
         }
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -153,6 +148,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message);
             }
         }
+
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             var editModel = (DiseaseCategoryDto)e.EditModel;

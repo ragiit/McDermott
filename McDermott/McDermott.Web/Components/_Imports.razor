@@ -14,16 +14,21 @@
 @using DevExpress.Blazor.RichEdit
 @using Microsoft.JSInterop;
 @using McDermott.Web.Components.Layout
+@using Blazored.Toast
+@using Blazored.Toast.Services
 
+@inject IHttpContextAccessor _httpContextAccessor
+@inject IToastService toastService
 @inject IJSRuntime JsRuntime
 @inject IMediator Mediator
-@inject NavigationManager NavigationManager
 @inject Blazored.LocalStorage.ILocalStorageService oLocal
+
+@inject NavigationManager NavigationManager
 
 @using static McDermott.Web.Extentions.Helper
 
 @using McDermott.Web.Extentions
-@using Blazored.TextEditor
+
 
 @using Newtonsoft.Json
 
@@ -35,5 +40,6 @@
 @using static McDermott.Application.Features.Commands.Config.UserCommand
 @using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand
 @using static McDermott.Application.Features.Commands.Config.GroupCommand
-@using static McDermott.Application.Features.Commands.Config.MenuCommand   
-@using static McDermott.Application.Features.Commands.Transaction.KioskCommand   
+@using static McDermott.Application.Features.Commands.Config.MenuCommand
+@using static McDermott.Application.Features.Commands.Transaction.KioskCommand
+@using static McDermott.Application.Features.Commands.Transaction.CounterCommand;
