@@ -25,6 +25,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                         .Include(x => x.Patient)
                         .Include(x => x.Service)
                         .Include(x => x.Physician)
+                        .Include(x=>x.Counter)
                         .AsNoTracking()
                         .Select(Kiosk => Kiosk.Adapt<KioskDto>())
                         .AsNoTracking()

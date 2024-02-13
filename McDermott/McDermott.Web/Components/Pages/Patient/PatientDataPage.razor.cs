@@ -25,7 +25,8 @@ namespace McDermott.Web.Components.Pages.Patient
         private bool ShowForm { get; set; } = false;
         private bool IsDeleted { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
-
+        private char Placeholder { get; set; } = '_';
+        private bool SaveLiterals { get; set; } = true;
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
@@ -67,6 +68,17 @@ namespace McDermott.Web.Components.Pages.Patient
 
             await LoadData();
         }
+
+        #region MaskedInput
+
+        private string EmailMask { get; set; } = @"(\w|[.-])+@(\w|-)+\.(\w|-){2,4}";
+
+        private void OnEmailChanged(string email)
+        {
+            UserForm.Email = email;
+        }
+
+        #endregion MaskedInput
 
         private async Task LoadData()
         {
@@ -140,8 +152,12 @@ namespace McDermott.Web.Components.Pages.Patient
 
         private void OnRowDoubleClick(GridRowClickEventArgs e)
         {
-            UserForm = SelectedDataItems[0].Adapt<UserDto>();
-            ShowForm = true;
+            try
+            {
+                UserForm = SelectedDataItems[0].Adapt<UserDto>();
+                ShowForm = true;
+            }
+            catch { }
         }
 
         private async Task HandleValidSubmit()

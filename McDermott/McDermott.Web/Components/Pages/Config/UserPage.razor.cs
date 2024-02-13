@@ -1,4 +1,6 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 using System.Security.Claims;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -20,6 +22,10 @@ namespace McDermott.Web.Components.Pages.Config
         private bool IsDeleted { get; set; } = true;
         private bool ShowForm { get; set; } = false;
         private bool VisibleExpiredId { get; set; } = false;
+        private char Placeholder { get; set; } = '_';
+        private string EmailMask { get; set; } = @"(\w|[.-])+@(\w|-)+\.(\w|-){2,4}";
+        private string imageUrl;
+
         public List<CountryDto> Countries = [];
         public List<ProvinceDto> Provinces = [];
         public List<CityDto> Cities = [];
@@ -44,6 +50,42 @@ namespace McDermott.Web.Components.Pages.Config
             "Single",
             "Married"
         };
+
+        private string fileKey = Guid.NewGuid().ToString();
+
+        private async Task OnInputFileChange(InputFileChangeEventArgs e)
+        {
+            //var imageFile = e.File;
+
+            //var buffer = new byte[imageFile.Size];
+            //await imageFile.OpenReadStream().ReadAsync(buffer);
+
+            //// Ubah buffer gambar menjadi format base64
+            //imageUrl = $"data:{imageFile.ContentType};base64,{Convert.ToBase64String(buffer)}";
+
+            try
+            {
+                var imageFile = e.File;
+
+                var buffer = new byte[imageFile.Size];
+                await imageFile.OpenReadStream().ReadAsync(buffer);
+
+                // Ubah buffer gambar menjadi format base64
+                imageUrl = $"data:{imageFile.ContentType};base64,{Convert.ToBase64String(buffer)}";
+
+                fileKey = Guid.NewGuid().ToString();
+            }
+            catch { }
+        }
+
+        private async Task PickImage()
+        {
+            try
+            {
+                await JsRuntime.InvokeVoidAsync("clickInputFile");
+            }
+            catch { }
+        }
 
         private async Task LoadData()
         {
@@ -218,10 +260,7 @@ namespace McDermott.Web.Components.Pages.Config
                 UserForm = SelectedDataItems[0].Adapt<UserDto>();
                 ShowForm = true;
             }
-            catch (Exception e)
-            {
-                var zz = e;
-            }
+            catch { }
         }
 
         private void EditItem_Click()

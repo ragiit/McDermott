@@ -25,7 +25,8 @@ namespace McDermott.Web.Components.Pages.Employee
         private bool ShowForm { get; set; } = false;
         private bool IsDeleted { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
-
+        private char Placeholder { get; set; } = '_';
+        private string EmailMask { get; set; } = @"(\w|[.-])+@(\w|-)+\.(\w|-){2,4}";
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 

@@ -4,6 +4,7 @@ namespace McDermott.Application.Features.Commands.Config
 {
     public class CountryCommand
     {
+        #region Get
         public class GetCountryQuery : IRequest<List<CountryDto>>;
 
         public class GetCountryByIdQuery : IRequest<CountryDto>
@@ -16,6 +17,9 @@ namespace McDermott.Application.Features.Commands.Config
             }
         }
 
+        #endregion
+
+        #region Create
         public class CreateCountryRequest : IRequest<CountryDto>
         {
             public CountryDto CountryDto { get; set; }
@@ -26,6 +30,18 @@ namespace McDermott.Application.Features.Commands.Config
             }
         }
 
+        public class CreateListCountryRequest : IRequest<List<CountryDto>>
+        {
+            public List<CountryDto> CountryDtos { get; set; }
+
+            public CreateListCountryRequest(List<CountryDto> CountryDtos)
+            {
+                this.CountryDtos = CountryDtos;
+            }
+        }
+        #endregion
+
+        #region Update
         public class UpdateCountryRequest : IRequest<bool>
         {
             public CountryDto CountryDto { get; set; }
@@ -35,7 +51,9 @@ namespace McDermott.Application.Features.Commands.Config
                 CountryDto = countryDto;
             }
         }
+        #endregion
 
+        #region Delete
         public class DeleteCountryRequest : IRequest<bool>
         {
             public int Id { get; set; }
@@ -55,5 +73,6 @@ namespace McDermott.Application.Features.Commands.Config
                 Id = id;
             }
         }
+        #endregion 
     }
 }

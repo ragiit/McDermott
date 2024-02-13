@@ -1,4 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using Microsoft.AspNetCore.Components;
 using static McDermott.Application.Features.Commands.Transaction.CounterCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction
@@ -8,25 +9,32 @@ namespace McDermott.Web.Components.Pages.Transaction
         #region Relation Data
 
         private List<CounterDto> counters = new();
+        private List<CounterDto> countersActive = new();
+        private List<CounterDto> countersInActive = new();
         private CounterDto counterForm = new();
+        private List<KioskDto> kiosks = new();
 
         #endregion Relation Data
 
         #region setings Grid
 
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private BaseAuthorizationLayout AuthorizationLayout = new();
+        private GroupMenuDto UserAccessCRUID = new();
+        public IGrid Grid { get; set; }
+        private List<string> NameCard = new();
+        private string textPopUp = "";
         private bool IsAccess { get; set; } = false;
         private bool PanelVisible { get; set; } = true;
         private bool PopUpVisible { get; set; } = false;
-        private string textPopUp = "";
-        private int CountCard { get; set; } = 0;
-        private List<string> NameCard = new();
-        public IGrid Grid { get; set; }
-        private int ActiveTabIndex { get; set; } = 1;
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-        private int FocusedRowVisibleIndex { get; set; }
+        private bool ArchiveCard { get; set; } = false;
         private bool EditItemsEnabled { get; set; }
-        private GroupMenuDto UserAccessCRUID = new();
+        private bool GirdDetail { get; set; } = false;
+        private int CountCard { get; set; } = 0;
+
+        private int ActiveTabIndex { get; set; } = 1;
+
+        private int FocusedRowVisibleIndex { get; set; }
 
         #endregion setings Grid
 
@@ -67,9 +75,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             StateHasChanged();
             PopUpVisible = false;
             PanelVisible = true;
-            counters.Clear();
-            var c = await Mediator.Send(new GetCounterQuery());
-            counters = [.. c.Where(x => x.IsActive == true)];
+            countersActive.Clear();
+            counters = await Mediator.Send(new GetCounterQuery());
+            countersActive = [.. counters.Where(x => x.IsActive == true)];
+            countersInActive = [.. counters.Where(x => x.IsActive == false)];
             //CountCard = [.. counters.Select(x => x.Name);
             PanelVisible = false;
         }
@@ -111,7 +120,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Button Function
 
-        private async Task NewItem_Click()
+        private void NewItem_Click()
         {
             counterForm = new();
             PopUpVisible = true;
@@ -136,18 +145,29 @@ namespace McDermott.Web.Components.Pages.Transaction
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        #region Button Export, Import And Colmn Chooser
+        #region Card
 
-        private async Task InActive_Click(int Id, string Name)
+        private async Task InActive_Click(int Id)
         {
             try
             {
                 if (Id != 0)
                 {
-                    counterForm.Id = Id;
-                    counterForm.IsActive = false;
-                    counterForm.Name = Name;
-                    await Mediator.Send(new UpdateCounterRequest(counterForm));
+                    var a = counters.Where(x => x.Id == Id).FirstOrDefault();
+                    if (a.IsActive == true)
+                    {
+                        counterForm.Id = Id;
+                        counterForm.IsActive = false;
+                        counterForm.Name = a.Name;
+                        await Mediator.Send(new UpdateCounterRequest(counterForm));
+                    }
+                    else
+                    {
+                        counterForm.Id = Id;
+                        counterForm.IsActive = true;
+                        counterForm.Name = a.Name;
+                        await Mediator.Send(new UpdateCounterRequest(counterForm));
+                    }
                     //NavigationManager.NavigateTo("transaction/counter", true);
                     await LoadData();
                 }
@@ -157,6 +177,46 @@ namespace McDermott.Web.Components.Pages.Transaction
                 throw new Exception(ex.Message);
             }
         }
+
+        private async Task DetailList(int Id)
+        {
+            try
+            {
+                GirdDetail = true;
+                var a = await Mediator.Send(new GetKioskQuery());
+                kiosks = [.. a.Where(x => x.CounterId == Id)];
+            }
+            catch
+            {
+            }
+        }
+
+        private async Task Archive_Click()
+        {
+            try
+            {
+                ArchiveCard = true;
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private void onBack()
+        {
+            try
+            {
+                ArchiveCard = false;
+                kiosks.Clear();
+            }
+            catch { }
+        }
+
+        #endregion Card
+
+        #region Button Export, Import And Colmn Chooser
 
         private async Task ExportXlsxItem_Click()
         {

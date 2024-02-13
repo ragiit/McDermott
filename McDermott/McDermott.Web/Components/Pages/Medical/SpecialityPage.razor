@@ -18,7 +18,7 @@
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
-                                <DxGrid @ref="Grid"
+                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
                                         Data="Specialitys"
                                         PageSize="10"
                                         @bind-SelectedDataItems="@SelectedDataItems"
@@ -50,7 +50,7 @@
                                             <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Specialitys.Count > 0" />
                                             <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Specialitys.Count > 0" />
                                             <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                            <DxToolbarItem BeginGroup="true" Text="Export" IconCssClass="fa-solid fa-file-export">
+                                            <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
                                                 <Items>
                                                     <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
                                                     <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />

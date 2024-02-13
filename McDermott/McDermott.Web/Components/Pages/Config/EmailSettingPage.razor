@@ -26,7 +26,7 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
 
-                                    <DxGrid @ref="Grid"
+                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                             Data="EmailSettings"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
@@ -140,7 +140,6 @@
                                                     <p>Sucess</p>
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
-
                                         </div>
                                     </BodyTemplate>
                                 </DxPopup>

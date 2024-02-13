@@ -47,7 +47,7 @@ namespace McDermott.Application.Features.Queries.Config
             public CreateCountryHandler(IUnitOfWork unitOfWork)
             {
                 _unitOfWork = unitOfWork;
-            }
+            } 
 
             public async Task<CountryDto> Handle(CreateCountryRequest request, CancellationToken cancellationToken)
             {
@@ -56,6 +56,25 @@ namespace McDermott.Application.Features.Queries.Config
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return result.Adapt<CountryDto>();
+            }
+        }
+
+        internal class CreateListCountryRequestHandler : IRequestHandler<CreateListCountryRequest, List<CountryDto>>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public CreateListCountryRequestHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<List<CountryDto>> Handle(CreateListCountryRequest request, CancellationToken cancellationToken)
+            {
+                var result = await _unitOfWork.Repository<Country>().AddAsync(request.CountryDtos.Adapt<List<Country>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return result.Adapt<List<CountryDto>>();
             }
         }
 

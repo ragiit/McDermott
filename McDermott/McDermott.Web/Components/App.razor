@@ -40,14 +40,12 @@
     @* Bootstrap 4 *@
     <link href="_content/DevExpress.Blazor.Themes/office-white.bs4.min.css" asp-append-version="true" rel="stylesheet" />
 
-   
     <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css" />
     @* bootstrap-external for Bootstrap 4 *@
     <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs4.min.css" />
     @*...*@
 
     @* Blazor Bootstrap *@
-
 
     <link href="McDermott.Web.styles.css" rel="stylesheet">
 
@@ -92,6 +90,10 @@
     <Routes @rendermode="InteractiveServer" />
     <script src="_framework/blazor.web.js"></script>
     <script>
+        window.clickInputFile = function () {
+            document.getElementById('fileInput').click();
+        }
+
         window.BlazorHelpers = {
             setTimeout: function (callback, timeout) {
                 return setTimeout(callback, timeout);
@@ -110,7 +112,7 @@
             }
         };
     </script>
-   
+
     <!-- jQuery -->
     <script src="AdminLTE/plugins/jquery/jquery.min.js"></script>
     <!-- jQuery UI 1.11.4 -->

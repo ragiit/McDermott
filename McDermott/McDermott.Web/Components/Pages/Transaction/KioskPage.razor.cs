@@ -38,7 +38,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             "NIP",
             "Oracle",
             "SAP",
-            "NIP"
+            "Legacy"
         };
 
         private string? NamePatient { get; set; } = string.Empty;

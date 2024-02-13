@@ -8,7 +8,31 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
+    .a {
+        z-index: -1;
+    }
 </style>
+
+<div class="a">
+
+    <BlazoredToasts Position="ToastPosition.TopRight"
+                    Timeout="5"
+                    IconType="IconType.FontAwesome"
+                    ShowProgressBar="true"
+                    SuccessClass="success-toast-override"
+                    SuccessIcon="fa fa-thumbs-up"
+                    InfoIcon="fa fa-info-circle"
+                    WarningIcon="fa fa-warning"
+                    ErrorIcon="fa fa-bug">
+        <CloseButtonContent>
+            <div>
+                <span>&times;</span>
+            </div>
+        </CloseButtonContent>
+    </BlazoredToasts>
+
+</div>
 
 <div class="wrapper">
 
@@ -160,8 +184,16 @@
                                     <ul class="nav nav-treeview">
                                         <li class="nav-item">
                                             <NavLink href="@url" class="nav-link">
-                                                <i class="far fa-circle nav-icon"></i>
-                                                <p>@d.Name</p>
+
+                                                @if (!string.IsNullOrWhiteSpace(d.Icon))
+                                                {
+                                                        @((MarkupString)d.Icon)
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-circle nav-icon"></i>
+                                                }
+                                                <p class="ml-3">@d.Name</p>
                                             </NavLink>
                                         </li>
                                     </ul>
@@ -224,20 +256,4 @@
     }
 
 </div>
-<!-- ./wrapper --> 
-
-<BlazoredToasts Position="ToastPosition.TopRight"
-                Timeout="5"
-                IconType="IconType.FontAwesome"
-                ShowProgressBar="true"
-                SuccessClass="success-toast-override"
-                SuccessIcon="fa fa-thumbs-up"
-                InfoIcon="fa fa-info-circle"
-                WarningIcon="fa fa-warning"
-                ErrorIcon="fa fa-bug">
-    <CloseButtonContent>
-        <div>
-            <span>&times;</span>
-        </div>
-    </CloseButtonContent>
-</BlazoredToasts>
+<!-- ./wrapper -->

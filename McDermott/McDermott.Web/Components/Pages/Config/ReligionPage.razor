@@ -15,7 +15,7 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
-                                <DxGrid @ref="Grid"
+                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
                                         Data="Religions"
                                         PageSize="10"
                                         @bind-SelectedDataItems="@SelectedDataItems"
@@ -48,14 +48,14 @@
                                             <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Religions.Count > 0" />
                                             <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Religions.Count > 0" />
                                             <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                            <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                            <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
                                                 <Items>
                                                     <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
                                                     <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
                                                     <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                 </Items>
                                             </DxToolbarItem>
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                            <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
                                         </DxToolbar>
                                         @*  <DxComboBox Data="EnumEditModeDatas"
                                     NullText="Select Grid Edit Mode..."

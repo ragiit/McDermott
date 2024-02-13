@@ -1,13 +1,10 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Mvc;
-using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CityPage
     {
-        DxUpload MyUpload { get; set; }
+        private DxUpload MyUpload { get; set; }
 
         private List<CityDto> Cities = [];
         private List<ProvinceDto> Provinces = [];

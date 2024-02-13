@@ -14,13 +14,15 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
+                                <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
                                                 IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                                 IsContentBlocked="true"
                                                 ApplyBackgroundShading="true"
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
-                                    <DxGrid @ref="Grid"
+                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
                                             Data="Countries"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
@@ -52,15 +54,16 @@
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Countries.Count > 0" />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Countries.Count > 0" />
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                 <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
                                                     <Items>
                                                         <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
                                                         <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
                                                         <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                     </Items>
                                                 </DxToolbarItem>
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Click="@ImportFile" Text="Import" IconCssClass="fa-solid fa-file-import" />
                                             </DxToolbar>
                                             @*  <DxComboBox Data="EnumEditModeDatas"
                                         NullText="Select Grid Edit Mode..."
@@ -77,6 +80,14 @@
                                         AllowedFileExtensions="@extentions"
                                         MaxFileSize="15000000">
                                         </DxUpload>*@
+
+                                            @* <DxUpload Name="myFile"
+                                        MaxFileSize="4000000"
+                                        AllowedFileExtensions="@(new List<string> { ".xlxs", ".jpeg", ".gif", ".png" })"
+                                        SelectedFilesChanged="@SelectedFilesChanged"
+                                        CssClass="@(SelectedFilesCount > 0 ? "w-100" : string.Empty)">
+                                        </DxUpload> *@
+
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />

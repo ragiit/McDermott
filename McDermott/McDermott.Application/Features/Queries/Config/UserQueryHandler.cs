@@ -86,6 +86,11 @@ namespace McDermott.Application.Features.Queries.Config
                     var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.SAP!.Equals(request.Number));
                     data = result.Adapt<List<UserDto>>().ToList();
                 }
+                else if (request.Types == "NIP")
+                {
+                    var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.NIP!.Equals(request.Number));
+                    data = result.Adapt<List<UserDto>>().ToList();
+                }
                 return data;
             }
         }

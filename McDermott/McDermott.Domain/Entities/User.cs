@@ -1,22 +1,29 @@
 ﻿namespace McDermott.Domain.Entities
 {
     public partial class User : BaseAuditableEntity
-    {
+    { 
         public int? GroupId { get; set; }
+
+        [Required]
         public string Name { get; set; } = string.Empty;
 
+        //[Required]
         public string UserName { get; set; } = string.Empty;
+
+        [Required]
         public string Email { get; set; } = string.Empty;
+
         public string Password { get; set; } = string.Empty;
 
-        public string? NoRm { get; set; }
         public int? GenderId { get; set; }
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
+         
         public DateTime? DateOfBirth { get; set; }
-        public string? TypeId { get; set; } // Jenis Identitas
-        public int? NoId { get; set; } // No Identitas
-        public DateTime? ExpiredId { get; set; }     // Expired Identitas
+
+        public string? TypeId { get; set; } = "KTP"; // Jenis Identitas
+        public string? NoId { get; set; } // No Identitas // KTP
+        public DateTime? ExpiredId { get; set; }
         public string? IdCardAddress1 { get; set; } // KTP Alamat 1
         public string? IdCardAddress2 { get; set; } // KTP Alamat 1
         public int? IdCardCountryId { get; set; } // KTP Negara
@@ -38,11 +45,11 @@
         public string? BiologicalMother { get; set; } // Ibu Kandung
         public string? MotherNIK { get; set; }
         public int? ReligionId { get; set; }
-        public int? MobilePhone { get; set; }
-        public int? HomePhoneNumber { get; set; }
+        public string? MobilePhone { get; set; }
+        public string? HomePhoneNumber { get; set; }
         public string? Npwp { get; set; }
-        public int? NoBpjsKs { get; set; }
-        public int? NoBpjsTk { get; set; }
+        public string? NoBpjsKs { get; set; }
+        public string? NoBpjsTk { get; set; }
         public string? SipNo { get; set; }
         public string? SipFile { get; set; }
         public DateTime? SipExp { get; set; }
@@ -56,8 +63,9 @@
         public string? EmergencyName { get; set; }
         public string? EmergencyRelation { get; set; }
         public string? EmergencyEmail { get; set; }
-        public int? EmergencyPhone { get; set; }
+        public string? EmergencyPhone { get; set; }
         public string? BloodType { get; set; }
+        public string? NoRm { get; set; } = "-";
         public string? DoctorCode { get; set; }
         public string? EmployeeCode { get; set; }
         public int? DegreeId { get; set; }
@@ -71,7 +79,7 @@
         public string? EmployeeType { get; set; }
         public string? EmployeeStatus { get; set; }
         public DateTime? JoinDate { get; set; }
-        public int NIP { get; set; }
+        public string? NIP { get; set; } 
         public string? Legacy { get; set; }
         public string? SAP { get; set; }
         public string? Oracle { get; set; }

@@ -1,16 +1,22 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
+using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CountryPage
     {
-        private List<CountryDto> Countries = new();
-
-        private bool PanelVisible { get; set; } = true;
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-        private int FocusedRowVisibleIndex { get; set; }
+        private List<CountryDto> Countries = [];
         private GroupMenuDto UserAccessCRUID = new();
+
+        private bool IsAccess = false;
+        private bool PanelVisible { get; set; } = true;
+        private int FocusedRowVisibleIndex { get; set; }
+
         public IGrid Grid { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         protected override async Task OnInitializedAsync()
         {
@@ -24,8 +30,6 @@ namespace McDermott.Web.Components.Pages.Config
 
             await LoadData();
         }
-
-        private bool IsAccess = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -45,10 +49,162 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData()
         {
+            PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Countries = await Mediator.Send(new GetCountryQuery());
             PanelVisible = false;
         }
+
+        #region Grid
+
+        protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
+        {
+            InvokeAsync(StateHasChanged);
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Name", "Code" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString().Trim().ToLower()))
+                    {
+                        ToastService.ShowInfo("The header must match the grid.");
+                        return;
+                    }
+
+                    var countries = new List<CountryDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var country = new CountryDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim()
+                        };
+
+                        if (!Countries.Any(x => x.Name.Trim().ToLower() == country.Name.Trim().ToLower()) && !countries.Any(x => x.Name.Trim().ToLower() == country.Name.Trim().ToLower()))
+                            countries.Add(country);
+                    }
+
+                    await Mediator.Send(new CreateListCountryRequest(countries));
+
+                    await LoadData();
+                }
+                catch { }
+            }
+        }
+
+        private async Task Refresh_Click()
+        {
+            await LoadData();
+        }
+
+        //public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        //{
+        //    foreach (var file in e.GetMultipleFiles(1))
+        //    {
+        //        try
+        //        {
+        //            using MemoryStream ms = new MemoryStream();
+        //            // copy data from file to memory stream
+        //            await file.OpenReadStream().CopyToAsync(ms);
+        //            // positions the cursor at the beginning of the memory stream
+        //            ms.Position = 0;
+
+        //            // create ExcelPackage from memory stream
+        //            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        //            using ExcelPackage package = new ExcelPackage(ms);
+
+        //            ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+        //            int colCount = ws.Dimension.End.Column;
+        //            int rowCount = ws.Dimension.End.Row;
+        //            var headerNames = new List<string>()
+        //            {
+        //                "Name",
+        //                "Code"
+        //            };
+
+        //            for (int i = 1; i <= colCount; i++)
+        //            {
+        //                var a = headerNames[i - 1].Trim().ToLower();
+        //                var b = ws.Cells[1, i].Value?.ToString().Trim().ToLower();
+        //                if (a != b)
+        //                {
+        //                    ToastService.ShowInfo("The header must match the grid.");
+        //                    return;
+        //                }
+        //            }
+
+        //            var countries = new List<CountryDto>();
+
+        //            // Start iterating from row 2
+        //            for (int row = 1; row <= rowCount; row++)
+        //            {
+        //                var country = new CountryDto();
+
+        //                // Access data from row 2 onwards
+        //                country.Name = ws.Cells[row, 1].Value?.ToString(); // Assuming name is in the first column
+
+        //                if (countries.Any(x => x.Name.ToLower().Trim().Equals(country.Name.ToLower().Trim())))
+        //                    continue;
+
+        //                country.Code = ws.Cells[row, 2].Value?.ToString(); // Assuming code is in the second column
+
+        //                countries.Add(country);
+        //            }
+
+        //            // Now you have a list of CountryDto objects extracted from Excel
+        //            // You can do further processing with this list, such as saving to database or any other operations
+        //        }
+        //        catch { }
+        //    }
+        //}
+
+        //private async Task ImportExcelFile(InputFileChangeEventArgs e)
+        //{
+        //    foreach (var file in e.GetMultipleFiles(1))
+        //    {
+        //        try
+        //        {
+        //            using (MemoryStream ms = new MemoryStream())
+        //            {
+        //                // copy data from file to memory stream
+        //                await file.OpenReadStream().CopyToAsync(ms);
+        //                // positions the cursor at the beginning of the memory stream
+        //                ms.Position = 0;
+
+        //                // create ExcelPackage from memory stream
+        //                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        //                using (ExcelPackage package = new ExcelPackage(ms))
+        //                {
+        //                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+        //                    int colCount = ws.Dimension.End.Column;
+        //                    int rowCount = ws.Dimension.End.Row;
+        //                    var s = ws.Cells[2, 2].Value;
+        //                    // rest of the code here...
+        //                }
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            throw;
+        //        }
+        //    }
+        //}
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
@@ -117,23 +273,9 @@ namespace McDermott.Web.Components.Pages.Config
             });
         }
 
-        private bool UploadVisible { get; set; } = false;
-
-        protected async Task SelectedFilesChangedAsync(IEnumerable<UploadFileInfo> files)
+        private async Task ImportFile()
         {
-            UploadVisible = files.ToList().Count == 0;
-            try
-            {
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error reading Excel file: {ex.Message}");
-            }
-        }
-
-        private void OnFileUploadStarted(FileUploadEventArgs e)
-        {
-            InvokeAsync(StateHasChanged);
+            await JsRuntime.InvokeVoidAsync("clickInputFile");
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -174,5 +316,7 @@ namespace McDermott.Web.Components.Pages.Config
             }
             catch { }
         }
+
+        #endregion Grid
     }
 }
