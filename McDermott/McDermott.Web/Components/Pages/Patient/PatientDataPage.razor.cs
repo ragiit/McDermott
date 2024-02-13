@@ -1,20 +1,23 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using System.Security.Claims;
+﻿using McDermott.Domain.Entities;
 
 namespace McDermott.Web.Components.Pages.Patient
 {
     public partial class PatientDataPage
     {
         private List<UserDto> Users = [];
-        public List<CityDto> Cities = [];
-        public List<CountryDto> Countries = [];
-        public List<ProvinceDto> Provinces = [];
-        public List<DistrictDto> Districts = [];
-        public List<VillageDto> Villages = [];
-        public List<DepartmentDto> Departments = [];
-        public List<JobPositionDto> JobPositions = [];
-        public List<ReligionDto> Religions = [];
-        public List<GenderDto> Genders = [];
+        private List<UserDto> Patiens = [];
+        private List<FamilyDto> Families = [];
+        private List<CityDto> Cities = [];
+        private List<CountryDto> Countries = [];
+        private List<ProvinceDto> Provinces = [];
+        private List<DistrictDto> Districts = [];
+        private List<VillageDto> Villages = [];
+        private List<DepartmentDto> Departments = [];
+        private List<JobPositionDto> JobPositions = [];
+        private List<ReligionDto> Religions = [];
+        private List<GenderDto> Genders = [];
+        private List<PatientFamilyRelationDto> PatientFamilyRelations = [];
+        private List<FamilyDto> Familys = [];
 
         private UserDto UserForm = new();
         private GroupMenuDto UserAccessCRUID = new();
@@ -25,10 +28,13 @@ namespace McDermott.Web.Components.Pages.Patient
         private bool ShowForm { get; set; } = false;
         private bool IsDeleted { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
+        private int FocusedRowFamilyMemberVisibleIndex { get; set; }
         private char Placeholder { get; set; } = '_';
         private bool SaveLiterals { get; set; } = true;
         public IGrid Grid { get; set; }
+        public IGrid GridFamilyRelation { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedDataFamilyRelationItems { get; set; } = new ObservableRangeCollection<object>();
 
         private List<string> IdentityTypes = new()
         {
@@ -65,6 +71,7 @@ namespace McDermott.Web.Components.Pages.Patient
             Genders = await Mediator.Send(new GetGenderQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());
             JobPositions = await Mediator.Send(new GetJobPositionQuery());
+            Families = await Mediator.Send(new GetFamilyQuery());
 
             await LoadData();
         }
@@ -93,6 +100,7 @@ namespace McDermott.Web.Components.Pages.Patient
             catch { }
 
             Users = await Mediator.Send(new GetUserPatientQuery());
+            Patiens = Users.Where(x => x.IsPatient == true).ToList();
 
             PanelVisible = false;
         }
@@ -150,16 +158,6 @@ namespace McDermott.Web.Components.Pages.Patient
 
         #region Grid
 
-        private void OnRowDoubleClick(GridRowClickEventArgs e)
-        {
-            try
-            {
-                UserForm = SelectedDataItems[0].Adapt<UserDto>();
-                ShowForm = true;
-            }
-            catch { }
-        }
-
         private async Task HandleValidSubmit()
         {
             FormValidationState = true;
@@ -181,6 +179,23 @@ namespace McDermott.Web.Components.Pages.Patient
         private void OnClickSmartButton(string text)
         {
             TabIndex = text.ToInt32();
+        }
+
+        private void OnSaveFamilyMember(GridEditModelSavingEventArgs e)
+        {
+            try
+            {
+                var editModel = (PatientFamilyRelationDto)e.EditModel;
+
+                if (string.IsNullOrWhiteSpace(editModel.Patient.Name))
+                    return;
+
+                if (editModel.Id == 0)
+                    PatientFamilyRelations.Add(editModel);
+                else
+                    PatientFamilyRelations[FocusedRowFamilyMemberVisibleIndex] = editModel;
+            }
+            catch { }
         }
 
         private async Task OnSave()
@@ -233,6 +248,23 @@ namespace McDermott.Web.Components.Pages.Patient
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
+        private void GridFamilyMember_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            if (args.DataItem is not null)
+            {
+                IsDeleted = (bool)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(((UserDto)args.DataItem).Id.ToString())!;
+            }
+
+            FocusedRowFamilyMemberVisibleIndex = args.VisibleIndex;
+        }
+
+        private void OnDeleteFamilyRelation(GridDataItemDeletingEventArgs e)
+        {
+            var aaa = SelectedDataFamilyRelationItems.Adapt<List<PatientFamilyRelationDto>>();
+            PatientFamilyRelations.RemoveAll(x => aaa.Select(z => z.Patient).Contains(x.Patient));
+            SelectedDataFamilyRelationItems = new ObservableRangeCollection<object>();
+        }
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             if (SelectedDataItems is null)
@@ -256,12 +288,29 @@ namespace McDermott.Web.Components.Pages.Patient
             ShowForm = true;
         }
 
-        private void EditItem_Click()
+        private async Task NewFamilyRelationItem_Click()
+        {
+            await GridFamilyRelation.StartEditNewRowAsync();
+        }
+
+        private async Task EditFamilyRelationItem_Click()
+        {
+            await GridFamilyRelation.StartEditRowAsync(FocusedRowFamilyMemberVisibleIndex);
+        }
+
+        private void OnRowDoubleClick(GridRowClickEventArgs e)
+        {
+            EditItem();
+        }
+
+        private async void EditItem()
         {
             try
             {
                 UserForm = SelectedDataItems[0].Adapt<UserDto>();
                 ShowForm = true;
+
+                PatientFamilyRelations = await Mediator.Send(new GetPatientFamilyByPatientQuery(x => x.PatientId == UserForm.Id));
             }
             catch { }
         }
@@ -269,6 +318,11 @@ namespace McDermott.Web.Components.Pages.Patient
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        private void DeleteFamilyRelationItem_Click()
+        {
+            GridFamilyRelation.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
         private async Task Refresh_Click()

@@ -79,13 +79,40 @@ namespace McDermott.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate)
+        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            return await _dbContext
-                .Set<T>()
-                .AsNoTracking()
-                .Where(predicate)
-                .ToListAsync();
+            if (predicate is null)
+            {
+                return await _dbContext
+                    .Set<T>()
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
+            }
+            else
+            {
+                return await _dbContext
+                    .Set<T>()
+                    .AsNoTracking()
+                    .Where(predicate)
+                    .ToListAsync(cancellationToken);
+            }
+        }
+
+        public async Task<List<T>> GetAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IQueryable<T>>? includes = null, CancellationToken cancellationToken = default)
+        {
+            var query = _dbContext.Set<T>().AsQueryable();
+
+            if (includes is not null)
+            {
+                query = includes(query);
+            }
+
+            if (predicate is not null)
+            {
+                query = query.Where(predicate);
+            }
+
+            return await query.AsNoTracking().ToListAsync(cancellationToken);
         }
 
         public async Task<T> GetByIdAsync(int id)

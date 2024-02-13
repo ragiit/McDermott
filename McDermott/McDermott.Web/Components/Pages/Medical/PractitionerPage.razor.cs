@@ -1,5 +1,6 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using Microsoft.AspNetCore.Components;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Security.Claims;
 
 namespace McDermott.Web.Components.Pages.Medical
@@ -7,6 +8,7 @@ namespace McDermott.Web.Components.Pages.Medical
     public partial class PractitionerPage
     {
         private List<UserDto> Users = [];
+        private List<SpecialityDto> Specialities = [];
         public List<CityDto> Cities = [];
         public List<CountryDto> Countries = [];
         public List<ProvinceDto> Provinces = [];
@@ -28,6 +30,8 @@ namespace McDermott.Web.Components.Pages.Medical
         private int FocusedRowVisibleIndex { get; set; }
         private string EmailMask { get; set; } = @"(\w|[.-])+@(\w|-)+\.(\w|-){2,4}";
         private char Placeholder { get; set; } = '_';
+        private IEnumerable<ServiceDto> Services { get; set; } = [];
+        private IEnumerable<ServiceDto> SelectedServices { get; set; } = [];
 
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
@@ -58,6 +62,8 @@ namespace McDermott.Web.Components.Pages.Medical
             }
             catch { }
 
+            Specialities = await Mediator.Send(new GetSpecialityQuery());
+            Services = await Mediator.Send(new GetServiceQuery());
             Countries = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Cities = await Mediator.Send(new GetCityQuery());
@@ -103,6 +109,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private void OnRowDoubleClick(GridRowClickEventArgs e)
         {
             UserForm = SelectedDataItems[0].Adapt<UserDto>();
+            SelectedServices = Services.Where(x => UserForm.DoctorServiceIds.Contains(x.Id)).ToList();
             ShowForm = true;
         }
 
@@ -135,9 +142,18 @@ namespace McDermott.Web.Components.Pages.Medical
             UserForm.IsDoctor = true;
 
             if (UserForm.Id == 0)
+            {
+                var a = SelectedServices.Select(x => x.Id).ToList();
+                UserForm.DoctorServiceIds?.AddRange(a);
                 await Mediator.Send(new CreateUserRequest(UserForm));
+            }
             else
+            {
+                UserForm.DoctorServiceIds = SelectedServices.Select(x => x.Id).ToList();
                 await Mediator.Send(new UpdateUserRequest(UserForm));
+            }
+
+            SelectedServices = [];
 
             await LoadData();
         }
@@ -174,7 +190,7 @@ namespace McDermott.Web.Components.Pages.Medical
             await LoadData();
         }
 
-        private async Task NewItem_Click()
+        private void NewItem_Click()
         {
             UserForm = new();
             ShowForm = true;
@@ -185,6 +201,7 @@ namespace McDermott.Web.Components.Pages.Medical
             try
             {
                 UserForm = SelectedDataItems[0].Adapt<UserDto>();
+                SelectedServices = Services.Where(x => UserForm.DoctorServiceIds.Contains(x.Id)).ToList();
                 ShowForm = true;
             }
             catch { }

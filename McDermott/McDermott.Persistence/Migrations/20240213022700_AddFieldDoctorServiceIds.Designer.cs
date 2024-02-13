@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240213022700_AddFieldDoctorServiceIds")]
+    partial class AddFieldDoctorServiceIds
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -214,39 +217,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("ProvinceId");
 
                     b.ToTable("Companies");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.Counter", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Counters");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Country", b =>
@@ -1173,9 +1143,6 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CounterId")
-                        .HasColumnType("int");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1194,9 +1161,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int?>("PhysicianId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Queue")
-                        .HasColumnType("int");
-
                     b.Property<int?>("ServiceId")
                         .HasColumnType("int");
 
@@ -1213,8 +1177,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CounterId");
 
                     b.HasIndex("PatientId");
 
@@ -1384,47 +1346,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("PatientAllergies");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.PatientFamilyRelation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("FamilyId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FamilyMemberId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PatientId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FamilyId");
-
-                    b.HasIndex("FamilyMemberId");
-
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("PatientFamilyRelations");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Procedure", b =>
@@ -2209,11 +2130,6 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.Kiosk", b =>
                 {
-                    b.HasOne("McDermott.Domain.Entities.Counter", "Counter")
-                        .WithMany()
-                        .HasForeignKey("CounterId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.User", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
@@ -2228,8 +2144,6 @@ namespace McDermott.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Counter");
 
                     b.Navigation("Patient");
 
@@ -2247,33 +2161,6 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.PatientFamilyRelation", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.Family", "Family")
-                        .WithMany()
-                        .HasForeignKey("FamilyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("McDermott.Domain.Entities.User", "FamilyMember")
-                        .WithMany()
-                        .HasForeignKey("FamilyMemberId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("McDermott.Domain.Entities.User", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Family");
-
-                    b.Navigation("FamilyMember");
-
-                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Province", b =>

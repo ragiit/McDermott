@@ -1,4 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Domain.Entities;
 using Microsoft.JSInterop;
 
 namespace McDermott.Web.Components.Pages.Employee
@@ -8,7 +9,11 @@ namespace McDermott.Web.Components.Pages.Employee
         public List<DepartmentDto> Departments = [];
         public List<DepartmentDto> ParentDepartments = [];
         public List<CompanyDto> Companies = [];
+        private List<UserDto> AllUsers = [];
         private List<UserDto> Users = [];
+
+        private int UpdateUserId { get; set; }
+        private int SelectedUserId { get; set; }
 
         private List<string> DepartmentCategories = new()
         {
@@ -38,9 +43,16 @@ namespace McDermott.Web.Components.Pages.Employee
         {
             PanelVisible = true;
 
-            Users = await Mediator.Send(new GetUserEmployeeQuery());
+            AllUsers = await Mediator.Send(new GetUserEmployeeQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());
             ParentDepartments = await Mediator.Send(new GetDepartmentQuery());
+
+            Departments.ForEach(x =>
+            {
+                var n = AllUsers.FirstOrDefault(z => z.DepartmentId == x.Id);
+                if (n is not null)
+                    x.Manager = n.Name;
+            });
 
             PanelVisible = false;
         }
@@ -102,22 +114,41 @@ namespace McDermott.Web.Components.Pages.Employee
         {
             var editModel = (DepartmentDto)e.EditModel;
 
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
-
             if (editModel.ParentId is not null)
                 editModel.ParentName = Departments.FirstOrDefault(x => x.Id == editModel.ParentId).Name;
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateDepartmentRequest(editModel));
+            {
+                var result = await Mediator.Send(new CreateDepartmentRequest(editModel));
+                editModel.Id = result.Id;
+            }
             else
+            {
+                var user = await Mediator.Send(new GetUserByIdQuery(UpdateUserId));
+                if (user is not null)
+                {
+                    user.DepartmentId = null;
+                    await Mediator.Send(new UpdateUserRequest(user));
+                }
+
                 await Mediator.Send(new UpdateDepartmentRequest(editModel));
+            }
+
+            if (SelectedUserId != 0)
+            {
+                var user = await Mediator.Send(new GetUserByIdQuery(SelectedUserId));
+                user.DepartmentId = editModel.Id;
+                await Mediator.Send(new UpdateUserRequest(user));
+            }
+
+            SelectedUserId = 0;
 
             await LoadData();
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
+            SelectedUserId = 0;
             FocusedRowVisibleIndex = args.VisibleIndex;
             EditItemsEnabled = true;
         }
@@ -137,12 +168,61 @@ namespace McDermott.Web.Components.Pages.Employee
 
         private async Task NewItem_Click()
         {
+            Users = [.. AllUsers.Where(x => x.IsEmployee == true && x.DepartmentId == null).OrderBy(x => x.Name)];
             await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+
+            try
+            {
+                int departmentId = SelectedDataItems[0].Adapt<DepartmentDto>().Id;
+                var user = AllUsers.FirstOrDefault(x => x.DepartmentId == departmentId);
+
+                Users = AllUsers
+                    .Where(x => x.Id == user?.Id && departmentId == x.DepartmentId || x.DepartmentId == null)
+                    .OrderBy(x => x.Name)
+                    .ToList();
+
+                UpdateUserId = user?.Id ?? 0;
+
+                SelectedUserId = user?.Id ?? 0;
+            }
+            catch { }
+
+            return;
+
+            try
+            {
+                int departmentId = SelectedDataItems[0].Adapt<DepartmentDto>().Id;
+                var user = AllUsers.FirstOrDefault(x => x.DepartmentId == departmentId);
+
+                if (user is null)
+                {
+                    Users = [.. Users.Where(x => x.DepartmentId == null).OrderBy(x => x.Name)];
+                    SelectedUserId = 0;
+                    return;
+                }
+
+                var a = AllUsers;
+
+                var users = new List<UserDto>();
+                foreach (var item in a)
+                {
+                    if (item.Id == user.Id && departmentId == item.DepartmentId)
+                        users.Add(item);
+
+                    if (item.DepartmentId == null)
+                        users.Add(item);
+                }
+
+                Users = users;
+
+                SelectedUserId = user.Id;
+            }
+            catch { }
         }
 
         private void DeleteItem_Click()

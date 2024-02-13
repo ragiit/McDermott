@@ -75,7 +75,7 @@
                                                                 ApplyBackgroundShading="true"
                                                                 IndicatorAreaVisible="false"
                                                                 Text="Fetching Data...">
-                                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
+                                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                                             Data="Users2"
                                                             PageSize="10"
                                                             @bind-SelectedDataItems="@SelectedDataItems"
@@ -103,7 +103,7 @@
                                                         <ToolbarTemplate>
                                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
                                                                 <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0 && !IsDeleted" />
                                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                                 <DxToolbarItem Text="Column Chooser" BeginGroup="true" Click="ColumnChooserButton_Click" IconCssClass="fa-solid fa-table-columns" />
@@ -153,7 +153,7 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
+                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                                 Data="Users"
                                                 PageSize="10"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
@@ -181,7 +181,7 @@
                                             <ToolbarTemplate>
                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0 && !IsDeleted" />
                                                     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                     <DxToolbarItem Text="Column Chooser" BeginGroup="true" Click="ColumnChooserButton_Click" IconCssClass="fa-solid fa-table-columns" />
@@ -488,7 +488,7 @@
                                             </div>
                                         </DxFormLayoutGroup>
 
-                                        <DxFormLayoutGroup Caption="Allergy Data" ColSpanMd="12">
+                                        <DxFormLayoutGroup Caption="Allergy" ColSpanMd="12">
                                             <Items>
                                                 <DxFormLayoutItem ColSpanMd="12" Caption="Farmacologi:">
                                                     <DxMemo @bind-Text="@UserForm.PatientAllergy.Farmacology"
@@ -508,6 +508,103 @@
                                                             NullText="Food"
                                                             Rows="1" />
                                                 </DxFormLayoutItem>
+                                            </Items>
+                                        </DxFormLayoutGroup>
+
+                                        <DxFormLayoutGroup Caption="Family Relation" ColSpanMd="12">
+                                            <Items>
+                                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                IsContentBlocked="true"
+                                                                ApplyBackgroundShading="true"
+                                                                IndicatorAreaVisible="false"
+                                                                Text="Fetching Data...">
+
+                                                    <DxGrid @ref="GridFamilyRelation" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                            Data="PatientFamilyRelations"
+                                                            PageSize="10"
+                                                            @bind-SelectedDataItems="@SelectedDataFamilyRelationItems"
+                                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                            KeyFieldName="Id"
+                                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                                            EditModelSaving="OnSaveFamilyMember"
+                                                            DataItemDeleting="OnDeleteFamilyRelation"
+                                                            EditMode="GridEditMode.EditRow"
+                                                            PopupEditFormCssClass="pw-800"
+                                                            PagerPosition="GridPagerPosition.Bottom"
+                                                            PageSizeSelectorVisible="true"
+                                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                            PageSizeSelectorAllRowsItemVisible="true"
+                                                            PagerSwitchToInputBoxButtonCount="10"
+                                                            AllowSelectRowByClick="true"
+                                                            FocusedRowEnabled="true"
+                                                            PagerVisibleNumericButtonCount="10"
+                                                            FocusedRowChanged="GridFamilyMember_FocusedRowChanged"
+                                                            ShowGroupPanel="true"
+                                                            AutoExpandAllGroupRows="true"
+                                                            ShowFilterRow="true"
+                                                            ShowSearchBox="true"
+                                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                                            KeyboardNavigationEnabled="true">
+                                                        <ToolbarTemplate>
+                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                                <DxToolbarItem Text="New" Click="NewFamilyRelationItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                                <DxToolbarItem Text="Edit" Click="EditFamilyRelationItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataFamilyRelationItems.Count > 0 && PatientFamilyRelations.Count > 0" />
+                                                                <DxToolbarItem Text="Delete" Click="DeleteFamilyRelationItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataFamilyRelationItems.Count > 0 && PatientFamilyRelations.Count > 0" />
+                                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                                    <Items>
+                                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                                    </Items>
+                                                                </DxToolbarItem>
+                                                            </DxToolbar>
+                                                        </ToolbarTemplate>
+                                                        <Columns>
+                                                            <DxGridSelectionColumn Width="15px" />
+                                                            <DxGridDataColumn FieldName="FamilyMember" Caption="Family Member" SortIndex="0">
+                                                                <EditSettings>
+                                                                    <DxComboBoxSettings Data="Patiens"
+                                                                                        TextFieldName="Name"
+                                                                                        ValueFieldName="FamilyMemberId">
+                                                                    </DxComboBoxSettings>
+                                                                </EditSettings>
+                                                            </DxGridDataColumn>
+                                                            <DxGridDataColumn FieldName="Family" Caption="Relation">
+                                                                <EditSettings>
+                                                                    <DxComboBoxSettings Data="Families"
+                                                                                        TextFieldName="Relation"
+                                                                                        ValueFieldName="FamilyId">
+                                                                    </DxComboBoxSettings>
+                                                                </EditSettings>
+                                                            </DxGridDataColumn>
+                                                        </Columns>
+                                                        @* <EditFormTemplate Context="EditFormContext2">
+                                                @{
+                                                var a = (PatientFamilyRelationDto)EditFormContext2.EditModel;
+                                                }
+                                                <DxFormLayout CssClass="w-100">
+                                                <DxFormLayoutItem Caption="Patient:" ColSpanMd="12">
+                                                <DxComboBox Data="@Patiens"
+                                                NullText="Select Patient..."
+                                                @bind-Value="@a.PatientId"
+                                                TextFieldName="Name"
+                                                ValueFieldName="Id">
+                                                </DxComboBox>
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Relation:" ColSpanMd="12">
+                                                <DxComboBox Data="@Families"
+                                                NullText="Select Relation..."
+                                                @bind-Value="@a.FamilyId"
+                                                TextFieldName="Relation"
+                                                ValueFieldName="Id">
+                                                </DxComboBox>
+                                                </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                                </EditFormTemplate> *@
+                                                    </DxGrid>
+                                                </DxLoadingPanel>
                                             </Items>
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>

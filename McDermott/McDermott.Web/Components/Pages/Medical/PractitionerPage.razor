@@ -23,7 +23,7 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
+                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                                 Data="Users"
                                                 PageSize="10"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
@@ -109,6 +109,7 @@
                                                                NullText="Mobile Phone"
                                                                ShowValidationIcon="true"
                                                                Mask="@NumericMask.WholeNumber">
+                                                    <DxTextMaskProperties Placeholder="Placeholder" />
                                                 </DxMaskedInput>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Home Phone Number:">
@@ -388,6 +389,24 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Sip Expired:">
                                                 <DxDateEdit @bind-Date="@UserForm.SipExp" NullText="Sip Expired" Mask="@DateTimeMask.ShortDate" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Services:">
+                                                <DxTagBox Data="@Services"
+                                                          FilteringMode="@DataGridFilteringMode.Contains"
+                                                          @bind-Values="@SelectedServices"
+                                                          TextFieldName="Name"
+                                                          NullText="Select Service"
+                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Speciality">
+                                                <Template>
+                                                    <DxComboBox Data="@Specialities"
+                                                                NullText="Select Speciality..."
+                                                                @bind-Value="@UserForm.SpecialityId"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id">
+                                                    </DxComboBox>
+                                                </Template>
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>
