@@ -83,6 +83,8 @@
         public string? Legacy { get; set; }
         public string? SAP { get; set; }
         public string? Oracle { get; set; }
+        public List<int>? DoctorServiceIds { get; set; }
+
 
         public virtual Group? Group { get; set; }
         public virtual Gender? Gender { get; set; }

@@ -169,6 +169,16 @@ namespace McDermott.Web.Components.Pages.Config
             if (!FormValidationState)
                 return;
 
+            if (Convert.ToBoolean(UserForm.IsPatient))
+            {
+                var date = DateTime.Now;
+                var lastId = Users.Where(x => x.IsPatient == true).ToList().LastOrDefault();
+
+                UserForm.NoRm = lastId is null
+                         ? $"{date:dd-MM-yyyy}-0001"
+                         : $"{date:dd-MM-yyyy}-{(int.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
+            }
+
             if (UserForm.Id == 0)
                 await Mediator.Send(new CreateUserRequest(UserForm));
             else

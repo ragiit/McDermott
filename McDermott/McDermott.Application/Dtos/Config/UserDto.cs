@@ -125,6 +125,7 @@ namespace McDermott.Application.Dtos.Config
 
         public string? EmployeeStatus { get; set; }
         public DateTime? JoinDate { get; set; }
+        public List<int>? DoctorServiceIds { get; set; } = [];  
 
         public virtual GroupDto? Group { get; set; }
         public virtual JobPositionDto? JobPosition { get; set; }

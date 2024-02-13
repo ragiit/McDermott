@@ -23,7 +23,7 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
+                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                                 Data="Users"
                                                 PageSize="10"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
@@ -388,6 +388,14 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Sip Expired:">
                                                 <DxDateEdit @bind-Date="@UserForm.SipExp" NullText="Sip Expired" Mask="@DateTimeMask.ShortDate" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Services:">
+                                                <DxTagBox Data="@Services"
+                                                          FilteringMode="@DataGridFilteringMode.Contains"
+                                                          @bind-Values="@SelectedServices"
+                                                          TextFieldName="Name"
+                                                          NullText="Select Service"
+                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>
