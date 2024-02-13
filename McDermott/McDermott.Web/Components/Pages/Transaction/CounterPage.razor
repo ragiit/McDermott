@@ -1,0 +1,174 @@
+﻿@* @page "/transaction/counter" *@
+@page "/transaction/counter"
+@rendermode InteractiveServer
+<PageTitle>McDermott - Transaction Counter</PageTitle>
+<style>
+    .dxbl-toolbar-dropdown-toggle {
+        display: none;
+    }
+
+    .cards {
+        background-color: aliceblue;
+    }
+
+        .cards:hover {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            transform: scaleX(1.1);
+        }
+</style>
+<div class="wrapper ml-2 mr-2">
+    <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Counter" />
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row ">
+                <div class="col">
+                    @if (!GirdDetail)
+                    {
+                        @if (!ArchiveCard)
+                        {
+                            <div class="card">
+                                <div class="card-header">
+                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                        <Items>
+                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" CssClass="fs-6 fw-bolder" IconCssClass="fa-solid fa-plus" />
+                                            <DxToolbarItem Text="Archive Counter" BeginGroup="true" Click="Archive_Click" IconCssClass="fa-solid fa-box-archive" Alignment="ToolbarItemAlignment.Right" />
+                                        </Items>
+                                    </DxToolbar>
+                                </div>
+                            </div>
+                            <div class="row">
+                                @foreach (var i in countersActive)
+                                {
+
+                                    <div class="col-md-4 ">
+                                        <div class="card cards">
+                                            <div class="card-header">
+
+                                                <DxToolbar Title="@i.Name" ItemRenderStyleMode="ToolbarRenderStyleMode.Plain"
+                                                           CssClass="position-relative">
+                                                    <Items>
+                                                        <DxToolbarItem IconCssClass="fa-solid fa-ellipsis-vertical fa-lg" CssClass="position-absolute top-50 start-100 translate-middle">
+                                                            <Items>
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="@(() => EditItem_Click(i.Id))" IconCssClass="fa-solid fa-pen-to-square" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="@(() => OnDelete(i.Id))" IconCssClass="fa-solid fa-trash" />
+                                                                <DxToolbarItem Text="InActive" Click="@(() => InActive_Click(i.Id))" IconCssClass="fa-solid fa-circle-xmark" />
+                                                            </Items>
+                                                        </DxToolbarItem>
+                                                    </Items>
+                                                </DxToolbar>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+
+                                                    <h4> Total Data : 60</h4>
+                                                </div>
+                                                <div class="row justify-content-end">
+                                                    <div class="col-md-4 align-self-end">
+                                                        <DxButton IconCssClass="fa-solid fa-eye" Text="view" Click="@(() => DetailList(i.Id))" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <DxPopup HeaderText="@textPopUp" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" Width="35%">
+
+                                <EditForm Model="@counterForm" Context="EditFormContext">
+                                    <DxFormLayout CssClass="w-100">
+                                        <DxFormLayoutItem ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@counterForm.Name" NullText="Input Name Counter.." />
+                                        </DxFormLayoutItem>
+                                    </DxFormLayout>
+
+                                    <div class="row justify-content-end">
+                                        <div class="col-auto align-self-end">
+                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
+                                        </div>
+                                    </div>
+
+                                </EditForm>
+                            </DxPopup>
+                        }
+                        else if (ArchiveCard)
+                        {
+                            <div class="card">
+                                <div class="card-header">
+                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                        <Items>
+                                            <DxToolbarItem Text="Back" Click="onBack" CssClass="fs-6 fw-bolder" IconCssClass="fa-solid fa-arrow-left" />
+                                        </Items>
+                                    </DxToolbar>
+                                </div>
+                            </div>
+                            <div class="row">
+                                @foreach (var i in countersInActive)
+                                {
+
+                                    <div class="col-md-4 ">
+                                        <div class="card cards">
+                                            <div class="card-header">
+
+                                                <DxToolbar Title="@i.Name" ItemRenderStyleMode="ToolbarRenderStyleMode.Plain"
+                                                           CssClass="position-relative">
+                                                    <Items>
+                                                        <DxToolbarItem IconCssClass="fa-solid fa-ellipsis-vertical fa-lg" CssClass="position-absolute top-50 start-100 translate-middle">
+                                                            <Items>
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="@(() => EditItem_Click(i.Id))" IconCssClass="fa-solid fa-pen-to-square" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="@(() => OnDelete(i.Id))" IconCssClass="fa-solid fa-trash" />
+                                                                <DxToolbarItem Text="Active" Click="@(() => InActive_Click(i.Id))" IconCssClass="fa-solid fa-check" />
+                                                            </Items>
+                                                        </DxToolbarItem>
+                                                    </Items>
+                                                </DxToolbar>
+                                            </div>
+                                            <div class="card-body">
+                                                <h4> Total Data : 60</h4>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+                        }
+                    }
+                    else if (GirdDetail)
+                    {
+                        <div class="Row">
+                            <div class="col">
+                                <div class="card">
+                                    @foreach (var item in kiosks)
+                                    {
+                                        <div class="card-header">
+                                            <div class="row justify-content-arround">
+                                                <div class="col-md-4">
+
+                                                    <DxButton Text="Back" Click="onBack" CssClass="fs-6 fw-bolder" IconCssClass="fa-solid fa-arrow-left" />
+
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h3>@item.Counter.Name</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <DxGrid @ref="Grid">
+                                                <Columns>
+                                                    <DxDataGridColumn FieldName="@item.Queue" Caption=""/>
+                                                    <DxDataGridColumn FieldName="@item.User.Name" Caption=""/>
+                                                </Columns>
+                                            </DxGrid>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+

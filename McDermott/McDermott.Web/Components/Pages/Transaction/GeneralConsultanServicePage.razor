@@ -38,7 +38,7 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
+                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                                 Data="GeneralConsultanServices"
                                                 PageSize="10"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
@@ -154,13 +154,13 @@
                                              </div>
                                              <div class="col-md-6">
                                                  <DxFormLayout CssClass="mt ">
-                                                   @*   <DxFormLayoutItem Caption="Docter" ColSpanMd="12">
-                                                         <DxComboBox Data="@IsPratition"
-                                                                     NullText="Docter"
-                                                                     @bind-Value="@FormRegis.PratitionerId"
-                                                                     ValueChanged="@((DoctorScheduleDto Docter)=> SelectedService(Docter))"
-                                                                     InputId="CbDoctoreName"></DxComboBox>
-                                                     </DxFormLayoutItem> *@
+                                                     @*   <DxFormLayoutItem Caption="Docter" ColSpanMd="12">
+                                            <DxComboBox Data="@IsPratition"
+                                            NullText="Docter"
+                                            @bind-Value="@FormRegis.PratitionerId"
+                                            ValueChanged="@((DoctorScheduleDto Docter)=> SelectedService(Docter))"
+                                            InputId="CbDoctoreName"></DxComboBox>
+                                            </DxFormLayoutItem> *@
                                                      <DxFormLayoutItem Caption="Service" ColSpanMd="12">
                                                          <DxComboBox Data="@Names"
                                                                      NullText="Service.."

@@ -14,9 +14,9 @@ namespace McDermott.Application.Dtos.Config
         public string? Smpt_Encryption { get; set; }
 
         [StringLength(200)]
-        public string? Smpt_Host { get; set; } = string.Empty;
+        public string Smpt_Host { get; set; } = string.Empty;
         public string? Smpt_Pass { get; set; } = string.Empty;
-        public int? Smpt_Port { get; set; }
+        public int Smpt_Port { get; set; }
 
         [StringLength(200)]
         public string? Smpt_User { get; set; } = string.Empty;

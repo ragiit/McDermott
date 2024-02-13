@@ -6,8 +6,10 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class EmailTemplatePage
     {
+        private bool[] DocumentContent;
         private BaseAuthorizationLayout AuthorizationLayout = new();
         private bool IsAccess { get; set; } = false;
+        private bool showForm { get; set; } = false;
         private bool PanelVisible { get; set; } = true;
         private bool PopupVisible { get; set; } = false;
         private string textPopUp = "";
@@ -119,7 +121,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             await LoadUser();
             EmailFormTemplate = new();
-            PopupVisible = true;
+            showForm = true;
             textPopUp = "Form Template Email";
             await Grid.StartEditNewRowAsync();
         }
@@ -128,7 +130,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             await LoadUser();
             EmailFormTemplate = new();
-            PopupVisible = true;
+            showForm = true;
             textPopUp = "Edit Form Template Email";
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }

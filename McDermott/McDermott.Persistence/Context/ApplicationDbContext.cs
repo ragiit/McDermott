@@ -64,6 +64,7 @@ namespace McDermott.Persistence.Context
         //Transaction
         public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
         public DbSet<Kiosk> Kiosks { get; set; }
+        public DbSet<Counter> Counters { get; set; }
 
         #endregion DbSet
 
