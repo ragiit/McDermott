@@ -8,7 +8,11 @@ global using McDermott.Web.Extentions;
 global using McDermott.Application.Dtos.Config;
 global using McDermott.Application.Dtos.Medical;
 global using McDermott.Application.Dtos.Transaction; 
-global using McDermott.Application.Dtos.Employee; 
+global using McDermott.Application.Dtos.Employee;
+global using McDermott.Application.Dtos.Patient;
+
+global using DevExpress.Data.XtraReports.Native;
+global using System.Security.Claims;
 
 global using static McDermott.Application.Features.Commands.Config.CityCommand;
 global using static McDermott.Application.Features.Commands.Config.CountryCommand;
@@ -34,3 +38,5 @@ global using static McDermott.Application.Features.Commands.Patient.PatientComma
 global using static McDermott.Application.Features.Commands.Medical.PractitionerCommand;
 global using static McDermott.Application.Features.Commands.Config.CompanyCommand;
 global using static McDermott.Application.Features.Commands.Employee.EmployeeCommand;
+global using static McDermott.Application.Features.Commands.Patient.FamilyCommand;
+global using static McDermott.Application.Features.Commands.Patient.PatientFamilyRelationCommand;

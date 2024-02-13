@@ -11,6 +11,9 @@ global using McDermott.Application.Dtos.Config;
 global using McDermott.Application.Dtos.Employee;
 global using McDermott.Application.Dtos.Patient;
 
+
+global using System.Linq.Expressions;
+
 global using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand;
 global using static McDermott.Application.Features.Commands.Config.GenderCommand;
 global using static McDermott.Application.Features.Commands.Config.GroupCommand;
@@ -22,3 +25,4 @@ global using static McDermott.Application.Features.Commands.Config.UserCommand;
 global using static McDermott.Application.Features.Commands.Employee.EmployeeCommand;
 global using static McDermott.Application.Features.Commands.Patient.PatientCommand;
 global using static McDermott.Application.Features.Commands.Medical.PractitionerCommand;
+global using static McDermott.Application.Features.Commands.Patient.PatientFamilyRelationCommand;

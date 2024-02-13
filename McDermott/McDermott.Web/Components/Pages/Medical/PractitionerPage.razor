@@ -109,6 +109,7 @@
                                                                NullText="Mobile Phone"
                                                                ShowValidationIcon="true"
                                                                Mask="@NumericMask.WholeNumber">
+                                                    <DxTextMaskProperties Placeholder="Placeholder" />
                                                 </DxMaskedInput>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Home Phone Number:">
@@ -396,6 +397,16 @@
                                                           TextFieldName="Name"
                                                           NullText="Select Service"
                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Speciality">
+                                                <Template>
+                                                    <DxComboBox Data="@Specialities"
+                                                                NullText="Select Speciality..."
+                                                                @bind-Value="@UserForm.SpecialityId"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id">
+                                                    </DxComboBox>
+                                                </Template>
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>

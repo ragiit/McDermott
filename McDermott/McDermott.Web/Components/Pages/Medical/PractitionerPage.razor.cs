@@ -8,6 +8,7 @@ namespace McDermott.Web.Components.Pages.Medical
     public partial class PractitionerPage
     {
         private List<UserDto> Users = [];
+        private List<SpecialityDto> Specialities = [];
         public List<CityDto> Cities = [];
         public List<CountryDto> Countries = [];
         public List<ProvinceDto> Provinces = [];
@@ -61,6 +62,7 @@ namespace McDermott.Web.Components.Pages.Medical
             }
             catch { }
 
+            Specialities = await Mediator.Send(new GetSpecialityQuery());
             Services = await Mediator.Send(new GetServiceQuery());
             Countries = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
