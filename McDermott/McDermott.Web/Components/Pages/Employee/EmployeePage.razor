@@ -23,7 +23,7 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
+                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                                 Data="Users"
                                                 PageSize="10"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
@@ -360,7 +360,7 @@
                                                     <DxTextMaskProperties Placeholder="Placeholder" />
                                                 </DxMaskedInput>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="NIP:">
+                                            <DxFormLayoutItem Caption="NIP Number:">
                                                 <DxMaskedInput @bind-Value="@UserForm.NIP"
                                                                NullText="NIP"
                                                                ShowValidationIcon="true"
@@ -368,13 +368,13 @@
                                                     <DxTextMaskProperties Placeholder="Placeholder" />
                                                 </DxMaskedInput>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Legacy:">
+                                            <DxFormLayoutItem Caption="Legacy Number:">
                                                 <DxTextBox @bind-Text="@UserForm.Legacy" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Legacy" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Oracle:">
+                                            <DxFormLayoutItem Caption="Oracle Number:">
                                                 <DxTextBox @bind-Text="@UserForm.Oracle" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Oracle" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="SAP:">
+                                            <DxFormLayoutItem Caption="SAP Number:">
                                                 <DxTextBox @bind-Text="@UserForm.SAP" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="SAP" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Employee Type:">

@@ -133,8 +133,12 @@ namespace McDermott.Web.Components.Pages.Patient
                 if (string.IsNullOrWhiteSpace(editModel.Name))
                     return;
 
+                editModel.ParentRelation = editModel.Name;
+
                 if (editModel.Id == 0)
+                {
                     await Mediator.Send(new CreateFamilyRequest(editModel));
+                }
                 else
                     await Mediator.Send(new UpdateFamilyRequest(editModel));
             }
@@ -146,6 +150,8 @@ namespace McDermott.Web.Components.Pages.Patient
 
                 if (editModel.Id == 0)
                 {
+                    editModel.ParentRelation = name;
+                    editModel.ChildRelation = relation;
                     await Mediator.Send(new CreateFamilyRequest(editModel));
 
                     var invers = Familys.Where(x => x.Name == relation).Select(x => x.Id).FirstOrDefault();
@@ -153,6 +159,8 @@ namespace McDermott.Web.Components.Pages.Patient
                     editModel.Id = invers;
                     editModel.Name = relation;
                     editModel.Relation = name + "-" + relation;
+                    editModel.ChildRelation = name;
+                    editModel.ParentRelation = relation;
                     await Mediator.Send(new UpdateFamilyRequest(editModel));
                 }
                 else

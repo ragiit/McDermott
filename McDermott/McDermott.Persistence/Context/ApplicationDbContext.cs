@@ -53,7 +53,7 @@ namespace McDermott.Persistence.Context
         public DbSet<BuildingLocation> BuildingLocations { get; set; }
 
         //Patiente
-        public DbSet<Family> families { get; set; }
+        public DbSet<Family> Families { get; set; }
         public DbSet<PatientFamilyRelation> PatientFamilyRelations { get; set; }
         public DbSet<PatientAllergy> PatientAllergies { get; set; }
 

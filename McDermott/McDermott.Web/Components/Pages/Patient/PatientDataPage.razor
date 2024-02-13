@@ -529,7 +529,7 @@
                                                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                             EditModelSaving="OnSaveFamilyMember"
                                                             DataItemDeleting="OnDeleteFamilyRelation"
-                                                            EditMode="GridEditMode.EditRow"
+                                                            EditMode="GridEditMode.PopupEditForm"
                                                             PopupEditFormCssClass="pw-800"
                                                             PagerPosition="GridPagerPosition.Bottom"
                                                             PageSizeSelectorVisible="true"
@@ -563,46 +563,32 @@
                                                         </ToolbarTemplate>
                                                         <Columns>
                                                             <DxGridSelectionColumn Width="15px" />
-                                                            <DxGridDataColumn FieldName="FamilyMember" Caption="Family Member" SortIndex="0">
-                                                                <EditSettings>
-                                                                    <DxComboBoxSettings Data="Patiens"
-                                                                                        TextFieldName="Name"
-                                                                                        ValueFieldName="FamilyMemberId">
-                                                                    </DxComboBoxSettings>
-                                                                </EditSettings>
-                                                            </DxGridDataColumn>
-                                                            <DxGridDataColumn FieldName="Family" Caption="Relation">
-                                                                <EditSettings>
-                                                                    <DxComboBoxSettings Data="Families"
-                                                                                        TextFieldName="Relation"
-                                                                                        ValueFieldName="FamilyId">
-                                                                    </DxComboBoxSettings>
-                                                                </EditSettings>
-                                                            </DxGridDataColumn>
+                                                            <DxGridDataColumn FieldName="FamilyMember.Name" Caption="Family Member" SortIndex="0" />
+                                                            <DxGridDataColumn FieldName="Relation" Caption="Relation" />
                                                         </Columns>
-                                                        @* <EditFormTemplate Context="EditFormContext2">
-                                                @{
-                                                var a = (PatientFamilyRelationDto)EditFormContext2.EditModel;
-                                                }
-                                                <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem Caption="Patient:" ColSpanMd="12">
-                                                <DxComboBox Data="@Patiens"
-                                                NullText="Select Patient..."
-                                                @bind-Value="@a.PatientId"
-                                                TextFieldName="Name"
-                                                ValueFieldName="Id">
-                                                </DxComboBox>
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Relation:" ColSpanMd="12">
-                                                <DxComboBox Data="@Families"
-                                                NullText="Select Relation..."
-                                                @bind-Value="@a.FamilyId"
-                                                TextFieldName="Relation"
-                                                ValueFieldName="Id">
-                                                </DxComboBox>
-                                                </DxFormLayoutItem>
-                                                </DxFormLayout>
-                                                </EditFormTemplate> *@
+                                                        <EditFormTemplate Context="EditFormContext2">
+                                                            @{
+                                                                var a = (PatientFamilyRelationDto)EditFormContext2.EditModel;
+                                                            }
+                                                            <DxFormLayout CssClass="w-100">
+                                                                <DxFormLayoutItem Caption="Patient:" ColSpanMd="12">
+                                                                    <DxComboBox Data="@Patiens"
+                                                                                NullText="Select Patient..."
+                                                                                @bind-Value="@a.FamilyMemberId"
+                                                                                TextFieldName="Name"
+                                                                                ValueFieldName="Id">
+                                                                    </DxComboBox>
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem Caption="Relation:" ColSpanMd="12">
+                                                                    <DxComboBox Data="@Families"
+                                                                                NullText="Select Relation..."
+                                                                                @bind-Value="@a.FamilyId"
+                                                                                TextFieldName="Relation"
+                                                                                ValueFieldName="Id">
+                                                                    </DxComboBox>
+                                                                </DxFormLayoutItem>
+                                                            </DxFormLayout>
+                                                        </EditFormTemplate>
                                                     </DxGrid>
                                                 </DxLoadingPanel>
                                             </Items>

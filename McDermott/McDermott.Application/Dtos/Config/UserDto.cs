@@ -86,9 +86,7 @@ namespace McDermott.Application.Dtos.Config
         public bool? IsDoctor { get; set; } = false;
         public bool? IsEmployeeRelation { get; set; } = false;
         public string? EmployeeType { get; set; }
-
-        //[Required]
-        [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
+         
         public string? NIP { get; set; }
 
         public string? Legacy { get; set; }

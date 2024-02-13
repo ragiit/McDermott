@@ -187,8 +187,14 @@ namespace McDermott.Web.Components.Pages.Patient
             {
                 var editModel = (PatientFamilyRelationDto)e.EditModel;
 
-                if (string.IsNullOrWhiteSpace(editModel.Patient.Name))
+                if (editModel.FamilyMemberId == 0)
                     return;
+                if (UserForm.Id != 0)
+                    editModel.PatientId = UserForm.Id;
+
+                editModel.FamilyMember = Users.FirstOrDefault(x => x.Id == editModel.FamilyMemberId);
+                editModel.Family = Families.FirstOrDefault(x => x.Id == editModel.FamilyId);
+                editModel.Relation = editModel.Family.ParentRelation + " - " + editModel.Family.ChildRelation;
 
                 if (editModel.Id == 0)
                     PatientFamilyRelations.Add(editModel);
@@ -210,6 +216,14 @@ namespace McDermott.Web.Components.Pages.Patient
             UserForm.IsNurse = false;
             UserForm.IsPhysicion = false;
 
+            PatientFamilyRelations.ForEach(x =>
+            {
+                x.Family = null;
+                x.Relation = null;
+                x.Patient = null;
+                x.FamilyMember = null;
+            });
+
             if (UserForm.Id == 0)
             {
                 var date = DateTime.Now;
@@ -221,6 +235,9 @@ namespace McDermott.Web.Components.Pages.Patient
 
                 var result = await Mediator.Send(new CreateUserRequest(UserForm));
                 UserForm.PatientAllergy.UserId = result.Id;
+                PatientFamilyRelations.ForEach(x => x.PatientId = result.Id);
+
+                await Mediator.Send(new CreateListPatientFamilyRelationRequest(PatientFamilyRelations));
                 await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
             }
             else

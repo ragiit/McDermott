@@ -15,5 +15,27 @@ namespace McDermott.Application.Features.Commands.Patient
             }
         }
         #endregion
+
+        #region Create
+        public class CreatePatientFamilyRelationRequest : IRequest<PatientFamilyRelationDto>
+        {
+            public PatientFamilyRelationDto PatientFamilyRelationDto { get; set; }
+
+            public CreatePatientFamilyRelationRequest(PatientFamilyRelationDto PatientFamilyRelationDto)
+            {
+                this.PatientFamilyRelationDto = PatientFamilyRelationDto;
+            }
+        }
+
+        public class CreateListPatientFamilyRelationRequest : IRequest<List<PatientFamilyRelationDto>>
+        {
+            public List<PatientFamilyRelationDto> PatientFamilyRelationDto { get; set; }
+
+            public CreateListPatientFamilyRelationRequest(List<PatientFamilyRelationDto> PatientFamilyRelationDto)
+            {
+                this.PatientFamilyRelationDto = PatientFamilyRelationDto;
+            }
+        }
+        #endregion
     }
 }
