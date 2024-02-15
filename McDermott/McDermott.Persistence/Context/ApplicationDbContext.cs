@@ -54,6 +54,7 @@ namespace McDermott.Persistence.Context
 
         //Patiente
         public DbSet<Family> Families { get; set; }
+        public DbSet<InsurancePolicy> InsurancePolicies { get; set; }
         public DbSet<PatientFamilyRelation> PatientFamilyRelations { get; set; }
         public DbSet<PatientAllergy> PatientAllergies { get; set; }
 
