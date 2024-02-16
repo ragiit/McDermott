@@ -1,22 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace McDermott.Application.Features.Commands.Patient
 {
     public class InsurancePolicyCommand
     {
         #region Get
-        public class GetInsurancePolicyQuery : IRequest<List<InsurancePolicyDto>>
-        {
-            public Expression<Func<InsurancePolicy, bool>> Predicate { get; }
 
-            public GetInsurancePolicyQuery(Expression<Func<InsurancePolicy, bool>> predicate)
-            {
-                Predicate = predicate;
-            }
+        public class GetInsurancePolicyQuery(Expression<Func<InsurancePolicy, bool>>? predicate = null) : IRequest<List<InsurancePolicyDto>>
+        { 
+            public Expression<Func<InsurancePolicy, bool>> Predicate { get; } = predicate;
+        }
+
+        public class GetInsurancePolicyCountQuery(Expression<Func<InsurancePolicy, bool>>? predicate = null) : IRequest<int>
+        {
+            public Expression<Func<InsurancePolicy, bool>> Predicate { get; } = predicate;
+        }
+
+        #endregion
+
+        #region Create
+
+        public class CreateInsurancePolicyRequest(InsurancePolicyDto InsurancePolicyDto) : IRequest<InsurancePolicyDto>
+        {
+            public InsurancePolicyDto InsurancePolicyDto { get; set; } = InsurancePolicyDto;
+        }
+
+        #endregion
+
+        #region Update
+        public class UpdateInsurancePolicyRequest(InsurancePolicyDto InsurancePolicyDto) : IRequest<bool>
+        {
+            public InsurancePolicyDto InsurancePolicyDto { get; set; } = InsurancePolicyDto;
+        }
+
+        #endregion
+
+        #region Delete
+        public class DeleteInsurancePolicyRequest(int id = 0, List<int>? ids = null) : IRequest<bool>
+        {
+            public int Id { get; set; } = id;
+            public List<int> Ids { get; set; } = ids ?? [];
         }
         #endregion
     }

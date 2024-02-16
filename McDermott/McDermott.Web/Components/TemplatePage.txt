@@ -218,18 +218,16 @@
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteCountryRequest(((CountryDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteInsurancePolicyRequest(((InsuranceDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<CountryDto>>();
-                    await Mediator.Send(new DeleteListCountryRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteInsurancePolicyRequest(ids: SelectedDataItems.Adapt<List<InsuranceDto>>().Select(x => x.Id).ToList()));
                 }
+
                 await LoadData();
             }
-            catch (Exception ee)
-            {
-            }
+            catch { }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
@@ -402,7 +400,128 @@ private void EditItem_Click()
 #endregion
 ========================== END ==========================
 
+========================== Command Handler ==========================
+  #region Get
 
+public class GetInsurancePolicyQuery(Expression<Func<InsurancePolicy, bool>> predicate) : IRequest<List<InsurancePolicyDto>>
+{
+    public Expression<Func<InsurancePolicy, bool>> Predicate { get; } = predicate;
+}
+
+#endregion
+
+#region Create
+
+public class CreateInsurancePolicyRequest(InsurancePolicyDto InsurancePolicyDto) : IRequest<InsurancePolicyDto>
+{
+    public InsurancePolicyDto InsurancePolicyDto { get; set; } = InsurancePolicyDto;
+}
+
+#endregion
+
+#region Update
+public class UpdateInsurancePolicyRequest(InsurancePolicyDto InsurancePolicyDto) : IRequest<bool>
+{
+    public InsurancePolicyDto InsurancePolicyDto { get; set; } = InsurancePolicyDto;
+}
+
+#endregion
+
+#region Delete
+public class DeleteInsurancePolicyRequest(int id = 0, List<int>? ids = null) : IRequest<bool>
+{
+    public int Id { get; set; } = id;
+    public List<int> Ids { get; set; } = ids ?? [];
+}
+#endregion
+========================== END Command Handler ==========================
+
+========================== Query Handler ==========================
+  #region Get
+internal class GetInsurancePolicyQueryHandler : IRequestHandler<GetInsurancePolicyQuery, List<InsurancePolicyDto>>
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public GetInsurancePolicyQueryHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<List<InsurancePolicyDto>> Handle(GetInsurancePolicyQuery query, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _unitOfWork.Repository<InsurancePolicy>().GetAsync(
+                query.Predicate,
+                    x => x
+                    .Include(z => z.Insurance)
+                    .Include(z => z.User), cancellationToken);
+
+            return result.Adapt<List<InsurancePolicyDto>>();
+        }
+        catch (Exception e)
+        {
+            return [];
+        }
+    }
+}
+#endregion
+
+#region Create
+internal class CreateInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateInsurancePolicyRequest, InsurancePolicyDto>
+{
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+    public async Task<InsurancePolicyDto> Handle(CreateInsurancePolicyRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _unitOfWork.Repository<InsurancePolicy>().AddAsync(request.InsurancePolicyDto.Adapt<InsurancePolicy>());
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return result.Adapt<InsurancePolicyDto>();
+    }
+}
+#endregion
+
+#region Update
+internal class UpdateInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateInsurancePolicyRequest, bool>
+{
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+    public async Task<bool> Handle(UpdateInsurancePolicyRequest request, CancellationToken cancellationToken)
+    {
+        await _unitOfWork.Repository<InsurancePolicy>().UpdateAsync(request.InsurancePolicyDto.Adapt<InsurancePolicy>());
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
+}
+#endregion
+
+#region Delete
+internal class DeleteInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteInsurancePolicyRequest, bool>
+{
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+    public async Task<bool> Handle(DeleteInsurancePolicyRequest request, CancellationToken cancellationToken)
+    { 
+        if (request.Id > 0)
+        {
+            await _unitOfWork.Repository<InsurancePolicy>().DeleteAsync(request.Id);
+        }
+                 
+        if (request.Ids.Count > 0)
+        {
+            await _unitOfWork.Repository<InsurancePolicy>().DeleteAsync(x => request.Ids.Contains(x.Id));
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return true; 
+    }
+}
+#endregion
+========================== END Query Handler ==========================
 
 
 

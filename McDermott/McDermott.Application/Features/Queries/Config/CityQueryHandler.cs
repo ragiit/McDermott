@@ -6,14 +6,9 @@ namespace McDermott.Application.Features.Queries.Config
 {
     public class CityQueryHandler
     {
-        internal class GetAllCityQueryHandler : IRequestHandler<GetCityQuery, List<CityDto>>
+        internal class GetAllCityQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetCityQuery, List<CityDto>>
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllCityQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<List<CityDto>> Handle(GetCityQuery query, CancellationToken cancellationToken)
             {

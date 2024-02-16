@@ -1,4 +1,9 @@
 ﻿using McDermott.Domain.Entities;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
+using Microsoft.SqlServer.Server;
+using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Patient
 {
@@ -18,6 +23,7 @@ namespace McDermott.Web.Components.Pages.Patient
         private List<GenderDto> Genders = [];
         private List<PatientFamilyRelationDto> PatientFamilyRelations = [];
         private List<FamilyDto> Familys = [];
+        private List<InsurancePolicyDto> InsurancePolicies = [];
 
         private UserDto UserForm = new();
         private GroupMenuDto UserAccessCRUID = new();
@@ -31,6 +37,10 @@ namespace McDermott.Web.Components.Pages.Patient
         private int FocusedRowFamilyMemberVisibleIndex { get; set; }
         private char Placeholder { get; set; } = '_';
         private bool SaveLiterals { get; set; } = true;
+
+        [Parameter]
+        public int InsurancePoliciesCount { get; set; } = 0;
+
         public IGrid Grid { get; set; }
         public IGrid GridFamilyRelation { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
@@ -74,6 +84,26 @@ namespace McDermott.Web.Components.Pages.Patient
             Families = await Mediator.Send(new GetFamilyQuery());
 
             await LoadData();
+            return;
+            // Create an instance of Form B
+            var formB = new InsurancePolicyPageListForm();
+
+            // Create an EventCallback object for the method
+            var eventCallback = EventCallback.Factory.Create<List<InsurancePolicyDto>>(this, UpdateInsurancePoliciesCount);
+
+            // Subscribe to the event using the EventCallback object
+            formB.InsurancePoliciesUpdated = eventCallback;
+        }
+
+        private void UpdateInsurancePoliciesCount(List<InsurancePolicyDto> updatedInsurancePolicies)
+        {
+            InsurancePoliciesCount = updatedInsurancePolicies.Count;
+            StateHasChanged(); // Perbarui tampilan
+        }
+
+        private void UpdateIntA(int newValue)
+        {
+            StateHasChanged(); // Perbarui tampilan
         }
 
         #region MaskedInput
@@ -176,8 +206,16 @@ namespace McDermott.Web.Components.Pages.Patient
             ShowForm = false;
         }
 
+        private void OnClose()
+        {
+            TabIndex = -1;
+        }
+
         private void OnClickSmartButton(string text)
         {
+            //NavigationManager.NavigateTo("patient/insurance-policy");
+            //var a = new InsurancePolicyPage();
+            //a.User = UserForm;
             TabIndex = text.ToInt32();
         }
 
@@ -193,7 +231,7 @@ namespace McDermott.Web.Components.Pages.Patient
                     editModel.PatientId = UserForm.Id;
 
                 editModel.FamilyMember = Users.FirstOrDefault(x => x.Id == editModel.FamilyMemberId);
-                editModel.Family = Families.FirstOrDefault(x => x.Id == editModel.FamilyId);
+                //editModel.Family = Families.FirstOrDefault(x => x.Id == editModel.FamilyId);
                 editModel.Relation = editModel.Family.ParentRelation + " - " + editModel.Family.ChildRelation;
 
                 if (editModel.Id == 0)
@@ -327,7 +365,9 @@ namespace McDermott.Web.Components.Pages.Patient
                 UserForm = SelectedDataItems[0].Adapt<UserDto>();
                 ShowForm = true;
 
-                PatientFamilyRelations = await Mediator.Send(new GetPatientFamilyByPatientQuery(x => x.PatientId == UserForm.Id));
+                //PatientFamilyRelations = await Mediator.Send(new GetPatientFamilyByPatientQuery(x => x.PatientId == UserForm.Id));
+                //InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
+                InsurancePoliciesCount = await Mediator.Send(new GetInsurancePolicyCountQuery(x => x.UserId == UserForm.Id));
             }
             catch { }
         }

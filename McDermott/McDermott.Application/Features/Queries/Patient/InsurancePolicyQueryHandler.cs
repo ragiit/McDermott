@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Patient.InsurancePolicyCommand;
-
+﻿
 namespace McDermott.Application.Features.Queries.Patient
 {
     public class InsurancePolicyQueryHandler
@@ -35,6 +29,83 @@ namespace McDermott.Application.Features.Queries.Patient
                 {
                     return [];
                 }
+            } 
+        }
+        internal class GetInsurancePolicyCountQueryHandler : IRequestHandler<GetInsurancePolicyCountQuery, int>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public GetInsurancePolicyCountQueryHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<int> Handle(GetInsurancePolicyCountQuery query, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    return await _unitOfWork.Repository<InsurancePolicy>().GetCountAsync(
+                      query.Predicate, cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    return 0;
+                }
+            }
+        }
+        #endregion
+
+        #region Create
+        internal class CreateInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateInsurancePolicyRequest, InsurancePolicyDto>
+        {
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+            public async Task<InsurancePolicyDto> Handle(CreateInsurancePolicyRequest request, CancellationToken cancellationToken)
+            {
+                var result = await _unitOfWork.Repository<InsurancePolicy>().AddAsync(request.InsurancePolicyDto.Adapt<InsurancePolicy>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return result.Adapt<InsurancePolicyDto>();
+            }
+        }
+        #endregion
+
+        #region Update
+        internal class UpdateInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateInsurancePolicyRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+            public async Task<bool> Handle(UpdateInsurancePolicyRequest request, CancellationToken cancellationToken)
+            {
+                await _unitOfWork.Repository<InsurancePolicy>().UpdateAsync(request.InsurancePolicyDto.Adapt<InsurancePolicy>());
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return true;
+            }
+        }
+        #endregion
+
+        #region Delete
+        internal class DeleteInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteInsurancePolicyRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+            public async Task<bool> Handle(DeleteInsurancePolicyRequest request, CancellationToken cancellationToken)
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<InsurancePolicy>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<InsurancePolicy>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return true;
             }
         }
         #endregion

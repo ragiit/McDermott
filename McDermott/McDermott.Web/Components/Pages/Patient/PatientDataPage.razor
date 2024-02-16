@@ -26,6 +26,10 @@
                                         <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                         IconCssClass="fa-solid fa-users"
                                         Text="@($"Family Relation ini tab dibawah ")" /> *@
+
+                                                <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
+                                                               IconCssClass="fa-solid fa-notes-medical"
+                                                               Text="@($"{InsurancePoliciesCount} Insurance Policy")" />
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-virus-slash"
                                                                Text="@($"Data General Examination")" />
@@ -61,72 +65,26 @@
                                 <DxTab Text="Test"></DxTab>
                                 </DxTabs> *@
 
+                                        @if (TabIndex != -1)
+                                        {
+                                            <div class="ml-2 mt-3 mb-2">
+                                                <div class="row justify-content-end">
+                                                    <div class="col-auto align-self-end">
+                                                        <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
+                                                                  Text="Close"
+                                                                  RenderStyle="ButtonRenderStyle.Danger"
+                                                                  Click="OnClose"
+                                                                  IconCssClass="fa-solid fa-xmark"
+                                                                  CssClass="w-20 ml" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
                                         @switch (TabIndex)
                                         {
-                                            case 1:
-                                                <p>DJ</p>
-                                                break;
-
                                             case 0:
-                                                <br />
-                                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                                IsContentBlocked="true"
-                                                                ApplyBackgroundShading="true"
-                                                                IndicatorAreaVisible="false"
-                                                                Text="Fetching Data...">
-                                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                            Data="Users2"
-                                                            PageSize="10"
-                                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                                            AllowSelectRowByClick="true"
-                                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                            KeyFieldName="Id"
-                                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                                            DataItemDeleting="OnDelete"
-                                                            FocusedRowEnabled="true"
-                                                            PopupEditFormCssClass="pw-800"
-                                                            PagerPosition="GridPagerPosition.Bottom"
-                                                            PageSizeSelectorVisible="true"
-                                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                            RowDoubleClick="OnRowDoubleClick"
-                                                            PageSizeSelectorAllRowsItemVisible="true"
-                                                            PagerSwitchToInputBoxButtonCount="10"
-                                                            PagerVisibleNumericButtonCount="10"
-                                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                                            ShowGroupPanel="true"
-                                                            AutoExpandAllGroupRows="true"
-                                                            ShowFilterRow="true"
-                                                            ShowSearchBox="true"
-                                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                                            KeyboardNavigationEnabled="true">
-                                                        <ToolbarTemplate>
-                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0 && !IsDeleted" />
-                                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                                <DxToolbarItem Text="Column Chooser" BeginGroup="true" Click="ColumnChooserButton_Click" IconCssClass="fa-solid fa-table-columns" />
-                                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                                    <Items>
-                                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                                    </Items>
-                                                                </DxToolbarItem>
-                                                                @* <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" /> *@
-                                                            </DxToolbar>
-                                                        </ToolbarTemplate>
-                                                        <Columns>
-                                                            <DxGridSelectionColumn Width="15px" />
-                                                            <DxGridDataColumn FieldName="NIP" SortOrder="GridColumnSortOrder.Descending" />
-                                                            <DxGridDataColumn FieldName="Name" />
-                                                            <DxGridDataColumn FieldName="Email" />
-                                                            <DxGridDataColumn FieldName="JobPosition.Name" Caption="Job Position" />
-                                                            <DxGridDataColumn FieldName="Department.Name" Caption="Department" />
-                                                        </Columns>
-                                                    </DxGrid>
-                                                </DxLoadingPanel>
+                                                <InsurancePolicyPageListForm User="@UserForm" />
                                                 break;
                                             default:
                                                 break;
@@ -139,6 +97,10 @@
                 </div>
             </section>
         }
+
+        @if (TabIndex == -1)
+        {
+
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -579,14 +541,14 @@
                                                                                 ValueFieldName="Id">
                                                                     </DxComboBox>
                                                                 </DxFormLayoutItem>
-                                                                <DxFormLayoutItem Caption="Relation:" ColSpanMd="12">
-                                                                    <DxComboBox Data="@Families"
-                                                                                NullText="Select Relation..."
-                                                                                @bind-Value="@a.FamilyId"
-                                                                                TextFieldName="Relation"
-                                                                                ValueFieldName="Id">
-                                                                    </DxComboBox>
-                                                                </DxFormLayoutItem>
+                                                                @*   <DxFormLayoutItem Caption="Relation:" ColSpanMd="12">
+                                                        <DxComboBox Data="@Families"
+                                                        NullText="Select Relation..."
+                                                        @bind-Value="@a.FamilyId"
+                                                        TextFieldName="Relation"
+                                                        ValueFieldName="Id">
+                                                        </DxComboBox>
+                                                        </DxFormLayoutItem> *@
                                                             </DxFormLayout>
                                                         </EditFormTemplate>
                                                     </DxGrid>
@@ -620,5 +582,6 @@
                 </div>
             </div>
         </section>
+        }
     </div>
 }
