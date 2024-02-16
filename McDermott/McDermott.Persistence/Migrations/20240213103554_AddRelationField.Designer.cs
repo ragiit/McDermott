@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240213103554_AddRelationField")]
+    partial class AddRelationField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -214,39 +217,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("ProvinceId");
 
                     b.ToTable("Companies");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.Counter", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Counters");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Country", b =>
@@ -1134,158 +1104,6 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("Insurances");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.InsurancePolicy", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("AgeAtTimeOfService")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("CardPrintDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Class")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("CurrentAge")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Diagnosa")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("DinSos")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Doctor")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("InsuranceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("InsuranceName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("InsuranceNo")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("MedicalRecordNo")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("NoCard")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("NoId")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("NoSKTM")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("NursingClass")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ParticipantName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ParticipantStatus")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("PolicyNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Poly")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Prolanis")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("PronalisPBR")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ProviderName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ServicePPKCode")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ServicePPKName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ServiceParticipant")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ServiceType")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Sex")
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
-
-                    b.Property<DateTime?>("TatDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("TmtDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InsuranceId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("InsurancePolicies");
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.JobPosition", b =>
                 {
                     b.Property<int>("Id")
@@ -1331,17 +1149,14 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BPJS")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CounterId")
-                        .HasColumnType("int");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Insurance")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NumberType")
                         .HasColumnType("nvarchar(max)");
@@ -1352,11 +1167,11 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int?>("PhysicianId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Queue")
-                        .HasColumnType("int");
-
                     b.Property<int?>("ServiceId")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("StageInsurance")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
@@ -1368,8 +1183,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CounterId");
 
                     b.HasIndex("PatientId");
 
@@ -2354,25 +2167,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Province");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.InsurancePolicy", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.Insurance", "Insurance")
-                        .WithMany()
-                        .HasForeignKey("InsuranceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("McDermott.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Insurance");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.JobPosition", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.Department", "Department")
@@ -2386,11 +2180,6 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.Kiosk", b =>
                 {
-                    b.HasOne("McDermott.Domain.Entities.Counter", "Counter")
-                        .WithMany()
-                        .HasForeignKey("CounterId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.User", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
@@ -2405,8 +2194,6 @@ namespace McDermott.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Counter");
 
                     b.Navigation("Patient");
 

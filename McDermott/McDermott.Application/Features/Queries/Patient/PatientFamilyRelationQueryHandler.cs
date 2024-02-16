@@ -1,5 +1,7 @@
 ﻿
 
+using static McDermott.Application.Features.Commands.Patient.FamilyCommand;
+
 namespace McDermott.Application.Features.Queries.Patient
 {
     public class PatientFamilyRelationQueryHandler
@@ -23,6 +25,25 @@ namespace McDermott.Application.Features.Queries.Patient
                         .Include(z => z.Patient), 
                     cancellationToken
                     );
+
+                return result.Adapt<List<PatientFamilyRelationDto>>();
+            }
+        }
+
+        internal class CreateListPatientFamilyRelationRequestHandler : IRequestHandler<CreateListPatientFamilyRelationRequest, List<PatientFamilyRelationDto>>
+        {
+            private readonly IUnitOfWork _unitOfWork;
+
+            public CreateListPatientFamilyRelationRequestHandler(IUnitOfWork unitOfWork)
+            {
+                _unitOfWork = unitOfWork;
+            }
+
+            public async Task<List<PatientFamilyRelationDto>> Handle(CreateListPatientFamilyRelationRequest request, CancellationToken cancellationToken)
+            {
+                var result = await _unitOfWork.Repository<PatientFamilyRelation>().AddAsync(request.PatientFamilyRelationDto.Adapt<List<PatientFamilyRelation>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return result.Adapt<List<PatientFamilyRelationDto>>();
             }

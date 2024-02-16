@@ -1,0 +1,323 @@
+﻿@page "/patient/insurance-policy"
+@rendermode InteractiveServer
+
+<PageTitle>McDermott - Master Data Insurance Policy</PageTitle>
+
+@if (IsAccess)
+{
+    <div class="wrapper">
+
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Insurance Policy" />
+
+        @if (!ShowForm)
+        {
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-body">
+                                    <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
+                                    <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                    IsContentBlocked="true"
+                                                    ApplyBackgroundShading="true"
+                                                    IndicatorAreaVisible="false"
+                                                    Text="Fetching Data...">
+                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                Data="InsurancePolicies"
+                                                PageSize="10"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                KeyFieldName="Id"
+                                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                                EditModelSaving="OnSave"
+                                                DataItemDeleting="OnDelete"
+                                                AllowSelectRowByClick="true"
+                                                EditMode="GridEditMode.PopupEditForm"
+                                                PopupEditFormCssClass="pw-800"
+                                                PagerPosition="GridPagerPosition.Bottom"
+                                                PageSizeSelectorVisible="true"
+                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                PageSizeSelectorAllRowsItemVisible="true"
+                                                PagerSwitchToInputBoxButtonCount="10"
+                                                FocusedRowEnabled="true"
+                                                PagerVisibleNumericButtonCount="10"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                ShowGroupPanel="true"
+                                                AutoExpandAllGroupRows="true"
+                                                ShowFilterRow="true"
+                                                ShowSearchBox="true"
+                                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                                KeyboardNavigationEnabled="true">
+                                            <ToolbarTemplate>
+                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Countries.Count > 0" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Countries.Count > 0" />
+                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                        <Items>
+                                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                        </Items>
+                                                    </DxToolbarItem>
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Import" Click="@ImportFile" Text="Import" IconCssClass="fa-solid fa-file-import" />
+                                                </DxToolbar>
+                                            </ToolbarTemplate>
+                                            <Columns>
+                                                <DxGridSelectionColumn Width="15px" />
+                                                <DxGridDataColumn FieldName="User.Name" Caption="Patient" SortIndex="0" />
+                                                <DxGridDataColumn FieldName="Insurance.Name" Caption="Insurance Company" />
+                                                <DxGridDataColumn FieldName="PolicyNumber" Caption="Policy Number" />
+                                                <DxGridDataColumn FieldName="Active" />
+                                            </Columns>
+                                        </DxGrid>
+                                    </DxLoadingPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        }
+        else
+        {
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col">
+                            <div class="card">
+                                <EditForm Model="@InsurancePoliciyForm" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
+                                          OnInvalidSubmit="@HandleInvalidSubmit">
+                                    <DataAnnotationsValidator />
+                                    <DxFormLayout CssClass="mt">
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem Caption="Patient:" ColSpanMd="12">
+                                                <DxComboBox Data="@Users"
+                                                            NullText="Select Patient..."
+                                                            @bind-Value="@InsurancePoliciyForm.UserId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id">
+                                                </DxComboBox>
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem Caption="Insurance Company:" ColSpanMd="6">
+                                                <DxComboBox Data="@Insurances"
+                                                            NullText="Select Insurance Company..."
+                                                            @bind-Value="@InsurancePoliciyForm.InsuranceId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id">
+                                                </DxComboBox>
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem Caption="Policy Number:" ColSpanMd="6">
+                                                <DxTextBox @bind-Text="@InsurancePoliciyForm.PolicyNumber"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Policy Number" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem Caption="Active:" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@InsurancePoliciyForm.Active" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutGroup Caption="BPJS Integration" ColSpanMd="12" CssClass="mt-3">
+                                                <Items>
+                                                    <DxFormLayoutItem Caption="Prolanis">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.Prolanis"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Prolanis" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Nama Peserta">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.ParticipantName"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Nama Peserta" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="No. Kartu">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.NoCard"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="No. Kartu" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="NIK">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.NoId"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="NIK" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Sex">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.Sex"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Sex" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Kelas Rawat">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.Class"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Kelas Rawat" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="No. Medical Record">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.MedicalRecordNo"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="No. Medical Record" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Kode PPK">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.ServicePPKCode"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Kode PPK" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Nama PPK">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.ServicePPKName"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Nama PPK" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="No. Telp">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.PhoneNumber"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="No. Telp" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Kelas Perawatan">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.NursingClass"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Kelas Perawatan" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Diagnosa">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.Diagnosa"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Diagnosa" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Poli">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.Poly"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Poli" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Dokter">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.Doctor"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Dokter" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Tanggal Lahir">
+                                                        <DxDateEdit @bind-Date="@InsurancePoliciyForm.DateOfBirth"
+                                                                    NullText="Tanggal Lahir" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Tanggal Cetak Kartu">
+                                                        <DxDateEdit @bind-Date="@InsurancePoliciyForm.CardPrintDate"
+                                                                    NullText="Tanggal Cetak Kartu" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="TMT">
+                                                        <DxDateEdit @bind-Date="@InsurancePoliciyForm.TmtDate"
+                                                                    NullText="TMT" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="TAT">
+                                                        <DxDateEdit @bind-Date="@InsurancePoliciyForm.TatDate"
+                                                                    NullText="TAT" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Status Peserta">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.ParticipantStatus"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Status Peserta" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Jenis Layanan">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.ServiceType"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Jenis Layanan" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Peserta Layanan">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.ServiceParticipant"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Peserta Layanan" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Usia Saat Ini">
+                                                        <DxDateEdit @bind-Date="@InsurancePoliciyForm.CurrentAge"
+                                                                    NullText="Usia Saat Ini" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Usia Saat Pelayanan">
+                                                        <DxDateEdit @bind-Date="@InsurancePoliciyForm.AgeAtTimeOfService"
+                                                                    NullText="Usia Saat Pelayanan" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="DinSos">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.DinSos"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="DinSos" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Prolanis PBR">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.PronalisPBR"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Prolanis PBR" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="No. SKTM">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.NoSKTM"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="No. SKTM" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="No. Asuransi">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.InsuranceNo"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="No. Asuransi" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Nama Asuransi">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.InsuranceName"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Nama Asuransi" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Nama Provider">
+                                                        <DxTextBox @bind-Text="@InsurancePoliciyForm.ProviderName"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Nama Provider" />
+                                                    </DxFormLayoutItem>
+                                                </Items>
+                                            </DxFormLayoutGroup>
+                                        </DxFormLayout>
+                                    </DxFormLayout>
+                                    <div class="ml-2 mt-1 mb-2 mr-3">
+                                        <div class="row justify-content-end">
+                                            <div class="col-auto align-self-end">
+                                                <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
+                                                          Text="Save"
+                                                          RenderStyle="ButtonRenderStyle.Info"
+                                                          SubmitFormOnClick="true"
+                                                          IconCssClass="fa-solid fa-floppy-disk"
+                                                          CssClass="w-20 ml" />
+                                                <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
+                                                          Text="Cancel"
+                                                          RenderStyle="ButtonRenderStyle.Danger"
+                                                          Click="OnCancel"
+                                                          IconCssClass="fa-solid fa-xmark"
+                                                          CssClass="w-20 ml" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </EditForm>
+                                <div class="mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        }
+    </div>
+}
