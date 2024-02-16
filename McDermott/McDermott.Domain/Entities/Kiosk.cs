@@ -10,8 +10,7 @@ namespace McDermott.Domain.Entities
     {
         public string? Type {  get; set; }
         public string? NumberType { get; set; }
-        public string? Insurance {  get; set; }
-        public bool? StageInsurance { get; set; }
+        public string? BPJS {  get; set; }
         public int? CounterId { get; set; }
         public int? Queue {  get; set; }
         public int? PatientId { get; set; }

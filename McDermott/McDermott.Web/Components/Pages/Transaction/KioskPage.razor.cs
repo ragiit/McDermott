@@ -58,10 +58,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                 this.ServicedId = value;
 
                 Names.Clear();
-
-                var item = DoctorSchedules.Where(x => x.ServiceId == ServicedId).ToList();
-                item.ForEach(x => x.Physicions = string.Join(", ", Physician.Where(z => x.PhysicionIds != null && x.PhysicionIds.Contains(z.Id)).Select(z => z.Name).ToList()));
-                Physicians = item;
             }
         }
 
@@ -223,14 +219,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                 showForm = true;
                 NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
                 FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
-                FormKios.Insurance = "Personal";
             }
             else
             {
                 showForm = false;
-                //AlertColor alertColor = AlertColor.Primary;
-                //IconName alertIconName = IconName.CheckCircleFill;
-                //string alertMessage = "A simple alert - check it out!";
             }
         }
 
