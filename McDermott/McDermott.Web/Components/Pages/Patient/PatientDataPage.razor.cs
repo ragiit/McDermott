@@ -130,7 +130,7 @@ namespace McDermott.Web.Components.Pages.Patient
             catch { }
 
             Users = await Mediator.Send(new GetUserPatientQuery());
-            Patiens = Users.Where(x => x.IsPatient == true).ToList();
+            Patiens = Users.Where(x => x.IsPatient == true && x.Id != UserForm.PatientAllergy.UserId).ToList();
 
             PanelVisible = false;
         }
@@ -230,9 +230,9 @@ namespace McDermott.Web.Components.Pages.Patient
                 if (UserForm.Id != 0)
                     editModel.PatientId = UserForm.Id;
 
-                editModel.FamilyMember = Users.FirstOrDefault(x => x.Id == editModel.FamilyMemberId);
+                //editModel.FamilyMember = Users.FirstOrDefault(x => x.Id == editModel.FamilyMemberId);
                 //editModel.Family = Families.FirstOrDefault(x => x.Id == editModel.FamilyId);
-                editModel.Relation = editModel.Family.ParentRelation + " - " + editModel.Family.ChildRelation;
+                //editModel.Relation = editModel.Family!.ParentRelation + " - " + editModel.Family.ChildRelation;
 
                 if (editModel.Id == 0)
                     PatientFamilyRelations.Add(editModel);
