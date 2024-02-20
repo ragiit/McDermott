@@ -23,7 +23,7 @@ namespace McDermott.Application.Features.Queries.Queue
             {
                 return await _unitOfWork.Repository<KioskDepartement>().Entities
                         .Include(x => x.ServiceK)
-                        .Include(x=>x.ServiceP)
+                        .Include(x => x.ServiceP)
                         .Select(KioskDepartement => KioskDepartement.Adapt<KioskDepartementDto>())
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);

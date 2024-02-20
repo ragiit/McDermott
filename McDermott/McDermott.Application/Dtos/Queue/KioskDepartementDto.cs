@@ -12,5 +12,8 @@ namespace McDermott.Application.Dtos.Queue
         public int? ServiceKId { get; set; }
         public int? ServicePId { get; set; }
 
+        public virtual ServiceDto? ServiceK { get; set; }
+        public virtual ServiceDto? ServiceP { get; set; }
+
     }
 }
