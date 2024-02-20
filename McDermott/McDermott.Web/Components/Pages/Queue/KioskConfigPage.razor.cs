@@ -152,6 +152,12 @@ namespace McDermott.Web.Components.Pages.Queue
             NavigationManager.NavigateTo($"/queue/kiosk/{configId}");
         }
 
+        private void OnCancel()
+        {
+            FormKioskConfig = new();
+            PopUpVisible = false;
+        }
+
         private void ColumnChooserButton_Click()
         {
             Grid.ShowColumnChooser();
@@ -221,6 +227,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 }
                 else
                 {
+                    FormKioskConfig.ServiceIds = SelectedServices.Select(x => x.Id).ToList();
                     await Mediator.Send(new UpdateKioskConfigRequest(FormKioskConfig));
                 }
                 await LoadData();
