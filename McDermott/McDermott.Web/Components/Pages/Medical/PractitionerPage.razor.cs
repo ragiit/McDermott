@@ -25,6 +25,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private bool PanelVisible = false;
         private bool FormValidationState = true;
         private bool IsAccess = false;
+
         private bool ShowForm { get; set; } = false;
         private bool IsDeleted { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }

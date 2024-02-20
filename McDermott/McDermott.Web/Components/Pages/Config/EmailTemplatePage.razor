@@ -72,63 +72,64 @@
                                         </DxGrid>
                                     </DxLoadingPanel>
                                 }
-                                else @if(showForm){
-                            <EditForm Model="@EmailFormTemplate" Context="EditFormContext">
-                                <DxFormLayout CssClass="w-100">
-                                    <DxFormLayoutItem ColSpanMd="12">
-                                        <label>Subject</label>
-                                        <DxTextBox @bind-Text="@EmailFormTemplate.Subject" NullText="Subject" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem ColSpanMd="12">
-                                        <label for="by">By</label>
-                                        <DxTextBox ReadOnly="true" Enabled="false" @bind-Text="@userBy" InputCssClass="fw-bold" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem ColSpanMd="12">
-                                        <label>From</label>
-                                        <DxTextBox @bind-Text="@EmailFormTemplate.From" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem ColSpanMd="12">
-                                        <label>To</label>
-                                        <DxTextBox @bind-Text="@EmailFormTemplate.To" NullText="mail@mail.com" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem ColSpanMd="12">
-                                        <label>Cc</label>
-                                        <DxTagBox Data="@Cc"
-                                                  NullText="Select Cc..."
-                                                  FilteringMode="@DataGridFilteringMode.Contains"
-                                                  @bind-Values="@CcBy"
-                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                  CssClass="cw-480"
-                                                  InputId="tbCustomTags" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem ColSpanMd="12">
-                                        <label>To Partner</label>
-                                        <DxComboBox Data="@ToPartner"
-                                                    NullText="Select Partner..."
-                                                    @bind-Value="@EmailFormTemplate.ToPartnerId"
-                                                    TextFieldName="Name"
-                                                    ValueFieldName="Id">
-                                        </DxComboBox>
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem ColSpanMd="12">
-                                        <label>Schendule</label>
-                                        <DxDateEdit @bind-Date="@EmailFormTemplate.Schendule" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem ColSpanMd="12">
-                                        <label>Body</label>
-                                        <DxRichEdit DocumentContent="@DocumentContent" CssClass="w-100 ch-720" />
-                                    </DxFormLayoutItem>
-                                </DxFormLayout>
-                                <DxFormLayout CssClass="w-100">
-                                    <DxButton SubmitFormOnClick="true" Text="Send"></DxButton>
-                                </DxFormLayout>
-                            </EditForm>
-                            }
+                                else @if (showForm)
+                                {
+                                    <EditForm Model="@EmailFormTemplate" Context="EditFormContext">
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <label>Subject</label>
+                                                <DxTextBox @bind-Text="@EmailFormTemplate.Subject" NullText="Subject" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <label for="by">By</label>
+                                                <DxTextBox ReadOnly="true" Enabled="false" @bind-Text="@userBy" InputCssClass="fw-bold" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <label>From</label>
+                                                <DxTextBox @bind-Text="@EmailFormTemplate.From" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <label>To</label>
+                                                <DxTextBox @bind-Text="@EmailFormTemplate.To" NullText="mail@mail.com" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <label>Cc</label>
+                                                <DxTagBox Data="@Cc"
+                                                          NullText="Select Cc..."
+                                                          FilteringMode="@DataGridFilteringMode.Contains"
+                                                          @bind-Values="@CcBy"
+                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                          CssClass="cw-480"
+                                                          InputId="tbCustomTags" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <label>To Partner</label>
+                                                <DxComboBox Data="@ToPartner"
+                                                            NullText="Select Partner..."
+                                                            @bind-Value="@EmailFormTemplate.ToPartnerId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id">
+                                                </DxComboBox>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <label>Schendule</label>
+                                                <DxDateEdit @bind-Date="@EmailFormTemplate.Schendule" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <label>Body</label>
+                                                <Editor  @bind-Value="@EmailFormTemplate.Message"/>
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxButton SubmitFormOnClick="true" Text="Send"></DxButton>
+                                        </DxFormLayout>
+                                    </EditForm>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-</div>
+        </section>
+    </div>
 }

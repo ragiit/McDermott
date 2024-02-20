@@ -1,4 +1,4 @@
-﻿@page "/transaction/kiosk"
+﻿@page "/queue/kiosk/{id:int}"
 @rendermode InteractiveServer
 <PageTitle>McDermott - Transaction Kiosk</PageTitle>
 
@@ -64,7 +64,7 @@
                                                 <DxTextBox @bind-Text="@FormKios.BPJS" NullText="BPJS..." ReadOnly style="background-color:#949494" />
                                              </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Service" ColSpanMd="12">
-                                                <DxComboBox Data="@Services" @bind-Value="@Serviced" NullText="Select Service.." ValueFieldName="Id" TextFieldName="Name" />
+                                                <DxComboBox Data="@Names" @bind-Value="@Serviced" NullText="Select Service.."  />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Physician" ColSpanMd="12">
                                                 <DxComboBox Data="@Physicians" @bind-Value="@FormKios.PhysicianId" NullText="Select Physician.." ValueFieldName="Id" TextFieldName="Name" />

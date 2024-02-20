@@ -1358,6 +1358,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int?>("ServiceId")
                         .HasColumnType("int");
 
+                    b.Property<bool?>("StageBpjs")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
 
@@ -1378,6 +1381,74 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("ServiceId");
 
                     b.ToTable("Kiosks");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.KioskConfig", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ServiceIds")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KioskConfigs");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.KioskDepartement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ServiceKId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ServicePId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceKId");
+
+                    b.HasIndex("ServicePId");
+
+                    b.ToTable("KioskDepartements");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Location", b =>
@@ -1721,6 +1792,12 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsKiosk")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPatient")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -2413,6 +2490,23 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Physician");
 
                     b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.KioskDepartement", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.Service", "ServiceK")
+                        .WithMany()
+                        .HasForeignKey("ServiceKId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.Service", "ServiceP")
+                        .WithMany()
+                        .HasForeignKey("ServicePId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ServiceK");
+
+                    b.Navigation("ServiceP");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.PatientAllergy", b =>

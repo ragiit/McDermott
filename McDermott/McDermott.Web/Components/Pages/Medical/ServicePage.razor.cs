@@ -160,6 +160,26 @@ namespace McDermott.Web.Components.Pages.Medical
             SelectedDataItems = new ObservableRangeCollection<object>();
             Services = await Mediator.Send(new GetServiceQuery());
 
+            foreach (var i in Services)
+            {
+                if (i.IsKiosk == true && i.IsPatient == false)
+                {
+                    i.Flag = "Kiosk";
+                }
+                else if (i.IsKiosk == false && i.IsPatient == true)
+                {
+                    i.Flag = "Patient";
+                }
+                else if (i.IsKiosk == true && i.IsPatient == true)
+                {
+                    i.Flag = " Patient And Kiosk";
+                }
+                else
+                {
+                    i.Flag = " ";
+                }
+            }
+
             PanelVisible = false;
         }
 

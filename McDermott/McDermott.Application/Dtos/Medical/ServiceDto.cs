@@ -19,5 +19,8 @@ namespace McDermott.Application.Dtos.Medical
         public string Code { get; set; } = string.Empty;
 
         public string Quota { get; set; } = string.Empty;
+        public bool IsPatient { get; set; } = false;
+        public bool IsKiosk { get; set; } = false;
+        public string Flag { get; set; } = string.Empty;
     }
 }
