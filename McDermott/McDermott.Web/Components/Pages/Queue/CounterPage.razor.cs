@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using static McDermott.Application.Features.Commands.Transaction.CounterCommand;
 
-namespace McDermott.Web.Components.Pages.Transaction
+namespace McDermott.Web.Components.Pages.Queue
 {
     public partial class CounterPage
     {
