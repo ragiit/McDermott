@@ -40,3 +40,4 @@ global using static McDermott.Application.Features.Commands.Config.CompanyComman
 global using static McDermott.Application.Features.Commands.Employee.EmployeeCommand;
 global using static McDermott.Application.Features.Commands.Patient.FamilyCommand;
 global using static McDermott.Application.Features.Commands.Patient.PatientFamilyRelationCommand;
+global using static McDermott.Application.Features.Commands.Patient.InsurancePolicyCommand;

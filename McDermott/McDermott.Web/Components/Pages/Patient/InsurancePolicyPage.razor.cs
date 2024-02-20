@@ -1,4 +1,5 @@
 ﻿using McDermott.Domain.Entities;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using OfficeOpenXml;
@@ -10,10 +11,35 @@ namespace McDermott.Web.Components.Pages.Patient
         private List<CountryDto> Countries = [];
         private List<ProvinceDto> Provinces = [];
 
+        [Parameter]
+        public UserDto User { get; set; } = new()
+        {
+            Name = "-"
+        };
+
         private List<UserDto> Users = [];
         private List<InsuranceDto> Insurances = [];
         private List<InsurancePolicyDto> InsurancePolicies = [];
         private InsurancePolicyDto InsurancePoliciyForm = new();
+
+        #region Data
+
+        private bool IsBPJS = false;
+        private int _InsuranceId = 0;
+
+        private int InsuranceId
+        {
+            get => _InsuranceId;
+            set
+            {
+                InsurancePoliciyForm.InsuranceId = value;
+                _InsuranceId = value;
+
+                IsBPJS = Insurances.Any(x => x.IsBPJS == true && x.Id == value) ? true : false;
+            }
+        }
+
+        #endregion Data
 
         #region Grid Properties
 
@@ -42,6 +68,8 @@ namespace McDermott.Web.Components.Pages.Patient
             }
             catch { }
 
+            Insurances = await Mediator.Send(new GetInsuranceQuery());
+
             await LoadData();
         }
 
@@ -66,6 +94,14 @@ namespace McDermott.Web.Components.Pages.Patient
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Countries = await Mediator.Send(new GetCountryQuery());
+
+            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
+
+            if (User != null && User.Id != 0)
+            {
+                InsurancePolicies = InsurancePolicies.Where(x => x.UserId == User.Id).ToList();
+            }
+
             PanelVisible = false;
         }
 
@@ -91,24 +127,33 @@ namespace McDermott.Web.Components.Pages.Patient
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteCountryRequest(((CountryDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteInsurancePolicyRequest(((InsuranceDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<CountryDto>>();
-                    await Mediator.Send(new DeleteListCountryRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteInsurancePolicyRequest(ids: SelectedDataItems.Adapt<List<InsuranceDto>>().Select(x => x.Id).ToList()));
                 }
+
                 await LoadData();
             }
-            catch (Exception ee)
-            {
-            }
+            catch { }
         }
 
         private async Task OnSave()
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(User.Name))
+                {
+                    ToastService.ShowInfo("Please select the Patient first.");
+                    return;
+                }
+
+                if (InsurancePoliciyForm.Id == 0)
+                    await Mediator.Send(new CreateInsurancePolicyRequest(InsurancePoliciyForm));
+                else
+                    await Mediator.Send(new UpdateInsurancePolicyRequest(InsurancePoliciyForm));
+
                 await LoadData();
             }
             catch { }

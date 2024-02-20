@@ -84,19 +84,45 @@
                                 <div class="card">
                                     <div class="card-header">
 
-                                        <div class="col-auto align-self-start">
-                                            @* <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="Confirm" IconCssClass="fa-solid fa-check" /> *@
-                                            <DxButton IconCssClass="fa-solid fa-check" Text="Confirm" RenderStyle="ButtonRenderStyle.Info"></DxButton>
+                                        @* <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="Confirm" IconCssClass="fa-solid fa-check" /> *@
+
+                                        <div class="row justify-content-end">
+
+                                            <div class="col align-self-center">
+                                                <DxButton IconCssClass="fa-solid fa-check" Text="Confirm" RenderStyle="ButtonRenderStyle.Info"></DxButton>
+                                                <DxButton IconCssClass="fa-solid fa-xmark" Text="Cancel" RenderStyle="ButtonRenderStyle.Danger"></DxButton>
+                                            </div>
+
+                                            <div class="col-auto align-self-end">
+                                                <DxTabs>
+                                                    <DxTab Text="Planned"></DxTab>
+                                                    <DxTab Text="Confirmed" Enabled="false"></DxTab>
+                                                    <DxTab Text="Nurse Station" Enabled="false"></DxTab>
+                                                    <DxTab Text="Waiting" Enabled="false"></DxTab>
+                                                    <DxTab Text="Physician" Enabled="false"></DxTab>
+                                                    <DxTab Text="Finished" Enabled="false"></DxTab>
+                                                </DxTabs>
+                                            </div>
                                         </div>
+
+                                        @*   <div class="col-auto align-self-end">
+                                <DxGrid Data="@NurseStations">
+                                <Columns>
+                                <DxGridDataColumn FieldName="@nameof(NurseStation.Status)" Caption="Status" />
+                                <DxGridDataColumn FieldName="@nameof(NurseStation.Count)" Caption="Count" />
+
+                                </Columns>
+                                </DxGrid>
+                                </div> *@
                                     </div>
                                     <div class="card-body">
                                         @* <DxPopup @bind-Visible="@PopupVisible" HeaderText="@textPopUp" HeaderCssClass="fw-bold" Width="70%"> *@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <DxFormLayout CssClass="mt ">
-                                                    <DxFormLayoutItem Caption="Admission Queue" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@FormRegis.AdmissionQueue" />
-                                                    </DxFormLayoutItem>
+                                                    @* <DxFormLayoutItem Caption="Admission Queue" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@FormRegis.AdmissionQueue" />
+                                            </DxFormLayoutItem> *@
                                                     <DxFormLayoutItem Caption="Patient" ColSpanMd="12">
                                                         <DxComboBox Data="@patients"
                                                                     NullText="Select Partner..."
@@ -138,13 +164,13 @@
 
                                                          </Template>
                                                      </DxFormLayoutItem>
-                                                     <DxFormLayoutItem Caption="Method" ColSpanMd="12">
+                                                     <DxFormLayoutItem Caption="Reg Type:" ColSpanMd="12">
                                                          <DxComboBox Data="@RegisType"
                                                                      NullText="Select Registration..."
                                                                      @bind-Value="@FormRegis.TypeRegistration">
                                                          </DxComboBox>
                                                      </DxFormLayoutItem>
-                                                     <DxFormLayoutItem Caption="Method" ColSpanMd="12">
+                                                     <DxFormLayoutItem Caption="Medical Type:" ColSpanMd="12">
                                                          <DxComboBox Data="@Method"
                                                                      NullText="Select Method..."
                                                                      @bind-Value="@FormRegis.Method">
@@ -154,17 +180,17 @@
                                              </div>
                                              <div class="col-md-6">
                                                  <DxFormLayout CssClass="mt ">
-                                                     @*   <DxFormLayoutItem Caption="Docter" ColSpanMd="12">
-                                            <DxComboBox Data="@IsPratition"
-                                            NullText="Docter"
-                                            @bind-Value="@FormRegis.PratitionerId"
-                                            ValueChanged="@((DoctorScheduleDto Docter)=> SelectedService(Docter))"
-                                            InputId="CbDoctoreName"></DxComboBox>
-                                            </DxFormLayoutItem> *@
                                                      <DxFormLayoutItem Caption="Service" ColSpanMd="12">
-                                                         <DxComboBox Data="@Names"
+                                                         <DxComboBox Data="@Services"
                                                                      NullText="Service.."
-                                                                     @bind-Value="@SelectedNames" TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
+                                                                     @bind-Value="@FormRegis.ServiceId" TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
+                                                     </DxFormLayoutItem>
+                                                     <DxFormLayoutItem Caption="Physicion:" ColSpanMd="12">
+                                                         <DxComboBox Data="@IsPratition"
+                                                                     NullText="Docter"
+                                                                     @bind-Value="@FormRegis.PratitionerId"
+                                                                     TextFieldName="Name"
+                                                                     InputId="CbDoctoreName"></DxComboBox>
                                                      </DxFormLayoutItem>
                                                      <DxFormLayoutItem Caption="Payment Methode" ColSpanMd="12">
                                                          <DxComboBox Data="@Payments"
@@ -177,7 +203,7 @@
                                                             <DxComboBox Data="@Insurances" @bind-Value="@FormRegis.InsuranceId" NullText="Select Insurance .."></DxComboBox>
                                                         </DxFormLayoutItem>
                                                     }
-                                                    <DxFormLayoutItem Caption="Schendule Date" ColSpanMd="12">
+                                                    <DxFormLayoutItem Caption="Registration Date:" ColSpanMd="12">
                                                         <DxDateEdit @bind-Date="@FormRegis.DateSchendule" Mask="@DateTimeMask.ShortDate" NullText="Tanggal"></DxDateEdit>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem Caption="Schendule Time" ColSpanMd="12">
@@ -218,9 +244,118 @@
                                         <div class="cw-480 ch-220 mt-5">
                                             <DxTabs @bind-ActiveTabIndex="@ActiveTabIndex">
                                                 <DxTab Text="Clinical Assesment"></DxTab>
-                                                <DxTab Text="Assesment Nurse"></DxTab>
-                                                <DxTab Text="Assesment Physician"></DxTab>
+                                                <DxTab Text="CPPT"></DxTab>
+                                                <DxTab Text="Laboratorium Attachment"></DxTab>
+                                                <DxTab Text="Radiology Attachment"></DxTab>
+                                                <DxTab Text="Alcohol & Drugs Test Attachment"></DxTab>
+                                                <DxTab Text="BPJS PCare"></DxTab>
                                             </DxTabs>
+
+                                            @switch (ActiveTabIndex)
+                                            {
+                                                case 0:
+                                                    <DxFormLayout>
+                                                        <Items>
+                                                            <DxFormLayoutGroup Caption="Clinical Assessment" ColSpanMd="12">
+                                                                <Items>
+                                                                    <DxFormLayoutItem Caption="Weight:">
+                                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem Caption="Height:">
+                                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem Caption="Temp:">
+                                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem Caption="HR:">
+                                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem Caption="Body Max Index:">
+                                                                        <h2>0</h2>
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem Caption="Systolic/Diastolic BP:">
+                                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem Caption="SpO2:">
+                                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem Caption="RBS:">
+                                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem Caption="BMI State:">
+                                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem BeginRow="true" Caption="GCS">
+                                                                        <p></p>
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem BeginRow="true" Caption="E:">
+                                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem Caption="V:">
+                                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem Caption="M:">
+                                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                    </DxFormLayoutItem>
+                                                                </Items>
+                                                            </DxFormLayoutGroup>
+                                                        </Items>
+                                                    </DxFormLayout>
+                                                    break;
+                                                case 1:
+                                                    <DxFormLayout>
+                                                        <DxFormLayoutGroup Caption="Input CPPT" ColSpanMd="12">
+                                                            <Items>
+
+                                                                <DxFormLayoutItem Caption="User:" ColSpanMd="12">
+                                                                    <DxComboBox Data="@patients"
+                                                                                NullText="Select User..."
+                                                                                @bind-Value="@FormRegis.Id"
+                                                                                TextFieldName="Name"
+                                                                                ValueFieldName="Id">
+                                                                    </DxComboBox>
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption="Subjective:" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption="Objective:" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption="Diagnosis:" ColSpanMd="12">
+                                                                    <DxComboBox Data="@patients"
+                                                                                NullText="Select Diagnosis..."
+                                                                                @bind-Value="@FormRegis.Id"
+                                                                                TextFieldName="Name"
+                                                                                ValueFieldName="Id">
+                                                                    </DxComboBox>
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption="Code:" ColSpanMd="12">
+                                                                    <DxTextBox ReadOnly="true" @bind-Text="@FormRegis.IdentityNumber" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption="Disease:" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption="Disease Category:" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption="Plan:" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@FormRegis.IdentityNumber" />
+                                                                </DxFormLayoutItem>
+                                                            </Items>
+                                                        </DxFormLayoutGroup>
+                                                    </DxFormLayout>
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+
                                         </div>
                                     </div>
                                     <div class="card-footer">

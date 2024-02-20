@@ -26,18 +26,34 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Data Statis
 
+        public class NurseStation
+        {
+            public int Id { get; set; }
+            public string Status { get; set; }
+            public int Count { get; set; }
+        }
+
+        public IEnumerable<NurseStation> NurseStations { get; set; } = new List<NurseStation>
+        {
+            new NurseStation { Id = 1, Status = "Planned", Count = 10 },
+            new NurseStation { Id = 2, Status = "Confirmed", Count = 5 },
+            new NurseStation { Id = 3, Status = "Waiting", Count = 2 },
+            new NurseStation { Id = 4, Status = "Physician", Count = 1 },
+            new NurseStation { Id = 5, Status = "Finished", Count = 0 },
+        };
+
         private List<string> Payments = new List<string>
         {
             "Personal",
-            "Corporate",
             "Insurance",
             "BPJS"
         };
 
         private List<string> RegisType = new List<string>
         {
-            "Out Patient Care",
-            "IGD"
+            "General Consultation",
+            "Emergency",
+            "MCU"
         };
 
         private List<string> Method = new List<string>
@@ -121,6 +137,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 Age = currentDate.Year - Birthdate!.Value.Year;
 
                 FormRegis.Age = Age;
+                FormRegis.NoRM = item.NoRm;
                 FormRegis.IdentityNumber = item.NoId.ToString();
                 FormRegis.PatientId = item.Id;
             }

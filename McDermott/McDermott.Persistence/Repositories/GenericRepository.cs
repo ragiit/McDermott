@@ -114,7 +114,7 @@ namespace McDermott.Persistence.Repositories
 
             return await query.AsNoTracking().ToListAsync(cancellationToken);
         }
-
+ 
         public async Task<T> GetByIdAsync(int id)
         {
             return await _dbContext.Set<T>().FindAsync(id);
@@ -127,6 +127,19 @@ namespace McDermott.Persistence.Repositories
                 T exist = _dbContext.Set<T>().Find(item.Id);
                 _dbContext.Entry(exist).CurrentValues.SetValues(entity);
             }
+        }
+
+        public async Task<int> GetCountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            var query = _dbContext.Set<T>().AsQueryable();
+             
+
+            if (predicate is not null)
+            {
+                query = query.Where(predicate);
+            }
+
+            return await query.AsNoTracking().CountAsync(cancellationToken);
         }
     }
 }

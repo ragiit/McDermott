@@ -140,6 +140,12 @@ namespace McDermott.Web.Components.Pages.Config
             if (string.IsNullOrWhiteSpace(editModel.Name))
                 return;
 
+            if (!string.IsNullOrWhiteSpace(editModel.ParentMenu))
+            {
+                var splits = editModel.Name.ToLower().Split(" ");
+                editModel.Url = $"{editModel.ParentMenu.ToLower().Trim()}/{string.Join("-", splits)}";
+            }
+
             if (editModel.Id == 0)
                 await Mediator.Send(new CreateMenuRequest(editModel));
             else
