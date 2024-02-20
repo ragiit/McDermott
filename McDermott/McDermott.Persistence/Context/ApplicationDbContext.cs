@@ -41,6 +41,7 @@ namespace McDermott.Persistence.Context
 
         //Medical
         public DbSet<DiseaseCategory> DiseaseCategories { get; set; }
+        public DbSet<NursingDiagnoses> NursingDiagnoses { get; set; }
 
         public DbSet<Procedure> Procedures { get; set; }
         public DbSet<CronisCategory> CronisCategories { get; set; }

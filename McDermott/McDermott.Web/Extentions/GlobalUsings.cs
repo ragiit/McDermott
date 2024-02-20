@@ -9,7 +9,7 @@ global using McDermott.Application.Dtos.Config;
 global using McDermott.Application.Dtos.Medical;
 global using McDermott.Application.Dtos.Transaction; 
 global using McDermott.Application.Dtos.Employee;
-global using McDermott.Application.Dtos.Patient;
+global using McDermott.Application.Dtos.Patient; 
 
 global using DevExpress.Data.XtraReports.Native;
 global using System.Security.Claims;

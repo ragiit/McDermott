@@ -30,14 +30,9 @@ namespace McDermott.Application.Features.Commands.Config
             }
         }
 
-        public class CreateListCountryRequest : IRequest<List<CountryDto>>
+        public class CreateListCountryRequest(List<CountryDto> CountryDtos) : IRequest<List<CountryDto>>
         {
-            public List<CountryDto> CountryDtos { get; set; }
-
-            public CreateListCountryRequest(List<CountryDto> CountryDtos)
-            {
-                this.CountryDtos = CountryDtos;
-            }
+            public List<CountryDto> CountryDtos { get; set; } = CountryDtos;
         }
         #endregion
 

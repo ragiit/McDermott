@@ -403,7 +403,7 @@ private void EditItem_Click()
 ========================== Command Handler ==========================
   #region Get
 
-public class GetInsurancePolicyQuery(Expression<Func<InsurancePolicy, bool>> predicate) : IRequest<List<InsurancePolicyDto>>
+public class GetInsurancePolicyQuery(Expression<Func<InsurancePolicy, bool>>? predicate = null) : IRequest<List<InsurancePolicyDto>>
 {
     public Expression<Func<InsurancePolicy, bool>> Predicate { get; } = predicate;
 }
@@ -415,6 +415,11 @@ public class GetInsurancePolicyQuery(Expression<Func<InsurancePolicy, bool>> pre
 public class CreateInsurancePolicyRequest(InsurancePolicyDto InsurancePolicyDto) : IRequest<InsurancePolicyDto>
 {
     public InsurancePolicyDto InsurancePolicyDto { get; set; } = InsurancePolicyDto;
+}
+
+public class CreateListCountryRequest(List<CountryDto> CountryDtos) : IRequest<List<CountryDto>>
+{
+    public List<CountryDto> CountryDtos { get; set; } = CountryDtos;
 }
 
 #endregion
@@ -438,14 +443,9 @@ public class DeleteInsurancePolicyRequest(int id = 0, List<int>? ids = null) : I
 
 ========================== Query Handler ==========================
   #region Get
-internal class GetInsurancePolicyQueryHandler : IRequestHandler<GetInsurancePolicyQuery, List<InsurancePolicyDto>>
+internal class GetInsurancePolicyQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetInsurancePolicyQuery, List<InsurancePolicyDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
-
-    public GetInsurancePolicyQueryHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
 
     public async Task<List<InsurancePolicyDto>> Handle(GetInsurancePolicyQuery query, CancellationToken cancellationToken)
     {
@@ -479,6 +479,20 @@ internal class CreateInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHa
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return result.Adapt<InsurancePolicyDto>();
+    }
+}
+
+internal class CreateListCountryRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateListCountryRequest, List<CountryDto>>
+{
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+    public async Task<List<CountryDto>> Handle(CreateListCountryRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _unitOfWork.Repository<Country>().AddAsync(request.CountryDtos.Adapt<List<Country>>());
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return result.Adapt<List<CountryDto>>();
     }
 }
 #endregion

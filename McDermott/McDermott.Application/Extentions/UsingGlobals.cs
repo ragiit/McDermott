@@ -27,3 +27,4 @@ global using static McDermott.Application.Features.Commands.Employee.EmployeeCom
 global using static McDermott.Application.Features.Commands.Patient.PatientCommand;
 global using static McDermott.Application.Features.Commands.Medical.PractitionerCommand;
 global using static McDermott.Application.Features.Commands.Patient.PatientFamilyRelationCommand;
+global using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;

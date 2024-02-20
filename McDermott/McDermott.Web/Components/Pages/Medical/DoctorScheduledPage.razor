@@ -21,7 +21,7 @@
                                                 ApplyBackgroundShading="true"
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
+                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                             Data="DoctorSchedules"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
@@ -83,13 +83,13 @@
                                             ApplyBackgroundShading="true"> *@
                                                 <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Schedule Name:" ColSpanMd="12">
 
-                                                  @*   <DxComboBox Data="@Schedules"
-                                                                NullText="Select Schedule..."
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                @bind-Value="@Value"
-                                                                TextFieldName="Name"
-                                                                ValueFieldName="Id">
-                                                    </DxComboBox> *@
+                                                    @*   <DxComboBox Data="@Schedules"
+                                                NullText="Select Schedule..."
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                @bind-Value="@Value"
+                                                TextFieldName="Name"
+                                                ValueFieldName="Id">
+                                                </DxComboBox> *@
 
                                                     <DxTagBox Data="@Schedules"
                                                               FilteringMode="@DataGridFilteringMode.Contains"
@@ -112,11 +112,11 @@
                                                 </DxFormLayoutItem>
 
                                                 <DxFormLayoutItem Caption="Start Date:" ColSpanMd="12">
-                                                    <DxDateEdit @bind-Date="@StartDate"  Mask="@DateTimeMask.ShortDate" />
+                                                    <DxDateEdit @bind-Date="@StartDate" Mask="@DateTimeMask.ShortDate" />
                                                 </DxFormLayoutItem>
 
                                                 <DxFormLayoutItem Caption="End Date:" ColSpanMd="12">
-                                                    <DxDateEdit @bind-Date="@EndDate"   Mask="@DateTimeMask.ShortDate" />
+                                                    <DxDateEdit @bind-Date="@EndDate" Mask="@DateTimeMask.ShortDate" />
                                                 </DxFormLayoutItem>
                                                 @* </DxLoadingPanel> *@
                                             </DxFormLayout>
@@ -141,7 +141,7 @@
                                 <DxComboBox Data="@Services"
                                             NullText="Select Service"
                                             FilteringMode="@DataGridFilteringMode.Contains"
-                                            @bind-Value="@DoctorSchedule.ServiceId"
+                                            @bind-Value="@ServiceId"
                                             TextFieldName="Name"
                                             InputId="tbOverview3"
                                             ValueFieldName="Id">
