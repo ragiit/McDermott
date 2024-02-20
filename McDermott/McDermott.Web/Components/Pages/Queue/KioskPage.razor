@@ -1,4 +1,4 @@
-﻿@page "/transaction/kiosk"
+﻿@page "/queue/kiosk/{id:int}"
 @rendermode InteractiveServer
 <PageTitle>McDermott - Transaction Kiosk</PageTitle>
 
@@ -55,46 +55,45 @@
                                     </DxFormLayoutItem>
                                     @if (showForm)
                                     {
-                                        <DxFormLayoutItem Caption="Patient" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@NamePatient" NullText="Patient..." ReadOnly style="background-color:#949494" />
-                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="BPJS" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@FormKios.Insurance" NullText="Insurance..." ReadOnly style="background-color:#949494" />
-                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Stage BPJS" ColSpanMd="12">
-                                            @if (FormKios.Insurance == "BPJS")
-                                            {
-                                                <p> <i class="fa-solid fa-circle-check" style="color: #20fc03;"></i> Active</p>
-                                            }
-                                            else
-                                            {
-                                                <p><i class="fa-solid fa-circle-xmark" style="color: #ec091f;"></i> Non Active</p>
-                                            }
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Service" ColSpanMd="12">
-                                            <DxComboBox Data="@Services" @bind-Value="@Serviced" NullText="Select Service.." ValueFieldName="Id" TextFieldName="Name" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Physician" ColSpanMd="12">
-                                            <DxComboBox Data="@Physicians" @bind-Value="@FormKios.PhysicianId" NullText="Select Physician.." ValueFieldName="Id" TextFieldName="Name" />
-                                        </DxFormLayoutItem>
+                                        @if (NamePatient != null)
+                                        {
+                                            <DxFormLayoutItem Caption="Patient" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@NamePatient" NullText="Patient..." ReadOnly style="background-color:#949494" />
+                                             </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="BPJS" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@FormKios.BPJS" NullText="BPJS..." ReadOnly style="background-color:#949494" />
+                                             </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Service" ColSpanMd="12">
+                                                <DxComboBox Data="@Names" @bind-Value="@Serviced" NullText="Select Service.."  />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Physician" ColSpanMd="12">
+                                                <DxComboBox Data="@Physicians" @bind-Value="@FormKios.PhysicianId" NullText="Select Physician.." ValueFieldName="Id" TextFieldName="Name" />
+                                            </DxFormLayoutItem>
+                                        }
+                                        else
+                                        {
+                                           <DxFormLayoutItem ColSpanMd="12">
+                                               <p class="text-center"> Data Not Found...</p>
+                                           </DxFormLayoutItem>
+                                        }
                                     }
-                                    else
-                                    {
-                                        @* <Alert Color="@alertColor" Dismissable="false"> <Icon Name="@alertIconName" class="me-2"></Icon>@alertMessage </Alert> *@
-                                    }
+
                                 </DxFormLayout>
                             </EditForm>
                         </div>
                         @if (showForm)
                         {
-                            <div class="card-footer">
-                                <div class="row  justify-content-end">
-                                    <div class="col-auto align-self-end">
-                                        <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true" Click="OnSave"></DxButton>
-                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
+                            @if (NamePatient != null)
+                            {
+                                <div class="card-footer">
+                                    <div class="row  justify-content-end">
+                                        <div class="col-auto align-self-end">
+                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            }
                         }
                     </div>
                 </div>

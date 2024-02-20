@@ -67,6 +67,10 @@ namespace McDermott.Persistence.Context
         public DbSet<Kiosk> Kiosks { get; set; }
         public DbSet<Counter> Counters { get; set; }
 
+        //Queue
+        public DbSet<KioskConfig> KioskConfigs { get; set; }
+        public DbSet<KioskDepartement> KioskDepartements  { get; set; }
+
         #endregion DbSet
 
         #region MyRegion

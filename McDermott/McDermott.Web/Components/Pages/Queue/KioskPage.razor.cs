@@ -1,6 +1,9 @@
-﻿using DevExpress.Data.XtraReports.Native;
+﻿using McDermott.Domain.Entities;
+using Microsoft.AspNetCore.Components;
+using System.Linq;
+using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 
-namespace McDermott.Web.Components.Pages.Transaction
+namespace McDermott.Web.Components.Pages.Queue
 {
     public partial class KioskPage
     {
@@ -17,9 +20,10 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region setings Grid
 
-        private BaseAuthorizationLayout AuthorizationLayout = new();
-        private bool IsAccess { get; set; } = false;
+        //private BaseAuthorizationLayout AuthorizationLayout = new();
+        //private bool IsAccess { get; set; } = false;
         private bool PanelVisible { get; set; } = true;
+
         private bool showForm { get; set; } = false;
         private string textPopUp = "";
         public IGrid Grid { get; set; }
@@ -27,11 +31,14 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
-        private GroupMenuDto UserAccessCRUID = new();
+        //private GroupMenuDto UserAccessCRUID = new();
 
         #endregion setings Grid
 
         #region Data Static And Variable Additional
+
+        [Parameter]
+        public int id { get; set; }
 
         private List<string> type = new List<string>
         {
@@ -58,10 +65,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                 this.ServicedId = value;
 
                 Names.Clear();
-
-                var item = DoctorSchedules.Where(x => x.ServiceId == ServicedId).ToList();
-                item.ForEach(x => x.Physicions = string.Join(", ", Physician.Where(z => x.PhysicionIds != null && x.PhysicionIds.Contains(z.Id)).Select(z => z.Name).ToList()));
-                Physicians = item;
             }
         }
 
@@ -69,31 +72,31 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Async Data And Auth
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
+        //protected override async Task OnAfterRenderAsync(bool firstRender)
+        //{
+        //    await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender)
-            {
-                try
-                {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
-                }
-                catch { }
-            }
-        }
+        //    if (firstRender)
+        //    {
+        //        try
+        //        {
+        //            var result = await NavigationManager.CheckAccessUser(oLocal);
+        //            IsAccess = result.Item1;
+        //            UserAccessCRUID = result.Item2;
+        //        }
+        //        catch { }
+        //    }
+        //}
 
         protected override async Task OnInitializedAsync()
         {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
+            //    try
+            //    {
+            //        var result = await NavigationManager.CheckAccessUser(oLocal);
+            //        IsAccess = result.Item1;
+            //        UserAccessCRUID = result.Item2;
+            //    }
+            //    catch { }
             //var by =
 
             Kiosks = await Mediator.Send(new GetKioskQuery());
@@ -108,6 +111,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             SelectedDataItems = new ObservableRangeCollection<object>();
             Kiosks = await Mediator.Send(new GetKioskQuery());
             Services = await Mediator.Send(new GetServiceQuery());
+
             DoctorSchedules = await Mediator.Send(new GetDoctorScheduleQuery());
             PanelVisible = false;
         }
@@ -223,14 +227,22 @@ namespace McDermott.Web.Components.Pages.Transaction
                 showForm = true;
                 NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
                 FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
-                FormKios.Insurance = "Personal";
+                var kconfig = await Mediator.Send(new GetKioskConfigQuery());
+                kconfig = kconfig.Where(x => x.Id == id).ToList();
+                foreach (var item in kconfig)
+                {
+                    var n = item.ServiceIds;
+                    foreach (var i in n)
+                    {
+                        var serv = Services.Where(x => x.Id == i).ToList();
+                        var serId = serv.Select(x => x.Name).ToList();
+                        Names.AddRange(serId);
+                    }
+                }
             }
             else
             {
                 showForm = false;
-                //AlertColor alertColor = AlertColor.Primary;
-                //IconName alertIconName = IconName.CheckCircleFill;
-                //string alertMessage = "A simple alert - check it out!";
             }
         }
 

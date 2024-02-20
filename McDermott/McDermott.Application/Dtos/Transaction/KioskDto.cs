@@ -13,10 +13,10 @@ namespace McDermott.Application.Dtos.Transaction
         public string? Type { get; set; } 
         [Required]
         [StringLength(150)]
+        [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? NumberType { get; set; } = string.Empty;
         public int? PatientId { get; set; }
-        public string? Insurance { get; set; } = string.Empty;
-        public bool? StageInsurance { get; set; }
+        public string? BPJS { get; set; } = string.Empty;
         public int? ServiceId { get; set; }
         public int? PhysicianId { get; set; }
         public int? Queue {  get; set; }

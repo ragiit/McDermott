@@ -61,6 +61,7 @@
                                         <DxGridDataColumn FieldName="Name" SortIndex="0" />
                                         <DxGridDataColumn FieldName="Code" />
                                         <DxGridDataColumn FieldName="Quota" />
+                                        <DxGridDataColumn FieldName="Flag" Caption="Flag"/>
                                     </Columns>
                                     <EditFormTemplate Context="EditFormContext">
                                         @{
@@ -79,6 +80,12 @@
                                             <DxFormLayoutItem Caption="Quota:" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("Quota")
                                             </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Patient" ColSpanMd="6">
+                                                <DxCheckBox @bind-Checked="@a.IsPatient"/>
+                                            </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Kiosk" ColSpanMd="6">
+                                            <DxCheckBox @bind-Checked="@a.IsKiosk" />
+                                        </DxFormLayoutItem>
 
                                         </DxFormLayout>
                                     </EditFormTemplate>

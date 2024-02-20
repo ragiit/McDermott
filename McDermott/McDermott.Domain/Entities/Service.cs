@@ -15,5 +15,7 @@ namespace McDermott.Domain.Entities
         public string Code { get; set; } = string.Empty;
 
         public string Quota { get; set; } = string.Empty;
+        public bool IsPatient {  get; set; }
+        public bool IsKiosk { get; set; }
     }
 }

@@ -11,11 +11,11 @@
 @using McDermott.Web.Components
 @using DevExpress.Blazor
 @using DevExpress.Blazor.Office
-@using DevExpress.Blazor.RichEdit
 @using Microsoft.JSInterop;
 @using McDermott.Web.Components.Layout
 @using Blazored.Toast
 @using Blazored.Toast.Services
+@using TinyMCE.Blazor
 
 @inject IHttpContextAccessor _httpContextAccessor
 @inject IToastService ToastService
@@ -33,6 +33,7 @@
 @using Newtonsoft.Json
 
 @using McDermott.Application.Dtos.Config
+@using McDermott.Application.Dtos.Queue
 @using McDermott.Application.Dtos.Medical
 @using McDermott.Application.Dtos.Transaction
 
@@ -43,3 +44,5 @@
 @using static McDermott.Application.Features.Commands.Config.MenuCommand
 @using static McDermott.Application.Features.Commands.Transaction.KioskCommand
 @using static McDermott.Application.Features.Commands.Transaction.CounterCommand;
+@using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
+@using static McDermott.Application.Features.Commands.Queue.KioskDepartementCommand;
