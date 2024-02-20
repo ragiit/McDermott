@@ -82,11 +82,17 @@ namespace McDermott.Web.Components.Pages.Transaction
         private string textPopUp = "";
         private string DisplayFormat { get; } = string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator) ? "HH:mm" : "h:mm tt";
         public IGrid Grid { get; set; }
-        private int ActiveTabIndex { get; set; } = 1;
+        private int ActiveTabIndex { get; set; } = 0;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
         private GroupMenuDto UserAccessCRUID = new();
+        private List<Temppp> Temppps { get; set; } = [];
+        private class Temppp
+        {
+            public string Title { get; set; }
+            public string Body { get; set; }
+        }
 
         #endregion Grid Setting
 
@@ -290,7 +296,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             catch { }
         }
-
+        private async Task Refresh_Click()
+        {
+            await LoadData();
+        }
         private async Task OnSave()
         {
             try

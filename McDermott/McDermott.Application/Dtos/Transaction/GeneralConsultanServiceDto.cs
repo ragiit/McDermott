@@ -24,6 +24,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? NoRM { get; set; } = string.Empty;
         public string? IdentityNumber { get; set; } = string.Empty;
         public string? TypeRegistration { get; set; }
+        public bool? Negatif { get; set; } = false;
 
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public int? Age { get; set; }
