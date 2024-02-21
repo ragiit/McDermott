@@ -1,34 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using McDermott.Application.Dtos.Transaction;
+using static McDermott.Application.Features.Queries.Transaction.GeneralConsultanServiceQueryHandler;
 
 namespace McDermott.Application.Features.Commands.Transaction
 {
     public class GeneralConsultanServiceCommand
     {
-        public class GetGeneralConsultanServiceQuery : IRequest<List<GeneralConsultanServiceDto>>;
-
-        public class GetGeneralConsultanServiceByIdQuery : IRequest<GeneralConsultanServiceDto>
+        #region Create
+        #region Create
+        internal class CreateGeneralConsultantClinicalAssesmentHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateGeneralConsultantClinicalAssesmentRequest, GeneralConsultantClinicalAssesmentDto>
         {
-            public int Id { get; set; }
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-            public GetGeneralConsultanServiceByIdQuery(int id)
+            public async Task<GeneralConsultantClinicalAssesmentDto> Handle(CreateGeneralConsultantClinicalAssesmentRequest request, CancellationToken cancellationToken)
             {
-                Id = id;
+                var result = await _unitOfWork.Repository<GeneralConsultantClinicalAssesment>().AddAsync(request.GeneralConsultantClinicalAssesmentDto.Adapt<GeneralConsultantClinicalAssesment>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return result.Adapt<GeneralConsultantClinicalAssesmentDto>();
             }
         }
 
-        public class CreateGeneralConsultanServiceRequest : IRequest<GeneralConsultanServiceDto>
+        internal class CreateListGeneralConsultantClinicalAssesmentRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateListGeneralConsultantClinicalAssesmentRequest, List<GeneralConsultantClinicalAssesmentDto>>
         {
-            public GeneralConsultanServiceDto GeneralConsultanServiceDto { get; set; }
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-            public CreateGeneralConsultanServiceRequest(GeneralConsultanServiceDto GeneralConsultanServiceDto)
+            public async Task<List<GeneralConsultantClinicalAssesmentDto>> Handle(CreateListGeneralConsultantClinicalAssesmentRequest request, CancellationToken cancellationToken)
             {
-                this.GeneralConsultanServiceDto = GeneralConsultanServiceDto;
+                var result = await _unitOfWork.Repository<GeneralConsultantClinicalAssesment>().AddAsync(request.GeneralConsultantClinicalAssesmentDtos.Adapt<List<GeneralConsultantClinicalAssesment>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return result.Adapt<List<GeneralConsultantClinicalAssesmentDto>>();
             }
+        }
+        #endregion
+        #endregion
+
+        #region Get
+        public class GetGeneralConsultanServiceQuery : IRequest<List<GeneralConsultanServiceDto>>;
+
+        public class GetGeneralConsultanServiceByIdQuery(int id) : IRequest<GeneralConsultanServiceDto>
+        {
+            public int Id { get; set; } = id;
+        }
+
+        public class GetGeneralConsultantClinicalAssesmentQuery(Expression<Func<GeneralConsultantClinicalAssesment, bool>>? predicate = null) : IRequest<List<GeneralConsultantClinicalAssesmentDto>>
+        {
+            public Expression<Func<GeneralConsultantClinicalAssesment, bool>> Predicate { get; } = predicate;
+        }
+        #endregion
+
+
+        public class CreateGeneralConsultanServiceRequest(GeneralConsultanServiceDto GeneralConsultanServiceDto) : IRequest<GeneralConsultanServiceDto>
+        {
+            public GeneralConsultanServiceDto GeneralConsultanServiceDto { get; set; } = GeneralConsultanServiceDto;
         }
 
         public class UpdateGeneralConsultanServiceRequest : IRequest<bool>
@@ -59,5 +86,14 @@ namespace McDermott.Application.Features.Commands.Transaction
                 Id = id;
             }
         }
+
+
+        #region Update
+        public class UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinicalAssesmentDto GeneralConsultantClinicalAssesmentDto) : IRequest<bool>
+        {
+            public GeneralConsultantClinicalAssesmentDto GeneralConsultantClinicalAssesmentDto { get; set; } = GeneralConsultantClinicalAssesmentDto;
+        }
+
+        #endregion
     }
 }

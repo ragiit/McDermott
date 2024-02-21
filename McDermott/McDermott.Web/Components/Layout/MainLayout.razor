@@ -12,6 +12,15 @@
     .a {
         z-index: -1;
     }
+
+    .toast-custom {
+        z-index: 1000;
+    }
+
+    .blazored-toast-container {
+        z-index: 9999 !important;
+    }
+
 </style>
 
 <div class="a">
@@ -20,7 +29,8 @@
                     Timeout="5"
                     IconType="IconType.FontAwesome"
                     ShowProgressBar="true"
-                    SuccessClass="success-toast-override"
+                    SuccessClass="success-toast-override toast-custom"
+                    InfoClass="toast-custom"
                     SuccessIcon="fa fa-thumbs-up"
                     InfoIcon="fa fa-info-circle"
                     WarningIcon="fa fa-warning"

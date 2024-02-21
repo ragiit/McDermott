@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240221064529_AddCliinicalAssesment")]
+    partial class AddCliinicalAssesment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -905,7 +908,7 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int?>("ServiceId")
                         .HasColumnType("int");
 
-                    b.Property<string>("StagingStatus")
+                    b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TypeMedical")
@@ -973,6 +976,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int?>("GeneralConsultantServiceId")
                         .HasColumnType("int");
 
+                    b.Property<int>("GeneralConsultantServiceId")
+                        .HasColumnType("int");
+
                     b.Property<int>("HR")
                         .HasColumnType("int");
 
@@ -991,6 +997,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int>("SpO2")
                         .HasColumnType("int");
 
+                    b.Property<string>("StagingStatus")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("SystolicDiastolicBP")
                         .HasColumnType("int");
 
@@ -1007,6 +1016,12 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<double>("Weight")
+                        .HasColumnType("float");
+
+                    b.Property<double>("_Height")
+                        .HasColumnType("float");
+
+                    b.Property<double>("_Weight")
                         .HasColumnType("float");
 
                     b.HasKey("Id");

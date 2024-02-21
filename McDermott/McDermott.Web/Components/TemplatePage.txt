@@ -468,31 +468,31 @@ internal class GetInsurancePolicyQueryHandler(IUnitOfWork unitOfWork) : IRequest
 #endregion
 
 #region Create
-internal class CreateInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateInsurancePolicyRequest, InsurancePolicyDto>
+internal class CreateGeneralConsultantClinicalAssesmentHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateGeneralConsultantClinicalAssesmentRequest, GeneralConsultantClinicalAssesmentDto>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<InsurancePolicyDto> Handle(CreateInsurancePolicyRequest request, CancellationToken cancellationToken)
+    public async Task<GeneralConsultantClinicalAssesmentDto> Handle(CreateGeneralConsultantClinicalAssesmentRequest request, CancellationToken cancellationToken)
     {
-        var result = await _unitOfWork.Repository<InsurancePolicy>().AddAsync(request.InsurancePolicyDto.Adapt<InsurancePolicy>());
+        var result = await _unitOfWork.Repository<GeneralConsultantClinicalAssesment>().AddAsync(request.GeneralConsultantClinicalAssesmentDto.Adapt<GeneralConsultantClinicalAssesment>());
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return result.Adapt<InsurancePolicyDto>();
+        return result.Adapt<GeneralConsultantClinicalAssesmentDto>();
     }
 }
 
-internal class CreateListCountryRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateListCountryRequest, List<CountryDto>>
+internal class CreateListGeneralConsultantClinicalAssesmentRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateListGeneralConsultantClinicalAssesmentRequest, List<GeneralConsultantClinicalAssesmentDto>>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<List<CountryDto>> Handle(CreateListCountryRequest request, CancellationToken cancellationToken)
+    public async Task<List<GeneralConsultantClinicalAssesmentDto>> Handle(CreateListGeneralConsultantClinicalAssesmentRequest request, CancellationToken cancellationToken)
     {
-        var result = await _unitOfWork.Repository<Country>().AddAsync(request.CountryDtos.Adapt<List<Country>>());
+        var result = await _unitOfWork.Repository<GeneralConsultantClinicalAssesment>().AddAsync(request.GeneralConsultantClinicalAssesmentDtos.Adapt<List<GeneralConsultantClinicalAssesment>>());
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return result.Adapt<List<CountryDto>>();
+        return result.Adapt<List<GeneralConsultantClinicalAssesmentDto>>();
     }
 }
 #endregion

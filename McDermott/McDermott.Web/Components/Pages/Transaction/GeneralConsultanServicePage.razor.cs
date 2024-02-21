@@ -1,9 +1,9 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using Microsoft.AspNetCore.Components;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Build.Framework;
+using Microsoft.CodeAnalysis;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-using System.Runtime.InteropServices;
-using static DevExpress.Xpo.DB.DataStoreLongrunnersWatch;
+using static McDermott.Application.Features.Queries.Transaction.GeneralConsultanServiceQueryHandler;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -11,6 +11,7 @@ namespace McDermott.Web.Components.Pages.Transaction
     {
         #region Relation Data
 
+        private GeneralConsultantClinicalAssesmentDto GeneralConsultantClinical = new();
         private List<GeneralConsultanServiceDto> GeneralConsultanServices = new();
         private List<UserDto> IsPatient = new();
         private List<UserDto> patients = new List<UserDto>();
@@ -80,7 +81,23 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Grid Setting
 
-        private GeneralConsultanServiceDto FormRegis = new();
+        private int ServiceId
+        {
+            get => _ServiceId;
+            set
+            {
+                _ServiceId = value;
+                FormRegis.ServiceId = value;
+                IsPratition = AllDoctors.Where(x => x.DoctorServiceIds.Contains(value)).ToList();
+
+                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
+            }
+        }
+
+        private GeneralConsultanServiceDto FormRegis = new()
+        {
+        };
+
         private BaseAuthorizationLayout AuthorizationLayout = new();
         private bool IsAccess { get; set; } = false;
         private bool PanelVisible { get; set; } = true;
@@ -91,10 +108,19 @@ namespace McDermott.Web.Components.Pages.Transaction
         public IGrid Grid { get; set; }
         private int ActiveTabIndex { get; set; } = 0;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedDataItems2 { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
         private GroupMenuDto UserAccessCRUID = new();
-        private List<Temppp> Temppps { get; set; } = [];
+
+        private List<Temppp> Temppps { get; set; } = new List<Temppp>
+        {
+            new Temppp
+            {
+                Title = "Test",
+                Body = "Test Body"
+            }
+        };
 
         private class Temppp
         {
@@ -168,19 +194,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private int _ServiceId { get; set; }
 
-        private int ServiceId
-        {
-            get => _ServiceId;
-            set
-            {
-                _ServiceId = value;
-                FormRegis.ServiceId = value;
-                IsPratition = AllDoctors.Where(x => x.DoctorServiceIds.Contains(value)).ToList();
-
-                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
-            }
-        }
-
         private int _DoctorId { get; set; }
 
         private int DoctorId
@@ -188,6 +201,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             get => _DoctorId;
             set
             {
+                FormRegis.PratitionerId = value;
                 _DoctorId = value;
                 SetTimeSchedule(value, RegistrationDate);
             }
@@ -221,7 +235,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             Times.AddRange(slots.Select(x => $"{x.WorkFromFormatString} - {x.WorkToFormatString}"));
         }
 
+        [System.ComponentModel.DataAnnotations.Required]
         private string _PaymentMethod { get; set; }
+
         private string MedicalTypee { get; set; }
         private List<InsuranceTemp> Temps = [];
 
@@ -236,11 +252,37 @@ namespace McDermott.Web.Components.Pages.Transaction
             { get { return PolicyNumber + " - " + InsuranceName; } }
         }
 
+        private List<string> Stagings = new List<string>
+        {
+            "Planned",
+            "Confirmed",
+            "Nurse Station",
+            "Waiting",
+            "Physician",
+            "Finished"
+        };
+
+        private async Task OnClickConfirm()
+        {
+            var index = Stagings.FindIndex(x => x == FormRegis.StagingStatus);
+            if (FormRegis.StagingStatus != "Finished")
+            {
+                FormRegis.StagingStatus = Stagings[index + 1];
+            }
+            await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+        }
+
+        private void OnCancel2()
+        {
+            ToastService.ShowSuccess("TESTTTTTTTTTTTTTTTTTTTTTTTTTTTTtt");
+        }
+
         private string PaymentMethod
         {
             get => _PaymentMethod;
             set
             {
+                FormRegis.Payment = value;
                 _PaymentMethod = value;
 
                 Insurances.Clear();
@@ -277,8 +319,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             get => PatientsId;
             set
             {
-                //Names.Clear();
-                int PatientsId = value; InvokeAsync(StateHasChanged);
+                int PatientsId = value;
                 this.PatientsId = value;
 
                 var item = patients.FirstOrDefault(x => x.Id == PatientsId);
@@ -290,10 +331,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                     Age = currentDate.Year - Birthdate!.Value.Year;
                 }
 
-                FormRegis.Age = Age;
-                FormRegis.NoRM = item.NoRm;
-                FormRegis.IdentityNumber = item.NoId.ToString();
-                FormRegis.PatientId = item.Id;
+                try
+                {
+                    FormRegis.Age = Age;
+                    FormRegis.NoRM = item.NoRm;
+                    FormRegis.IdentityNumber = item.NoId.ToString();
+                    FormRegis.PatientId = item.Id;
+                }
+                catch { }
             }
         }
 
@@ -325,6 +370,55 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             //Schendule
             var schendule = await Mediator.Send(new GetDoctorScheduleQuery());
+        }
+
+        private bool FormValidationState = true;
+
+        private async Task HandleValidSubmit()
+        {
+            FormValidationState = true;
+
+            await OnSave();
+        }
+
+        private async Task OnSave()
+        {
+            try
+            {
+                if (!FormValidationState)
+                    return;
+
+                if (FormRegis.Id == 0)
+                {
+                    var result = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                    GeneralConsultantClinical.GeneralConsultantServiceId = result.Id;
+                    await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+                    GeneralConsultantClinical.GeneralConsultantServiceId = FormRegis.Id;
+                    await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                }
+
+                FormRegis = new GeneralConsultanServiceDto();
+                GeneralConsultantClinical = new();
+                showForm = false;
+
+                await LoadData();
+
+                ToastService.ShowInfo("Successfully");
+            }
+            catch (Exception exx)
+            {
+                ToastService.ShowError(exx.Message);
+            }
+        }
+
+        private async void HandleInvalidSubmit()
+        {
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+            FormValidationState = false;
         }
 
         private async Task LoadData()
@@ -375,16 +469,35 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task EditItem_Click()
         {
+            await EditItemVoid();
+        }
+
+        private async Task EditItemVoid()
+        {
             try
             {
-                var General = SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>();
-                FormRegis = General;
-                await SelectData();
                 showForm = true;
-                textPopUp = "Edit Data Registration";
-                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+
+                FormRegis = SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>();
+                if (FormRegis.StagingStatus != "Finished")
+                {
+                    var index = Stagings.FindIndex(x => x == FormRegis.StagingStatus);
+
+                    FormRegis.StagingStatus = Stagings[index + 1];
+                }
+                var clinical = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+
+                GeneralConsultantClinical = clinical[0];
             }
-            catch { }
+            catch (Exception exx)
+            {
+                ToastService.ShowError(exx.Message);
+            }
+        }
+
+        private async Task OnRowDoubleClick(GridRowClickEventArgs e)
+        {
+            await EditItemVoid();
         }
 
         private void ColumnChooserButton_Click()
@@ -424,6 +537,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private void OnCancel()
         {
             FormRegis = new();
+            GeneralConsultantClinical = new GeneralConsultantClinicalAssesmentDto();
             showForm = false;
         }
 
@@ -448,22 +562,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task Refresh_Click()
         {
             await LoadData();
-        }
-
-        private async Task OnSave()
-        {
-            try
-            {
-                var edit = FormRegis;
-                if (FormRegis.Id == 0)
-                    await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
-                else
-                    await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
-
-                FormRegis = new();
-                await LoadData();
-            }
-            catch { }
         }
     }
 }
