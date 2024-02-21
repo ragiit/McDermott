@@ -1,5 +1,9 @@
-﻿using McDermott.Domain.Entities;
+﻿using McDermott.Application.Dtos.Queue;
+using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NuGet.Packaging;
+using System.Collections.Generic;
 using System.Linq;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 
@@ -10,7 +14,10 @@ namespace McDermott.Web.Components.Pages.Queue
         #region Relation Data
 
         public List<KioskDto> Kiosks = new();
+        public List<KioskConfigDto> KioskConf = new();
         public List<ServiceDto> Services = new();
+        public List<ServiceDto> serv = new List<ServiceDto>();
+        public ServiceDto servs = new();
         public List<UserDto> Patients = new();
         public List<UserDto> Physician = new();
         public List<DoctorScheduleDto> Physicians = [];
@@ -26,6 +33,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private bool showForm { get; set; } = false;
         private string textPopUp = "";
+        private string HeaderName { get; set; } = string.Empty;
         public IGrid Grid { get; set; }
         private int ActiveTabIndex { get; set; } = 1;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
@@ -49,10 +57,12 @@ namespace McDermott.Web.Components.Pages.Queue
         };
 
         private string? NamePatient { get; set; } = string.Empty;
+        private int? CountServiceId { get; set; }
 
         private KioskDto FormKios = new();
         private int ServicedId = 0;
         private List<string> Names { get; set; } = new List<string>();
+        private string Bpjs { get; set; } = string.Empty;
         private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
         private string PhysicionName { get; set; }
 
@@ -101,6 +111,11 @@ namespace McDermott.Web.Components.Pages.Queue
 
             Kiosks = await Mediator.Send(new GetKioskQuery());
             await LoadData();
+            foreach (var i in KioskConf)
+            {
+                HeaderName = i.Name;
+                break;
+            }
         }
 
         private async Task LoadData()
@@ -111,7 +126,8 @@ namespace McDermott.Web.Components.Pages.Queue
             SelectedDataItems = new ObservableRangeCollection<object>();
             Kiosks = await Mediator.Send(new GetKioskQuery());
             Services = await Mediator.Send(new GetServiceQuery());
-
+            var kconfig = await Mediator.Send(new GetKioskConfigQuery());
+            KioskConf = kconfig.Where(x => x.Id == id).ToList();
             DoctorSchedules = await Mediator.Send(new GetDoctorScheduleQuery());
             PanelVisible = false;
         }
@@ -222,21 +238,30 @@ namespace McDermott.Web.Components.Pages.Queue
             var types = FormKios.Type;
             var InputSearch = FormKios.NumberType;
             Patients = await Mediator.Send(new GetDataUserForKioskQuery(types, InputSearch));
+
             if (Patients != null)
             {
                 showForm = true;
                 NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
                 FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
-                var kconfig = await Mediator.Send(new GetKioskConfigQuery());
-                kconfig = kconfig.Where(x => x.Id == id).ToList();
-                foreach (var item in kconfig)
+                FormKios.BPJS = Patients.Select(x => x.NoBpjsKs).FirstOrDefault();
+                if (FormKios.BPJS != null)
+                {
+                    FormKios.StageBpjs = true;
+                }
+
+                foreach (var item in KioskConf)
                 {
                     var n = item.ServiceIds;
-                    foreach (var i in n)
+                    CountServiceId = KioskConf.SelectMany(item => item.ServiceIds).Count();
+
+                    if (item.ServiceIds.Count > 1)
                     {
-                        var serv = Services.Where(x => x.Id == i).ToList();
-                        var serId = serv.Select(x => x.Name).ToList();
-                        Names.AddRange(serId);
+                        serv.AddRange(Services.Where(x => item.ServiceIds.Contains(x.Id)));
+                    }
+                    else
+                    {
+                        FormKios.ServiceId = Services.FirstOrDefault(x => item.ServiceIds.Contains(x.Id))?.Id;
                     }
                 }
             }

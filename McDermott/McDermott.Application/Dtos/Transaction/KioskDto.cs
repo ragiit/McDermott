@@ -17,11 +17,13 @@ namespace McDermott.Application.Dtos.Transaction
         public string? NumberType { get; set; } = string.Empty;
         public int? PatientId { get; set; }
         public string? BPJS { get; set; } = string.Empty;
+        public bool? StageBpjs { get; set; }
         public int? ServiceId { get; set; }
         public int? PhysicianId { get; set; }
         public int? Queue {  get; set; }
         public int? CounterId {  get; set; }
         public  virtual CounterDto? Counter  { get; set; }
         public virtual UserDto? User { get; set; }
+        
     }
 }
