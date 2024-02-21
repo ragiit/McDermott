@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NuGet.Packaging;
 using System.Collections.Generic;
 using System.Linq;
+using static Azure.Core.HttpHeader;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
@@ -17,11 +18,10 @@ namespace McDermott.Web.Components.Pages.Queue
         public List<KioskConfigDto> KioskConf = new();
         public List<ServiceDto> Services = new();
         public List<ServiceDto> serv = new List<ServiceDto>();
+        public List<UserDto> Phys = new();
         public ServiceDto servs = new();
         public List<UserDto> Patients = new();
         public List<UserDto> Physician = new();
-        public List<DoctorScheduleDto> Physicians = [];
-        public List<DoctorScheduleDto> DoctorSchedules = new();
 
         #endregion Relation Data
 
@@ -32,6 +32,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private bool PanelVisible { get; set; } = true;
 
         private bool showForm { get; set; } = false;
+        private bool showPhysician { get; set; } = false;
         private string textPopUp = "";
         private string HeaderName { get; set; } = string.Empty;
         public IGrid Grid { get; set; }
@@ -61,26 +62,35 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private KioskDto FormKios = new();
         private int ServicedId = 0;
-        private List<string> Names { get; set; } = new List<string>();
         private string Bpjs { get; set; } = string.Empty;
+        private IEnumerable<ServiceDto> SelectedServices = [];
         private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
-        private string PhysicionName { get; set; }
-
-        private int Serviced
-        {
-            get => ServicedId;
-            set
-            {
-                int ServicedId = value; InvokeAsync(StateHasChanged);
-                this.ServicedId = value;
-
-                Names.Clear();
-            }
-        }
 
         #endregion Data Static And Variable Additional
 
         #region Async Data And Auth
+
+        private void SelectedServiceChanged(ServiceDto services)
+        {
+            SelectedNames = new List<string>();
+            //if (e is not null)
+            //{
+            //    foreach (var item in e)
+            //    {
+            //        //var n = item.Physicions.Split(",");
+
+            //        //foreach (var item1 in n)
+            //        //{
+            //        //    if (Names.Contains(item1))
+            //        //        continue;
+
+            //        //    Names.Add(item1);
+            //        //}
+            //    }
+
+            //SelectedNames = Names.Distinct();
+            //}
+        }
 
         //protected override async Task OnAfterRenderAsync(bool firstRender)
         //{
@@ -128,7 +138,6 @@ namespace McDermott.Web.Components.Pages.Queue
             Services = await Mediator.Send(new GetServiceQuery());
             var kconfig = await Mediator.Send(new GetKioskConfigQuery());
             KioskConf = kconfig.Where(x => x.Id == id).ToList();
-            DoctorSchedules = await Mediator.Send(new GetDoctorScheduleQuery());
             PanelVisible = false;
         }
 
@@ -250,18 +259,27 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormKios.StageBpjs = true;
                 }
 
-                foreach (var item in KioskConf)
+                foreach (var kiosk in KioskConf)
                 {
-                    var n = item.ServiceIds;
-                    CountServiceId = KioskConf.SelectMany(item => item.ServiceIds).Count();
+                    var serviceIds = kiosk.ServiceIds;
+                    CountServiceId = KioskConf.SelectMany(k => k.ServiceIds).Count();
 
-                    if (item.ServiceIds.Count > 1)
+                    if (CountServiceId > 1)
                     {
-                        serv.AddRange(Services.Where(x => item.ServiceIds.Contains(x.Id)));
+                        serv.AddRange(Services.Where(service => serviceIds.Contains(service.Id)));
                     }
                     else
                     {
-                        FormKios.ServiceId = Services.FirstOrDefault(x => item.ServiceIds.Contains(x.Id))?.Id;
+                        FormKios.ServiceId = Services.FirstOrDefault(service => serviceIds.Contains(service.Id))?.Id;
+                        var serviceId = FormKios.ServiceId;
+
+                        var matchingPhysicians = Physician.Where(phy => phy.DoctorServiceIds.Contains((int)serviceId));
+
+                        if (matchingPhysicians.Any())
+                        {
+                            showPhysician = true;
+                            Phys.AddRange(matchingPhysicians.Where(phy => phy.IsDoctor == true));
+                        }
                     }
                 }
             }

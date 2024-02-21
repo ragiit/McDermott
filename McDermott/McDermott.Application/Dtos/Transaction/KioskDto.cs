@@ -10,7 +10,7 @@ namespace McDermott.Application.Dtos.Transaction
     public partial class KioskDto : IMapFrom<Kiosk>
     {
         public int Id { get; set; }
-        public string? Type { get; set; } 
+        public string? Type { get; set; }
         [Required]
         [StringLength(150)]
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
@@ -20,8 +20,8 @@ namespace McDermott.Application.Dtos.Transaction
         public bool? StageBpjs { get; set; }
         public int? ServiceId { get; set; }
         public int? PhysicianId { get; set; }
-        public int? Queue {  get; set; }
-        public int? CounterId {  get; set; }
+        public int? Queue { get; set; }
+        public int? CounterId { get; set; }
         public  virtual CounterDto? Counter  { get; set; }
         public virtual UserDto? User { get; set; }
         

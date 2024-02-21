@@ -1,4 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Application.Dtos.Queue;
 using Microsoft.JSInterop;
 
 namespace McDermott.Web.Components.Pages.Medical
@@ -6,10 +7,15 @@ namespace McDermott.Web.Components.Pages.Medical
     public partial class ServicePage
     {
         public List<ServiceDto> Services = [];
+        public List<ServiceDto> ServicesK = [];
+        public ServiceDto FormService = new();
+        private IEnumerable<ServiceDto> SelectedServices { get; set; } = [];
 
         #region Default Grid
 
         private bool PanelVisible { get; set; } = true;
+        private bool PopUpVisible { get; set; } = false;
+        private string TextPopUp { get; set; } = string.Empty;
         public IGrid Grid { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
@@ -59,18 +65,22 @@ namespace McDermott.Web.Components.Pages.Medical
             }
         }
 
-        private async Task OnSave(GridEditModelSavingEventArgs e)
+        private async Task OnSave()
         {
-            var editModel = (ServiceDto)e.EditModel;
-
-            if (string.IsNullOrWhiteSpace(editModel.Name))
+            if (string.IsNullOrWhiteSpace(FormService.Name))
                 return;
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateServiceRequest(editModel));
+            if (FormService.Id == 0)
+            {
+                var a = SelectedServices.Select(x => x.Id).ToList();
+                FormService.ServicedId?.AddRange(a);
+                await Mediator.Send(new CreateServiceRequest(FormService));
+            }
             else
-                await Mediator.Send(new UpdateServiceRequest(editModel));
-
+            {
+                FormService.ServicedId = SelectedServices.Select(x => x.Id).ToList();
+                await Mediator.Send(new UpdateServiceRequest(FormService));
+            }
             await LoadData();
         }
 
@@ -95,12 +105,25 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task NewItem_Click()
         {
-            await Grid.StartEditNewRowAsync();
+            PopUpVisible = true;
+            TextPopUp = "Add Services";
         }
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            FormService = SelectedDataItems[0].Adapt<ServiceDto>();
+            if (FormService != null && FormService.ServicedId != null)
+            {
+                SelectedServices = Services.Where(x => FormService.ServicedId.Contains(x.Id));
+            }
+            PopUpVisible = true;
+            TextPopUp = "Edit Services";
+        }
+
+        private void OnCancel()
+        {
+            FormService = new();
+            PopUpVisible = false;
         }
 
         private void DeleteItem_Click()
@@ -156,27 +179,45 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task LoadData()
         {
             PanelVisible = true;
-
+            PopUpVisible = false;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Services = await Mediator.Send(new GetServiceQuery());
+            ServicesK = [.. Services.Where(x => x.IsKiosk == true)];
+            Services.ForEach(x => x.KioskName = string.Join(",", Services.Where(z => x.ServicedId != null && x.ServicedId.Contains(z.Id)).Select(x => x.Name).ToList()));
 
             foreach (var i in Services)
             {
                 if (i.IsKiosk == true && i.IsPatient == false)
                 {
                     i.Flag = "Kiosk";
+                    if (i.KioskName == null || i.KioskName == "")
+                    {
+                        i.KioskName = "-";
+                    }
                 }
                 else if (i.IsKiosk == false && i.IsPatient == true)
                 {
                     i.Flag = "Patient";
+                    if (i.KioskName == null || i.KioskName == "")
+                    {
+                        i.KioskName = "-";
+                    }
                 }
                 else if (i.IsKiosk == true && i.IsPatient == true)
                 {
-                    i.Flag = " Patient And Kiosk";
+                    i.Flag = " Patient, Kiosk";
+                    if (i.KioskName == null || i.KioskName == "")
+                    {
+                        i.KioskName = "-";
+                    }
                 }
                 else
                 {
-                    i.Flag = " ";
+                    i.Flag = "-";
+                    if (i.KioskName == null || i.KioskName == "")
+                    {
+                        i.KioskName = "-";
+                    }
                 }
             }
 

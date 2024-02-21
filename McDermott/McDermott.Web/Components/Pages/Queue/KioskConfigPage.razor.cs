@@ -1,6 +1,8 @@
 ﻿using McDermott.Application.Dtos.Queue;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using System.Security.Policy;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
@@ -146,9 +148,9 @@ namespace McDermott.Web.Components.Pages.Queue
             PopUpVisible = true;
         }
 
-        private void OnRenderTo()
+        private async void OnRenderTo(KioskConfigDto context)
         {
-            int configId = kioskConfigs.Select(x => x.Id).FirstOrDefault();
+            var configId = context.Id;
             NavigationManager.NavigateTo($"/queue/kiosk/{configId}");
         }
 
