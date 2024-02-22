@@ -54,7 +54,7 @@ namespace McDermott.Persistence.Migrations
                 column: "GeneralConsultantServiceId",
                 principalTable: "GeneralConsultanServices",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.NoAction);
         }
     }
 }
