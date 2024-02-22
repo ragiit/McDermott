@@ -109,9 +109,6 @@ namespace McDermott.Web.Components.Pages.Medical
             }
         }
 
-        private List<IBrowserFile> files = new();
-        private int maxFileSize = 1 * 1024 * 1024;
-
         private void RemoveSelectedFile()
         {
             UserForm.SipFile = null;
@@ -119,26 +116,12 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async void SelectFiles(InputFileChangeEventArgs e)
         {
-            files = e.GetMultipleFiles(maxFileSize).ToList();
-
+            int maxFileSize = 1 * 1024 * 1024;
             var allowedExtenstions = new string[] { ".png", ".jpg", ".jpeg", ".gif" };
-            int count = 0;
 
             UserForm.SipFile = e.File.Name;
 
-            await FileUploadService.UploadFileAsync(e.File, maxFileSize, allowedExtenstions);
-
-            //foreach (var file in files)
-            //{
-            //    try
-            //    {
-            //        UserForm.SipFile = file.fil
-            //        //(int statusCode, string statusMessage) = await FileUploadService.UploadFileAsync(file, maxFileSize, allowedExtenstions);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //    }
-            //}
+            await FileUploadService.UploadFileAsync(e.File, maxFileSize, []);
         }
 
         private async Task SelectFile()

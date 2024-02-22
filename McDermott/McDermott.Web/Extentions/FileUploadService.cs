@@ -25,7 +25,7 @@ namespace McDermott.Web.Extentions
             }
 
             var fileExtension = Path.GetExtension(file.Name);
-            if (!allowedExtensions.Contains(fileExtension))
+            if (allowedExtensions.Count() > 0 && !allowedExtensions.Contains(fileExtension))
             {
                 return (0, $"File: {file.Name}, File type not allowed");
             }

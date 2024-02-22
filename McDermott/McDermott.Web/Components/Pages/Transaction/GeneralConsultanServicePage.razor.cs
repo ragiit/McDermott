@@ -1,8 +1,16 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.Build.Framework;
+﻿using McDermott.Domain.Entities;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.CodeAnalysis;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.JSInterop;
 using System.Globalization;
+using System.Reflection;
+using System.Security.Permissions;
+using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
+using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
+using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;
+using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanCPPTCommand;
+using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanMedicalSupportCommand;
 using static McDermott.Application.Features.Queries.Transaction.GeneralConsultanServiceQueryHandler;
 
 namespace McDermott.Web.Components.Pages.Transaction
@@ -23,119 +31,25 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<InsuranceDto> Insurances = [];
         private List<InsuranceDto> AllInsurances = [];
         private List<InsurancePolicyDto> InsurancePolicies = [];
-        private List<ServiceDto> Services = new();
+        private List<ServiceDto> Services = [];
 
-        private IEnumerable<DoctorScheduleDto> SelectedSchedules = [];
-        private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
-        private List<string> Names { get; set; } = new();
+        #region Form Regis
 
-        #endregion Relation Data
+        private GeneralConsultanServiceDto FormRegis = new();
 
-        #region Data Statis
+        #endregion Form Regis
 
-        public class NurseStation
-        {
-            public int Id { get; set; }
-            public string Status { get; set; }
-            public int Count { get; set; }
-        }
+        #region UserInfo
 
-        public IEnumerable<NurseStation> NurseStations { get; set; } = new List<NurseStation>
-        {
-            new NurseStation { Id = 1, Status = "Planned", Count = 10 },
-            new NurseStation { Id = 2, Status = "Confirmed", Count = 5 },
-            new NurseStation { Id = 3, Status = "Waiting", Count = 2 },
-            new NurseStation { Id = 4, Status = "Physician", Count = 1 },
-            new NurseStation { Id = 5, Status = "Finished", Count = 0 },
-        };
-
-        private List<string> Payments = new List<string>
-        {
-            "Personal",
-            "Insurance",
-            "BPJS"
-        };
-
-        private List<string> RegisType = new List<string>
-        {
-            "General Consultation",
-            "Emergency",
-            "MCU"
-        };
-
-        private List<string> Method = new List<string>
-        {
-            "MCU",
-            "Gas And Oil"
-        };
-
-        private int PatientsId = 0;
-
-        private int PractitionerId = 0;
-
-        private int Age = 0;
-        private DateTime? Birthdate { get; set; }
-        private string IdentityNum { get; set; }
-
-        #endregion Data Statis
-
-        #region Grid Setting
-
-        private int ServiceId
-        {
-            get => _ServiceId;
-            set
-            {
-                _ServiceId = value;
-                FormRegis.ServiceId = value;
-                IsPratition = AllDoctors.Where(x => x.DoctorServiceIds.Contains(value)).ToList();
-
-                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
-            }
-        }
-
-        private GeneralConsultanServiceDto FormRegis = new()
-        {
-        };
-
-        private BaseAuthorizationLayout AuthorizationLayout = new();
-        private bool IsAccess { get; set; } = false;
-        private bool PanelVisible { get; set; } = true;
-        private bool showForm { get; set; } = false;
-        private string textPopUp = "";
-        private string Timeee = "";
-        private string DisplayFormat { get; } = string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator) ? "HH:mm" : "h:mm tt";
-        public IGrid Grid { get; set; }
-        private int ActiveTabIndex { get; set; } = 0;
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-        private IReadOnlyList<object> SelectedDataItems2 { get; set; } = new ObservableRangeCollection<object>();
-        private int FocusedRowVisibleIndex { get; set; }
-        private bool EditItemsEnabled { get; set; }
-        private GroupMenuDto UserAccessCRUID = new();
-
-        private List<Temppp> Temppps { get; set; } = new List<Temppp>
-        {
-            new Temppp
-            {
-                Title = "Test",
-                Body = "Test Body"
-            }
-        };
-
-        private class Temppp
-        {
-            public string Title { get; set; }
-            public string Body { get; set; }
-        }
-
-        #endregion Grid Setting
+        private User UserLogin = new();
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
-
             if (firstRender)
             {
+                await LoadUser();
+                StateHasChanged();
+
                 try
                 {
                     var result = await NavigationManager.CheckAccessUser(oLocal);
@@ -146,136 +60,24 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        protected override async Task OnInitializedAsync()
+        private async Task LoadUser()
         {
             try
             {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
+                UserLogin = await oLocal.GetUserInfo();
             }
             catch { }
-            //var by =
-
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
-            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
-
-            await LoadData();
         }
 
-        private int _InsurancePolicyId { get; set; }
-        private int InsuranceId { get; set; }
+        #endregion UserInfo
 
-        private int InsurancePolicyId
-        {
-            get => _InsurancePolicyId;
-            set
-            {
-                _InsurancePolicyId = value;
-            }
-        }
+        private IEnumerable<DoctorScheduleDto> SelectedSchedules = [];
+        private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
+        private List<string> Names { get; set; } = new();
 
-        private void GetInsurancePhysician(int value)
-        {
-            if (string.IsNullOrWhiteSpace(PaymentMethod))
-                return;
+        #endregion Relation Data
 
-            InsurancePolicies.Clear();
-
-            if (PaymentMethod.Equals("BPJS"))
-            {
-                Insurances = AllInsurances.Where(x => InsurancePolicies.Select(z => z.InsuranceId).Contains(x.Id) && x.IsBPJS == true).ToList();
-            }
-            else
-            {
-                Insurances = AllInsurances.Where(x => InsurancePolicies.Select(z => z.InsuranceId).Contains(x.Id) && x.IsBPJS == false).ToList();
-            }
-        }
-
-        private int _ServiceId { get; set; }
-
-        private int _DoctorId { get; set; }
-
-        private int DoctorId
-        {
-            get => _DoctorId;
-            set
-            {
-                FormRegis.PratitionerId = value;
-                _DoctorId = value;
-                SetTimeSchedule(value, RegistrationDate);
-            }
-        }
-
-        private DateTime _RegistrationDate { get; set; } = DateTime.Now;
-
-        private DateTime RegistrationDate
-        {
-            get => _RegistrationDate;
-            set
-            {
-                _RegistrationDate = value;
-                SetTimeSchedule(DoctorId, value);
-            }
-        }
-
-        private List<string> Times = [];
-
-        private async Task GetScheduleTimesUser(int value)
-        {
-            var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == value));
-        }
-
-        private async Task SetTimeSchedule(int patientId, DateTime date)
-        {
-            var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == patientId && x.StartDate.Date == date.Date && x.DoctorSchedule.ServiceId == ServiceId));
-
-            Times.Clear();
-
-            Times.AddRange(slots.Select(x => $"{x.WorkFromFormatString} - {x.WorkToFormatString}"));
-        }
-
-        [System.ComponentModel.DataAnnotations.Required]
-        private string _PaymentMethod { get; set; }
-
-        private string MedicalTypee { get; set; }
-        private List<InsuranceTemp> Temps = [];
-
-        private class InsuranceTemp
-        {
-            public int InsurancePolicyId { get; set; }
-            public int InsuranceId { get; set; }
-            public string InsuranceName { get; set; }
-            public string PolicyNumber { get; set; }
-
-            public string ConcatInsurancePolicy
-            { get { return PolicyNumber + " - " + InsuranceName; } }
-        }
-
-        private List<string> Stagings = new List<string>
-        {
-            "Planned",
-            "Confirmed",
-            "Nurse Station",
-            "Waiting",
-            "Physician",
-            "Finished"
-        };
-
-        private async Task OnClickConfirm()
-        {
-            var index = Stagings.FindIndex(x => x == FormRegis.StagingStatus);
-            if (FormRegis.StagingStatus != "Finished")
-            {
-                FormRegis.StagingStatus = Stagings[index + 1];
-            }
-            await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
-        }
-
-        private void OnCancel2()
-        {
-            ToastService.ShowInfo("TESTTTTTTTTTTTTTTTTTTTTTTTTTTTTtt");
-        }
+        #region Data Statis
 
         private string PaymentMethod
         {
@@ -342,6 +144,510 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
+        private string Code { get; set; } = "";
+        private int _NursingDiagnosis { get; set; }
+
+        private int NursingDiagnosis
+        {
+            get => _NursingDiagnosis;
+            set
+            {
+                FormInputCPPTGeneralConsultan.NursingDiagnosisId = value;
+                _NursingDiagnosis = value;
+
+                FormInputCPPTGeneralConsultan.Code = NursingDiagnoses.FirstOrDefault(x => x.Id == FormInputCPPTGeneralConsultan.NursingDiagnosisId)!.Code!;
+            }
+        }
+
+        public class NurseStation
+        {
+            public int Id { get; set; }
+            public string Status { get; set; }
+            public int Count { get; set; }
+        }
+
+        public IEnumerable<NurseStation> NurseStations { get; set; } = new List<NurseStation>
+        {
+            new() { Id = 1, Status = "Planned", Count = 10 },
+            new() { Id = 2, Status = "Confirmed", Count = 5 },
+            new() { Id = 3, Status = "Waiting", Count = 2 },
+            new() { Id = 4, Status = "Physician", Count = 1 },
+            new() { Id = 5, Status = "Finished", Count = 0 },
+        };
+
+        private List<string> Payments = new List<string>
+        {
+            "Personal",
+            "Insurance",
+            "BPJS"
+        };
+
+        private List<string> RegisType = new List<string>
+        {
+            "General Consultation",
+            "Emergency",
+            "MCU"
+        };
+
+        private List<string> Method = new List<string>
+        {
+            "MCU",
+            "Gas And Oil"
+        };
+
+        private int PatientsId = 0;
+
+        private int PractitionerId = 0;
+
+        private int Age = 0;
+        private DateTime? Birthdate { get; set; }
+        private string IdentityNum { get; set; }
+        private string _PaymentMethod { get; set; }
+
+        private string MedicalTypee { get; set; }
+        private List<InsuranceTemp> Temps = [];
+
+        private class InsuranceTemp
+        {
+            public int InsurancePolicyId { get; set; }
+            public int InsuranceId { get; set; }
+            public string InsuranceName { get; set; }
+            public string PolicyNumber { get; set; }
+
+            public string ConcatInsurancePolicy
+            { get { return PolicyNumber + " - " + InsuranceName; } }
+        }
+
+        private List<string> Stagings = new List<string>
+        {
+            "Planned",
+            "Confirmed",
+            "Nurse Station",
+            "Waiting",
+            "Physician",
+            "Finished"
+        }; private int _InsurancePolicyId { get; set; }
+
+        private int InsuranceId { get; set; }
+
+        private int InsurancePolicyId
+        {
+            get => _InsurancePolicyId;
+            set
+            {
+                _InsurancePolicyId = value;
+            }
+        }
+
+        private int _ServiceId { get; set; }
+
+        private int _DoctorId { get; set; }
+
+        private int DoctorId
+        {
+            get => _DoctorId;
+            set
+            {
+                FormRegis.PratitionerId = value;
+                _DoctorId = value;
+                SetTimeSchedule(value, RegistrationDate);
+            }
+        }
+
+        private DateTime _RegistrationDate { get; set; } = DateTime.Now;
+
+        private DateTime RegistrationDate
+        {
+            get => _RegistrationDate;
+            set
+            {
+                FormRegis.RegistrationDate = value;
+                _RegistrationDate = value;
+                SetTimeSchedule(DoctorId, value);
+            }
+        }
+
+        private List<string> Times = [];
+
+        #endregion Data Statis
+
+        #region Grid Setting
+
+        private int ServiceId
+        {
+            get => _ServiceId;
+            set
+            {
+                _ServiceId = value;
+                FormRegis.ServiceId = value;
+                IsPratition = AllDoctors.Where(x => x.DoctorServiceIds.Contains(value)).ToList();
+
+                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
+            }
+        }
+
+        private BaseAuthorizationLayout AuthorizationLayout = new();
+        private bool IsAccess { get; set; } = false;
+        private bool PanelVisible { get; set; } = true;
+        private bool showForm { get; set; } = false;
+        private string textPopUp = "";
+        private string Timeee = "";
+        private string DisplayFormat { get; } = string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator) ? "HH:mm" : "h:mm tt";
+        public IGrid Grid { get; set; }
+        private int ActiveTabIndex { get; set; } = 0;
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedDataItems2 { get; set; } = new ObservableRangeCollection<object>();
+        private int FocusedRowVisibleIndex { get; set; }
+        private bool EditItemsEnabled { get; set; }
+        private GroupMenuDto UserAccessCRUID = new();
+
+        private List<Temppp> Temppps { get; set; } = new List<Temppp>
+        {
+            new Temppp
+            {
+                Title = "Test",
+                Body = "Test Body"
+            }
+        };
+
+        private class Temppp
+        {
+            public string Title { get; set; }
+            public string Body { get; set; }
+        }
+
+        #endregion Grid Setting
+
+        #region File Upload Attachment
+
+        private async Task ExportXlsxItem_Click()
+        {
+            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+        }
+
+        private async Task ExportXlsItem_Click()
+        {
+            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+        }
+
+        private async Task ExportCsvItem_Click()
+        {
+            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
+            {
+                ExportSelectedRowsOnly = true,
+            });
+        }
+
+        //private void RemoveSelectedFile()
+        //{
+        //    UserForm.SipFile = null;
+        //}
+
+        //private async void SelectFiles(InputFileChangeEventArgs e)
+        //{
+        //    int maxFileSize = 1 * 1024 * 1024;
+        //    var allowedExtenstions = new string[] { ".png", ".jpg", ".jpeg", ".gif" };
+
+        //    UserForm.SipFile = e.File.Name;
+
+        //    await FileUploadService.UploadFileAsync(e.File, maxFileSize, []);
+        //}
+
+        #endregion File Upload Attachment
+
+        #region Tab CPPT
+
+        private IGrid GridTabCPPT { get; set; }
+        private int FocusedGridTabCPPTRowVisibleIndex { get; set; }
+        private IReadOnlyList<object> SelectedDataItemsCPPT { get; set; } = new ObservableRangeCollection<object>();
+
+        private InputCPPTGeneralConsultanCPPT FormInputCPPTGeneralConsultan = new();
+        private GeneralConsultanCPPTDto GeneralConsultanCPPT = new();
+
+        private List<NursingDiagnosesDto> NursingDiagnoses = [];
+        private List<DiagnosisDto> Diagnoses = [];
+        private List<DiseaseCategoryDto> DiseaseCategories = [];
+        private List<GeneralConsultanCPPTDto> GeneralConsultanCPPTs = [];
+
+        private class InputCPPTGeneralConsultanCPPT
+        {
+            public string? Subjective { get; set; }
+            public string? Objective { get; set; }
+            public int NursingDiagnosisId { get; set; }
+            public string? Code { get; set; }
+            public int? DiseasesId { get; set; }
+            public int? DiseasesCategoryId { get; set; }
+            public string? Plan { get; set; }
+            public DateTime Date { get; set; } = DateTime.Now;
+        }
+
+        private async Task OnSaveTabCPPTConfirm()
+        {
+        }
+
+        private void OnDeleteTabCPPTConfirm(GridDataItemDeletingEventArgs e)
+        {
+            GeneralConsultanCPPTs.Remove((GeneralConsultanCPPTDto)e.DataItem);
+            GridTabCPPT.Reload();
+        }
+
+        private void OnClickConfirmCPPT()
+        {
+            var temps = new List<GeneralConsultanCPPTDto>();
+            temps.Add(new GeneralConsultanCPPTDto
+            {
+                Id = new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second,
+                Title = UserLogin.Name,
+            });
+            temps.Add(new GeneralConsultanCPPTDto
+            {
+                Id = new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second,
+                Title = "Date and Time",
+                Body = DateTime.Now.ToString("dd-MMM-yyy HH:mm:tt")
+            });
+
+            foreach (var key in GetPropertyNames(new InputCPPTGeneralConsultanCPPT()))
+            {
+                if (key == "Date")
+                    continue;
+
+                PropertyInfo property = typeof(InputCPPTGeneralConsultanCPPT).GetProperty(key);
+                object? value = property?.GetValue(FormInputCPPTGeneralConsultan);
+
+                if (value != null)
+                {
+                    temps.Add(new GeneralConsultanCPPTDto
+                    {
+                        Id = new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second,
+                        Title = key,
+                        Body = value is null ? "" : value.ToString(), // Ubah ke string sesuai kebutuhan
+                    });
+                }
+            }
+
+            GeneralConsultanCPPTs.AddRange(temps);
+            GridTabCPPT.Reload();
+            OnClickCancelConfirmCPPT();
+        }
+
+        private void GridTabCPPT_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedGridTabCPPTRowVisibleIndex = args.VisibleIndex;
+        }
+
+        public static List<string> GetPropertyNames<T>(T obj)
+        {
+            List<string> propertyNames = new List<string>();
+            Type type = typeof(T);
+
+            foreach (PropertyInfo prop in type.GetProperties())
+            {
+                propertyNames.Add(prop.Name);
+            }
+
+            return propertyNames;
+        }
+
+        private void OnClickCancelConfirmCPPT()
+        {
+            //NursingDiagnosis = 0;
+            FormInputCPPTGeneralConsultan = new InputCPPTGeneralConsultanCPPT();
+        }
+
+        #endregion Tab CPPT
+
+        #region Tab Medical Support
+
+        private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport = new();
+        private List<IBrowserFile> BrowserFiles = [];
+
+        #region FileAttachmentLab
+
+        private void RemoveSelectedFileLab()
+        {
+            GeneralConsultanMedicalSupport.LabEximinationAttachment = null;
+        }
+
+        private async void SelectFilesLab(InputFileChangeEventArgs e)
+        {
+            BrowserFiles.Add(e.File);
+
+            GeneralConsultanMedicalSupport.LabEximinationAttachment = e.File.Name;
+
+            //await FileUploadService.UploadFileAsync(e.File, 1 * 1024 * 1024, []);
+        }
+
+        private async Task SelectFileLab()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "labFile");
+        }
+
+        private async Task DownloadSIPFileLab()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "labFile");
+        }
+
+        #endregion FileAttachmentLab
+
+        #region FileAttachmentRadiology
+
+        private void RemoveSelectedFileRadiology()
+        {
+            GeneralConsultanMedicalSupport.RadiologyEximinationAttachment = null;
+        }
+
+        private async void SelectFilesRadiology(InputFileChangeEventArgs e)
+        {
+            BrowserFiles.Add(e.File);
+
+            GeneralConsultanMedicalSupport.RadiologyEximinationAttachment = e.File.Name;
+
+            //await FileUploadService.UploadFileAsync(e.File, 1 * 1024 * 1024, []);
+        }
+
+        private async Task SelectFileRadiology()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "radiologyFile");
+        }
+
+        private async Task DownloadSIPFileRadiology()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "radiologyFile");
+        }
+
+        #endregion FileAttachmentRadiology
+
+        #region FileAttachmentAlcohol
+
+        private void RemoveSelectedFileAlcohol()
+        {
+            GeneralConsultanMedicalSupport.AlcoholEximinationAttachment = null;
+        }
+
+        private async void SelectFilesAlcohol(InputFileChangeEventArgs e)
+        {
+            BrowserFiles.Add(e.File);
+
+            GeneralConsultanMedicalSupport.AlcoholEximinationAttachment = e.File.Name;
+
+            //await FileUploadService.UploadFileAsync(e.File, 1 * 1024 * 1024, []);
+        }
+
+        private async Task SelectFileAlcohol()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "alcoholFile");
+        }
+
+        private async Task DownloadSIPFileAlcohol()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "alcoholFile");
+        }
+
+        #endregion FileAttachmentAlcohol
+
+        #region FileAttachmentDrug
+
+        private void RemoveSelectedFileDrug()
+        {
+            GeneralConsultanMedicalSupport.DrugEximinationAttachment = null;
+        }
+
+        private async void SelectFilesDrug(InputFileChangeEventArgs e)
+        {
+            BrowserFiles.Add(e.File);
+
+            GeneralConsultanMedicalSupport.DrugEximinationAttachment = e.File.Name;
+
+            ToastService.ShowInfo(BrowserFiles.Count().ToString());
+
+            //await FileUploadService.UploadFileAsync(e.File, 1 * 1024 * 1024, []);
+        }
+
+        private async Task SelectFileDrug()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "drugFile");
+        }
+
+        private async Task DownloadSIPFileDrug()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "drugFile");
+        }
+
+        #endregion FileAttachmentDrug
+
+        #endregion Tab Medical Support
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                var result = await NavigationManager.CheckAccessUser(oLocal);
+                IsAccess = result.Item1;
+                UserAccessCRUID = result.Item2;
+            }
+            catch { }
+            //var by =
+
+            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
+            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
+            NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
+            Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
+            DiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
+            await LoadData();
+        }
+
+        private void GetInsurancePhysician(int value)
+        {
+            if (string.IsNullOrWhiteSpace(PaymentMethod))
+                return;
+
+            InsurancePolicies.Clear();
+
+            if (PaymentMethod.Equals("BPJS"))
+            {
+                Insurances = AllInsurances.Where(x => InsurancePolicies.Select(z => z.InsuranceId).Contains(x.Id) && x.IsBPJS == true).ToList();
+            }
+            else
+            {
+                Insurances = AllInsurances.Where(x => InsurancePolicies.Select(z => z.InsuranceId).Contains(x.Id) && x.IsBPJS == false).ToList();
+            }
+        }
+
+        private async Task GetScheduleTimesUser(int value)
+        {
+            var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == value));
+        }
+
+        private async Task SetTimeSchedule(int patientId, DateTime date)
+        {
+            var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == patientId && x.StartDate.Date == date.Date && x.DoctorSchedule.ServiceId == ServiceId));
+
+            Times.Clear();
+
+            Times.AddRange(slots.Select(x => $"{x.WorkFromFormatString} - {x.WorkToFormatString}"));
+        }
+
+        private async Task OnClickConfirm()
+        {
+            var index = Stagings.FindIndex(x => x == FormRegis.StagingStatus);
+            if (FormRegis.StagingStatus != "Finished")
+            {
+                FormRegis.StagingStatus = Stagings[index + 1];
+            }
+            await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+        }
+
+        private void OnCancel2()
+        {
+            ToastService.ShowInfo("TESTTTTTTTTTTTTTTTTTTTTTTTTTTTTtt");
+        }
+
         private void SelectedService(DoctorScheduleDto docter)
         {
             //var selectedServices = DoctorScheduleDto
@@ -393,17 +699,32 @@ namespace McDermott.Web.Components.Pages.Transaction
                     var result = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
                     GeneralConsultantClinical.GeneralConsultantServiceId = result.Id;
                     await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                    await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                    await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                    await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
                 }
                 else
                 {
                     await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
                     GeneralConsultantClinical.GeneralConsultantServiceId = FormRegis.Id;
                     await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                    await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                    await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                    await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                    await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(ids: GeneralConsultanCPPTs.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
                 }
 
                 FormRegis = new GeneralConsultanServiceDto();
                 GeneralConsultantClinical = new();
                 showForm = false;
+
+                BrowserFiles.Distinct();
+
+                foreach (var item in BrowserFiles)
+                {
+                    await FileUploadService.UploadFileAsync(item, 1 * 1024 * 1024, []);
+                }
 
                 await LoadData();
 
@@ -455,7 +776,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
-            FocusedRowVisibleIndex = args.VisibleIndex;
+            FocusedGridTabCPPTRowVisibleIndex = args.VisibleIndex;
             UpdateEditItemsEnabled(true);
         }
 
@@ -508,30 +829,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
         }
 
         private void OnCancel()
