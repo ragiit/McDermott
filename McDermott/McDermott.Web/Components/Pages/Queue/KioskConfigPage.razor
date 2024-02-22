@@ -1,4 +1,4 @@
-﻿@page "/queue/kiosk-config"
+﻿@page "/queue/configuration-kiosk"
 @rendermode InteractiveServer
 
 <PageTitle>McDermott - Queue Kiosk Config</PageTitle>
@@ -72,7 +72,8 @@
                                             <DxGridDataColumn FieldName="ServiceName" Caption="Sercive " />
                                             <DxGridDataColumn Caption="Action ">
                                                 <CellDisplayTemplate>
-                                                    <DxButton RenderStyle="@ButtonRenderStyle.Success" IconCssClass="fa-solid fa-play mr-1" Text="Play" Click="OnRenderTo"></DxButton>
+                                                    
+                                                    <DxButton RenderStyle="@ButtonRenderStyle.Success" IconCssClass="fa-solid fa-play mr-1" Text="Play" @onclick="() => OnRenderTo((KioskConfigDto)context.DataItem)"></DxButton>
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
 

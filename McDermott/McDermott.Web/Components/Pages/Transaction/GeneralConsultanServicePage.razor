@@ -187,7 +187,8 @@
                                                     <DxFormLayoutItem Caption="Service" ColSpanMd="12">
                                                         <DxComboBox ShowValidationIcon="true" Data="@Services"
                                                                     NullText="Service.."
-                                                                    @bind-Value="@ServiceId" TextFieldName="Name" ValueFieldName="Id"></DxComboBox ShowValidationIcon="true">
+                                                                    @bind-Value="@ServiceId" TextFieldName="Name" ValueFieldName="Id">
+                                                                </DxComboBox ShowValidationIcon="true">
                                                                         <ValidationMessage For="@(() => ServiceId)" />
 
                                                     </DxFormLayoutItem>

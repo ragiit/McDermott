@@ -274,7 +274,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private void OnCancel2()
         {
-            ToastService.ShowSuccess("TESTTTTTTTTTTTTTTTTTTTTTTTTTTTTtt");
+            ToastService.ShowInfo("TESTTTTTTTTTTTTTTTTTTTTTTTTTTTTtt");
         }
 
         private string PaymentMethod

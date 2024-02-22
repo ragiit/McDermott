@@ -17,6 +17,7 @@ namespace McDermott.Application.Features.Queries.Medical
             public async Task<List<ServiceDto>> Handle(GetServiceQuery query, CancellationToken cancellationToken)
             {
                 return await _unitOfWork.Repository<Service>().Entities
+                        //.Include(x => x.Serviced)
                         .Select(Service => Service.Adapt<ServiceDto>())
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);

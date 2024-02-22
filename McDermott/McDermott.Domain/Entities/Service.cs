@@ -17,5 +17,7 @@ namespace McDermott.Domain.Entities
         public string Quota { get; set; } = string.Empty;
         public bool IsPatient {  get; set; }
         public bool IsKiosk { get; set; }
+        public List<int>? ServicedId { get; set; }
+        //public virtual Service? Serviced { get; set; }
     }
 }

@@ -1,6 +1,11 @@
-﻿using McDermott.Domain.Entities;
+﻿using McDermott.Application.Dtos.Queue;
+using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NuGet.Packaging;
+using System.Collections.Generic;
 using System.Linq;
+using static Azure.Core.HttpHeader;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
@@ -10,11 +15,13 @@ namespace McDermott.Web.Components.Pages.Queue
         #region Relation Data
 
         public List<KioskDto> Kiosks = new();
+        public List<KioskConfigDto> KioskConf = new();
         public List<ServiceDto> Services = new();
+        public List<ServiceDto> serv = new List<ServiceDto>();
+        public List<UserDto> Phys = new();
+        public ServiceDto servs = new();
         public List<UserDto> Patients = new();
         public List<UserDto> Physician = new();
-        public List<DoctorScheduleDto> Physicians = [];
-        public List<DoctorScheduleDto> DoctorSchedules = new();
 
         #endregion Relation Data
 
@@ -25,7 +32,9 @@ namespace McDermott.Web.Components.Pages.Queue
         private bool PanelVisible { get; set; } = true;
 
         private bool showForm { get; set; } = false;
+        private bool showPhysician { get; set; } = false;
         private string textPopUp = "";
+        private string HeaderName { get; set; } = string.Empty;
         public IGrid Grid { get; set; }
         private int ActiveTabIndex { get; set; } = 1;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
@@ -49,28 +58,32 @@ namespace McDermott.Web.Components.Pages.Queue
         };
 
         private string? NamePatient { get; set; } = string.Empty;
+        private int? CountServiceId { get; set; }
 
         private KioskDto FormKios = new();
-        private int ServicedId = 0;
-        private List<string> Names { get; set; } = new List<string>();
+        private int _ServiceId { get; set; }
+        private string Bpjs { get; set; } = string.Empty;
+        private IEnumerable<ServiceDto> SelectedServices = [];
         private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
-        private string PhysicionName { get; set; }
-
-        private int Serviced
-        {
-            get => ServicedId;
-            set
-            {
-                int ServicedId = value; InvokeAsync(StateHasChanged);
-                this.ServicedId = value;
-
-                Names.Clear();
-            }
-        }
 
         #endregion Data Static And Variable Additional
 
         #region Async Data And Auth
+
+        private int ServiceId
+        {
+            get => _ServiceId;
+            set
+            {
+                _ServiceId = value;
+                FormKios.ServiceId = value;
+                Phys = Physician.Where(x => x.DoctorServiceIds.Contains(value)).ToList();
+
+                showPhysician = true;
+
+                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
+            }
+        }
 
         //protected override async Task OnAfterRenderAsync(bool firstRender)
         //{
@@ -101,6 +114,11 @@ namespace McDermott.Web.Components.Pages.Queue
 
             Kiosks = await Mediator.Send(new GetKioskQuery());
             await LoadData();
+            foreach (var i in KioskConf)
+            {
+                HeaderName = i.Name;
+                break;
+            }
         }
 
         private async Task LoadData()
@@ -111,8 +129,8 @@ namespace McDermott.Web.Components.Pages.Queue
             SelectedDataItems = new ObservableRangeCollection<object>();
             Kiosks = await Mediator.Send(new GetKioskQuery());
             Services = await Mediator.Send(new GetServiceQuery());
-
-            DoctorSchedules = await Mediator.Send(new GetDoctorScheduleQuery());
+            var kconfig = await Mediator.Send(new GetKioskConfigQuery());
+            KioskConf = kconfig.Where(x => x.Id == id).ToList();
             PanelVisible = false;
         }
 
@@ -222,21 +240,39 @@ namespace McDermott.Web.Components.Pages.Queue
             var types = FormKios.Type;
             var InputSearch = FormKios.NumberType;
             Patients = await Mediator.Send(new GetDataUserForKioskQuery(types, InputSearch));
+
             if (Patients != null)
             {
                 showForm = true;
                 NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
                 FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
-                var kconfig = await Mediator.Send(new GetKioskConfigQuery());
-                kconfig = kconfig.Where(x => x.Id == id).ToList();
-                foreach (var item in kconfig)
+                FormKios.BPJS = Patients.Select(x => x.NoBpjsKs).FirstOrDefault();
+                if (FormKios.BPJS != null)
                 {
-                    var n = item.ServiceIds;
-                    foreach (var i in n)
+                    FormKios.StageBpjs = true;
+                }
+
+                foreach (var kiosk in KioskConf)
+                {
+                    var serviceIds = kiosk.ServiceIds;
+                    CountServiceId = KioskConf.SelectMany(k => k.ServiceIds).Count();
+
+                    if (CountServiceId > 1)
                     {
-                        var serv = Services.Where(x => x.Id == i).ToList();
-                        var serId = serv.Select(x => x.Name).ToList();
-                        Names.AddRange(serId);
+                        serv.AddRange(Services.Where(service => serviceIds.Contains(service.Id)));
+                    }
+                    else
+                    {
+                        FormKios.ServiceId = Services.FirstOrDefault(service => serviceIds.Contains(service.Id))?.Id;
+                        var serviceId = FormKios.ServiceId;
+
+                        var matchingPhysicians = Physician.Where(phy => phy.DoctorServiceIds.Contains((int)serviceId));
+
+                        if (matchingPhysicians.Any())
+                        {
+                            showPhysician = true;
+                            Phys.AddRange(matchingPhysicians.Where(phy => phy.IsDoctor == true));
+                        }
                     }
                 }
             }
