@@ -72,7 +72,9 @@ namespace McDermott.Web.Components.Pages.Medical
 
             if (FormService.Id == 0)
             {
-                await Mediator.Send(new CreateServiceRequest(FormService));
+                
+                    await Mediator.Send(new CreateServiceRequest(FormService));
+                
             }
             else
             {
