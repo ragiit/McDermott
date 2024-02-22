@@ -7,9 +7,8 @@ namespace McDermott.Web.Components.Pages.Medical
     public partial class ServicePage
     {
         public List<ServiceDto> Services = [];
-        public List<ServiceDto> ServicesK = [];
+        public List<ServiceDto> ServicesK = new();
         public ServiceDto FormService = new();
-        private IEnumerable<ServiceDto> SelectedServices { get; set; } = [];
 
         #region Default Grid
 
@@ -22,6 +21,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private GroupMenuDto UserAccessCRUID = new();
         private bool IsAccess = false;
+        private string KioskName { get; set; } = String.Empty;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -72,13 +72,10 @@ namespace McDermott.Web.Components.Pages.Medical
 
             if (FormService.Id == 0)
             {
-                var a = SelectedServices.Select(x => x.Id).ToList();
-                FormService.ServicedId?.AddRange(a);
                 await Mediator.Send(new CreateServiceRequest(FormService));
             }
             else
             {
-                FormService.ServicedId = SelectedServices.Select(x => x.Id).ToList();
                 await Mediator.Send(new UpdateServiceRequest(FormService));
             }
             await LoadData();
@@ -112,10 +109,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task EditItem_Click()
         {
             FormService = SelectedDataItems[0].Adapt<ServiceDto>();
-            if (FormService != null && FormService.ServicedId != null)
-            {
-                SelectedServices = Services.Where(x => FormService.ServicedId.Contains(x.Id));
-            }
+
             PopUpVisible = true;
             TextPopUp = "Edit Services";
         }
@@ -182,15 +176,18 @@ namespace McDermott.Web.Components.Pages.Medical
             PopUpVisible = false;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Services = await Mediator.Send(new GetServiceQuery());
-            ServicesK = [.. Services.Where(x => x.IsKiosk == true)];
-            Services.ForEach(x => x.KioskName = string.Join(",", Services.Where(z => x.ServicedId != null && x.ServicedId.Contains(z.Id)).Select(x => x.Name).ToList()));
+            ServicesK = [.. Services.Where(x => x.IsKiosk == true).ToList()];
 
             foreach (var i in Services)
             {
                 if (i.IsKiosk == true && i.IsPatient == false)
                 {
                     i.Flag = "Kiosk";
-                    if (i.KioskName == null || i.KioskName == "")
+                    if (i.ServicedId != null && i.ServicedId != 0)
+                    {
+                        i.KioskName = Services.Where(x => x.Id == i.ServicedId).Select(z => z.Name).FirstOrDefault();
+                    }
+                    else
                     {
                         i.KioskName = "-";
                     }
@@ -198,7 +195,11 @@ namespace McDermott.Web.Components.Pages.Medical
                 else if (i.IsKiosk == false && i.IsPatient == true)
                 {
                     i.Flag = "Patient";
-                    if (i.KioskName == null || i.KioskName == "")
+                    if (i.ServicedId != null && i.ServicedId != 0)
+                    {
+                        i.KioskName = Services.Where(x => x.Id == i.ServicedId).Select(z => z.Name).FirstOrDefault();
+                    }
+                    else
                     {
                         i.KioskName = "-";
                     }
@@ -206,7 +207,11 @@ namespace McDermott.Web.Components.Pages.Medical
                 else if (i.IsKiosk == true && i.IsPatient == true)
                 {
                     i.Flag = " Patient, Kiosk";
-                    if (i.KioskName == null || i.KioskName == "")
+                    if (i.ServicedId != null && i.ServicedId != 0)
+                    {
+                        i.KioskName = Services.Where(x => x.Id == i.ServicedId).Select(z => z.Name).FirstOrDefault();
+                    }
+                    else
                     {
                         i.KioskName = "-";
                     }
@@ -214,10 +219,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 else
                 {
                     i.Flag = "-";
-                    if (i.KioskName == null || i.KioskName == "")
-                    {
-                        i.KioskName = "-";
-                    }
+                    i.KioskName = "-";
                 }
             }
 

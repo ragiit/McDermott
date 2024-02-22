@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using McDermott.Application.Dtos.Transaction;
-using static McDermott.Application.Features.Commands.Transaction.KioskCommand;
+using static McDermott.Application.Features.Commands.Queue.KioskCommand;
 
-namespace McDermott.Application.Features.Queries.Transaction
+namespace McDermott.Application.Features.Queries.Queue
 {
     public class KioskQueryHandler
     {
@@ -25,7 +25,6 @@ namespace McDermott.Application.Features.Queries.Transaction
                         .Include(x => x.Patient)
                         .Include(x => x.Service)
                         .Include(x => x.Physician)
-                        .Include(x=>x.Counter)
                         .AsNoTracking()
                         .Select(Kiosk => Kiosk.Adapt<KioskDto>())
                         .AsNoTracking()

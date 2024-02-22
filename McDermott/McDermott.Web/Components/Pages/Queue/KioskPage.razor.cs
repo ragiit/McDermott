@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using static Azure.Core.HttpHeader;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
+using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
 {
@@ -15,6 +16,7 @@ namespace McDermott.Web.Components.Pages.Queue
         #region Relation Data
 
         public List<KioskDto> Kiosks = new();
+        public List<KioskQueueDto> KioskQueues = new();
         public List<KioskConfigDto> KioskConf = new();
         public List<ServiceDto> Services = new();
         public List<ServiceDto> serv = new List<ServiceDto>();
@@ -61,6 +63,8 @@ namespace McDermott.Web.Components.Pages.Queue
         private int? CountServiceId { get; set; }
 
         private KioskDto FormKios = new();
+        private KioskQueueDto FormQueue = new();
+        private bool showQueue { get; set; } = false;
         private int _ServiceId { get; set; }
         private string Bpjs { get; set; } = string.Empty;
         private IEnumerable<ServiceDto> SelectedServices = [];
@@ -314,9 +318,33 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 var edit = FormKios;
                 if (FormKios.Id == 0)
-                    await Mediator.Send(new CreateKioskRequest(FormKios));
+                {
+                    // Mendapatkan ID dari hasil CreateKioskRequest
+                    var checkId = await Mediator.Send(new CreateKioskRequest(FormKios));
+
+                    // Mendapatkan antrian kiosk
+                    var kioskQueues = await Mediator.Send(new GetKioskQueueQuery());
+                    var todayQueues = kioskQueues
+                        .Where(x => x.ServiceId == checkId.ServiceId && x.CreatedDate?.Date == DateTime.Now.Date)
+                        .ToList();
+
+                    // Menentukan nomor antrian
+                    FormQueue.NoQueue = todayQueues.Count == 0
+                        ? 1
+                        : todayQueues.Max(x => x.NoQueue) + 1;
+
+                    // Mengisi informasi antrian
+                    FormQueue.KioskId = checkId.Id;
+                    FormQueue.ServiceId = checkId.ServiceId;
+
+                    // Membuat KioskQueue baru
+                    await Mediator.Send(new CreateKioskQueueRequest(FormQueue));
+                    showQueue = true;
+                }
                 else
+                {
                     await Mediator.Send(new UpdateKioskRequest(FormKios));
+                }
 
                 FormKios = new();
                 await LoadData();

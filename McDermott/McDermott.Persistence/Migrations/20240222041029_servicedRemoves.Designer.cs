@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240222041029_servicedRemoves")]
+    partial class servicedRemoves
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1420,6 +1423,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("BPJS")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("CounterId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1433,6 +1439,9 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("PhysicianId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Queue")
                         .HasColumnType("int");
 
                     b.Property<int?>("ServiceId")
@@ -1451,6 +1460,8 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CounterId");
 
                     b.HasIndex("PatientId");
 
@@ -1493,7 +1504,7 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("KioskConfigs");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.KioskQueue", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.KioskDepartement", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1508,13 +1519,10 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("KioskId")
+                    b.Property<int?>("ServiceKId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("NoQueue")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ServiceId")
+                    b.Property<int?>("ServicePId")
                         .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
@@ -1525,11 +1533,11 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("KioskId");
+                    b.HasIndex("ServiceKId");
 
-                    b.HasIndex("ServiceId");
+                    b.HasIndex("ServicePId");
 
-                    b.ToTable("KioskQueues");
+                    b.ToTable("KioskDepartements");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Location", b =>
@@ -1922,9 +1930,6 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ServicedId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1932,8 +1937,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ServicedId");
 
                     b.ToTable("Services");
                 });
@@ -2599,6 +2602,11 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.Kiosk", b =>
                 {
+                    b.HasOne("McDermott.Domain.Entities.Counter", "Counter")
+                        .WithMany()
+                        .HasForeignKey("CounterId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("McDermott.Domain.Entities.User", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
@@ -2614,6 +2622,8 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.Navigation("Counter");
+
                     b.Navigation("Patient");
 
                     b.Navigation("Physician");
@@ -2621,21 +2631,21 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Service");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.KioskQueue", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.KioskDepartement", b =>
                 {
-                    b.HasOne("McDermott.Domain.Entities.Kiosk", "Kiosk")
+                    b.HasOne("McDermott.Domain.Entities.Service", "ServiceK")
                         .WithMany()
-                        .HasForeignKey("KioskId")
+                        .HasForeignKey("ServiceKId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.Service", "Service")
+                    b.HasOne("McDermott.Domain.Entities.Service", "ServiceP")
                         .WithMany()
-                        .HasForeignKey("ServiceId")
+                        .HasForeignKey("ServicePId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Kiosk");
+                    b.Navigation("ServiceK");
 
-                    b.Navigation("Service");
+                    b.Navigation("ServiceP");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.PatientAllergy", b =>
@@ -2684,16 +2694,6 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.Service", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.Service", "Serviced")
-                        .WithMany()
-                        .HasForeignKey("ServicedId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Serviced");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.User", b =>

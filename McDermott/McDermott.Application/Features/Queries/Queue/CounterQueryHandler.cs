@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.Transaction.CounterCommand;
 
-namespace McDermott.Application.Features.Queries.Transaction
+namespace McDermott.Application.Features.Queries.Queue
 {
     public class CounterQueryHandler
     {
@@ -21,7 +21,7 @@ namespace McDermott.Application.Features.Queries.Transaction
 
             public async Task<List<CounterDto>> Handle(GetCounterQuery query, CancellationToken cancellationToken)
             {
-                return await _unitOfWork.Repository<Counter>().Entities                       
+                return await _unitOfWork.Repository<Counter>().Entities
                         .AsNoTracking()
                         .Select(Counter => Counter.Adapt<CounterDto>())
                         .AsNoTracking()

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using McDermott.Application.Dtos.Transaction;
 
-namespace McDermott.Application.Features.Commands.Transaction
+namespace McDermott.Application.Features.Commands.Queue
 {
     public class KioskCommand
     {
