@@ -23,7 +23,7 @@ namespace McDermott.Application.Dtos.Medical
         public bool IsKiosk { get; set; } = false;
         public string Flag { get; set; } = string.Empty;
         public string KioskName {  get; set; } = string.Empty;
-        public int ServicedId { get; set; } 
+        public int? ServicedId { get; set; } 
         public virtual ServiceDto? Service { get; set; }
     }
 }
