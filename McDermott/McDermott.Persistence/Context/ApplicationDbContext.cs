@@ -17,9 +17,8 @@ namespace McDermott.Persistence.Context
 
         #region DbSet
 
-        //Configure
+        #region Config 
         public DbSet<City> Cities { get; set; }
-
         public DbSet<Country> Countries { get; set; }
         public DbSet<District> Districts { get; set; }
         public DbSet<Gender> Genders { get; set; }
@@ -39,10 +38,11 @@ namespace McDermott.Persistence.Context
         public DbSet<EmailSetting> EmailSettings { get; set; }
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
 
-        //Medical
+        #endregion
+
+        #region Medical
         public DbSet<DiseaseCategory> DiseaseCategories { get; set; }
         public DbSet<NursingDiagnoses> NursingDiagnoses { get; set; }
-
         public DbSet<Procedure> Procedures { get; set; }
         public DbSet<CronisCategory> CronisCategories { get; set; }
         public DbSet<Diagnosis> Diagnoses { get; set; }
@@ -52,31 +52,33 @@ namespace McDermott.Persistence.Context
         public DbSet<Insurance> Insurances { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<BuildingLocation> BuildingLocations { get; set; }
+        #endregion
 
-        //Patiente
+        #region Patiente
         public DbSet<Family> Families { get; set; }
         public DbSet<InsurancePolicy> InsurancePolicies { get; set; }
         public DbSet<PatientFamilyRelation> PatientFamilyRelations { get; set; }
         public DbSet<PatientAllergy> PatientAllergies { get; set; }
-
         public DbSet<DoctorSchedule> DoctorSchedules { get; set; }
         public DbSet<DoctorScheduleDetail> DoctorScheduleDetails { get; set; }
         public DbSet<DoctorScheduleSlot> DoctorScheduleSlots { get; set; }
+        #endregion
 
-        //Transaction
+        #region Transaction
         public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
         public DbSet<GeneralConsultantClinicalAssesment> GeneralConsultantClinicalAssesments { get; set; }
-       
+        #endregion
 
-        //Queue
+        #region Queue
         public DbSet<KioskConfig> KioskConfigs { get; set; }
         public DbSet<KioskQueue> KioskQueues  { get; set; }
         public DbSet<Kiosk> Kiosks { get; set; }
         public DbSet<Counter> Counters { get; set; }
 
         #endregion DbSet
+        #endregion
 
-        #region MyRegion
+        #region OnModelCreating
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -87,7 +89,7 @@ namespace McDermott.Persistence.Context
             {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
-             
+
             //modelBuilder.Entity<EmailTemplate>()
             //  .HasMany(m => m.ToPartner)
             //  .OnDelete(DeleteBehavior.Cascade);

@@ -401,7 +401,7 @@ private void EditItem_Click()
 ========================== END ==========================
 
 ========================== Command Handler ==========================
-  #region Get
+#region Get
 
 public class GetInsurancePolicyQuery(Expression<Func<InsurancePolicy, bool>>? predicate = null) : IRequest<List<InsurancePolicyDto>>
 {
@@ -417,9 +417,9 @@ public class CreateInsurancePolicyRequest(InsurancePolicyDto InsurancePolicyDto)
     public InsurancePolicyDto InsurancePolicyDto { get; set; } = InsurancePolicyDto;
 }
 
-public class CreateListCountryRequest(List<CountryDto> CountryDtos) : IRequest<List<CountryDto>>
+public class CreateListGeneralConsultanCPPTRequest(List<GeneralConsultanCPPTDto> GeneralConsultanCPPTDtos) : IRequest<List<GeneralConsultanCPPTDto>>
 {
-    public List<CountryDto> CountryDtos { get; set; } = CountryDtos;
+    public List<GeneralConsultanCPPTDto> GeneralConsultanCPPTDtos { get; set; } = GeneralConsultanCPPTDtos;
 }
 
 #endregion
@@ -442,7 +442,7 @@ public class DeleteInsurancePolicyRequest(int id = 0, List<int>? ids = null) : I
 ========================== END Command Handler ==========================
 
 ========================== Query Handler ==========================
-  #region Get
+#region Get
 internal class GetInsurancePolicyQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetInsurancePolicyQuery, List<InsurancePolicyDto>>
 {
     private readonly IUnitOfWork _unitOfWork;

@@ -15,6 +15,8 @@ global using McDermott.Application.Dtos.Transaction;
 
 global using System.Linq.Expressions;
 
+global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanMedicalSupportCommand;
+global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanCPPTCommand;
 global using static McDermott.Application.Features.Commands.Patient.InsurancePolicyCommand;
 global using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand;
 global using static McDermott.Application.Features.Commands.Config.GenderCommand;
