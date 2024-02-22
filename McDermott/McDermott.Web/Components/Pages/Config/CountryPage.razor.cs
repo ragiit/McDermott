@@ -275,7 +275,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task ImportFile()
         {
-            await JsRuntime.InvokeVoidAsync("clickInputFile");
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)

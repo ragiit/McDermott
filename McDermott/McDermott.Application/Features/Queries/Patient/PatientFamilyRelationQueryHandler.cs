@@ -21,7 +21,7 @@ namespace McDermott.Application.Features.Queries.Patient
                     request.Predicate, 
                         x => x
                         .Include(z => z.FamilyMember)
-                        .Include(z => z.Family)
+                        //.Include(z => z.Family)
                         .Include(z => z.Patient), 
                     cancellationToken
                     );

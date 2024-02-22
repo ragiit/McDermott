@@ -16,7 +16,7 @@
 @using Blazored.Toast
 @using Blazored.Toast.Services
 
-
+@inject IFileUploadService FileUploadService
 @inject IHttpContextAccessor _httpContextAccessor
 @inject IToastService ToastService
 @inject IJSRuntime JsRuntime
@@ -28,7 +28,6 @@
 @using static McDermott.Web.Extentions.Helper
 
 @using McDermott.Web.Extentions
-
 
 @using Newtonsoft.Json
 

@@ -1,6 +1,7 @@
 using Blazored.LocalStorage;
 using Blazored.Toast;
 using McDermott.Application.Extentions;
+using McDermott.Domain.Entities;
 using McDermott.Persistence.Extensions;
 using McDermott.Web.Components;
 
@@ -11,6 +12,7 @@ builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplicationLayer();
+builder.Services.AddTransient<IFileUploadService, FileUploadService>();
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
 builder.Services.AddBlazoredLocalStorage();

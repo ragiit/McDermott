@@ -199,23 +199,23 @@
                                         <ul class="nav nav-treeview">
                                             <li class="nav-item">
                                                 <NavLink href="@url" class="nav-link">
-
-                                                @if (!string.IsNullOrWhiteSpace(d.Icon))
-                                                {
-                                                    @((MarkupString)d.Icon)
-                                                }
-                                                else
-                                                {
                                                     <i class="far fa-circle nav-icon"></i>
-                                                }
-                                                <p class="ml-3">@d.Name</p>
-                                            </NavLink>
-                                        </li>
-                                    </ul>
-                                }
-                            </li>
-                        }
-                        @*
+                                                    @*    @if (!string.IsNullOrWhiteSpace(d.Icon))
+                                    {
+                                    @((MarkupString)d.Icon)
+                                    }
+                                    else
+                                    {
+
+                                    } *@
+                                                    <p class="ml-3">@d.Name</p>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
+                                    }
+                                </li>
+                            }
+                            @*
                     @foreach (var h in HeaderMenuDtos)
                     {
                     <li class="nav-item">

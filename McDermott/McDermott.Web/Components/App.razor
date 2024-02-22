@@ -90,8 +90,8 @@
     <Routes @rendermode="InteractiveServer" />
     <script src="_framework/blazor.web.js"></script>
     <script>
-        window.clickInputFile = function () {
-            document.getElementById('fileInput').click();
+        window.clickInputFile = function (key) {
+            document.getElementById(key).click();
         }
 
         window.BlazorHelpers = {
@@ -112,7 +112,6 @@
             }
         };
 
-        
     </script>
 
     <!-- jQuery -->
@@ -145,7 +144,6 @@
     <script src="AdminLTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
     <!-- AdminLTE App -->
     <script src="AdminLTE/dist/js/adminlte.js"></script>
-   
 
     @* <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> *@
     @* <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script> *@

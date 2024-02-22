@@ -1,6 +1,10 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using DevExpress.Utils.Design;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.JSInterop;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
 namespace McDermott.Web.Components.Pages.Medical
@@ -103,6 +107,47 @@ namespace McDermott.Web.Components.Pages.Medical
                 }
                 catch { }
             }
+        }
+
+        private List<IBrowserFile> files = new();
+        private int maxFileSize = 1 * 1024 * 1024;
+
+        private void RemoveSelectedFile()
+        {
+            UserForm.SipFile = null;
+        }
+
+        private async void SelectFiles(InputFileChangeEventArgs e)
+        {
+            files = e.GetMultipleFiles(maxFileSize).ToList();
+
+            var allowedExtenstions = new string[] { ".png", ".jpg", ".jpeg", ".gif" };
+            int count = 0;
+
+            UserForm.SipFile = e.File.Name;
+
+            await FileUploadService.UploadFileAsync(e.File, maxFileSize, allowedExtenstions);
+
+            //foreach (var file in files)
+            //{
+            //    try
+            //    {
+            //        UserForm.SipFile = file.fil
+            //        //(int statusCode, string statusMessage) = await FileUploadService.UploadFileAsync(file, maxFileSize, allowedExtenstions);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //    }
+            //}
+        }
+
+        private async Task SelectFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "sipFile");
+        }
+
+        private async Task HandleFormSubmit()
+        {
         }
 
         #region Grid

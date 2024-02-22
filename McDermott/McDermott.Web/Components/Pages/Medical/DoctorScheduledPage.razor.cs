@@ -1,5 +1,4 @@
 ﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Persistence.Migrations;
 using Microsoft.AspNetCore.Razor.Language.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
