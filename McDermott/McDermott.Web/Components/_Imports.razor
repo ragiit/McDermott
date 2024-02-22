@@ -16,7 +16,7 @@
 @using Blazored.Toast
 @using Blazored.Toast.Services
 
-
+@inject IFileUploadService FileUploadService
 @inject IHttpContextAccessor _httpContextAccessor
 @inject IToastService ToastService
 @inject IJSRuntime JsRuntime
@@ -28,7 +28,6 @@
 @using static McDermott.Web.Extentions.Helper
 
 @using McDermott.Web.Extentions
-
 
 @using Newtonsoft.Json
 
@@ -42,7 +41,7 @@
 @using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand
 @using static McDermott.Application.Features.Commands.Config.GroupCommand
 @using static McDermott.Application.Features.Commands.Config.MenuCommand
-@using static McDermott.Application.Features.Commands.Transaction.KioskCommand
+@using static McDermott.Application.Features.Commands.Queue.KioskCommand
 @using static McDermott.Application.Features.Commands.Transaction.CounterCommand;
 @using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 @using static McDermott.Application.Features.Commands.Queue.KioskDepartementCommand;

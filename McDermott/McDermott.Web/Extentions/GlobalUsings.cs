@@ -7,9 +7,9 @@ global using McDermott.Web.Extentions;
 
 global using McDermott.Application.Dtos.Config;
 global using McDermott.Application.Dtos.Medical;
-global using McDermott.Application.Dtos.Transaction; 
+global using McDermott.Application.Dtos.Transaction;
 global using McDermott.Application.Dtos.Employee;
-global using McDermott.Application.Dtos.Patient; 
+global using McDermott.Application.Dtos.Patient;
 
 global using DevExpress.Data.XtraReports.Native;
 global using System.Security.Claims;
@@ -24,13 +24,13 @@ global using static McDermott.Application.Features.Commands.Config.ReligionComma
 global using static McDermott.Application.Features.Commands.Config.UserCommand;
 global using static McDermott.Application.Features.Commands.Config.VillageCommand;
 global using static McDermott.Application.Features.Commands.Config.GroupCommand;
-global using static McDermott.Application.Features.Commands.Medical.BuildingCommand;  
+global using static McDermott.Application.Features.Commands.Medical.BuildingCommand;
 global using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceCommand;
-global using static McDermott.Application.Features.Commands.Transaction.KioskCommand;
+global using static McDermott.Application.Features.Commands.Queue.KioskCommand;
 global using static McDermott.Application.Features.Commands.Medical.InsuranceCommand;
-global using static McDermott.Application.Features.Commands.Medical.ServiceCommand; 
-global using static McDermott.Application.Features.Commands.Config.GenderCommand;  
+global using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
+global using static McDermott.Application.Features.Commands.Config.GenderCommand;
 global using static McDermott.Application.Features.Commands.Config.MenuCommand;
 global using static McDermott.Application.Features.Commands.Medical.HealthCenterCommand;
 global using static McDermott.Application.Features.Commands.Medical.SpecialityCommand;

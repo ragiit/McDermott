@@ -1,0 +1,63 @@
+﻿using McDermott.Application.Dtos.Queue;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace McDermott.Application.Features.Commands.Queue
+{
+    public class KioskQueueCommand
+    {
+        public class GetKioskQueueQuery : IRequest<List<KioskQueueDto>>;
+
+        public class GetKioskQueueByIdQuery : IRequest<KioskQueueDto>
+        {
+            public int Id { get; set; }
+
+            public GetKioskQueueByIdQuery(int id)
+            {
+                Id = id;
+            }
+        }
+
+        public class CreateKioskQueueRequest : IRequest<KioskQueueDto>
+        {
+            public KioskQueueDto KioskQueueDto { get; set; }
+
+            public CreateKioskQueueRequest(KioskQueueDto KioskQueueDto)
+            {
+                this.KioskQueueDto = KioskQueueDto;
+            }
+        }
+
+        public class UpdateKioskQueueRequest : IRequest<bool>
+        {
+            public KioskQueueDto KioskQueueDto { get; set; }
+
+            public UpdateKioskQueueRequest(KioskQueueDto KioskQueueDto)
+            {
+                this.KioskQueueDto = KioskQueueDto;
+            }
+        }
+
+        public class DeleteKioskQueueRequest : IRequest<bool>
+        {
+            public int Id { get; set; }
+
+            public DeleteKioskQueueRequest(int id)
+            {
+                Id = id;
+            }
+        }
+        public class DeleteListKioskQueueRequest : IRequest<bool>
+        {
+            public List<int> Id { get; set; }
+
+            public DeleteListKioskQueueRequest(List<int> id)
+            {
+                Id = id;
+            }
+        }
+    }
+}
