@@ -5,11 +5,25 @@ using System.Text;
 using System.Threading.Tasks;
 using McDermott.Application.Dtos.Transaction;
 using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceCommand;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace McDermott.Application.Features.Queries.Transaction
 {
     public class GeneralConsultanServiceQueryHandler
     {
+        #region Create
+
+        public class CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinicalAssesmentDto GeneralConsultantClinicalAssesmentDto) : IRequest<GeneralConsultantClinicalAssesmentDto>
+        {
+            public GeneralConsultantClinicalAssesmentDto GeneralConsultantClinicalAssesmentDto { get; set; } = GeneralConsultantClinicalAssesmentDto;
+        }
+
+        public class CreateListGeneralConsultantClinicalAssesmentRequest(List<GeneralConsultantClinicalAssesmentDto> GeneralConsultantClinicalAssesmentDtos) : IRequest<List<GeneralConsultantClinicalAssesmentDto>>
+        {
+            public List<GeneralConsultantClinicalAssesmentDto> GeneralConsultantClinicalAssesmentDtos { get; set; } = GeneralConsultantClinicalAssesmentDtos;
+        }
+
+        #endregion
         internal class GetAllGeneralConsultanServiceQueryHandler : IRequestHandler<GetGeneralConsultanServiceQuery, List<GeneralConsultanServiceDto>>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -40,14 +54,9 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-        internal class GetGeneralConsultanServiceByIdQueryHandler : IRequestHandler<GetGeneralConsultanServiceByIdQuery, GeneralConsultanServiceDto>
+        internal class GetGeneralConsultanServiceByIdQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetGeneralConsultanServiceByIdQuery, GeneralConsultanServiceDto>
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetGeneralConsultanServiceByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<GeneralConsultanServiceDto> Handle(GetGeneralConsultanServiceByIdQuery request, CancellationToken cancellationToken)
             {
@@ -56,6 +65,37 @@ namespace McDermott.Application.Features.Queries.Transaction
                 return result.Adapt<GeneralConsultanServiceDto>();
             }
         }
+
+        internal class GetGeneralConsultantClinicalAssesmentQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetGeneralConsultantClinicalAssesmentQuery, List<GeneralConsultantClinicalAssesmentDto>>
+        {
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+            public async Task<List<GeneralConsultantClinicalAssesmentDto>> Handle(GetGeneralConsultantClinicalAssesmentQuery request, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    var result = await _unitOfWork.Repository<GeneralConsultantClinicalAssesment>().GetAsync(
+                        request.Predicate,
+                            x => x, cancellationToken);
+
+                    return result.Adapt<List<GeneralConsultantClinicalAssesmentDto>>();
+                }
+                catch (Exception e)
+                {
+                    return [];
+                }
+            }
+        }
+
+        //internal class GetGeneralConsultantClinicalAssesmentQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetGeneralConsultantClinicalAssesmentQuery, List<GeneralConsultantClinicalAssesmentDto>>
+        //{
+        //    private readonly IUnitOfWork _unitOfWork;
+
+        //    public async Task<List<GeneralConsultantClinicalAssesmentDto>> Handle(GetGeneralConsultantClinicalAssesmentQuery query, CancellationToken cancellationToken)
+        //    {
+                
+        //    }
+        //}
 
         internal class CreateGeneralConsultanServiceHandler : IRequestHandler<CreateGeneralConsultanServiceRequest, GeneralConsultanServiceDto>
         {
@@ -129,5 +169,20 @@ namespace McDermott.Application.Features.Queries.Transaction
                 return true;
             }
         }
+
+        #region Update
+        internal class UpdateGeneralConsultantClinicalAssesmentHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateGeneralConsultantClinicalAssesmentRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+            public async Task<bool> Handle(UpdateGeneralConsultantClinicalAssesmentRequest request, CancellationToken cancellationToken)
+            {
+                await _unitOfWork.Repository<GeneralConsultantClinicalAssesment>().UpdateAsync(request.GeneralConsultantClinicalAssesmentDto.Adapt<GeneralConsultantClinicalAssesment>());
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return true;
+            }
+        }
+        #endregion
     }
 }

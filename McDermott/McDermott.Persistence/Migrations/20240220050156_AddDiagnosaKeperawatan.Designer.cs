@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240220050156_AddDiagnosaKeperawatan")]
+    partial class AddDiagnosaKeperawatan
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -872,13 +875,13 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DateSchendule")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("IdentityNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("InsuranceId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("InsurancePolicyId")
                         .HasColumnType("int");
 
                     b.Property<string>("Method")
@@ -896,19 +899,10 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int?>("PratitionerId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("RegistrationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ScheduleTime")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("ServiceId")
                         .HasColumnType("int");
 
-                    b.Property<string>("StagingStatus")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TypeMedical")
+                    b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TypeRegistration")
@@ -930,8 +924,6 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("InsuranceId");
 
-                    b.HasIndex("InsurancePolicyId");
-
                     b.HasIndex("PatientId");
 
                     b.HasIndex("PratitionerId");
@@ -939,81 +931,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("ServiceId");
 
                     b.ToTable("GeneralConsultanServices");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultantClinicalAssesment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<double>("BMIIndex")
-                        .HasColumnType("float");
-
-                    b.Property<string>("BMIIndexString")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BMIState")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("E")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("GeneralConsultantServiceId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("HR")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Height")
-                        .HasColumnType("float");
-
-                    b.Property<int>("M")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RBS")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RR")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SpO2")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SystolicDiastolicBP")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Temp")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("V")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Weight")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GeneralConsultantServiceId");
-
-                    b.ToTable("GeneralConsultantClinicalAssesments");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Group", b =>
@@ -1927,9 +1844,6 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ServicedId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -2486,11 +2400,6 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("InsuranceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.InsurancePolicy", "InsurancePolicy")
-                        .WithMany()
-                        .HasForeignKey("InsurancePolicyId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.User", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
@@ -2508,23 +2417,11 @@ namespace McDermott.Persistence.Migrations
 
                     b.Navigation("Insurance");
 
-                    b.Navigation("InsurancePolicy");
-
                     b.Navigation("Patient");
 
                     b.Navigation("Pratitioner");
 
                     b.Navigation("Service");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultantClinicalAssesment", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
-                        .WithMany()
-                        .HasForeignKey("GeneralConsultantServiceId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("GeneralConsultanService");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GroupMenu", b =>

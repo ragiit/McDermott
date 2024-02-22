@@ -59,14 +59,9 @@ namespace McDermott.Application.Features.Queries.Config
             }
         }
 
-        internal class CreateListCountryRequestHandler : IRequestHandler<CreateListCountryRequest, List<CountryDto>>
+        internal class CreateListCountryRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateListCountryRequest, List<CountryDto>>
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateListCountryRequestHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<List<CountryDto>> Handle(CreateListCountryRequest request, CancellationToken cancellationToken)
             {

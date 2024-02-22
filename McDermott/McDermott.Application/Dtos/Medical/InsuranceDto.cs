@@ -23,5 +23,7 @@ namespace McDermott.Application.Dtos.Medical
         public int? AdminFee { get; set; }
         public int? Presentase { get; set; }
         public int? AdminFeeMax { get; set; }
+
+        
     }
 }

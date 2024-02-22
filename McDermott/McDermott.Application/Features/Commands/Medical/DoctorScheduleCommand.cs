@@ -5,8 +5,13 @@ namespace McDermott.Application.Features.Commands.Medical
     public class DoctorScheduleCommand
     { 
         #region Get
-        public class GetDoctorScheduleQuery : IRequest<List<DoctorScheduleDto>>;
-        public class GetDoctorScheduleSlotQuery : IRequest<List<DoctorScheduleSlotDto>>;
+        //public class GetDoctorScheduleQuery : IRequest<List<DoctorScheduleDto>>;
+        public class GetDoctorScheduleQuery(Expression<Func<DoctorSchedule, bool>>? predicate = null) : IRequest<List<DoctorScheduleDto>>
+        {
+            public Expression<Func<DoctorSchedule, bool>> Predicate { get; } = predicate;
+        }
+
+        //public class GetDoctorScheduleSlotQuery : IRequest<List<DoctorScheduleSlotDto>>;
 
         public class GetDoctorScheduleByIdQuery : IRequest<DoctorScheduleDto>
         {
@@ -16,6 +21,11 @@ namespace McDermott.Application.Features.Commands.Medical
             {
                 Id = id;
             }
+        }
+
+        public class GetDoctorScheduleSlotQuery(Expression<Func<DoctorScheduleSlot, bool>>? predicate = null) : IRequest<List<DoctorScheduleSlotDto>>
+        {
+            public Expression<Func<DoctorScheduleSlot, bool>> Predicate { get; } = predicate;
         }
 
         public class GetDoctorScheduleSlotByDoctorScheduleIdRequest : IRequest<List<DoctorScheduleSlotDto>>
@@ -33,6 +43,12 @@ namespace McDermott.Application.Features.Commands.Medical
                 this.DoctorScheduleId = DoctorScheduleId;
             }
         }
+
+        public class GetGetScheduleDetailQuery(Expression<Func<DoctorScheduleDetail, bool>>? predicate = null) : IRequest<List<DoctorScheduleDetailDto>>
+        {
+            public Expression<Func<DoctorScheduleDetail, bool>> Predicate { get; } = predicate;
+        }
+
 
         public class GetDoctorScheduleDetailByScheduleIdQuery : IRequest<List<DoctorScheduleDetailDto>>
         {

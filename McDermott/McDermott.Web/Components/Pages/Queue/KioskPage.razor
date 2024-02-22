@@ -70,8 +70,9 @@
                                                     <DxFormLayoutItem Caption="Service" ColSpanMd="12">
                                                         <DxComboBox Data="@serv"
                                                                     FilteringMode="@DataGridFilteringMode.Contains"
-                                                                    @bind-Value="@SelectedServices"
+                                                                    @bind-Value="@ServiceId"
                                                                     TextFieldName="Name"
+                                                                    ValueFieldName="Id"
                                                                     ></DxComboBox>
                                                     </DxFormLayoutItem>
                                                 }

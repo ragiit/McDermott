@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240221092758_aaa")]
+    partial class aaa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -970,9 +973,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int>("E")
                         .HasColumnType("int");
 
-                    b.Property<int?>("GeneralConsultantServiceId")
-                        .HasColumnType("int");
-
                     b.Property<int>("HR")
                         .HasColumnType("int");
 
@@ -1010,8 +1010,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GeneralConsultantServiceId");
 
                     b.ToTable("GeneralConsultantClinicalAssesments");
                 });
@@ -1927,9 +1925,6 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ServicedId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -2515,16 +2510,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Pratitioner");
 
                     b.Navigation("Service");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultantClinicalAssesment", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
-                        .WithMany()
-                        .HasForeignKey("GeneralConsultantServiceId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("GeneralConsultanService");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GroupMenu", b =>

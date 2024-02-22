@@ -12,6 +12,14 @@
     .a {
         z-index: -1;
     }
+
+    .toast-custom {
+        z-index: 1000;
+    }
+
+    .blazored-toast-container {
+        z-index: 9999 !important;
+    }
 </style>
 
 <div class="a">
@@ -20,7 +28,8 @@
                     Timeout="5"
                     IconType="IconType.FontAwesome"
                     ShowProgressBar="true"
-                    SuccessClass="success-toast-override"
+                    SuccessClass="success-toast-override toast-custom"
+                    InfoClass="toast-custom"
                     SuccessIcon="fa fa-thumbs-up"
                     InfoIcon="fa fa-info-circle"
                     WarningIcon="fa fa-warning"
@@ -31,7 +40,6 @@
             </div>
         </CloseButtonContent>
     </BlazoredToasts>
-
 </div>
 
 <div class="wrapper">
@@ -42,7 +50,6 @@
     }
     else
     {
-
 
         @if (User == null)
         {
@@ -193,22 +200,22 @@
                                             <li class="nav-item">
                                                 <NavLink href="@url" class="nav-link">
 
-                                                    @if (!string.IsNullOrWhiteSpace(d.Icon))
-                                                    {
-                                                        @((MarkupString)d.Icon)
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class="far fa-circle nav-icon"></i>
-                                                    }
-                                                    <p class="ml-3">@d.Name</p>
-                                                </NavLink>
-                                            </li>
-                                        </ul>
-                                    }
-                                </li>
-                            }
-                            @*
+                                                @if (!string.IsNullOrWhiteSpace(d.Icon))
+                                                {
+                                                    @((MarkupString)d.Icon)
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-circle nav-icon"></i>
+                                                }
+                                                <p class="ml-3">@d.Name</p>
+                                            </NavLink>
+                                        </li>
+                                    </ul>
+                                }
+                            </li>
+                        }
+                        @*
                     @foreach (var h in HeaderMenuDtos)
                     {
                     <li class="nav-item">
@@ -265,6 +272,5 @@
 
         }
     }
-
 </div>
 <!-- ./wrapper -->

@@ -61,7 +61,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private int? CountServiceId { get; set; }
 
         private KioskDto FormKios = new();
-        private int ServicedId = 0;
+        private int _ServiceId { get; set; }
         private string Bpjs { get; set; } = string.Empty;
         private IEnumerable<ServiceDto> SelectedServices = [];
         private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
@@ -70,26 +70,19 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Async Data And Auth
 
-        private void SelectedServiceChanged(ServiceDto services)
+        private int ServiceId
         {
-            SelectedNames = new List<string>();
-            //if (e is not null)
-            //{
-            //    foreach (var item in e)
-            //    {
-            //        //var n = item.Physicions.Split(",");
+            get => _ServiceId;
+            set
+            {
+                _ServiceId = value;
+                FormKios.ServiceId = value;
+                Phys = Physician.Where(x => x.DoctorServiceIds.Contains(value)).ToList();
 
-            //        //foreach (var item1 in n)
-            //        //{
-            //        //    if (Names.Contains(item1))
-            //        //        continue;
+                showPhysician = true;
 
-            //        //    Names.Add(item1);
-            //        //}
-            //    }
-
-            //SelectedNames = Names.Distinct();
-            //}
+                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
+            }
         }
 
         //protected override async Task OnAfterRenderAsync(bool firstRender)

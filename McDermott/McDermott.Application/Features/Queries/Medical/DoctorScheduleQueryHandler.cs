@@ -3,40 +3,85 @@ namespace McDermott.Application.Features.Queries.Medical
 {
     public class DoctorScheduleQueryHandler
     {
-        internal class GetAllDoctorScheduleQueryHandler : IRequestHandler<GetDoctorScheduleQuery, List<DoctorScheduleDto>>
-        {
-            private readonly IUnitOfWork _unitOfWork;
+        //internal class GetAllDoctorScheduleQueryHandler : IRequestHandler<GetDoctorScheduleQuery, List<DoctorScheduleDto>>
+        //{
+        //    private readonly IUnitOfWork _unitOfWork;
 
-            public GetAllDoctorScheduleQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+        //    public GetAllDoctorScheduleQueryHandler(IUnitOfWork unitOfWork)
+        //    {
+        //        _unitOfWork = unitOfWork;
+        //    }
+
+        //    public async Task<List<DoctorScheduleDto>> Handle(GetDoctorScheduleQuery query, CancellationToken cancellationToken)
+        //    {
+        //        return await _unitOfWork.Repository<DoctorSchedule>().Entities
+        //                .Include(x => x.Service)
+        //                .Select(DoctorSchedule => DoctorSchedule.Adapt<DoctorScheduleDto>())
+        //                .AsNoTracking()
+        //                .ToListAsync(cancellationToken);
+        //    }
+        //}
+
+        internal class GetDoctorScheduleQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetDoctorScheduleQuery, List<DoctorScheduleDto>>
+        {
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<List<DoctorScheduleDto>> Handle(GetDoctorScheduleQuery query, CancellationToken cancellationToken)
             {
-                return await _unitOfWork.Repository<DoctorSchedule>().Entities
-                        .Include(x => x.Service)
-                        .Select(DoctorSchedule => DoctorSchedule.Adapt<DoctorScheduleDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                try
+                {
+                    var result = await _unitOfWork.Repository<DoctorSchedule>().GetAsync(
+                        query.Predicate,
+                            x => x
+                            .Include(z => z.Service), cancellationToken);
+
+                    return result.Adapt<List<DoctorScheduleDto>>();
+                }
+                catch (Exception e)
+                {
+                    return [];
+                }
             }
         }
 
-        internal class GetDoctorScheduleSlotQueryHandler : IRequestHandler<GetDoctorScheduleSlotQuery, List<DoctorScheduleSlotDto>>
-        {
-            private readonly IUnitOfWork _unitOfWork;
+        //internal class GetDoctorScheduleSlotQueryHandler : IRequestHandler<GetDoctorScheduleSlotQuery, List<DoctorScheduleSlotDto>>
+        //{
+        //    private readonly IUnitOfWork _unitOfWork;
 
-            public GetDoctorScheduleSlotQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+        //    public GetDoctorScheduleSlotQueryHandler(IUnitOfWork unitOfWork)
+        //    {
+        //        _unitOfWork = unitOfWork;
+        //    }
+
+        //    public async Task<List<DoctorScheduleSlotDto>> Handle(GetDoctorScheduleSlotQuery query, CancellationToken cancellationToken)
+        //    {
+        //        return await _unitOfWork.Repository<DoctorScheduleSlot>().Entities
+        //                .Select(DoctorSchedule => DoctorSchedule.Adapt<DoctorScheduleSlotDto>())
+        //                .AsNoTracking()
+        //                .ToListAsync(cancellationToken);
+        //    }
+        //}
+
+        internal class GetDoctorScheduleSlotQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetDoctorScheduleSlotQuery, List<DoctorScheduleSlotDto>>
+        {
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<List<DoctorScheduleSlotDto>> Handle(GetDoctorScheduleSlotQuery query, CancellationToken cancellationToken)
             {
-                return await _unitOfWork.Repository<DoctorScheduleSlot>().Entities
-                        .Select(DoctorSchedule => DoctorSchedule.Adapt<DoctorScheduleSlotDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                try
+                {
+                    var result = await _unitOfWork.Repository<DoctorScheduleSlot>().GetAsync(
+                        query.Predicate,
+                            x => x
+                            .Include(z => z.Physician)
+                            .Include(z => z.DoctorSchedule), cancellationToken);
+
+                    return result.Adapt<List<DoctorScheduleSlotDto>>();
+                }
+                catch (Exception e)
+                {
+                    return [];
+                }
             }
         }
 
@@ -228,6 +273,28 @@ namespace McDermott.Application.Features.Queries.Medical
             }
         }
 
+        internal class GetGetScheduleDetailQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetGetScheduleDetailQuery, List<DoctorScheduleDetailDto>>
+        {
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+            public async Task<List<DoctorScheduleDetailDto>> Handle(GetGetScheduleDetailQuery query, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    var result = await _unitOfWork.Repository<DoctorScheduleDetail>().GetAsync(
+                        query.Predicate,
+                            x => x
+                            .Include(z => z.DoctorSchedule)
+                            , cancellationToken);
+
+                    return result.Adapt<List<DoctorScheduleDetailDto>>();
+                }
+                catch (Exception e)
+                {
+                    return [];
+                }
+            }
+        }
         internal class GetDoctorScheduleDetailByScheduleIdQueryHandler : IRequestHandler<GetDoctorScheduleDetailByScheduleIdQuery, List<DoctorScheduleDetailDto>>
         {
             private readonly IUnitOfWork _unitOfWork;

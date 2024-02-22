@@ -1,4 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Persistence.Migrations;
 using Microsoft.AspNetCore.Razor.Language.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
@@ -26,6 +27,7 @@ namespace McDermott.Web.Components.Pages.Medical
         //public List<DoctorScheduleDetailDto> DoctorScheduleDetails = [];
 
         private List<ServiceDto> Services = [];
+        private IEnumerable<UserDto> AllUsers = [];
         private IEnumerable<UserDto> Users = [];
         private IEnumerable<UserDto> SelectedPhysicions = [];
         private List<DoctorScheduleDto> DoctorSchedules = [];
@@ -44,6 +46,21 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private int newId = 0;
         private string PhysicionName { get; set; }
+
+        private int _ServiceId { get; set; }
+
+        private int ServiceId
+        {
+            get => _ServiceId;
+            set
+            {
+                Users = [];
+                DoctorSchedule.ServiceId = value;
+                SelectedPhysicions = [];
+                _ServiceId = value;
+                Users = AllUsers.Where(x => x.DoctorServiceIds.Contains(value)).AsEnumerable();
+            }
+        }
 
         private int Value
         {
@@ -161,6 +178,7 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
 
             var users = await Mediator.Send(new GetUserQuery());
+            AllUsers = users.Where(x => x.IsDoctor == true && x.IsPhysicion == true).AsEnumerable();
             Users = users.Where(x => x.IsDoctor == true && x.IsPhysicion == true).AsEnumerable();
 
             DoctorSchedules.Clear();

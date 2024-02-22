@@ -10,6 +10,7 @@ global using McDermott.Application.Dtos.Medical;
 global using McDermott.Application.Dtos.Config;
 global using McDermott.Application.Dtos.Employee;
 global using McDermott.Application.Dtos.Patient;
+global using McDermott.Application.Dtos.Transaction;
 
 
 global using System.Linq.Expressions;
@@ -27,3 +28,5 @@ global using static McDermott.Application.Features.Commands.Employee.EmployeeCom
 global using static McDermott.Application.Features.Commands.Patient.PatientCommand;
 global using static McDermott.Application.Features.Commands.Medical.PractitionerCommand;
 global using static McDermott.Application.Features.Commands.Patient.PatientFamilyRelationCommand;
+global using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;
+global using static McDermott.Application.Features.Queries.Transaction.GeneralConsultanServiceQueryHandler;
