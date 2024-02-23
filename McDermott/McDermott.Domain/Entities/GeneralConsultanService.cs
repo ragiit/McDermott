@@ -24,6 +24,7 @@ namespace McDermott.Domain.Entities
         public string? TypeRegistration { get; set; }
         public string? TypeMedical { get; set; }
         public string? ScheduleTime { get; set; }
+        public bool IsAlertInformationSpecialCase { get; set; } = false;
         public DateTime? RegistrationDate { get; set; }
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }

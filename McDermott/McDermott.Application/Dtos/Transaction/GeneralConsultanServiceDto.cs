@@ -37,6 +37,11 @@ namespace McDermott.Application.Dtos.Transaction
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; } 
         public bool Temp { get; set; } = false;
+        public bool IsAlertInformationSpecialCase { get; set; } = false;
+        public bool IsWeather { get; set; } = false;
+        public bool IsPharmacology { get; set; } = false;
+        public bool IsFood { get; set; } = false;
+
 
         public virtual UserDto? Patient { get; set; }
         public virtual UserDto? Pratitioner { get; set; }

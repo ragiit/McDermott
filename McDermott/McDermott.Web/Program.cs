@@ -12,7 +12,7 @@ builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplicationLayer();
-builder.Services.AddTransient<IFileUploadService, FileUploadService>();
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
 builder.Services.AddBlazoredLocalStorage();

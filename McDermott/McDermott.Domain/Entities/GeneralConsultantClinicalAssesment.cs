@@ -30,7 +30,8 @@ namespace McDermott.Domain.Entities
         public int Temp { get; set; }
         public int HR { get; set; }
         public int RBS { get; set; }
-        public int SystolicDiastolicBP { get; set; }
+        public int Systolic { get; set; }
+        public int DiastolicBP { get; set; }
         public int SpO2 { get; set; }
 
         public double BMIIndex { get; set; }

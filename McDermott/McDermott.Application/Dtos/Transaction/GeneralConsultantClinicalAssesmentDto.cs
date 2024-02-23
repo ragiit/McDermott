@@ -9,7 +9,7 @@ namespace McDermott.Application.Dtos.Transaction
     public class GeneralConsultantClinicalAssesmentDto : IMapFrom<GeneralConsultantClinicalAssesment>
     {
         public int Id { get; set; }
-        public int GeneralConsultantServiceId { get; set; }
+        public int GeneralConsultanServiceId { get; set; }
         public double _Weight { get; set; }
 
         public double Weight
@@ -69,7 +69,8 @@ namespace McDermott.Application.Dtos.Transaction
         [Required]
         public int HR { get; set; }
         public int RBS { get; set; }
-        public int SystolicDiastolicBP { get; set; }
+        public int Systolic{ get; set; }
+        public int DiastolicBP { get; set; }
         public int SpO2 { get; set; }
 
         public double BMIIndex { get; set; }

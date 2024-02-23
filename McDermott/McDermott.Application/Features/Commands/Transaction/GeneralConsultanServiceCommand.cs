@@ -1,6 +1,4 @@
-﻿
-using McDermott.Application.Dtos.Transaction;
-using static McDermott.Application.Features.Queries.Transaction.GeneralConsultanServiceQueryHandler;
+﻿ 
 
 namespace McDermott.Application.Features.Commands.Transaction
 {
