@@ -136,6 +136,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task NewItem_Click(IGrid context)
         {
+            FormKioskConfig = new();
             PopUpVisible = true;
             TextPopUp = "Add Config Kiosk";
         }
