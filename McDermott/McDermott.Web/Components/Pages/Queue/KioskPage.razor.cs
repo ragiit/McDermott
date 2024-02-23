@@ -2,6 +2,7 @@
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NuGet.Packaging;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         public List<KioskDto> Kiosks = new();
         public List<KioskQueueDto> KioskQueues = new();
+        public KioskQueueDto ViewQueue = new();
         public List<KioskConfigDto> KioskConf = new();
         public List<ServiceDto> Services = new();
         public List<ServiceDto> serv = new List<ServiceDto>();
@@ -130,6 +132,8 @@ namespace McDermott.Web.Components.Pages.Queue
             showForm = false;
             PanelVisible = true;
             Physician = await Mediator.Send(new GetUserQuery());
+            KioskQueues = await Mediator.Send(new GetKioskQueueQuery());
+            ViewQueue = KioskQueues.OrderByDescending(x => x.CreatedDate).FirstOrDefault();
             SelectedDataItems = new ObservableRangeCollection<object>();
             Kiosks = await Mediator.Send(new GetKioskQuery());
             Services = await Mediator.Send(new GetServiceQuery());
@@ -233,8 +237,27 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #endregion Button Export, Import And Colmn Chooser
 
-        private void OnCancel()
+        private async Task OnCanceled(int id)
         {
+            try
+            {
+                if (id != 0)
+                {
+                    await Mediator.Send(new DeleteKioskQueueRequest(id));
+                }
+                showQueue = false;
+                FormKios = new();
+                ToastService.ShowError("Antrian Dibatalkan!!");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private async void OnCancel()
+        {
+            showQueue = false;
             FormKios = new();
             showForm = false;
         }
@@ -323,8 +346,8 @@ namespace McDermott.Web.Components.Pages.Queue
                     var checkId = await Mediator.Send(new CreateKioskRequest(FormKios));
 
                     // Mendapatkan antrian kiosk
-                    var kioskQueues = await Mediator.Send(new GetKioskQueueQuery());
-                    var todayQueues = kioskQueues
+
+                    var todayQueues = KioskQueues
                         .Where(x => x.ServiceId == checkId.ServiceId && x.CreatedDate?.Date == DateTime.Now.Date)
                         .ToList();
 

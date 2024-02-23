@@ -72,9 +72,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
             if (FormService.Id == 0)
             {
-                
-                    await Mediator.Send(new CreateServiceRequest(FormService));
-                
+                await Mediator.Send(new CreateServiceRequest(FormService));
             }
             else
             {
@@ -104,6 +102,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task NewItem_Click()
         {
+            FormService = new();
             PopUpVisible = true;
             TextPopUp = "Add Services";
         }
