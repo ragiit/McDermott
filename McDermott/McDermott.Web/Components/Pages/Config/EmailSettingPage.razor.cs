@@ -1,8 +1,4 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Application.Dtos.Config;
-using McDermott.Web.Extentions;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
-using System.Net;
+﻿using Microsoft.JSInterop;
 using System.Net.Mail;
 using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 
@@ -23,8 +19,6 @@ namespace McDermott.Web.Components.Pages.Config
         private GroupMenuDto UserAccessCRUID = new();
 
         #endregion Auth
-
-        private readonly SmtpClient? _smtpClient;
 
         #region Grid Setting
 
@@ -51,6 +45,10 @@ namespace McDermott.Web.Components.Pages.Config
             "TLS (STARTTLS)",
             "SSL/TLS"
         };
+
+        private string resultMessage = "";
+        private bool IsConnected { get; set; }
+        private bool isLoading { get; set; }
 
         #endregion Data static
 
@@ -216,20 +214,56 @@ namespace McDermott.Web.Components.Pages.Config
 
         #endregion Save Function
 
+        private string currentSmptEncryption = "";
+
+        private string OnSmptEncryptionChange
+        {
+            get => currentSmptEncryption;
+            set
+            {
+                currentSmptEncryption = value;
+                FormEmails.Smpt_Encryption = value;
+                if (currentSmptEncryption == "TLS (STARTTLS)")
+                {
+                    FormEmails.Smpt_Port = "25";
+                }
+                else if (currentSmptEncryption == "SSL/TLS")
+                {
+                    FormEmails.Smpt_Port = "465";
+                }
+                else if (currentSmptEncryption == "none")
+                {
+                    FormEmails.Smpt_Port = "";
+                }
+            }
+        }
+
         private async Task TestConnect()
         {
             try
             {
-                using (SmtpClient smtp = new SmtpClient(FormEmails.Smpt_Host, FormEmails.Smpt_Port))
+                var Port = int.Parse(FormEmails.Smpt_Port);
+                isLoading = true;
+                using (var client = new MailKit.Net.Smtp.SmtpClient())
                 {
-                    smtp.Credentials = new NetworkCredential(FormEmails.Smpt_User, FormEmails.Smpt_Pass);
-                    smtp.EnableSsl = false;
-                    //smtp.Send();
+                    await client.ConnectAsync(FormEmails.Smpt_Host, Port, MailKit.Security.SecureSocketOptions.Auto);
+
+                    if (client.IsConnected)
+                    {
+                        await client.AuthenticateAsync(FormEmails.Smpt_User, FormEmails.Smpt_Pass);
+                        IsConnected = true;
+                        ToastService.ShowSuccess("Connection Success");
+                    }
                 }
+                isLoading = false;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                isLoading = true;
+                Console.WriteLine(ex.Message);
+                IsConnected = false;
+                ToastService.ShowError("Connection InValid!!!");
+                isLoading = false;
             }
         }
     }

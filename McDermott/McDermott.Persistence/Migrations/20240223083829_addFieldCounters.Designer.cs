@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240223083829_addFieldCounters")]
+    partial class addFieldCounters
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,9 +247,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int?>("ServiceId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ServiceKId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
@@ -261,8 +261,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("PhysicianId");
 
                     b.HasIndex("ServiceId");
-
-                    b.HasIndex("ServiceKId");
 
                     b.ToTable("Counters");
                 });
@@ -704,6 +702,7 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Smtp_Encryption")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Smtp_Host")
@@ -713,8 +712,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("Smtp_Pass")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Smtp_Port")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("Smtp_Port")
+                        .HasColumnType("int");
 
                     b.Property<string>("Smtp_User")
                         .HasMaxLength(200)
@@ -2409,16 +2408,9 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.Service", "ServiceK")
-                        .WithMany()
-                        .HasForeignKey("ServiceKId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Physician");
 
                     b.Navigation("Service");
-
-                    b.Navigation("ServiceK");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Department", b =>

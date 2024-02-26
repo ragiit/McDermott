@@ -1,11 +1,6 @@
-﻿using McDermott.Application.Dtos.Queue;
-using McDermott.Domain.Entities;
+﻿using DevExpress.XtraSpellChecker.Native;
+using McDermott.Application.Dtos.Queue;
 using Microsoft.AspNetCore.Components;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using NuGet.Packaging;
-using System.Collections.Generic;
-using System.Linq;
 using static Azure.Core.HttpHeader;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
@@ -99,25 +94,22 @@ namespace McDermott.Web.Components.Pages.Queue
         //    {
         //        try
         //        {
-        //            var result = await NavigationManager.CheckAccessUser(oLocal);
-        //            IsAccess = result.Item1;
-        //            UserAccessCRUID = result.Item2;
+        //            var timer = new Timer(new TimerCallback(_ =>
+        //            {
+        //                UriHelper.NavigateTo(UriHelper.Uri, forceLoad: true);
+        //            }), null, 2000, 2000);
         //        }
         //        catch { }
         //    }
         //}
 
+        private void ReloadPage()
+        {
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
+        }
+
         protected override async Task OnInitializedAsync()
         {
-            //    try
-            //    {
-            //        var result = await NavigationManager.CheckAccessUser(oLocal);
-            //        IsAccess = result.Item1;
-            //        UserAccessCRUID = result.Item2;
-            //    }
-            //    catch { }
-            //var by =
-
             Kiosks = await Mediator.Send(new GetKioskQuery());
             await LoadData();
             foreach (var i in KioskConf)
@@ -129,8 +121,9 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task LoadData()
         {
-            showForm = false;
             PanelVisible = true;
+            StateHasChanged();
+            showForm = false;
             Physician = await Mediator.Send(new GetUserQuery());
             KioskQueues = await Mediator.Send(new GetKioskQueueQuery());
             ViewQueue = KioskQueues.OrderByDescending(x => x.CreatedDate).FirstOrDefault();
@@ -248,6 +241,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 showQueue = false;
                 FormKios = new();
                 ToastService.ShowError("Antrian Dibatalkan!!");
+                ReloadPage();
             }
             catch (Exception ex)
             {
@@ -347,14 +341,26 @@ namespace McDermott.Web.Components.Pages.Queue
 
                     // Mendapatkan antrian kiosk
 
+                    //var todayQueues = KioskQueues
+                    //    .Where(x => x.ServiceId == checkId.ServiceId && x.CreatedDate?.Date == DateTime.Now.Date)
+                    //    .ToList();
+                    //KioskQueues = await Mediator.Send(new GetKioskQueueQuery());
                     var todayQueues = KioskQueues
-                        .Where(x => x.ServiceId == checkId.ServiceId && x.CreatedDate?.Date == DateTime.Now.Date)
-                        .ToList();
+                        .Where(x => x.ServiceId == checkId.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date).ToList();
 
                     // Menentukan nomor antrian
-                    FormQueue.NoQueue = todayQueues.Count == 0
-                        ? 1
-                        : todayQueues.Max(x => x.NoQueue) + 1;
+                    //FormQueue.NoQueue = todayQueues.Count == 0
+                    //    ? 1
+                    //    : todayQueues.Max(x => x.NoQueue);
+                    if (todayQueues.Count == 0)
+                    {
+                        FormQueue.NoQueue = 1;
+                    }
+                    else
+                    {
+                        var GetNoQueue = todayQueues.OrderByDescending(x => x.NoQueue).FirstOrDefault();
+                        FormQueue.NoQueue = (int)GetNoQueue.NoQueue + 1;
+                    }
 
                     // Mengisi informasi antrian
                     FormQueue.KioskId = checkId.Id;
@@ -363,6 +369,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     // Membuat KioskQueue baru
                     await Mediator.Send(new CreateKioskQueueRequest(FormQueue));
                     showQueue = true;
+                    ToastService.ShowSuccess("Number Queue is Generated Succces!!");
                 }
                 else
                 {

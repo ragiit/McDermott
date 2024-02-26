@@ -1,4 +1,5 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
 using static McDermott.Application.Features.Commands.Transaction.CounterCommand;
 
@@ -11,8 +12,13 @@ namespace McDermott.Web.Components.Pages.Queue
         private List<CounterDto> counters = new();
         private List<CounterDto> countersActive = new();
         private List<CounterDto> countersInActive = new();
+        private List<ServiceDto> Services = [];
+        private List<UserDto> Physicians = [];
+        public List<UserDto> Phys = new();
+        private List<ServiceDto> ServiceK = new();
+        private List<ServiceDto> ServiceP = [];
         private CounterDto counterForm = new();
-        private List<KioskDto> kiosks = new();
+        private List<KioskDto> Kiosks = new();
 
         #endregion Relation Data
 
@@ -29,16 +35,42 @@ namespace McDermott.Web.Components.Pages.Queue
         private bool PopUpVisible { get; set; } = false;
         private bool ArchiveCard { get; set; } = false;
         private bool EditItemsEnabled { get; set; }
+        private bool showFormProcess { get; set; } = false;
         private bool GirdDetail { get; set; } = false;
         private int CountCard { get; set; } = 0;
-
+        private int _ServiceId { get; set; }
+        private int idServiceK { get; set; }
         private int ActiveTabIndex { get; set; } = 1;
+        private string NameCounter { get; set; } = string.Empty;
 
         private int FocusedRowVisibleIndex { get; set; }
 
         #endregion setings Grid
 
         #region Async Data And Auth
+
+        private int Serviced
+        {
+            get => _ServiceId;
+            set
+            {
+                _ServiceId = value;
+                counterForm.ServiceId = value;
+                List<ServiceDto> service = new();
+                service = Services.Where(x => x.Id == value).ToList();
+
+                foreach (var i in service)
+                {
+                    if (i != null)
+                    {
+                        ServiceK = Services.Where(x => x.Id == i.ServicedId).ToList();
+                        Phys = Physicians.Where(x => x.DoctorServiceIds.Contains(value)).ToList();
+                    }
+                }
+
+                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
+            }
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -76,9 +108,15 @@ namespace McDermott.Web.Components.Pages.Queue
             PopUpVisible = false;
             PanelVisible = true;
             countersActive.Clear();
+            counterForm = new();
             counters = await Mediator.Send(new GetCounterQuery());
+            Services = await Mediator.Send(new GetServiceQuery());
+            ServiceP = [.. Services.Where(x => x.IsPatient == true)];
+            var Physician = await Mediator.Send(new GetUserQuery());
+            Physicians = [.. Physician.Where(x => x.IsPhysicion == true)];
             countersActive = [.. counters.Where(x => x.IsActive == true)];
             countersInActive = [.. counters.Where(x => x.IsActive == false)];
+
             //CountCard = [.. counters.Select(x => x.Name);
             PanelVisible = false;
         }
@@ -135,7 +173,6 @@ namespace McDermott.Web.Components.Pages.Queue
                 counterForm = General;
                 PopUpVisible = true;
                 textPopUp = "Edit Data Counter";
-                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
             }
             catch { }
         }
@@ -146,6 +183,27 @@ namespace McDermott.Web.Components.Pages.Queue
         }
 
         #region Card
+
+        private async Task ShowOnProcess(int id)
+        {
+            try
+            {
+                StateHasChanged();
+                PanelVisible = true;
+                counterForm = new();
+                var General = await Mediator.Send(new GetCounterByIdQuery(id));
+                counterForm.Id = General.Id;
+                counterForm.Name = General.Name;
+                //PopUpVisible = true;
+                textPopUp = "Configurtion Counter " + counterForm.Name;
+                showFormProcess = true;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         private async Task InActive_Click(int Id)
         {
@@ -183,11 +241,14 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 GirdDetail = true;
+                var General = await Mediator.Send(new GetCounterByIdQuery(Id));
                 var a = await Mediator.Send(new GetKioskQuery());
-                kiosks = [.. a.Where(x => x.CounterId == Id)];
+                Kiosks = [.. a.Where(x => x.ServiceId == General.ServiceId)];
+                NameCounter = "Counter " + General.Name;
             }
-            catch
+            catch (Exception ex)
             {
+                throw new Exception(ex.Message);
             }
         }
 
@@ -209,7 +270,7 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 ArchiveCard = false;
-                kiosks.Clear();
+                Kiosks.Clear();
             }
             catch { }
         }
@@ -277,6 +338,7 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 counterForm.IsActive = true;
+                counterForm.Status = "open";
                 var edit = counterForm;
                 if (counterForm.Id == 0)
                     await Mediator.Send(new CreateCounterRequest(counterForm));
@@ -287,6 +349,20 @@ namespace McDermott.Web.Components.Pages.Queue
                 await LoadData();
             }
             catch { }
+        }
+
+        private async Task OnProcess()
+        {
+            //counterForm.Name = General.Name;
+            counterForm.IsActive = true;
+            counterForm.Status = "on process";
+            var edit = counterForm;
+            if (counterForm.Id != 0)
+            {
+                await Mediator.Send(new UpdateCounterRequest(counterForm));
+            }
+            showFormProcess = false;
+            await LoadData();
         }
 
         #endregion Methode Save And Update
