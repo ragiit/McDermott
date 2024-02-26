@@ -208,7 +208,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 var a = SelectedDataItems.Adapt<List<UserDto>>();
 
-                int userActive = (int)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
+                int userActive = (int)HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
 
                 await Mediator.Send(new DeleteListUserRequest(a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
             }
@@ -229,7 +229,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             if (args.DataItem is not null)
             {
-                IsDeleted = (bool)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(((UserDto)args.DataItem).Id.ToString())!;
+                IsDeleted = (bool)HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(((UserDto)args.DataItem).Id.ToString())!;
             }
 
             FocusedRowVisibleIndex = args.VisibleIndex;

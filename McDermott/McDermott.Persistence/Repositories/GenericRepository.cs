@@ -2,6 +2,7 @@
 using McDermott.Domain.Common;
 using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Linq.Expressions;
 
 namespace McDermott.Persistence.Repositories
@@ -73,12 +74,24 @@ namespace McDermott.Persistence.Repositories
 
         public async Task<List<T>> GetAllAsync()
         {
-            return await _dbContext
+            var result = await _dbContext
                 .Set<T>()
                 .AsNoTracking()
                 .ToListAsync();
+
+            LogInformation(nameof(GetAllAsync), result!);
+
+            return result;
+        }
+        public void LogInformation(dynamic method, dynamic result)
+        {
+            Log.Information(method + " => {@result}", result);
         }
 
+        public void LogError(dynamic method, dynamic result)
+        {
+            Log.Error(method + " => {@result}", result);
+        }
         public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
         {
             if (predicate is null)
