@@ -72,12 +72,12 @@ namespace McDermott.Persistence.Repositories
             }
         }
 
-        public async Task<List<T>> GetAllAsync()
+        public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var result = await _dbContext
                 .Set<T>()
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             LogInformation(nameof(GetAllAsync), result!);
 
