@@ -34,7 +34,6 @@
                                             KeyFieldName="Id"
                                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                             DataItemDeleting="OnDelete"
-                                            EditMode="GridEditMode.EditForm"
                                             PopupEditFormCssClass="my-style"
                                             PagerPosition="GridPagerPosition.Bottom"
                                             PageSizeSelectorVisible="true"
@@ -76,18 +75,21 @@
                                     <BodyTemplate Context="PopupContext">
                                         <div style="padding-top: 1rem; padding-bottom: 1rem">
                                             @{
-
+                                                var data = "";
                                                 if (FormEmails.Smpt_Encryption == "TLS (STARTTLS)")
                                                 {
-                                                    FormEmails.Smpt_Port = 25;
+                                                    data = "25";
+                                                   
                                                 }
                                                 else if (FormEmails.Smpt_Encryption == "SSL/TLS")
                                                 {
-                                                    FormEmails.Smpt_Port = 465;
+                                                    data = "465";
+                                                   
                                                 }
                                                 else if (FormEmails.Smpt_Encryption == "none")
                                                 {
-                                                    FormEmails.Smpt_Port = 0;
+                                                    data = "";
+                                                    
                                                 }
                                             }
                                             <DxFormLayout CssClass="mt">
@@ -101,10 +103,10 @@
                                                 </DxFormLayoutGroup>
                                                 <DxFormLayoutGroup Caption="Connection Information" ColSpanMd="12">
                                                     <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Server:">
-                                                        <DxTextBox @bind-Text="@FormEmails.Smpt_Host" NullText="SMPTP Server" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        <DxTextBox  @bind-Text="@FormEmails.Smpt_Host" NullText="SMPTP Server" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Port:">
-                                                        <DxSpinEdit @bind-Value="@FormEmails.Smpt_Port" NullText="SMTP PORT" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        <DxTextBox  @bind-text="@FormEmails.Smpt_Port" NullText="SMTP PORT" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                     </DxFormLayoutItem>
                                                 </DxFormLayoutGroup>
                                                 <DxFormLayoutGroup Caption="Security And Authentication" ColSpanMd="12">
@@ -112,7 +114,7 @@
                                                         <Template>
                                                             <DxComboBox Data="@Stts_Ecrypt"
                                                                         NullText="Select Ecrypt..."
-                                                                        @bind-Value="@FormEmails.Smpt_Encryption">
+                                                                        @bind-Value="@OnSmptEncryptionChange">
                                                             </DxComboBox>
                                                         </Template>
                                                     </DxFormLayoutItem>
@@ -137,7 +139,28 @@
                                                               CssClass="w-20 ml" />
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem ColSpanMd="6">
-                                                    <p>Sucess</p>
+                                                    @if (isLoading)
+                                                    {
+                                                        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+                                                    }
+                                                    else
+                                                    {
+
+                                                        @if (IsConnected)
+                                                        {
+                                                            <p class="text-success">Connection successful!</p>
+                                                        }
+                                                        else if (!IsConnected)
+                                                        {
+                                                            <p class="text-danger">Connection failed.</p>
+                                                        }
+                                                        else
+                                                        {
+
+                                                            <p></p>
+                                                        }
+                                                    }
+
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
                                         </div>

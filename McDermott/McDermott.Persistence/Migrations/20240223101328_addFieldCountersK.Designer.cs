@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240223101328_addFieldCountersK")]
+    partial class addFieldCountersK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -704,6 +707,7 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Smtp_Encryption")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Smtp_Host")
@@ -713,8 +717,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("Smtp_Pass")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Smtp_Port")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("Smtp_Port")
+                        .HasColumnType("int");
 
                     b.Property<string>("Smtp_User")
                         .HasMaxLength(200)
@@ -898,9 +902,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int?>("InsurancePolicyId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsAlertInformationSpecialCase")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Method")
                         .HasColumnType("nvarchar(max)");
 
@@ -987,9 +988,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DiastolicBP")
-                        .HasColumnType("int");
-
                     b.Property<int>("E")
                         .HasColumnType("int");
 
@@ -1014,7 +1012,7 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int>("SpO2")
                         .HasColumnType("int");
 
-                    b.Property<int>("Systolic")
+                    b.Property<int>("SystolicDiastolicBP")
                         .HasColumnType("int");
 
                     b.Property<int>("Temp")

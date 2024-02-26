@@ -22,6 +22,8 @@ namespace McDermott.Application.Features.Queries.Queue
             public async Task<List<CounterDto>> Handle(GetCounterQuery query, CancellationToken cancellationToken)
             {
                 return await _unitOfWork.Repository<Counter>().Entities
+                        .Include(x => x.Physician)
+                        .Include(x => x.Service)
                         .AsNoTracking()
                         .Select(Counter => Counter.Adapt<CounterDto>())
                         .AsNoTracking()

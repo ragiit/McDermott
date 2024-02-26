@@ -24,6 +24,7 @@
                 <div class="col">
                     @if (!GirdDetail)
                     {
+
                         @if (!ArchiveCard)
                         {
                             <div class="card">
@@ -39,12 +40,11 @@
                             <div class="row">
                                 @foreach (var i in countersActive)
                                 {
-
                                     <div class="col-md-4 ">
                                         <div class="card cards">
                                             <div class="card-header">
 
-                                                <DxToolbar Title="@i.Name" ItemRenderStyleMode="ToolbarRenderStyleMode.Plain"
+                                                <DxToolbar Title="@i.Name.ToUpper()" ItemRenderStyleMode="ToolbarRenderStyleMode.Plain"
                                                            CssClass="position-relative">
                                                     <Items>
                                                         <DxToolbarItem IconCssClass="fa-solid fa-ellipsis-vertical fa-lg" CssClass="position-absolute top-50 start-100 translate-middle">
@@ -59,35 +59,79 @@
                                             </div>
                                             <div class="card-body">
                                                 <div class="row">
+                                                    @if (i.Status == "open")
+                                                    {
+                                                        <label>Status : <p class="text-info">Open</p></label>
+                                                    }
+                                                    else if (i.Status == "on process")
+                                                    {
+                                                        <label>Status : <p class="text-success">On Process</p> </label>
 
-                                                    <h4> Total Data : 60</h4>
+                                                    }
                                                 </div>
-                                                <div class="row justify-content-end">
-                                                    <div class="col-md-4 align-self-end">
-                                                        <DxButton IconCssClass="fa-solid fa-eye" Text="view" Click="@(() => DetailList(i.Id))" />
+                                                <div class="row justify-content-end mt-3">
+                                                    <div class="col-md-auto align-self-center">
+                                                        @if (i.Status == "open")
+                                                        {
+                                                            <DxButton IconCssClass="fa-solid fa-gears" RenderStyle="ButtonRenderStyle.Info" Text="Start Configuration" Click="@(()=>ShowOnProcess(i.Id))"></DxButton>
+                                                        }
+                                                        else if (i.Status == "on process")
+                                                        {
+                                                            <DxButton IconCssClass="fa-solid fa-eye" Text="view" Click="@(() => DetailList(i.Id))" />
+                                                        }
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
                                 }
                             </div>
                             <DxPopup HeaderText="@textPopUp" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" Width="35%">
-
                                 <EditForm Model="@counterForm" Context="EditFormContext">
                                     <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem ColSpanMd="12">
                                             <DxTextBox @bind-Text="@counterForm.Name" NullText="Input Name Counter.." />
                                         </DxFormLayoutItem>
                                     </DxFormLayout>
-
                                     <div class="row justify-content-end">
                                         <div class="col-auto align-self-end">
                                             <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true" Click="OnSave"></DxButton>
                                             <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
                                         </div>
                                     </div>
-
+                                </EditForm>
+                            </DxPopup>
+                            <DxPopup HeaderText="@textPopUp.ToUpper()" Width="55rem" Height="20em" @bind-Visible="@showFormProcess">
+                                <EditForm Model="counterForm" Context="EditFormContext">
+                                    <DxFormLayout CssClass="mt">
+                                        <DxFormLayoutItem Caption="Service" ColSpanMd="12">
+                                            <DxComboBox Data="@ServiceP"
+                                                        @bind-Value="@Serviced"
+                                                        NullText="Select Service.."
+                                                        TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Service Counter" ColSpanMd="12">
+                                            <DxComboBox Data="@ServiceK"
+                                                        @bind-Value="@counterForm.ServiceKId"
+                                                        NullText="Select Service Counter.."
+                                                        TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Physician" ColSpanMd="12">
+                                            <DxComboBox Data="@Phys"
+                                                        @bind-Value="@counterForm.PhysicianId"
+                                                        NullText="Select Physician.."
+                                                        TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem ColSpanMd="12">
+                                            <div class="row justify-content-end mt-3">
+                                                <div class="col-auto align-self-end">
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-gears " Text="Configuration" SubmitFormOnClick="true" Click="OnProcess"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
+                                                </div>
+                                            </div>
+                                        </DxFormLayoutItem>
+                                    </DxFormLayout>
                                 </EditForm>
                             </DxPopup>
                         }
@@ -105,11 +149,9 @@
                             <div class="row">
                                 @foreach (var i in countersInActive)
                                 {
-
                                     <div class="col-md-4 ">
                                         <div class="card cards">
                                             <div class="card-header">
-
                                                 <DxToolbar Title="@i.Name" ItemRenderStyleMode="ToolbarRenderStyleMode.Plain"
                                                            CssClass="position-relative">
                                                     <Items>
@@ -126,11 +168,9 @@
                                             <div class="card-body">
                                                 <h4> Total Data : 60</h4>
                                             </div>
-
                                         </div>
                                     </div>
                                 }
-
                             </div>
                         }
                     }
@@ -139,33 +179,29 @@
                         <div class="Row">
                             <div class="col">
                                 <div class="card">
-                                    @foreach (var item in kiosks)
-                                    {
-                                        <div class="card-header">
-                                            <div class="row justify-content-arround">
-                                                <div class="col-md-4">
-
-                                                    <DxButton Text="Back" Click="onBack" CssClass="fs-6 fw-bolder" IconCssClass="fa-solid fa-arrow-left" />
-
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <h3>@item.Counter.Name</h3>
-                                                </div>
+                                    <div class="card-header">
+                                        <div class="row justify-content-arround">
+                                            <div class="col-md-4">
+                                                <DxButton Text="Back" Click="onBack" CssClass="fs-6 fw-bolder" IconCssClass="fa-solid fa-arrow-left" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h4>@NameCounter.ToUpper()</h4>
                                             </div>
                                         </div>
-                                        <div class="card-body">
-                                            <DxGrid @ref="Grid">
-                                                <Columns>
-                                                    <DxDataGridColumn FieldName="@item.Queue" Caption=""/>
-                                                    <DxDataGridColumn FieldName="@item.User.Name" Caption=""/>
-                                                </Columns>
-                                            </DxGrid>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                
+                                            </div>
+                                            <div class="col-md-6"></div>
                                         </div>
-                                    }
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     }
+
                 </div>
             </div>
         </div>
