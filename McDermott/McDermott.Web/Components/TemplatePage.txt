@@ -540,3 +540,69 @@ internal class DeleteInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHa
 
 
 [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
+
+
+
+
+========================== Upload Download File ==========================
+
+<DxFormLayoutItem Caption="Sip File:">
+    <DxMaskedInput @bind-Value="@UserForm.SipFile"
+                    ShowValidationIcon="true"
+                    ReadOnly="true"
+                    MaskMode="MaskMode.RegEx">
+        <Buttons>
+            <InputFile id="sipFile" accept=".txt, .pdf, .docx" OnChange="@SelectFiles" multiple="false" style="display:none" />
+            <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" />
+            <DxEditorButton Click="DownloadFile" IconCssClass="fa-solid fa-download" />
+            <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" />
+        </Buttons>
+    </DxMaskedInput>
+</DxFormLayoutItem>
+
+
+private void RemoveSelectedFile()
+{
+    UserForm.SipFile = null;
+}
+
+private async void SelectFiles(InputFileChangeEventArgs e)
+{
+    BrowserFile = e.File;
+    UserForm.SipFile = e.File.Name;
+}
+
+private async Task SelectFile()
+{
+    await JsRuntime.InvokeVoidAsync("clickInputFile", "sipFile");
+}
+
+private async Task DownloadFile()
+{
+    if (UserForm.Id != 0 && !string.IsNullOrWhiteSpace(UserForm.SipFile))
+    {
+        await Helper.DownloadFile(UserForm.SipFile, HttpContextAccessor, HttpClient, JsRuntime);
+    }
+}
+
+// Ketika Update 
+var userDtoSipFile = SelectedDataItems[0].Adapt<UserDto>().SipFile;
+
+if (UserForm.SipFile != userDtoSipFile)
+{
+    if (UserForm.SipFile != null)
+        Helper.DeleteFile(UserForm.SipFile);
+
+    if (userDtoSipFile != null)
+        Helper.DeleteFile(userDtoSipFile);
+}
+
+UserForm.DoctorServiceIds = SelectedServices.Select(x => x.Id).ToList();
+await Mediator.Send(new UpdateUserRequest(UserForm));
+
+if (UserForm.SipFile != userDtoSipFile)
+{
+    if (UserForm.SipFile != null)
+        await FileUploadService.UploadFileAsync(BrowserFile);
+}
+========================== END Upload Download File ==========================

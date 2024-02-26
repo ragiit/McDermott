@@ -402,8 +402,8 @@
                                                                     <DxTextBox @bind-Text="@FormInputCPPTGeneralConsultan.Objective" />
                                                                 </DxFormLayoutItem>
 
-                                                                @if (Convert.ToBoolean(UserLogin.IsEmployee) && Convert.ToBoolean(UserLogin.IsUser) && Convert.ToBoolean(UserLogin.IsPatient)  && Convert.ToBoolean(UserLogin.IsDoctor))
-                                                                {
+                                                               @*  @if (Convert.ToBoolean(UserLogin.IsEmployee) && Convert.ToBoolean(UserLogin.IsUser) && Convert.ToBoolean(UserLogin.IsPatient)  && Convert.ToBoolean(UserLogin.IsDoctor))
+                                                                { *@
                                                                     <DxFormLayoutItem Caption="Nursing Diagnosis:" ColSpanMd="12">
                                                                         <DxComboBox ShowValidationIcon="true" Data="@NursingDiagnoses"
                                                                                     NullText="Select Nursing Diagnosis..."
@@ -442,10 +442,10 @@
                                                                                     ValueFieldName="Id">
                                                                         </DxComboBox>
                                                                     </DxFormLayoutItem>
-                                                                }
-                                                                else if ( Convert.ToBoolean(UserLogin.IsUser) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsNurse))
-                                                                {
-                                                                    <DxFormLayoutItem Caption="Nursing Diagnosis:" ColSpanMd="12">
+                                                                @* } *@
+                                                               @*  else if ( Convert.ToBoolean(UserLogin.IsUser) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsNurse))
+                                                                { *@
+                                                                   @*  <DxFormLayoutItem Caption="Nursing Diagnosis:" ColSpanMd="12">
                                                                         <DxComboBox ShowValidationIcon="true" Data="@NursingDiagnoses"
                                                                                     NullText="Select Nursing Diagnosis..."
                                                                                     @bind-Value="@NursingDiagnosis"
@@ -460,11 +460,11 @@
 
                                                                     <DxFormLayoutItem Caption="Plan:" ColSpanMd="12">
                                                                         <DxTextBox @bind-Text="@FormInputCPPTGeneralConsultan.Plan" />
-                                                                    </DxFormLayoutItem>
-                                                                }
-                                                                 else if (Convert.ToBoolean(UserLogin.IsUser) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
-                                                                {
-                                                                     <DxFormLayoutItem Caption="Diseases:" ColSpanMd="12">
+                                                                    </DxFormLayoutItem> *@
+                                                                @* } *@
+                                                                @*  else if (Convert.ToBoolean(UserLogin.IsUser) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
+                                                                { *@
+                                                                   @*   <DxFormLayoutItem Caption="Diseases:" ColSpanMd="12">
                                                                     <DxComboBox ShowValidationIcon="true" Data="@Diagnoses"
                                                                                 NullText="Select Diseases..."
                                                                                 @bind-Value="@DiseasesId"
@@ -484,8 +484,8 @@
                                                                                     TextFieldName="Name"
                                                                                     ValueFieldName="Id">
                                                                         </DxComboBox>
-                                                                    </DxFormLayoutItem>
-                                                                }
+                                                                    </DxFormLayoutItem> *@
+                                                                @* } *@
 
                                                             </Items>
                                                         </DxFormLayoutGroup>
