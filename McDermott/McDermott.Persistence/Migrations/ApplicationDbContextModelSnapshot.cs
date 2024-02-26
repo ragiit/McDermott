@@ -898,6 +898,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int?>("InsurancePolicyId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsAlertInformationSpecialCase")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Method")
                         .HasColumnType("nvarchar(max)");
 
@@ -984,6 +987,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DiastolicBP")
+                        .HasColumnType("int");
+
                     b.Property<int>("E")
                         .HasColumnType("int");
 
@@ -1008,7 +1014,7 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int>("SpO2")
                         .HasColumnType("int");
 
-                    b.Property<int>("SystolicDiastolicBP")
+                    b.Property<int>("Systolic")
                         .HasColumnType("int");
 
                     b.Property<int>("Temp")

@@ -20,6 +20,8 @@ namespace McDermott.Application.Features.Queries.Config
                         .Select(country => country.Adapt<CountryDto>())
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
+
+                var result = await _unitOfWork.Repository<Country>().GetAllAsync();
             }
         }
 

@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.JSInterop;
 using System.Globalization;
 using System.Reflection;
-using System.Security.Permissions;
+using static DevExpress.XtraPrinting.Native.ExportOptionsPropertiesNames;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;
@@ -32,8 +32,24 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<InsuranceDto> AllInsurances = [];
         private List<InsurancePolicyDto> InsurancePolicies = [];
         private List<ServiceDto> Services = [];
+        private List<PatientAllergyDto> PatientAllergies = [];
 
         #region Form Regis
+
+        public MarkupString GetIssuePriorityIconHtml(bool priority)
+        {
+            string priorytyClass = "warning";
+            string title = "Medium";
+            if (priority == true)
+            {
+                priorytyClass = "danger";
+                title = " Priority ";
+
+                string html = string.Format("<span class='badge bg-{0} py-1 px-2' title='{1} Priority'>{1}</span>", priorytyClass, title);
+                return new MarkupString(html);
+            }
+            return new MarkupString("");
+        }
 
         private GeneralConsultanServiceDto FormRegis = new();
 
@@ -141,6 +157,20 @@ namespace McDermott.Web.Components.Pages.Transaction
                     FormRegis.PatientId = item.Id;
                 }
                 catch { }
+
+                var patientAlergy = PatientAllergies.FirstOrDefault(x => x.UserId == item.Id);
+                if (patientAlergy is not null)
+                {
+                    FormRegis.IsWeather = !string.IsNullOrWhiteSpace(patientAlergy.Weather);
+                    FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(patientAlergy.Farmacology);
+                    FormRegis.IsFood = !string.IsNullOrWhiteSpace(patientAlergy.Food);
+                }
+                else
+                {
+                    FormRegis.IsWeather = false;
+                    FormRegis.IsPharmacology = false;
+                    FormRegis.IsFood = false;
+                }
             }
         }
 
@@ -273,6 +303,22 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Grid Setting
 
+        private int _DiseasesId { get; set; }
+
+        private int DiseasesId
+        {
+            get => _DiseasesId;
+            set
+            {
+                _DiseasesId = value;
+                FormInputCPPTGeneralConsultan.DiseasesId = value;
+                var parent = Diagnoses.FirstOrDefault(z => z.Id == value).Name;
+                DiseaseCategories = AllDiseaseCategories.Where(x => x.ParentCategory == parent).ToList();
+
+                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
+            }
+        }
+
         private int ServiceId
         {
             get => _ServiceId;
@@ -373,6 +419,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<NursingDiagnosesDto> NursingDiagnoses = [];
         private List<DiagnosisDto> Diagnoses = [];
         private List<DiseaseCategoryDto> DiseaseCategories = [];
+        private List<DiseaseCategoryDto> AllDiseaseCategories = [];
         private List<GeneralConsultanCPPTDto> GeneralConsultanCPPTs = [];
 
         private class InputCPPTGeneralConsultanCPPT
@@ -480,7 +527,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             GeneralConsultanMedicalSupport.LabEximinationAttachment = e.File.Name;
 
-            //await FileUploadService.UploadFileAsync(e.File, 1 * 1024 * 1024, []);
+            await FileUploadService.UploadFileAsync(e.File, 1 * 1024 * 1024, []);
         }
 
         private async Task SelectFileLab()
@@ -490,7 +537,15 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task DownloadSIPFileLab()
         {
-            await JsRuntime.InvokeVoidAsync("clickInputFile", "labFile");
+            var a = await FileUploadService.DownloadFile(GeneralConsultanMedicalSupport.LabEximinationAttachment);
+
+            NavigationManager.NavigateTo(a);
+
+            return;
+
+            //using var s = new DotNetStreamReference(stream: a);
+
+            //await JsRuntime.InvokeVoidAsync("downloadFileFromStream", GeneralConsultanMedicalSupport.LabEximinationAttachment, s);
         }
 
         #endregion FileAttachmentLab
@@ -598,7 +653,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
             NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
             Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
-            DiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
+            AllDiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
+            PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
             await LoadData();
         }
 
@@ -673,9 +729,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             //Medical Type
             Services = await Mediator.Send(new GetServiceQuery());
-
-            //Schendule
-            var schendule = await Mediator.Send(new GetDoctorScheduleQuery());
         }
 
         private bool FormValidationState = true;
@@ -694,23 +747,29 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (!FormValidationState)
                     return;
 
+                BrowserFiles.Distinct();
+
+                foreach (var item in BrowserFiles)
+                {
+                    await FileUploadService.UploadFileAsync(item, 1 * 1024 * 1024, []);
+                }
+
                 if (FormRegis.Id == 0)
                 {
                     var result = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
-                    GeneralConsultantClinical.GeneralConsultantServiceId = result.Id;
+                    GeneralConsultantClinical.GeneralConsultanServiceId = result.Id;
+                    GeneralConsultanMedicalSupport.GeneralConsultanServiceId = result.Id;
+                    GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanServiceId = result.Id; x.Id = 0; });
                     await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
                     await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
-                    await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
                     await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
                 }
                 else
                 {
                     await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
-                    GeneralConsultantClinical.GeneralConsultantServiceId = FormRegis.Id;
-                    await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                    GeneralConsultantClinical.GeneralConsultanServiceId = FormRegis.Id;
                     await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
                     await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
-                    await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
                     await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(ids: GeneralConsultanCPPTs.Select(x => x.Id).ToList()));
                     await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
                 }
@@ -718,13 +777,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                 FormRegis = new GeneralConsultanServiceDto();
                 GeneralConsultantClinical = new();
                 showForm = false;
-
-                BrowserFiles.Distinct();
-
-                foreach (var item in BrowserFiles)
-                {
-                    await FileUploadService.UploadFileAsync(item, 1 * 1024 * 1024, []);
-                }
 
                 await LoadData();
 
@@ -748,6 +800,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
+            await SelectData();
             PanelVisible = false;
         }
 
@@ -806,8 +859,17 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     FormRegis.StagingStatus = Stagings[index + 1];
                 }
-                var clinical = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
 
+                Value = FormRegis.PatientId.ToInt32();
+                ServiceId = FormRegis.ServiceId.ToInt32();
+                DoctorId = FormRegis.PratitionerId.ToInt32();
+                PaymentMethod = FormRegis.Payment;
+
+                var clinical = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                var support = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+
+                GeneralConsultanMedicalSupport = support[0];
                 GeneralConsultantClinical = clinical[0];
             }
             catch (Exception exx)

@@ -5,9 +5,9 @@ namespace McDermott.Application.Features.Queries.Transaction
     public class GeneralConsultanMedicalSupportQuery
     {
         #region Get
-        internal class GetGeneralConsultanMedicalSupportQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetGeneralConsultanMedicalSupportQuery, List<GeneralConsultanMedicalSupportDto>>
+        internal class GetGeneralConsultanMedicalSupportQueryHandleraa(IUnitOfWork unitOfWork) : IRequestHandler<GetGeneralConsultanMedicalSupportQuery, List<GeneralConsultanMedicalSupportDto>>
         {
-            private readonly IUnitOfWork _unitOfWork;
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<List<GeneralConsultanMedicalSupportDto>> Handle(GetGeneralConsultanMedicalSupportQuery query, CancellationToken cancellationToken)
             {

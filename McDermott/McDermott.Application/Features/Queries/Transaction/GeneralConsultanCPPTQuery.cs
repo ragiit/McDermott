@@ -6,7 +6,7 @@ namespace McDermott.Application.Features.Queries.Transaction
         #region Get
         internal class GetGeneralConsultanCPPTQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetGeneralConsultanCPPTQuery, List<GeneralConsultanCPPTDto>>
         {
-            private readonly IUnitOfWork _unitOfWork;
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<List<GeneralConsultanCPPTDto>> Handle(GetGeneralConsultanCPPTQuery query, CancellationToken cancellationToken)
             {
@@ -42,17 +42,17 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-        internal class CreateListGeneralConsultantClinicalAssesmentRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateListGeneralConsultantClinicalAssesmentRequest, List<GeneralConsultantClinicalAssesmentDto>>
+        internal class CreateListGeneralConsultantClinicalAssesmentRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateListGeneralConsultanCPPTRequest, List<GeneralConsultanCPPTDto>>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-            public async Task<List<GeneralConsultantClinicalAssesmentDto>> Handle(CreateListGeneralConsultantClinicalAssesmentRequest request, CancellationToken cancellationToken)
+            public async Task<List<GeneralConsultanCPPTDto>> Handle(CreateListGeneralConsultanCPPTRequest request, CancellationToken cancellationToken)
             {
-                var result = await _unitOfWork.Repository<GeneralConsultantClinicalAssesment>().AddAsync(request.GeneralConsultantClinicalAssesmentDtos.Adapt<List<GeneralConsultantClinicalAssesment>>());
+                var result = await _unitOfWork.Repository<GeneralConsultanCPPT>().AddAsync(request.GeneralConsultanCPPTDtos.Adapt<List<GeneralConsultanCPPT>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return result.Adapt<List<GeneralConsultantClinicalAssesmentDto>>();
+                return result.Adapt<List<GeneralConsultanCPPTDto>>();
             }
         }
         #endregion

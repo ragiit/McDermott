@@ -10,5 +10,6 @@ namespace McDermott.Web.Extentions
     public interface IFileUploadService
     {
         Task<(int, string)> UploadFileAsync(IBrowserFile file, int maxFileSize, string[] allowedExtensions);
+        Task<string> DownloadFile(string fileName);
     }
 }

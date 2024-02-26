@@ -67,6 +67,8 @@ namespace McDermott.Persistence.Context
         #region Transaction
         public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
         public DbSet<GeneralConsultantClinicalAssesment> GeneralConsultantClinicalAssesments { get; set; }
+        public DbSet<GeneralConsultanCPPT> GeneralConsultanCPPTs { get; set; }
+        public DbSet<GeneralConsultanMedicalSupport> GeneralConsultanMedicalSupports { get; set; }
         #endregion
 
         #region Queue
@@ -76,6 +78,7 @@ namespace McDermott.Persistence.Context
         public DbSet<Counter> Counters { get; set; }
 
         #endregion DbSet
+
         #endregion
 
         #region OnModelCreating

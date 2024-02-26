@@ -445,7 +445,7 @@ public class DeleteInsurancePolicyRequest(int id = 0, List<int>? ids = null) : I
 #region Get
 internal class GetInsurancePolicyQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetInsurancePolicyQuery, List<InsurancePolicyDto>>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task<List<InsurancePolicyDto>> Handle(GetInsurancePolicyQuery query, CancellationToken cancellationToken)
     {

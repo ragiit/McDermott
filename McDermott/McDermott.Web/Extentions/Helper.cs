@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using static System.Net.WebRequestMethods;
 
 namespace McDermott.Web.Extentions
 {
@@ -157,5 +158,72 @@ namespace McDermott.Web.Extentions
         }
 
         public static int ToInt32(this object o) => Convert.ToInt32(o);
+
+        public static async Task DownloadFile(string file, IHttpContextAccessor HttpContextAccessor, HttpClient Http, IJSRuntime JsRuntime)
+        {
+            try
+            {
+                var currentProtocol = HttpContextAccessor.HttpContext.Request.Scheme;
+
+                var currentHost = HttpContextAccessor.HttpContext.Request.Host.Value;
+                var baseUrl = $"{currentProtocol}://{currentHost}";
+
+                var apiUrl = $"{baseUrl}/files/{file}";
+                var response = await Http.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStreamAsync();
+                    var fileName = "Hasil-Ronsen.jpeg"; // Change the file name if necessary
+
+                    using (var ms = new MemoryStream())
+                    {
+                        await content.CopyToAsync(ms);
+                        var bytes = ms.ToArray();
+                        var base64Content = Convert.ToBase64String(bytes);
+
+                        await JsRuntime.InvokeVoidAsync("downloadFile", new
+                        {
+                            fileName = file,
+                            content = base64Content
+                        });
+                    }
+                }
+                else
+                {
+                    // Handle error
+                    // You might want to show an error message or log the error
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                // You might want to show an error message or log the exception
+            }
+        }
+
+        public static void DeleteFile(string filePath)
+        {
+            try
+            {
+                // Path.Combine untuk membuat path lengkap ke file di dalam wwwroot
+                string wwwRootPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files");
+                string fullPath = Path.Combine(wwwRootPath, filePath);
+
+                if (System.IO.File.Exists(fullPath))
+                {
+                    System.IO.File.Delete(fullPath);
+                    Console.WriteLine($"File {filePath} berhasil dihapus.");
+                }
+                else
+                {
+                    Console.WriteLine($"File {filePath} tidak ditemukan.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Terjadi kesalahan saat menghapus file: {ex.Message}");
+            }
+        }
     }
 }

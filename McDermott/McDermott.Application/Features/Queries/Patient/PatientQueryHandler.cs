@@ -22,6 +22,31 @@
                         .ToListAsync(cancellationToken);
             }
         }
+
+
+
+        internal class GetPatientAllergyQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetPatientAllergyQuery, List<PatientAllergyDto>>
+        {
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+            public async Task<List<PatientAllergyDto>> Handle(GetPatientAllergyQuery query, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    var result = await _unitOfWork.Repository<PatientAllergy>().GetAsync(
+                        query.Predicate,
+                            x => x 
+                            .Include(z => z.User), cancellationToken);
+
+                    return result.Adapt<List<PatientAllergyDto>>();
+                }
+                catch (Exception e)
+                {
+                    return [];
+                }
+            }
+        }
+
         #endregion
 
         #region Create
