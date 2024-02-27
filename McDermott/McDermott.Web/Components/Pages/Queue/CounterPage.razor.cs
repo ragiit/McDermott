@@ -1,6 +1,8 @@
 ﻿using DevExpress.Data.XtraReports.Native;
+using McDermott.Application.Dtos.Queue;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
+using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 using static McDermott.Application.Features.Commands.Transaction.CounterCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
@@ -18,6 +20,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private List<ServiceDto> ServiceK = new();
         private List<ServiceDto> ServiceP = [];
         private CounterDto counterForm = new();
+        private List<KioskQueueDto> KiosksQueue = new();
         private List<KioskDto> Kiosks = new();
 
         #endregion Relation Data
@@ -243,8 +246,9 @@ namespace McDermott.Web.Components.Pages.Queue
                 GirdDetail = true;
                 var General = await Mediator.Send(new GetCounterByIdQuery(Id));
                 var a = await Mediator.Send(new GetKioskQuery());
-                Kiosks = [.. a.Where(x => x.ServiceId == General.ServiceId)];
-                NameCounter = "Counter " + General.Name;
+                var b = await Mediator.Send(new GetKioskQueueQuery());
+                KiosksQueue = [.. b.Where(x => x.ServiceId == General.ServiceId)];
+                NameCounter = "Queue Listing Counter " + General.Name;
             }
             catch (Exception ex)
             {

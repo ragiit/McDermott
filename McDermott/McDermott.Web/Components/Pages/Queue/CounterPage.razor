@@ -191,10 +191,48 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-md-6">
-                                                
+                                            <div class="col-md-4">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <label>User</label>                                                        
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <p class="mt-0">poli</p>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-9">
+                                                        <label>Service</label>
+                                                        <p></p>
+                                                    </div>                                                    
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md">
+                                                        <label>Service</label>
+                                                        <p></p>
+                                                    </div>                                                    
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md">
+                                                        <label>Service</label>
+                                                        <p></p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="col-md-6"></div>
+                                            <div class="col-md-8">
+                                                <DxGrid @ref="Grid"
+                                                        Data="@KiosksQueue">
+                                                    <Columns>
+                                                        <DxGridDataColumn FieldName="NoQueue" Caption="No" Width="60px" />
+                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" SortIndex="0" />
+                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
+                                                            <CellDisplayTemplate>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })"></DxButton>
+                                                            </CellDisplayTemplate>
+                                                        </DxGridDataColumn>
+                                                    </Columns>
+                                                </DxGrid>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

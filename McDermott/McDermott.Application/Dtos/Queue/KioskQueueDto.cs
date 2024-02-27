@@ -14,5 +14,7 @@ namespace McDermott.Application.Dtos.Queue
         public int? ServiceKId { get; set; }
         public int? NoQueue {  get; set; }
         public DateTime? CreatedDate { get; set; }
+
+        public virtual Kiosk? Kiosk { get; set; }
     }
 }
