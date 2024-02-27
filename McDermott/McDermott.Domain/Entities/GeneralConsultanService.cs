@@ -35,5 +35,9 @@ namespace McDermott.Domain.Entities
         public virtual Service? Service { get; set; }
         public virtual InsurancePolicy? InsurancePolicy { get; set; }   
 
+        public virtual List<GeneralConsultanCPPT>? GeneralConsultanCPPTs { get; set; }
+        public virtual List<GeneralConsultanMedicalSupport>? GeneralConsultanMedicalSupports { get; set; }
+        public virtual List<GeneralConsultantClinicalAssesment>? GeneralConsultantClinicalAssesments { get; set; } 
+
     }
 }

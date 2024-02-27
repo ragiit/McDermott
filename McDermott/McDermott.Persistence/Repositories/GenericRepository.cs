@@ -99,7 +99,7 @@ namespace McDermott.Persistence.Repositories
         }
         public void LogInformation(dynamic method, dynamic result)
         {
-            //Log.Information(method + " => {@result}", result);
+            Log.Information(method + " => {@result}", result);
         }
 
         public void LogError(dynamic method, dynamic result)

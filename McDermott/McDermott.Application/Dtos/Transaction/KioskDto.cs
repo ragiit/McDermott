@@ -23,7 +23,8 @@ namespace McDermott.Application.Dtos.Transaction
         public int? Queue { get; set; }
         public int? CounterId { get; set; }
         public  virtual CounterDto? Counter  { get; set; }
-        public virtual UserDto? User { get; set; }
+        public  virtual ServiceDto? Service  { get; set; }
+        public virtual UserDto? Patient { get; set; }
         
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.CodeAnalysis;
 using Microsoft.JSInterop;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Reflection;
 using static DevExpress.XtraPrinting.Native.ExportOptionsPropertiesNames;
@@ -142,15 +143,16 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 var item = patients.FirstOrDefault(x => x.Id == PatientsId);
 
-                if (item.DateOfBirth != null)
-                {
-                    DateTime currentDate = DateTime.UtcNow;
-                    Birthdate = item.DateOfBirth;
-                    Age = currentDate.Year - Birthdate!.Value.Year;
-                }
-
+              
                 try
                 {
+                    if (item.DateOfBirth != null)
+                    {
+                        DateTime currentDate = DateTime.UtcNow;
+                        Birthdate = item.DateOfBirth;
+                        Age = currentDate.Year - Birthdate!.Value.Year;
+                    }
+
                     FormRegis.Age = Age;
                     FormRegis.NoRM = item.NoRm;
                     FormRegis.IdentityNumber = item.NoId.ToString();
@@ -182,10 +184,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             get => _NursingDiagnosis;
             set
             {
-                FormInputCPPTGeneralConsultan.NursingDiagnosisId = value;
-                _NursingDiagnosis = value;
+                //FormInputCPPTGeneralConsultan.NursingDiagnosisId = value;
+                //_NursingDiagnosis = value;
 
-                FormInputCPPTGeneralConsultan.Code = NursingDiagnoses.FirstOrDefault(x => x.Id == FormInputCPPTGeneralConsultan.NursingDiagnosisId)!.Code!;
+                //FormInputCPPTGeneralConsultan.Code = NursingDiagnoses.FirstOrDefault(x => x.Id == FormInputCPPTGeneralConsultan.NursingDiagnosisId)!.Code!;
             }
         }
 
@@ -310,10 +312,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             get => _DiseasesId;
             set
             {
-                _DiseasesId = value;
-                FormInputCPPTGeneralConsultan.DiseasesId = value;
-                var parent = Diagnoses.FirstOrDefault(z => z.Id == value).Name;
-                DiseaseCategories = AllDiseaseCategories.Where(x => x.ParentCategory == parent).ToList();
+                //_DiseasesId = value;
+                //FormInputCPPTGeneralConsultan.DiseasesId = value;
+                //var parent = Diagnoses.FirstOrDefault(z => z.Id == value).Name;
+                //DiseaseCategories = AllDiseaseCategories.Where(x => x.ParentCategory == parent).ToList();
 
                 //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
             }
@@ -417,20 +419,32 @@ namespace McDermott.Web.Components.Pages.Transaction
         private GeneralConsultanCPPTDto GeneralConsultanCPPT = new();
 
         private List<NursingDiagnosesDto> NursingDiagnoses = [];
+        private List<NursingDiagnosesTemp> NursingDiagnosesTemps = [];
         private List<DiagnosisDto> Diagnoses = [];
+        private List<DiagnosesTemp> DiagnosesTemps = [];
         private List<DiseaseCategoryDto> DiseaseCategories = [];
         private List<DiseaseCategoryDto> AllDiseaseCategories = [];
         private List<GeneralConsultanCPPTDto> GeneralConsultanCPPTs = [];
+
+        private class NursingDiagnosesTemp
+        {
+            public int Id { get; set; }
+            public string Problem { get; set; } = string.Empty;
+        }
+
+        private class DiagnosesTemp
+        {
+            public int Id { get; set; }
+
+            public string NameCode { get; set; }
+        }
 
         private class InputCPPTGeneralConsultanCPPT
         {
             public string? Subjective { get; set; }
             public string? Objective { get; set; }
-            public int NursingDiagnosisId { get; set; }
-            public string? Code { get; set; }
-            public int? DiseasesId { get; set; }
-            public int? DiseasesCategoryId { get; set; }
-            public string? Plan { get; set; }
+            public string Diagnosis { get; set; }
+            public string NursingDiagnosis { get; set; }
             public DateTime Date { get; set; } = DateTime.Now;
         }
 
@@ -479,6 +493,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
 
             GeneralConsultanCPPTs.AddRange(temps);
+
             GridTabCPPT.Reload();
             OnClickCancelConfirmCPPT();
         }
@@ -507,6 +522,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             FormInputCPPTGeneralConsultan = new InputCPPTGeneralConsultanCPPT();
         }
 
+        private void OnClickGetObjectives()
+        {
+            FormInputCPPTGeneralConsultan.Objective = $"Weight: {GeneralConsultantClinical.Weight}, Height: {GeneralConsultantClinical.Height}, RR: {GeneralConsultantClinical.RR}, SpO2: {GeneralConsultantClinical.SpO2}, BMIIndex: {Math.Round(GeneralConsultantClinical.BMIIndex, 2).ToString()}, BMIState: {GeneralConsultantClinical.BMIState}, Temp: {GeneralConsultantClinical.Temp}, HR: {GeneralConsultantClinical.HR}, Systolic: {GeneralConsultantClinical.Systolic}, DiastolicBP: {GeneralConsultantClinical.DiastolicBP}, RBS: {GeneralConsultantClinical.RBS}, E: {GeneralConsultantClinical.E}, V: {GeneralConsultantClinical.V}, M: {GeneralConsultantClinical.M}";
+        }
+
         #endregion Tab CPPT
 
         #region Tab Medical Support
@@ -533,6 +553,14 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task SelectFileLab()
         {
             await JsRuntime.InvokeVoidAsync("clickInputFile", "labFile");
+        }
+
+        private async Task DownloadFile(string fileName)
+        {
+            if (GeneralConsultanMedicalSupport.Id != 0 && !string.IsNullOrWhiteSpace(fileName))
+            {
+                await Helper.DownloadFile(fileName, HttpContextAccessor, HttpClient, JsRuntime);
+            }
         }
 
         private async Task DownloadSIPFileLab()
@@ -652,7 +680,21 @@ namespace McDermott.Web.Components.Pages.Transaction
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
             NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
+            var nursingDiagnosesTemps = NursingDiagnoses.Select(x => new NursingDiagnosesTemp
+            {
+                Id = x.Id,
+                Problem = $"{x.Problem} - {x.Code}" // Menggunakan interpolasi string untuk menggabungkan Problem dan Code
+            }).ToList();
+            NursingDiagnosesTemps.AddRange(nursingDiagnosesTemps);
+
             Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
+            var diagnosesTemps = Diagnoses.Select(x => new DiagnosesTemp
+            {
+                Id = x.Id,
+                NameCode = $"{x.Name} - {x.Code}" // Menggunakan interpolasi string untuk menggabungkan Problem dan Code
+            }).ToList();
+            DiagnosesTemps.AddRange(diagnosesTemps);
+
             AllDiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
             PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
             await LoadData();
@@ -747,31 +789,58 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (!FormValidationState)
                     return;
 
-                BrowserFiles.Distinct();
-
-                foreach (var item in BrowserFiles)
-                {
-                    await FileUploadService.UploadFileAsync(item, 1 * 1024 * 1024, []);
-                }
-
                 if (FormRegis.Id == 0)
                 {
+                    BrowserFiles.Distinct();
+
+                    foreach (var item in BrowserFiles)
+                    {
+                        await FileUploadService.UploadFileAsync(item, 1 * 1024 * 1024, []);
+                    }
                     var result = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
                     GeneralConsultantClinical.GeneralConsultanServiceId = result.Id;
                     GeneralConsultanMedicalSupport.GeneralConsultanServiceId = result.Id;
                     GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanServiceId = result.Id; x.Id = 0; });
                     await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
-                    //  await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
-                    //  await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
+                    await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                    await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
                 }
                 else
                 {
                     await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
                     GeneralConsultantClinical.GeneralConsultanServiceId = FormRegis.Id;
                     await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
-                    // await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                    await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
                     await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(ids: GeneralConsultanCPPTs.Select(x => x.Id).ToList()));
-                    //   await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
+                    await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
+
+                    var userDtoSipFile = SelectedDataItems[0].Adapt<UserDto>().SipFile;
+
+                    //BrowserFiles.Distinct();
+
+                    //foreach (var item in BrowserFiles)
+                    //{
+                    //    await FileUploadService.UploadFileAsync(item, 1 * 1024 * 1024, []);
+
+                    //}
+
+                    //if (UserForm.SipFile != userDtoSipFile)
+                    //{
+                    //    if (UserForm.SipFile != null)
+                    //        Helper.DeleteFile(UserForm.SipFile);
+
+                    //    if (userDtoSipFile != null)
+                    //        Helper.DeleteFile(userDtoSipFile);
+                    //}
+
+                    //UserForm.DoctorServiceIds = SelectedServices.Select(x => x.Id).ToList();
+                    //await Mediator.Send(new UpdateUserRequest(UserForm));
+
+                    //if (UserForm.SipFile != userDtoSipFile)
+                    //{
+                    //    if (UserForm.SipFile != null)
+                    //        await FileUploadService.UploadFileAsync(BrowserFile);
+                    //}
                 }
 
                 FormRegis = new GeneralConsultanServiceDto();
@@ -837,8 +906,11 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             await SelectData();
             showForm = true;
-            textPopUp = "Add Data Registration";
-            await Grid.StartEditNewRowAsync();
+            FormRegis = new GeneralConsultanServiceDto();
+            GeneralConsultantClinical = new GeneralConsultantClinicalAssesmentDto();
+            FormInputCPPTGeneralConsultan = new InputCPPTGeneralConsultanCPPT();
+            GeneralConsultanCPPTs.Clear();
+            GeneralConsultanMedicalSupport = new GeneralConsultanMedicalSupportDto();
         }
 
         private async Task EditItem_Click()

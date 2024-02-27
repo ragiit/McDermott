@@ -98,6 +98,23 @@ namespace McDermott.Persistence.Context
             //  .OnDelete(DeleteBehavior.Cascade);
 
             // Contoh: Aturan cascade delete untuk hubungan many-to-many
+
+            modelBuilder.Entity<GeneralConsultanService>()
+              .HasMany(m => m.GeneralConsultanCPPTs)
+              .WithOne(c => c.GeneralConsultanService)
+              .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GeneralConsultanService>()
+              .HasMany(m => m.GeneralConsultanMedicalSupports)
+              .WithOne(c => c.GeneralConsultanService)
+              .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GeneralConsultanService>()
+              .HasMany(m => m.GeneralConsultantClinicalAssesments)
+              .WithOne(c => c.GeneralConsultanService)
+              .OnDelete(DeleteBehavior.Cascade);
+
+
             //modelBuilder.Entity<Province>()
             //  .HasMany(m => m.Districts)
             //  .WithOne(c => c.Province)

@@ -865,6 +865,115 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("Genders");
                 });
 
+            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanCPPT", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GeneralConsultanServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GeneralConsultanServiceId");
+
+                    b.ToTable("GeneralConsultanCPPTs");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanMedicalSupport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AlcoholEximinationAttachment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AlcoholEximinationName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("AlcoholNegative")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("AlcoholPositive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DrugEximinationAttachment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DrugEximinationName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("DrugNegative")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("DrugPositive")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("GeneralConsultanServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LabEximinationAttachment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LabEximinationName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RadiologyEximinationAttachment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RadiologyEximinationName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GeneralConsultanServiceId");
+
+                    b.ToTable("GeneralConsultanMedicalSupports");
+                });
+
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanService", b =>
                 {
                     b.Property<int>("Id")
@@ -2523,6 +2632,27 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("By");
                 });
 
+            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanCPPT", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
+                        .WithMany("GeneralConsultanCPPTs")
+                        .HasForeignKey("GeneralConsultanServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GeneralConsultanService");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanMedicalSupport", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
+                        .WithMany("GeneralConsultanMedicalSupports")
+                        .HasForeignKey("GeneralConsultanServiceId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("GeneralConsultanService");
+                });
+
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanService", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.Insurance", "Insurance")
@@ -2564,9 +2694,9 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultantClinicalAssesment", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
-                        .WithMany()
+                        .WithMany("GeneralConsultantClinicalAssesments")
                         .HasForeignKey("GeneralConsultanServiceId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("GeneralConsultanService");
                 });
@@ -2933,6 +3063,15 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.Gender", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanService", b =>
+                {
+                    b.Navigation("GeneralConsultanCPPTs");
+
+                    b.Navigation("GeneralConsultanMedicalSupports");
+
+                    b.Navigation("GeneralConsultantClinicalAssesments");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Group", b =>
