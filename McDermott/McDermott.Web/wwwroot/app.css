@@ -104,7 +104,7 @@ h1:focus {
 }
 /* Atau menggunakan gambar latar belakang */
 .custom-card-image {
-    background-image: url('https://i.pinimg.com/originals/00/07/20/000720cb78e88785c1e35c7f5c74e8cc.jpg'); /* Ganti path dengan path gambar Anda */
+    background-image: url('../image/bgCounter.jpg'); /* Ganti path dengan path gambar Anda */
     background-size: cover;
     background-position: center;
     color: #2a2b2b; /* Sesuaikan warna teks dengan gambar latar belakang */
