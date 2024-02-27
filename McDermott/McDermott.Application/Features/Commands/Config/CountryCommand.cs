@@ -7,14 +7,9 @@ namespace McDermott.Application.Features.Commands.Config
         #region Get
         public class GetCountryQuery : IRequest<List<CountryDto>>;
 
-        public class GetCountryByIdQuery : IRequest<CountryDto>
+        public class GetCountryByIdQuery(int id) : IRequest<CountryDto>
         {
-            public int Id { get; set; }
-
-            public GetCountryByIdQuery(int id)
-            {
-                Id = id;
-            }
+            public int Id { get; set; } = id;
         }
 
         #endregion

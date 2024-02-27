@@ -70,30 +70,38 @@ namespace McDermott.Web.Extentions
             }
         }
 
-        public async Task<(int, string)> UploadFileAsync(IBrowserFile file, int maxFileSize, string[] allowedExtensions)
+        public async Task<(int, string)> UploadFileAsync(IBrowserFile file, int? maxFileSize = 0, string[] allowedExtensions = null)
         {
-            var uploadDirectory = Path.Combine(_environment.WebRootPath, "Uploads");
+            if (file == null)
+                return (0, $"Null File");
+
+            var uploadDirectory = Path.Combine(_environment.WebRootPath, "files");
             if (!Directory.Exists(uploadDirectory))
             {
                 Directory.CreateDirectory(uploadDirectory);
-            }
+            } 
 
-            if (file.Size > maxFileSize)
+            if (maxFileSize > 0)
             {
-                return (0, $"File: {file.Name} exceeds the maximum allowed file size.");
+
+                if (file.Size > maxFileSize)
+                {
+                    return (0, $"File: {file.Name} exceeds the maximum allowed file size.");
+                }
             }
 
             var fileExtension = Path.GetExtension(file.Name);
-            if (allowedExtensions.Count() > 0 && !allowedExtensions.Contains(fileExtension))
+            if (allowedExtensions is not null && allowedExtensions.Count() > 0 && !allowedExtensions.Contains(fileExtension))
             {
                 return (0, $"File: {file.Name}, File type not allowed");
             }
 
             //var fileName = $"{Guid.NewGuid()}{fileExtension}";
-            var fileName = $"{fileExtension}";
+            var fileName = $"{file.Name}";
             var path = Path.Combine(uploadDirectory, fileName);
             await using var fs = new FileStream(path, FileMode.Create);
-            await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+            long size = maxFileSize == null || maxFileSize == 0? file.Size : maxFileSize.ToInt32() ;
+            await file.OpenReadStream(size).CopyToAsync(fs);
             return (1, fileName);
         }
 

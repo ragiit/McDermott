@@ -383,13 +383,13 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Sip File:">
                                                 <DxMaskedInput @bind-Value="@UserForm.SipFile"
-                                                               NullText="mail@domain.com"
                                                                ShowValidationIcon="true"
+                                                               ReadOnly="true"
                                                                MaskMode="MaskMode.RegEx">
                                                     <Buttons>
-                                                        <InputFile id="sipFile" OnChange="@SelectFiles" multiple="false" style="display:none" />
+                                                        <InputFile id="sipFile" accept=".txt, .pdf, .docx" OnChange="@SelectFiles" multiple="false" style="display:none" />
                                                         <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" />
-                                                        <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-download" />
+                                                        <DxEditorButton Click="DownloadFile" IconCssClass="fa-solid fa-download" />
                                                         <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" />
                                                     </Buttons>
                                                 </DxMaskedInput>

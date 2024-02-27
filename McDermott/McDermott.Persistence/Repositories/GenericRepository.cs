@@ -45,20 +45,34 @@ namespace McDermott.Persistence.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            var entity = await _dbContext.Set<T>().FindAsync(id);
+            try
+            {
+                var entity = await _dbContext.Set<T>().FindAsync(id);
 
-            _dbContext.Set<T>().Remove(entity!);
+                _dbContext.Set<T>().Remove(entity!);
+            }
+            catch (Exception ex)
+            {
+                LogError(nameof(DeleteAsync), ex.Message);
+            }
         }
 
         public async Task DeleteAsync(Expression<Func<T, bool>> predicate)
         {
-            var entity = await _dbContext.Set<T>()
-                                         .Where(predicate)
-                                         .ToListAsync();
-            if (entity != null)
+            try
             {
-                _dbContext.Set<T>().RemoveRange(entity);
-                await _dbContext.SaveChangesAsync();
+                var entity = await _dbContext.Set<T>()
+                                        .Where(predicate)
+                                        .ToListAsync();
+                if (entity != null)
+                {
+                    _dbContext.Set<T>().RemoveRange(entity);
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError(nameof(DeleteAsync), ex.Message);
             }
         }
 
@@ -79,13 +93,13 @@ namespace McDermott.Persistence.Repositories
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            LogInformation(nameof(GetAllAsync), result!);
+            //LogInformation(nameof(GetAllAsync), result!);
 
             return result;
         }
         public void LogInformation(dynamic method, dynamic result)
         {
-            Log.Information(method + " => {@result}", result);
+            //Log.Information(method + " => {@result}", result);
         }
 
         public void LogError(dynamic method, dynamic result)
@@ -113,24 +127,46 @@ namespace McDermott.Persistence.Repositories
 
         public async Task<List<T>> GetAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IQueryable<T>>? includes = null, CancellationToken cancellationToken = default)
         {
-            var query = _dbContext.Set<T>().AsQueryable();
-
-            if (includes is not null)
+            try
             {
-                query = includes(query);
-            }
+                var query = _dbContext.Set<T>().AsQueryable();
 
-            if (predicate is not null)
+                if (includes is not null)
+                {
+                    query = includes(query);
+                }
+
+                if (predicate is not null)
+                {
+                    query = query.Where(predicate);
+                }
+
+                LogInformation(nameof(GetAsync), query);
+
+                return await query.AsNoTracking().ToListAsync(cancellationToken);
+            }
+            catch (Exception ex)
             {
-                query = query.Where(predicate);
+                LogError(nameof(GetAsync), ex.Message);
+                return [];
             }
-
-            return await query.AsNoTracking().ToListAsync(cancellationToken);
         }
- 
+
         public async Task<T> GetByIdAsync(int id)
         {
-            return await _dbContext.Set<T>().FindAsync(id);
+            try
+            {
+                var result = await _dbContext.Set<T>().FindAsync(id);
+
+                LogInformation(nameof(GetAsync), result);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                LogError(nameof(GetAsync), ex.Message);
+                return default(T);
+            }
         }
 
         public async Task UpdateAsync(List<T> entity)
@@ -145,7 +181,7 @@ namespace McDermott.Persistence.Repositories
         public async Task<int> GetCountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
         {
             var query = _dbContext.Set<T>().AsQueryable();
-             
+
 
             if (predicate is not null)
             {

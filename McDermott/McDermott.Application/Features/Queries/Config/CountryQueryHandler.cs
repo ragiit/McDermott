@@ -16,12 +16,14 @@ namespace McDermott.Application.Features.Queries.Config
 
             public async Task<List<CountryDto>> Handle(GetCountryQuery query, CancellationToken cancellationToken)
             {
-                return await _unitOfWork.Repository<Country>().Entities
-                        .Select(country => country.Adapt<CountryDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                //return await _unitOfWork.Repository<Country>().Entities
+                //        .Select(country => country.Adapt<CountryDto>())
+                //        .AsNoTracking()
+                //        .ToListAsync(cancellationToken);
 
                 var result = await _unitOfWork.Repository<Country>().GetAllAsync();
+
+                return result.Adapt<List<CountryDto>>();
             }
         }
 

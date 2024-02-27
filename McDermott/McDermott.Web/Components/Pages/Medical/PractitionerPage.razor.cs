@@ -1,11 +1,13 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using DevExpress.Utils.Design;
+using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.JSInterop;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
+using static McDermott.Web.Components.Pages.Medical.DoctorScheduledPage;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -29,6 +31,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private bool PanelVisible = false;
         private bool FormValidationState = true;
         private bool IsAccess = false;
+        private IBrowserFile BrowserFile { get; set; }
 
         private bool ShowForm { get; set; } = false;
         private bool IsDeleted { get; set; } = true;
@@ -87,7 +90,8 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
 
             ShowForm = false;
-
+            UserForm = new UserDto();
+            SelectedDataItems = new ObservableRangeCollection<object>();
             Users = await Mediator.Send(new GetUserPractitionerQuery());
 
             PanelVisible = false;
@@ -116,17 +120,21 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async void SelectFiles(InputFileChangeEventArgs e)
         {
-            int maxFileSize = 1 * 1024 * 1024;
-            var allowedExtenstions = new string[] { ".png", ".jpg", ".jpeg", ".gif" };
-
+            BrowserFile = e.File;
             UserForm.SipFile = e.File.Name;
-
-            await FileUploadService.UploadFileAsync(e.File, maxFileSize, []);
         }
 
         private async Task SelectFile()
         {
             await JsRuntime.InvokeVoidAsync("clickInputFile", "sipFile");
+        }
+
+        private async Task DownloadFile()
+        {
+            if (UserForm.Id != 0 && !string.IsNullOrWhiteSpace(UserForm.SipFile))
+            {
+                await Helper.DownloadFile(UserForm.SipFile, HttpContextAccessor, HttpClient, JsRuntime);
+            }
         }
 
         private async Task HandleFormSubmit()
@@ -172,14 +180,44 @@ namespace McDermott.Web.Components.Pages.Medical
 
             if (UserForm.Id == 0)
             {
+                await FileUploadService.UploadFileAsync(BrowserFile);
                 var a = SelectedServices.Select(x => x.Id).ToList();
                 UserForm.DoctorServiceIds?.AddRange(a);
                 await Mediator.Send(new CreateUserRequest(UserForm));
             }
             else
             {
+                //if (UserForm.SipFile != null && SelectedDataItems[0].Adapt<UserDto>().SipFile != null && UserForm.SipFile != SelectedDataItems[0].Adapt<UserDto>().SipFile)
+                //    Helper.DeleteFile(SelectedDataItems[0].Adapt<UserDto>().SipFile!);
+
+                //if (UserForm.SipFile == null)
+                //    Helper.DeleteFile(SelectedDataItems[0].Adapt<UserDto>().SipFile!);
+
+                //UserForm.DoctorServiceIds = SelectedServices.Select(x => x.Id).ToList();
+                //await Mediator.Send(new UpdateUserRequest(UserForm));
+
+                //if (UserForm.SipFile is not null && UserForm.SipFile != SelectedDataItems[0].Adapt<UserDto>().SipFile)
+                //    await FileUploadService.UploadFileAsync(BrowserFile);
+
+                var userDtoSipFile = SelectedDataItems[0].Adapt<UserDto>().SipFile;
+
+                if (UserForm.SipFile != userDtoSipFile)
+                {
+                    if (UserForm.SipFile != null)
+                        Helper.DeleteFile(UserForm.SipFile);
+
+                    if (userDtoSipFile != null)
+                        Helper.DeleteFile(userDtoSipFile);
+                }
+
                 UserForm.DoctorServiceIds = SelectedServices.Select(x => x.Id).ToList();
                 await Mediator.Send(new UpdateUserRequest(UserForm));
+
+                if (UserForm.SipFile != userDtoSipFile)
+                {
+                    if (UserForm.SipFile != null)
+                        await FileUploadService.UploadFileAsync(BrowserFile);
+                }
             }
 
             SelectedServices = [];
