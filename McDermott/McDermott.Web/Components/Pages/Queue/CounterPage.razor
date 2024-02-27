@@ -61,16 +61,18 @@
                                                 <div class="row">
                                                     @if (i.Status == "open")
                                                     {
-                                                        <label>Status : <p class="text-info">Open</p></label>
+                                                        <label>Status : <p class="shadow-sm badge bg-body fs-6 text-info py-2 px-3">Open</p></label>
                                                     }
                                                     else if (i.Status == "on process")
                                                     {
-                                                        <label>Status : <p class="text-success">On Process</p> </label>
+
+                                                        <label>Status : <p class="shadow-sm badge bg-body fs-6 text-success py-2 px-3">On Process</p></label>
+
 
                                                     }
                                                 </div>
                                                 <div class="row justify-content-end mt-3">
-                                                    <div class="col-md-auto align-self-center">
+                                                    <div class="col-md-auto align-self-start">
                                                         @if (i.Status == "open")
                                                         {
                                                             <DxButton IconCssClass="fa-solid fa-gears" RenderStyle="ButtonRenderStyle.Info" Text="Start Configuration" Click="@(()=>ShowOnProcess(i.Id))"></DxButton>
@@ -182,7 +184,7 @@
                                     <div class="card-header">
                                         <div class="row justify-content-arround">
                                             <div class="col-md-4">
-                                                <DxButton Text="Back" Click="onBack" CssClass="fs-6 fw-bolder" IconCssClass="fa-solid fa-arrow-left" />
+                                                <DxButton Text="Back" Click="CloseDetail" CssClass="fs-6 fw-bolder" IconCssClass="fa-solid fa-arrow-left" />
                                             </div>
                                             <div class="col-md-6">
                                                 <h4>@NameCounter.ToUpper()</h4>
@@ -190,11 +192,77 @@
                                         </div>
                                     </div>
                                     <div class="card-body">
+
                                         <div class="row">
-                                            <div class="col-md-6">
-                                                
+                                            <div class="col-md-4">
+                                                <div class="row justify-content-end">
+                                                    <div class="col-md-8 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
+                                                    <hr />
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-5">
+                                                        <label>User</label>
+                                                    </div>
+                                                    <div class="col-md-7">
+                                                        <p class="mt-0">@userBy</p>
+                                                    </div>
+                                                    <hr />
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-5">
+                                                        <label>Service</label>
+                                                    </div>
+                                                    <div class="col-md-7">
+                                                        <p>@NameServices</p>
+                                                    </div>
+                                                    <hr />
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-5">
+                                                        <label>Service Kiosk</label>
+                                                    </div>
+                                                    <div class="col-md-7">
+                                                        <p>@NameServicesK</p>
+                                                    </div>
+                                                    <hr />
+                                                </div>
+                                               @*  <div class="row">
+                                                    <div class="col-md-5">
+                                                        <label>Service</label>
+                                                    </div>
+                                                    <div class="col-md-7">
+                                                        <p>Service</p>
+                                                    </div>
+                                                    <hr />
+                                                </div> *@
                                             </div>
-                                            <div class="col-md-6"></div>
+                                            <div class="col-md-8">
+                                                <DxGrid @ref="Grid"
+                                                        Data="@KiosksQueue"
+                                                        PageSize="10"
+                                                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"                                                       
+                                                        AllowSelectRowByClick="true"                                                        
+                                                        PagerPosition="GridPagerPosition.Bottom"
+                                                        PageSizeSelectorVisible="true"
+                                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                        PageSizeSelectorAllRowsItemVisible="true"
+                                                        PagerSwitchToInputBoxButtonCount="10"
+                                                        PagerVisibleNumericButtonCount="10"
+                                                        CustomizeElement="Grid_CustomizeElement"
+                                                        KeyboardNavigationEnabled="true">
+                                                    <Columns>
+                                                        <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="60px" />
+                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" SortIndex="0" />
+                                                        <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" />
+                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Phycisian" />
+                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
+                                                            <CellDisplayTemplate>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })"></DxButton>
+                                                            </CellDisplayTemplate>
+                                                        </DxGridDataColumn>
+                                                    </Columns>
+                                                </DxGrid>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
