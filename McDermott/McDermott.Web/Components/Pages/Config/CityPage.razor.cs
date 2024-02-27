@@ -80,6 +80,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
+            PanelVisible = true;
             try
             {
                 var result = await NavigationManager.CheckAccessUser(oLocal);
@@ -113,6 +114,7 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task LoadData()
         {
             PanelVisible = true;
+            await Task.Delay(3000);
             SelectedDataItems = new ObservableRangeCollection<object>();
             Cities = await Mediator.Send(new GetCityQuery());
             PanelVisible = false;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +15,7 @@ namespace McDermott.Application.Dtos.Queue
         public int? ServiceKId { get; set; }
         public int? NoQueue {  get; set; }
         public DateTime? CreatedDate { get; set; }
+        public string? Queues { get; set; }
 
         public virtual Kiosk? Kiosk { get; set; }
     }

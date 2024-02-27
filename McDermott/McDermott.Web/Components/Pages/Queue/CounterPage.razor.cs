@@ -45,6 +45,10 @@ namespace McDermott.Web.Components.Pages.Queue
         private int idServiceK { get; set; }
         private int ActiveTabIndex { get; set; } = 1;
         private string NameCounter { get; set; } = string.Empty;
+        private string NameServices { get; set; } = string.Empty;
+        private string NameServicesK { get; set; } = string.Empty;
+        private string? userBy;
+        private User? User = new();
 
         private int FocusedRowVisibleIndex { get; set; }
 
@@ -239,6 +243,11 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
+        private void CloseDetail()
+        {
+            GirdDetail = false;
+        }
+
         private async Task DetailList(int Id)
         {
             try
@@ -249,6 +258,20 @@ namespace McDermott.Web.Components.Pages.Queue
                 var b = await Mediator.Send(new GetKioskQueueQuery());
                 KiosksQueue = [.. b.Where(x => x.ServiceId == General.ServiceId)];
                 NameCounter = "Queue Listing Counter " + General.Name;
+                var q = KiosksQueue.Select(x => x.NoQueue).ToList();
+                var s = General.ServiceId;
+                var sk = General.ServiceKId;
+                NameServices = Services.Where(x => x.Id == s).Select(x => x.Name).FirstOrDefault();
+                if (sk != null)
+                {
+                    NameServicesK = Services.Where(x => x.Id == sk).Select(x => x.Name).FirstOrDefault();
+                }
+                else
+                {
+                    NameServicesK = "-";
+                }
+                User = await oLocal.GetUserInfo();
+                userBy = User.Name;
             }
             catch (Exception ex)
             {

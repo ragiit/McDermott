@@ -24,6 +24,8 @@ namespace McDermott.Application.Features.Queries.Queue
                 return await _unitOfWork.Repository<KioskQueue>().Entities
                         .Include(x => x.Kiosk)
                         .Include(x => x.Kiosk.Patient)
+                        .Include(x => x.Kiosk.Service)
+                        .Include(x => x.Kiosk.Physician)
                         .Include(x => x.Service)
                         .AsNoTracking()
                         .Select(KioskQueue => KioskQueue.Adapt<KioskQueueDto>())
