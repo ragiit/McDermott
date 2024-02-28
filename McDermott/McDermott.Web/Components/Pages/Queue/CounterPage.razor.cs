@@ -79,6 +79,29 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
+        public MarkupString GetIssuePriorityIconHtml(string status)
+        {
+            string priorytyClass = "info";
+            string title = "Call";
+            if (status == "call")
+            {
+                priorytyClass = "info";
+                title = " Call ";
+
+                string html = string.Format("<div class='row justify-content-center'><div class='col-sm-5 pl-0'><span class='badge bg-{0} py-1 px-4' title='{1}'>{1}</span></div></div>", priorytyClass, title);
+                return new MarkupString(html);
+            }
+            else if (status == "hadir")
+            {
+                priorytyClass = "success";
+                title = " Hadir ";
+
+                string html = string.Format("<div class='row justify-content-center'><div class='col-sm-5 pl-0'><span class='badge bg-{0} py-1 px-4' title='{1}'>{1}</span></div></div>", priorytyClass, title);
+                return new MarkupString(html);
+            }
+            return new MarkupString("");
+        }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -256,7 +279,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 var General = await Mediator.Send(new GetCounterByIdQuery(Id));
                 var a = await Mediator.Send(new GetKioskQuery());
                 var b = await Mediator.Send(new GetKioskQueueQuery());
-                KiosksQueue = [.. b.Where(x => x.ServiceId == General.ServiceId)];
+                KiosksQueue = [.. b.Where(x => x.ServiceId == General.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date)];
                 NameCounter = "Queue Listing Counter " + General.Name;
                 var q = KiosksQueue.Select(x => x.NoQueue).ToList();
                 var s = General.ServiceId;
@@ -336,6 +359,7 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             counterForm = new();
             PopUpVisible = false;
+            showFormProcess = false;
         }
 
         #endregion Button Function

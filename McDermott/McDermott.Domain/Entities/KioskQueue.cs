@@ -11,6 +11,7 @@ namespace McDermott.Domain.Entities
         public int? KioskId { get; set; }
         public int? ServiceId { get; set; }       
         public int? NoQueue { get; set; }
+        public string? Status { get; set; }
 
         public virtual Kiosk? Kiosk { get; set; }
         public virtual Service? Service { get; set; }

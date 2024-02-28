@@ -1,4 +1,5 @@
-﻿using DevExpress.Data.XtraReports.Native;
+﻿using Blazored.TextEditor;
+using DevExpress.Data.XtraReports.Native;
 using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Config.EmailTemplateCommand;
 
@@ -6,6 +7,8 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class EmailTemplatePage
     {
+        #region grid configuration
+
         private bool[] DocumentContent;
         private BaseAuthorizationLayout AuthorizationLayout = new();
         private bool IsAccess { get; set; } = false;
@@ -29,6 +32,27 @@ namespace McDermott.Web.Components.Pages.Config
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
+
+        #endregion grid configuration
+
+        #region BlazoredTextEditor
+
+        private BlazoredTextEditor richEditor = default!;
+        private string toolbar = """"...markup here..."""";
+        private string body = """"...markup here..."""";
+        private BlazoredTextEditor QuillHtml;
+        private BlazoredTextEditor QuillNative;
+        private BlazoredTextEditor QuillReadOnly;
+
+        private string QuillHTMLContent;
+        private string QuillContent;
+
+        private string QuillReadOnlyContent =
+            @"<span><b>Read Only</b> <u>Content</u></span>";
+
+        private bool mode = false;
+
+        #endregion BlazoredTextEditor
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
