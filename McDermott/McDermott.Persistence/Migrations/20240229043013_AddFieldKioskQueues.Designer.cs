@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240229043013_AddFieldKioskQueues")]
+    partial class AddFieldKioskQueues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2643,9 +2646,9 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanCPPT", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
-                        .WithMany("GeneralConsultanCPPTs")
+                        .WithMany()
                         .HasForeignKey("GeneralConsultanServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("GeneralConsultanService");
@@ -2654,9 +2657,9 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanMedicalSupport", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
-                        .WithMany("GeneralConsultanMedicalSupports")
+                        .WithMany()
                         .HasForeignKey("GeneralConsultanServiceId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("GeneralConsultanService");
                 });
@@ -2702,9 +2705,9 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultantClinicalAssesment", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
-                        .WithMany("GeneralConsultantClinicalAssesments")
+                        .WithMany()
                         .HasForeignKey("GeneralConsultanServiceId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("GeneralConsultanService");
                 });
@@ -3078,15 +3081,6 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.Gender", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanService", b =>
-                {
-                    b.Navigation("GeneralConsultanCPPTs");
-
-                    b.Navigation("GeneralConsultanMedicalSupports");
-
-                    b.Navigation("GeneralConsultantClinicalAssesments");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Group", b =>

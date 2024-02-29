@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace McDermott.Application.Dtos.Transaction
+namespace McDermott.Application.Dtos.Queue
 {
     public class CounterDto : IMapFrom<Counter>
     {
@@ -16,7 +16,10 @@ namespace McDermott.Application.Dtos.Transaction
         public int? ServiceId { get; set; }
         public int? ServiceKId { get; set; }
         public int? PhysicianId { get; set; }
+
         public string? Status { get; set; } = string.Empty;
+
+        public virtual ServiceDto? Service { get; set; }
 
 
     }

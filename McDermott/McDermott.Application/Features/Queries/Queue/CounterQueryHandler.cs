@@ -1,4 +1,4 @@
-﻿using McDermott.Application.Dtos.Transaction;
+﻿using McDermott.Application.Dtos.Queue;
 using System;
 using System.Collections.Generic;
 using System.Linq;
