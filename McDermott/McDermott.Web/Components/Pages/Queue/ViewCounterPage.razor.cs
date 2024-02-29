@@ -13,6 +13,8 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private List<CounterDto> counters = new();
         private List<KioskQueueDto> KiosksQueue = new();
+        private List<KioskQueueDto> DataKiosksQueue = new();
+        private KioskQueueDto FormKiosksQueue = new();
         private List<KioskDto> Kiosks = new();
         private List<ServiceDto> Services = [];
         private List<UserDto> Physicians = [];
@@ -63,24 +65,24 @@ namespace McDermott.Web.Components.Pages.Queue
             var general = await Mediator.Send(new GetCounterByIdQuery(id));
             Services = await Mediator.Send(new GetServiceQuery());
             var physician = await Mediator.Send(new GetUserQuery());
-            var b = await Mediator.Send(new GetKioskQueueQuery());
+            DataKiosksQueue = await Mediator.Send(new GetKioskQueueQuery());
 
             //var cekServicesK = service
             if (general.ServiceId == null & general.PhysicianId == null)
             {
-                KiosksQueue = [.. b.Where(x => x.Service?.ServicedId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date)];
+                KiosksQueue = [.. DataKiosksQueue.Where(x => x.Service?.ServicedId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date)];
             }
             else if (general.ServiceId != null & general.PhysicianId == null)
             {
-                KiosksQueue = [.. b.Where(x => x.Service?.ServicedId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.ServiceId == general.ServiceId)];
+                KiosksQueue = [.. DataKiosksQueue.Where(x => x.Service?.ServicedId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.ServiceId == general.ServiceId)];
             }
             else if (general.ServiceId == null & general.PhysicianId != null)
             {
-                KiosksQueue = [.. b.Where(x => x.Service?.ServicedId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId)];
+                KiosksQueue = [.. DataKiosksQueue.Where(x => x.Service?.ServicedId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId)];
             }
             else if (general.ServiceId != null & general.PhysicianId != null)
             {
-                KiosksQueue = [.. b.Where(x => x.Service?.ServicedId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId && x.ServiceId == general.ServiceId)];
+                KiosksQueue = [.. DataKiosksQueue.Where(x => x.Service?.ServicedId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId && x.ServiceId == general.ServiceId)];
             }
             NameCounter = $"Queue Listing Counter {general.Name}";
             sId = general.ServiceId;
@@ -140,6 +142,29 @@ namespace McDermott.Web.Components.Pages.Queue
         #endregion Grid Confiduration
 
         #region Function Button
+
+        private async Task Click_Call(int id)
+        {
+            try
+            {
+                var data = DataKiosksQueue.Where(x => x.Id == id).FirstOrDefault();
+                FormKiosksQueue.Id = data.Id;
+                FormKiosksQueue.KioskId = data.KioskId;
+                FormKiosksQueue.ServiceId = data.ServiceId;
+                FormKiosksQueue.NoQueue = data.NoQueue;
+                FormKiosksQueue.ServiceKId = data.ServiceKId;
+                FormKiosksQueue.Status = "call";
+
+                if (FormKiosksQueue.Id != null)
+                {
+                    await Mediator.Send(new UpdateKioskQueueRequest(FormKiosksQueue));
+                }
+                await LoadData();
+            }catch(Exception ex)
+            {
+                ToastService.ShowError(ex.Message);
+            }
+        }
 
         private void CloseDetail()
         {

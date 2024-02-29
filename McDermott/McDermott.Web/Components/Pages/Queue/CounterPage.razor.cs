@@ -70,7 +70,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 service = Services.Where(x => x.Id == value).ToList();
 
                 //get Service Flag P
-                ServiceP = Services.Where(x => x.ServicedId == value).ToList();
+                ServiceP = Services.Where(x => x.ServicedId == value && x.IsPatient == true).ToList();
 
                 //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
             }

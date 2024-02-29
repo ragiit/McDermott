@@ -93,7 +93,18 @@
                                                                 </DxGridDataColumn>
                                                                 <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
                                                                     <CellDisplayTemplate>
-                                                                        <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })"></DxButton>
+                                                                        @{
+                                                                            var a = (KioskQueueDto)context.DataItem;
+                                                                        }
+                                                                        @if (a.Status == null)
+                                                                        {
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                        }
+                                                                        else if (a.Status == "call")
+                                                                        {
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Success" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-clipboard-user" Attributes="@(new Dictionary<string, object> {  ["title"] = "Hadir" })" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                        }
                                                                     </CellDisplayTemplate>
                                                                 </DxGridDataColumn>
                                                             </Columns>
@@ -162,7 +173,7 @@
                                                                 KeyboardNavigationEnabled="true">
                                                             <Columns>
                                                                 <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="60px" />
-                                                                <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" SortIndex="0" /> 
+                                                                <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" SortIndex="0" />
                                                                 <DxGridDataColumn FieldName="Status" Caption="Status">
                                                                     <CellDisplayTemplate>
                                                                         @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).Status)
@@ -170,7 +181,18 @@
                                                                 </DxGridDataColumn>
                                                                 <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
                                                                     <CellDisplayTemplate>
-                                                                        <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })"></DxButton>
+                                                                        @{
+                                                                            var a = (KioskQueueDto)context.DataItem;
+                                                                        }
+                                                                        @if (a.Status == null)
+                                                                        {
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                        }
+                                                                        else if (a.Status == "call")
+                                                                        {
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Success" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-clipboard-user" Attributes="@(new Dictionary<string, object> {  ["title"] = "Hadir" })" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                        }
                                                                     </CellDisplayTemplate>
                                                                 </DxGridDataColumn>
                                                             </Columns>
@@ -248,7 +270,18 @@
                                                                 </DxGridDataColumn>
                                                                 <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
                                                                     <CellDisplayTemplate>
-                                                                        <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })"></DxButton>
+                                                                        @{
+                                                                            var a = (KioskQueueDto)context.DataItem;
+                                                                        }
+                                                                        @if (a.Status == null)
+                                                                        {
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                        }
+                                                                        else if (a.Status == "call")
+                                                                        {
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Success" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-clipboard-user" Attributes="@(new Dictionary<string, object> {  ["title"] = "Hadir" })" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                        }
                                                                     </CellDisplayTemplate>
                                                                 </DxGridDataColumn>
                                                             </Columns>
@@ -326,7 +359,17 @@
                                                                 </DxGridDataColumn>
                                                                 <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
                                                                     <CellDisplayTemplate>
-                                                                        <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })"></DxButton>
+                                                                        @{
+                                                                            var a = (KioskQueueDto)context.DataItem;
+                                                                        }
+                                                                        @if (a.Status == null)
+                                                                        {
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                        }else if(a.Status == "call")
+                                                                        {
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Success" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-clipboard-user" Attributes="@(new Dictionary<string, object> {  ["title"] = "Hadir" })" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                        }
                                                                     </CellDisplayTemplate>
                                                                 </DxGridDataColumn>
                                                             </Columns>

@@ -59,7 +59,15 @@
                                                         }else{
                                                             <DxToolbarItem Enabled ="false" Text="Delete" Click="@(() => OnDelete(i.Id))" IconCssClass="fa-solid fa-trash" />
                                                         }
-                                                        <DxToolbarItem Text="Closed" Click="@(() => InActive_Click(i.Id))" IconCssClass="fa-solid fa-circle-xmark" />
+                                                        @if (i.Status == "open")
+                                                        {
+                                                            <DxToolbarItem Enabled="false" Text="Closed" Click="@(() => InActive_Click(i.Id))" IconCssClass="fa-solid fa-circle-xmark" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <DxToolbarItem Text="Closed" Click="@(() => InActive_Click(i.Id))" IconCssClass="fa-solid fa-circle-xmark" />
+                                                        }
+                                                       
                                                     </Items>
                                                 </DxToolbarItem>
                                             </Items>

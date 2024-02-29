@@ -72,7 +72,7 @@
                                          HeaderText="@TextPopUp"
                                          Width="60%"
                                          Height="90%">
-                                    <BodyTemplate Context="PopupContext">
+                                    <EditForm Model="@FormEmails" Context="EditFormContext">
                                         <div style="padding-top: 1rem; padding-bottom: 1rem">
                                             @{
                                                 var data = "";
@@ -162,9 +162,19 @@
                                                     }
 
                                                 </DxFormLayoutItem>
+                                                <DxFormLayoutItem ColSpanMd="12">
+                                                    <div class="row justify-content-end">
+                                                        <div class="col-4">
+                                                            <DxButton Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <DxButton Text="Discard" SubmitFormOnClick="true"></DxButton>
+                                                        </div>
+                                                    </div>
+                                                </DxFormLayoutItem>
                                             </DxFormLayout>
                                         </div>
-                                    </BodyTemplate>
+                                    </EditForm>
                                 </DxPopup>
                             </div>
                         </div>
