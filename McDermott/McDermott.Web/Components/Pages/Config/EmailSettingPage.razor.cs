@@ -47,7 +47,7 @@ namespace McDermott.Web.Components.Pages.Config
         };
 
         private string resultMessage = "";
-        private bool IsConnected { get; set; }
+        private bool? IsConnected { get; set; }
         private bool isLoading { get; set; }
 
         #endregion Data static
@@ -85,6 +85,7 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task LoadData()
         {
             PanelVisible = true;
+            PopUpVisible = false;
             SelectedDataItems = new ObservableRangeCollection<object>();
             EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
             PanelVisible = false;
@@ -129,16 +130,32 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItem_Click()
         {
+            FormEmails = new();
             PopUpVisible = true;
+            IsConnected = null;
             TextPopUp = "Tambah Data";
-            await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
+            try
+            {
+                var general = SelectedDataItems[0].Adapt<EmailSettingDto>();
+                FormEmails = general;
+
+                PopUpVisible = true;
+                TextPopUp = "Edit Data";
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError(ex.Message);
+            }
+        }
+
+        private async Task OnCancel()
+        {
             PopUpVisible = false;
-            TextPopUp = "Edit Data";
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            await LoadData();
         }
 
         private void DeleteItem_Click()
@@ -197,9 +214,9 @@ namespace McDermott.Web.Components.Pages.Config
 
         #region Save Function
 
-        private async Task OnSave(GridEditModelSavingEventArgs e)
+        private async Task OnSave()
         {
-            var editModel = (EmailSettingDto)e.EditModel;
+            var editModel = FormEmails;
 
             if (string.IsNullOrWhiteSpace(editModel.Description))
                 return;
@@ -214,26 +231,42 @@ namespace McDermott.Web.Components.Pages.Config
 
         #endregion Save Function
 
-        private string currentSmptEncryption = "";
+        private string currentSmtpEncryption = "";
 
-        private string OnSmptEncryptionChange
+        private void SelectedItemChanged(string e)
         {
-            get => currentSmptEncryption;
+            if (e.Equals("TLS (STARTTLS)"))
+            {
+                FormEmails.Smtp_Port = "25";
+            }
+            else if (e.Equals("SSL/TLS"))
+            {
+                FormEmails.Smtp_Port = "465";
+            }
+            else if (e.Equals("none"))
+            {
+                FormEmails.Smtp_Port = "";
+            }
+        }
+
+        private string OnSmtpEncryptionChange
+        {
+            get => currentSmtpEncryption;
             set
             {
-                currentSmptEncryption = value;
-                FormEmails.Smpt_Encryption = value;
-                if (currentSmptEncryption == "TLS (STARTTLS)")
+                currentSmtpEncryption = value;
+                FormEmails.Smtp_Encryption = value;
+                if (currentSmtpEncryption == "TLS (STARTTLS)")
                 {
-                    FormEmails.Smpt_Port = "25";
+                    FormEmails.Smtp_Port = "25";
                 }
-                else if (currentSmptEncryption == "SSL/TLS")
+                else if (currentSmtpEncryption == "SSL/TLS")
                 {
-                    FormEmails.Smpt_Port = "465";
+                    FormEmails.Smtp_Port = "465";
                 }
-                else if (currentSmptEncryption == "none")
+                else if (currentSmtpEncryption == "none")
                 {
-                    FormEmails.Smpt_Port = "";
+                    FormEmails.Smtp_Port = "";
                 }
             }
         }
@@ -242,17 +275,18 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                var Port = int.Parse(FormEmails.Smpt_Port);
+                var Port = int.Parse(FormEmails.Smtp_Port);
                 isLoading = true;
                 using (var client = new MailKit.Net.Smtp.SmtpClient())
                 {
-                    await client.ConnectAsync(FormEmails.Smpt_Host, Port, MailKit.Security.SecureSocketOptions.Auto);
+                    await client.ConnectAsync(FormEmails.Smtp_Host, Port, MailKit.Security.SecureSocketOptions.Auto);
 
                     if (client.IsConnected)
                     {
-                        await client.AuthenticateAsync(FormEmails.Smpt_User, FormEmails.Smpt_Pass);
+                        await client.AuthenticateAsync(FormEmails.Smtp_User, FormEmails.Smtp_Pass);
                         IsConnected = true;
                         ToastService.ShowSuccess("Connection Success");
+                        FormEmails.Status = "testing";
                     }
                 }
                 isLoading = false;
@@ -262,7 +296,7 @@ namespace McDermott.Web.Components.Pages.Config
                 isLoading = true;
                 Console.WriteLine(ex.Message);
                 IsConnected = false;
-                ToastService.ShowError("Connection InValid!!!");
+                ToastService.ShowError("Connection Failed!!!");
                 isLoading = false;
             }
         }

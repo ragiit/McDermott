@@ -19,6 +19,7 @@ namespace McDermott.Application.Dtos.Config
 
         [StringLength(200)]
         public string? From { get; set; } = string.Empty;
+        public string? Status { get; set; } = string.Empty;
 
         [StringLength(200)]
         public string? To { get; set; } = string.Empty;

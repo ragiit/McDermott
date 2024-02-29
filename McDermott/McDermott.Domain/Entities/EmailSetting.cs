@@ -12,6 +12,7 @@ namespace McDermott.Domain.Entities
         [StringLength(200)]
         public string? Smtp_Host { get; set; }
         public string? Smtp_Pass { get; set; }
+        public string? Status { get; set; }
         
         public string? Smtp_Port { get; set; }
         [StringLength(200)]
