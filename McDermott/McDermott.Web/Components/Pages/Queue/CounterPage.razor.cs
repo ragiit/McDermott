@@ -42,11 +42,13 @@ namespace McDermott.Web.Components.Pages.Queue
         private bool GirdDetail { get; set; } = false;
         private int CountCard { get; set; } = 0;
         private int _ServiceId { get; set; }
+        private int _physicionId { get; set; }
         private int idServiceK { get; set; }
         private int ActiveTabIndex { get; set; } = 1;
         private string NameCounter { get; set; } = string.Empty;
         private string NameServices { get; set; } = string.Empty;
         private string NameServicesK { get; set; } = string.Empty;
+        private int? PhysicianId { get; set; }
         private string? userBy;
         private User? User = new();
 
@@ -56,21 +58,38 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Async Data And Auth
 
-        private int Serviced
+        private int SelectServiced
         {
             get => _ServiceId;
             set
             {
                 _ServiceId = value;
+                counterForm.ServiceKId = value;
+                List<ServiceDto> service = new();
+                service = Services.Where(x => x.Id == value).ToList();
+
+                //get Service Flag P
+                ServiceP = Services.Where(x => x.ServicedId == value).ToList();
+
+                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
+            }
+        }
+
+        private int SelectPhysicion
+        {
+            get => _physicionId;
+            set
+            {
+                _physicionId = value;
                 counterForm.ServiceId = value;
                 List<ServiceDto> service = new();
                 service = Services.Where(x => x.Id == value).ToList();
 
+                //get Physicion
                 foreach (var i in service)
                 {
                     if (i != null)
                     {
-                        ServiceK = Services.Where(x => x.Id == i.ServicedId).ToList();
                         Phys = Physicians.Where(x => x.DoctorServiceIds.Contains(value)).ToList();
                     }
                 }
@@ -141,7 +160,7 @@ namespace McDermott.Web.Components.Pages.Queue
             counterForm = new();
             counters = await Mediator.Send(new GetCounterQuery());
             Services = await Mediator.Send(new GetServiceQuery());
-            ServiceP = [.. Services.Where(x => x.IsPatient == true)];
+            ServiceK = [.. Services.Where(x => x.IsKiosk == true)];
             var Physician = await Mediator.Send(new GetUserQuery());
             Physicians = [.. Physician.Where(x => x.IsPhysicion == true)];
             countersActive = [.. counters.Where(x => x.IsActive == true)];
@@ -221,6 +240,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 StateHasChanged();
                 PanelVisible = true;
                 counterForm = new();
+
                 var General = await Mediator.Send(new GetCounterByIdQuery(id));
                 counterForm.Id = General.Id;
                 counterForm.Name = General.Name;
@@ -231,7 +251,7 @@ namespace McDermott.Web.Components.Pages.Queue
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                ToastService.ShowError(ex.Message);
             }
         }
 
@@ -277,6 +297,10 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 GirdDetail = true;
                 var General = await Mediator.Send(new GetCounterByIdQuery(Id));
+                if (General.PhysicianId != null)
+                {
+                    PhysicianId = General.PhysicianId;
+                }
                 var a = await Mediator.Send(new GetKioskQuery());
                 var b = await Mediator.Send(new GetKioskQueueQuery());
                 KiosksQueue = [.. b.Where(x => x.ServiceId == General.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date)];
@@ -284,6 +308,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 var q = KiosksQueue.Select(x => x.NoQueue).ToList();
                 var s = General.ServiceId;
                 var sk = General.ServiceKId;
+
                 NameServices = Services.Where(x => x.Id == s).Select(x => x.Name).FirstOrDefault();
                 if (sk != null)
                 {
@@ -293,6 +318,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     NameServicesK = "-";
                 }
+
                 User = await oLocal.GetUserInfo();
                 userBy = User.Name;
             }
@@ -404,16 +430,22 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task OnProcess()
         {
-            //counterForm.Name = General.Name;
-            counterForm.IsActive = true;
-            counterForm.Status = "on process";
-            var edit = counterForm;
-            if (counterForm.Id != 0)
+            try
             {
-                await Mediator.Send(new UpdateCounterRequest(counterForm));
+                counterForm.IsActive = true;
+                counterForm.Status = "on process";
+                var edit = counterForm;
+                if (counterForm.Id != 0)
+                {
+                    await Mediator.Send(new UpdateCounterRequest(counterForm));
+                }
+                showFormProcess = false;
+                await LoadData();
             }
-            showFormProcess = false;
-            await LoadData();
+            catch (Exception ex)
+            {
+                ToastService.ShowError(ex.Message);
+            }
         }
 
         #endregion Methode Save And Update

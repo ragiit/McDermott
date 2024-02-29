@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace McDermott.Application.Dtos.Transaction
+namespace McDermott.Application.Dtos.Queue
 {
     public partial class KioskDto : IMapFrom<Kiosk>
     {
@@ -22,9 +22,9 @@ namespace McDermott.Application.Dtos.Transaction
         public int? PhysicianId { get; set; }
         public int? Queue { get; set; }
         public int? CounterId { get; set; }
-        public  virtual CounterDto? Counter  { get; set; }
-        public  virtual ServiceDto? Service  { get; set; }
+        public virtual CounterDto? Counter { get; set; }
+        public virtual ServiceDto? Service { get; set; }
         public virtual UserDto? Patient { get; set; }
-        
+
     }
 }
