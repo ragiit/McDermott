@@ -29,8 +29,14 @@ namespace McDermott.Persistence.Extensions
             //   options.UseSqlServer(connectionString,
             //       builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
-            services.AddDbContextFactory<ApplicationDbContext>(options =>
-               options.UseSqlServer(connectionString), ServiceLifetime.Transient);
+            //services.AddDbContextFactory<ApplicationDbContext>(options =>
+            //   options.UseSqlServer(connectionString), ServiceLifetime.Transient);
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                options.UseSqlServer(connectionString);
+            }, ServiceLifetime.Transient);
         }
 
         private static void AddRepositories(this IServiceCollection services)

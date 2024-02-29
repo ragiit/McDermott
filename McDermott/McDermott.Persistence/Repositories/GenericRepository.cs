@@ -1,4 +1,5 @@
-﻿using McDermott.Application.Interfaces.Repositories;
+﻿using Mapster;
+using McDermott.Application.Interfaces.Repositories;
 using McDermott.Domain.Common;
 using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -33,12 +34,18 @@ namespace McDermott.Persistence.Repositories
 
         public Task UpdateAsync(T entity)
         {
-            T exist = _dbContext.Set<T>().Find(entity.Id);
+            T exist = _dbContext.Set<T>().Find(entity.Id)!;
+
+            // Melampirkan entitas yang sudah ada ke DbContext
+            _dbContext.Attach(exist);
+
+            // Menandai entitas sebagai dimodifikasi
+            _dbContext.Entry(exist).State = EntityState.Modified;
 
             entity.CreatedBy = exist.CreatedBy;
-            entity.CreatedDate = exist.CreatedDate;
-
-            _dbContext.Entry(exist).CurrentValues.SetValues(entity);
+            entity.CreatedDate = exist.CreatedDate; 
+             
+            exist = entity.Adapt(exist); 
 
             return Task.CompletedTask;
         }
@@ -99,12 +106,13 @@ namespace McDermott.Persistence.Repositories
         }
         public void LogInformation(dynamic method, dynamic result)
         {
-            //Log.Information(method + " => {@result}", result);
+            // Uncomment jika ingin melihat data di console
+            //Log.Information(method + " => {@result}", result); 
         }
 
         public void LogError(dynamic method, dynamic result)
         {
-            Log.Error(method + " => {@result}", result);
+            Log.Error(method + "ERROR => {@result}", result);
         }
         public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
         {
