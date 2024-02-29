@@ -1,22 +1,26 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace McDermott.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class AddFieldKioskQueue : Migration
+    public partial class addFieldEmailSettingTemplate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
                 name: "Status",
-                table: "KioskQueues",
+                table: "EmailTemplates",
                 type: "nvarchar(max)",
                 nullable: true);
 
+            migrationBuilder.AddColumn<string>(
+                name: "Status",
+                table: "EmailSettings",
+                type: "nvarchar(max)",
+                nullable: true);
         }
 
         /// <inheritdoc />
@@ -24,7 +28,11 @@ namespace McDermott.Persistence.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "Status",
-                table: "KioskQueues");
+                table: "EmailTemplates");
+
+            migrationBuilder.DropColumn(
+                name: "Status",
+                table: "EmailSettings");
         }
     }
 }
