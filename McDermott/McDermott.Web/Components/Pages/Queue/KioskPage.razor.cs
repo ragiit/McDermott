@@ -53,10 +53,12 @@ namespace McDermott.Web.Components.Pages.Queue
             "NIP",
             "Oracle",
             "SAP",
-            "Legacy"
+            "Legacy",
+            "NIK"
         };
 
         private string? NamePatient { get; set; } = string.Empty;
+        private string? statBPJS { get; set; } = string.Empty;
         private int? CountServiceId { get; set; }
 
         private KioskDto FormKios = new();
@@ -271,6 +273,12 @@ namespace McDermott.Web.Components.Pages.Queue
                 if (FormKios.BPJS != null)
                 {
                     FormKios.StageBpjs = true;
+                    statBPJS = "Active";
+                }
+                else
+                {
+                    FormKios.StageBpjs = false;
+                    statBPJS = "InActive";
                 }
 
                 foreach (var kiosk in KioskConf)

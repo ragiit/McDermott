@@ -69,8 +69,21 @@
                                                             <DxFormLayoutItem Caption="BPJS" ColSpanMd="12">
                                                                 <DxTextBox @bind-Text="@FormKios.BPJS" ReadOnly style="background-color:#949494" />
                                                             </DxFormLayoutItem>
-                                                            <DxFormLayoutItem Caption=" Stage Bpjs" ColSpanMd="12">
-                                                                <DxCheckBox @bind-Checked="@FormKios.StageBpjs"></DxCheckBox>
+                                                            <DxFormLayoutItem Caption=" BPJS Status" ColSpanMd="12">
+                                                                @if (FormKios.BPJS != null)
+                                                                {
+                                                                    <h6 class="text-success">
+                                                                        <i class="fa-solid fa-circle" style="color: #05e401;"></i>
+                                                                        @statBPJS
+                                                                    </h6>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <h6 class="text-danger">
+                                                                        <i class="fa-solid fa-circle" style="color: #d20404;"></i> 
+                                                                        @statBPJS
+                                                                    </h6>
+                                                                }
                                                             </DxFormLayoutItem>
                                                         }
                                                         @if (CountServiceId > 1)

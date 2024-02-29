@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace McDermott.Application.Features.Commands.Transaction
+namespace McDermott.Application.Features.Commands.Queue
 {
     public class CounterCommand
     {
