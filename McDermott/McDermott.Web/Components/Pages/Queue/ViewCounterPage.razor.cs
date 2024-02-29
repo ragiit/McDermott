@@ -3,7 +3,7 @@ using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
-using static McDermott.Application.Features.Commands.Transaction.CounterCommand;
+using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
 {
@@ -40,25 +40,11 @@ namespace McDermott.Web.Components.Pages.Queue
         private User? User = new();
 
         [Parameter]
-        public int id { get; set; } = 14;
+        public int id { get; set; }
 
         #endregion variabel data
 
         #region Async Data
-
-        //protected override async Task OnAfterRenderAsync(bool firstRender)
-        //{
-        //    await base.OnAfterRenderAsync(firstRender);
-
-        //    if (firstRender)
-        //    {
-        //        try
-        //        {
-        //            await LoadUser();
-        //        }
-        //        catch { }
-        //    }
-        //}
 
         protected override async Task OnInitializedAsync()
         {
@@ -68,12 +54,6 @@ namespace McDermott.Web.Components.Pages.Queue
             }
             catch { }
         }
-
-        //private async Task LoadUser()
-        //{
-        //    User = await oLocal.GetUserInfo();
-        //    userBy = User.Name;
-        //}
 
         private async Task LoadData()
         {
@@ -86,9 +66,22 @@ namespace McDermott.Web.Components.Pages.Queue
             var b = await Mediator.Send(new GetKioskQueueQuery());
 
             //var cekServicesK = service
-
-            KiosksQueue = [.. b.Where(x => x.ServiceId == general.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date)];
-
+            if (general.ServiceId == null & general.PhysicianId == null)
+            {
+                KiosksQueue = [.. b.Where(x => x.Service?.ServicedId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date)];
+            }
+            else if (general.ServiceId != null & general.PhysicianId == null)
+            {
+                KiosksQueue = [.. b.Where(x => x.Service?.ServicedId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.ServiceId == general.ServiceId)];
+            }
+            else if (general.ServiceId == null & general.PhysicianId != null)
+            {
+                KiosksQueue = [.. b.Where(x => x.Service?.ServicedId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId)];
+            }
+            else if (general.ServiceId != null & general.PhysicianId != null)
+            {
+                KiosksQueue = [.. b.Where(x => x.Service?.ServicedId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId && x.ServiceId == general.ServiceId)];
+            }
             NameCounter = $"Queue Listing Counter {general.Name}";
             sId = general.ServiceId;
             PhysicianId = general.PhysicianId;
@@ -97,7 +90,7 @@ namespace McDermott.Web.Components.Pages.Queue
             NameServicesK = Services.FirstOrDefault(x => x.Id == skId)?.Name;
 
             NameServices = sId != null ? Services.FirstOrDefault(x => x.Id == sId)?.Name : "-";
-            Phy = PhysicianId != null ? physician.FirstOrDefault(x => x.Id == PhysicianId && x.IsPhysicion)?.Name : null;
+            Phy = PhysicianId != null ? physician.FirstOrDefault(x => x.Id == PhysicianId && x.IsPhysicion)?.Name : "-";
         }
 
         #endregion Async Data
@@ -150,6 +143,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private void CloseDetail()
         {
+            NavigationManager.NavigateTo("/queue/queue-counter");
         }
 
         #endregion Function Button

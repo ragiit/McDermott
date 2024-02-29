@@ -2,8 +2,9 @@
 using McDermott.Application.Dtos.Queue;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
+using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
-using static McDermott.Application.Features.Commands.Transaction.CounterCommand;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace McDermott.Web.Components.Pages.Queue
 {
@@ -262,20 +263,12 @@ namespace McDermott.Web.Components.Pages.Queue
                 if (Id != 0)
                 {
                     var a = counters.Where(x => x.Id == Id).FirstOrDefault();
-                    if (a.IsActive == true)
-                    {
-                        counterForm.Id = Id;
-                        counterForm.IsActive = false;
-                        counterForm.Name = a.Name;
-                        await Mediator.Send(new UpdateCounterRequest(counterForm));
-                    }
-                    else
-                    {
-                        counterForm.Id = Id;
-                        counterForm.IsActive = true;
-                        counterForm.Name = a.Name;
-                        await Mediator.Send(new UpdateCounterRequest(counterForm));
-                    }
+
+                    counterForm.Id = Id;
+                    counterForm.Name = a.Name;
+                    counterForm.Status = "open";
+                    await Mediator.Send(new UpdateCounterRequest(counterForm));
+
                     //NavigationManager.NavigateTo("transaction/counter", true);
                     await LoadData();
                 }
@@ -295,32 +288,33 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             try
             {
-                GirdDetail = true;
-                var General = await Mediator.Send(new GetCounterByIdQuery(Id));
-                if (General.PhysicianId != null)
-                {
-                    PhysicianId = General.PhysicianId;
-                }
-                var a = await Mediator.Send(new GetKioskQuery());
-                var b = await Mediator.Send(new GetKioskQueueQuery());
-                KiosksQueue = [.. b.Where(x => x.ServiceId == General.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date)];
-                NameCounter = "Queue Listing Counter " + General.Name;
-                var q = KiosksQueue.Select(x => x.NoQueue).ToList();
-                var s = General.ServiceId;
-                var sk = General.ServiceKId;
+                //    GirdDetail = true;
+                //    var General = await Mediator.Send(new GetCounterByIdQuery(Id));
+                //    if (General.PhysicianId != null)
+                //    {
+                //        PhysicianId = General.PhysicianId;
+                //    }
+                //    var a = await Mediator.Send(new GetKioskQuery());
+                //    var b = await Mediator.Send(new GetKioskQueueQuery());
+                //    KiosksQueue = [.. b.Where(x => x.ServiceId == General.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date)];
+                //    NameCounter = "Queue Listing Counter " + General.Name;
+                //    var q = KiosksQueue.Select(x => x.NoQueue).ToList();
+                //    var s = General.ServiceId;
+                //    var sk = General.ServiceKId;
 
-                NameServices = Services.Where(x => x.Id == s).Select(x => x.Name).FirstOrDefault();
-                if (sk != null)
-                {
-                    NameServicesK = Services.Where(x => x.Id == sk).Select(x => x.Name).FirstOrDefault();
-                }
-                else
-                {
-                    NameServicesK = "-";
-                }
+                //    NameServices = Services.Where(x => x.Id == s).Select(x => x.Name).FirstOrDefault();
+                //    if (sk != null)
+                //    {
+                //        NameServicesK = Services.Where(x => x.Id == sk).Select(x => x.Name).FirstOrDefault();
+                //    }
+                //    else
+                //    {
+                //        NameServicesK = "-";
+                //    }
 
-                User = await oLocal.GetUserInfo();
-                userBy = User.Name;
+                //    User = await oLocal.GetUserInfo();
+                //    userBy = User.Name;
+                NavigationManager.NavigateTo($"/queue/counter-view/{Id}");
             }
             catch (Exception ex)
             {
@@ -428,6 +422,54 @@ namespace McDermott.Web.Components.Pages.Queue
             catch { }
         }
 
+        private async Task StopProcess(int id)
+        {
+            try
+            {
+                var a = counters.Where(x => x.Id == id).FirstOrDefault();
+                counterForm.Id = a.Id;
+                counterForm.Name = a.Name;
+                counterForm.ServiceId = a.ServiceId;
+                counterForm.ServiceKId = a.ServiceKId;
+                counterForm.IsActive = true;
+                counterForm.Status = "stop";
+
+                if (a != null)
+                {
+                    await Mediator.Send(new UpdateCounterRequest(counterForm));
+                }
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError(ex.Message);
+            }
+        }
+
+        private async Task ResumeProcess(int id)
+        {
+            try
+            {
+                var a = counters.Where(x => x.Id == id).FirstOrDefault();
+                counterForm.Id = a.Id;
+                counterForm.Name = a.Name;
+                counterForm.ServiceId = a.ServiceId;
+                counterForm.ServiceKId = a.ServiceKId;
+                counterForm.IsActive = true;
+                counterForm.Status = "on process";
+
+                if (a != null)
+                {
+                    await Mediator.Send(new UpdateCounterRequest(counterForm));
+                }
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError(ex.Message);
+            }
+        }
+
         private async Task OnProcess()
         {
             try
@@ -439,6 +481,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     await Mediator.Send(new UpdateCounterRequest(counterForm));
                 }
+                NavigationManager.NavigateTo($"/queue/counter-view/{counterForm.Id}");
                 showFormProcess = false;
                 await LoadData();
             }

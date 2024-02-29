@@ -1,4 +1,4 @@
-﻿@page "/queue/counter-view"
+﻿@page "/queue/counter-view/{id:int}"
 @rendermode InteractiveServer
 <PageTitle>McDermott - Counter View</PageTitle>
 <div class="wrapper">
@@ -22,82 +22,318 @@
                                             </div>
                                         </div>
                                         <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <div class="row justify-content-end">
-                                                        <div class="col-md-8 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
-                                                        <hr class="px-0" />
+                                            @if (sId == null && PhysicianId == null)
+                                            {
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="row justify-content-end">
+                                                            <div class="col-md-8 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>User</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p class="mt-0">@userBy </p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>Service Counter</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p>@NameServicesK</p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>Service</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p>@NameServices</p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>Physicion</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p>@Phy</p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
                                                     </div>
-                                                    <div class="row">
-                                                        <div class="col-md-5">
-                                                            <label>User</label>
-                                                        </div>
-                                                        <div class="col-md-7">
-                                                            <p class="mt-0">@userBy </p>
-                                                        </div>
-                                                        <hr class="px-0" />
+                                                    <div class="col-md-8">
+                                                        <DxGrid @ref="Grid"
+                                                                Data="@KiosksQueue"
+                                                                PageSize="10"
+                                                                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                                                AllowSelectRowByClick="true"
+                                                                PagerPosition="GridPagerPosition.Bottom"
+                                                                PageSizeSelectorVisible="true"
+                                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                                PageSizeSelectorAllRowsItemVisible="true"
+                                                                PagerSwitchToInputBoxButtonCount="10"
+                                                                PagerVisibleNumericButtonCount="10"
+                                                                CustomizeElement="Grid_CustomizeElement"
+                                                                KeyboardNavigationEnabled="true">
+                                                            <Columns>
+                                                                <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="60px" />
+                                                                <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" SortIndex="0" />
+                                                                <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" />
+                                                                <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" />
+                                                                <DxGridDataColumn FieldName="Status" Caption="Status">
+                                                                    <CellDisplayTemplate>
+                                                                        @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).Status)
+                                                                    </CellDisplayTemplate>
+                                                                </DxGridDataColumn>
+                                                                <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
+                                                                    <CellDisplayTemplate>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })"></DxButton>
+                                                                    </CellDisplayTemplate>
+                                                                </DxGridDataColumn>
+                                                            </Columns>
+                                                        </DxGrid>
                                                     </div>
-                                                    <div class="row">
-                                                        <div class="col-md-5">
-                                                            <label>Service Counter</label>
-                                                        </div>
-                                                        <div class="col-md-7">
-                                                            <p>@NameServicesK</p>
-                                                        </div>
-                                                        <hr class="px-0" />
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-5">
-                                                            <label>Service</label>
-                                                        </div>
-                                                        <div class="col-md-7">
-                                                            <p>@NameServices</p>
-                                                        </div>
-                                                        <hr class="px-0" />
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-5">
-                                                            <label>Service</label>
-                                                        </div>
-                                                        <div class="col-md-7">
-                                                            <p>@Phy</p>
-                                                        </div>
-                                                        <hr class="px-0" />
-                                                    </div>
-                                                    
                                                 </div>
-                                                <div class="col-md-8">
-                                                    <DxGrid @ref="Grid"
-                                                            Data="@KiosksQueue"
-                                                            PageSize="10"
-                                                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                                            AllowSelectRowByClick="true"
-                                                            PagerPosition="GridPagerPosition.Bottom"
-                                                            PageSizeSelectorVisible="true"
-                                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                            PageSizeSelectorAllRowsItemVisible="true"
-                                                            PagerSwitchToInputBoxButtonCount="10"
-                                                            PagerVisibleNumericButtonCount="10"
-                                                            CustomizeElement="Grid_CustomizeElement"
-                                                            KeyboardNavigationEnabled="true">
-                                                        <Columns>
-                                                            <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="60px" />
-                                                            <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" SortIndex="0" />
-                                                            <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" />
-                                                            <DxGridDataColumn FieldName="Status" Caption="Status">
-                                                                <CellDisplayTemplate>
-                                                                    @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).Status)
-                                                                </CellDisplayTemplate>
-                                                            </DxGridDataColumn>
-                                                            <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
-                                                                <CellDisplayTemplate>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })"></DxButton>
-                                                                </CellDisplayTemplate>
-                                                            </DxGridDataColumn>
-                                                        </Columns>
-                                                    </DxGrid>
+                                            }
+                                            else if (sId != null && PhysicianId != null)
+                                            {
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="row justify-content-end">
+                                                            <div class="col-md-8 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>User</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p class="mt-0">@userBy </p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>Service Counter</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p>@NameServicesK</p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>Service</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p>@NameServices</p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>Physicion</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p>@Phy</p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <DxGrid @ref="Grid"
+                                                                Data="@KiosksQueue"
+                                                                PageSize="10"
+                                                                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                                                AllowSelectRowByClick="true"
+                                                                PagerPosition="GridPagerPosition.Bottom"
+                                                                PageSizeSelectorVisible="true"
+                                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                                PageSizeSelectorAllRowsItemVisible="true"
+                                                                PagerSwitchToInputBoxButtonCount="10"
+                                                                PagerVisibleNumericButtonCount="10"
+                                                                CustomizeElement="Grid_CustomizeElement"
+                                                                KeyboardNavigationEnabled="true">
+                                                            <Columns>
+                                                                <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="60px" />
+                                                                <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" SortIndex="0" /> 
+                                                                <DxGridDataColumn FieldName="Status" Caption="Status">
+                                                                    <CellDisplayTemplate>
+                                                                        @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).Status)
+                                                                    </CellDisplayTemplate>
+                                                                </DxGridDataColumn>
+                                                                <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
+                                                                    <CellDisplayTemplate>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })"></DxButton>
+                                                                    </CellDisplayTemplate>
+                                                                </DxGridDataColumn>
+                                                            </Columns>
+                                                        </DxGrid>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            }
+                                            else if (sId != null && PhysicianId == null)
+                                            {
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="row justify-content-end">
+                                                            <div class="col-md-8 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>User</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p class="mt-0">@userBy </p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>Service Counter</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p>@NameServicesK</p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>Service</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p>@NameServices</p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>Physicion</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p>@Phy</p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <DxGrid @ref="Grid"
+                                                                Data="@KiosksQueue"
+                                                                PageSize="10"
+                                                                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                                                AllowSelectRowByClick="true"
+                                                                PagerPosition="GridPagerPosition.Bottom"
+                                                                PageSizeSelectorVisible="true"
+                                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                                PageSizeSelectorAllRowsItemVisible="true"
+                                                                PagerSwitchToInputBoxButtonCount="10"
+                                                                PagerVisibleNumericButtonCount="10"
+                                                                CustomizeElement="Grid_CustomizeElement"
+                                                                KeyboardNavigationEnabled="true">
+                                                            <Columns>
+                                                                <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="60px" />
+                                                                <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" SortIndex="0" />
+                                                                <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" />
+                                                                <DxGridDataColumn FieldName="Status" Caption="Status">
+                                                                    <CellDisplayTemplate>
+                                                                        @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).Status)
+                                                                    </CellDisplayTemplate>
+                                                                </DxGridDataColumn>
+                                                                <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
+                                                                    <CellDisplayTemplate>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })"></DxButton>
+                                                                    </CellDisplayTemplate>
+                                                                </DxGridDataColumn>
+                                                            </Columns>
+                                                        </DxGrid>
+                                                    </div>
+                                                </div>
+                                            }
+                                            else if (sId == null && PhysicianId != null)
+                                            {
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="row justify-content-end">
+                                                            <div class="col-md-8 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>User</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p class="mt-0">@userBy </p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>Service Counter</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p>@NameServicesK</p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>Service</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p>@NameServices</p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <label>Physicion</label>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <p>@Phy</p>
+                                                            </div>
+                                                            <hr class="px-0" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <DxGrid @ref="Grid"
+                                                                Data="@KiosksQueue"
+                                                                PageSize="10"
+                                                                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                                                AllowSelectRowByClick="true"
+                                                                PagerPosition="GridPagerPosition.Bottom"
+                                                                PageSizeSelectorVisible="true"
+                                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                                PageSizeSelectorAllRowsItemVisible="true"
+                                                                PagerSwitchToInputBoxButtonCount="10"
+                                                                PagerVisibleNumericButtonCount="10"
+                                                                CustomizeElement="Grid_CustomizeElement"
+                                                                KeyboardNavigationEnabled="true">
+                                                            <Columns>
+                                                                <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="60px" />
+                                                                <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" SortIndex="0" />
+                                                                <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" />
+                                                                <DxGridDataColumn FieldName="Status" Caption="Status">
+                                                                    <CellDisplayTemplate>
+                                                                        @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).Status)
+                                                                    </CellDisplayTemplate>
+                                                                </DxGridDataColumn>
+                                                                <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
+                                                                    <CellDisplayTemplate>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" Attributes="@(new Dictionary<string, object> {  ["title"] = "Call" })"></DxButton>
+                                                                    </CellDisplayTemplate>
+                                                                </DxGridDataColumn>
+                                                            </Columns>
+                                                        </DxGrid>
+                                                    </div>
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 </div>
