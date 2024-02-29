@@ -1,7 +1,5 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using System.Security.Claims;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -68,7 +66,7 @@ namespace McDermott.Web.Components.Pages.Config
                 var imageFile = e.File;
 
                 var buffer = new byte[imageFile.Size];
-                await imageFile.OpenReadStream().ReadAsync(buffer);
+                _ = await imageFile.OpenReadStream().ReadAsync(buffer);
 
                 // Ubah buffer gambar menjadi format base64
                 imageUrl = $"data:{imageFile.ContentType};base64,{Convert.ToBase64String(buffer)}";
@@ -180,9 +178,31 @@ namespace McDermott.Web.Components.Pages.Config
             }
 
             if (UserForm.Id == 0)
-                await Mediator.Send(new CreateUserRequest(UserForm));
+            {
+                _ = await FileUploadService.UploadFileAsync(BrowserFile);
+                _ = await Mediator.Send(new CreateUserRequest(UserForm));
+            }
             else
-                await Mediator.Send(new UpdateUserRequest(UserForm));
+            {
+                var userDtoSipFile = SelectedDataItems[0].Adapt<UserDto>().SipFile;
+
+                if (UserForm.SipFile != userDtoSipFile)
+                {
+                    if (UserForm.SipFile != null)
+                        Helper.DeleteFile(UserForm.SipFile);
+
+                    if (userDtoSipFile != null)
+                        Helper.DeleteFile(userDtoSipFile);
+                }
+
+                _ = await Mediator.Send(new UpdateUserRequest(UserForm));
+
+                if (UserForm.SipFile != userDtoSipFile)
+                {
+                    if (UserForm.SipFile != null)
+                        _ = await FileUploadService.UploadFileAsync(BrowserFile);
+                }
+            }
 
             await LoadData();
         }
@@ -202,7 +222,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             if (SelectedDataItems is null)
             {
-                await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
+                _ = await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
             }
             else
             {
@@ -210,7 +230,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 int userActive = (int)HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
 
-                await Mediator.Send(new DeleteListUserRequest(a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
+                _ = await Mediator.Send(new DeleteListUserRequest(a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
             }
             await LoadData();
         }
@@ -225,17 +245,6 @@ namespace McDermott.Web.Components.Pages.Config
             EditItemsEnabled = enabled;
         }
 
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            if (args.DataItem is not null)
-            {
-                IsDeleted = (bool)HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(((UserDto)args.DataItem).Id.ToString())!;
-            }
-
-            FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
-        }
-
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -247,6 +256,43 @@ namespace McDermott.Web.Components.Pages.Config
                 e.Style = "background-color: rgba(0, 0, 0, 0.08)";
                 e.CssClass = "header-bold";
             }
+        }
+
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            if (args.DataItem is not null)
+            {
+                IsDeleted = (bool)HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(((UserDto)args.DataItem).Id.ToString())!;
+            }
+
+            FocusedRowVisibleIndex = args.VisibleIndex;
+            UpdateEditItemsEnabled(true);
+        }
+
+        private IBrowserFile BrowserFile;
+
+        private async Task DownloadFile()
+        {
+            if (UserForm.Id != 0 && !string.IsNullOrWhiteSpace(UserForm.SipFile))
+            {
+                await Helper.DownloadFile(UserForm.SipFile, HttpContextAccessor, HttpClient, JsRuntime);
+            }
+        }
+
+        private async void SelectFiles(InputFileChangeEventArgs e)
+        {
+            BrowserFile = e.File;
+            UserForm.SipFile = e.File.Name;
+        }
+
+        private async Task SelectFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "sipFile");
+        }
+
+        private void RemoveSelectedFile()
+        {
+            UserForm.SipFile = null;
         }
 
         private void OnItemUpdating(string fieldName, object newValue)
@@ -280,9 +326,8 @@ namespace McDermott.Web.Components.Pages.Config
                 UserForm = SelectedDataItems[0].Adapt<UserDto>();
                 ShowForm = true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                var zz = e;
             }
             //await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }

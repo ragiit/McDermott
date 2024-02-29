@@ -1,7 +1,6 @@
 using Blazored.LocalStorage;
 using Blazored.Toast;
 using McDermott.Application.Extentions;
-using McDermott.Domain.Entities;
 using McDermott.Persistence.Extensions;
 using McDermott.Web.Components;
 using Serilog;
@@ -22,11 +21,11 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddPersistenceLayer(builder.Configuration);
 
-//Log.Logger = new LoggerConfiguration()
-//    .ReadFrom.Configuration(builder.Configuration)
-//    .CreateLogger();
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
 
-//builder.Services.AddSerilog();
+builder.Services.AddSerilog();
 
 var app = builder.Build();
 
@@ -37,7 +36,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-//app.UseSerilogRequestLogging();
+app.UseSerilogRequestLogging();
 
 
 app.UseHttpsRedirection();
