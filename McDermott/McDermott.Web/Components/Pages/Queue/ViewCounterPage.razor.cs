@@ -133,8 +133,8 @@ namespace McDermott.Web.Components.Pages.Queue
                     return new MarkupString("");
             }
 
-            string html = $"<div class='row justify-content-center'><div class='col-sm-5 pl-0'>" +
-                          $"<span class='badge bg-{priorityClass} py-1 px-4' title='{title}'>{title}</span></div></div>";
+            string html = $"<div class='row '><div class='col-3'>" +
+                          $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
 
             return new MarkupString(html);
         }
@@ -160,7 +160,8 @@ namespace McDermott.Web.Components.Pages.Queue
                     await Mediator.Send(new UpdateKioskQueueRequest(FormKiosksQueue));
                 }
                 await LoadData();
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 ToastService.ShowError(ex.Message);
             }

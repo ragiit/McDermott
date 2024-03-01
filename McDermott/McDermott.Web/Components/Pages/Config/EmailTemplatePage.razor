@@ -124,7 +124,7 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem ColSpanMd="12">
                                                 <label>Body</label>
-                                                <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Enter non HTML format like centering...">
+                                                <BlazoredTextEditor  @ref="@QuillHtml" Placeholder="Enter non HTML format like centering...">
                                                     <ToolbarContent>
                                                         <select class="ql-header">
                                                             <option selected=""></option>
@@ -157,7 +157,7 @@
                                                         </span>
                                                     </ToolbarContent>
                                                     <EditorContent >
-
+                                                        @((MarkupString)@EmailFormTemplate.Message)
                                                     </EditorContent>
                                                 </BlazoredTextEditor>
                                             </DxFormLayoutItem>
@@ -168,7 +168,7 @@
                                                     <div class="col-4">
                                                         <DxButton SubmitFormOnClick="true" Text="Send" @onclick="@(async()=>await SendEmail())"></DxButton>
                                                     </div>
-                                                    <div class="col-8">
+                                                    <div class="col-2">
                                                         <DxButton SubmitFormOnClick="true" Text="Save" @onclick="@(async()=>await OnSave())"></DxButton>
                                                         <DxButton SubmitFormOnClick="true" Text="Discard" @onclick="@(async()=>await OnCancle())"></DxButton>
                                                     </div>
