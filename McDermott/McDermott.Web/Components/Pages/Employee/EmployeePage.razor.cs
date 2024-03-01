@@ -136,10 +136,6 @@ namespace McDermott.Web.Components.Pages.Employee
                 return;
 
             UserForm.IsEmployee = true;
-            UserForm.IsDoctor = false;
-            UserForm.IsNurse = false;
-            UserForm.IsPhysicion = false;
-            UserForm.IsUser = false;
 
             if (UserForm.Id == 0)
                 await Mediator.Send(new CreateUserRequest(UserForm));

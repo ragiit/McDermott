@@ -1,4 +1,4 @@
-﻿ namespace McDermott.Application.Features.Queries.Patient
+﻿namespace McDermott.Application.Features.Queries.Patient
 {
     public class PatientQueryHandler
     {
@@ -14,7 +14,7 @@
 
             public async Task<List<UserDto>> Handle(GetUserPatientQuery query, CancellationToken cancellationToken)
             {
-                return await _unitOfWork.Repository<User>().Entities 
+                return await _unitOfWork.Repository<User>().Entities
                         .Include(x => x.Department)
                         .Where(x => x.IsPatient == true)
                         .Select(User => User.Adapt<UserDto>())
@@ -35,12 +35,12 @@
                 {
                     var result = await _unitOfWork.Repository<PatientAllergy>().GetAsync(
                         query.Predicate,
-                            x => x 
+                            x => x
                             .Include(z => z.User), cancellationToken);
 
                     return result.Adapt<List<PatientAllergyDto>>();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return [];
                 }
@@ -69,6 +69,22 @@
             }
         }
 
+        #endregion
+
+
+        #region Update
+        internal class UpdatePatientAllergyRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdatePatientAllergyRequest, bool>
+        {
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+            public async Task<bool> Handle(UpdatePatientAllergyRequest request, CancellationToken cancellationToken)
+            {
+                await _unitOfWork.Repository<PatientAllergy>().UpdateAsync(request.PatientAllergyDto.Adapt<PatientAllergy>());
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return true;
+            }
+        }
         #endregion
     }
 }

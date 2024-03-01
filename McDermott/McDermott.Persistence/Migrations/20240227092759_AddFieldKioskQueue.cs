@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -16,7 +15,6 @@ namespace McDermott.Persistence.Migrations
                 table: "KioskQueues",
                 type: "nvarchar(max)",
                 nullable: true);
-
         }
 
         /// <inheritdoc />
