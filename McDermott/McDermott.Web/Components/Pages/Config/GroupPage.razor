@@ -148,7 +148,7 @@
                                                 var a = (GroupMenuDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem Caption="Menu:" ColSpanMd="12">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Menu:" ColSpanMd="12">
                                                     <DxComboBox Data="@Menus"
                                                                 NullText="Select Menu..."
                                                                 FilteringMode="@DataGridFilteringMode.Contains"
@@ -157,19 +157,19 @@
                                                                 ValueFieldName="Id">
                                                     </DxComboBox>
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Create:" ColSpanMd="3">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Create:" ColSpanMd="3">
                                                     @EditFormContext.GetEditor("Create")
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Read:" ColSpanMd="3">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Read:" ColSpanMd="3">
                                                     @EditFormContext.GetEditor("Read")
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Update:" ColSpanMd="3">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Update:" ColSpanMd="3">
                                                     @EditFormContext.GetEditor("Update")
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Delete:" ColSpanMd="3">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Delete:" ColSpanMd="3">
                                                     @EditFormContext.GetEditor("Delete")
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Import:" ColSpanMd="3">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Import:" ColSpanMd="3">
                                                     @EditFormContext.GetEditor("Import")
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>

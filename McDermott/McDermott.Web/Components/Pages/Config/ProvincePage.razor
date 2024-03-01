@@ -78,23 +78,23 @@
                                         <DxGridDataColumn FieldName="Name" SortIndex="0" />
                                         <DxGridDataColumn FieldName="Code" SortIndex="0" />
                                         <DxGridDataColumn FieldName="Country.Name" Caption="Country" />
-
                                     </Columns>
                                     <EditFormTemplate Context="EditFormContext">
                                         @{
                                             var a = (ProvinceDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                            <DxFormLayoutItem  CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                 <div class="pop-warning">
                                                     @EditFormContext.GetEditor("Name")
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Code:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Code:" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("Code")
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Country:" ColSpanMd="12">
-                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" Data="@Countries"
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Country" ColSpanMd="12">
+                                                <DxComboBox 
+                                                              Data="@Countries" 
                                                             NullText="Select Country..."
                                                             @bind-Value="@a.CountryId"
                                                             TextFieldName="Name"

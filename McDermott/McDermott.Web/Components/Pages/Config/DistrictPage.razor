@@ -85,12 +85,12 @@
                                             var a = (DistrictDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name:" ColSpanMd="12">
                                                 <div class="pop-warning">
                                                     @EditFormContext.GetEditor("Name")
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Province:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Province:" ColSpanMd="12">
                                                 <DxComboBox Data="@Provinces"
                                                             NullText="Select Province..."
                                                             @bind-Value="@a.ProvinceId"
@@ -98,7 +98,7 @@
                                                             ValueFieldName="Id">
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="City:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="City:" ColSpanMd="12">
                                                 <DxComboBox Data="@Cities"
                                                             NullText="Select City..."
                                                             @bind-Value="@a.CityId"
