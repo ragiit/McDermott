@@ -1,10 +1,12 @@
 ﻿using Mapster;
 using McDermott.Application.Interfaces.Repositories;
 using McDermott.Domain.Common;
+using McDermott.Domain.Entities;
 using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace McDermott.Persistence.Repositories
 {
@@ -43,9 +45,23 @@ namespace McDermott.Persistence.Repositories
             _dbContext.Entry(exist).State = EntityState.Modified;
 
             entity.CreatedBy = exist.CreatedBy;
-            entity.CreatedDate = exist.CreatedDate; 
-             
-            exist = entity.Adapt(exist); 
+            entity.CreatedDate = exist.CreatedDate;
+
+            foreach (PropertyInfo property in typeof(T).GetProperties())
+            {
+                var nullAttribute = property.GetCustomAttribute<SetToNullAttribute>();
+                if (nullAttribute != null)
+                {
+                    property.SetValue(entity, null);
+                }
+                else
+                {
+                    // Atur nilai properti lainnya sesuai kebutuhan
+                }
+            }
+
+
+            exist = entity.Adapt(exist);
 
             return Task.CompletedTask;
         }

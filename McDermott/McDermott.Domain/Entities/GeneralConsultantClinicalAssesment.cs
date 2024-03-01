@@ -1,31 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace McDermott.Domain.Entities
 {
     public class GeneralConsultantClinicalAssesment : BaseAuditableEntity
     {
-        
+
         public int? GeneralConsultanServiceId { get; set; }
         [NotMapped]
         public double _Weight { get; set; }
 
         public double Weight
         {
-            get;set;
+            get; set;
         }
 
         [NotMapped]
         public double _Height { get; set; }
         public double Height
         {
-            get;set;
+            get; set;
         }
-      
+
         public int RR { get; set; }
         public int Temp { get; set; }
         public int HR { get; set; }
@@ -41,7 +36,7 @@ namespace McDermott.Domain.Entities
 
         public int E { get; set; }
         public int V { get; set; }
-        public int M { get; set; } 
+        public int M { get; set; }
         public void CalculateBMI(double height, double weight)
         {
             BMIIndex = 0;
@@ -75,6 +70,7 @@ namespace McDermott.Domain.Entities
             }
         }
 
+        [SetToNull] // Tandai properti yang harus diatur ke null
         public virtual GeneralConsultanService? GeneralConsultanService { get; set; }
     }
 }

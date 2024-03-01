@@ -21,8 +21,8 @@
         public string? IdentityNumber { get; set; }
         public DateTime? BirthDay { get; set; }
         [Required]
-        public string? TypeRegistration { get; set; } = "General Consultation";
-        [Required]
+        public string? TypeRegistration { get; set; } = string.Empty;
+
         public string? TypeMedical { get; set; }
         [Required]
         public string? ScheduleTime { get; set; }
