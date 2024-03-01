@@ -44,6 +44,7 @@ bld/
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 McDermott/.vs
+McDermott/McDermott.Web/appsettings.json
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

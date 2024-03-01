@@ -77,59 +77,64 @@
                                          HeaderText="@TextPopUp"
                                          Width="60%"
                                          Height="90%">
-                                    <EditForm Model="@FormEmails" Context="EditFormContext">
+                                    <EditForm Model="@FormEmails" Context="EditFormContext"
+                                              OnInvalidSubmit="@HandleInvalidSubmit"
+                                              OnValidSubmit="@HandleValidSubmit">
                                         <DataAnnotationsValidator />
-                                        <div style="padding-top: 1rem; padding-bottom: 1rem">
-
-                                            <DxFormLayout CssClass="mt">
-                                                <DxFormLayoutGroup Caption="Configuration Email" ColSpanLg="12">
-                                                    <DxFormLayoutItem ColSpanMd="6" Caption="Description:">
-                                                        <DxTextBox @bind-Text="@FormEmails.Description" NullText="Description.."></DxTextBox>
+                                            <DxFormLayout CssClass="mt pt-1">
+                                                <DxFormLayoutGroup Caption="Configuration Email" ColSpanLg="12" CssClass="mt-3 mb-2">
+                                                <DxFormLayoutItem ColSpanMd="6" Caption="Description:" CaptionCssClass="normal-caption">
+                                                        <DxTextBox @bind-Text="@FormEmails.Description" NullText="Description.." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxTextBox>
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem ColSpanMd="6" Caption="Priority:">
-                                                        <DxSpinEdit @bind-Value="@FormEmails.Sequence" NullText="Priority" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                <DxFormLayoutItem ColSpanMd="6" Caption="Priority:" CaptionCssClass="normal-caption">
+                                                        <DxSpinEdit @bind-Value="@FormEmails.Sequence" NullText="Priority" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
                                                     </DxFormLayoutItem>
                                                 </DxFormLayoutGroup>
-                                                <DxFormLayoutGroup Caption="Connection Information" ColSpanMd="12">
-                                                    <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Server:">
-                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_Host" NullText="SmtpP Server" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                <DxFormLayoutGroup Caption="Connection Information" ColSpanMd="12" CssClass="my-2">
+                                                    <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Server:" CaptionCssClass="required-caption normal-caption">
+                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_Host" NullText="Smtp Server" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
+                                                        <ValidationMessage For="@(()=>FormEmails.Smtp_Host)" />
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Port:">
-                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_Port" NullText="port" />
+                                                    <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Port:" CaptionCssClass="required-caption normal-caption">
+                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_Port" NullText="Port" ShowValidationIcon="true" />
+                                                        <ValidationMessage For="@(()=>FormEmails.Smtp_Port)" />
                                                     </DxFormLayoutItem>
                                                 </DxFormLayoutGroup>
-                                                <DxFormLayoutGroup Caption="Security And Authentication" ColSpanMd="12">
-                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Conection Scurity:">
+                                                <DxFormLayoutGroup Caption="Security And Authentication" ColSpanMd="12" CssClass="my-2">
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Conection Scurity:" CaptionCssClass="required-caption normal-caption">
                                                         <Template>
                                                             <DxComboBox Data="@Stts_Ecrypt"
                                                                         NullText="Select Ecryp  t..."
                                                                         AllowUserInput="true"
                                                                         SelectedItemChanged="@((string city) => SelectedItemChanged(city))"
-                                                                        @bind-Value="@FormEmails.Smtp_Encryption">
+                                                                        @bind-Value="@FormEmails.Smtp_Encryption"
+                                                                        ShowValidationIcon="true">
                                                             </DxComboBox>
+                                                            <ValidationMessage For="@(()=>FormEmails.Smtp_Encryption)" />
                                                         </Template>
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Username:">
-                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_User" NullText="Username" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Username:" CaptionCssClass="required-caption normal-caption">
+                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_User" NullText="Username" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" /><ValidationMessage For="@(()=>FormEmails.Smtp_User)" />
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Password:">
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Password:" CaptionCssClass="required-caption normal-caption">
                                                         <DxTextBox @bind-Text="@FormEmails.Smtp_Pass"
                                                                    NullText="Password"
                                                                    Password="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                   InputId="tbPassword" />
+                                                                   InputId="tbPassword" ShowValidationIcon="true" />
+                                                        <ValidationMessage For="@(()=>FormEmails.Smtp_Pass)" />
                                                     </DxFormLayoutItem>
                                                 </DxFormLayoutGroup>
                                             </DxFormLayout>
-                                            <DxFormLayout CssClass="col-12">
-                                                <DxFormLayoutItem ColSpanMd="5">
+                                            <DxFormLayout CssClass="col-12 my-0 py-1">
+                                                <DxFormLayoutItem ColSpanMd="5" CssClass="my-2">
                                                     <DxButton IconCssClass="fa-solid fa-wifi"
                                                               RenderStyleMode="@ButtonRenderStyleMode.Outline"
                                                               Text="Test Conenction"
                                                               onclick="@TestConnect"
                                                               CssClass="w-20 ml" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="6">
+                                                <DxFormLayoutItem ColSpanMd="6" CssClass="my-2">
                                                     @if (isLoading)
                                                     {
                                                         <LoadingIndicatorLayout></LoadingIndicatorLayout>
@@ -152,7 +157,7 @@
                                                     }
 
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="12">
+                                                <DxFormLayoutItem ColSpanMd="12" CssClass="my-2">
                                                     <div class="row justify-content-end">
                                                         <div class="col-auto align-self-end">
                                                             <DxButton Text="Save" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Info" SubmitFormOnClick="true" Click="OnSave"></DxButton>
@@ -160,8 +165,9 @@
                                                         </div>
                                                     </div>
                                                 </DxFormLayoutItem>
+                                                
                                             </DxFormLayout>
-                                        </div>
+                                        
                                     </EditForm>
                                 </DxPopup>
                             </div>
@@ -171,5 +177,6 @@
             </div>
         </section>
     </div>
+
 
 }
