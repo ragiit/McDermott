@@ -88,18 +88,21 @@
                                             var a = (MenuDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem Caption="Name:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("Name")
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Parent Menu:" ColSpanMd="12">
-                                                <DxComboBox Data="@ParentMenuDto"
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parent Menu" ColSpanMd="12">
+                                                <DxComboBox
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@ParentMenuDto"
                                                             NullText="Select Parent Menu..."
                                                             @bind-Value="@a.ParentMenu"
                                                             TextFieldName="Name"
                                                             ValueFieldName="Name">
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Sequence:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sequence" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("Sequence")
                                             </DxFormLayoutItem>
                                             @*   <DxFormLayoutItem Caption="URL:" ColSpanMd="12">
