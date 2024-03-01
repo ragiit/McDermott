@@ -69,6 +69,13 @@
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
                                                 </DxToolbar>
                                             </ToolbarTemplate>
+                                            <Columns>
+                                                <DxGridSelectionColumn Width="15px" />
+                                                <DxGridDataColumn FieldName="From" Caption="From"  />
+                                                <DxGridDataColumn FieldName="Subject" Caption="Subject"  />
+                                                <DxGridDataColumn FieldName="To" Caption="To"  />
+                                                <DxGridDataColumn FieldName="Status" Caption="Status"  />
+                                            </Columns>
                                         </DxGrid>
                                     </DxLoadingPanel>
                                 }
@@ -117,7 +124,7 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem ColSpanMd="12">
                                                 <label>Body</label>
-                                                <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Enter non HTML format like centering..." >
+                                                <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Enter non HTML format like centering...">
                                                     <ToolbarContent>
                                                         <select class="ql-header">
                                                             <option selected=""></option>
@@ -142,17 +149,31 @@
                                                             <button class="ql-list" value="bullet"></button>
                                                         </span>
                                                         <span class="ql-formats">
+                                                            <button class="ql-image"></button>
+                                                            <button class="ql-video"></button>
+                                                        </span>
+                                                        <span class="ql-formats">
                                                             <button class="ql-link"></button>
                                                         </span>
                                                     </ToolbarContent>
-                                                    <EditorContent>
+                                                    <EditorContent >
 
                                                     </EditorContent>
                                                 </BlazoredTextEditor>
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                         <DxFormLayout CssClass="w-100">
-                                            <DxButton SubmitFormOnClick="true" Text="Send"></DxButton>
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <div class="row justify-content-between">
+                                                    <div class="col-4">
+                                                        <DxButton SubmitFormOnClick="true" Text="Send" @onclick="@(async()=>await SendEmail())"></DxButton>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <DxButton SubmitFormOnClick="true" Text="Save" @onclick="@(async()=>await OnSave())"></DxButton>
+                                                        <DxButton SubmitFormOnClick="true" Text="Discard" @onclick="@(async()=>await OnCancle())"></DxButton>
+                                                    </div>
+                                                </div>
+                                            </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditForm>
                                 }

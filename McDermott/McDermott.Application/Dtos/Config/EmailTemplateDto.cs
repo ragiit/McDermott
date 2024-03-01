@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace McDermott.Application.Dtos.Config
 {
     public class EmailTemplateDto : IMapFrom<EmailTemplate>
     {
-        public int id { get; set; }
+        public int Id { get; set; }
         public int? ById { get; set; }
         public int? ToPartnerId { get; set; }
 
@@ -26,6 +27,6 @@ namespace McDermott.Application.Dtos.Config
         public string? Cc { get; set; } = string.Empty;
         public string? ReplayTo { get; set; } = string.Empty;
         public DateTime? Schendule { get; set; }
-        public string? Message { get; set; } = string.Empty;
+        public string? Message { get; set; }
     }
 }

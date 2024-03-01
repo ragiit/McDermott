@@ -46,11 +46,26 @@ namespace McDermott.Web.Components.Pages.Config
             "SSL/TLS"
         };
 
+        private void HandleValidSubmit()
+        {
+            FormValidationState = @"Form data is valid";
+        }
+
+        private void HandleInvalidSubmit()
+        {
+            FormValidationState = @"Form data is invalid";
+        }
+
+        #endregion Data static
+
+        #region variabel
+
+        private string FormValidationState = @"Press the ""Save"" button to validate the form.";
         private string resultMessage = "";
         private bool? IsConnected { get; set; }
         private bool isLoading { get; set; }
 
-        #endregion Data static
+        #endregion variabel
 
         #region Async Data And Auth Render
 
@@ -286,7 +301,7 @@ namespace McDermott.Web.Components.Pages.Config
                         await client.AuthenticateAsync(FormEmails.Smtp_User, FormEmails.Smtp_Pass);
                         IsConnected = true;
                         ToastService.ShowSuccess("Connection Success");
-                        FormEmails.Status = "testing";
+                        FormEmails.Status = "Connected!";
                     }
                 }
                 isLoading = false;
