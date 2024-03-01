@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -35,19 +36,23 @@ namespace McDermott.Web.Components.Pages.Config
         public List<DepartmentDto> Departments = [];
         public List<JobPositionDto> JobPositions = [];
 
-        private List<string> IdentityTypes = new()
-        {
+        private readonly List<string> IdentityTypes =
+        [
             "KTP",
             "Paspor",
             "SIM",
             "VISA",
-        };
+        ];
 
-        private List<string> MartialStatuss = new()
-        {
+        private readonly List<string> MartialStatuss =
+        [
             "Single",
-            "Married"
-        };
+            "Married",
+            "Divorced",
+            "Widowed",
+            "Separated",
+            "Unmarried"
+        ];
 
         private string fileKey = Guid.NewGuid().ToString();
 

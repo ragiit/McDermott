@@ -1,0 +1,43 @@
+﻿<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>@Title</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    @foreach (var item in Items)
+                    {
+                        <li class="breadcrumb-item">
+                            @if (!item.IsActive)
+                            {
+                                <a href="@item.Url" @onclick="async () => await item.OnClick.InvokeAsync()">@item.Title</a>
+                            }
+                            else
+                            {
+                                @item.Title
+                            }
+                        </li>
+                    }
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    public class BreadcrumbItem
+    {
+        public string Title { get; set; }
+        public string Url { get; set; }
+        public bool IsActive { get; set; }
+        public EventCallback OnClick { get; set; }
+    }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public List<BreadcrumbItem> Items { get; set; } = new List<BreadcrumbItem>();
+}

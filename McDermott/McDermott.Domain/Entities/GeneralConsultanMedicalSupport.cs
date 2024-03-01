@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
     public class GeneralConsultanMedicalSupport : BaseAuditableEntity
     {
@@ -25,6 +19,7 @@ namespace McDermott.Domain.Entities
         public bool? DrugNegative { get; set; }
         public bool? DrugPositive { get; set; }
 
+        [SetToNull] // Tandai properti yang harus diatur ke null
         public GeneralConsultanService? GeneralConsultanService { get; set; }
     }
 }
