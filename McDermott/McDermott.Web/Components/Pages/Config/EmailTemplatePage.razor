@@ -145,14 +145,14 @@
                                                             <button class="ql-link"></button>
                                                         </span>
                                                     </ToolbarContent>
-                                                    <EditorContent>
+                                                    <EditorContent >
                                                         
                                                     </EditorContent>
                                                 </BlazoredTextEditor>
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                         <DxFormLayout CssClass="w-100">
-                                            <DxButton SubmitFormOnClick="true" Text="Send"></DxButton>
+                                            <DxButton SubmitFormOnClick="true" Text="Send" @onclick="@(async()=>await SendEmail())"></DxButton>
                                         </DxFormLayout>
                                     </EditForm>
                                 }

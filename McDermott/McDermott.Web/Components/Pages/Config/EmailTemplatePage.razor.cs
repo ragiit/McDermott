@@ -1,6 +1,7 @@
 ﻿using Blazored.TextEditor;
 using DevExpress.Data.XtraReports.Native;
 using McDermott.Domain.Entities;
+using Microsoft.AspNetCore.Components;
 using static McDermott.Application.Features.Commands.Config.EmailTemplateCommand;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -43,6 +44,7 @@ namespace McDermott.Web.Components.Pages.Config
         private BlazoredTextEditor QuillHtml;
         private BlazoredTextEditor QuillNative;
         private BlazoredTextEditor QuillReadOnly;
+        private MarkupString priview;
 
         private string QuillHTMLContent;
         private string QuillContent;
@@ -156,7 +158,6 @@ namespace McDermott.Web.Components.Pages.Config
             EmailFormTemplate = new();
             showForm = true;
             textPopUp = "Edit Form Template Email";
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
         private void ColumnChooserButton_Click()
@@ -200,6 +201,14 @@ namespace McDermott.Web.Components.Pages.Config
                 await LoadData();
             }
             catch { }
+        }
+
+        private async Task SendEmail()
+        {
+            if (!string.IsNullOrWhiteSpace(await QuillHtml.GetText()))
+            {
+                priview = (MarkupString)await QuillHtml.GetHTML();
+            }
         }
     }
 }
