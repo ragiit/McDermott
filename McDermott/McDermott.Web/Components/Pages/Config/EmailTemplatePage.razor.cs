@@ -277,10 +277,10 @@ namespace McDermott.Web.Components.Pages.Config
                 var pass = cek.Smtp_Pass;
                 var user = EmailFormTemplate.From;
 
-                if (!string.IsNullOrWhiteSpace(await QuillHtml.GetHTML()))
-                {
-                    preview = (MarkupString)await QuillHtml.GetHTML();
-                }
+                //if (!string.IsNullOrWhiteSpace(await QuillHtml.GetHTML()))
+                //{
+                preview = (MarkupString)await QuillHtml.GetHTML();
+                //}
                 EmailFormTemplate.Message = preview.ToString();
                 EmailFormTemplate.Status = "sending";
 
