@@ -455,6 +455,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             public string? Subjective { get; set; }
             public string? Objective { get; set; }
+            public string? Plan { get; set; }
             public string Diagnosis { get; set; }
             public string NursingDiagnosis { get; set; }
             public DateTime Date { get; set; } = DateTime.Now;
@@ -775,7 +776,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                 {
+                    FormRegis.StagingStatus = "Confirmed";
                     var result = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                    await LoadData();
                 }
             }
             catch (Exception ex)
@@ -1037,12 +1040,12 @@ namespace McDermott.Web.Components.Pages.Transaction
                 DoctorId = FormRegis.PratitionerId.ToInt32();
                 PaymentMethod = FormRegis.Payment;
 
-                var clinical = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
-                var support = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
-                GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                //var clinical = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                //var support = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                //GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
 
-                GeneralConsultanMedicalSupport = support[0];
-                GeneralConsultantClinical = clinical[0];
+                //GeneralConsultanMedicalSupport = support[0];
+                //GeneralConsultantClinical = clinical[0];
             }
             catch (Exception exx)
             {
