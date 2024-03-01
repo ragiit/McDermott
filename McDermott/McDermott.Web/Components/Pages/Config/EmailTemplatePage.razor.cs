@@ -5,6 +5,7 @@ using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
 using MimeKit;
 using MimeKit.Text;
+using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 using static McDermott.Application.Features.Commands.Config.EmailTemplateCommand;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -14,6 +15,7 @@ namespace McDermott.Web.Components.Pages.Config
         #region relation Data
 
         private List<EmailTemplateDto> EmailTemplates = new();
+        private List<EmailSettingDto> EmailSettings = new();
         private EmailTemplateDto EmailFormTemplate = new();
         private IEnumerable<UserDto> CcBy = [];
         private List<UserDto> ToPartner;
@@ -57,7 +59,7 @@ namespace McDermott.Web.Components.Pages.Config
         private BlazoredTextEditor QuillHtml;
         private BlazoredTextEditor QuillNative;
         private BlazoredTextEditor QuillReadOnly;
-        private MarkupString priview;
+        private MarkupString preview;
 
         private string QuillHTMLContent;
         private string QuillContent;
@@ -98,7 +100,7 @@ namespace McDermott.Web.Components.Pages.Config
             catch { }
             //var by =
 
-            EmailTemplates = await Mediator.Send(new GetEmailTemplateQuery());
+            //EmailTemplates = await Mediator.Send(new GetEmailTemplateQuery());
             await LoadData();
         }
 
@@ -122,7 +124,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData()
         {
-            PopupVisible = false;
+            showForm = false;
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             EmailTemplates = await Mediator.Send(new GetEmailTemplateQuery());
@@ -172,15 +174,21 @@ namespace McDermott.Web.Components.Pages.Config
             EmailFormTemplate = new();
             showForm = true;
             textPopUp = "Form Template Email";
-            await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
             await LoadUser();
-            EmailFormTemplate = new();
             showForm = true;
+            var general = SelectedDataItems[0].Adapt<EmailTemplateDto>();
+            EmailFormTemplate = general;
             textPopUp = "Edit Form Template Email";
+        }
+
+        private async Task OnCancle()
+        {
+            showForm = false;
+            await LoadData();
         }
 
         private void ColumnChooserButton_Click()
@@ -228,20 +236,52 @@ namespace McDermott.Web.Components.Pages.Config
             catch { }
         }
 
+        private async Task OnSave()
+        {
+            try
+            {
+                if (EmailFormTemplate.Status == "")
+                {
+                    EmailFormTemplate.Status = "draf";
+                }
+                if (!string.IsNullOrWhiteSpace(await QuillHtml.GetHTML()))
+                {
+                    preview = (MarkupString)await QuillHtml.GetHTML();
+                }
+                EmailFormTemplate.Message = preview.ToString();
+                var a = EmailFormTemplate;
+                if (EmailFormTemplate.Id == 0)
+                {
+                    await Mediator.Send(new CreateEmailTemplateRequest(EmailFormTemplate));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateEmailTemplateRequest(EmailFormTemplate));
+                }
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError(ex.Message);
+            }
+        }
+
         private async Task SendEmail()
         {
             try
             {
-                var host = "smtp.gmail.com";
-                var port = int.Parse("587");
-                var username = "nuralimajids@gmail.com";
-                var pass = "fjzyzqrteviltcub";
+                EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
+                var cek = EmailSettings.Where(x => x.Smtp_User == EmailFormTemplate.From).FirstOrDefault();
+                var host = cek.Smtp_Host;
+                var port = int.Parse(cek.Smtp_Port);
+                var pass = cek.Smtp_Pass;
+                var user = EmailFormTemplate.From;
 
-                if (!string.IsNullOrWhiteSpace(await QuillHtml.GetText()))
+                if (!string.IsNullOrWhiteSpace(await QuillHtml.GetHTML()))
                 {
-                    priview = (MarkupString)await QuillHtml.GetHTML();
+                    preview = (MarkupString)await QuillHtml.GetHTML();
                 }
-                EmailFormTemplate.Message = priview.ToString();
+                EmailFormTemplate.Message = preview.ToString();
                 EmailFormTemplate.Status = "sending";
 
                 var message = new MimeMessage();
@@ -249,12 +289,35 @@ namespace McDermott.Web.Components.Pages.Config
                 message.To.Add(MailboxAddress.Parse(EmailFormTemplate.To));
                 message.Subject = EmailFormTemplate.Subject;
                 message.Body = new TextPart(TextFormat.Html) { Text = EmailFormTemplate.Message };
+                //message.Cc.Add(MailboxAddress.Parse(EmailFormTemplate.Cc));
+                //message.Body = new TextPart(TextFormat.Html) { Text = EmailFormTemplate.Message };
 
                 using var smtp = new SmtpClient();
-                smtp.Connect(host, port, MailKit.Security.SecureSocketOptions.StartTls);
-                smtp.Authenticate(username, pass);
-                smtp.Send(message);
-                smtp.Disconnect(true);
+                if (cek.Smtp_Encryption == "SSL/TLS")
+                {
+                    smtp.Connect(host, port, MailKit.Security.SecureSocketOptions.SslOnConnect);
+                    smtp.Authenticate(user, pass);
+                    smtp.Send(message);
+                    smtp.Disconnect(true);
+                    ToastService.ShowSuccess("Success Send Email!");
+                }
+                else if (cek.Smtp_Encryption == "TLS (STARTTLS)")
+                {
+                    smtp.Connect(host, port, MailKit.Security.SecureSocketOptions.StartTls);
+                    smtp.Authenticate(user, pass);
+                    smtp.Send(message);
+                    smtp.Disconnect(true);
+                    ToastService.ShowSuccess("Success Send Email!");
+                }
+                else
+                {
+                    smtp.Connect(host, port, MailKit.Security.SecureSocketOptions.None);
+                    smtp.Authenticate(user, pass);
+                    smtp.Send(message);
+                    smtp.Disconnect(true);
+                    EmailFormTemplate.Status = "Send";
+                    ToastService.ShowSuccess("Success Send Email!");
+                }
             }
             catch (Exception ex)
             {

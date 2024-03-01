@@ -301,7 +301,7 @@ namespace McDermott.Web.Components.Pages.Config
                         await client.AuthenticateAsync(FormEmails.Smtp_User, FormEmails.Smtp_Pass);
                         IsConnected = true;
                         ToastService.ShowSuccess("Connection Success");
-                        FormEmails.Status = "testing";
+                        FormEmails.Status = "Connected!";
                     }
                 }
                 isLoading = false;

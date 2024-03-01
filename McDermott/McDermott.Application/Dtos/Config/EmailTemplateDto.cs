@@ -11,7 +11,7 @@ namespace McDermott.Application.Dtos.Config
 {
     public class EmailTemplateDto : IMapFrom<EmailTemplate>
     {
-        public int id { get; set; }
+        public int Id { get; set; }
         public int? ById { get; set; }
         public int? ToPartnerId { get; set; }
 

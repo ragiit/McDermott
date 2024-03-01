@@ -12,7 +12,7 @@ namespace McDermott.Domain.Entities
         public string? Subject { get; set; }
 
         [StringLength(200)]
-        public string? from { get; set; }
+        public string? From { get; set; }
 
         public int? ById { get; set; }
 
