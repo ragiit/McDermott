@@ -94,7 +94,7 @@
                                                 @EditFormContext.GetEditor("Code")
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Country:" ColSpanMd="12">
-                                                <DxComboBox Data="@Countries"
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" Data="@Countries"
                                                             NullText="Select Country..."
                                                             @bind-Value="@a.CountryId"
                                                             TextFieldName="Name"
