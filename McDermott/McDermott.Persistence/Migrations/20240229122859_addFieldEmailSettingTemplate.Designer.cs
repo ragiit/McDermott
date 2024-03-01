@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240229122859_addFieldEmailSettingTemplate")]
+    partial class addFieldEmailSettingTemplate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1004,9 +1007,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("EndDateSickLeave")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("IdentityNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -1017,9 +1017,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsAlertInformationSpecialCase")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSickLeave")
                         .HasColumnType("bit");
 
                     b.Property<string>("Method")
@@ -1048,9 +1045,6 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<string>("StagingStatus")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("StartDateSickLeave")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("TypeMedical")
                         .HasColumnType("nvarchar(max)");

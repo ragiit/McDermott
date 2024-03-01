@@ -53,10 +53,12 @@ namespace McDermott.Web.Components.Pages.Queue
             "NIP",
             "Oracle",
             "SAP",
-            "Legacy"
+            "Legacy",
+            "NIK"
         };
 
         private string? NamePatient { get; set; } = string.Empty;
+        private string? statBPJS { get; set; } = string.Empty;
         private int? CountServiceId { get; set; }
 
         private KioskDto FormKios = new();
@@ -271,6 +273,12 @@ namespace McDermott.Web.Components.Pages.Queue
                 if (FormKios.BPJS != null)
                 {
                     FormKios.StageBpjs = true;
+                    statBPJS = "Active";
+                }
+                else
+                {
+                    FormKios.StageBpjs = false;
+                    statBPJS = "InActive";
                 }
 
                 foreach (var kiosk in KioskConf)
@@ -340,18 +348,10 @@ namespace McDermott.Web.Components.Pages.Queue
                     var checkId = await Mediator.Send(new CreateKioskRequest(FormKios));
 
                     // Mendapatkan antrian kiosk
-
-                    //var todayQueues = KioskQueues
-                    //    .Where(x => x.ServiceId == checkId.ServiceId && x.CreatedDate?.Date == DateTime.Now.Date)
-                    //    .ToList();
-                    //KioskQueues = await Mediator.Send(new GetKioskQueueQuery());
                     var todayQueues = KioskQueues
                         .Where(x => x.ServiceId == checkId.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date).ToList();
 
                     // Menentukan nomor antrian
-                    //FormQueue.NoQueue = todayQueues.Count == 0
-                    //    ? 1
-                    //    : todayQueues.Max(x => x.NoQueue);
                     if (todayQueues.Count == 0)
                     {
                         FormQueue.NoQueue = 1;
@@ -362,9 +362,12 @@ namespace McDermott.Web.Components.Pages.Queue
                         FormQueue.NoQueue = (int)GetNoQueue.NoQueue + 1;
                     }
 
+                    // mendapatkan service counter Id
+                    var skId = Services.Where(x => x.Id == checkId.ServiceId).Select(x => x.ServicedId).FirstOrDefault();
                     // Mengisi informasi antrian
                     FormQueue.KioskId = checkId.Id;
                     FormQueue.ServiceId = checkId.ServiceId;
+                    FormQueue.ServiceKId = skId;
 
                     // Membuat KioskQueue baru
                     await Mediator.Send(new CreateKioskQueueRequest(FormQueue));

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using McDermott.Application.Dtos.Medical;
-using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {

@@ -56,14 +56,9 @@ namespace McDermott.Application.Features.Commands.Transaction
             public GeneralConsultanServiceDto GeneralConsultanServiceDto { get; set; } = GeneralConsultanServiceDto;
         }
 
-        public class UpdateGeneralConsultanServiceRequest : IRequest<bool>
+        public class UpdateGeneralConsultanServiceRequest(GeneralConsultanServiceDto GeneralConsultanServiceDto) : IRequest<bool>
         {
-            public GeneralConsultanServiceDto GeneralConsultanServiceDto { get; set; }
-
-            public UpdateGeneralConsultanServiceRequest(GeneralConsultanServiceDto GeneralConsultanServiceDto)
-            {
-                this.GeneralConsultanServiceDto = GeneralConsultanServiceDto;
-            }
+            public GeneralConsultanServiceDto GeneralConsultanServiceDto { get; set; } = GeneralConsultanServiceDto;
         }
 
         public class DeleteGeneralConsultanServiceRequest : IRequest<bool>

@@ -34,7 +34,6 @@
                                             KeyFieldName="Id"
                                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                             DataItemDeleting="OnDelete"
-                                            PopupEditFormCssClass="my-style"
                                             PagerPosition="GridPagerPosition.Bottom"
                                             PageSizeSelectorVisible="true"
                                             PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
@@ -52,50 +51,40 @@
                                             SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                             KeyboardNavigationEnabled="true">
                                         <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && EmailSettings.Count > 0" />
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="() => NewItem_Click()" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && EmailSettings.Count > 0" />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && EmailSettings.Count > 0" />
+
                                             </DxToolbar>
+
+
                                         </ToolbarTemplate>
+
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="Sequence" Caption="Priority" SortIndex="0" />
                                             <DxGridDataColumn FieldName="Description" Caption="Description" />
                                             <DxGridDataColumn FieldName="Smtp_Host" Caption="SMTP Server" />
-                                            <DxGridDataColumn FieldName="Smtp_user" Caption="Username" />
+                                            <DxGridDataColumn FieldName="Smtp_User" Caption="Username" />
                                             <DxGridDataColumn FieldName="Smtp_Encryption" Caption="Connection Scurity" />
+                                            <DxGridDataColumn FieldName="Status" Caption="Status" />
                                         </Columns>
+
                                     </DxGrid>
                                 </DxLoadingPanel>
                                 <DxPopup @bind-Visible="@PopUpVisible"
                                          HeaderText="@TextPopUp"
                                          Width="60%"
                                          Height="90%">
-                                    <BodyTemplate Context="PopupContext">
+                                    <EditForm Model="@FormEmails" Context="EditFormContext">
+                                        <DataAnnotationsValidator />
                                         <div style="padding-top: 1rem; padding-bottom: 1rem">
-                                            @{
-                                                var data = "";
-                                                if (FormEmails.Smpt_Encryption == "TLS (STARTTLS)")
-                                                {
-                                                    data = "25";
-                                                   
-                                                }
-                                                else if (FormEmails.Smpt_Encryption == "SSL/TLS")
-                                                {
-                                                    data = "465";
-                                                   
-                                                }
-                                                else if (FormEmails.Smpt_Encryption == "none")
-                                                {
-                                                    data = "";
-                                                    
-                                                }
-                                            }
+
                                             <DxFormLayout CssClass="mt">
                                                 <DxFormLayoutGroup Caption="Configuration Email" ColSpanLg="12">
                                                     <DxFormLayoutItem ColSpanMd="6" Caption="Description:">
-                                                        <DxTextBox @bind-Text="@FormEmails.Description" NullText="Description..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        <DxTextBox @bind-Text="@FormEmails.Description" NullText="Description.."></DxTextBox>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem ColSpanMd="6" Caption="Priority:">
                                                         <DxSpinEdit @bind-Value="@FormEmails.Sequence" NullText="Priority" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
@@ -103,26 +92,28 @@
                                                 </DxFormLayoutGroup>
                                                 <DxFormLayoutGroup Caption="Connection Information" ColSpanMd="12">
                                                     <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Server:">
-                                                        <DxTextBox  @bind-Text="@FormEmails.Smpt_Host" NullText="SMPTP Server" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_Host" NullText="SmtpP Server" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Port:">
-                                                        <DxTextBox  @bind-text="@FormEmails.Smpt_Port" NullText="SMTP PORT" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_Port" NullText="port" />
                                                     </DxFormLayoutItem>
                                                 </DxFormLayoutGroup>
                                                 <DxFormLayoutGroup Caption="Security And Authentication" ColSpanMd="12">
                                                     <DxFormLayoutItem ColSpanMd="12" Caption="Conection Scurity:">
                                                         <Template>
                                                             <DxComboBox Data="@Stts_Ecrypt"
-                                                                        NullText="Select Ecrypt..."
-                                                                        @bind-Value="@OnSmptEncryptionChange">
+                                                                        NullText="Select Ecryp  t..."
+                                                                        AllowUserInput="true"
+                                                                        SelectedItemChanged="@((string city) => SelectedItemChanged(city))"
+                                                                        @bind-Value="@FormEmails.Smtp_Encryption">
                                                             </DxComboBox>
                                                         </Template>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem ColSpanMd="12" Caption="Username:">
-                                                        <DxTextBox @bind-Text="@FormEmails.Smpt_User" NullText="Username" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_User" NullText="Username" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem ColSpanMd="12" Caption="Password:">
-                                                        <DxTextBox @bind-Text="@FormEmails.Smpt_Pass"
+                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_Pass"
                                                                    NullText="Password"
                                                                    Password="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -145,26 +136,33 @@
                                                     }
                                                     else
                                                     {
-
-                                                        @if (IsConnected)
+                                                        @if (IsConnected == true)
                                                         {
-                                                            <p class="text-success">Connection successful!</p>
+                                                            <h6 class="text-success">Connection Successful!</h6>
                                                         }
-                                                        else if (!IsConnected)
+                                                        else if (IsConnected == false)
                                                         {
-                                                            <p class="text-danger">Connection failed.</p>
+                                                            <h6 class="text-danger">Connection Failed!</h6>
                                                         }
                                                         else
                                                         {
-
-                                                            <p></p>
+                                                            <h6 class="text-info">Connection Status Unknown.</h6>
                                                         }
+
                                                     }
 
                                                 </DxFormLayoutItem>
+                                                <DxFormLayoutItem ColSpanMd="12">
+                                                    <div class="row justify-content-end">
+                                                        <div class="col-auto align-self-end">
+                                                            <DxButton Text="Save" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Info" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                                            <DxButton Text="Discard" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" Click="OnCancel"></DxButton>
+                                                        </div>
+                                                    </div>
+                                                </DxFormLayoutItem>
                                             </DxFormLayout>
                                         </div>
-                                    </BodyTemplate>
+                                    </EditForm>
                                 </DxPopup>
                             </div>
                         </div>

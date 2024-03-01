@@ -1,9 +1,5 @@
 ﻿using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.JSInterop;
-using Microsoft.SqlServer.Server;
-using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Patient
 {
@@ -247,12 +243,7 @@ namespace McDermott.Web.Components.Pages.Patient
             if (!FormValidationState)
                 return;
 
-            UserForm.IsEmployee = false;
             UserForm.IsPatient = true;
-            UserForm.IsUser = false;
-            UserForm.IsDoctor = false;
-            UserForm.IsNurse = false;
-            UserForm.IsPhysicion = false;
 
             PatientFamilyRelations.ForEach(x =>
             {
@@ -281,8 +272,15 @@ namespace McDermott.Web.Components.Pages.Patient
             else
             {
                 UserForm.PatientAllergy.UserId = UserForm.Id;
-                await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
                 await Mediator.Send(new UpdateUserRequest(UserForm));
+                if (UserForm.PatientAllergy.Id == 0)
+                {
+                    await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdatePatientAllergyRequest(UserForm.PatientAllergy));
+                }
             }
 
             await LoadData();
@@ -368,6 +366,15 @@ namespace McDermott.Web.Components.Pages.Patient
                 //PatientFamilyRelations = await Mediator.Send(new GetPatientFamilyByPatientQuery(x => x.PatientId == UserForm.Id));
                 //InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
                 InsurancePoliciesCount = await Mediator.Send(new GetInsurancePolicyCountQuery(x => x.UserId == UserForm.Id));
+                var alergy = await Mediator.Send(new GetPatientAllergyQuery(x => x.UserId == UserForm.Id));
+                if (alergy.Count == 0)
+                {
+                    UserForm.PatientAllergy = new PatientAllergyDto();
+                }
+                else
+                {
+                    UserForm.PatientAllergy = alergy[0];
+                }
             }
             catch { }
         }

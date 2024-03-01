@@ -90,6 +90,10 @@ namespace McDermott.Application.Features.Queries.Config
                 {
                     var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.NIP!.Equals(request.Number));
                     data = result.Adapt<List<UserDto>>().ToList();
+                }else if(request.Types == "NIK")
+                {
+                    var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.NoId!.Equals(request.Number));
+                    data = result.Adapt<List<UserDto>>().ToList();
                 }
                 return data;
             }

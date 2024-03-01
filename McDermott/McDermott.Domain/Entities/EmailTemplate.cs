@@ -27,6 +27,7 @@ namespace McDermott.Domain.Entities
         public string? ReplayTo { get; set; }
         public DateTime? Schendule { get; set; }
         public string? Message { get; set; }
+        public string? Status { get; set; }
 
         public virtual User? By { get; set; }
         public virtual List<User>? ToPartner { get; set; }

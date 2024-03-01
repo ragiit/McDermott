@@ -62,7 +62,7 @@
                                     <DxGridDataColumn FieldName="Code" Width="100px" />
                                     <DxGridDataColumn FieldName="Quota" Width="90px" />
                                     <DxGridDataColumn FieldName="Flag" Width="130px" Caption="Flag" />
-                                    <DxGridDataColumn FieldName="KioskName" Caption=" Service Kiosk" />
+                                    <DxGridDataColumn FieldName="KioskName" Caption=" Service Counter" />
                                 </Columns>                               
                             </DxGrid>
 
@@ -90,13 +90,13 @@
                                         <DxFormLayoutItem Caption="Patient" ColSpanMd="6">
                                             <DxCheckBox @bind-Checked="@FormService.IsPatient" />
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Kiosk" ColSpanMd="6">
+                                        <DxFormLayoutItem Caption="Counter" ColSpanMd="6">
                                             <DxCheckBox @bind-Checked="@FormService.IsKiosk" />
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem ColSpanMd="12" Caption="Service Kiosk" Visible="@Convert.ToBoolean(@FormService.IsPatient)">
+                                        <DxFormLayoutItem ColSpanMd="12" Caption="Service Counter" Visible="@Convert.ToBoolean(@FormService.IsPatient)">
                                             <DxComboBox Data="@ServicesK"
                                                       @bind-Value="@FormService.ServicedId"
-                                                      NullText="select Service Kiosk.."
+                                                      NullText="select Service Counter.."
                                                       TextFieldName="Name"
                                                       ValueFieldName="Id"></DxComboBox>
                                         </DxFormLayoutItem>

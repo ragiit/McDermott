@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using McDermott.Application.Dtos.Config;
-using McDermott.Application.Dtos.Medical;
-
-namespace McDermott.Application.Dtos.Transaction
+﻿namespace McDermott.Application.Dtos.Transaction
 {
     public partial class GeneralConsultanServiceDto : IMapFrom<GeneralConsultanService>
     {
         public int Id { get; set; }
         public int? PatientId { get; set; }
-        public int? InsuranceId { get; set; } 
-        public int? InsurancePolicyId { get; set; } 
+        public int? InsuranceId { get; set; }
+        public int? InsurancePolicyId { get; set; }
+
+        [Required]
         public int? ServiceId { get; set; }
+        [Required]
         public int? PratitionerId { get; set; }
         public int? ClassType { get; set; }
         public string? StagingStatus { get; set; } = "Planned";
@@ -27,17 +21,23 @@ namespace McDermott.Application.Dtos.Transaction
         public string? IdentityNumber { get; set; }
         public DateTime? BirthDay { get; set; }
         [Required]
-        public string? TypeRegistration { get; set; }
+        public string? TypeRegistration { get; set; } = "General Consultation";
+        [Required]
         public string? TypeMedical { get; set; }
+        [Required]
         public string? ScheduleTime { get; set; }
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public int? Age { get; set; }
+        [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime? RegistrationDate { get; set; } = DateTime.Now;
         public TimeSpan? WorkFrom { get; set; }
-        public TimeSpan? WorkTo { get; set; } 
+        public TimeSpan? WorkTo { get; set; }
         public bool Temp { get; set; } = false;
         public bool IsAlertInformationSpecialCase { get; set; } = false;
+        public bool IsSickLeave { get; set; } = false;
+        public DateTime? StartDateSickLeave { get; set; }
+        public DateTime? EndDateSickLeave { get; set; }
         public bool IsWeather { get; set; } = false;
         public bool IsPharmacology { get; set; } = false;
         public bool IsFood { get; set; } = false;

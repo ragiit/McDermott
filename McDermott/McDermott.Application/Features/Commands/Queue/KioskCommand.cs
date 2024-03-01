@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using McDermott.Application.Dtos.Transaction;
+using McDermott.Application.Dtos.Queue;
 
 namespace McDermott.Application.Features.Commands.Queue
 {

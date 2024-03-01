@@ -1,13 +1,6 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using DevExpress.Utils.Design;
-using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.JSInterop;
-using System.Runtime.CompilerServices;
-using System.Security.Claims;
-using static McDermott.Web.Components.Pages.Medical.DoctorScheduledPage;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -173,17 +166,14 @@ namespace McDermott.Web.Components.Pages.Medical
             if (!FormValidationState)
                 return;
 
-            UserForm.IsEmployee = false;
-            UserForm.IsPatient = false;
-            UserForm.IsUser = false;
             UserForm.IsDoctor = true;
 
             if (UserForm.Id == 0)
             {
-                await FileUploadService.UploadFileAsync(BrowserFile);
+                _ = await FileUploadService.UploadFileAsync(BrowserFile);
                 var a = SelectedServices.Select(x => x.Id).ToList();
                 UserForm.DoctorServiceIds?.AddRange(a);
-                await Mediator.Send(new CreateUserRequest(UserForm));
+                _ = await Mediator.Send(new CreateUserRequest(UserForm));
             }
             else
             {
@@ -211,12 +201,12 @@ namespace McDermott.Web.Components.Pages.Medical
                 }
 
                 UserForm.DoctorServiceIds = SelectedServices.Select(x => x.Id).ToList();
-                await Mediator.Send(new UpdateUserRequest(UserForm));
+                _ = await Mediator.Send(new UpdateUserRequest(UserForm));
 
                 if (UserForm.SipFile != userDtoSipFile)
                 {
                     if (UserForm.SipFile != null)
-                        await FileUploadService.UploadFileAsync(BrowserFile);
+                        _ = await FileUploadService.UploadFileAsync(BrowserFile);
                 }
             }
 
@@ -244,7 +234,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             if (SelectedDataItems is null)
             {
-                await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
+                _ = await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
             }
             else
             {
@@ -252,7 +242,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
                 int userActive = (int)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
 
-                await Mediator.Send(new DeleteListUserRequest(a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
+                _ = await Mediator.Send(new DeleteListUserRequest(a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
             }
             await LoadData();
         }

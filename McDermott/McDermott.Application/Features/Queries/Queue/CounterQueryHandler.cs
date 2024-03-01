@@ -1,10 +1,10 @@
-﻿using McDermott.Application.Dtos.Transaction;
+﻿using McDermott.Application.Dtos.Queue;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Transaction.CounterCommand;
+using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 
 namespace McDermott.Application.Features.Queries.Queue
 {
