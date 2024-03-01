@@ -3,13 +3,28 @@
     public partial class GeneralConsultanServiceDto : IMapFrom<GeneralConsultanService>
     {
         public int Id { get; set; }
+        [Required(ErrorMessage = "The Patient field is required.")]
         public int? PatientId { get; set; }
         public int? InsuranceId { get; set; }
+        //[NoRMRequired(ErrorMessage = "The Insurance Policy field is required.")]
         public int? InsurancePolicyId { get; set; }
+        public class NoRMRequiredAttribute : ValidationAttribute
+        {
+            protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+            {
+                var model = (GeneralConsultanServiceDto)validationContext.ObjectInstance;
 
-        [Required]
+                if (!string.IsNullOrEmpty(model.Payment) && string.IsNullOrEmpty((string)value))
+                {
+                    return new ValidationResult(ErrorMessage);
+                }
+
+                return ValidationResult.Success;
+            }
+        }
+        [Required(ErrorMessage = "The Service field is required.")]
         public int? ServiceId { get; set; }
-        [Required]
+        [Required(ErrorMessage = "The Physicion field is required.")]
         public int? PratitionerId { get; set; }
         public int? ClassType { get; set; }
         public string? StagingStatus { get; set; } = "Planned";
@@ -18,6 +33,7 @@
         [Required]
         public string? Payment { get; set; }
         public string? NoRM { get; set; }
+
         public string? IdentityNumber { get; set; }
         public DateTime? BirthDay { get; set; }
         [Required]

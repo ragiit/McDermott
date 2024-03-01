@@ -2,6 +2,7 @@
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Reflection;
 
 namespace McDermott.Persistence.Context
@@ -73,7 +74,7 @@ namespace McDermott.Persistence.Context
 
         #region Queue
         public DbSet<KioskConfig> KioskConfigs { get; set; }
-        public DbSet<KioskQueue> KioskQueues  { get; set; }
+        public DbSet<KioskQueue> KioskQueues { get; set; }
         public DbSet<Kiosk> Kiosks { get; set; }
         public DbSet<Counter> Counters { get; set; }
 
@@ -286,29 +287,38 @@ namespace McDermott.Persistence.Context
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
-            var currentUser = _httpContextAccessor.HttpContext.User.Identity.Name ?? "";
-
-            var entries = ChangeTracker.Entries<BaseAuditableEntity>();
-
-            foreach (var entry in entries)
+            try
             {
-                var now = DateTime.Now;
+                var currentUser = _httpContextAccessor.HttpContext.User.Identity.Name ?? "";
 
-                switch (entry.State)
+                var entries = ChangeTracker.Entries<BaseAuditableEntity>();
+
+                foreach (var entry in entries)
                 {
-                    case EntityState.Added:
-                        entry.Entity.CreatedBy = currentUser;
-                        entry.Entity.CreatedDate = now;
-                        break;
+                    var now = DateTime.Now;
 
-                    case EntityState.Modified:
-                        entry.Entity.UpdatedBy = currentUser;
-                        entry.Entity.UpdatedDate = now;
-                        break;
+                    switch (entry.State)
+                    {
+                        case EntityState.Added:
+                            entry.Entity.CreatedBy = currentUser;
+                            entry.Entity.CreatedDate = now;
+                            break;
+
+                        case EntityState.Modified:
+                            entry.Entity.UpdatedBy = currentUser;
+                            entry.Entity.UpdatedDate = now;
+                            break;
+                    }
                 }
-            }
 
-            return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e.Message);
+
+                return 0;
+            }
         }
 
         public override int SaveChanges()

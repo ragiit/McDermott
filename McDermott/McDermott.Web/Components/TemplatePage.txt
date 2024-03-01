@@ -606,3 +606,176 @@ if (UserForm.SipFile != userDtoSipFile)
         await FileUploadService.UploadFileAsync(BrowserFile);
 }
 ========================== END Upload Download File ==========================
+
+
+
+
+
+
+
+
+
+
+
+
+<DxPopup HeaderText="Refer To" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+        <EditForm Model="@FormRegis" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+            <DataAnnotationsValidator />
+             <DxFormLayout>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <DxFormLayout  Enabled="false" CssClass="mt ">
+                               @*  <DxFormLayoutItem
+                                        CaptionCssClass="required-caption normal-caption normal-caption"
+                                        Caption="Patient"
+                                        ColSpanMd="12">
+                                    <DxComboBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
+                                                ShowValidationIcon="true"
+                                                Data="@patients"
+                                                NullText="Select Partner..."
+                                                @bind-Value="@FormRegis.PatientId"
+                                                TextFieldName="Name"
+                                                SelectedItemChanged="@((UserDto e) => SelectedItemPatientChanged(e))"
+                                                ValueFieldName="Id">
+                                    </DxComboBox>
+                                    <ValidationMessage For="@(()=>FormRegis.PatientId)" />
+
+                                </DxFormLayoutItem> *@
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@FormRegis.NoRM" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@FormRegis.IdentityNumber" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
+                                    <Template>
+                                        <DxGridLayout>
+                                            <Rows>
+                                                <DxGridLayoutRow />
+                                            </Rows>
+                                            <Columns>
+                                                <DxGridLayoutColumn Width="90%" />
+                                                <DxGridLayoutColumn Width="30%" />
+                                            </Columns>
+                                            <Items>
+                                                <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
+                                                    <Template>
+                                                        <DxSpinEdit ShowValidationIcon="true"MinValue="0" @bind-Value="@FormRegis.Age" NullText="Age" ReadOnly InputCssClass="fw-normal" />
+                                                    </Template>
+                                                </DxGridLayoutItem>
+                                                <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                    <Template>
+                                                        <h6 class="pl-1 pt-2 normal-caption">Year</h6>
+                                                    </Template>
+                                                </DxGridLayoutItem>
+                                            </Items>
+                                        </DxGridLayout>
+
+                                    </Template>
+                                </DxFormLayoutItem>
+                            @*    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg Type" ColSpanMd="12">
+                                     <DxComboBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
+                                                Data="@RegisType"
+                                                NullText="Select Registration..."
+                                                AllowUserInput="true"
+                                                SelectedItemChanged="@((string city) => SelectedItemChanged(city))"
+                                                @bind-Value="@FormRegis.TypeRegistration">
+                                    </DxComboBox>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem
+                                        Visible="@(string.IsNullOrWhiteSpace(FormRegis.TypeRegistration))"
+                                        CaptionCssClass="required-caption normal-caption"
+                                        Caption="Medical Type"
+                                        ColSpanMd="12">
+                                    <DxComboBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))" ShowValidationIcon="true" Data="@Method"
+                                                NullText="Select Method..."
+                                                @bind-Value="@FormRegis.TypeMedical">
+                                    </DxComboBox>
+                                </DxFormLayoutItem> *@
+                                <DxFormLayoutItem  CaptionCssClass="normal-caption" Caption="Alert Information Special Case" ColSpanMd="12">
+                                    <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))" @bind-Checked="@FormRegis.IsAlertInformationSpecialCase" />
+                                </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </div>
+                        <div class="col-md-6">
+                            <DxFormLayout CssClass="mt ">
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
+                                    <DxComboBox ShowValidationIcon="true" Data="@Services"
+                                                NullText="Service.."
+                                                ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
+                                                @bind-Value="@ServiceId" TextFieldName="Name" ValueFieldName="Id">
+                                    </DxComboBox>
+                                    <ValidationMessage For="@(() => ServiceId)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Physicion" ColSpanMd="12">
+                                    <DxComboBox ShowValidationIcon="true" Data="@IsPratition"
+                                                NullText="Docter"
+                                                @bind-Value="@DoctorId"
+                                                ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
+                                                TextFieldName="Name"
+                                                ValueFieldName="Id"
+                                                InputId="CbDoctoreName">
+                                    </DxComboBox>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Payment Methode" ColSpanMd="12">
+                                    <DxComboBox ShowValidationIcon="true" Data="@Payments"
+                                                NullText="Payment Method.."
+                                                ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
+                                                @bind-Value="@PaymentMethod">
+                                    </DxComboBox>
+                                </DxFormLayoutItem>
+                                @if (PaymentMethod == "Insurance" || PaymentMethod == "BPJS")
+                                {
+                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption=" " ColSpanMd="12">
+                                        <DxComboBox ShowValidationIcon="true" ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))" TextFieldName="ConcatInsurancePolicy" ValueFieldName="InsurancePolicyId" Data="@Temps" @bind-Value="@FormRegis.InsurancePolicyId" NullText="Select Insurance .."></DxComboBox ShowValidationIcon="true">
+                                    </DxFormLayoutItem>
+                                }
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
+                                    <DxDateEdit   ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))" @bind-Date="@RegistrationDate" Mask="@DateTimeMask.ShortDate" NullText="Select Registration Date" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Schedule Time" ColSpanMd="12">
+                                    <DxComboBox ShowValidationIcon="true" Data="@Times"
+                                                NullText="Select Time.."
+                                                ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
+                                                @bind-Value="@FormRegis.ScheduleTime"/>
+                                </DxFormLayoutItem>
+                                    <DxFormLayoutItem Visible="@(FormRegis.StagingStatus.Equals("Physician") || FormRegis.StagingStatus!.Equals("Finished"))" CaptionCssClass="normal-caption" Caption="Sick Leave" ColSpanMd="12">
+                                        <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Physician"))" @bind-Checked="@FormRegis.IsSickLeave" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Visible="@(FormRegis.IsSickLeave && (FormRegis.StagingStatus.Equals("Physician") || FormRegis.StagingStatus!.Equals("Finished")))" CaptionCssClass="required-caption normal-caption" Caption="Start-End Date" ColSpanMd="12">
+                                    <Template>
+                                        <DxGridLayout ColumnSpacing="8px">
+                                            <Rows>
+                                                <DxGridLayoutRow />
+                                            </Rows>
+                                            <Columns>
+                                                <DxGridLayoutColumn />
+                                                <DxGridLayoutColumn />
+                                            </Columns>
+                                            <Items>
+                                                <DxGridLayoutItem Row="0" Column="0"  >
+                                                    <Template>
+                                                        <DxDateEdit ReadOnly="@(!FormRegis.StagingStatus!.Equals("Physician"))" @bind-Date="@FormRegis.StartDateSickLeave" Mask="@DateTimeMask.ShortDate" NullText="Select Registration Date" />
+                                                    </Template>
+                                                </DxGridLayoutItem>
+                                                <DxGridLayoutItem Row="0" Column="1" >
+                                                    <Template>
+                                                        <DxDateEdit ReadOnly="@(!FormRegis.StagingStatus!.Equals("Physician"))" @bind-Date="@FormRegis.EndDateSickLeave" Mask="@DateTimeMask.ShortDate" NullText="Select Registration Date" />
+                                                    </Template>
+                                                </DxGridLayoutItem>
+                                            </Items>
+                                        </DxGridLayout>
+                                    </Template>
+                                    </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </div>
+                    </div>
+             </DxFormLayout>
+                <div class="row justify-content-end">
+                    <div class="col-auto align-self-end">
+                        <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                        <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
+                    </div>
+                </div>
+        </EditForm>
+    </DxPopup>
