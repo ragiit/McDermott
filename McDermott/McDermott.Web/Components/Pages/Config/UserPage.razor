@@ -106,7 +106,7 @@
                                             <div class="row w-100">
                                                 <div class="col-md-6">
                                                     <DxFormLayout CssClass="mt">
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Name" ColSpanMd="12">
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption"Caption="Name" ColSpanMd="12">
                                                             <DxTextBox @bind-Text="@UserForm.Name"
                                                                        ShowValidationIcon="true"
                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -160,7 +160,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <DxFormLayout CssClass="mt">
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Mobile" ColSpanMd="12">
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption"Caption="Mobile" ColSpanMd="12">
                                                             <DxMaskedInput @bind-Value="@UserForm.MobilePhone"
                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                            NullText="Mobile Phone"
