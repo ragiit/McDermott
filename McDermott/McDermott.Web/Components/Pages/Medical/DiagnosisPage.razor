@@ -75,15 +75,15 @@
                                             var a = (DiagnosisDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                 <div class="pop-warning">
                                                     @EditFormContext.GetEditor("Name")
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Code:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Code" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("Code")
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Disease Category:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Disease Category" ColSpanMd="12">
                                                 <DxComboBox Data="@Diseases"
                                                             NullText="Select Disease..."
                                                             @bind-Value="@a.DiseaseCategoryId"
@@ -91,7 +91,7 @@
                                                             ValueFieldName="Id">
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Chronic Category:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Chronic Category" ColSpanMd="12">
                                                 <DxComboBox Data="@Cronises"
                                                             NullText="Select Chronic..."
                                                             @bind-Value="@a.CronisCategoryId"

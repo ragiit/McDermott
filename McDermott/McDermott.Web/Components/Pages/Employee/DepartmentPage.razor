@@ -75,11 +75,11 @@
                                             var a = (DepartmentDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem Caption="Parent Department:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Parent Department" ColSpanMd="12">
                                                 <Template>
                                                     <DxComboBox Data="@ParentDepartments"
                                                                 NullText="Select Parent Department..."
@@ -91,7 +91,7 @@
                                                 </Template>
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem Caption="Company:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Company" ColSpanMd="12">
                                                 <Template>
                                                     <DxComboBox Data="@Companies"
                                                                 NullText="Select Company..."
@@ -103,7 +103,7 @@
                                                 </Template>
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem Caption="Manager:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Manager" ColSpanMd="12">
                                                 <Template>
                                                     <DxComboBox Data="@Users"
                                                                 NullText="Select Manager..."
@@ -114,7 +114,7 @@
                                                 </Template>
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem Caption="Department Category:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Department Category" ColSpanMd="12">
                                                 <Template>
                                                     <DxComboBox NullText="Select Department Category..." FilteringMode="@DataGridFilteringMode.Contains" Data="@DepartmentCategories" @bind-Value="@a.DepartmentCategory" />
                                                 </Template>

@@ -147,9 +147,8 @@
                                 }
                                 else
                                 {
-                                    <label for="tbOverview" class="demo-text cw-320 mb-1">
-                                        Building
-                                    </label>
+                                 
+                                    <p for="tbOverview"> Building</p>
 
                                     <DxTextBox @bind-Text="@Building.Name"
                                                NullText="Building"
@@ -163,9 +162,8 @@
                             NullText="Code"
                             InputId="tbOverview3" /> *@
 
-                                    <label for="tbOverview2" class="demo-text cw-320 mb-1 mt-2">
-                                        Health Center
-                                    </label>
+                                  
+                                    <p for="tbOverview2"> Health Center</p>
 
                                     <DxComboBox Data="@HealthCenters"
                                                 NullText="Select Health Center..."
@@ -231,7 +229,8 @@
                                                 var a = (BuildingLocationDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem Caption="Location:" ColSpanMd="12">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
+                                                                  Caption="Location" ColSpanMd="12">
                                                     <DxComboBox Data="@Locations"
                                                                 NullText="Select Location..."
                                                                 FilteringMode="@DataGridFilteringMode.Contains"

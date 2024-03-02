@@ -77,23 +77,22 @@
                                      Height="400px">
                                  <EditForm Model=@FormService Context="EditFormContext">                                    
                                     <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                             <DxTextBox @bind-Text="@FormService.Name" NullText="Name Service.."/>
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Code:" ColSpanMd="12">
+                                        <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Code" ColSpanMd="12">
                                             <DxTextBox @bind-Text="@FormService.Code" NullText="Code.."/>
                                         </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem Caption="Quota:" ColSpanMd="12">
+                                        <DxFormLayoutItem CaptionCssClass="caption normal-caption"  Caption="Quota" ColSpanMd="12">
                                            <DxTextBox @bind-Text="@FormService.Quota" NullText="Quota Service.."/>
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Patient" ColSpanMd="6">
+                                        <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Patient" ColSpanMd="6">
                                             <DxCheckBox @bind-Checked="@FormService.IsPatient" />
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Counter" ColSpanMd="6">
+                                        <DxFormLayoutItem CaptionCssClass="caption normal-caption"  Caption="Counter" ColSpanMd="6">
                                             <DxCheckBox @bind-Checked="@FormService.IsKiosk" />
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem ColSpanMd="12" Caption="Service Counter" Visible="@Convert.ToBoolean(@FormService.IsPatient)">
+                                        <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="caption normal-caption" Caption="Service Counter" Visible="@Convert.ToBoolean(@FormService.IsPatient)">
                                             <DxComboBox Data="@ServicesK"
                                                       @bind-Value="@FormService.ServicedId"
                                                       NullText="select Service Counter.."

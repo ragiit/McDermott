@@ -75,14 +75,14 @@
                                                 var a = (NursingDiagnosesDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem Caption="Problem:" ColSpanMd="12">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Problem" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@a.Problem"
                                                                ShowValidationIcon="true"
                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                NullText="Problem" />
                                                 </DxFormLayoutItem>
 
-                                                <DxFormLayoutItem Caption="Code:">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Code">
                                                     <DxTextBox @bind-Text="@a.Code"
                                                                ShowValidationIcon="true"
                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"

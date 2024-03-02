@@ -73,10 +73,10 @@
                                             var a = (JobPositionDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Department:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Department" ColSpanMd="12">
                                                 <Template>
                                                     <DxComboBox Data="@Departments"
                                                                 NullText="Select Department..."

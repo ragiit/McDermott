@@ -3,7 +3,7 @@
     public class ProvinceDto : IMapFrom<Province>
     {
         public int Id { get; set; }
-        public int CountryId { get; set; }
+        public int? CountryId { get; set; }
 
         [Required]
         [StringLength(200)]
