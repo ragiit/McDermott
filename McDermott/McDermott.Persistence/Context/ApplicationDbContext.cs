@@ -18,7 +18,8 @@ namespace McDermott.Persistence.Context
 
         #region DbSet
 
-        #region Config 
+        #region Config
+
         public DbSet<City> Cities { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<District> Districts { get; set; }
@@ -39,9 +40,10 @@ namespace McDermott.Persistence.Context
         public DbSet<EmailSetting> EmailSettings { get; set; }
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
 
-        #endregion
+        #endregion Config
 
         #region Medical
+
         public DbSet<DiseaseCategory> DiseaseCategories { get; set; }
         public DbSet<NursingDiagnoses> NursingDiagnoses { get; set; }
         public DbSet<Procedure> Procedures { get; set; }
@@ -53,9 +55,11 @@ namespace McDermott.Persistence.Context
         public DbSet<Insurance> Insurances { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<BuildingLocation> BuildingLocations { get; set; }
-        #endregion
+
+        #endregion Medical
 
         #region Patiente
+
         public DbSet<Family> Families { get; set; }
         public DbSet<InsurancePolicy> InsurancePolicies { get; set; }
         public DbSet<PatientFamilyRelation> PatientFamilyRelations { get; set; }
@@ -63,24 +67,28 @@ namespace McDermott.Persistence.Context
         public DbSet<DoctorSchedule> DoctorSchedules { get; set; }
         public DbSet<DoctorScheduleDetail> DoctorScheduleDetails { get; set; }
         public DbSet<DoctorScheduleSlot> DoctorScheduleSlots { get; set; }
-        #endregion
+
+        #endregion Patiente
 
         #region Transaction
+
         public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
         public DbSet<GeneralConsultantClinicalAssesment> GeneralConsultantClinicalAssesments { get; set; }
         public DbSet<GeneralConsultanCPPT> GeneralConsultanCPPTs { get; set; }
         public DbSet<GeneralConsultanMedicalSupport> GeneralConsultanMedicalSupports { get; set; }
-        #endregion
+
+        #endregion Transaction
 
         #region Queue
+
         public DbSet<KioskConfig> KioskConfigs { get; set; }
         public DbSet<KioskQueue> KioskQueues { get; set; }
         public DbSet<Kiosk> Kiosks { get; set; }
         public DbSet<Counter> Counters { get; set; }
 
-        #endregion DbSet
+        #endregion Queue
 
-        #endregion
+        #endregion DbSet
 
         #region OnModelCreating
 
@@ -114,7 +122,6 @@ namespace McDermott.Persistence.Context
               .HasMany(m => m.GeneralConsultantClinicalAssesments)
               .WithOne(c => c.GeneralConsultanService)
               .OnDelete(DeleteBehavior.Cascade);
-
 
             //modelBuilder.Entity<Province>()
             //  .HasMany(m => m.Districts)
@@ -315,9 +322,9 @@ namespace McDermott.Persistence.Context
             }
             catch (Exception e)
             {
-                Log.Error(e.Message);
+                Log.Error("Message: An error occurred while saving data: " + e.Message + "\n" + "Inner Message: An error occurred while saving data: " + e.InnerException?.Message);
 
-                return 0;
+                throw;
             }
         }
 
@@ -346,6 +353,6 @@ namespace McDermott.Persistence.Context
             return SaveChangesAsync().GetAwaiter().GetResult();
         }
 
-        #endregion MyRegion
+        #endregion OnModelCreating
     }
 }

@@ -8,6 +8,7 @@ namespace McDermott.Application.Features.Queries.Config
     public class UserQueryHandler
     {
         #region Get
+
         internal class GetAllUserQueryHandler : IRequestHandler<GetUserQuery, List<UserDto>>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -72,16 +73,18 @@ namespace McDermott.Application.Features.Queries.Config
 
             public async Task<List<UserDto>> Handle(GetDataUserForKioskQuery request, CancellationToken cancellationToken)
             {
-               List<UserDto>  data = new List<UserDto>();
+                List<UserDto> data = new List<UserDto>();
                 if (request.Types == "Legacy")
                 {
                     var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Legacy!.Equals(request.Number));
                     data = result.Adapt<List<UserDto>>().ToList();
-                }else if(request.Types == "Oracle")
+                }
+                else if (request.Types == "Oracle")
                 {
                     var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Oracle!.Equals(request.Number));
                     data = result.Adapt<List<UserDto>>().ToList();
-                }else if(request.Types == "SAP")
+                }
+                else if (request.Types == "SAP")
                 {
                     var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.SAP!.Equals(request.Number));
                     data = result.Adapt<List<UserDto>>().ToList();
@@ -90,7 +93,8 @@ namespace McDermott.Application.Features.Queries.Config
                 {
                     var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.NIP!.Equals(request.Number));
                     data = result.Adapt<List<UserDto>>().ToList();
-                }else if(request.Types == "NIK")
+                }
+                else if (request.Types == "NIK")
                 {
                     var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.NoId!.Equals(request.Number));
                     data = result.Adapt<List<UserDto>>().ToList();
@@ -98,9 +102,11 @@ namespace McDermott.Application.Features.Queries.Config
                 return data;
             }
         }
-        #endregion
+
+        #endregion Get
 
         #region Create
+
         internal class CreateUserHandler : IRequestHandler<CreateUserRequest, UserDto>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -133,9 +139,11 @@ namespace McDermott.Application.Features.Queries.Config
                 }
             }
         }
-        #endregion
+
+        #endregion Create
 
         #region Update
+
         internal class UpdateUserHandler : IRequestHandler<UpdateUserRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -158,9 +166,11 @@ namespace McDermott.Application.Features.Queries.Config
                 return true;
             }
         }
-        #endregion
+
+        #endregion Update
 
         #region Delete
+
         internal class DeleteUserHandler : IRequestHandler<DeleteUserRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -180,21 +190,16 @@ namespace McDermott.Application.Features.Queries.Config
 
                     return true;
                 }
-                catch (Exception e )
+                catch (Exception e)
                 {
                     return false;
                 }
             }
         }
 
-        internal class DeleteListUserHandler : IRequestHandler<DeleteListUserRequest, bool>
+        internal class DeleteListUserHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteListUserRequest, bool>
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListUserHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<bool> Handle(DeleteListUserRequest request, CancellationToken cancellationToken)
             {
@@ -213,14 +218,9 @@ namespace McDermott.Application.Features.Queries.Config
             }
         }
 
-        internal class DeleteListCountryHandler : IRequestHandler<DeleteListCountryRequest, bool>
+        internal class DeleteListCountryHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteListCountryRequest, bool>
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListCountryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<bool> Handle(DeleteListCountryRequest request, CancellationToken cancellationToken)
             {
@@ -230,6 +230,8 @@ namespace McDermott.Application.Features.Queries.Config
                 return true;
             }
         }
-        #endregion 
+
+        #endregion Delete
+
     }
 }

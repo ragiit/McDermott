@@ -1,6 +1,7 @@
 ﻿using DevExpress.Data.XtraReports.Native;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.Data.SqlClient;
 using Microsoft.JSInterop;
 using OfficeOpenXml;
 
@@ -293,8 +294,9 @@ namespace McDermott.Web.Components.Pages.Config
                 }
                 await LoadData();
             }
-            catch (Exception ee)
-            {
+            catch (Exception ex)
+            { 
+                ex.HandleException(ToastService);
             }
         }
 
@@ -314,7 +316,10 @@ namespace McDermott.Web.Components.Pages.Config
 
                 await LoadData();
             }
-            catch { }
+            catch (Exception ex)
+            { 
+                ex.HandleException(ToastService);
+            }
         }
 
         #endregion Grid

@@ -51,7 +51,7 @@ namespace McDermott.Application.Features.Queries.Config
             public CreateCountryHandler(IUnitOfWork unitOfWork)
             {
                 _unitOfWork = unitOfWork;
-            } 
+            }
 
             public async Task<CountryDto> Handle(CreateCountryRequest request, CancellationToken cancellationToken)
             {
@@ -77,14 +77,9 @@ namespace McDermott.Application.Features.Queries.Config
             }
         }
 
-        internal class UpdateCountryHandler : IRequestHandler<UpdateCountryRequest, bool>
+        internal class UpdateCountryHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateCountryRequest, bool>
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateCountryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<bool> Handle(UpdateCountryRequest request, CancellationToken cancellationToken)
             {
@@ -113,20 +108,14 @@ namespace McDermott.Application.Features.Queries.Config
             }
         }
 
-        internal class DeleteListCountryHandler : IRequestHandler<DeleteListCountryRequest, bool>
+        internal class DeleteListCountryHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteListCountryRequest, bool>
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListCountryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<bool> Handle(DeleteListCountryRequest request, CancellationToken cancellationToken)
             {
                 await _unitOfWork.Repository<Country>().DeleteAsync(request.Id);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
-
                 return true;
             }
         }
