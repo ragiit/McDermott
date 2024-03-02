@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Employee
+﻿namespace McDermott.Application.Dtos.Employee
 {
     public class JobPositionDto : IMapFrom<JobPosition>
     {

@@ -1,11 +1,11 @@
-﻿ 
-
-namespace McDermott.Application.Features.Commands.Transaction
+﻿namespace McDermott.Application.Features.Commands.Transaction
 {
     public class GeneralConsultanServiceCommand
     {
         #region Create
+
         #region Create
+
         internal class CreateGeneralConsultantClinicalAssesmentHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateGeneralConsultantClinicalAssesmentRequest, GeneralConsultantClinicalAssesmentDto>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -33,10 +33,13 @@ namespace McDermott.Application.Features.Commands.Transaction
                 return result.Adapt<List<GeneralConsultantClinicalAssesmentDto>>();
             }
         }
-        #endregion
-        #endregion
+
+        #endregion Create
+
+        #endregion Create
 
         #region Get
+
         public class GetGeneralConsultanServiceQuery : IRequest<List<GeneralConsultanServiceDto>>;
 
         public class GetGeneralConsultanServiceByIdQuery(int id) : IRequest<GeneralConsultanServiceDto>
@@ -48,8 +51,8 @@ namespace McDermott.Application.Features.Commands.Transaction
         {
             public Expression<Func<GeneralConsultantClinicalAssesment, bool>> Predicate { get; } = predicate;
         }
-        #endregion
 
+        #endregion Get
 
         public class CreateGeneralConsultanServiceRequest(GeneralConsultanServiceDto GeneralConsultanServiceDto) : IRequest<GeneralConsultanServiceDto>
         {
@@ -70,6 +73,7 @@ namespace McDermott.Application.Features.Commands.Transaction
                 Id = id;
             }
         }
+
         public class DeleteListGeneralConsultanServiceRequest : IRequest<bool>
         {
             public List<int> Id { get; set; }
@@ -80,13 +84,13 @@ namespace McDermott.Application.Features.Commands.Transaction
             }
         }
 
-
         #region Update
+
         public class UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinicalAssesmentDto GeneralConsultantClinicalAssesmentDto) : IRequest<bool>
         {
             public GeneralConsultantClinicalAssesmentDto GeneralConsultantClinicalAssesmentDto { get; set; } = GeneralConsultantClinicalAssesmentDto;
         }
 
-        #endregion
+        #endregion Update
     }
 }

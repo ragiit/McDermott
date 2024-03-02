@@ -1,10 +1,6 @@
-﻿using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.CodeAnalysis;
-using Microsoft.JSInterop;
 using System.Globalization;
-using System.Reflection;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using McDermott.Application.Dtos.Config;
+﻿using System.Globalization;
 
 namespace McDermott.Application.Dtos.Medical
 {

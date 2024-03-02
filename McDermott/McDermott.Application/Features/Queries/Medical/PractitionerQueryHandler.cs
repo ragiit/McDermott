@@ -3,6 +3,7 @@
     public class PractitionerQueryHandler
     {
         #region Get
+
         //internal class GetAllUserEmployeeQueryHandler : IRequestHandler<GetUserPractitionerQuery, List<UserDto>>
         //{
         //    private readonly IUnitOfWork _unitOfWork;
@@ -46,7 +47,7 @@
                 }
             }
         }
-        #endregion
 
+        #endregion Get
     }
 }

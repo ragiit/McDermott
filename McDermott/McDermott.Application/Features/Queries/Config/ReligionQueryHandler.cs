@@ -1,7 +1,4 @@
-﻿
-
-
-namespace McDermott.Application.Features.Queries.Config
+﻿namespace McDermott.Application.Features.Queries.Config
 {
     public class ReligionQueryHandler
     {

@@ -1,7 +1,4 @@
-using Blazored.LocalStorage;
-using Blazored.Toast;
 using McDermott.Application.Extentions;
-using McDermott.Domain.Entities;
 using McDermott.Persistence.Extensions;
 using McDermott.Web.Components;
 using Serilog;

@@ -1,14 +1,10 @@
-﻿using Blazored.Toast.Services;
-using MediatR;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
     public partial class SignaPage
-    { 
+    {
         private List<SignaDto> Signas = [];
         private GroupMenuDto UserAccessCRUID = new();
 
@@ -37,7 +33,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             await LoadData();
         }
-       
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -102,7 +98,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         };
 
                         //if (!Countries.Any(x => x.Name.Trim().ToLower() == country.Name.Trim().ToLower()) && !countries.Any(x => x.Name.Trim().ToLower() == country.Name.Trim().ToLower()))
-                            ////countries.Add(country);
+                        ////countries.Add(country);
                     }
 
                     await Mediator.Send(new CreateListCountryRequest(countries));
@@ -117,7 +113,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             await LoadData();
         }
-
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
@@ -185,10 +180,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 ExportSelectedRowsOnly = true,
             });
         }
-        
+
         private async Task ImportFile()
         {
-            
             await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
 

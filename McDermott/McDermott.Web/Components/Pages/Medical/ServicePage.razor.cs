@@ -1,8 +1,4 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Application.Dtos.Queue;
-using Microsoft.JSInterop;
-
-namespace McDermott.Web.Components.Pages.Medical
+﻿namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class ServicePage
     {

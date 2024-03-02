@@ -1,11 +1,8 @@
-﻿using McDermott.Application.Dtos.Config;
-
-namespace McDermott.Application.Features.Commands.Config
+﻿namespace McDermott.Application.Features.Commands.Config
 {
     public class ProvinceCommand
     {
         public class GetProvinceQuery : IRequest<List<ProvinceDto>>;
-
 
         public class GetProvinceByIdQuery : IRequest<ProvinceDto>
         {

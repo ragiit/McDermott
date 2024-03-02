@@ -1,7 +1,4 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using Microsoft.JSInterop;
-
-namespace McDermott.Web.Components.Pages.Medical
+﻿namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class InsurancePage
     {

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace McDermott.Application.Dtos.Config
+﻿namespace McDermott.Application.Dtos.Config
 {
     public class GroupDto : IMapFrom<Group>
     {

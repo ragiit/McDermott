@@ -1,5 +1,4 @@
-﻿using McDermott.Application.Dtos.Medical;
-using static McDermott.Application.Features.Commands.Medical.LocationCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.LocationCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {

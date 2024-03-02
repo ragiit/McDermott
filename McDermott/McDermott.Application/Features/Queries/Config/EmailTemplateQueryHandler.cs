@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using McDermott.Application.Dtos.Config;
-using static McDermott.Application.Features.Commands.Config.EmailTemplateCommand;
+﻿using static McDermott.Application.Features.Commands.Config.EmailTemplateCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
@@ -101,6 +95,7 @@ namespace McDermott.Application.Features.Queries.Config
                 return true;
             }
         }
+
         internal class DeleteListEmailTemplateHandler : IRequestHandler<DeleteListEmailTemplateRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;

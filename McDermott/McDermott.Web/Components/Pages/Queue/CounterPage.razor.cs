@@ -1,10 +1,5 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Application.Dtos.Queue;
-using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Components;
+﻿using McDermott.Application.Dtos.Queue;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
-using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace McDermott.Web.Components.Pages.Queue
 {

@@ -1,5 +1,4 @@
-﻿using McDermott.Application.Dtos.Employee;
-using static McDermott.Application.Features.Commands.Employee.DepartmentCommand;
+﻿using static McDermott.Application.Features.Commands.Employee.DepartmentCommand;
 
 namespace McDermott.Application.Features.Queries.Employee
 {

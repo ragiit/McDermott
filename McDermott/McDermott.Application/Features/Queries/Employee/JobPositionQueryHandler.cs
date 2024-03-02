@@ -1,5 +1,4 @@
-﻿using McDermott.Application.Dtos.Employee;
-using static McDermott.Application.Features.Commands.Employee.JobPositionCommand;
+﻿using static McDermott.Application.Features.Commands.Employee.JobPositionCommand;
 
 namespace McDermott.Application.Features.Queries.Employee
 {

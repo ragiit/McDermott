@@ -1,9 +1,9 @@
-﻿
-namespace McDermott.Application.Features.Queries.Patient
+﻿namespace McDermott.Application.Features.Queries.Patient
 {
     public class InsurancePolicyQueryHandler
     {
         #region Get
+
         internal class GetInsurancePolicyQueryHandler : IRequestHandler<GetInsurancePolicyQuery, List<InsurancePolicyDto>>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -29,8 +29,9 @@ namespace McDermott.Application.Features.Queries.Patient
                 {
                     return [];
                 }
-            } 
+            }
         }
+
         internal class GetInsurancePolicyCountQueryHandler : IRequestHandler<GetInsurancePolicyCountQuery, int>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -53,9 +54,11 @@ namespace McDermott.Application.Features.Queries.Patient
                 }
             }
         }
-        #endregion
+
+        #endregion Get
 
         #region Create
+
         internal class CreateInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateInsurancePolicyRequest, InsurancePolicyDto>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -69,9 +72,11 @@ namespace McDermott.Application.Features.Queries.Patient
                 return result.Adapt<InsurancePolicyDto>();
             }
         }
-        #endregion
+
+        #endregion Create
 
         #region Update
+
         internal class UpdateInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateInsurancePolicyRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -84,9 +89,11 @@ namespace McDermott.Application.Features.Queries.Patient
                 return true;
             }
         }
-        #endregion
+
+        #endregion Update
 
         #region Delete
+
         internal class DeleteInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteInsurancePolicyRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -108,6 +115,7 @@ namespace McDermott.Application.Features.Queries.Patient
                 return true;
             }
         }
-        #endregion
+
+        #endregion Delete
     }
 }

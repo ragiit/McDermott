@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.JSInterop;
 using OfficeOpenXml;
 using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;
 

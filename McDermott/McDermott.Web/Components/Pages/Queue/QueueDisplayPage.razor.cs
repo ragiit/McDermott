@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.JSInterop;
 using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Queue
@@ -115,7 +114,6 @@ namespace McDermott.Web.Components.Pages.Queue
             await LoadData();
         }
 
-
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -185,7 +183,6 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task ImportFile()
         {
-
             await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
 

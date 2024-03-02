@@ -1,7 +1,4 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using System.Security.Claims;
-
-namespace McDermott.Web.Components.Pages.Employee
+﻿namespace McDermott.Web.Components.Pages.Employee
 {
     public partial class EmployeePage
     {

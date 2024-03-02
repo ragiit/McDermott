@@ -1,7 +1,4 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using static McDermott.Application.Features.Commands.Patient.FamilyCommand;
-
-namespace McDermott.Web.Components.Pages.Patient
+﻿namespace McDermott.Web.Components.Pages.Patient
 {
     public partial class FamilyPage
     {

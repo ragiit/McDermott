@@ -1,10 +1,9 @@
-﻿using McDermott.Application.Dtos.Config;
-
-namespace McDermott.Application.Features.Commands.Config
+﻿namespace McDermott.Application.Features.Commands.Config
 {
     public class UserCommand
     {
         #region Get
+
         public class GetUserQuery : IRequest<List<UserDto>>;
 
         public class GetUserByIdQuery : IRequest<UserDto>
@@ -30,8 +29,8 @@ namespace McDermott.Application.Features.Commands.Config
         public class GetDataUserForKioskQuery : IRequest<List<UserDto>>
         {
             public UserDto userDto { get; set; }
-            public string Types {  get; set; }
-            public string Number {  get; set; }
+            public string Types { get; set; }
+            public string Number { get; set; }
 
             public GetDataUserForKioskQuery(string Types, string Number)
             {
@@ -41,9 +40,10 @@ namespace McDermott.Application.Features.Commands.Config
             }
         }
 
-        #endregion
+        #endregion Get
 
         #region Create
+
         public class CreateUserRequest : IRequest<UserDto>
         {
             public UserDto UserDto { get; set; }
@@ -53,9 +53,11 @@ namespace McDermott.Application.Features.Commands.Config
                 this.UserDto = UserDto;
             }
         }
-        #endregion
+
+        #endregion Create
 
         #region Update
+
         public class UpdateUserRequest : IRequest<bool>
         {
             public UserDto UserDto { get; set; }
@@ -65,9 +67,11 @@ namespace McDermott.Application.Features.Commands.Config
                 this.UserDto = UserDto;
             }
         }
-        #endregion
+
+        #endregion Update
 
         #region Delete
+
         public class DeleteUserRequest : IRequest<bool>
         {
             public int Id { get; set; }
@@ -87,6 +91,7 @@ namespace McDermott.Application.Features.Commands.Config
                 Id = id;
             }
         }
-        #endregion 
+
+        #endregion Delete
     }
 }

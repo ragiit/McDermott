@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace McDermott.Application.Dtos.Employee
 {
     public class CompanyDto : IMapFrom<Company>
@@ -15,10 +13,8 @@ namespace McDermott.Application.Dtos.Employee
         [StringLength(200)]
         public string Name { get; set; }
 
-
         [StringLength(20)]
         public string Phone { get; set; }
-
 
         [StringLength(200)]
         public string Email { get; set; }

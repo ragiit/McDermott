@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
-    public class KioskDepartement:BaseAuditableEntity
+    public class KioskDepartement : BaseAuditableEntity
     {
         public int? ServiceKId { get; set; }
         public int? ServicePId { get; set; }

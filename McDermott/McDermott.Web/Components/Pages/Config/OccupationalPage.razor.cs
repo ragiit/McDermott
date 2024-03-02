@@ -1,4 +1,3 @@
-using DevExpress.Data.XtraReports.Native;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
 namespace McDermott.Web.Components.Pages.Config

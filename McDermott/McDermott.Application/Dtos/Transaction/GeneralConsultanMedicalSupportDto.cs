@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Transaction
+﻿namespace McDermott.Application.Dtos.Transaction
 {
     public class GeneralConsultanMedicalSupportDto : IMapFrom<GeneralConsultanMedicalSupport>
     {
@@ -34,6 +28,7 @@ namespace McDermott.Application.Dtos.Transaction
                 }
             }
         }
+
         public bool AlcoholPositive
         {
             get => _AlcoholPositive;
@@ -65,6 +60,7 @@ namespace McDermott.Application.Dtos.Transaction
                 }
             }
         }
+
         public bool DrugPositive
         {
             get => _DrugPositive;

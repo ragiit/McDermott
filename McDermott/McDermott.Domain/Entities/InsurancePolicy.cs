@@ -9,12 +9,16 @@
 
         [StringLength(200)]
         public string? Prolanis { get; set; }
+
         [StringLength(200)]
         public string? ParticipantName { get; set; }
+
         [StringLength(200)]
         public string? NoCard { get; set; }
+
         [StringLength(200)]
         public string? NoId { get; set; } // NIK
+
         [StringLength(5)]
         public string? Sex { get; set; }
 
@@ -26,18 +30,25 @@
 
         [StringLength(200)]
         public string? ServicePPKName { get; set; }
+
         [StringLength(200)]
         public string? ServicePPKCode { get; set; }
+
         [StringLength(50)]
         public string? PhoneNumber { get; set; }
+
         [StringLength(200)]
         public string? NursingClass { get; set; }
+
         [StringLength(200)]
         public string? Diagnosa { get; set; }
+
         [StringLength(200)]
         public string? Poly { get; set; }
+
         [StringLength(200)]
         public string? Doctor { get; set; }
+
         public DateTime? DateOfBirth { get; set; }
         public DateTime? CardPrintDate { get; set; }
         public DateTime? TmtDate { get; set; }
@@ -45,7 +56,6 @@
 
         [StringLength(200)]
         public string? ParticipantStatus { get; set; }
-
 
         [StringLength(200)]
         public string? ServiceType { get; set; }

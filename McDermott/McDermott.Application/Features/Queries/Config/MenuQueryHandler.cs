@@ -1,5 +1,4 @@
-﻿using McDermott.Application.Dtos.Config;
-using static McDermott.Application.Features.Commands.Config.MenuCommand;
+﻿using static McDermott.Application.Features.Commands.Config.MenuCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {

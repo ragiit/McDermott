@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components.Forms;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

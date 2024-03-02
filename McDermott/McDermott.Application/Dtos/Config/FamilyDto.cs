@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Config
+﻿namespace McDermott.Application.Dtos.Config
 {
     public partial class FamilyDto : IMapFrom<Family>
     {
@@ -14,13 +7,11 @@ namespace McDermott.Application.Dtos.Config
         [Required]
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
+
         public string? ParentRelation { get; set; }
         public string? ChildRelation { get; set; }
 
         [StringLength(100)]
         public string? Relation { get; set; }
-
-
     }
 }
-

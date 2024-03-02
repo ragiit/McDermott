@@ -1,7 +1,4 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using Microsoft.JSInterop;
-
-namespace McDermott.Web.Components.Pages.Config
+﻿namespace McDermott.Web.Components.Pages.Config
 {
     public partial class ProvincePage
     {

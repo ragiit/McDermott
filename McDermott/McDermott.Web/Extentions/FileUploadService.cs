@@ -1,39 +1,31 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.JSInterop;
-using System;
-using System.Net.Http;
-using static Microsoft.AspNetCore.Razor.Language.TagHelperMetadata;
+﻿using Microsoft.AspNetCore.Components.Forms;
 
 namespace McDermott.Web.Extentions
 {
     public class FileUploadService : IFileUploadService
     {
-        private readonly IWebHostEnvironment _environment; 
+        private readonly IWebHostEnvironment _environment;
 
         public FileUploadService(IWebHostEnvironment environment)
         {
-            _environment = environment; 
+            _environment = environment;
         }
 
-
-        public  async Task<string?> DownloadFile(string fileName)
+        public async Task<string?> DownloadFile(string fileName)
         {
             try
             {
-                // Ganti "nama_file.extension" dengan nama file yang ingin kamu download 
+                // Ganti "nama_file.extension" dengan nama file yang ingin kamu download
 
                 // Lokasi file di wwwroot
                 var filePath = @$"{_environment.WebRootPath}\Uploads\{fileName}";
                 return filePath;
                 //// Cek apakah file ada
                 //if (!System.IO.File.Exists(filePath))
-                //{ 
+                //{
                 //    return null!;
                 //}
 
-                 
                 //// Ambil konten file dari server
                 ////var content = await _httpClient.GetStreamAsync(filePath);
 
@@ -45,11 +37,7 @@ namespace McDermott.Web.Extentions
 
                 //memory.Position = 0;
 
-
                 //return fileStream;
-                 
-
-
 
                 //// Ambil konten file
                 ////var content = await System.IO.File.ReadAllBytesAsync(filePath);
@@ -61,8 +49,6 @@ namespace McDermott.Web.Extentions
                 ////response.ContentType = "application/octet-stream";
 
                 ////await response.Body.WriteAsync(content, 0, content.Length);
-
-
             }
             catch (Exception ex)
             {
@@ -79,11 +65,10 @@ namespace McDermott.Web.Extentions
             if (!Directory.Exists(uploadDirectory))
             {
                 Directory.CreateDirectory(uploadDirectory);
-            } 
+            }
 
             if (maxFileSize > 0)
             {
-
                 if (file.Size > maxFileSize)
                 {
                     return (0, $"File: {file.Name} exceeds the maximum allowed file size.");
@@ -100,10 +85,9 @@ namespace McDermott.Web.Extentions
             var fileName = $"{file.Name}";
             var path = Path.Combine(uploadDirectory, fileName);
             await using var fs = new FileStream(path, FileMode.Create);
-            long size = maxFileSize == null || maxFileSize == 0? file.Size : maxFileSize.ToInt32() ;
+            long size = maxFileSize == null || maxFileSize == 0 ? file.Size : maxFileSize.ToInt32();
             await file.OpenReadStream(size).CopyToAsync(fs);
             return (1, fileName);
         }
-
     }
 }

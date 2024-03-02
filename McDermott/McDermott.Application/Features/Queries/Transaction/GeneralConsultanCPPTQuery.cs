@@ -1,9 +1,9 @@
-﻿ 
-namespace McDermott.Application.Features.Queries.Transaction
+﻿namespace McDermott.Application.Features.Queries.Transaction
 {
     public class GeneralConsultanCPPTQuery
     {
         #region Get
+
         internal class GetGeneralConsultanCPPTQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetGeneralConsultanCPPTQuery, List<GeneralConsultanCPPTDto>>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -25,9 +25,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                 }
             }
         }
-        #endregion
+
+        #endregion Get
 
         #region Create
+
         internal class CreateGeneralConsultantClinicalAssesmentHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateGeneralConsultantClinicalAssesmentRequest, GeneralConsultantClinicalAssesmentDto>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -55,9 +57,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                 return result.Adapt<List<GeneralConsultanCPPTDto>>();
             }
         }
-        #endregion
+
+        #endregion Create
 
         #region Update
+
         internal class UpdateGeneralConsultanCPPTHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateGeneralConsultanCPPTRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -70,9 +74,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                 return true;
             }
         }
-        #endregion
+
+        #endregion Update
 
         #region Delete
+
         internal class DeleteGeneralConsultanCPPTHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteGeneralConsultanCPPTRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -94,6 +100,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 return true;
             }
         }
-        #endregion
+
+        #endregion Delete
     }
 }

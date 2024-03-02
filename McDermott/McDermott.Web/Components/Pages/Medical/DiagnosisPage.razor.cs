@@ -1,6 +1,4 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 

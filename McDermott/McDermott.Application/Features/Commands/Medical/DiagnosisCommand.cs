@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using McDermott.Application.Dtos.Medical;
-
-namespace McDermott.Application.Features.Commands.Medical
+﻿namespace McDermott.Application.Features.Commands.Medical
 {
     public class DiagnosisCommand
     {

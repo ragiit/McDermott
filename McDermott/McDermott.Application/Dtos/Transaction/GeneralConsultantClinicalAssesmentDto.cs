@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Transaction
+﻿namespace McDermott.Application.Dtos.Transaction
 {
     public class GeneralConsultantClinicalAssesmentDto : IMapFrom<GeneralConsultantClinicalAssesment>
     {
@@ -23,6 +17,7 @@ namespace McDermott.Application.Dtos.Transaction
         }
 
         public double _Height { get; set; }
+
         public double Height
         {
             get => _Height;
@@ -32,6 +27,7 @@ namespace McDermott.Application.Dtos.Transaction
                 CalculateBMI(value, Weight);
             }
         }
+
         public void CalculateBMI(double height, double weight)
         {
             BMIIndex = 0;
@@ -64,12 +60,15 @@ namespace McDermott.Application.Dtos.Transaction
                 return;
             }
         }
+
         public int RR { get; set; }
         public int Temp { get; set; }
+
         [Required]
         public int HR { get; set; }
+
         public int RBS { get; set; }
-        public int Systolic{ get; set; }
+        public int Systolic { get; set; }
         public int DiastolicBP { get; set; }
         public int SpO2 { get; set; }
 

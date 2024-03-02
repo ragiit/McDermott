@@ -1,7 +1,7 @@
 ﻿namespace McDermott.Domain.Entities
 {
     public partial class User : BaseAuditableEntity
-    { 
+    {
         public int? GroupId { get; set; }
 
         [Required]
@@ -18,7 +18,7 @@
         public int? GenderId { get; set; }
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
-         
+
         public DateTime? DateOfBirth { get; set; }
 
         public string? TypeId { get; set; } = "KTP"; // Jenis Identitas
@@ -79,12 +79,11 @@
         public string? EmployeeType { get; set; }
         public string? EmployeeStatus { get; set; }
         public DateTime? JoinDate { get; set; }
-        public string? NIP { get; set; } 
+        public string? NIP { get; set; }
         public string? Legacy { get; set; }
         public string? SAP { get; set; }
         public string? Oracle { get; set; }
         public List<int>? DoctorServiceIds { get; set; }
-
 
         public virtual Group? Group { get; set; }
         public virtual Gender? Gender { get; set; }

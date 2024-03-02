@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Medical
+﻿namespace McDermott.Application.Dtos.Medical
 {
     public class InsuranceDto : IMapFrom<Insurance>
     {
@@ -23,7 +16,5 @@ namespace McDermott.Application.Dtos.Medical
         public int? AdminFee { get; set; }
         public int? Presentase { get; set; }
         public int? AdminFeeMax { get; set; }
-
-        
     }
 }

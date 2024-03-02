@@ -1,7 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Components;
-
-namespace McDermott.Web.Components.Pages.Patient
+﻿namespace McDermott.Web.Components.Pages.Patient
 {
     public partial class PatientDataPage
     {

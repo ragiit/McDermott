@@ -1,6 +1,4 @@
-using McDermott.Application.Dtos.Employee;
 using static McDermott.Application.Features.Commands.Config.CompanyCommand;
-using static McDermott.Application.Features.Commands.Config.CountryCommand;
 
 namespace McDermott.Application.Features.Queries.Employee
 {

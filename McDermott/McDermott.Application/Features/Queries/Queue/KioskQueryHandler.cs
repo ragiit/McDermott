@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using McDermott.Application.Dtos.Queue;
+﻿using McDermott.Application.Dtos.Queue;
 using static McDermott.Application.Features.Commands.Queue.KioskCommand;
 
 namespace McDermott.Application.Features.Queries.Queue
@@ -123,4 +118,3 @@ namespace McDermott.Application.Features.Queries.Queue
         }
     }
 }
-

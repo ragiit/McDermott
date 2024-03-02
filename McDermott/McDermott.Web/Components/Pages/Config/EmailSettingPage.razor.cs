@@ -1,6 +1,4 @@
-﻿using Microsoft.JSInterop;
-using System.Net.Mail;
-using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
+﻿using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {

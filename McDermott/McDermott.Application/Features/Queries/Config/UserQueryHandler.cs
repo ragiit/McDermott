@@ -1,7 +1,4 @@
-﻿using McDermott.Application.Dtos.Config;
-using System.Linq.Expressions;
-using static McDermott.Application.Features.Commands.Config.CountryCommand;
-using static McDermott.Application.Features.Commands.Config.UserCommand;
+﻿using static McDermott.Application.Features.Commands.Config.CountryCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
@@ -232,6 +229,5 @@ namespace McDermott.Application.Features.Queries.Config
         }
 
         #endregion Delete
-
     }
 }

@@ -1,6 +1,4 @@
-﻿using DevExpress.Data.XtraReports.Native;
-
-namespace McDermott.Web.Components.Pages.Config
+﻿namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CityPage
     {

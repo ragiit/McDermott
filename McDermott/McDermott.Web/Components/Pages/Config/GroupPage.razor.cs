@@ -1,6 +1,4 @@
 ﻿using DevExpress.Blazor.Internal;
-using DevExpress.Data.XtraReports.Native;
-using Microsoft.JSInterop;
 using System.ComponentModel.DataAnnotations;
 
 namespace McDermott.Web.Components.Pages.Config

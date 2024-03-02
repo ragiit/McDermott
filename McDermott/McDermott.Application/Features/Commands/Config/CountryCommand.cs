@@ -1,6 +1,4 @@
-﻿using McDermott.Application.Dtos.Config;
-
-namespace McDermott.Application.Features.Commands.Config
+﻿namespace McDermott.Application.Features.Commands.Config
 {
     public class CountryCommand
     {

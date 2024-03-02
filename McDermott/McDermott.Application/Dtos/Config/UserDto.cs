@@ -1,6 +1,4 @@
-﻿
-
-namespace McDermott.Application.Dtos.Config
+﻿namespace McDermott.Application.Dtos.Config
 {
     public class UserDto : IMapFrom<User>
     {
@@ -26,8 +24,10 @@ namespace McDermott.Application.Dtos.Config
         public DateTime? DateOfBirth { get; set; }
 
         public string? TypeId { get; set; } = "KTP"; // Jenis Identitas
+
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? NoId { get; set; } // No Identitas // KTP
+
         public DateTime? ExpiredId { get; set; }
         public string? IdCardAddress1 { get; set; } // KTP Alamat 1
         public string? IdCardAddress2 { get; set; } // KTP Alamat 1
@@ -50,18 +50,25 @@ namespace McDermott.Application.Dtos.Config
         public string? BiologicalMother { get; set; } // Ibu Kandung
         public string? MotherNIK { get; set; }
         public int? ReligionId { get; set; }
+
         [Required]
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? MobilePhone { get; set; }
+
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? HomePhoneNumber { get; set; }
+
         public string? Npwp { get; set; }
+
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? NoBpjsKs { get; set; }
+
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? NoBpjsTk { get; set; }
+
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? SipNo { get; set; }
+
         public string? SipFile { get; set; }
         public DateTime? SipExp { get; set; }
         public string? StrNo { get; set; }
@@ -74,8 +81,10 @@ namespace McDermott.Application.Dtos.Config
         public string? EmergencyName { get; set; }
         public string? EmergencyRelation { get; set; }
         public string? EmergencyEmail { get; set; }
+
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? EmergencyPhone { get; set; }
+
         public string? BloodType { get; set; }
         public string? NoRm { get; set; } = "-";
         public string? DoctorCode { get; set; }

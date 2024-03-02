@@ -3,6 +3,7 @@
     public class EmployeeQueryHandler
     {
         #region Get
+
         internal class GetAllUserEmployeeQueryHandler : IRequestHandler<GetUserEmployeeQuery, List<UserDto>>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -23,7 +24,7 @@
                         .ToListAsync(cancellationToken);
             }
         }
-        #endregion
 
+        #endregion Get
     }
 }

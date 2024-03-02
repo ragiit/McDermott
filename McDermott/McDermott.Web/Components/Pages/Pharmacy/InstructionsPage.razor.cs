@@ -1,8 +1,4 @@
-﻿using Blazored.Toast.Services;
-using MediatR;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
@@ -118,7 +114,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await LoadData();
         }
 
-
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -188,7 +183,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task ImportFile()
         {
-
             await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
 

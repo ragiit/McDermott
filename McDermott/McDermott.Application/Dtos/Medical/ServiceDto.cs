@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Medical
+﻿namespace McDermott.Application.Dtos.Medical
 {
     public class ServiceDto : IMapFrom<Service>
     {
@@ -22,8 +15,8 @@ namespace McDermott.Application.Dtos.Medical
         public bool IsPatient { get; set; } = false;
         public bool IsKiosk { get; set; } = false;
         public string Flag { get; set; } = string.Empty;
-        public string KioskName {  get; set; } = string.Empty;
-        public int? ServicedId { get; set; } 
+        public string KioskName { get; set; } = string.Empty;
+        public int? ServicedId { get; set; }
         public virtual ServiceDto? Service { get; set; }
     }
 }

@@ -1,6 +1,4 @@
-﻿using McDermott.Application.Dtos.Employee;
-
-namespace McDermott.Application.Features.Commands.Employee
+﻿namespace McDermott.Application.Features.Commands.Employee
 {
     public class JobPositionCommand
     {

@@ -1,9 +1,4 @@
 ﻿using McDermott.Application.Dtos.Queue;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Features.Commands.Queue
 {
@@ -50,6 +45,7 @@ namespace McDermott.Application.Features.Commands.Queue
                 Id = id;
             }
         }
+
         public class DeleteListKioskDepartementRequest : IRequest<bool>
         {
             public List<int> Id { get; set; }
