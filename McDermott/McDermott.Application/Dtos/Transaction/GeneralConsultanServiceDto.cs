@@ -9,23 +9,7 @@
 
         public int? InsuranceId { get; set; }
 
-        //[NoRMRequired(ErrorMessage = "The Insurance Policy field is required.")]
         public int? InsurancePolicyId { get; set; }
-
-        public class NoRMRequiredAttribute : ValidationAttribute
-        {
-            protected override ValidationResult IsValid(object value, ValidationContext validationContext)
-            {
-                var model = (GeneralConsultanServiceDto)validationContext.ObjectInstance;
-
-                if (!string.IsNullOrEmpty(model.Payment) && string.IsNullOrEmpty((string)value))
-                {
-                    return new ValidationResult(ErrorMessage);
-                }
-
-                return ValidationResult.Success;
-            }
-        }
 
         [Required(ErrorMessage = "The Service field is required.")]
         public int? ServiceId { get; set; }
@@ -47,7 +31,7 @@
         public DateTime? BirthDay { get; set; }
 
         [Required]
-        public string? TypeRegistration { get; set; } = string.Empty;
+        public string? TypeRegistration { get; set; }
 
         public string? TypeMedical { get; set; }
 

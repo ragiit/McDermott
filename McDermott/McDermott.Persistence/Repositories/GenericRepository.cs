@@ -22,15 +22,44 @@ namespace McDermott.Persistence.Repositories
 
         public async Task<T> AddAsync(T entity)
         {
+            foreach (PropertyInfo property in typeof(T).GetProperties())
+            {
+                var nullAttribute = property.GetCustomAttribute<SetToNullAttribute>();
+                if (nullAttribute != null)
+                {
+                    property.SetValue(entity, null);
+                }
+                else
+                {
+                    // Atur nilai properti lainnya sesuai kebutuhan
+                }
+            }
+
             await _dbContext.Set<T>().AddAsync(entity);
             return entity;
         }
 
-        public async Task<List<T>> AddAsync(List<T> entity)
+        public async Task<List<T>> AddAsync(List<T> entities)
         {
-            await _dbContext.Set<T>().AddRangeAsync(entity);
+            foreach (var entity in entities)
+            {
+                foreach (PropertyInfo property in typeof(T).GetProperties())
+                {
+                    var nullAttribute = property.GetCustomAttribute<SetToNullAttribute>();
+                    if (nullAttribute != null)
+                    {
+                        property.SetValue(entity, null);
+                    }
+                    else
+                    {
+                        // Atur nilai properti lainnya sesuai kebutuhan
+                    }
+                }
+            }
 
-            return entity;
+            await _dbContext.Set<T>().AddRangeAsync(entities);
+
+            return entities;
         }
 
         public Task UpdateAsync(T entity)
