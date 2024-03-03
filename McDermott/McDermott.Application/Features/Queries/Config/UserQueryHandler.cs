@@ -1,4 +1,7 @@
-﻿using static McDermott.Application.Features.Commands.Config.CountryCommand;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using System.Text;
+using System.Text.Json;
+using static McDermott.Application.Features.Commands.Config.CountryCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
@@ -6,22 +9,77 @@ namespace McDermott.Application.Features.Queries.Config
     {
         #region Get
 
-        internal class GetAllUserQueryHandler : IRequestHandler<GetUserQuery, List<UserDto>>
+        internal class GetAllUserQueryHandler(IUnitOfWork _unitOfWork, IDistributedCache _cache) : IRequestHandler<GetUserQuery, List<UserDto>>
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllUserQueryHandler(IUnitOfWork unitOfWork)
+            // Method untuk menghapus cache
+            private async Task RemoveCache(string cacheKey)
             {
-                _unitOfWork = unitOfWork;
+                await _cache.RemoveAsync(cacheKey);
             }
+
+            // Method untuk menambahkan atau memperbarui cache
+            private async Task AddOrUpdateCache(string cacheKey, List<UserDto> data)
+            {
+                var cacheOptions = new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) // Contoh: Cache akan kedaluwarsa dalam 10 menit
+                };
+                await _cache.SetAsync(cacheKey, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(data)), cacheOptions);
+            }
+
+            // Method untuk menangani operasi create, update, dan delete
+            private async Task HandleCacheOperations()
+            {
+                var cacheKey = "GetAllUsersQuery"; // Kunci cache untuk query ini
+                await RemoveCache(cacheKey); // Hapus cache setelah melakukan operasi create, update, atau delete
+            }
+
 
             public async Task<List<UserDto>> Handle(GetUserQuery query, CancellationToken cancellationToken)
             {
-                return await _unitOfWork.Repository<User>().Entities
-                        .Include(x => x.Group)
-                        .Select(User => User.Adapt<UserDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                var cacheKey = "GetAllUsersQuery"; // Kunci cache untuk query ini
+
+                // Cek apakah hasil query sudah ada di cache
+                var cachedData = await _cache.GetAsync(cacheKey);
+                if (cachedData != null)
+                {
+                    // Jika ada, kembalikan data dari cache
+                    var cachedUsers = JsonSerializer.Deserialize<List<UserDto>>(cachedData);
+                    return cachedUsers;
+                }
+
+                // Jika data tidak ada di cache, lakukan query ke database
+                var users = await _unitOfWork.Repository<User>()
+                    .Entities
+                    .Include(x => x.Group)
+                    .Select(User => User.Adapt<UserDto>())
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
+
+                // Simpan data ke cache
+                var cacheOptions = new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) // Contoh: Cache akan kedaluwarsa dalam 10 menit
+                };
+
+                await _cache.SetAsync(cacheKey, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(users)), cacheOptions);
+
+                return users;
+            }
+
+            public async Task<bool> Handle(UpdateUserRequest request, CancellationToken cancellationToken)
+            {
+                // nanti dihapus
+                request.UserDto.UserName = request.UserDto.Email;
+
+                var user = request.UserDto.Adapt<User>();
+
+                await _unitOfWork.Repository<User>().UpdateAsync(user);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                await HandleCacheOperations();
+
+                return true;
             }
         }
 
@@ -141,28 +199,28 @@ namespace McDermott.Application.Features.Queries.Config
 
         #region Update
 
-        internal class UpdateUserHandler : IRequestHandler<UpdateUserRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
+        //internal class UpdateUserHandler : IRequestHandler<UpdateUserRequest, bool>
+        //{
+        //    private readonly IUnitOfWork _unitOfWork;
 
-            public UpdateUserHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+        //    public UpdateUserHandler(IUnitOfWork unitOfWork)
+        //    {
+        //        _unitOfWork = unitOfWork;
+        //    }
 
-            public async Task<bool> Handle(UpdateUserRequest request, CancellationToken cancellationToken)
-            {
-                // nanti dihapus
-                request.UserDto.UserName = request.UserDto.Email;
+        //    public async Task<bool> Handle(UpdateUserRequest request, CancellationToken cancellationToken)
+        //    {
+        //        // nanti dihapus
+        //        request.UserDto.UserName = request.UserDto.Email;
 
-                var user = request.UserDto.Adapt<User>();
+        //        var user = request.UserDto.Adapt<User>();
 
-                await _unitOfWork.Repository<User>().UpdateAsync(user);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+        //        await _unitOfWork.Repository<User>().UpdateAsync(user);
+        //        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return true;
-            }
-        }
+        //        return true;
+        //    }
+        //}
 
         #endregion Update
 
@@ -187,7 +245,7 @@ namespace McDermott.Application.Features.Queries.Config
 
                     return true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -208,7 +266,7 @@ namespace McDermott.Application.Features.Queries.Config
 
                     return true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }
