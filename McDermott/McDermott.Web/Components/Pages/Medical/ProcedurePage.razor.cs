@@ -1,5 +1,4 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

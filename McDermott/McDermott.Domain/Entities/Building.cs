@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
     public partial class Building : BaseAuditableEntity
     {
@@ -19,6 +13,5 @@ namespace McDermott.Domain.Entities
         public virtual HealthCenter? HealthCenter { get; set; }
 
         public virtual List<BuildingLocation>? BuildingLocations { get; set; }
-
     }
 }

@@ -1,8 +1,4 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using McDermott.Domain.Entities;
-using Microsoft.JSInterop;
-
-namespace McDermott.Web.Components.Pages.Employee
+﻿namespace McDermott.Web.Components.Pages.Employee
 {
     public partial class DepartmentPage
     {

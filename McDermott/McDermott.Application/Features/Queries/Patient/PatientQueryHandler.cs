@@ -3,6 +3,7 @@
     public class PatientQueryHandler
     {
         #region Get
+
         internal class GetAllUserEmployeeQueryHandler : IRequestHandler<GetUserPatientQuery, List<UserDto>>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -22,8 +23,6 @@
                         .ToListAsync(cancellationToken);
             }
         }
-
-
 
         internal class GetPatientAllergyQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetPatientAllergyQuery, List<PatientAllergyDto>>
         {
@@ -47,9 +46,10 @@
             }
         }
 
-        #endregion
+        #endregion Get
 
         #region Create
+
         internal class CreatePatientAllergyHandler : IRequestHandler<CreatePatientAllergyRequest, PatientAllergyDto>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -69,10 +69,10 @@
             }
         }
 
-        #endregion
-
+        #endregion Create
 
         #region Update
+
         internal class UpdatePatientAllergyRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdatePatientAllergyRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -85,6 +85,7 @@
                 return true;
             }
         }
-        #endregion
+
+        #endregion Update
     }
 }

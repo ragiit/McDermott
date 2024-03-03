@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using McDermott.Application.Dtos.Config;
-using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
+﻿using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {

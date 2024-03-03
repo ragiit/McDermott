@@ -31,20 +31,6 @@
     <ProjectReference Include="..\McDermott.Persistence\McDermott.Persistence.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Authentication\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Components\Pages\Medical\ProcedurePage.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Components\Pages\Medical\ProcedurePage.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Components\Pages\Medical\ProcedurePage.razor" />
-  </ItemGroup>
+ 
 
 </Project>

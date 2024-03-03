@@ -3,6 +3,7 @@
     public class NursingDiagnosesQueryHandler
     {
         #region Get
+
         internal class GetNursingDiagnosesQueryHandler : IRequestHandler<GetNursingDiagnosesQuery, List<NursingDiagnosesDto>>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -27,9 +28,11 @@
                 }
             }
         }
-        #endregion
+
+        #endregion Get
 
         #region Create
+
         internal class CreateNursingDiagnosesHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateNursingDiagnosesRequest, NursingDiagnosesDto>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -43,6 +46,7 @@
                 return result.Adapt<NursingDiagnosesDto>();
             }
         }
+
         internal class CreateListNursingDiagnosesRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateListNursingDiagnosesRequest, List<NursingDiagnosesDto>>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -56,9 +60,11 @@
                 return result.Adapt<List<NursingDiagnosesDto>>();
             }
         }
-        #endregion
+
+        #endregion Create
 
         #region Update
+
         internal class UpdateNursingDiagnosesHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateNursingDiagnosesRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -71,9 +77,11 @@
                 return true;
             }
         }
-        #endregion
+
+        #endregion Update
 
         #region Delete
+
         internal class DeleteNursingDiagnosesHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteNursingDiagnosesRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -95,6 +103,7 @@
                 return true;
             }
         }
-        #endregion
+
+        #endregion Delete
     }
 }

@@ -1,10 +1,9 @@
-﻿using McDermott.Application.Dtos.Medical;
-
-namespace McDermott.Application.Features.Commands.Medical
+﻿namespace McDermott.Application.Features.Commands.Medical
 {
     public class DoctorScheduleCommand
-    { 
+    {
         #region Get
+
         //public class GetDoctorScheduleQuery : IRequest<List<DoctorScheduleDto>>;
         public class GetDoctorScheduleQuery(Expression<Func<DoctorSchedule, bool>>? predicate = null) : IRequest<List<DoctorScheduleDto>>
         {
@@ -38,6 +37,7 @@ namespace McDermott.Application.Features.Commands.Medical
                 this.DoctorScheduleId = DoctorScheduleId;
                 this.PhysicianId = PhysicianId;
             }
+
             public GetDoctorScheduleSlotByDoctorScheduleIdRequest(int DoctorScheduleId)
             {
                 this.DoctorScheduleId = DoctorScheduleId;
@@ -49,7 +49,6 @@ namespace McDermott.Application.Features.Commands.Medical
             public Expression<Func<DoctorScheduleDetail, bool>> Predicate { get; } = predicate;
         }
 
-
         public class GetDoctorScheduleDetailByScheduleIdQuery : IRequest<List<DoctorScheduleDetailDto>>
         {
             public int DoctorScheduleId { get; set; }
@@ -59,9 +58,11 @@ namespace McDermott.Application.Features.Commands.Medical
                 this.DoctorScheduleId = DoctorScheduleId;
             }
         }
-        #endregion
+
+        #endregion Get
 
         #region Create
+
         public class CreateDoctorScheduleDetailRequest : IRequest<bool>
         {
             public List<DoctorScheduleDetailDto> DoctorScheduleDetailDtos { get; set; }
@@ -81,6 +82,7 @@ namespace McDermott.Application.Features.Commands.Medical
                 this.DoctorScheduleSlotDto = DoctorScheduleSlotDto;
             }
         }
+
         public class CreateDoctorScheduleRequest : IRequest<DoctorScheduleDto>
         {
             public DoctorScheduleDto DoctorScheduleDto { get; set; }
@@ -90,9 +92,11 @@ namespace McDermott.Application.Features.Commands.Medical
                 this.DoctorScheduleDto = DoctorScheduleDto;
             }
         }
-        #endregion
+
+        #endregion Create
 
         #region Update
+
         public class UpdateDoctorScheduleRequest : IRequest<bool>
         {
             public DoctorScheduleDto DoctorScheduleDto { get; set; }
@@ -102,9 +106,11 @@ namespace McDermott.Application.Features.Commands.Medical
                 this.DoctorScheduleDto = DoctorScheduleDto;
             }
         }
-        #endregion
+
+        #endregion Update
 
         #region Delete
+
         public class DeleteDoctorScheduleDetailByScheduleIdRequest : IRequest<bool>
         {
             public List<int> Id { get; set; }
@@ -154,6 +160,7 @@ namespace McDermott.Application.Features.Commands.Medical
                 Id = id;
             }
         }
+
         public class DeleteListDoctorScheduleSlotRequest : IRequest<bool>
         {
             public List<int> Id { get; set; }
@@ -167,7 +174,7 @@ namespace McDermott.Application.Features.Commands.Medical
         public class DeleteDoctorScheduleSlotByPhysicionIdRequest : IRequest<bool>
         {
             public List<int> PhysicianIds { get; set; }
-            public int DoctorScheduleId { get; set; }   
+            public int DoctorScheduleId { get; set; }
 
             public DeleteDoctorScheduleSlotByPhysicionIdRequest(List<int> PhysicianIds, int DoctorScheduleId)
             {
@@ -187,6 +194,7 @@ namespace McDermott.Application.Features.Commands.Medical
                 this.PhysicionId = physicionId;
             }
         }
+
         public class DeleteListDoctorScheduleSlotByScheduleIdPhysicionIdRequest : IRequest<bool>
         {
             public List<int> ScheduleId { get; set; }
@@ -198,6 +206,7 @@ namespace McDermott.Application.Features.Commands.Medical
                 PhysicionId = physicionId;
             }
         }
-        #endregion
+
+        #endregion Delete
     }
 }

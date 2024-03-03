@@ -1,5 +1,4 @@
-﻿ 
-namespace McDermott.Application.Features.Commands.Transaction
+﻿namespace McDermott.Application.Features.Commands.Transaction
 {
     public class GeneralConsultanMedicalSupportCommand
     {
@@ -10,7 +9,7 @@ namespace McDermott.Application.Features.Commands.Transaction
             public Expression<Func<GeneralConsultanMedicalSupport, bool>> Predicate { get; } = predicate;
         }
 
-        #endregion
+        #endregion Get
 
         #region Create
 
@@ -24,22 +23,25 @@ namespace McDermott.Application.Features.Commands.Transaction
             public List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportDtos { get; set; } = GeneralConsultanMedicalSupportDtos;
         }
 
-        #endregion
+        #endregion Create
 
         #region Update
+
         public class UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupportDto) : IRequest<bool>
         {
             public GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupportDto { get; set; } = GeneralConsultanMedicalSupportDto;
         }
 
-        #endregion
+        #endregion Update
 
         #region Delete
+
         public class DeleteGeneralConsultanMedicalSupportRequest(int id = 0, List<int>? ids = null) : IRequest<bool>
         {
             public int Id { get; set; } = id;
             public List<int> Ids { get; set; } = ids ?? [];
         }
-        #endregion
+
+        #endregion Delete
     }
 }

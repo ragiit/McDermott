@@ -1,34 +1,29 @@
 ﻿global using Mapster;
-global using McDermott.Application.Dtos;
+global using McDermott.Application.Dtos.Config;
+global using McDermott.Application.Dtos.Employee;
+global using McDermott.Application.Dtos.Medical;
+global using McDermott.Application.Dtos.Patient;
+global using McDermott.Application.Dtos.Transaction;
 global using McDermott.Application.Interfaces.Repositories;
 global using McDermott.Domain.Entities;
 global using MediatR;
 global using Microsoft.EntityFrameworkCore;
 global using System.ComponentModel.DataAnnotations;
-
-global using McDermott.Application.Dtos.Medical;
-global using McDermott.Application.Dtos.Config;
-global using McDermott.Application.Dtos.Employee;
-global using McDermott.Application.Dtos.Patient;
-global using McDermott.Application.Dtos.Transaction;
-
-
 global using System.Linq.Expressions;
-
-global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanMedicalSupportCommand;
-global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanCPPTCommand;
-global using static McDermott.Application.Features.Commands.Patient.InsurancePolicyCommand;
-global using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand;
 global using static McDermott.Application.Features.Commands.Config.GenderCommand;
 global using static McDermott.Application.Features.Commands.Config.GroupCommand;
-global using static McDermott.Application.Features.Commands.Medical.HealthCenterCommand;
-global using static McDermott.Application.Features.Commands.Medical.BuildingCommand;
-global using static McDermott.Application.Features.Commands.Medical.SpecialityCommand;
 global using static McDermott.Application.Features.Commands.Config.ReligionCommand;
 global using static McDermott.Application.Features.Commands.Config.UserCommand;
 global using static McDermott.Application.Features.Commands.Employee.EmployeeCommand;
-global using static McDermott.Application.Features.Commands.Patient.PatientCommand;
-global using static McDermott.Application.Features.Commands.Medical.PractitionerCommand;
-global using static McDermott.Application.Features.Commands.Patient.PatientFamilyRelationCommand;
+global using static McDermott.Application.Features.Commands.Medical.BuildingCommand;
+global using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand;
+global using static McDermott.Application.Features.Commands.Medical.HealthCenterCommand;
 global using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;
+global using static McDermott.Application.Features.Commands.Medical.PractitionerCommand;
+global using static McDermott.Application.Features.Commands.Medical.SpecialityCommand;
+global using static McDermott.Application.Features.Commands.Patient.InsurancePolicyCommand;
+global using static McDermott.Application.Features.Commands.Patient.PatientCommand;
+global using static McDermott.Application.Features.Commands.Patient.PatientFamilyRelationCommand;
+global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanCPPTCommand;
+global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanMedicalSupportCommand;
 global using static McDermott.Application.Features.Queries.Transaction.GeneralConsultanServiceQueryHandler;

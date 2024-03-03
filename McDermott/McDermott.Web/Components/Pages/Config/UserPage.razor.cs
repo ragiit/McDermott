@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components.Forms;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -71,7 +69,7 @@ namespace McDermott.Web.Components.Pages.Config
                 var imageFile = e.File;
 
                 var buffer = new byte[imageFile.Size];
-                _ = await imageFile.OpenReadStream().ReadAsync(buffer);
+                await imageFile.OpenReadStream().ReadAsync(buffer);
 
                 // Ubah buffer gambar menjadi format base64
                 imageUrl = $"data:{imageFile.ContentType};base64,{Convert.ToBase64String(buffer)}";
@@ -182,10 +180,22 @@ namespace McDermott.Web.Components.Pages.Config
                          : $"{date:dd-MM-yyyy}-{(int.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
             }
 
+            if (UserForm.IsSameDomicileAddress)
+            {
+                UserForm.DomicileAddress1 = UserForm.IdCardAddress1;
+                UserForm.DomicileAddress2 = UserForm.IdCardAddress2;
+                UserForm.DomicileRtRw = UserForm.IdCardRtRw;
+                UserForm.DomicileProvinceId = UserForm.IdCardProvinceId;
+                UserForm.DomicileCityId = UserForm.IdCardCityId;
+                UserForm.DomicileDistrictId = UserForm.IdCardDistrictId;
+                UserForm.DomicileVillageId = UserForm.IdCardVillageId;
+                UserForm.DomicileCountryId = UserForm.IdCardCountryId;
+            }
+
             if (UserForm.Id == 0)
             {
-                _ = await FileUploadService.UploadFileAsync(BrowserFile);
-                _ = await Mediator.Send(new CreateUserRequest(UserForm));
+                await FileUploadService.UploadFileAsync(BrowserFile);
+                await Mediator.Send(new CreateUserRequest(UserForm));
             }
             else
             {
@@ -200,12 +210,12 @@ namespace McDermott.Web.Components.Pages.Config
                         Helper.DeleteFile(userDtoSipFile);
                 }
 
-                _ = await Mediator.Send(new UpdateUserRequest(UserForm));
+                await Mediator.Send(new UpdateUserRequest(UserForm));
 
                 if (UserForm.SipFile != userDtoSipFile)
                 {
                     if (UserForm.SipFile != null)
-                        _ = await FileUploadService.UploadFileAsync(BrowserFile);
+                        await FileUploadService.UploadFileAsync(BrowserFile);
                 }
             }
 
@@ -227,7 +237,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             if (SelectedDataItems is null)
             {
-                _ = await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
+                await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
             }
             else
             {
@@ -235,7 +245,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 int userActive = (int)HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
 
-                _ = await Mediator.Send(new DeleteListUserRequest(a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
+                await Mediator.Send(new DeleteListUserRequest(a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
             }
             await LoadData();
         }

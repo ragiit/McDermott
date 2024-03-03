@@ -106,19 +106,19 @@
                                             <div class="row w-100">
                                                 <div class="col-md-6">
                                                     <DxFormLayout CssClass="mt">
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Name" ColSpanMd="12">
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                             <DxTextBox @bind-Text="@UserForm.Name"
                                                                        ShowValidationIcon="true"
                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                        NullText="Name" />
                                                             <ValidationMessage For="@(() => UserForm.Name)"   />
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Email" ColSpanMd="12">
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Email" ColSpanMd="12">
                                                             <DxMaskedInput @bind-Value="@UserForm.Email"
                                                                            Mask="@EmailMask"
                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                            NullText="mail@domain.com"
-                                                                           ShowValidationIcon="false"
+                                                                           ShowValidationIcon="true"
                                                                            MaskMode="MaskMode.RegEx">
                                                                 <Buttons>
                                                                     <DxEditorButton IconCssClass="fa-solid fa-envelope" />
@@ -129,8 +129,9 @@
                                                                                            PlaceholdersVisible="true" />
                                                                 </ChildContent>
                                                             </DxMaskedInput>
+                                                            <ValidationMessage For="@(() => UserForm.Email)"   />
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem Caption="Identity Number:" ColSpanMd="12" CaptionCssClass="normal-caption">
+                                                        <DxFormLayoutItem Caption="Identity Number" ColSpanMd="12" CaptionCssClass="normal-caption">
                                                             <DxMaskedInput @bind-Value="@UserForm.NoId"
                                                                            ShowValidationIcon="true"
                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -160,13 +161,14 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <DxFormLayout CssClass="mt">
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Mobile" ColSpanMd="12">
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Mobile" ColSpanMd="12">
                                                             <DxMaskedInput @bind-Value="@UserForm.MobilePhone"
                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                            NullText="Mobile Phone"
                                                                            ShowValidationIcon="true">
                                                                 <DxTextMaskProperties Placeholder="Placeholder" />
                                                             </DxMaskedInput>
+                                                            <ValidationMessage For="@(() => UserForm.MobilePhone)"   />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Phone" ColSpanMd="12">
                                                             <DxMaskedInput @bind-Value="@UserForm.HomePhoneNumber"
@@ -189,21 +191,7 @@
                                                             <DxTextBox @bind-Text="@UserForm.EmergencyRelation" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Relation" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Email" ColSpanMd="12">
-                                                            <DxMaskedInput @bind-Value="@UserForm.EmergencyEmail"
-                                                                           Mask="@EmailMask"
-                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                           NullText="mail@domain.com"
-                                                                           ShowValidationIcon="true"
-                                                                           MaskMode="MaskMode.RegEx">
-                                                                <Buttons>
-                                                                    <DxEditorButton IconCssClass="fa-solid fa-envelope" />
-                                                                </Buttons>
-                                                                <ChildContent>
-                                                                    <DxRegExMaskProperties MaskAutoCompleteMode="@MaskAutoCompleteMode.Strong"
-                                                                                           Placeholder="@('_')"
-                                                                                           PlaceholdersVisible="true" />
-                                                                </ChildContent>
-                                                            </DxMaskedInput>
+                                                            <DxTextBox @bind-Text="@UserForm.EmergencyEmail" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Email" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Phone" ColSpanMd="12">
                                                             <DxMaskedInput @bind-Value="@UserForm.EmergencyPhone"
@@ -216,7 +204,13 @@
                                                     </DxFormLayout>
                                                 </div>
                                             </div>
-
+                                            <div class="row w-100">
+                                                <div class="col-md-12">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Same Domicile Address with KTP Address" ColSpanMd="12">
+                                                        <DxCheckBox @bind-Checked="@UserForm.IsSameDomicileAddress" />
+                                                    </DxFormLayoutItem>
+                                                </div>
+                                            </div>
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="KTP Address" ColSpanMd="12">
                                                 <Template>
                                                     <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
@@ -302,7 +296,7 @@
                                                     </DxGridLayout>
                                                 </Template>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Domicile Address" ColSpanMd="12">
+                                            <DxFormLayoutItem Visible="@(!UserForm.IsSameDomicileAddress)" CaptionCssClass="normal-caption" Caption="Domicile Address" ColSpanMd="12">
                                                 <Template>
                                                     <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
                                                         <Rows>

@@ -1,7 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Patient

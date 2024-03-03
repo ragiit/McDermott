@@ -4,8 +4,8 @@ namespace McDermott.Domain.Entities
 {
     public class GeneralConsultantClinicalAssesment : BaseAuditableEntity
     {
-
         public int? GeneralConsultanServiceId { get; set; }
+
         [NotMapped]
         public double _Weight { get; set; }
 
@@ -16,6 +16,7 @@ namespace McDermott.Domain.Entities
 
         [NotMapped]
         public double _Height { get; set; }
+
         public double Height
         {
             get; set;
@@ -37,6 +38,7 @@ namespace McDermott.Domain.Entities
         public int E { get; set; }
         public int V { get; set; }
         public int M { get; set; }
+
         public void CalculateBMI(double height, double weight)
         {
             BMIIndex = 0;

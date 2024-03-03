@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Medical
+﻿namespace McDermott.Application.Dtos.Medical
 {
     public partial class ProcedureDto : IMapFrom<Procedure>
     {
@@ -14,8 +7,10 @@ namespace McDermott.Application.Dtos.Medical
         [Required]
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
+
         [StringLength(100)]
         public string? Code_Test { get; set; }
+
         [StringLength(200)]
         public string? Classification { get; set; }
     }

@@ -1,6 +1,4 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.Medical.LocationCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.LocationCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

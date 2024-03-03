@@ -1,6 +1,17 @@
 ﻿global using DevExpress.Blazor;
 global using McDermott.Application.Dtos;
 global using Mapster;
+global using Blazored.Toast;
+global using Blazored.Toast.Services;
+global using Blazored.LocalStorage;
+global using McDermott.Domain.Entities;
+global using Microsoft.AspNetCore.Components;
+global using Microsoft.Data.SqlClient;
+global using Microsoft.JSInterop;
+global using Newtonsoft.Json;
+global using System.Reflection;
+global using System.Security.Cryptography;
+global using System.Text;
 global using McDermott.Web.Components.Layout;
 
 global using McDermott.Web.Extentions;

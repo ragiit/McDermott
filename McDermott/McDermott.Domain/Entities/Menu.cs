@@ -11,6 +11,6 @@
         public string? Html { get; set; }
         public string? Url { get; set; }
 
-        public virtual List<GroupMenu>? GroupMenus { get; set; }    
+        public virtual List<GroupMenu>? GroupMenus { get; set; }
     }
 }

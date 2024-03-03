@@ -1,8 +1,4 @@
 ﻿using McDermott.Application.Dtos.Queue;
-using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using System.Security.Policy;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 
 namespace McDermott.Web.Components.Pages.Queue

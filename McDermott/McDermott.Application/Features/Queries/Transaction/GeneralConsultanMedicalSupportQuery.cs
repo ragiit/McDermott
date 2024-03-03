@@ -1,10 +1,9 @@
-﻿
-
-namespace McDermott.Application.Features.Queries.Transaction
+﻿namespace McDermott.Application.Features.Queries.Transaction
 {
     public class GeneralConsultanMedicalSupportQuery
     {
         #region Get
+
         internal class GetGeneralConsultanMedicalSupportQueryHandleraa(IUnitOfWork unitOfWork) : IRequestHandler<GetGeneralConsultanMedicalSupportQuery, List<GeneralConsultanMedicalSupportDto>>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -26,9 +25,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                 }
             }
         }
-        #endregion
+
+        #endregion Get
 
         #region Create
+
         internal class CreateGeneralConsultanMedicalSupportHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateGeneralConsultanMedicalSupportRequest, GeneralConsultanMedicalSupportDto>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -56,9 +57,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                 return result.Adapt<List<GeneralConsultanMedicalSupportDto>>();
             }
         }
-        #endregion
+
+        #endregion Create
 
         #region Update
+
         internal class UpdateGeneralConsultanMedicalSupportHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateGeneralConsultanMedicalSupportRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -71,9 +74,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                 return true;
             }
         }
-        #endregion
+
+        #endregion Update
 
         #region Delete
+
         internal class DeleteGeneralConsultanMedicalSupportHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteGeneralConsultanMedicalSupportRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -95,6 +100,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 return true;
             }
         }
-        #endregion
+
+        #endregion Delete
     }
 }

@@ -1,5 +1,4 @@
-﻿using McDermott.Application.Dtos.Medical;
-using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {

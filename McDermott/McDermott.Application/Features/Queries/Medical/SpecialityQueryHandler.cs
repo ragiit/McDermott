@@ -1,6 +1,3 @@
- 
-
-
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class SpecialityQueryHandler

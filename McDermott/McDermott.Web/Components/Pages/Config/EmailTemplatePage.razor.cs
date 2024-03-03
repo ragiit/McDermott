@@ -1,8 +1,5 @@
 ﻿using Blazored.TextEditor;
-using DevExpress.Data.XtraReports.Native;
 using MailKit.Net.Smtp;
-using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Components;
 using MimeKit;
 using MimeKit.Text;
 using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using McDermott.Application.Dtos.Transaction;
-using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceCommand;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+﻿using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceCommand;
 
 namespace McDermott.Application.Features.Queries.Transaction
 {
@@ -23,7 +16,8 @@ namespace McDermott.Application.Features.Queries.Transaction
             public List<GeneralConsultantClinicalAssesmentDto> GeneralConsultantClinicalAssesmentDtos { get; set; } = GeneralConsultantClinicalAssesmentDtos;
         }
 
-        #endregion
+        #endregion Create
+
         internal class GetAllGeneralConsultanServiceQueryHandler : IRequestHandler<GetGeneralConsultanServiceQuery, List<GeneralConsultanServiceDto>>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -93,7 +87,6 @@ namespace McDermott.Application.Features.Queries.Transaction
 
         //    public async Task<List<GeneralConsultantClinicalAssesmentDto>> Handle(GetGeneralConsultantClinicalAssesmentQuery query, CancellationToken cancellationToken)
         //    {
-                
         //    }
         //}
 
@@ -171,6 +164,7 @@ namespace McDermott.Application.Features.Queries.Transaction
         }
 
         #region Update
+
         internal class UpdateGeneralConsultantClinicalAssesmentHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateGeneralConsultantClinicalAssesmentRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -183,6 +177,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 return true;
             }
         }
-        #endregion
+
+        #endregion Update
     }
 }

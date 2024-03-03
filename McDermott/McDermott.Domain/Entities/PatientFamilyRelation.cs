@@ -1,6 +1,4 @@
-﻿ 
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
     public class PatientFamilyRelation : BaseAuditableEntity
     {

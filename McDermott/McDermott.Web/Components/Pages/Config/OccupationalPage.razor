@@ -66,12 +66,12 @@
                                     <EditFormTemplate Context="EditFormContext">
 
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Occupational:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption"Caption="Occupational:" ColSpanMd="12">
                                                 <div class="pop-warning">
                                                     @EditFormContext.GetEditor("Name")
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Description:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Description:" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("Description")
                                             </DxFormLayoutItem>
                                         </DxFormLayout>

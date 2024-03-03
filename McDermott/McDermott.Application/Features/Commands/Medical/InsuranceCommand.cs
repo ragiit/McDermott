@@ -1,6 +1,4 @@
-﻿using McDermott.Application.Dtos.Medical;
-
-namespace McDermott.Application.Features.Commands.Medical
+﻿namespace McDermott.Application.Features.Commands.Medical
 {
     public class InsuranceCommand
     {

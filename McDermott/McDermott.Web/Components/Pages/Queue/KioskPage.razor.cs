@@ -1,7 +1,4 @@
-﻿using DevExpress.XtraSpellChecker.Native;
-using McDermott.Application.Dtos.Queue;
-using Microsoft.AspNetCore.Components;
-using static Azure.Core.HttpHeader;
+﻿using McDermott.Application.Dtos.Queue;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 

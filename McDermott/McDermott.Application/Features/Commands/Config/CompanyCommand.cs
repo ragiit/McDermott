@@ -1,5 +1,3 @@
-using McDermott.Application.Dtos.Employee;
-
 namespace McDermott.Application.Features.Commands.Config
 {
     public class CompanyCommand

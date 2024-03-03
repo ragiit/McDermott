@@ -1,10 +1,6 @@
-﻿using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.CodeAnalysis;
-using Microsoft.JSInterop;
 using System.Globalization;
-using System.Reflection;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;
@@ -455,6 +451,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             public string? Subjective { get; set; }
             public string? Objective { get; set; }
+            public string? Plan { get; set; }
             public string Diagnosis { get; set; }
             public string NursingDiagnosis { get; set; }
             public DateTime Date { get; set; } = DateTime.Now;
@@ -735,7 +732,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task SetTimeSchedule(int patientId, DateTime date)
         {
-            var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == patientId && x.StartDate.Date == date.Date && x.DoctorSchedule.ServiceId == ServiceId));
+            var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == FormRegis.PratitionerId && x.StartDate.Date == date.Date && x.DoctorSchedule.ServiceId == FormRegis.ServiceId));
 
             Times.Clear();
 
@@ -775,7 +772,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                 {
+                    FormRegis.StagingStatus = "Confirmed";
                     var result = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                    await LoadData();
                 }
             }
             catch (Exception ex)
@@ -845,6 +844,15 @@ namespace McDermott.Web.Components.Pages.Transaction
                     PatientAllergy.Farmacology = null;
                 if (!FormRegis.IsFood)
                     PatientAllergy.Food = null;
+
+                //if (string.IsNullOrWhiteSpace(FormRegis.Payment))
+                //{
+                //    ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+                //    return;
+                //}
+                //else if (FormRegis.InsurancePolicyId == 0 && FormRegis.InsurancePolicyId is null)
+                //{
+                //}
 
                 IsReferTo = false;
 
@@ -1028,12 +1036,12 @@ namespace McDermott.Web.Components.Pages.Transaction
                 DoctorId = FormRegis.PratitionerId.ToInt32();
                 PaymentMethod = FormRegis.Payment;
 
-                var clinical = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
-                var support = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
-                GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                //var clinical = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                //var support = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                //GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
 
-                GeneralConsultanMedicalSupport = support[0];
-                GeneralConsultantClinical = clinical[0];
+                //GeneralConsultanMedicalSupport = support[0];
+                //GeneralConsultantClinical = clinical[0];
             }
             catch (Exception exx)
             {
@@ -1114,8 +1122,103 @@ namespace McDermott.Web.Components.Pages.Transaction
             ToastService.ShowInfo(country);
         }
 
+        private void SelectedItemServiceChanged(ServiceDto e)
+        {
+            IsPratition = AllDoctors.Where(x => x.DoctorServiceIds.Contains(e.Id)).ToList();
+        }
+
+        private async Task SelectedItemPhysicianChanged(UserDto e)
+        {
+            await SetTimeSchedule(e.Id, RegistrationDate);
+        }
+
+        private async Task SelectedItemPaymentChanged(string e)
+        {
+            FormRegis.Payment = e;
+            _PaymentMethod = e;
+
+            Insurances.Clear();
+
+            if (PaymentMethod.Equals("BPJS"))
+            {
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS == true).ToList();
+                Temps = all.Select(x => new InsuranceTemp
+                {
+                    InsurancePolicyId = x.Id,
+                    InsuranceId = x.InsuranceId,
+                    InsuranceName = x.Insurance.Name,
+                    PolicyNumber = x.PolicyNumber
+                }).ToList();
+            }
+            else
+            {
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS != true).ToList();
+                Temps = all.Select(x => new InsuranceTemp
+                {
+                    InsurancePolicyId = x.Id,
+                    InsuranceId = x.InsuranceId,
+                    InsuranceName = x.Insurance.Name,
+                    PolicyNumber = x.PolicyNumber
+                }).ToList();
+            }
+        }
+
+        private void SelectedItemPatientChanged(UserDto e)
+        {
+            if (e is null)
+                return;
+
+            var value = e.Id;
+
+            int PatientsId = value;
+            this.PatientsId = value;
+
+            var item = patients.FirstOrDefault(x => x.Id == PatientsId);
+
+            try
+            {
+                if (item.DateOfBirth != null)
+                {
+                    DateTime currentDate = DateTime.UtcNow;
+                    Birthdate = item.DateOfBirth;
+                    Age = currentDate.Year - Birthdate!.Value.Year;
+                }
+
+                FormRegis.Age = Age;
+                FormRegis.NoRM = item.NoRm;
+                FormRegis.IdentityNumber = item.NoId ?? "";
+                FormRegis.PatientId = item.Id;
+            }
+            catch { }
+
+            var patientAlergy = PatientAllergies.Where(x => x.UserId == item!.Id).FirstOrDefault();
+
+            if (patientAlergy is not null)
+            {
+                //FormRegis.IsWeather = patientAlergy.Any(x => !string.IsNullOrWhiteSpace(x.Weather));
+                //FormRegis.IsPharmacology = patientAlergy.Any(x => !string.IsNullOrWhiteSpace(x.Farmacology));
+                //FormRegis.IsFood = patientAlergy.Any(x => !string.IsNullOrWhiteSpace(x.Food));
+                PatientAllergy = patientAlergy;
+                PatientAllergy.Food = patientAlergy.Food;
+                PatientAllergy.Weather = patientAlergy.Weather;
+                PatientAllergy.Farmacology = patientAlergy.Farmacology;
+                FormRegis.IsWeather = !string.IsNullOrWhiteSpace(patientAlergy.Weather);
+                FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(patientAlergy.Farmacology);
+                FormRegis.IsFood = !string.IsNullOrWhiteSpace(patientAlergy.Food);
+            }
+            else
+            {
+                FormRegis.IsWeather = false;
+                FormRegis.IsPharmacology = false;
+                FormRegis.IsFood = false;
+            }
+        }
+
         private void SelectedItemChanged(String e)
         {
+            if (e is null)
+                return;
+
             if (e.Equals("Emergency"))
             {
                 Method = new List<string>
@@ -1124,6 +1227,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     "Work Related Injury",
                     "Road Accident Injury",
                 };
+                FormRegis.TypeMedical = Method[0];
             }
             else if (e.Equals("MCU"))
             {
@@ -1137,9 +1241,13 @@ namespace McDermott.Web.Components.Pages.Transaction
                     "Drug & Alcohol Test",
                     "Maternity Checkup"
                 };
+                FormRegis.TypeMedical = Method[0];
             }
-        }
+            else if (e.Equals("General Consultation"))
 
-        #endregion Function
+                FormRegis.TypeMedical = null;
+        }
     }
+
+    #endregion Function
 }

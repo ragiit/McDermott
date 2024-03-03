@@ -1,6 +1,4 @@
-﻿using McDermott.Application.Dtos.Config;
-
-namespace McDermott.Application.Features.Commands.Config
+﻿namespace McDermott.Application.Features.Commands.Config
 {
     public class VillageCommand
     {
@@ -45,6 +43,7 @@ namespace McDermott.Application.Features.Commands.Config
                 Id = id;
             }
         }
+
         public class DeleteListVillageRequest : IRequest<bool>
         {
             public List<int> Id { get; set; }

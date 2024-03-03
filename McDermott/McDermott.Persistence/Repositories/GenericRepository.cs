@@ -1,7 +1,6 @@
 ﻿using Mapster;
 using McDermott.Application.Interfaces.Repositories;
 using McDermott.Domain.Common;
-using McDermott.Domain.Entities;
 using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -60,7 +59,6 @@ namespace McDermott.Persistence.Repositories
                 }
             }
 
-
             exist = entity.Adapt(exist);
 
             return Task.CompletedTask;
@@ -99,7 +97,6 @@ namespace McDermott.Persistence.Repositories
             }
         }
 
-
         public async Task DeleteAsync(List<int> ids)
         {
             foreach (var id in ids)
@@ -120,16 +117,18 @@ namespace McDermott.Persistence.Repositories
 
             return result;
         }
+
         public void LogInformation(dynamic method, dynamic result)
         {
             // Uncomment jika ingin melihat data di console
-            //Log.Information(method + " => {@result}", result); 
+            //Log.Information(method + " => {@result}", result);
         }
 
         public void LogError(dynamic method, dynamic result)
         {
             Log.Error(method + "ERROR => {@result}", result);
         }
+
         public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
         {
             if (predicate is null)
@@ -205,7 +204,6 @@ namespace McDermott.Persistence.Repositories
         public async Task<int> GetCountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
         {
             var query = _dbContext.Set<T>().AsQueryable();
-
 
             if (predicate is not null)
             {

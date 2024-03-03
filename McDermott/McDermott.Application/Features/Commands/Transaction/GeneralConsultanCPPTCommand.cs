@@ -1,5 +1,4 @@
-﻿ 
-namespace McDermott.Application.Features.Commands.Transaction
+﻿namespace McDermott.Application.Features.Commands.Transaction
 {
     public class GeneralConsultanCPPTCommand
     {
@@ -10,7 +9,7 @@ namespace McDermott.Application.Features.Commands.Transaction
             public Expression<Func<GeneralConsultanCPPT, bool>> Predicate { get; } = predicate;
         }
 
-        #endregion
+        #endregion Get
 
         #region Create
 
@@ -24,22 +23,25 @@ namespace McDermott.Application.Features.Commands.Transaction
             public List<GeneralConsultanCPPTDto> GeneralConsultanCPPTDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
-        #endregion
+        #endregion Create
 
         #region Update
+
         public class UpdateGeneralConsultanCPPTRequest(GeneralConsultanCPPTDto GeneralConsultanCPPTDto) : IRequest<bool>
         {
             public GeneralConsultanCPPTDto GeneralConsultanCPPTDto { get; set; } = GeneralConsultanCPPTDto;
         }
 
-        #endregion
+        #endregion Update
 
         #region Delete
+
         public class DeleteGeneralConsultanCPPTRequest(int id = 0, List<int>? ids = null) : IRequest<bool>
         {
             public int Id { get; set; } = id;
             public List<int> Ids { get; set; } = ids ?? [];
         }
-        #endregion
+
+        #endregion Delete
     }
 }

@@ -1,7 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using Newtonsoft.Json;
-
-namespace McDermott.Web.Components.Layout
+﻿namespace McDermott.Web.Components.Layout
 {
     public partial class MainLayout
     {

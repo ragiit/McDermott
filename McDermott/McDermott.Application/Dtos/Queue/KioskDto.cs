@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Queue
+﻿namespace McDermott.Application.Dtos.Queue
 {
     public partial class KioskDto : IMapFrom<Kiosk>
     {
         public int Id { get; set; }
         public string? Type { get; set; }
+
         [Required]
         [StringLength(150)]
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? NumberType { get; set; } = string.Empty;
+
         public int? PatientId { get; set; }
         public string? BPJS { get; set; } = string.Empty;
         public bool? StageBpjs { get; set; }
@@ -25,6 +20,5 @@ namespace McDermott.Application.Dtos.Queue
         public virtual CounterDto? Counter { get; set; }
         public virtual ServiceDto? Service { get; set; }
         public virtual UserDto? Patient { get; set; }
-
     }
 }

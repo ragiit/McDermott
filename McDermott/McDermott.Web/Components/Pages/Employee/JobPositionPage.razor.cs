@@ -1,7 +1,4 @@
-﻿using DevExpress.Data.XtraReports.Native;
-using Microsoft.JSInterop;
-
-namespace McDermott.Web.Components.Pages.Employee
+﻿namespace McDermott.Web.Components.Pages.Employee
 {
     public partial class JobPositionPage
     {

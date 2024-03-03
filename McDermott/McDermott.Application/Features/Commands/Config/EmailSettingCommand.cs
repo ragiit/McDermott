@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using McDermott.Application.Dtos.Config;
-
-namespace McDermott.Application.Features.Commands.Config
+﻿namespace McDermott.Application.Features.Commands.Config
 {
     public partial class EmailSettingCommand
     {

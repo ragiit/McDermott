@@ -1,8 +1,4 @@
-﻿
-
-using static McDermott.Application.Features.Commands.Patient.FamilyCommand;
-
-namespace McDermott.Application.Features.Queries.Patient
+﻿namespace McDermott.Application.Features.Queries.Patient
 {
     public class PatientFamilyRelationQueryHandler
     {
@@ -18,11 +14,11 @@ namespace McDermott.Application.Features.Queries.Patient
             public async Task<List<PatientFamilyRelationDto>> Handle(GetPatientFamilyByPatientQuery request, CancellationToken cancellationToken)
             {
                 var result = await _unitOfWork.Repository<PatientFamilyRelation>().GetAsync(
-                    request.Predicate, 
+                    request.Predicate,
                         x => x
                         .Include(z => z.FamilyMember)
                         //.Include(z => z.Family)
-                        .Include(z => z.Patient), 
+                        .Include(z => z.Patient),
                     cancellationToken
                     );
 

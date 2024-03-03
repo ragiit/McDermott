@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace McDermott.Application.Dtos.Config
+﻿namespace McDermott.Application.Dtos.Config
 {
     public class ProvinceDto : IMapFrom<Province>
     {
@@ -11,12 +9,9 @@ namespace McDermott.Application.Dtos.Config
         [StringLength(200)]
         public string Name { get; set; } = string.Empty; // State Name
 
-
         [StringLength(5)]
         public string Code { get; set; } = string.Empty; // State Code
 
         public CountryDto? Country { get; set; }
-
-
     }
 }

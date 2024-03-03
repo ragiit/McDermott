@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using McDermott.Application.Dtos.Config;
-
-namespace McDermott.Application.Features.Commands.Patient
+﻿namespace McDermott.Application.Features.Commands.Patient
 {
     public class FamilyCommand
     {

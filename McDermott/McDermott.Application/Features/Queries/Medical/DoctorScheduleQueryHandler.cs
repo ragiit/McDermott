@@ -1,5 +1,4 @@
-﻿
-namespace McDermott.Application.Features.Queries.Medical
+﻿namespace McDermott.Application.Features.Queries.Medical
 {
     public class DoctorScheduleQueryHandler
     {
@@ -84,7 +83,6 @@ namespace McDermott.Application.Features.Queries.Medical
                 }
             }
         }
-
 
         internal class GetDoctorScheduleSlotByDoctorScheduleIdRequestHandler : IRequestHandler<GetDoctorScheduleSlotByDoctorScheduleIdRequest, List<DoctorScheduleSlotDto>>
         {
@@ -295,6 +293,7 @@ namespace McDermott.Application.Features.Queries.Medical
                 }
             }
         }
+
         internal class GetDoctorScheduleDetailByScheduleIdQueryHandler : IRequestHandler<GetDoctorScheduleDetailByScheduleIdQuery, List<DoctorScheduleDetailDto>>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -370,6 +369,7 @@ namespace McDermott.Application.Features.Queries.Medical
         }
 
         #region Delete
+
         internal class DeleteDoctorScheduleSlotRequestHandler : IRequestHandler<DeleteDoctorScheduleSlotRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -387,6 +387,7 @@ namespace McDermott.Application.Features.Queries.Medical
                 return true;
             }
         }
+
         internal class DeleteDoctorScheduleSlotByPhysicionIdRequestHandler : IRequestHandler<DeleteDoctorScheduleSlotByPhysicionIdRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -407,11 +408,11 @@ namespace McDermott.Application.Features.Queries.Medical
                 }
                 catch (Exception)
                 {
-
                     throw;
                 }
             }
         }
+
         internal class DeleteListDoctorScheduleSlotRequestHandler : IRequestHandler<DeleteListDoctorScheduleSlotRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -433,6 +434,7 @@ namespace McDermott.Application.Features.Queries.Medical
                 return true;
             }
         }
+
         internal class DeleteDoctorScheduleSlotByScheduleIdPhysicionIdRequestHandler : IRequestHandler<DeleteDoctorScheduleSlotByScheduleIdPhysicionIdRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -457,11 +459,11 @@ namespace McDermott.Application.Features.Queries.Medical
                 }
                 catch (Exception e)
                 {
-
                     throw;
                 }
             }
         }
+
         internal class DeleteListDoctorScheduleSlotByScheduleIdPhysicionIdRequestHandler : IRequestHandler<DeleteListDoctorScheduleSlotByScheduleIdPhysicionIdRequest, bool>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -489,11 +491,11 @@ namespace McDermott.Application.Features.Queries.Medical
                 }
                 catch (Exception e)
                 {
-
                     throw;
                 }
             }
         }
-        #endregion
+
+        #endregion Delete
     }
 }

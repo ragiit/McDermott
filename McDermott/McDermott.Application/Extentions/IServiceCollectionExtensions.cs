@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using System.Security.Claims;
 
 namespace McDermott.Application.Extentions
 {

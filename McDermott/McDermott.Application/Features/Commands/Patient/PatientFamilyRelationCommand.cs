@@ -1,15 +1,13 @@
-﻿
-
-namespace McDermott.Application.Features.Commands.Patient
+﻿namespace McDermott.Application.Features.Commands.Patient
 {
     public class PatientFamilyRelationCommand
     {
         #region Get
+
         public class GetPatientFamilyByPatientQuery : IRequest<List<PatientFamilyRelationDto>>
         {
             public Expression<Func<PatientFamilyRelation, bool>>? Predicate { get; }
             public bool ReturnSingle { get; } = false; // Parameter untuk menentukan apakah ingin mengembalikan satu data atau daftar data
-
 
             public GetPatientFamilyByPatientQuery(Expression<Func<PatientFamilyRelation, bool>>? predicate = null, bool ReturnSingle = false)
             {
@@ -17,9 +15,11 @@ namespace McDermott.Application.Features.Commands.Patient
                 this.ReturnSingle = ReturnSingle;
             }
         }
-        #endregion
+
+        #endregion Get
 
         #region Create
+
         public class CreatePatientFamilyRelationRequest : IRequest<PatientFamilyRelationDto>
         {
             public PatientFamilyRelationDto PatientFamilyRelationDto { get; set; }
@@ -39,6 +39,7 @@ namespace McDermott.Application.Features.Commands.Patient
                 this.PatientFamilyRelationDto = PatientFamilyRelationDto;
             }
         }
-        #endregion
+
+        #endregion Create
     }
 }

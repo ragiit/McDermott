@@ -1,6 +1,4 @@
-﻿
-
-namespace McDermott.Application.Dtos.Config
+﻿namespace McDermott.Application.Dtos.Config
 {
     public class VillageDto : IMapFrom<Village>
     {
@@ -13,7 +11,6 @@ namespace McDermott.Application.Dtos.Config
         [Required]
         [StringLength(200)]
         public string Name { get; set; } = string.Empty; // Kelurahan
-
 
         [StringLength(10)]
         public string PostalCode { get; set; } = string.Empty; // Kode Pos

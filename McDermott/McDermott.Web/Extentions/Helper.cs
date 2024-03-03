@@ -1,20 +1,33 @@
-﻿using Blazored.LocalStorage;
-using McDermott.Application.Dtos.Config;
-using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Components;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.JSInterop;
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
-using static System.Net.WebRequestMethods;
-
-namespace McDermott.Web.Extentions
+﻿namespace McDermott.Web.Extentions
 {
     public static class Helper
     {
+        public static void HandleException(this Exception ex, IToastService toastService)
+        {
+            string errorMessage = "An error occurred while saving data.";
+
+            if (ex.InnerException is SqlException sqlException)
+            {
+                switch (sqlException.Number)
+                {
+                    case 547:
+                        errorMessage = "Data cannot be deleted because it is associated with another entity. \n" + sqlException.Message;
+                        break;
+                    // Add more cases as needed for specific SQL error numbers
+                    default:
+                        errorMessage = "An error occurred in the database: " + sqlException.Message;
+                        break;
+                }
+            }
+            else
+            {
+                errorMessage = "An error occurred: " + ex.Message;
+            }
+
+            toastService.ClearErrorToasts();
+            toastService.ShowError(errorMessage);
+        }
+
         public static User? UserLogin { get; set; }
 
         public static string HashWithSHA256(string data)

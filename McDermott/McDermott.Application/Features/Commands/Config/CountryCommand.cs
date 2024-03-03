@@ -1,10 +1,9 @@
-﻿using McDermott.Application.Dtos.Config;
-
-namespace McDermott.Application.Features.Commands.Config
+﻿namespace McDermott.Application.Features.Commands.Config
 {
     public class CountryCommand
     {
         #region Get
+
         public class GetCountryQuery : IRequest<List<CountryDto>>;
 
         public class GetCountryByIdQuery(int id) : IRequest<CountryDto>
@@ -12,9 +11,10 @@ namespace McDermott.Application.Features.Commands.Config
             public int Id { get; set; } = id;
         }
 
-        #endregion
+        #endregion Get
 
         #region Create
+
         public class CreateCountryRequest : IRequest<CountryDto>
         {
             public CountryDto CountryDto { get; set; }
@@ -29,21 +29,20 @@ namespace McDermott.Application.Features.Commands.Config
         {
             public List<CountryDto> CountryDtos { get; set; } = CountryDtos;
         }
-        #endregion
+
+        #endregion Create
 
         #region Update
-        public class UpdateCountryRequest : IRequest<bool>
-        {
-            public CountryDto CountryDto { get; set; }
 
-            public UpdateCountryRequest(CountryDto countryDto)
-            {
-                CountryDto = countryDto;
-            }
+        public class UpdateCountryRequest(CountryDto countryDto) : IRequest<bool>
+        {
+            public CountryDto CountryDto { get; set; } = countryDto;
         }
-        #endregion
+
+        #endregion Update
 
         #region Delete
+
         public class DeleteCountryRequest : IRequest<bool>
         {
             public int Id { get; set; }
@@ -54,15 +53,11 @@ namespace McDermott.Application.Features.Commands.Config
             }
         }
 
-        public class DeleteListCountryRequest : IRequest<bool>
+        public class DeleteListCountryRequest(List<int> id) : IRequest<bool>
         {
-            public List<int> Id { get; set; }
-
-            public DeleteListCountryRequest(List<int> id)
-            {
-                Id = id;
-            }
+            public List<int> Id { get; set; } = id;
         }
-        #endregion 
+
+        #endregion Delete
     }
 }

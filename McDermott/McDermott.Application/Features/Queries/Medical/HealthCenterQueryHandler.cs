@@ -1,7 +1,4 @@
-﻿
-
-
-namespace McDermott.Application.Features.Queries.Medical
+﻿namespace McDermott.Application.Features.Queries.Medical
 {
     public class HealthCenterQueryHandler
     {

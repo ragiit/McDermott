@@ -1,6 +1,4 @@
-﻿using McDermott.Application.Dtos.Config;
-using static McDermott.Application.Features.Commands.Config.CountryCommand;
-using static McDermott.Application.Features.Commands.Config.DistrictCommand;
+﻿using static McDermott.Application.Features.Commands.Config.DistrictCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
