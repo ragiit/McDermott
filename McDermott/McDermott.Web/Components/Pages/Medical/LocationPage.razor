@@ -81,7 +81,8 @@
                                                     </div>
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Type" ColSpanMd="12">
-                                                    <DxComboBox Data="@Types" @bind-Value="@a.Type" NullText="Types" ShowValidationIcon="true" />
+                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                        Data="@Types" @bind-Value="@a.Type" NullText="Types" ShowValidationIcon="true" />
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
                                         </EditFormTemplate>

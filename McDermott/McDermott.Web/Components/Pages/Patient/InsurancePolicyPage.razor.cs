@@ -22,14 +22,14 @@ namespace McDermott.Web.Components.Pages.Patient
         #region Data
 
         private bool IsBPJS = false;
-        private int _InsuranceId = 0;
+        private int? _InsuranceId = 0;
 
-        private int InsuranceId
+        private int? InsuranceId
         {
             get => _InsuranceId;
             set
             {
-                InsurancePoliciyForm.InsuranceId = value;
+                InsurancePoliciyForm.InsuranceId = (int)value;
                 _InsuranceId = value;
 
                 IsBPJS = Insurances.Any(x => x.IsBPJS == true && x.Id == value) ? true : false;

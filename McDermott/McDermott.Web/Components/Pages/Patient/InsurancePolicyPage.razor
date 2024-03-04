@@ -107,7 +107,8 @@
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Insurance Company" ColSpanMd="6">
-                                                <DxComboBox Data="@Insurances"
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@Insurances"
                                                             NullText="Select Insurance Company..."
                                                             @bind-Value="@InsuranceId"
                                                             TextFieldName="Name"

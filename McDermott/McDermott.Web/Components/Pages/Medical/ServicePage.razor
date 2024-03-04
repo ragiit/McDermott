@@ -75,10 +75,12 @@
                                      MaxHeight="500"
                                      Width="500px"
                                      Height="400px">
-                                 <EditForm Model=@FormService Context="EditFormContext">                                    
+                                <EditForm Model=@FormService Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit"
+                                          OnValidSubmit="@HandleValidSubmit">
                                     <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@FormService.Name" NullText="Name Service.."/>
+                                            <DxTextBox @bind-Text="@FormService.Name" NullText="Name Service.." ShowValidationIcon="true"/>
+                                            <ValidationMessage For="@(()=>FormService.Name)"   />
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Code" ColSpanMd="12">
                                             <DxTextBox @bind-Text="@FormService.Code" NullText="Code.."/>

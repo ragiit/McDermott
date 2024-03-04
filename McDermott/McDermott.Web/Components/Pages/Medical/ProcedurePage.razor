@@ -82,7 +82,8 @@
                                                     @EditFormContext.GetEditor("Code_Test")
                                                 </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Classification" ColSpanMd="12">
-                                                    <DxComboBox Data="@Classification"
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                        Data="@Classification"
                                                     NullText="Select Classification..."
                                                     @bind-Value="@a.Classification" >
                                                     </DxComboBox>

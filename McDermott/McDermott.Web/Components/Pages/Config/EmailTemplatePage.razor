@@ -111,7 +111,8 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem ColSpanMd="12">
                                                 <label>To Partner</label>
-                                                <DxComboBox Data="@ToPartner"
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@ToPartner"
                                                             NullText="Select Partner..."
                                                             @bind-Value="@EmailFormTemplate.ToPartnerId"
                                                             TextFieldName="Name"

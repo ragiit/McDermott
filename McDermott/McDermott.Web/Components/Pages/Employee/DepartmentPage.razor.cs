@@ -9,7 +9,7 @@
         private List<UserDto> Users = [];
 
         private int UpdateUserId { get; set; }
-        private int SelectedUserId { get; set; }
+        private int? SelectedUserId { get; set; }
 
         private List<string> DepartmentCategories = new()
         {

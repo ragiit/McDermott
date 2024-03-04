@@ -91,19 +91,20 @@
                                                     </DxFormLayoutItem>
                                                 </DxFormLayoutGroup>
                                                 <DxFormLayoutGroup Caption="Connection Information" ColSpanMd="12" CssClass="my-2">
-                                                    <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Server:" CaptionCssClass="required-caption normal-caption">
+                                                    <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Server" CaptionCssClass="required-caption normal-caption">
                                                         <DxTextBox @bind-Text="@FormEmails.Smtp_Host" NullText="Smtp Server" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
                                                         <ValidationMessage For="@(()=>FormEmails.Smtp_Host)" />
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Port:" CaptionCssClass="required-caption normal-caption">
+                                                    <DxFormLayoutItem ColSpanMd="6" Caption="SMTP Port" CaptionCssClass="required-caption normal-caption">
                                                         <DxTextBox @bind-Text="@FormEmails.Smtp_Port" NullText="Port" ShowValidationIcon="true" />
                                                         <ValidationMessage For="@(()=>FormEmails.Smtp_Port)" />
                                                     </DxFormLayoutItem>
                                                 </DxFormLayoutGroup>
                                                 <DxFormLayoutGroup Caption="Security And Authentication" ColSpanMd="12" CssClass="my-2">
-                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Conection Scurity:" CaptionCssClass="required-caption normal-caption">
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Conection Scurity" CaptionCssClass="required-caption normal-caption">
                                                         <Template>
-                                                            <DxComboBox Data="@Stts_Ecrypt"
+                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                    Data="@Stts_Ecrypt"
                                                                         NullText="Select Ecryp  t..."
                                                                         AllowUserInput="true"
                                                                         SelectedItemChanged="@((string city) => SelectedItemChanged(city))"

@@ -84,7 +84,8 @@
                                                 @EditFormContext.GetEditor("Code")
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Disease Category" ColSpanMd="12">
-                                                <DxComboBox Data="@Diseases"
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                    Data="@Diseases"
                                                             NullText="Select Disease..."
                                                             @bind-Value="@a.DiseaseCategoryId"
                                                             TextFieldName="Name"
@@ -92,7 +93,8 @@
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Chronic Category" ColSpanMd="12">
-                                                <DxComboBox Data="@Cronises"
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                    Data="@Cronises"
                                                             NullText="Select Chronic..."
                                                             @bind-Value="@a.CronisCategoryId"
                                                             TextFieldName="Name"

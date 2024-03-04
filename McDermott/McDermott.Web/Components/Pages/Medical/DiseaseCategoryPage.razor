@@ -78,7 +78,8 @@
                                                     @EditFormContext.GetEditor("Name")
                                                 </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Parent Category" ColSpanMd="12">
-                                                    <DxComboBox Data="@ParentCategoryDto"
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                        Data="@ParentCategoryDto"
                                                                 NullText="Select Parent Category..."
                                                                 @bind-Value="@a.ParentCategory"
                                                                 TextFieldName="Name"

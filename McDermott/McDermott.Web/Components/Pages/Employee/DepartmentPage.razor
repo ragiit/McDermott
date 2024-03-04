@@ -81,7 +81,8 @@
 
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Parent Department" ColSpanMd="12">
                                                 <Template>
-                                                    <DxComboBox Data="@ParentDepartments"
+                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                                        Data="@ParentDepartments"
                                                                 NullText="Select Parent Department..."
                                                                 FilteringMode="@DataGridFilteringMode.Contains"
                                                                 @bind-Value="@a.ParentId"
@@ -93,7 +94,8 @@
 
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Company" ColSpanMd="12">
                                                 <Template>
-                                                    <DxComboBox Data="@Companies"
+                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                        Data="@Companies"
                                                                 NullText="Select Company..."
                                                                 FilteringMode="@DataGridFilteringMode.Contains"
                                                                 @bind-Value="@a.CompanyId"
@@ -105,7 +107,8 @@
 
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Manager" ColSpanMd="12">
                                                 <Template>
-                                                    <DxComboBox Data="@Users"
+                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                        Data="@Users"
                                                                 NullText="Select Manager..."
                                                                 FilteringMode="@DataGridFilteringMode.Contains"
                                                                 @bind-Value="@SelectedUserId"
@@ -116,7 +119,8 @@
 
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Department Category" ColSpanMd="12">
                                                 <Template>
-                                                    <DxComboBox NullText="Select Department Category..." FilteringMode="@DataGridFilteringMode.Contains" Data="@DepartmentCategories" @bind-Value="@a.DepartmentCategory" />
+                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                        NullText="Select Department Category..." FilteringMode="@DataGridFilteringMode.Contains" Data="@DepartmentCategories" @bind-Value="@a.DepartmentCategory" />
                                                 </Template>
                                             </DxFormLayoutItem>
 
