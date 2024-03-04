@@ -5,7 +5,7 @@
         public int Id { get; set; }
 
         [StringLength(200)]
-        [Required]
+        [Required(ErrorMessage ="Name Must Failled in!")]
         public string Name { get; set; } = string.Empty;
 
         [StringLength(5)]

@@ -10,23 +10,23 @@
         public int? Sequence { get; set; }
         public bool? Smtp_Debug { get; set; }
 
-        [Required(ErrorMessage = "Connection Scurity must be filled in!")]
+        [Required(ErrorMessage = "Connection Security Must Be Filled In!")]
         public string? Smtp_Encryption { get; set; }
 
         public string? Status { get; set; } = string.Empty;
 
         [StringLength(200)]
-        [Required(ErrorMessage = ("SMTP Server must be filled in!"))]
+        [Required(ErrorMessage = ("SMTP Server Must Be Filled In!"))]
         public string Smtp_Host { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = ("Password must be filled in!"))]
+        [Required(ErrorMessage = ("Password Must Be Filled In!"))]
         public string? Smtp_Pass { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = ("SMTP Port must be filled in!"))]
+        [Required(ErrorMessage = ("SMTP Port Must Be Filled In!"))]
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? Smtp_Port { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = ("Username must be filled in!"))]
+        [Required(ErrorMessage = ("Username Must Be Filled In!"))]
         [StringLength(200)]
         public string? Smtp_User { get; set; } = string.Empty;
     }

@@ -1,22 +1,27 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+﻿using McDermott.Application.Dtos.Queue;
+using Microsoft.AspNetCore.Components.Forms;
 using OfficeOpenXml;
+using static McDermott.Application.Features.Commands.Queue.CounterCommand;
+using static McDermott.Application.Features.Commands.Queue.QueueDisplayCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
 {
     public partial class QueueDisplayPage
     {
-        private List<QueueDisplayDto> QueueDisplay = [];
-        private GroupMenuDto UserAccessCRUID = new();
+        #region relation Data
 
-        public class QueueDisplayDto
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-        }
+        private List<QueueDisplayDto> QueueDisplay = [];
+        private List<CounterDto> Counters = [];
+        private IEnumerable<CounterDto> counterId = [];
+        private GroupMenuDto UserAccessCRUID = new();
+        public QueueDisplayDto FormDisplays = new();
+
+        #endregion relation Data
 
         private bool IsAccess = false;
         private bool PanelVisible { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
+        private List<string>? counteres;
 
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
@@ -54,6 +59,9 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
+            QueueDisplay = await Mediator.Send(new GetQueueDisplayQuery());
+            Counters = await Mediator.Send(new GetCounterQuery());
+            counteres = [.. Counters.Where(x => x.Status == "on process").Select(x => x.Name)];
             PanelVisible = false;
         }
 
