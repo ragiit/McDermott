@@ -65,7 +65,7 @@
 
                 var ids = groups.Select(x => x.MenuId).ToList();
 
-                HeaderMenuDtos = [.. menus.Where(x => x.ParentMenu == null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
+                HeaderMenuDtos = [.. menus.Where(x => x.ParentMenu == null && ids.Contains(x.Id) && !x.Name.Equals("Template Page")).OrderBy(x => x.Sequence.ToInt32())];
                 DetailMenuDtos = [.. menus.Where(x => x.ParentMenu != null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
 
                 if (user.GroupId is not null)

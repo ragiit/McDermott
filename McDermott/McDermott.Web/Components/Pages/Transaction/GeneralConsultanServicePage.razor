@@ -2,6 +2,12 @@
 @rendermode InteractiveServer
 <PageTitle>McDermott - Transaction General Consultan Service</PageTitle>
 
+<style>
+    .highlighted-item > td {
+        background-color: rgba(245, 198, 203, 0.5);
+    }
+</style>
+
 @if (IsAccess)
 {
     <div class="wrapper">
@@ -509,6 +515,16 @@
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 
+                                                                  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Objective" ColSpanMd="12">
+                                                                    <DxMaskedInput @bind-Value="@FormInputCPPTGeneralConsultan.Objective"
+                                                                                    NullText="Objective"
+                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                        <Buttons>
+                                                                            <DxEditorButton CssClass="text-bold btn-primary" Text="Get Objectives" Click="OnClickGetObjectives"/>
+                                                                        </Buttons>
+                                                                    </DxMaskedInput>
+                                                                </DxFormLayoutItem>
+
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Plan" ColSpanMd="12">
                                                                     <DxTextBox @bind-Text="@FormInputCPPTGeneralConsultan.Plan" NullText="Plan"
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
@@ -519,7 +535,7 @@
                                                                                     NullText="Select Diagnosis..."
                                                                                     @bind-Value="@FormInputCPPTGeneralConsultan.Diagnosis"
                                                                                     TextFieldName="NameCode"
-                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                     FilteringMode="@DataGridFilteringMode.Contains"
                                                                                     ValueFieldName="NameCode">
                                                                         </DxComboBox>
@@ -527,7 +543,7 @@
 
                                                                @*  @if (Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
                                                                 {
-                                                                   
+
                                                                 } *@
                                                                @*  else if ( (Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsNurse)))
                                                                 {
@@ -547,7 +563,7 @@
                                                                                     NullText="Select Diagnosis..."
                                                                                     @bind-Value="@FormInputCPPTGeneralConsultan.Diagnosis"
                                                                                     TextFieldName="NameCode"
-                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                     FilteringMode="@DataGridFilteringMode.Contains"
                                                                                     ValueFieldName="NameCode">
                                                                         </DxComboBox>
@@ -557,7 +573,7 @@
                                                                                     NullText="Select Nursing Diagnosis..."
                                                                                     @bind-Value="@FormInputCPPTGeneralConsultan.NursingDiagnosis"
                                                                                     TextFieldName="Problem"
-                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                     FilteringMode="@DataGridFilteringMode.Contains"
                                                                                     ValueFieldName="Problem">
                                                                         </DxComboBox>
@@ -608,6 +624,7 @@
                                                                             PopupEditFormCssClass="pw-800"
                                                                             PagerPosition="GridPagerPosition.Bottom"
                                                                             PageSizeSelectorVisible="true"
+                                                                            CustomizeElement="GridCPPT_CustomizeElement"
                                                                             PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                                                             PageSizeSelectorAllRowsItemVisible="true"
                                                                             PagerSwitchToInputBoxButtonCount="10"
@@ -832,7 +849,10 @@
 
                                                 @if (ActiveTabIndex == 1)
                                                 {
-                                                     @* Form  *@
+                                                    <EditForm Model="@FormInputCPPTGeneralConsultan" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmitCPPT"
+                                                              OnInvalidSubmit="@HandleInvalidSubmitCPPT">
+                                                        <DataAnnotationsValidator />
+                                                          @* Form HAHA  *@
                                                     <DxFormLayout>
                                                         <DxFormLayoutGroup Caption="Input CPPT" ColSpanMd="12">
                                                             <Items>
@@ -869,21 +889,21 @@
                                                                         </DxComboBox>
                                                                     </DxFormLayoutItem> *@
 
-
-                                                                      <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Nursing Diagnosis" ColSpanMd="12">
+                                                                      <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Nursing Diagnosis" ColSpanMd="12">
                                                                         <DxComboBox ShowValidationIcon="true" Data="@NursingDiagnosesTemps"
                                                                                     NullText="Select Nursing Diagnosis..."
                                                                                     @bind-Value="@FormInputCPPTGeneralConsultan.NursingDiagnosis"
                                                                                     TextFieldName="Problem"
-                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                     FilteringMode="@DataGridFilteringMode.Contains"
                                                                                     ValueFieldName="Problem">
                                                                         </DxComboBox>
+                                                                        <ValidationMessage For="@(() => FormInputCPPTGeneralConsultan.NursingDiagnosis)" />
                                                                     </DxFormLayoutItem>
 
                                                               @* @if ( Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsNurse))
                                                                 {
-                                                                  
+
                                                                 }
                                                                 else
                                                                 {
@@ -913,7 +933,7 @@
                                                             <div class="col-auto align-self-end">
                                                                 <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
                                                                             Text="Confirm"
-                                                                            Click="OnClickConfirmCPPT"
+                                                                            SubmitFormOnClick="true"
                                                                             RenderStyle="ButtonRenderStyle.Info"
                                                                             IconCssClass="fa-solid fa-floppy-disk"
                                                                             CssClass="w-20 ml" />
@@ -926,6 +946,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    </EditForm>
 
                                                     <DxFormLayout>
                                                         <DxFormLayoutGroup Caption="CPPT" ColSpanMd="12">
@@ -997,7 +1018,7 @@
 <DxPopup HeaderText="Refer To" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
     <EditForm Model="@FormRegis" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
         <DataAnnotationsValidator />
-            <DxFormLayout> 
+            <DxFormLayout>
                    <DxFormLayout>
                             <DxFormLayoutGroup Caption="General" ColSpanMd="12">
                                 <div class="row">
@@ -1047,8 +1068,8 @@
 
                                         </Template>
                                     </DxFormLayoutItem>
-                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg Type" ColSpanMd="12"> 
-                                            <DxComboBox  
+                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg Type" ColSpanMd="12">
+                                            <DxComboBox
                                                         Data="@RegisType"
                                                         NullText="Select Registration..."
                                                         AllowUserInput="true"
@@ -1079,7 +1100,7 @@
                                 <DxFormLayout CssClass="mt ">
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
                                         <DxComboBox ShowValidationIcon="true" Data="@Services"
-                                                    NullText="Select Service.." 
+                                                    NullText="Select Service.."
                                                         SelectedItemChanged="@((ServiceDto e) => SelectedItemServiceChanged(e))"
                                                     @bind-Value="@FormRegis.ServiceId" TextFieldName="Name" ValueFieldName="Id">
                                         </DxComboBox>
@@ -1088,7 +1109,7 @@
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Physicion" ColSpanMd="12">
                                         <DxComboBox ShowValidationIcon="true" Data="@IsPratition"
                                                     NullText="Select Physicion..."
-                                                    @bind-Value="@FormRegis.PratitionerId" 
+                                                    @bind-Value="@FormRegis.PratitionerId"
                                                     TextFieldName="Name"
                                                     ValueFieldName="Id"
                                                     SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))"
@@ -1098,7 +1119,7 @@
                                     </DxFormLayoutItem>
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Payment Methode" ColSpanMd="12">
                                         <DxComboBox ShowValidationIcon="true" Data="@Payments"
-                                                    NullText="Payment Method.." 
+                                                    NullText="Payment Method.."
                                                     SelectedItemChanged="@((string e) => SelectedItemPaymentChanged(e))"
                                                     @bind-Value="@FormRegis.Payment">
                                         </DxComboBox>
@@ -1107,7 +1128,7 @@
                                     @if (FormRegis.Payment == "Insurance" || FormRegis.Payment == "BPJS")
                                     {
                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption=" " ColSpanMd="12">
-                                            <DxComboBox ShowValidationIcon="true" 
+                                            <DxComboBox ShowValidationIcon="true"
                                                 TextFieldName="ConcatInsurancePolicy"
                                                 ValueFieldName="InsurancePolicyId"
                                                 Data="@Temps"
@@ -1122,10 +1143,10 @@
                                     </DxFormLayoutItem>
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Schedule Time" ColSpanMd="12">
                                         <DxComboBox ShowValidationIcon="true" Data="@Times"
-                                                    NullText="Select Time.." 
+                                                    NullText="Select Time.."
                                                     @bind-Value="@FormRegis.ScheduleTime"/>
                                             <ValidationMessage For="@(() => FormRegis.ScheduleTime)" />
-                                    </DxFormLayoutItem> 
+                                    </DxFormLayoutItem>
                                 </DxFormLayout>
                             </div>
                         </div>

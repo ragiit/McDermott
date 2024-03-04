@@ -3,27 +3,9 @@
     public class UserCommand
     {
         #region Get
-
-        public class GetUserQuery : IRequest<List<UserDto>>;
-
-        public class GetUserByIdQuery : IRequest<UserDto>
+        public class GetUserQuery(Expression<Func<User, bool>>? predicate = null) : IRequest<List<UserDto>>
         {
-            public int Id { get; set; }
-
-            public GetUserByIdQuery(int id)
-            {
-                Id = id;
-            }
-        }
-
-        public class GetUserByEmailPasswordQuery : IRequest<UserDto>
-        {
-            public UserDto UserDto { get; set; }
-
-            public GetUserByEmailPasswordQuery(UserDto UserDto)
-            {
-                this.UserDto = UserDto;
-            }
+            public Expression<Func<User, bool>> Predicate { get; } = predicate!;
         }
 
         public class GetDataUserForKioskQuery : IRequest<List<UserDto>>
@@ -34,7 +16,6 @@
 
             public GetDataUserForKioskQuery(string Types, string Number)
             {
-                this.userDto = userDto;
                 this.Types = Types;
                 this.Number = Number;
             }
@@ -44,52 +25,34 @@
 
         #region Create
 
-        public class CreateUserRequest : IRequest<UserDto>
+        public class CreateUserRequest(UserDto UserDto) : IRequest<UserDto>
         {
-            public UserDto UserDto { get; set; }
-
-            public CreateUserRequest(UserDto UserDto)
-            {
-                this.UserDto = UserDto;
-            }
+            public UserDto UserDto { get; set; } = UserDto;
         }
 
         #endregion Create
 
         #region Update
 
-        public class UpdateUserRequest : IRequest<bool>
+        public class UpdateUserRequest(UserDto UserDto) : IRequest<UserDto>
         {
-            public UserDto UserDto { get; set; }
+            public UserDto UserDto { get; set; } = UserDto;
+        }
 
-            public UpdateUserRequest(UserDto UserDto)
-            {
-                this.UserDto = UserDto;
-            }
+        public class UpdateListUserRequest(List<UserDto> UserDto) : IRequest<List<UserDto>>
+        {
+            public List<UserDto> UserDtos { get; set; } = UserDto;
         }
 
         #endregion Update
 
         #region Delete
 
-        public class DeleteUserRequest : IRequest<bool>
+
+        public class DeleteUserRequest(int id = 0, List<int>? ids = null) : IRequest<bool>
         {
-            public int Id { get; set; }
-
-            public DeleteUserRequest(int id)
-            {
-                Id = id;
-            }
-        }
-
-        public class DeleteListUserRequest : IRequest<bool>
-        {
-            public List<int> Id { get; set; }
-
-            public DeleteListUserRequest(List<int> id)
-            {
-                Id = id;
-            }
+            public int Id { get; set; } = id;
+            public List<int> Ids { get; set; } = ids ?? [];
         }
 
         #endregion Delete

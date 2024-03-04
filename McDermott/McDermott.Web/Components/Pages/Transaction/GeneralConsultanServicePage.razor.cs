@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Transaction
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class GeneralConsultanServicePage
     {
@@ -444,7 +446,10 @@
             public string? Objective { get; set; }
             public string? Plan { get; set; }
             public string? Diagnosis { get; set; }
+
+            [Required]
             public string? NursingDiagnosis { get; set; }
+
             public DateTime Date { get; set; } = DateTime.Now;
         }
 
@@ -824,6 +829,29 @@
             FormValidationState = true;
 
             await OnSave();
+        }
+
+        private void GridCPPT_CustomizeElement(GridCustomizeElementEventArgs e)
+        {
+            if (e.ElementType == GridElementType.DataRow && e.Grid.GetRowValue(e.VisibleIndex, "Body") is "")
+            {
+                e.CssClass = "highlighted-item";
+            }
+        }
+
+        private bool FormValidationStateCPPT = true;
+
+        private void HandleValidSubmitCPPT()
+        {
+            FormValidationStateCPPT = true;
+
+            OnClickConfirmCPPT();
+        }
+
+        private void HandleInvalidSubmitCPPT()
+        {
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+            FormValidationStateCPPT = false;
         }
 
         private async Task OnSave()
