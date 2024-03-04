@@ -15,20 +15,22 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                string cacheKey = $"GetUserQuery_{request.Predicate?.ToString()}"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
-                if (!_cache.TryGetValue(cacheKey, out List<UserDto>? result))
+                string cacheKey = $"GetUserQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                if (!_cache.TryGetValue(cacheKey, out List<User>? result))
                 {
-                    var temps = await _unitOfWork.Repository<User>().GetAsync(
-                        request.Predicate,
-                        x => x.Include(z => z.Group),
+                    result = await _unitOfWork.Repository<User>().GetAsync(
+                        null,
+                        includes: x => x.Include(z => z.Group),
                         cancellationToken);
-
-                    result = temps.Adapt<List<UserDto>>();
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }
 
-                return result;
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<UserDto>>();
             }
             catch (Exception)
             {

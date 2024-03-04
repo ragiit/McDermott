@@ -138,6 +138,7 @@
                                                                            NullText="Identity Number">
                                                                 <DxTextMaskProperties Placeholder="Placeholder" />
                                                             </DxMaskedInput>
+                                                            <ValidationMessage For="@(() => UserForm.NoId)"   />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Type" ColSpanMd="12">
                                                             <DxComboBox Data="@IdentityTypes" @bind-Value="@UserForm.TypeId"></DxComboBox>
@@ -357,7 +358,7 @@
                                                                     </DxComboBox>
                                                                 </Template>
                                                             </DxGridLayoutItem>
-                                                            <DxGridLayoutItem Row="4" Column="1" CssClass="mt ml">
+                                                            <DxGridLayoutItem Row="4" Column="1">
                                                                 <Template>
                                                                     <DxComboBox Data="@Villages.Where(x => x.CityId == UserForm.DomicileCityId && x.ProvinceId == UserForm.DomicileProvinceId && x.DistrictId == UserForm.DomicileDistrictId)"
                                                                                 NullText="Select Village..."

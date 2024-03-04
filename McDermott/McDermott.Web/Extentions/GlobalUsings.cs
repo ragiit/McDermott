@@ -52,7 +52,7 @@ global using static McDermott.Application.Features.Commands.Patient.PatientComma
 global using static McDermott.Application.Features.Commands.Medical.PractitionerCommand;
 global using static McDermott.Application.Features.Commands.Config.CompanyCommand;
 global using static McDermott.Application.Features.Commands.Employee.EmployeeCommand;
-global using static McDermott.Application.Features.Commands.Patient.FamilyCommand;
+global using static McDermott.Application.Features.Commands.Patient.FamilyRelationCommand;
 global using static McDermott.Application.Features.Commands.Patient.PatientFamilyRelationCommand;
 global using static McDermott.Application.Features.Commands.Patient.InsurancePolicyCommand;
 global using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;

@@ -1,5 +1,4 @@
-﻿
-using static McDermott.Application.Features.Commands.TemplateCommand;
+﻿using static McDermott.Application.Features.Commands.TemplateCommand;
 
 namespace McDermott.Application.Features.Queries
 {
@@ -18,19 +17,21 @@ namespace McDermott.Application.Features.Queries
             try
             {
                 string cacheKey = $"GetTemplateQuery_{request.Predicate?.ToString()}"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
-                if (!_cache.TryGetValue(cacheKey, out List<ProvinceDto>? result))
+                if (!_cache.TryGetValue(cacheKey, out List<Province>? result))
                 {
-                    var temps = await _unitOfWork.Repository<Province>().GetAsync(
+                    result = await _unitOfWork.Repository<Province>().GetAsync(
                         request.Predicate,
                         x => x.Include(z => z.Country),
                         cancellationToken);
 
-                    result = temps.Adapt<List<ProvinceDto>>();
-
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }
 
-                return result;
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<ProvinceDto>>();
             }
             catch (Exception)
             {

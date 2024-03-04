@@ -106,67 +106,82 @@
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-            if (SelectedDataItems is null)
+            try
             {
-                await Mediator.Send(new DeleteFamilyRequest(((FamilyDto)e.DataItem).Id));
+                if (SelectedDataItems is null || SelectedDataItems.Count == 1)
+                {
+                    await Mediator.Send(new DeleteFamilyRequest(((FamilyDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<FamilyDto>>();
+                    await Mediator.Send(new DeleteFamilyRequest(ids: a.Select(x => x.Id).ToList()));
+                }
+
+                await LoadData();
             }
-            else
+            catch (Exception ex)
             {
-                var a = SelectedDataItems.Adapt<List<FamilyDto>>();
-                await Mediator.Send(new DeleteListFamilyRequest(a.Select(x => x.Id).ToList()));
+                ex.HandleException(ToastService);
             }
-            await LoadData();
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (FamilyDto)e.EditModel;
-            name = editModel.Name;
-
-            //var invers = Familys.Where(x => x.Name == relation).Select(x => x.Id).FirstOrDefault();
-
-            if (relation == null || relation == "")
+            try
             {
-                if (string.IsNullOrWhiteSpace(editModel.Name))
-                    return;
+                var editModel = (FamilyDto)e.EditModel;
+                name = editModel.Name;
 
-                editModel.ParentRelation = editModel.Name;
+                //var invers = Familys.Where(x => x.Name == relation).Select(x => x.Id).FirstOrDefault();
 
-                if (editModel.Id == 0)
+                if (relation == null || relation == "")
                 {
-                    await Mediator.Send(new CreateFamilyRequest(editModel));
-                }
-                else
-                    await Mediator.Send(new UpdateFamilyRequest(editModel));
-            }
-            else
-            {
-                editModel.Relation = relation + "-" + name;
-                if (string.IsNullOrWhiteSpace(editModel.Name))
-                    return;
+                    if (string.IsNullOrWhiteSpace(editModel.Name))
+                        return;
 
-                if (editModel.Id == 0)
-                {
-                    editModel.ParentRelation = name;
-                    editModel.ChildRelation = relation;
-                    await Mediator.Send(new CreateFamilyRequest(editModel));
+                    editModel.ParentRelation = editModel.Name;
 
-                    var invers = Familys.Where(x => x.Name == relation).Select(x => x.Id).FirstOrDefault();
-
-                    editModel.Id = invers;
-                    editModel.Name = relation;
-                    editModel.Relation = name + "-" + relation;
-                    editModel.ChildRelation = name;
-                    editModel.ParentRelation = relation;
-                    await Mediator.Send(new UpdateFamilyRequest(editModel));
+                    if (editModel.Id == 0)
+                    {
+                        await Mediator.Send(new CreateFamilyRequest(editModel));
+                    }
+                    else
+                        await Mediator.Send(new UpdateFamilyRequest(editModel));
                 }
                 else
                 {
-                    await Mediator.Send(new UpdateFamilyRequest(editModel));
+                    editModel.Relation = relation + "-" + name;
+                    if (string.IsNullOrWhiteSpace(editModel.Name))
+                        return;
+
+                    if (editModel.Id == 0)
+                    {
+                        editModel.ParentRelation = name;
+                        editModel.ChildRelation = relation;
+                        await Mediator.Send(new CreateFamilyRequest(editModel));
+
+                        var invers = Familys.Where(x => x.Name == relation).Select(x => x.Id).FirstOrDefault();
+
+                        editModel.Id = invers;
+                        editModel.Name = relation;
+                        editModel.Relation = name + "-" + relation;
+                        editModel.ChildRelation = name;
+                        editModel.ParentRelation = relation;
+                        await Mediator.Send(new UpdateFamilyRequest(editModel));
+                    }
+                    else
+                    {
+                        await Mediator.Send(new UpdateFamilyRequest(editModel));
+                    }
                 }
+                relations.Clear();
+                await LoadData();
             }
-            relations.Clear();
-            await LoadData();
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
     }
 }

@@ -135,12 +135,10 @@
                                 @if (FormRegis.StagingStatus != "Finished" && FormRegis.StagingStatus != "Canceled")
                                 {
                                     <div class="card">
-                                        <div class="card-body">
-                                            <div class="w-100">
-                                                <div class="col align-self-center">
-                                                    <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Info"></DxButton>
-                                                    <DxButton IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancel2" RenderStyle="ButtonRenderStyle.Danger"></DxButton>
-                                                </div>
+                                        <div class="w-100">
+                                            <div class="col align-self-center">
+                                                <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Info"></DxButton>
+                                                <DxButton IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancel2" RenderStyle="ButtonRenderStyle.Danger"></DxButton>
                                             </div>
                                         </div>
                                     </div>
@@ -168,8 +166,8 @@
                                 }
 
                                 <div class="card">
-                                    <div class="card-body rounded-5">
-                                        <DxFormLayout>
+                                       <div class="w-100">
+                                             <DxFormLayout>
                                             <DxFormLayoutGroup Caption="General" ColSpanMd="12">
                                                <div class="row">
                                             <div class="col-md-6">
@@ -992,7 +990,7 @@
                                                 }
                                             }
                                         </div>
-                                    </div>
+                                       </div>
 
                                     @if (!FormRegis.StagingStatus.Equals("Waiting") && !FormRegis.StagingStatus.Equals("Confirmed") && !FormRegis.StagingStatus.Equals("Finished") && !FormRegis.StagingStatus.Equals("Canceled"))
                                     {
