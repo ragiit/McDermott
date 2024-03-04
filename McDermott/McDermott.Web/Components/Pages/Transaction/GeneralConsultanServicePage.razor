@@ -92,7 +92,7 @@
                                                 <DxGridDataColumn FieldName="Payment" Caption="Payment Methode" />
                                                 <DxGridDataColumn FieldName="Pratitioner.Name" Caption="Doctor" />
                                                 <DxGridDataColumn FieldName="Service.Name" Caption="Service" />
-                                                <DxGridDataColumn FieldName="StagingStatus" Caption="Status" GroupIndex="0" />
+                                                <DxGridDataColumn FieldName="StagingStatus" Caption="Status" />
                                                 <DxGridDataColumn FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
                                                     <CellDisplayTemplate>
                                                         @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto).IsAlertInformationSpecialCase)
@@ -135,12 +135,14 @@
                                 @if (FormRegis.StagingStatus != "Finished" && FormRegis.StagingStatus != "Canceled")
                                 {
                                     <div class="card">
-                                        <div class="w-100">
+                                       <div class="card-body">
+                                            <div class="w-100">
                                             <div class="col align-self-center">
                                                 <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Info"></DxButton>
                                                 <DxButton IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancel2" RenderStyle="ButtonRenderStyle.Danger"></DxButton>
                                             </div>
                                         </div>
+                                       </div>
                                     </div>
                                 }
 

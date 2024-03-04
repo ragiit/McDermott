@@ -83,15 +83,19 @@
                                                     @EditFormContext.GetEditor("Name")
                                                     <ValidationMessage For="@(()=> a.Name)"   />
                                                 </DxFormLayoutItem>
+
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
                                                     @*  <DxTextBox @bind-Text="@Province.Code" NullText="Code" InputCssClass="fw-normal" /> *@
                                                     @EditFormContext.GetEditor("Code")
                                                     <ValidationMessage For="@(()=> a.Code)"   />
                                                 </DxFormLayoutItem>
+
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Country" ColSpanMd="12">
                                                     <DxComboBox ShowValidationIcon="true"
                                                                 Data="@Countries"
                                                                 NullText="Select Country..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
                                                                 @bind-Value="@a.CountryId"
                                                                 TextFieldName="Name"
                                                                 ValueFieldName="Id">
