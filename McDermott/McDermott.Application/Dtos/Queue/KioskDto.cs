@@ -20,5 +20,6 @@
         public virtual CounterDto? Counter { get; set; }
         public virtual ServiceDto? Service { get; set; }
         public virtual UserDto? Patient { get; set; }
+        public virtual UserDto? Physician { get; set; }
     }
 }

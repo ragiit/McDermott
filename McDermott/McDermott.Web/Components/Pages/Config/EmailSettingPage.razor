@@ -55,7 +55,6 @@
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="() => NewItem_Click()" IconCssClass="fa-solid fa-plus" />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && EmailSettings.Count > 0" />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && EmailSettings.Count > 0" />
-
                                             </DxToolbar>
 
 
@@ -67,7 +66,7 @@
                                             <DxGridDataColumn FieldName="Description" Caption="Description" />
                                             <DxGridDataColumn FieldName="Smtp_Host" Caption="SMTP Server" />
                                             <DxGridDataColumn FieldName="Smtp_User" Caption="Username" />
-                                            <DxGridDataColumn FieldName="Smtp_Encryption" Caption="Connection Scurity" />
+                                            <DxGridDataColumn FieldName="Smtp_Encryption" Caption="Connection Security" />
                                             <DxGridDataColumn FieldName="Status" Caption="Status" />
                                         </Columns>
 
@@ -101,7 +100,7 @@
                                                     </DxFormLayoutItem>
                                                 </DxFormLayoutGroup>
                                                 <DxFormLayoutGroup Caption="Security And Authentication" ColSpanMd="12" CssClass="my-2">
-                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Conection Scurity:" CaptionCssClass="required-caption normal-caption">
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Conection Security:" CaptionCssClass="required-caption normal-caption">
                                                         <Template>
                                                             <DxComboBox Data="@Stts_Ecrypt"
                                                                         NullText="Select Ecryp  t..."

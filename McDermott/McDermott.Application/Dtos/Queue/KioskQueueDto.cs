@@ -11,7 +11,8 @@
         public string? Queues { get; set; }
         public string? Status { get; set; }
 
-        public virtual Kiosk? Kiosk { get; set; }
-        public virtual Service? Service { get; set; }
+        public virtual KioskDto? Kiosk { get; set; }
+        public virtual ServiceDto? Service { get; set; }
+        public virtual ServiceDto? ServiceK { get; set; }
     }
 }

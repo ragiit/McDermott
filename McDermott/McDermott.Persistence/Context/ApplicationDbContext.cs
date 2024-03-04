@@ -85,6 +85,7 @@ namespace McDermott.Persistence.Context
         public DbSet<KioskQueue> KioskQueues { get; set; }
         public DbSet<Kiosk> Kiosks { get; set; }
         public DbSet<Counter> Counters { get; set; }
+        public DbSet<QueueDisplay> QueueDisplays { get; set; }
 
         #endregion Queue
 
