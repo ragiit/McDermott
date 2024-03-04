@@ -369,7 +369,8 @@
 
                                         <DxFormLayoutGroup Caption="Employee" ColSpanMd="12">
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Job Position">
-                                                <DxComboBox Data="@JobPositions"
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@JobPositions"
                                                             NullText="Select Job Position..."
                                                             @bind-Value="@UserForm.JobPositionId"
                                                             TextFieldName="Name"
@@ -385,7 +386,8 @@
                                                 </DxMaskedInput>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Department">
-                                                <DxComboBox Data="@Departments"
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@Departments"
                                                             NullText="Select Department..."
                                                             @bind-Value="@UserForm.DepartmentId"
                                                             TextFieldName="Name"
@@ -421,7 +423,8 @@
                                                 <DxTextBox @bind-Text="@UserForm.SAP" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="SAP" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Employee Type">
-                                                <DxComboBox Data="@EmployeeTypes" @bind-Value="@UserForm.EmployeeType" NullText="Select Employee Type..." />
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@EmployeeTypes" @bind-Value="@UserForm.EmployeeType" NullText="Select Employee Type..." />
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>
