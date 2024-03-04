@@ -96,7 +96,7 @@
                                     <DataAnnotationsValidator />
                                     <DxFormLayout CssClass="mt">
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem Caption="Patient:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Patient" ColSpanMd="12">
                                                 @* <DxComboBox Data="@Users"
                                         NullText="Select Patient..."
                                         @bind-Value="@InsurancePoliciyForm.UserId"
@@ -106,7 +106,7 @@
                                                 <h3>@User.Name</h3>
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem Caption="Insurance Company:" ColSpanMd="6">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Insurance Company" ColSpanMd="6">
                                                 <DxComboBox Data="@Insurances"
                                                             NullText="Select Insurance Company..."
                                                             @bind-Value="@InsuranceId"
@@ -115,14 +115,14 @@
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem Caption="Policy Number:" ColSpanMd="6">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Policy Number" ColSpanMd="6">
                                                 <DxTextBox @bind-Text="@InsurancePoliciyForm.PolicyNumber"
                                                            ShowValidationIcon="true"
                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                            NullText="Policy Number" />
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem Caption="Active:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Active" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@InsurancePoliciyForm.Active" />
                                             </DxFormLayoutItem>
 

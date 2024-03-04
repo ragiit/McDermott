@@ -101,7 +101,8 @@
                                                     </div>
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Province:" ColSpanMd="12">
-                                                    <DxComboBox Data="@Provinces"
+                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                        Data="@Provinces"
                                                                 NullText="Select Province..."
                                                                 @bind-Value="@a.ProvinceId"
                                                                 TextFieldName="Name"

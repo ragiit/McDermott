@@ -8,7 +8,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private List<string> Types = new List<string>
         {
-            "Vendor Location", "View", "Internal Location", "Customer Location", "Inventory Loss", "Production", "Transit Location"
+            "Internal Location"
         };
 
         #region Default Grid

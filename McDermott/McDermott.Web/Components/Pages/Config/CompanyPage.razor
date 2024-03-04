@@ -79,22 +79,22 @@
                                     <DataAnnotationsValidator />
                                     <div class="card-body">
                                         <DxFormLayout CssClass="mt">
-                                            <DxFormLayoutItem caption="Name: " ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" caption="Name" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@formCompanies.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name Company" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem caption="Email: ">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" caption="Email">
                                                 <DxTextBox @bind-Text="@formCompanies.Email" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Email Company" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem caption="Phone: ">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" caption="Phone">
                                                 <DxTextBox @bind-Text="@formCompanies.Phone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Phone Company" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem caption="Website: ">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" caption="Website">
                                                 <DxTextBox @bind-Text="@formCompanies.Website" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Website Company" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem caption="VAT: ">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" caption="VAT">
                                                 <DxTextBox @bind-Text="@formCompanies.VAT" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="VAT" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Address:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Address" ColSpanMd="12">
                                                 <Template>
                                                     <DxGridLayout>
                                                         <Rows>
@@ -120,7 +120,8 @@
                                                             </DxGridLayoutItem>
                                                             <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
                                                                 <Template>
-                                                                    <DxComboBox Data="@Provinces"
+                                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        Data="@Provinces"
                                                                                 NullText="Select Province..."
                                                                                 @bind-Value="@formCompanies.ProvinceId"
                                                                                 TextFieldName="Name"
@@ -130,7 +131,8 @@
                                                             </DxGridLayoutItem>
                                                             <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
                                                                 <Template>
-                                                                    <DxComboBox Data="@Cities.Where(x => x.ProvinceId == formCompanies.ProvinceId)"
+                                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        Data="@Cities.Where(x => x.ProvinceId == formCompanies.ProvinceId)"
                                                                                 NullText="Select City..."
                                                                                 @bind-Value="@formCompanies.CityId"
                                                                                 TextFieldName="Name"
@@ -140,7 +142,8 @@
                                                             </DxGridLayoutItem>
                                                             <DxGridLayoutItem Row="3" Column="0" CssClass="mt">
                                                                 <Template>
-                                                                    <DxComboBox Data="@Countries.Where(x => formCompanies.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == formCompanies.ProvinceId)?.CountryId)"
+                                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        Data="@Countries.Where(x => formCompanies.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == formCompanies.ProvinceId)?.CountryId)"
                                                                                 NullText="Select Country..."
                                                                                 @bind-Value="@formCompanies.CountryId"
                                                                                 TextFieldName="Name"

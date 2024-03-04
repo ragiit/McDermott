@@ -74,13 +74,13 @@
                                             var a = (FamilyDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                 <div class="pop-warning">
                                                     <DxTextBox NullText="Name" @bind-Text="@a.Name" />
                                                 </div>
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem Caption="Inverse Relation:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Inverse Relation" ColSpanMd="12">
                                                 <DxComboBox Data="@relations"
                                                             NullText="Select Relation..."
                                                             @bind-Value="@relation"
