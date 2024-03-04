@@ -58,12 +58,12 @@
                                 </ToolbarTemplate>
                                 <Columns>
                                     <DxGridSelectionColumn Width="15px" />
-                                    <DxGridDataColumn FieldName="Name" SortIndex="0" Width="200px"/>
+                                    <DxGridDataColumn FieldName="Name" SortIndex="0" Width="200px" />
                                     <DxGridDataColumn FieldName="Code" Width="100px" />
                                     <DxGridDataColumn FieldName="Quota" Width="90px" />
                                     <DxGridDataColumn FieldName="Flag" Width="130px" Caption="Flag" />
                                     <DxGridDataColumn FieldName="KioskName" Caption=" Service Counter" />
-                                </Columns>                               
+                                </Columns>
                             </DxGrid>
 
                             <DxPopup @bind-Visible="@PopUpVisible"
@@ -71,21 +71,22 @@
                                      HeaderText="@TextPopUp"
                                      MinWidth="300"
                                      MinHeight="200"
-                                     MaxWidth="800"
-                                     MaxHeight="500"
-                                     Width="500px"
-                                     Height="400px">
-                                 <EditForm Model=@FormService Context="EditFormContext">                                    
+                                     
+                                     Width="50%"
+                                     Height="50%">
+                                <EditForm Model=@FormService Context="EditFormContext">
+                                    <DataAnnotationsValidator />
                                     <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@FormService.Name" NullText="Name Service.."/>
+                                            <DxTextBox @bind-Text="@FormService.Name" NullText="Name Service.." ShowValidationIcon="true" />
+                                            <ValidationMessage For="@(()=>FormService.Name)" />
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem Caption="Code:" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@FormService.Code" NullText="Code.."/>
+                                            <DxTextBox @bind-Text="@FormService.Code" NullText="Code.." />
                                         </DxFormLayoutItem>
 
                                         <DxFormLayoutItem Caption="Quota:" ColSpanMd="12">
-                                           <DxTextBox @bind-Text="@FormService.Quota" NullText="Quota Service.."/>
+                                            <DxTextBox @bind-Text="@FormService.Quota" NullText="Quota Service.." />
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem Caption="Patient" ColSpanMd="6">
                                             <DxCheckBox @bind-Checked="@FormService.IsPatient" />
@@ -95,10 +96,10 @@
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem ColSpanMd="12" Caption="Service Counter" Visible="@Convert.ToBoolean(@FormService.IsPatient)">
                                             <DxComboBox Data="@ServicesK"
-                                                      @bind-Value="@FormService.ServicedId"
-                                                      NullText="select Service Counter.."
-                                                      TextFieldName="Name"
-                                                      ValueFieldName="Id"></DxComboBox>
+                                                        @bind-Value="@FormService.ServicedId"
+                                                        NullText="select Service Counter.."
+                                                        TextFieldName="Name"
+                                                        ValueFieldName="Id"></DxComboBox>
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem ColSpanMd="12">
                                             <div class="row justify-content-end">

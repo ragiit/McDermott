@@ -229,15 +229,17 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task OnSave()
         {
-            var editModel = FormEmails;
-
-            if (string.IsNullOrWhiteSpace(editModel.Description))
+            if(FormEmails.Status == "")
+            {
+                FormEmails.Status = "No Testing";
+            }
+            if (string.IsNullOrWhiteSpace(FormEmails.Smtp_Host))
                 return;
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateEmailSettingRequest(editModel));
+            if (FormEmails.Id == 0)
+                await Mediator.Send(new CreateEmailSettingRequest(FormEmails));
             else
-                await Mediator.Send(new UpdateEmailSettingRequest(editModel));
+                await Mediator.Send(new UpdateEmailSettingRequest(FormEmails));
 
             await LoadData();
         }
