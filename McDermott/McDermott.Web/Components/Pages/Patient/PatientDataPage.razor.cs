@@ -122,7 +122,7 @@
             }
             catch { }
 
-            Users = await Mediator.Send(new GetUserPatientQuery());
+            Users = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
             Patiens = Users.Where(x => x.IsPatient == true && x.Id != UserForm.PatientAllergy.UserId).ToList();
 
             PanelVisible = false;
@@ -327,7 +327,7 @@
 
                 int userActive = (int)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
 
-                await Mediator.Send(new DeleteListUserRequest(a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
+                await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
             }
             await LoadData();
         }

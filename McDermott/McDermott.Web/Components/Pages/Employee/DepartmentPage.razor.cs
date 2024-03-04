@@ -120,11 +120,12 @@
             }
             else
             {
-                var user = await Mediator.Send(new GetUserByIdQuery(UpdateUserId));
-                if (user is not null)
+                var user = await Mediator.Send(new GetUserQuery(x => x.Id == UpdateUserId));
+
+                if (user.Count > 0)
                 {
-                    user.DepartmentId = null;
-                    await Mediator.Send(new UpdateUserRequest(user));
+                    user[0].DepartmentId = null;
+                    await Mediator.Send(new UpdateUserRequest(user[0]));
                 }
 
                 await Mediator.Send(new UpdateDepartmentRequest(editModel));
@@ -132,9 +133,9 @@
 
             if (SelectedUserId != 0)
             {
-                var user = await Mediator.Send(new GetUserByIdQuery(SelectedUserId));
-                user.DepartmentId = editModel.Id;
-                await Mediator.Send(new UpdateUserRequest(user));
+                var user = await Mediator.Send(new GetUserQuery(x => x.Id == UpdateUserId));
+                user[0].DepartmentId = editModel.Id;
+                await Mediator.Send(new UpdateUserRequest(user[0]));
             }
 
             SelectedUserId = 0;

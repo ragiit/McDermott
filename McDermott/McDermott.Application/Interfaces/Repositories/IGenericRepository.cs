@@ -20,9 +20,9 @@ namespace McDermott.Application.Interfaces.Repositories
 
         Task<List<T>> AddAsync(List<T> entity);
 
-        Task UpdateAsync(T entity);
+        Task<T> UpdateAsync(T entity);
 
-        Task UpdateAsync(List<T> entity);
+        Task<List<T>> UpdateAsync(List<T> entity);
 
         Task DeleteAsync(int id);
 
