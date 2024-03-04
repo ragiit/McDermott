@@ -11,5 +11,6 @@ namespace McDermott.Application.Dtos.Queue
         public int Id { get; set; }
         public string? Name { get; set; } = string.Empty;
         public int? CounterId { get; set; }
+        public virtual List<CounterDto>? Counter {  get; set; }
     }
 }

@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace McDermott.Domain.Entities
 {
-    internal class QueueDisplay
+    public class QueueDisplay:BaseAuditableEntity
     {
+        public string? Name {  get; set; }
+        public List<int>? CounterId { get; set; }
+
+        public virtual List<Counter>? Counter {  get; set; }
     }
 }
