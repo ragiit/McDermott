@@ -71,12 +71,12 @@
                                             var a = (SpecialityDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem Caption="Description:" CaptionCssClass="required-caption" ColSpanMd="6">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Description:" ColSpanMd="6">
                                                 <div class="pop-warning">
                                                     @EditFormContext.GetEditor("Name")
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Code:" ColSpanMd="6">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Code" ColSpanMd="6">
                                                 <!-- @EditFormContext.GetEditor("Code") -->
                                                 <DxTextBox @bind-Text="@a.Code" />
                                             </DxFormLayoutItem>

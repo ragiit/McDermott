@@ -22,46 +22,145 @@ namespace McDermott.Persistence.Repositories
 
         public async Task<T> AddAsync(T entity)
         {
-            await _dbContext.Set<T>().AddAsync(entity);
-            return entity;
-        }
-
-        public async Task<List<T>> AddAsync(List<T> entity)
-        {
-            await _dbContext.Set<T>().AddRangeAsync(entity);
-
-            return entity;
-        }
-
-        public Task UpdateAsync(T entity)
-        {
-            T exist = _dbContext.Set<T>().Find(entity.Id)!;
-
-            // Melampirkan entitas yang sudah ada ke DbContext
-            _dbContext.Attach(exist);
-
-            // Menandai entitas sebagai dimodifikasi
-            _dbContext.Entry(exist).State = EntityState.Modified;
-
-            entity.CreatedBy = exist.CreatedBy;
-            entity.CreatedDate = exist.CreatedDate;
-
-            foreach (PropertyInfo property in typeof(T).GetProperties())
+            try
             {
-                var nullAttribute = property.GetCustomAttribute<SetToNullAttribute>();
-                if (nullAttribute != null)
+                foreach (PropertyInfo property in typeof(T).GetProperties())
                 {
-                    property.SetValue(entity, null);
+                    var nullAttribute = property.GetCustomAttribute<SetToNullAttribute>();
+                    if (nullAttribute != null)
+                    {
+                        property.SetValue(entity, null);
+                    }
+                    else
+                    {
+                        // Atur nilai properti lainnya sesuai kebutuhan
+                    }
                 }
-                else
-                {
-                    // Atur nilai properti lainnya sesuai kebutuhan
-                }
+
+                await _dbContext.Set<T>().AddAsync(entity);
+                return entity;
             }
+            catch (Exception)
+            {
 
-            exist = entity.Adapt(exist);
+                throw;
+            }
+        }
 
-            return Task.CompletedTask;
+        public async Task<List<T>> AddAsync(List<T> entities)
+        {
+            try
+            {
+                foreach (var entity in entities)
+                {
+                    foreach (PropertyInfo property in typeof(T).GetProperties())
+                    {
+                        var nullAttribute = property.GetCustomAttribute<SetToNullAttribute>();
+                        if (nullAttribute != null)
+                        {
+                            property.SetValue(entity, null);
+                        }
+                        else
+                        {
+                            // Atur nilai properti lainnya sesuai kebutuhan
+                        }
+                    }
+                }
+
+                await _dbContext.Set<T>().AddRangeAsync(entities);
+
+                return entities;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<T> UpdateAsync(T entity)
+        {
+            try
+            {
+                T exist = await _dbContext.Set<T>().FindAsync(entity.Id)!;
+
+                if (exist is not null)
+                {
+                    // Melampirkan entitas yang sudah ada ke DbContext
+                    _dbContext.Attach(exist);
+
+                    // Menandai entitas sebagai dimodifikasi
+                    _dbContext.Entry(exist).State = EntityState.Modified;
+
+                    entity.CreatedBy = exist.CreatedBy;
+                    entity.CreatedDate = exist.CreatedDate;
+
+                    foreach (PropertyInfo property in typeof(T).GetProperties())
+                    {
+                        var nullAttribute = property.GetCustomAttribute<SetToNullAttribute>();
+                        if (nullAttribute != null)
+                        {
+                            property.SetValue(entity, null);
+                        }
+                        else
+                        {
+                            // Atur nilai properti lainnya sesuai kebutuhan
+                        }
+                    }
+
+                    exist = entity.Adapt(exist);
+                }
+
+                return exist!;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<T>> UpdateAsync(List<T> entities)
+        {
+            try
+            {
+                foreach (var entity in entities)
+                {
+                    T exist = await _dbContext.Set<T>().FindAsync(entity.Id)!;
+
+                    if (exist is not null)
+                    {
+                        // Melampirkan entitas yang sudah ada ke DbContext
+                        _dbContext.Attach(exist);
+
+                        // Menandai entitas sebagai dimodifikasi
+                        _dbContext.Entry(exist).State = EntityState.Modified;
+
+                        entity.CreatedBy = exist.CreatedBy;
+                        entity.CreatedDate = exist.CreatedDate;
+
+                        foreach (PropertyInfo property in typeof(T).GetProperties())
+                        {
+                            var nullAttribute = property.GetCustomAttribute<SetToNullAttribute>();
+                            if (nullAttribute != null)
+                            {
+                                property.SetValue(entity, null);
+                            }
+                            else
+                            {
+                                // Atur nilai properti lainnya sesuai kebutuhan
+                            }
+                        }
+
+                        exist = entity.Adapt(exist);
+                    }
+                }
+
+                return entities!;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task DeleteAsync(int id)
@@ -171,7 +270,7 @@ namespace McDermott.Persistence.Repositories
             catch (Exception ex)
             {
                 LogError(nameof(GetAsync), ex.Message);
-                return [];
+                throw;
             }
         }
 
@@ -192,14 +291,14 @@ namespace McDermott.Persistence.Repositories
             }
         }
 
-        public async Task UpdateAsync(List<T> entity)
-        {
-            foreach (var item in entity)
-            {
-                T exist = _dbContext.Set<T>().Find(item.Id);
-                _dbContext.Entry(exist).CurrentValues.SetValues(entity);
-            }
-        }
+        //public async Task UpdateAsync(List<T> entity)
+        //{
+        //    foreach (var item in entity)
+        //    {
+        //        T exist = _dbContext.Set<T>().Find(item.Id);
+        //        _dbContext.Entry(exist).CurrentValues.SetValues(entity);
+        //    }
+        //}
 
         public async Task<int> GetCountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
         {

@@ -10,6 +10,7 @@ global using MediatR;
 global using Microsoft.EntityFrameworkCore;
 global using System.ComponentModel.DataAnnotations;
 global using System.Linq.Expressions;
+global using Microsoft.Extensions.Caching.Memory;
 global using static McDermott.Application.Features.Commands.Config.GenderCommand;
 global using static McDermott.Application.Features.Commands.Config.GroupCommand;
 global using static McDermott.Application.Features.Commands.Config.ReligionCommand;

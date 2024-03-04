@@ -4,64 +4,34 @@
     {
         public class GetProvinceQuery : IRequest<List<ProvinceDto>>;
 
-        public class GetProvinceByIdQuery : IRequest<ProvinceDto>
+        public class GetProvinceByIdQuery(int id) : IRequest<ProvinceDto>
         {
-            public int Id { get; set; }
-
-            public GetProvinceByIdQuery(int id)
-            {
-                Id = id;
-            }
+            public int Id { get; set; } = id;
         }
 
-        public class GetProvinceByCountry : IRequest<List<ProvinceDto>>
+        public class GetProvinceByCountry(int? countryId) : IRequest<List<ProvinceDto>>
         {
-            public int? CountryId { get; set; }
-
-            public GetProvinceByCountry(int? countryId)
-            {
-                CountryId = countryId;
-            }
+            public int? CountryId { get; set; } = countryId;
         }
 
-        public class CreateProvinceRequest : IRequest<ProvinceDto>
+        public class CreateProvinceRequest(ProvinceDto ProvinceDto) : IRequest<ProvinceDto>
         {
-            public ProvinceDto ProvinceDto { get; set; }
-
-            public CreateProvinceRequest(ProvinceDto ProvinceDto)
-            {
-                this.ProvinceDto = ProvinceDto;
-            }
+            public ProvinceDto ProvinceDto { get; set; } = ProvinceDto;
         }
 
-        public class UpdateProvinceRequest : IRequest<bool>
+        public class UpdateProvinceRequest(ProvinceDto ProvinceDto) : IRequest<bool>
         {
-            public ProvinceDto ProvinceDto { get; set; }
-
-            public UpdateProvinceRequest(ProvinceDto ProvinceDto)
-            {
-                this.ProvinceDto = ProvinceDto;
-            }
+            public ProvinceDto ProvinceDto { get; set; } = ProvinceDto;
         }
 
-        public class DeleteProvinceRequest : IRequest<bool>
+        public class DeleteProvinceRequest(int id) : IRequest<bool>
         {
-            public int Id { get; set; }
-
-            public DeleteProvinceRequest(int id)
-            {
-                Id = id;
-            }
+            public int Id { get; set; } = id;
         }
 
-        public class DeleteListProvinceRequest : IRequest<bool>
+        public class DeleteListProvinceRequest(List<int> id) : IRequest<bool>
         {
-            public List<int> Id { get; set; }
-
-            public DeleteListProvinceRequest(List<int> id)
-            {
-                Id = id;
-            }
+            public List<int> Id { get; set; } = id;
         }
     }
 }

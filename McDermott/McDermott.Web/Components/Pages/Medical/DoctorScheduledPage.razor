@@ -81,7 +81,7 @@
                                             IsContentBlocked="true"
                                             CssClass="w-100"
                                             ApplyBackgroundShading="true"> *@
-                                                <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Schedule Name:" ColSpanMd="12">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Schedule Name" ColSpanMd="12">
 
                                                     @*   <DxComboBox Data="@Schedules"
                                                 NullText="Select Schedule..."
@@ -126,17 +126,14 @@
                             }
                             else
                             {
-                                <label for="tbOverview" class="demo-text cw-320 mb-1">
-                                    Name
-                                </label>
-
+                                
+                                <p for="tbOverview"> Name</p>
                                 <DxTextBox @bind-Text="@DoctorSchedule.Name"
                                            NullText="Name"
                                            InputId="tbOverview" />
 
-                                <label for="tbOverview3" class="demo-text cw-320 mb-1 mt-2">
-                                    Service
-                                </label>
+                      
+                                <p for="tbOverview">Service</p>
 
                                 <DxComboBox Data="@Services"
                                             NullText="Select Service"
@@ -147,9 +144,8 @@
                                             ValueFieldName="Id">
                                 </DxComboBox>
 
-                                <label for="tbOverview2" class="demo-text cw-320 mb-1 mt-2">
-                                    Physicion
-                                </label>
+                            
+                                <p for="tbOverview"> Physicion</p>
 
                                 <DxTagBox Data="@Users"
                                           FilteringMode="@DataGridFilteringMode.Contains"
@@ -220,30 +216,30 @@
                                             var a = (DoctorScheduleDetailDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                 <div class="pop-warning">
                                                     <DxTextBox @bind-Text="@a.Name" NullText="Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Day of Week:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Day of Week" ColSpanMd="12">
                                                 <DxComboBox Data="@DayOfWeeks" @bind-Value="@a.DayOfWeek" FilteringMode="@DataGridFilteringMode.Contains" NullText="Day of Weeks" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Work From:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Work From" ColSpanMd="12">
                                                 <DxTimeEdit @bind-Time="@a.WorkFrom"
                                                             Format="@DisplayFormat"
                                                             DisplayFormat="@DisplayFormat"
                                                             CssClass="cw-320" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Work To:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Work To" ColSpanMd="12">
                                                 <DxTimeEdit @bind-Time="@a.WorkTo"
                                                             Format="@DisplayFormat"
                                                             DisplayFormat="@DisplayFormat"
                                                             CssClass="cw-320" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Quota:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Quota" ColSpanMd="12">
                                                 <DxSpinEdit @bind-Value="@a.Quota" NullText="Quota" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Update to BPJS:" ColSpanMd="3">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Update to BPJS" ColSpanMd="3">
                                                 <DxCheckBox @bind-Checked="a.UpdateToBpjs" />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>

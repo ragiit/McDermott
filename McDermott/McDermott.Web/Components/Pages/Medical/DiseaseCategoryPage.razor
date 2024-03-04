@@ -74,10 +74,10 @@
                                                 var a = (DiseaseCategoryDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem Caption="Name:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                     @EditFormContext.GetEditor("Name")
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Parent Category:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Parent Category" ColSpanMd="12">
                                                     <DxComboBox Data="@ParentCategoryDto"
                                                                 NullText="Select Parent Category..."
                                                                 @bind-Value="@a.ParentCategory"

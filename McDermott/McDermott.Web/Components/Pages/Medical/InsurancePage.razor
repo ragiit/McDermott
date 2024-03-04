@@ -78,30 +78,37 @@
                                             var a = (InsuranceDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
+                                                              Caption="Name:" ColSpanMd="12">
                                                 <div class="pop-warning">
                                                     @EditFormContext.GetEditor("Name")
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Code:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
+                                                              Caption="Code" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("Code")
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Type:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
+                                                              Caption="Type" ColSpanMd="12">
                                                 <DxComboBox Data="@Types" @bind-Value="@a.Type" NullText="Types" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Admin Fee %:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
+                                                              Caption="Admin Fee %" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("AdminFee")
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Presentase %:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
+                                                              Caption="Presentase %" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("Presentase")
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Admin Fee Max:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
+                                                              Caption="Admin Fee Max" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("AdminFeeMax")
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="BPJS:" ColSpanMd="3">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
+                                                              Caption="BPJS" ColSpanMd="3">
                                                 <DxCheckBox @bind-Checked="a.IsBPJS" />
                                             </DxFormLayoutItem>
-                                        </DxFormLayout>
+                                        </DxFormLayout> 
                                     </EditFormTemplate>
                                 </DxGrid>
                             </DxLoadingPanel>

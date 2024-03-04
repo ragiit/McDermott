@@ -73,25 +73,25 @@
                                                 var a = (HealthCenterDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="6">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="6">
                                                     <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Type:" ColSpanMd="6">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Type" ColSpanMd="6">
                                                     <DxComboBox Data="@Types" @bind-Value="@a.Type" NullText="Types" ShowValidationIcon="true" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Phone:" ColSpanMd="6">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Phone" ColSpanMd="6">
                                                     <DxTextBox @bind-Text="@a.Phone" NullText="Phone" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Mobile:" ColSpanMd="6">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Mobile" ColSpanMd="6">
                                                     <DxTextBox @bind-Text="@a.Mobile" NullText="Mobile" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Email:" ColSpanMd="6">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Email" ColSpanMd="6">
                                                     <DxTextBox @bind-Text="@a.Email" NullText="Email" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Website Link:" ColSpanMd="6">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Website Link" ColSpanMd="6">
                                                     <DxTextBox @bind-Text="@a.WebsiteLink" NullText="Website Link" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Address:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Address" ColSpanMd="12">
                                                     <Template>
                                                         <DxGridLayout>
                                                             <Rows>

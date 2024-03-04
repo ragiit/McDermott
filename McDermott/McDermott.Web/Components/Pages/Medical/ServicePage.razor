@@ -71,7 +71,7 @@
                                      HeaderText="@TextPopUp"
                                      MinWidth="300"
                                      MinHeight="200"
-                                     
+
                                      Width="50%"
                                      Height="50%">
                                 <EditForm Model=@FormService Context="EditFormContext">
@@ -88,13 +88,13 @@
                                         <DxFormLayoutItem Caption="Quota:" ColSpanMd="12">
                                             <DxTextBox @bind-Text="@FormService.Quota" NullText="Quota Service.." />
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Patient" ColSpanMd="6">
+                                        <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Patient" ColSpanMd="6">
                                             <DxCheckBox @bind-Checked="@FormService.IsPatient" />
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Counter" ColSpanMd="6">
+                                        <DxFormLayoutItem CaptionCssClass="caption normal-caption"  Caption="Counter" ColSpanMd="6">
                                             <DxCheckBox @bind-Checked="@FormService.IsKiosk" />
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem ColSpanMd="12" Caption="Service Counter" Visible="@Convert.ToBoolean(@FormService.IsPatient)">
+                                        <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="caption normal-caption" Caption="Service Counter" Visible="@Convert.ToBoolean(@FormService.IsPatient)">
                                             <DxComboBox Data="@ServicesK"
                                                         @bind-Value="@FormService.ServicedId"
                                                         NullText="select Service Counter.."

@@ -53,8 +53,6 @@
 
                 </form> *@
 
-
-
                 <DxFormLayout CssClass="mt-auto col-md">
                     <DxFormLayoutItem ColSpanMd="12" BeginRow="true">
                         <label for="EmailId" class="demo-text mb-1">
@@ -199,8 +197,8 @@
         // toastService.ShowWarning("Warning");
         // toastService.ShowError("Error");
 
-        var user = await Mediator.Send(new GetUserByEmailPasswordQuery(User.Adapt<UserDto>()));
-        if (user is not null && !string.IsNullOrWhiteSpace(User!.Email) && !string.IsNullOrWhiteSpace(User.Password))
+        var user = await Mediator.Send(new GetUserQuery(x => x.Email == User.Email && x.Password == User.Password));
+        if (user.Count > 0 && !string.IsNullOrWhiteSpace(User!.Email) && !string.IsNullOrWhiteSpace(User.Password))
         {
             // Helper.UserLogin = user;
 
@@ -230,14 +228,14 @@
             // await _protectedSessionStorage.SetAsync("UserSession", b);
             // await _protectedSessionStorage.SetAsync("UserMenuSession", DetailMenuDtos);
 
-            string serialize = JsonConvert.SerializeObject(user);
+            string serialize = JsonConvert.SerializeObject(user[0]);
             var encrypt = Helper.Encrypt(serialize);
 
             await oLocal.SetItemAsync("dotnet", encrypt);
 
-            if (user.GroupId is not null)
+            if (user[0].GroupId is not null)
             {
-                var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((int)user.GroupId));
+                var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((int)user[0].GroupId));
 
                 var encryptMenu = Helper.Encrypt(JsonConvert.SerializeObject(g));
 

@@ -1,74 +1,44 @@
-﻿using static McDermott.Application.Features.Commands.Config.CountryCommand;
+﻿using Microsoft.Extensions.Caching.Distributed;
 
 namespace McDermott.Application.Features.Queries.Config
 {
-    public class UserQueryHandler
+    public class UserQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetUserQuery, List<UserDto>>,
+        IRequestHandler<GetDataUserForKioskQuery, List<UserDto>>,
+        IRequestHandler<CreateUserRequest, UserDto>,
+        IRequestHandler<UpdateUserRequest, UserDto>,
+        IRequestHandler<DeleteUserRequest, bool>
     {
-        #region Get
 
-        internal class GetAllUserQueryHandler : IRequestHandler<GetUserQuery, List<UserDto>>
+        #region Get  
+        public async Task<List<UserDto>> Handle(GetUserQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllUserQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetUserQuery_{request.Predicate?.ToString()}"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                if (!_cache.TryGetValue(cacheKey, out List<UserDto>? result))
+                {
+                    var temps = await _unitOfWork.Repository<User>().GetAsync(
+                        request.Predicate,
+                        x => x.Include(z => z.Group),
+                        cancellationToken);
+
+                    result = temps.Adapt<List<UserDto>>();
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                return result;
             }
-
-            public async Task<List<UserDto>> Handle(GetUserQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<User>().Entities
-                        .Include(x => x.Group)
-                        .Select(User => User.Adapt<UserDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserDto>
+        public async Task<List<UserDto>> Handle(GetDataUserForKioskQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetUserByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<UserDto> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<User>().GetByIdAsync(request.Id);
-
-                return result.Adapt<UserDto>();
-            }
-        }
-
-        internal class GetUserByEmailPasswordQueryHandler : IRequestHandler<GetUserByEmailPasswordQuery, UserDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetUserByEmailPasswordQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<UserDto> Handle(GetUserByEmailPasswordQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Email.Equals(request.UserDto.Email) && x.Password.Equals(request.UserDto.Password));
-
-                return result.Adapt<List<UserDto>>().FirstOrDefault()!;
-            }
-        }
-
-        internal class GetUserForKioskQueryhandler : IRequestHandler<GetDataUserForKioskQuery, List<UserDto>>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetUserForKioskQueryhandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<List<UserDto>> Handle(GetDataUserForKioskQuery request, CancellationToken cancellationToken)
+            try
             {
                 List<UserDto> data = new List<UserDto>();
                 if (request.Types == "Legacy")
@@ -98,136 +68,108 @@ namespace McDermott.Application.Features.Queries.Config
                 }
                 return data;
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         #endregion Get
 
         #region Create
-
-        internal class CreateUserHandler : IRequestHandler<CreateUserRequest, UserDto>
+        public async Task<UserDto> Handle(CreateUserRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateUserHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                if (!request.UserDto.TypeId.Contains("VISA"))
+                    request.UserDto.ExpiredId = null;
+
+                // nanti dihapus
+                request.UserDto.UserName = request.UserDto.Email;
+
+                var result = await _unitOfWork.Repository<User>().AddAsync(request.UserDto.Adapt<User>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetUserQuery_");
+
+                return result.Adapt<UserDto>();
             }
-
-            public async Task<UserDto> Handle(CreateUserRequest request, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                try
-                {
-                    if (!request.UserDto.TypeId.Contains("VISA"))
-                        request.UserDto.ExpiredId = null;
-
-                    // nanti dihapus
-                    request.UserDto.UserName = request.UserDto.Email;
-
-                    var result = await _unitOfWork.Repository<User>().AddAsync(request.UserDto.Adapt<User>());
-
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    return result.Adapt<UserDto>();
-                }
-                catch (Exception e)
-                {
-                    Console.Write("😋" + e.Message);
-                    throw;
-                }
+                throw;
             }
         }
-
         #endregion Create
 
         #region Update
-
-        internal class UpdateUserHandler : IRequestHandler<UpdateUserRequest, bool>
+        public async Task<UserDto> Handle(UpdateUserRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateUserHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(UpdateUserRequest request, CancellationToken cancellationToken)
+            try
             {
                 // nanti dihapus
                 request.UserDto.UserName = request.UserDto.Email;
 
                 var user = request.UserDto.Adapt<User>();
 
-                await _unitOfWork.Repository<User>().UpdateAsync(user);
+                var result = await _unitOfWork.Repository<User>().UpdateAsync(user);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return true;
+                _cache.Remove("GetUserQuery_");
+
+                return result.Adapt<UserDto>();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
+        public async Task<List<UserDto>> Handle(UpdateListUserRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<User>().UpdateAsync(request.UserDtos.Adapt<List<User>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetUserQuery_");
+
+                return result.Adapt<List<UserDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
         #endregion Update
 
         #region Delete
-
-        internal class DeleteUserHandler : IRequestHandler<DeleteUserRequest, bool>
+        public async Task<bool> Handle(DeleteUserRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteUserHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteUserRequest request, CancellationToken cancellationToken)
-            {
-                try
+                if (request.Id > 0)
                 {
                     await _unitOfWork.Repository<User>().DeleteAsync(request.Id);
-                    await _unitOfWork.Repository<PatientAllergy>().DeleteAsync(x => x.UserId == request.Id);
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    return true;
                 }
-                catch (Exception e)
+
+                if (request.Ids.Count > 0)
                 {
-                    return false;
+                    await _unitOfWork.Repository<User>().DeleteAsync(x => request.Ids.Contains(x.Id));
                 }
-            }
-        }
 
-        internal class DeleteListUserHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteListUserRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<bool> Handle(DeleteListUserRequest request, CancellationToken cancellationToken)
-            {
-                try
-                {
-                    await _unitOfWork.Repository<User>().DeleteAsync(request.Id);
-                    await _unitOfWork.Repository<PatientAllergy>().DeleteAsync(x => request.Id.Contains(x.UserId));
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    return false;
-                }
-            }
-        }
-
-        internal class DeleteListCountryHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteListCountryRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<bool> Handle(DeleteListCountryRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Country>().DeleteAsync(request.Id);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetUserQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
-
         #endregion Delete
     }
 }

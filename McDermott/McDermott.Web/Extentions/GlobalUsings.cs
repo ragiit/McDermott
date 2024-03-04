@@ -13,6 +13,9 @@ global using System.Reflection;
 global using System.Security.Cryptography;
 global using System.Text;
 global using McDermott.Web.Components.Layout;
+global using Microsoft.AspNetCore.Components.Forms;
+global using Microsoft.CodeAnalysis;
+global using System.Globalization;
 
 global using McDermott.Web.Extentions;
 
@@ -52,3 +55,9 @@ global using static McDermott.Application.Features.Commands.Employee.EmployeeCom
 global using static McDermott.Application.Features.Commands.Patient.FamilyCommand;
 global using static McDermott.Application.Features.Commands.Patient.PatientFamilyRelationCommand;
 global using static McDermott.Application.Features.Commands.Patient.InsurancePolicyCommand;
+global using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
+global using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
+global using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;
+global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanCPPTCommand;
+global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanMedicalSupportCommand;
+global using static McDermott.Application.Features.Queries.Transaction.GeneralConsultanServiceQueryHandler;
