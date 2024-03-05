@@ -3,10 +3,10 @@
     public class VillageDto : IMapFrom<Village>
     {
         public int Id { get; set; }
-        public int ProvinceId { get; set; }
-        public int CityId { get; set; } // Kabupaten
+        public int? ProvinceId { get; set; }
+        public int? CityId { get; set; } // Kabupaten
 
-        public int DistrictId { get; set; } // Kecamatan
+        public int? DistrictId { get; set; } // Kecamatan
 
         [Required]
         [StringLength(200)]

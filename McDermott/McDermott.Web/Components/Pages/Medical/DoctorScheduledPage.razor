@@ -135,7 +135,8 @@
                       
                                 <p for="tbOverview">Service</p>
 
-                                <DxComboBox Data="@Services"
+                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    Data="@Services"    
                                             NullText="Select Service"
                                             FilteringMode="@DataGridFilteringMode.Contains"
                                             @bind-Value="@ServiceId"

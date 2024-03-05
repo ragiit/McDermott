@@ -50,7 +50,11 @@
         private List<string> MartialStatuss = new()
         {
             "Single",
-            "Married"
+            "Married",
+            "Divorced",
+            "Widowed",
+            "Separated",
+            "Unmarried"
         };
 
         protected override async Task OnInitializedAsync()
@@ -77,6 +81,7 @@
             Families = await Mediator.Send(new GetFamilyQuery());
 
             await LoadData();
+
             return;
             // Create an instance of Form B
             var formB = new InsurancePolicyPageListForm();
@@ -115,6 +120,8 @@
             PanelVisible = true;
 
             ShowForm = false;
+            PatientFamilyRelations.Clear();
+            UserForm = new();
 
             try
             {
@@ -190,6 +197,7 @@
 
         private void HandleInvalidSubmit()
         {
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
             FormValidationState = false;
         }
 
@@ -220,67 +228,72 @@
 
                 if (editModel.FamilyMemberId == 0)
                     return;
+
                 if (UserForm.Id != 0)
                     editModel.PatientId = UserForm.Id;
-
-                //editModel.FamilyMember = Users.FirstOrDefault(x => x.Id == editModel.FamilyMemberId);
-                //editModel.Family = Families.FirstOrDefault(x => x.Id == editModel.FamilyId);
-                //editModel.Relation = editModel.Family!.ParentRelation + " - " + editModel.Family.ChildRelation;
 
                 if (editModel.Id == 0)
                     PatientFamilyRelations.Add(editModel);
                 else
                     PatientFamilyRelations[FocusedRowFamilyMemberVisibleIndex] = editModel;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task OnSave()
         {
-            if (!FormValidationState)
-                return;
-
-            UserForm.IsPatient = true;
-
-            PatientFamilyRelations.ForEach(x =>
+            try
             {
-                x.Family = null;
-                x.Relation = null;
-                x.Patient = null;
-                x.FamilyMember = null;
-            });
+                if (!FormValidationState)
+                    return;
 
-            if (UserForm.Id == 0)
-            {
-                var date = DateTime.Now;
-                var lastId = Users.ToList().LastOrDefault();
+                UserForm.IsPatient = true;
 
-                UserForm.NoRm = lastId is null
-                         ? $"{date:dd-MM-yyyy}-0001"
-                         : $"{date:dd-MM-yyyy}-{(int.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
-
-                var result = await Mediator.Send(new CreateUserRequest(UserForm));
-                UserForm.PatientAllergy.UserId = result.Id;
-                PatientFamilyRelations.ForEach(x => x.PatientId = result.Id);
-
-                await Mediator.Send(new CreateListPatientFamilyRelationRequest(PatientFamilyRelations));
-                await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
-            }
-            else
-            {
-                UserForm.PatientAllergy.UserId = UserForm.Id;
-                await Mediator.Send(new UpdateUserRequest(UserForm));
-                if (UserForm.PatientAllergy.Id == 0)
+                if (UserForm.IsSameDomicileAddress)
                 {
+                    UserForm.DomicileAddress1 = UserForm.IdCardAddress1;
+                    UserForm.DomicileAddress2 = UserForm.IdCardAddress2;
+                    UserForm.DomicileRtRw = UserForm.IdCardRtRw;
+                    UserForm.DomicileProvinceId = UserForm.IdCardProvinceId;
+                    UserForm.DomicileCityId = UserForm.IdCardCityId;
+                    UserForm.DomicileDistrictId = UserForm.IdCardDistrictId;
+                    UserForm.DomicileVillageId = UserForm.IdCardVillageId;
+                    UserForm.DomicileCountryId = UserForm.IdCardCountryId;
+                }
+
+                if (UserForm.Id == 0)
+                {
+                    var date = DateTime.Now;
+                    var lastId = Users.ToList().LastOrDefault();
+
+                    UserForm.NoRm = lastId is null
+                             ? $"{date:dd-MM-yyyy}-0001"
+                             : $"{date:dd-MM-yyyy}-{(int.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
+
+                    var result = await Mediator.Send(new CreateUserRequest(UserForm));
+                    UserForm.PatientAllergy.UserId = result.Id;
                     await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
                 }
                 else
                 {
-                    await Mediator.Send(new UpdatePatientAllergyRequest(UserForm.PatientAllergy));
-                }
-            }
+                    UserForm.PatientAllergy.UserId = UserForm.Id;
+                    await Mediator.Send(new UpdateUserRequest(UserForm));
 
-            await LoadData();
+                    if (UserForm.PatientAllergy.Id == 0)
+                        await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
+                    else
+                        await Mediator.Send(new UpdatePatientAllergyRequest(UserForm.PatientAllergy));
+                }
+
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private void ColumnChooserButton_Click()
@@ -317,24 +330,32 @@
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-            if (SelectedDataItems is null)
+            try
             {
-                await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
+                if (SelectedDataItems is null || SelectedDataItems.Count == 1)
+                {
+                    await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<UserDto>>();
+
+                    int userActive = (int)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
+
+                    await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
+                }
+                await LoadData();
             }
-            else
+            catch (Exception ex)
             {
-                var a = SelectedDataItems.Adapt<List<UserDto>>();
-
-                int userActive = (int)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
-
-                await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
+                ex.HandleException(ToastService);
             }
-            await LoadData();
         }
 
-        private async Task NewItem_Click()
+        private void NewItem_Click()
         {
             UserForm = new();
+            PatientFamilyRelations.Clear();
             ShowForm = true;
         }
 
@@ -373,7 +394,10 @@
                     UserForm.PatientAllergy = alergy[0];
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private void DeleteItem_Click()

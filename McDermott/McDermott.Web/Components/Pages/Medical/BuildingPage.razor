@@ -165,7 +165,8 @@
                                   
                                     <p for="tbOverview2"> Health Center</p>
 
-                                    <DxComboBox Data="@HealthCenters"
+                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        Data="@HealthCenters"
                                                 NullText="Select Health Center..."
                                                 FilteringMode="@DataGridFilteringMode.Contains"
                                                 @bind-Value="@Building.HealthCenterId"

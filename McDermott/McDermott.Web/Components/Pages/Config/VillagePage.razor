@@ -87,16 +87,17 @@
                                             var a = (VillageDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption"Caption="Name:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption"Caption="Name" ColSpanMd="12">
                                                 <div class="pop-warning">
                                                     @EditFormContext.GetEditor("Name")
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Postal Code:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Postal Code" ColSpanMd="12">
                                                 @EditFormContext.GetEditor("PostalCode")
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Province:" ColSpanMd="12">
-                                                <DxComboBox Data="@Provinces"
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Province" ColSpanMd="12">
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                    Data="@Provinces"
                                                             NullText="Select Province..."
                                                             @bind-Value="@a.ProvinceId"
                                                             TextFieldName="Name"
@@ -104,7 +105,8 @@
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption"Caption="City:" ColSpanMd="12">
-                                                <DxComboBox Data="@Cities"
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                    Data="@Cities"
                                                             NullText="Select City..."
                                                             @bind-Value="@a.CityId"
                                                             TextFieldName="Name"
@@ -112,7 +114,8 @@
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="District:" ColSpanMd="12">
-                                                <DxComboBox Data="@Districts"
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                    Data="@Districts"
                                                             NullText="Select District..."
                                                             @bind-Value="@a.DistrictId"
                                                             TextFieldName="Name"

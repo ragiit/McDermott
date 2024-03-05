@@ -134,6 +134,18 @@
 
             UserForm.IsEmployee = true;
 
+            if (UserForm.IsSameDomicileAddress)
+            {
+                UserForm.DomicileAddress1 = UserForm.IdCardAddress1;
+                UserForm.DomicileAddress2 = UserForm.IdCardAddress2;
+                UserForm.DomicileRtRw = UserForm.IdCardRtRw;
+                UserForm.DomicileProvinceId = UserForm.IdCardProvinceId;
+                UserForm.DomicileCityId = UserForm.IdCardCityId;
+                UserForm.DomicileDistrictId = UserForm.IdCardDistrictId;
+                UserForm.DomicileVillageId = UserForm.IdCardVillageId;
+                UserForm.DomicileCountryId = UserForm.IdCardCountryId;
+            }
+
             if (UserForm.Id == 0)
                 await Mediator.Send(new CreateUserRequest(UserForm));
             else

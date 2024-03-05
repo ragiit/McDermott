@@ -77,7 +77,8 @@
                                                     <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
                                                 </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Type" ColSpanMd="6">
-                                                    <DxComboBox Data="@Types" @bind-Value="@a.Type" NullText="Types" ShowValidationIcon="true" />
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                        Data="@Types" @bind-Value="@a.Type" NullText="Types" ShowValidationIcon="true" />
                                                 </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Phone" ColSpanMd="6">
                                                     <DxTextBox @bind-Text="@a.Phone" NullText="Phone" />
@@ -117,7 +118,8 @@
                                                                 </DxGridLayoutItem>
                                                                 <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
                                                                     <Template>
-                                                                        <DxComboBox Data="@Provinces"
+                                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                            Data="@Provinces"
                                                                                     NullText="Select Province..."
                                                                                     @bind-Value="@a.ProvinceId"
                                                                                     TextFieldName="Name"
@@ -127,7 +129,8 @@
                                                                 </DxGridLayoutItem>
                                                                 <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
                                                                     <Template>
-                                                                        <DxComboBox Data="@Cities.Where(x => x.ProvinceId == a.ProvinceId)"
+                                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                            Data="@Cities.Where(x => x.ProvinceId == a.ProvinceId)"
                                                                                     NullText="Select City..."
                                                                                     @bind-Value="@a.CityId"
                                                                                     TextFieldName="Name"
@@ -137,7 +140,8 @@
                                                                 </DxGridLayoutItem>
                                                                 <DxGridLayoutItem Row="3" Column="0" ColumnSpan="12" CssClass="mt">
                                                                     <Template>
-                                                                        <DxComboBox Data="@Countries.Where(x => a.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == a.ProvinceId)?.CountryId)"
+                                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                            Data="@Countries.Where(x => a.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == a.ProvinceId)?.CountryId)"
                                                                                     NullText="Select Country..."
                                                                                     @bind-Value="@a.CountryId"
                                                                                     TextFieldName="Name"

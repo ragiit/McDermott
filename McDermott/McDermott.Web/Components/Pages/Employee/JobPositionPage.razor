@@ -78,7 +78,8 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Department" ColSpanMd="12">
                                                 <Template>
-                                                    <DxComboBox Data="@Departments"
+                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                        Data="@Departments"
                                                                 NullText="Select Department..."
                                                                 @bind-Value="@a.DepartmentId"
                                                                 TextFieldName="Name"

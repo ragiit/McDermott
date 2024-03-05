@@ -115,8 +115,9 @@
             await OnSave();
         }
 
-        private async void HandleInvalidSubmit()
+        private void HandleInvalidSubmit()
         {
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
             FormValidationState = false;
         }
 

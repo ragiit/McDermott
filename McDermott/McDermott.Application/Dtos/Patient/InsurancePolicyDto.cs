@@ -9,7 +9,7 @@
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? PolicyNumber { get; set; }
 
-        public bool Active { get; set; } = true;
+        public bool Active { get; set; } = false;
 
         [StringLength(200)]
         public string? Prolanis { get; set; }

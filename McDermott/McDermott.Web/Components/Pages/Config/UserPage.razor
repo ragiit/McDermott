@@ -102,6 +102,7 @@
                                           OnInvalidSubmit="@HandleInvalidSubmit">
                                     <DataAnnotationsValidator />
                                     <DxFormLayout CssClass="mt">
+
                                         <DxFormLayoutGroup Caption="General Information" ColSpanMd="12">
                                             <div class="row w-100">
                                                 <div class="col-md-6">
@@ -140,22 +141,25 @@
                                                             </DxMaskedInput>
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Type" ColSpanMd="12">
-                                                            <DxComboBox Data="@IdentityTypes" @bind-Value="@UserForm.TypeId"></DxComboBox>
+                                                            <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains" Data="@IdentityTypes" @bind-Value="@UserForm.TypeId"></DxComboBox>
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Expired Identity" Visible="@(@UserForm.TypeId == null ? false : @UserForm.TypeId.Contains("VISA"))">
                                                             <DxDateEdit @bind-Date="@UserForm.ExpiredId" Mask="@DateTimeMask.ShortDate" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Religion" ColSpanMd="12">
-                                                            <DxComboBox Data="@Religions" NullText="Religion" @bind-Value="@UserForm.ReligionId" TextFieldName="Name" ValueFieldName="Id" />
+                                                            <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        Data="@Religions" NullText="Religion" @bind-Value="@UserForm.ReligionId" TextFieldName="Name" ValueFieldName="Id" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date of Birth" ColSpanMd="12">
                                                             <DxDateEdit @bind-Date="@UserForm.DateOfBirth" NullText="Date of Birth" MaxDate="DateTime.Now" Mask="@DateTimeMask.ShortDate" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Gender" ColSpanMd="12">
-                                                            <DxComboBox Data="@Genders" NullText="Gender" @bind-Value="@UserForm.GenderId" TextFieldName="Name" ValueFieldName="Id" />
+                                                            <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        Data="@Genders" NullText="Gender" @bind-Value="@UserForm.GenderId" TextFieldName="Name" ValueFieldName="Id" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Martial Status" ColSpanMd="12">
-                                                            <DxComboBox Data="@MartialStatuss" NullText="Martial Status" @bind-Value="@UserForm.MartialStatus"></DxComboBox>
+                                                            <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        Data="@MartialStatuss" @bind-Value="@UserForm.MartialStatus" NullText="Select Martial Status..."></DxComboBox>
                                                         </DxFormLayoutItem>
                                                     </DxFormLayout>
                                                 </div>
@@ -244,7 +248,7 @@
                                                             </DxGridLayoutItem>
                                                             <DxGridLayoutItem Row="3" Column="0">
                                                                 <Template>
-                                                                    <DxComboBox Data="@Provinces"
+                                                                    <DxComboBox Data="@Provinces" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 NullText="Select Province..."
                                                                                 @bind-Value="@UserForm.IdCardProvinceId"
                                                                                 TextFieldName="Name"
@@ -255,7 +259,7 @@
                                                             <DxGridLayoutItem Row="3" Column="1">
                                                                 <Template>
                                                                     <DxComboBox Data="@Cities.Where(x => x.ProvinceId == UserForm.IdCardProvinceId)"
-                                                                                NullText="Select City..."
+                                                                                NullText="Select City..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 @bind-Value="@UserForm.IdCardCityId"
                                                                                 TextFieldName="Name"
                                                                                 ValueFieldName="Id">
@@ -265,7 +269,7 @@
                                                             <DxGridLayoutItem Row="4" Column="0">
                                                                 <Template>
                                                                     <DxComboBox Data="@Districts.Where(x => x.CityId == UserForm.IdCardCityId && x.ProvinceId == UserForm.IdCardProvinceId)"
-                                                                                NullText="Select District..."
+                                                                                NullText="Select District..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 @bind-Value="@UserForm.IdCardDistrictId"
                                                                                 TextFieldName="Name"
                                                                                 ValueFieldName="Id">
@@ -275,7 +279,7 @@
                                                             <DxGridLayoutItem Row="4" Column="1">
                                                                 <Template>
                                                                     <DxComboBox Data="@Villages.Where(x => x.CityId == UserForm.IdCardCityId && x.ProvinceId == UserForm.IdCardProvinceId && x.DistrictId == UserForm.IdCardDistrictId)"
-                                                                                NullText="Select Village..."
+                                                                                NullText="Select Village..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 @bind-Value="@UserForm.IdCardVillageId"
                                                                                 TextFieldName="Name"
                                                                                 ValueFieldName="Id">
@@ -285,7 +289,7 @@
                                                             <DxGridLayoutItem Row="5" Column="0" ColumnSpan="12">
                                                                 <Template>
                                                                     <DxComboBox Data="@Countries.Where(x => UserForm.IdCardProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == UserForm.IdCardProvinceId)?.CountryId)"
-                                                                                NullText="Select Country..."
+                                                                                NullText="Select Country..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 @bind-Value="@UserForm.IdCardCountryId"
                                                                                 TextFieldName="Name"
                                                                                 ValueFieldName="Id">
@@ -329,7 +333,7 @@
                                                             </DxGridLayoutItem>
                                                             <DxGridLayoutItem Row="3" Column="0">
                                                                 <Template>
-                                                                    <DxComboBox Data="@Provinces"
+                                                                    <DxComboBox Data="@Provinces" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 NullText="Select Province..."
                                                                                 @bind-Value="@UserForm.DomicileProvinceId"
                                                                                 TextFieldName="Name"
@@ -340,7 +344,7 @@
                                                             <DxGridLayoutItem Row="3" Column="1" CssClass="mt ml">
                                                                 <Template>
                                                                     <DxComboBox Data="@Cities.Where(x => x.ProvinceId == UserForm.DomicileProvinceId.GetValueOrDefault())"
-                                                                                NullText="Select City..."
+                                                                                NullText="Select City..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 @bind-Value="@UserForm.DomicileCityId"
                                                                                 TextFieldName="Name"
                                                                                 ValueFieldName="Id">
@@ -351,16 +355,16 @@
                                                                 <Template>
                                                                     <DxComboBox Data="@Districts.Where(x => x.CityId == UserForm.DomicileCityId && x.ProvinceId == UserForm.DomicileProvinceId)"
                                                                                 NullText="Select District..."
-                                                                                @bind-Value="@UserForm.DomicileDistrictId"
+                                                                                @bind-Value="@UserForm.DomicileDistrictId" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 TextFieldName="Name"
                                                                                 ValueFieldName="Id">
                                                                     </DxComboBox>
                                                                 </Template>
                                                             </DxGridLayoutItem>
-                                                            <DxGridLayoutItem Row="4" Column="1" CssClass="mt ml">
+                                                            <DxGridLayoutItem Row="4" Column="1">
                                                                 <Template>
                                                                     <DxComboBox Data="@Villages.Where(x => x.CityId == UserForm.DomicileCityId && x.ProvinceId == UserForm.DomicileProvinceId && x.DistrictId == UserForm.DomicileDistrictId)"
-                                                                                NullText="Select Village..."
+                                                                                NullText="Select Village..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 @bind-Value="@UserForm.DomicileVillageId"
                                                                                 TextFieldName="Name"
                                                                                 ValueFieldName="Id">
@@ -370,7 +374,7 @@
                                                             <DxGridLayoutItem Row="5" Column="0" ColumnSpan="12">
                                                                 <Template>
                                                                     <DxComboBox Data="@Countries.Where(x => UserForm.DomicileProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == UserForm.DomicileProvinceId)?.CountryId)"
-                                                                                NullText="Select Country..."
+                                                                                NullText="Select Country..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 @bind-Value="@UserForm.DomicileCountryId"
                                                                                 TextFieldName="Name"
                                                                                 ValueFieldName="Id">
@@ -424,7 +428,6 @@
                                                     </Items>
                                                 </DxGridLayout>
                                             </div>
-
                                         </DxFormLayoutGroup>
 
                                         <DxFormLayoutGroup Caption="User" ColSpanMd="12" Visible="@Convert.ToBoolean(UserForm.IsUser)">
