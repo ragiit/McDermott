@@ -25,7 +25,7 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
+                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                                 Data="Groups"
                                                 PageSize="10"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
@@ -78,13 +78,13 @@
                                 }
                                 else
                                 {
-                                   
-                                    <p for="tbOverview"> Group</p>
-                                    <DxTextBox @bind-Text="@Group.Name"
-                                               NullText="Group"
-                                               InputId="tbOverview" />
 
-                                    <br />
+                                    <p for="tbOverview required-caption"> Group</p>
+                                    <DxTextBox @bind-Text="@Group.Name"
+                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                               NullText="Group" />
+
+                                    <br>
 
                                     <DxGrid @ref="GridGropMenu"
                                             Data="GroupMenus"
