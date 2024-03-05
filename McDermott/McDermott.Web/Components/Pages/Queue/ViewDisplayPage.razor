@@ -4,7 +4,45 @@
 <div class="wrapper">
     <section class="content">
         <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="card ">
+                        <div class="card-body bg-info rounded">
+                            <div class="row justify-content-between">
+                                <div class="col-4 ">
+                                    <h3 class="mt-2">Mc HealthCare</h3>
+                                    <p class="mb-0">Jl. Budi Kasih</p>
+                                    <p class="mb-0">telpn. 021839828282</p>
+                                </div>
+                                <div class="col-4">
+                                    <h5 class="text-center">@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy", indonesianCulture)</h5>
+                                    <h2 class="text-center">@currentTime</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                @foreach (var view in listcounter.Take(2))
+                {
+                    <div class="col-6">
 
+                        <div class="card">
+                            <div class="card-header bg-gradient-info py-0">
+                                <h3 class="text-center text-light">Number Queue</h3>
+                            </div>
+                            <div class="card-body">
+                                
+                                
+                            </div>
+                            <div class="card-footer bg-gradient-success py-0">
+                                <h3 class="text-center text-light">@view.Name</h3>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
         </div>
     </section>
 </div>

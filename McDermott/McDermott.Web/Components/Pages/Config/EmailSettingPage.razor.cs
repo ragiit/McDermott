@@ -155,7 +155,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 var general = SelectedDataItems[0].Adapt<EmailSettingDto>();
                 FormEmails = general;
-
+                FormEmails.Smtp_Pass.ToString();
                 PopUpVisible = true;
                 TextPopUp = "Edit Data";
             }
@@ -229,17 +229,29 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task OnSave()
         {
-            if (FormEmails.Status == "")
+            try
             {
-                FormEmails.Status = "No Testing";
+                if (FormEmails.Smtp_Pass == null || FormEmails.Smtp_User == null || FormEmails.Smtp_Host == null || FormEmails.Smtp_Encryption == null || FormEmails.Smtp_Port == null)
+                {
+                    return;
+                }
+
+                if (FormEmails.Status == "")
+                {
+                    FormEmails.Status = "No Testing";
+                }
+
+                if (FormEmails.Id == 0)
+                    await Mediator.Send(new CreateEmailSettingRequest(FormEmails));
+                else
+                    await Mediator.Send(new UpdateEmailSettingRequest(FormEmails));
+
+                await LoadData();
             }
-
-            if (FormEmails.Id == 0)
-                await Mediator.Send(new CreateEmailSettingRequest(FormEmails));
-            else
-                await Mediator.Send(new UpdateEmailSettingRequest(FormEmails));
-
-            await LoadData();
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         #endregion Save Function
