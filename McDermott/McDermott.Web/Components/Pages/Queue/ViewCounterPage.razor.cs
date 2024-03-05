@@ -99,7 +99,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #endregion Async Data
 
-        #region Grid Confiduration
+        #region Grid Configuration
 
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
@@ -141,7 +141,7 @@ namespace McDermott.Web.Components.Pages.Queue
             return new MarkupString(html);
         }
 
-        #endregion Grid Confiduration
+        #endregion Grid Configuration
 
         #region Function Button
 
@@ -174,7 +174,6 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 var data = await Mediator.Send(new GetKioskQueueQuery());
-                
 
                 if (FormCounters.Id != 0)
                 {
