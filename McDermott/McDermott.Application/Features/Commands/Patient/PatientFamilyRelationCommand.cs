@@ -4,42 +4,33 @@
     {
         #region Get
 
-        public class GetPatientFamilyByPatientQuery : IRequest<List<PatientFamilyRelationDto>>
+        public class GetPatientFamilyByPatientQuery(Expression<Func<PatientFamilyRelation, bool>>? predicate = null) : IRequest<List<PatientFamilyRelationDto>>
         {
-            public Expression<Func<PatientFamilyRelation, bool>>? Predicate { get; }
-            public bool ReturnSingle { get; } = false; // Parameter untuk menentukan apakah ingin mengembalikan satu data atau daftar data
-
-            public GetPatientFamilyByPatientQuery(Expression<Func<PatientFamilyRelation, bool>>? predicate = null, bool ReturnSingle = false)
-            {
-                Predicate = predicate;
-                this.ReturnSingle = ReturnSingle;
-            }
+            public Expression<Func<PatientFamilyRelation, bool>>? Predicate { get; } = predicate;
         }
 
         #endregion Get
 
         #region Create
 
-        public class CreatePatientFamilyRelationRequest : IRequest<PatientFamilyRelationDto>
+        public class CreatePatientFamilyRelationRequest(PatientFamilyRelationDto PatientFamilyRelationDto) : IRequest<PatientFamilyRelationDto>
         {
-            public PatientFamilyRelationDto PatientFamilyRelationDto { get; set; }
-
-            public CreatePatientFamilyRelationRequest(PatientFamilyRelationDto PatientFamilyRelationDto)
-            {
-                this.PatientFamilyRelationDto = PatientFamilyRelationDto;
-            }
+            public PatientFamilyRelationDto PatientFamilyRelationDto { get; set; } = PatientFamilyRelationDto;
         }
 
-        public class CreateListPatientFamilyRelationRequest : IRequest<List<PatientFamilyRelationDto>>
+        public class CreateListPatientFamilyRelationRequest(List<PatientFamilyRelationDto> PatientFamilyRelationDto) : IRequest<List<PatientFamilyRelationDto>>
         {
-            public List<PatientFamilyRelationDto> PatientFamilyRelationDto { get; set; }
-
-            public CreateListPatientFamilyRelationRequest(List<PatientFamilyRelationDto> PatientFamilyRelationDto)
-            {
-                this.PatientFamilyRelationDto = PatientFamilyRelationDto;
-            }
+            public List<PatientFamilyRelationDto> PatientFamilyRelationDto { get; set; } = PatientFamilyRelationDto;
         }
 
         #endregion Create
+
+        #region DELETE 
+        public class DeletePatientFamilyRelationRequest(int id = 0, List<int>? ids = null) : IRequest<bool>
+        {
+            public int Id { get; set; } = id;
+            public List<int> Ids { get; set; } = ids ?? [];
+        }
+        #endregion
     }
 }

@@ -570,17 +570,17 @@
                                                             <Columns>
                                                                 <DxGridSelectionColumn Width="15px" />
                                                                 <DxGridDataColumn FieldName="FamilyMember.Name" Caption="Family Member" SortIndex="0" />
-                                                                <DxGridDataColumn FieldName="Relation" Caption="Relation" />
+                                                                <DxGridDataColumn FieldName="Family.Relation" Caption="Relation" />
                                                             </Columns>
                                                             <EditFormTemplate Context="EditFormContext2">
                                                                 @{
                                                                     var a = (PatientFamilyRelationDto)EditFormContext2.EditModel;
                                                                 }
                                                                 <DxFormLayout CssClass="w-100">
-                                                                    <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Patient" ColSpanMd="12">
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient" ColSpanMd="12">
                                                                         <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                     Data="@Patiens"
-                                                                                    NullText="Select Patient..."
+                                                                                    NullText="Select Family Member..."
                                                                                     @bind-Value="@a.FamilyMemberId"
                                                                                     TextFieldName="Name"
                                                                                     ValueFieldName="Id">

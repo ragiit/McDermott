@@ -124,6 +124,14 @@ namespace McDermott.Persistence.Context
               .WithOne(c => c.GeneralConsultanService)
               .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Department>()
+            .HasOne(e => e.Manager)
+            .WithMany();
+
+            modelBuilder.Entity<User>()
+          .HasOne(e => e.Department)
+          .WithMany();
+
             //modelBuilder.Entity<Province>()
             //  .HasMany(m => m.Districts)
             //  .WithOne(c => c.Province)

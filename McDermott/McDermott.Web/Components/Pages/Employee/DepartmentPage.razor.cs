@@ -3,6 +3,7 @@
     public partial class DepartmentPage
     {
         public List<DepartmentDto> Departments = [];
+        public List<DepartmentDto> AllParentDepartments = [];
         public List<DepartmentDto> ParentDepartments = [];
         public List<CompanyDto> Companies = [];
         private List<UserDto> AllUsers = [];
@@ -39,16 +40,17 @@
         {
             PanelVisible = true;
 
-            AllUsers = await Mediator.Send(new GetUserEmployeeQuery());
+            Users = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true));
             Departments = await Mediator.Send(new GetDepartmentQuery());
-            ParentDepartments = await Mediator.Send(new GetDepartmentQuery());
+            ParentDepartments = await Mediator.Send(new GetDepartmentQuery(x => x.ParentDepartmentId == null));
+            AllParentDepartments = [.. ParentDepartments];
 
-            Departments.ForEach(x =>
-            {
-                var n = AllUsers.FirstOrDefault(z => z.DepartmentId == x.Id);
-                if (n is not null)
-                    x.Manager = n.Name;
-            });
+            //Departments.ForEach(x =>
+            //{
+            //    var n = AllUsers.FirstOrDefault(z => z.DepartmentId == x.Id);
+            //    if (n is not null)
+            //        x.Manager = n.Name;
+            //});
 
             PanelVisible = false;
         }
@@ -96,56 +98,63 @@
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<DepartmentDto>>();
-                    await Mediator.Send(new DeleteListDepartmentRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteDepartmentRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
-            catch (Exception ee)
+            catch (Exception ex)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+                ex.HandleException(ToastService);
             }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (DepartmentDto)e.EditModel;
-
-            if (editModel.ParentId is not null)
-                editModel.ParentName = Departments.FirstOrDefault(x => x.Id == editModel.ParentId).Name;
-
-            if (editModel.Id == 0)
+            try
             {
-                var result = await Mediator.Send(new CreateDepartmentRequest(editModel));
-                editModel.Id = result.Id;
-            }
-            else
-            {
-                var user = await Mediator.Send(new GetUserQuery(x => x.Id == UpdateUserId));
+                var editModel = (DepartmentDto)e.EditModel;
 
-                if (user.Count > 0)
+                //if (editModel.ParentId is not null)
+                //    editModel.ParentName = Departments.FirstOrDefault(x => x.Id == editModel.ParentId).Name;
+
+                if (editModel.Id == 0)
                 {
-                    user[0].DepartmentId = null;
-                    await Mediator.Send(new UpdateUserRequest(user[0]));
+                    var result = await Mediator.Send(new CreateDepartmentRequest(editModel));
+                    editModel.Id = result.Id;
+                }
+                else
+                {
+                    var user = await Mediator.Send(new GetUserQuery(x => x.Id == UpdateUserId));
+
+                    if (user.Count > 0)
+                    {
+                        user[0].DepartmentId = null;
+                        await Mediator.Send(new UpdateUserRequest(user[0]));
+                    }
+
+                    await Mediator.Send(new UpdateDepartmentRequest(editModel));
                 }
 
-                await Mediator.Send(new UpdateDepartmentRequest(editModel));
-            }
+                //if (SelectedUserId != 0)
+                //{
+                //    var user = await Mediator.Send(new GetUserQuery(x => x.Id == UpdateUserId));
+                //    if (user.Count > 0)
+                //    {
+                //        user[0].DepartmentId = editModel.Id;
+                //        await Mediator.Send(new UpdateUserRequest(user[0]));
+                //    }
+                //}
 
-            if (SelectedUserId != 0)
+                await LoadData();
+            }
+            catch (Exception ex)
             {
-                var user = await Mediator.Send(new GetUserQuery(x => x.Id == UpdateUserId));
-                user[0].DepartmentId = editModel.Id;
-                await Mediator.Send(new UpdateUserRequest(user[0]));
+                ex.HandleException(ToastService);
             }
-
-            SelectedUserId = 0;
-
-            await LoadData();
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
-            SelectedUserId = 0;
             FocusedRowVisibleIndex = args.VisibleIndex;
             EditItemsEnabled = true;
         }
@@ -165,29 +174,30 @@
 
         private async Task NewItem_Click()
         {
-            Users = [.. AllUsers.Where(x => x.IsEmployee == true && x.DepartmentId == null).OrderBy(x => x.Name)];
+            ParentDepartments = AllParentDepartments.ToList();
             await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
+            ParentDepartments = AllParentDepartments.Where(x => x.Id != SelectedDataItems[0].Adapt<DepartmentDto>().Id).ToList();
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
 
-            try
-            {
-                int departmentId = SelectedDataItems[0].Adapt<DepartmentDto>().Id;
-                var user = AllUsers.FirstOrDefault(x => x.DepartmentId == departmentId);
+            //try
+            //{
+            //    int departmentId = SelectedDataItems[0].Adapt<DepartmentDto>().Id;
+            //    var user = AllUsers.FirstOrDefault(x => x.DepartmentId == departmentId);
 
-                Users = AllUsers
-                    .Where(x => x.Id == user?.Id && departmentId == x.DepartmentId || x.DepartmentId == null)
-                    .OrderBy(x => x.Name)
-                    .ToList();
+            //    Users = AllUsers
+            //        .Where(x => x.Id == user?.Id && departmentId == x.DepartmentId || x.DepartmentId == null)
+            //        .OrderBy(x => x.Name)
+            //        .ToList();
 
-                UpdateUserId = user?.Id ?? 0;
+            //    UpdateUserId = user?.Id ?? 0;
 
-                SelectedUserId = user?.Id ?? 0;
-            }
-            catch { }
+            //    SelectedUserId = user?.Id ?? 0;
+            //}
+            //catch { }
 
             return;
 

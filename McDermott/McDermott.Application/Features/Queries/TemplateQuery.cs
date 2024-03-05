@@ -16,7 +16,7 @@ namespace McDermott.Application.Features.Queries
         {
             try
             {
-                string cacheKey = $"GetTemplateQuery_{request.Predicate?.ToString()}"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                string cacheKey = $"GetTemplateQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
                 if (!_cache.TryGetValue(cacheKey, out List<Province>? result))
                 {
                     result = await _unitOfWork.Repository<Province>().GetAsync(

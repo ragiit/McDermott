@@ -179,6 +179,8 @@
                                                                     ShowValidationIcon="true"
                                                                     Data="@patients"
                                                                     NullText="Select Patient..."
+                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                    FilteringMode="@DataGridFilteringMode.Contains"
                                                                     @bind-Value="@FormRegis.PatientId"
                                                                     TextFieldName="Name"
                                                                     SelectedItemChanged="@((UserDto e) => SelectedItemPatientChanged(e))"
@@ -241,7 +243,7 @@
                                                                 Caption="Medical Type" ColSpanMd="12">
                                                         <DxComboBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))" ShowValidationIcon="true" Data="@Method"
                                                                     NullText="Select Method..."
-                                                                    FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        FilteringMode="@DataGridFilteringMode.Contains"
                                                                     @bind-Value="@FormRegis.TypeMedical">
                                                         </DxComboBox>
                                                     </DxFormLayoutItem>
@@ -257,6 +259,8 @@
                                                         <DxComboBox ShowValidationIcon="true" Data="@Services"
                                                                     NullText="Select Service.."
                                                                     ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
+                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                        FilteringMode="@DataGridFilteringMode.Contains"
                                                                      SelectedItemChanged="@((ServiceDto e) => SelectedItemServiceChanged(e))"
                                                                     @bind-Value="@FormRegis.ServiceId" TextFieldName="Name" ValueFieldName="Id">
                                                         </DxComboBox>
@@ -269,6 +273,8 @@
                                                                     ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
                                                                     TextFieldName="Name"
                                                                     ValueFieldName="Id"
+                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                    FilteringMode="@DataGridFilteringMode.Contains"
                                                                     SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))"
                                                                     InputId="CbDoctoreName">
                                                         </DxComboBox>
@@ -277,6 +283,8 @@
                                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Payment Methode" ColSpanMd="12">
                                                         <DxComboBox ShowValidationIcon="true" Data="@Payments"
                                                                     NullText="Payment Method.."
+                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                    FilteringMode="@DataGridFilteringMode.Contains"
                                                                     ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
                                                                     SelectedItemChanged="@((string e) => SelectedItemPaymentChanged(e))"
                                                                     @bind-Value="@FormRegis.Payment">
@@ -291,6 +299,8 @@
                                                                 TextFieldName="ConcatInsurancePolicy"
                                                                 ValueFieldName="InsurancePolicyId"
                                                                 Data="@Temps"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
                                                                 @bind-Value="@FormRegis.InsurancePolicyId"
                                                                 NullText="Select Insurance ..">
                                                             </DxComboBox ShowValidationIcon="true">
@@ -303,6 +313,8 @@
                                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Schedule Time" ColSpanMd="12">
                                                         <DxComboBox ShowValidationIcon="true" Data="@Times"
                                                                     NullText="Select Time.."
+                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                    FilteringMode="@DataGridFilteringMode.Contains"
                                                                     ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
                                                                     @bind-Value="@FormRegis.ScheduleTime"/>
                                                          <ValidationMessage For="@(() => FormRegis.ScheduleTime)" />

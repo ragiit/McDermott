@@ -2,56 +2,45 @@
 {
     public class DepartmentCommand
     {
-        public class GetDepartmentQuery : IRequest<List<DepartmentDto>>;
-
-        public class GetDepartmentByIdQuery : IRequest<DepartmentDto>
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
+        public class GetDepartmentQuery(Expression<Func<Department, bool>>? predicate = null) : IRequest<List<DepartmentDto>>
         {
-            public int Id { get; set; }
+            public Expression<Func<Department, bool>> Predicate { get; } = predicate!;
+        }
+        #endregion
 
-            public GetDepartmentByIdQuery(int id)
-            {
-                Id = id;
-            }
+
+        #region CREATE
+        public class CreateDepartmentRequest(DepartmentDto DepartmentDto) : IRequest<DepartmentDto>
+        {
+            public DepartmentDto DepartmentDto { get; set; } = DepartmentDto;
         }
 
-        public class CreateDepartmentRequest : IRequest<DepartmentDto>
+        public class CreateListDepartmentRequest(List<DepartmentDto> GeneralConsultanCPPTDtos) : IRequest<List<DepartmentDto>>
         {
-            public DepartmentDto DepartmentDto { get; set; }
+            public List<DepartmentDto> DepartmentDtos { get; set; } = GeneralConsultanCPPTDtos;
+        }
+        #endregion
 
-            public CreateDepartmentRequest(DepartmentDto DepartmentDto)
-            {
-                this.DepartmentDto = DepartmentDto;
-            }
+        #region Update
+        public class UpdateDepartmentRequest(DepartmentDto DepartmentDto) : IRequest<DepartmentDto>
+        {
+            public DepartmentDto DepartmentDto { get; set; } = DepartmentDto;
         }
 
-        public class UpdateDepartmentRequest : IRequest<bool>
+        public class UpdateListDepartmentRequest(List<DepartmentDto> DepartmentDtos) : IRequest<List<DepartmentDto>>
         {
-            public DepartmentDto DepartmentDto { get; set; }
-
-            public UpdateDepartmentRequest(DepartmentDto DepartmentDto)
-            {
-                this.DepartmentDto = DepartmentDto;
-            }
+            public List<DepartmentDto> DepartmentDtos { get; set; } = DepartmentDtos;
         }
 
-        public class DeleteDepartmentRequest : IRequest<bool>
+        #endregion
+
+        #region DELETE 
+        public class DeleteDepartmentRequest(int id = 0, List<int>? ids = null) : IRequest<bool>
         {
-            public int Id { get; set; }
-
-            public DeleteDepartmentRequest(int id)
-            {
-                Id = id;
-            }
+            public int Id { get; set; } = id;
+            public List<int> Ids { get; set; } = ids ?? [];
         }
-
-        public class DeleteListDepartmentRequest : IRequest<bool>
-        {
-            public List<int> Id { get; set; }
-
-            public DeleteListDepartmentRequest(List<int> id)
-            {
-                Id = id;
-            }
-        }
+        #endregion
     }
 }

@@ -732,6 +732,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == FormRegis.PratitionerId && x.StartDate.Date == date.Date && x.DoctorSchedule.ServiceId == FormRegis.ServiceId));
 
+                FormRegis.ScheduleTime = null;
                 Times.Clear();
 
                 Times.AddRange(slots.Select(x => $"{x.WorkFromFormatString} - {x.WorkToFormatString}"));
@@ -743,6 +744,12 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
+                if (FormRegis.PatientId == null || FormRegis.TypeRegistration == null || FormRegis.ServiceId is null || FormRegis.PratitionerId is null || FormRegis.ScheduleTime is null || (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null)))
+                {
+                    ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+                    return;
+                }
+
                 if (FormRegis.Id != 0)
                 {
                     var text = FormRegis.StagingStatus == "Physician" ? "Consultation Done" : FormRegis.StagingStatus;
@@ -1066,7 +1073,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private async void HandleInvalidSubmit()
+        private void HandleInvalidSubmit()
         {
             ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
             FormValidationState = false;
@@ -1263,6 +1270,12 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
+                if (e is null)
+
+                {
+                    FormRegis.PratitionerId = null;
+                    return;
+                }
                 IsPratition = AllDoctors.Where(x => x.DoctorServiceIds.Contains(e.Id)).ToList();
             }
             catch { }
@@ -1272,6 +1285,11 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
+                if (e == null)
+                {
+                    e = new UserDto();
+                }
+
                 await SetTimeSchedule(e.Id, RegistrationDate);
             }
             catch { }
@@ -1279,10 +1297,14 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private void SelectedItemPaymentChanged(string e)
         {
+            Insurances.Clear();
+            Temps.Clear();
+
+            if (e is null)
+                return;
+
             FormRegis.Payment = e;
             _PaymentMethod = e;
-
-            Insurances.Clear();
 
             if (PaymentMethod.Equals("BPJS"))
             {
@@ -1311,7 +1333,19 @@ namespace McDermott.Web.Components.Pages.Transaction
         private void SelectedItemPatientChanged(UserDto e)
         {
             if (e is null)
+            {
+                FormRegis.InsurancePolicyId = null;
+                FormRegis.Age = null;
+                FormRegis.NoRM = null;
+                FormRegis.IdentityNumber = null;
+                PatientAllergy.Food = null;
+                PatientAllergy.Weather = null;
+                PatientAllergy.Farmacology = null;
+                FormRegis.IsWeather = false;
+                FormRegis.IsPharmacology = false;
+                FormRegis.IsFood = false;
                 return;
+            }
 
             var value = e.Id;
 
@@ -1335,6 +1369,29 @@ namespace McDermott.Web.Components.Pages.Transaction
                 FormRegis.PatientId = item.Id;
             }
             catch { }
+
+            if (PaymentMethod.Equals("BPJS"))
+            {
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS == true).ToList();
+                Temps = all.Select(x => new InsuranceTemp
+                {
+                    InsurancePolicyId = x.Id,
+                    InsuranceId = x.InsuranceId,
+                    InsuranceName = x.Insurance.Name,
+                    PolicyNumber = x.PolicyNumber
+                }).ToList();
+            }
+            else
+            {
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS != true).ToList();
+                Temps = all.Select(x => new InsuranceTemp
+                {
+                    InsurancePolicyId = x.Id,
+                    InsuranceId = x.InsuranceId,
+                    InsuranceName = x.Insurance.Name,
+                    PolicyNumber = x.PolicyNumber
+                }).ToList();
+            }
 
             var patientAlergy = PatientAllergies.Where(x => x.UserId == item!.Id).FirstOrDefault();
 
@@ -1362,7 +1419,9 @@ namespace McDermott.Web.Components.Pages.Transaction
         private void SelectedItemChanged(String e)
         {
             if (e is null)
+            {
                 return;
+            }
 
             if (e.Equals("Emergency"))
             {

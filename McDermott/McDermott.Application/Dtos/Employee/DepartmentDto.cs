@@ -3,19 +3,17 @@
     public class DepartmentDto : IMapFrom<Department>
     {
         public int Id { get; set; }
+        public int? CompanyId { get; set; }
+        public int? ParentDepartmentId { get; set; }
+        public int? ManagerId { get; set; }
 
         [StringLength(200)]
         [Required]
         public string Name { get; set; } = string.Empty;
-
-        public int? ParentId { get; set; }
-
-        [StringLength(200)]
-        public string? ParentName { get; set; }
-
-        public int? CompanyId { get; set; }
         public string? DepartmentCategory { get; set; }
-        public string? Manager { get; set; }
+
+        public virtual UserDto? Manager { get; set; }
+        public virtual DepartmentDto? ParentDepartment { get; set; }
         public virtual CompanyDto? Company { get; set; }
     }
 }
