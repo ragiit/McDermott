@@ -80,11 +80,11 @@
                                               OnInvalidSubmit="@HandleInvalidSubmit"
                                               OnValidSubmit="@HandleValidSubmit">
                                         <DataAnnotationsValidator />
-                                            <DxFormLayout CssClass="mt pt-1">
-                                                <DxFormLayoutGroup Caption="Configuration Email" ColSpanLg="12" CssClass="mt-3 mb-2">
+                                        <DxFormLayout CssClass="mt pt-1">
+                                            <DxFormLayoutGroup Caption="Configuration Email" ColSpanLg="12" CssClass="mt-3 mb-2">
                                                 <DxFormLayoutItem ColSpanMd="6" Caption="Description:" CaptionCssClass="normal-caption">
-                                                        <DxTextBox @bind-Text="@FormEmails.Description" NullText="Description.." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxTextBox>
-                                                    </DxFormLayoutItem>
+                                                    <DxTextBox @bind-Text="@FormEmails.Description" NullText="Description.." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxTextBox>
+                                                </DxFormLayoutItem>
                                                 <DxFormLayoutItem ColSpanMd="6" Caption="Priority:" CaptionCssClass="normal-caption">
                                                         <DxSpinEdit @bind-Value="@FormEmails.Sequence" NullText="Priority" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
                                                     </DxFormLayoutItem>
@@ -154,20 +154,20 @@
                                                             <h6 class="text-info">Connection Status Unknown.</h6>
                                                         }
 
-                                                    }
+                                                }
 
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="12" CssClass="my-2">
-                                                    <div class="row justify-content-end">
-                                                        <div class="col-auto align-self-end">
-                                                            <DxButton Text="Save" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Info" SubmitFormOnClick="true" Click="OnSave"></DxButton>
-                                                            <DxButton Text="Discard" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" Click="OnCancel"></DxButton>
-                                                        </div>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem ColSpanMd="12" CssClass="my-2">
+                                                <div class="row justify-content-end">
+                                                    <div class="col-auto align-self-end">
+                                                        <DxButton Text="Save" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Info" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                                        <DxButton Text="Discard" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" Click="OnCancel"></DxButton>
                                                     </div>
-                                                </DxFormLayoutItem>
-                                                
-                                            </DxFormLayout>
-                                        
+                                                </div>
+                                            </DxFormLayoutItem>
+
+                                        </DxFormLayout>
+
                                     </EditForm>
                                 </DxPopup>
                             </div>

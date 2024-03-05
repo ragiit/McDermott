@@ -229,12 +229,10 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task OnSave()
         {
-            if(FormEmails.Status == "")
+            if (FormEmails.Status == "")
             {
                 FormEmails.Status = "No Testing";
             }
-            if (string.IsNullOrWhiteSpace(FormEmails.Smtp_Host))
-                return;
 
             if (FormEmails.Id == 0)
                 await Mediator.Send(new CreateEmailSettingRequest(FormEmails));
@@ -250,6 +248,10 @@ namespace McDermott.Web.Components.Pages.Config
 
         private void SelectedItemChanged(string e)
         {
+            if (e is null)
+            {
+                return;
+            }
             if (e.Equals("TLS (STARTTLS)"))
             {
                 FormEmails.Smtp_Port = "25";
