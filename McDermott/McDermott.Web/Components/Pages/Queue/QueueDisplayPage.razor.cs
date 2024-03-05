@@ -12,16 +12,17 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private List<QueueDisplayDto> QueueDisplay = [];
         private List<CounterDto> Counters = [];
-        private IEnumerable<CounterDto> counterId = [];
         private GroupMenuDto UserAccessCRUID = new();
         public QueueDisplayDto FormDisplays = new();
 
         #endregion relation Data
 
+        private IEnumerable<CounterDto> selectedCounter { get; set; } = [];
         private bool IsAccess = false;
         private bool PanelVisible { get; set; } = true;
+        private bool showPopUp { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
-        private List<string>? counteres;
+        private List<CounterDto>? counteres = [];
 
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
@@ -61,7 +62,8 @@ namespace McDermott.Web.Components.Pages.Queue
             SelectedDataItems = new ObservableRangeCollection<object>();
             QueueDisplay = await Mediator.Send(new GetQueueDisplayQuery());
             Counters = await Mediator.Send(new GetCounterQuery());
-            counteres = [.. Counters.Where(x => x.Status == "on process").Select(x => x.Name)];
+            counteres = [.. Counters.Where(x => x.Status == "on process")];
+            QueueDisplay.ForEach(x => x.NameCounter = string.Join(",", Counters.Where(z => x.CounterId != null && x.CounterId.Contains(z.Id)).Select(x => x.Name).ToList()));
             PanelVisible = false;
         }
 
@@ -145,9 +147,13 @@ namespace McDermott.Web.Components.Pages.Queue
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
+        #endregion Grid
+
+        #region Function Button
+
         private async Task NewItem_Click()
         {
-            await Grid.StartEditNewRowAsync();
+            showPopUp = true;
         }
 
         private async Task EditItem_Click()
@@ -189,10 +195,30 @@ namespace McDermott.Web.Components.Pages.Queue
             });
         }
 
+        private async Task OnCancel()
+        {
+            showPopUp = false;
+            await LoadData();
+        }
+
         private async Task ImportFile()
         {
             await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
+
+        #endregion Function Button
+
+        #region Method OnRenderTo
+
+        private async Task OnRenderTo(QueueDisplayDto context)
+        {
+            var DisplayId = context.Id;
+            NavigationManager.NavigateTo($"/queue/viewdisplay/{DisplayId}", true);
+        }
+
+        #endregion Method OnRenderTo
+
+        #region Method Delete
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
@@ -200,12 +226,12 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteCountryRequest(((CountryDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteQueueDisplayRequest(((QueueDisplayDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<CountryDto>>();
-                    await Mediator.Send(new DeleteListCountryRequest(a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<QueueDisplayDto>>();
+                    await Mediator.Send(new DeleteListQueueDisplayRequest(a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
@@ -214,25 +240,36 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        private async Task OnSave(GridEditModelSavingEventArgs e)
+        #endregion Method Delete
+
+        #region Method save
+
+        private async Task OnSave()
         {
             try
             {
-                var editModel = (CountryDto)e.EditModel;
-
-                if (string.IsNullOrWhiteSpace(editModel.Name))
+                if (string.IsNullOrWhiteSpace(FormDisplays.Name))
                     return;
 
-                if (editModel.Id == 0)
-                    await Mediator.Send(new CreateCountryRequest(editModel));
+                if (FormDisplays.Id == 0)
+                {
+                    var ListCounter = selectedCounter.Select(x => x.Id).ToList();
+                    FormDisplays.CounterId?.AddRange(ListCounter);
+                    await Mediator.Send(new CreateQueueDisplayRequest(FormDisplays));
+                }
                 else
-                    await Mediator.Send(new UpdateCountryRequest(editModel));
-
+                {
+                    FormDisplays.CounterId = selectedCounter.Select(x => x.Id).ToList();
+                    await Mediator.Send(new UpdateQueueDisplayRequest(FormDisplays));
+                }
                 await LoadData();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
-        #endregion Grid
+        #endregion Method save
     }
 }

@@ -45,18 +45,18 @@ namespace McDermott.Web.Components.Pages.Medical
         private int newId = 0;
         private string PhysicionName { get; set; }
 
-        private int _ServiceId { get; set; }
+        private int? _ServiceId { get; set; }
 
-        private int ServiceId
+        private int? ServiceId
         {
             get => _ServiceId;
             set
             {
                 Users = [];
-                DoctorSchedule.ServiceId = value;
+                DoctorSchedule.ServiceId = value.ToInt32 ();
                 SelectedPhysicions = [];
                 _ServiceId = value;
-                Users = AllUsers.Where(x => x.DoctorServiceIds.Contains(value)).AsEnumerable();
+                Users = AllUsers.Where(x => x.DoctorServiceIds.Contains(value.ToInt32())).AsEnumerable();
             }
         }
 

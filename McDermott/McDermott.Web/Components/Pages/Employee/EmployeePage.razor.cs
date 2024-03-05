@@ -38,7 +38,11 @@
         private List<string> MartialStatuss = new()
         {
             "Single",
-            "Married"
+            "Married",
+            "Divorced",
+            "Widowed",
+            "Separated",
+            "Unmarried"
         };
 
         private List<string> EmployeeTypes = new()

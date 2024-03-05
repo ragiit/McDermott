@@ -69,10 +69,16 @@
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="Name" Caption="Queue Display" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="NameCounter" Caption="Counter" />
+                                            <DxGridDataColumn Caption=" Action Display" >
+                                                <CellDisplayTemplate>
+                                                    <DxButton RenderStyle="@ButtonRenderStyle.Success" IconCssClass="fa-solid fa-play mr-1" Text="Play" @onclick="() => OnRenderTo((QueueDisplayDto)context.DataItem)"></DxButton>
+                                                </CellDisplayTemplate>
+                                            </DxGridDataColumn>
                                         </Columns>
                                     </DxGrid>
                                 </DxLoadingPanel>
-                                <DxPopup @bind-Visible="@PanelVisible" HeaderText="Set Display">
+                                <DxPopup @bind-Visible="@showPopUp" HeaderText="Set Display">
                                     <EditForm Model="@FormDisplays" Context="EditFormContext">
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
@@ -80,12 +86,22 @@
                                                     <DxTextBox @bind-Text="@FormDisplays.Name" NullText="Name Display.."></DxTextBox>
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem ColSpanMd="12">
+                                            <DxFormLayoutItem ColSpanMd="12" Caption="Counter">
                                                 <DxTagBox Data="@counteres" FilteringMode="@DataGridFilteringMode.Contains"
-                                                          @bind-Values="@counterId" NullText="Select Counter.."
+                                                          @bind-Values="@selectedCounter" 
+                                                          NullText="Select Counter.."
                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                          TextFieldName="Name"
                                                           CssClass="cw-480"
                                                           InputId="tbCustomTags" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <div class="row justify-content-end" >
+                                                    <div class="col-5 align-self-end">
+                                                        <DxButton Text="Save" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Info" SubmitFormOnClick = "true" Click="OnSave"></DxButton>
+                                                        <DxButton Text="Discard" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
+                                                    </div>
+                                                </div>
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditForm>
