@@ -95,19 +95,21 @@
                                                 var a = (CityDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption"Caption="Name:" ColSpanMd="12">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption"Caption="Name" ColSpanMd="12">
                                                     <div class="pop-warning">
                                                         @EditFormContext.GetEditor("Name")
                                                     </div>
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Province:" ColSpanMd="12">
-                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                         Data="@Provinces"
                                                                 NullText="Select Province..."
                                                                 @bind-Value="@a.ProvinceId"
                                                                 TextFieldName="Name"
                                                                 ValueFieldName="Id">
                                                     </DxComboBox>
+                                                    <ValidationMessage For="@(()=>a.ProvinceId)"   />
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
                                         </EditFormTemplate>

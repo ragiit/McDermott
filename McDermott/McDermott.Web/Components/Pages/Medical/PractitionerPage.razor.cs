@@ -43,8 +43,12 @@
 
         private List<string> MartialStatuss = new()
         {
-            "Single",
-            "Married"
+           "Single",
+            "Married",
+            "Divorced",
+            "Widowed",
+            "Separated",
+            "Unmarried"
         };
 
         protected override async Task OnInitializedAsync()

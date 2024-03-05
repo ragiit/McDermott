@@ -80,11 +80,14 @@
                                                         @EditFormContext.GetEditor("Name")
                                                     </div>
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Type" ColSpanMd="12">
-                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Type" ColSpanMd="12">
+                                                    <DxComboBox 
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                         Data="@Types" @bind-Value="@a.Type" NullText="Types" ShowValidationIcon="true" />
+                                                    <ValidationMessage For="@(()=>a.Type)"   />
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
+                                      
                                         </EditFormTemplate>
                                     </DxGrid>
                                 </DxLoadingPanel>

@@ -93,7 +93,7 @@
         public bool? IsEmployee { get; set; } = false;
         public bool? IsPatient { get; set; } = false;
         public bool? IsUser { get; set; } = false;
-        public bool IsSameDomicileAddress { get; set; } = false;
+        public bool IsSameDomicileAddress { get; set; } = true;
         public bool? IsDoctor { get; set; } = false;
         public bool? IsEmployeeRelation { get; set; } = false;
         public string? EmployeeType { get; set; }
