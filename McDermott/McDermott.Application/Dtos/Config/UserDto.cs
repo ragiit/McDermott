@@ -55,7 +55,7 @@
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? MobilePhone { get; set; }
 
-        [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
+        //[RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? HomePhoneNumber { get; set; }
 
         public string? Npwp { get; set; }
