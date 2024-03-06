@@ -28,6 +28,7 @@ global using McDermott.Application.Dtos.Patient;
 global using DevExpress.Data.XtraReports.Native;
 global using System.Security.Claims;
 
+global using static McDermott.Application.Features.Commands.Medical.LocationCommand;
 global using static McDermott.Application.Features.Commands.Config.CityCommand;
 global using static McDermott.Application.Features.Commands.Config.CountryCommand;
 global using static McDermott.Application.Features.Commands.Employee.DepartmentCommand;

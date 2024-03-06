@@ -50,6 +50,9 @@
                 UserAccessCRUID = result.Item2;
             }
             catch { }
+
+            Locations = await Mediator.Send(new GetLocationQuery());
+
             await LoadData();
         }
 
