@@ -6,9 +6,9 @@
 
         public class GetDiagnosisByIdQuery : IRequest<DiagnosisDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetDiagnosisByIdQuery(int id)
+            public GetDiagnosisByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteDiagnosisRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteDiagnosisRequest(int id)
+            public DeleteDiagnosisRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListDiagnosisRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListDiagnosisRequest(List<int> id)
+            public DeleteListDiagnosisRequest(List<long> id)
             {
                 Id = id;
             }

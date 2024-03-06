@@ -7,7 +7,7 @@
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private dynamic dd;
-        private int Value { get; set; } = 0;
+        private long Value { get; set; } = 0;
         private bool PanelVisible { get; set; } = true;
         private string textPopUp = "";
         private int FocusedRowVisibleIndex { get; set; }

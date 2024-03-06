@@ -10,8 +10,8 @@
 
         public string Type { get; set; } = string.Empty;
         public bool IsBPJS { get; set; }
-        public int? AdminFee { get; set; }
-        public int? Presentase { get; set; }
-        public int? AdminFeeMax { get; set; }
+        public long? AdminFee { get; set; }
+        public long? Presentase { get; set; }
+        public long? AdminFeeMax { get; set; }
     }
 }

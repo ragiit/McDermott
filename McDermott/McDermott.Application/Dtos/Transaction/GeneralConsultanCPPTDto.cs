@@ -2,8 +2,8 @@
 {
     public class GeneralConsultanCPPTDto : IMapFrom<GeneralConsultanCPPT>
     {
-        public int Id { get; set; }
-        public int GeneralConsultanServiceId { get; set; }
+         public long Id { get; set; }
+        public long GeneralConsultanServiceId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Body { get; set; } = string.Empty;
         public DateTime DateTime { get; set; } = DateTime.Now;

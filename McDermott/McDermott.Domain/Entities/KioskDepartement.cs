@@ -2,8 +2,8 @@
 {
     public class KioskDepartement : BaseAuditableEntity
     {
-        public int? ServiceKId { get; set; }
-        public int? ServicePId { get; set; }
+        public long? ServiceKId { get; set; }
+        public long? ServicePId { get; set; }
 
         public virtual Service? ServiceK { get; set; }
         public virtual Service? ServiceP { get; set; }

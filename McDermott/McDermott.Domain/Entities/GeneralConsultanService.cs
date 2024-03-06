@@ -2,12 +2,12 @@
 {
     public partial class GeneralConsultanService : BaseAuditableEntity
     {
-        public int? PatientId { get; set; }
-        public int? InsuranceId { get; set; }
-        public int? InsurancePolicyId { get; set; }
-        public int? ServiceId { get; set; }
-        public int? PratitionerId { get; set; }
-        public int? ClassType { get; set; }
+        public long? PatientId { get; set; }
+        public long? InsuranceId { get; set; }
+        public long? InsurancePolicyId { get; set; }
+        public long? ServiceId { get; set; }
+        public long? PratitionerId { get; set; }
+        public long? ClassType { get; set; }
         public string? StagingStatus { get; set; }
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }

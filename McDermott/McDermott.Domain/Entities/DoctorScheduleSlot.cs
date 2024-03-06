@@ -2,8 +2,8 @@
 {
     public partial class DoctorScheduleSlot : BaseAuditableEntity
     {
-        public int DoctorScheduleId { get; set; }
-        public int? PhysicianId { get; set; }
+        public long DoctorScheduleId { get; set; }
+        public long? PhysicianId { get; set; }
         public DateTime StartDate { get; set; }
         public TimeSpan WorkFrom { get; set; }
 

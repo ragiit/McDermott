@@ -2,9 +2,9 @@
 {
     public class GroupMenuDto : IMapFrom<GroupMenu>
     {
-        public int Id { get; set; }
-        public int GroupId { get; set; }
-        public int MenuId { get; set; }
+         public long Id { get; set; }
+        public long GroupId { get; set; }
+        public long MenuId { get; set; }
         public bool Create { get; set; } = false;
         public bool Read { get; set; } = false;
         public bool Update { get; set; } = false;

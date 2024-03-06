@@ -36,7 +36,7 @@
 
                     return result.Adapt<List<DoctorScheduleDto>>();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return [];
                 }
@@ -77,7 +77,7 @@
 
                     return result.Adapt<List<DoctorScheduleSlotDto>>();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return [];
                 }
@@ -146,7 +146,7 @@
 
                     return true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     throw;
                 }
@@ -210,7 +210,7 @@
 
                     return true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -239,7 +239,7 @@
 
                     return true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -264,7 +264,7 @@
 
                     return true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     throw;
                 }
@@ -287,7 +287,7 @@
 
                     return result.Adapt<List<DoctorScheduleDetailDto>>();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return [];
                 }
@@ -401,7 +401,7 @@
             {
                 try
                 {
-                    await _unitOfWork.Repository<DoctorScheduleSlot>().DeleteAsync(x => x.DoctorScheduleId == request.DoctorScheduleId && !request.PhysicianIds.Contains((int)x.PhysicianId!));
+                    await _unitOfWork.Repository<DoctorScheduleSlot>().DeleteAsync(x => x.DoctorScheduleId == request.DoctorScheduleId && !request.PhysicianIds.Contains((long)x.PhysicianId!));
                     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                     return true;
@@ -457,7 +457,7 @@
 
                     return true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     throw;
                 }
@@ -489,7 +489,7 @@
 
                     return true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     throw;
                 }

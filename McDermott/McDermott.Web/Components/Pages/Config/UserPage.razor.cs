@@ -176,7 +176,7 @@
 
                 UserForm.NoRm = lastId is null
                          ? $"{date:dd-MM-yyyy}-0001"
-                         : $"{date:dd-MM-yyyy}-{(int.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
+                         : $"{date:dd-MM-yyyy}-{(long.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
             }
 
             if (UserForm.IsSameDomicileAddress)
@@ -242,7 +242,7 @@
             {
                 var a = SelectedDataItems.Adapt<List<UserDto>>();
 
-                int userActive = (int)HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
+                long userActive = (long)HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
 
                 await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
             }

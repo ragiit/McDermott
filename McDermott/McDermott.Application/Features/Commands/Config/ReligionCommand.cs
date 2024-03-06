@@ -6,9 +6,9 @@
 
         public class GetReligionByIdQuery : IRequest<ReligionDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetReligionByIdQuery(int id)
+            public GetReligionByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteReligionRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteReligionRequest(int id)
+            public DeleteReligionRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListReligionRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListReligionRequest(List<int> id)
+            public DeleteListReligionRequest(List<long> id)
             {
                 Id = id;
             }

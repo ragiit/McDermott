@@ -2,7 +2,7 @@
 {
     public class NursingDiagnosesDto : IMapFrom<NursingDiagnoses>
     {
-        public int Id { get; set; }
+         public long Id { get; set; }
 
         [Required]
         public string Problem { get; set; } = string.Empty;

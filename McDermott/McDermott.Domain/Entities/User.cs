@@ -2,7 +2,7 @@
 {
     public partial class User : BaseAuditableEntity
     {
-        public int? GroupId { get; set; }
+        public long? GroupId { get; set; }
 
         [Required]
         public string Name { get; set; } = string.Empty;
@@ -15,7 +15,7 @@
 
         public string Password { get; set; } = string.Empty;
 
-        public int? GenderId { get; set; }
+        public long? GenderId { get; set; }
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
 
@@ -26,25 +26,25 @@
         public DateTime? ExpiredId { get; set; }
         public string? IdCardAddress1 { get; set; } // KTP Alamat 1
         public string? IdCardAddress2 { get; set; } // KTP Alamat 1
-        public int? IdCardCountryId { get; set; } // KTP Negara
-        public int? IdCardProvinceId { get; set; } // KTP Province
-        public int? IdCardCityId { get; set; } // KTP City
-        public int? IdCardDistrictId { get; set; } // KTP District
-        public int? IdCardVillageId { get; set; } // KTP Village
+        public long? IdCardCountryId { get; set; } // KTP Negara
+        public long? IdCardProvinceId { get; set; } // KTP Province
+        public long? IdCardCityId { get; set; } // KTP City
+        public long? IdCardDistrictId { get; set; } // KTP District
+        public long? IdCardVillageId { get; set; } // KTP Village
         public string? IdCardRtRw { get; set; } // KTP  RTRW
-        public int? IdCardZip { get; set; } // KTP Zip
+        public long? IdCardZip { get; set; } // KTP Zip
         public string? DomicileAddress1 { get; set; }   // Domisili Alamat 1
         public string? DomicileAddress2 { get; set; }   // Domisili Alamat 2
-        public int? DomicileCountryId { get; set; } // Domisili Negara
-        public int? DomicileProvinceId { get; set; } // Domisili Province
-        public int? DomicileCityId { get; set; } // Domisili City
-        public int? DomicileDistrictId { get; set; } // Domisili District
-        public int? DomicileVillageId { get; set; } // Domisili Village
+        public long? DomicileCountryId { get; set; } // Domisili Negara
+        public long? DomicileProvinceId { get; set; } // Domisili Province
+        public long? DomicileCityId { get; set; } // Domisili City
+        public long? DomicileDistrictId { get; set; } // Domisili District
+        public long? DomicileVillageId { get; set; } // Domisili Village
         public string? DomicileRtRw { get; set; } // Domisili RtRw
-        public int? DomicileZip { get; set; } // Domisili ZIp
+        public long? DomicileZip { get; set; } // Domisili ZIp
         public string? BiologicalMother { get; set; } // Ibu Kandung
         public string? MotherNIK { get; set; }
-        public int? ReligionId { get; set; }
+        public long? ReligionId { get; set; }
         public string? MobilePhone { get; set; }
         public string? HomePhoneNumber { get; set; }
         public string? Npwp { get; set; }
@@ -56,10 +56,10 @@
         public string? StrNo { get; set; }
         public string? StrFile { get; set; }
         public DateTime? StrExp { get; set; }
-        public int? SpecialityId { get; set; }
+        public long? SpecialityId { get; set; }
         public string? UserPhoto { get; set; }
-        public int? JobPositionId { get; set; }
-        public int? DepartmentId { get; set; }
+        public long? JobPositionId { get; set; }
+        public long? DepartmentId { get; set; }
         public string? EmergencyName { get; set; }
         public string? EmergencyRelation { get; set; }
         public string? EmergencyEmail { get; set; }
@@ -68,7 +68,7 @@
         public string? NoRm { get; set; } = "-";
         public string? DoctorCode { get; set; }
         public string? EmployeeCode { get; set; }
-        public int? DegreeId { get; set; }
+        public long? DegreeId { get; set; }
         public bool? IsEmployee { get; set; }
         public bool? IsPatient { get; set; }
         public bool? IsUser { get; set; }
@@ -83,7 +83,7 @@
         public string? Legacy { get; set; }
         public string? SAP { get; set; }
         public string? Oracle { get; set; }
-        public List<int>? DoctorServiceIds { get; set; }
+        public List<long>? DoctorServiceIds { get; set; }
 
         public virtual Group? Group { get; set; }
         public virtual Gender? Gender { get; set; }

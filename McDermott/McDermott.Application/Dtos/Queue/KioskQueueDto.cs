@@ -2,11 +2,11 @@
 {
     public class KioskQueueDto : IMapFrom<KioskQueue>
     {
-        public int Id { get; set; }
-        public int? KioskId { get; set; }
-        public int? ServiceId { get; set; }
-        public int? ServiceKId { get; set; }
-        public int? NoQueue { get; set; }
+         public long Id { get; set; }
+        public long? KioskId { get; set; }
+        public long? ServiceId { get; set; }
+        public long? ServiceKId { get; set; }
+        public long? NoQueue { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string? Queues { get; set; }
         public string? Status { get; set; }

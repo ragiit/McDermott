@@ -2,8 +2,8 @@
 {
     public class DoctorScheduleDetailDto : IMapFrom<DoctorScheduleDetail>
     {
-        public int Id { get; set; }
-        public int DoctorScheduleId { get; set; }
+         public long Id { get; set; }
+        public long DoctorScheduleId { get; set; }
 
         [Required]
         [StringLength(200)]
@@ -29,7 +29,7 @@
         public string WorkToFormatString
         { get { return WorkTo.ToString(@"hh\:mm"); } }
 
-        public int Quota { get; set; } = 0;
+        public long Quota { get; set; } = 0;
         public bool UpdateToBpjs { get; set; } = false;
 
         public DoctorScheduleDto? DoctorSchedule { get; set; }

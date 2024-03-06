@@ -9,7 +9,7 @@
             public Expression<Func<InsurancePolicy, bool>> Predicate { get; } = predicate;
         }
 
-        public class GetInsurancePolicyCountQuery(Expression<Func<InsurancePolicy, bool>>? predicate = null) : IRequest<int>
+        public class GetInsurancePolicyCountQuery(Expression<Func<InsurancePolicy, bool>>? predicate = null) : IRequest<long>
         {
             public Expression<Func<InsurancePolicy, bool>> Predicate { get; } = predicate;
         }
@@ -36,10 +36,10 @@
 
         #region Delete
 
-        public class DeleteInsurancePolicyRequest(int id = 0, List<int>? ids = null) : IRequest<bool>
+        public class DeleteInsurancePolicyRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
-            public int Id { get; set; } = id;
-            public List<int> Ids { get; set; } = ids ?? [];
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
         }
 
         #endregion Delete

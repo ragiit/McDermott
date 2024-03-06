@@ -12,7 +12,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private List<CronisCategoryDto> Chronises = new();
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private dynamic dd;
-        private int Value { get; set; } = 0;
+        private long Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
         public IGrid Grid { get; set; }

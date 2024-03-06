@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using OfficeOpenXml;
+﻿using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -127,15 +126,15 @@ namespace McDermott.Web.Components.Pages.Config
 
         //            ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-        //            int colCount = ws.Dimension.End.Column;
-        //            int rowCount = ws.Dimension.End.Row;
+        //            long colCount = ws.Dimension.End.Column;
+        //            long rowCount = ws.Dimension.End.Row;
         //            var headerNames = new List<string>()
         //            {
         //                "Name",
         //                "Code"
         //            };
 
-        //            for (int i = 1; i <= colCount; i++)
+        //            for (long i = 1; i <= colCount; i++)
         //            {
         //                var a = headerNames[i - 1].Trim().ToLower();
         //                var b = ws.Cells[1, i].Value?.ToString().Trim().ToLower();
@@ -149,7 +148,7 @@ namespace McDermott.Web.Components.Pages.Config
         //            var countries = new List<CountryDto>();
 
         //            // Start iterating from row 2
-        //            for (int row = 1; row <= rowCount; row++)
+        //            for (long row = 1; row <= rowCount; row++)
         //            {
         //                var country = new CountryDto();
 
@@ -189,8 +188,8 @@ namespace McDermott.Web.Components.Pages.Config
         //                using (ExcelPackage package = new ExcelPackage(ms))
         //                {
         //                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
-        //                    int colCount = ws.Dimension.End.Column;
-        //                    int rowCount = ws.Dimension.End.Row;
+        //                    long colCount = ws.Dimension.End.Column;
+        //                    long rowCount = ws.Dimension.End.Row;
         //                    var s = ws.Cells[2, 2].Value;
         //                    // rest of the code here...
         //                }

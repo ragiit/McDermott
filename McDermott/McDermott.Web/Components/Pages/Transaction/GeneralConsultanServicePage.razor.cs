@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using QuestPDF.Fluent;
-using QuestPDF.Helpers;
 using QuestPDF.Previewer;
 
 namespace McDermott.Web.Components.Pages.Transaction
@@ -11,7 +10,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
             var image = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\mcdermott_logo.png");
-            await QuestPDF.Fluent.Document
+            QuestPDF.Fluent.Document
                 .Create(x =>
                 {
                     x.Page(page =>
@@ -20,20 +19,25 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                         page.Header().Row(row =>
                         {
-                            row.Spacing(25);
                             row.ConstantItem(150).Image(File.ReadAllBytes(image));
                             row.RelativeItem().Column(c =>
                             {
                                 c.Item().Text("Slip Registration").FontSize(36).SemiBold();
-                                c.Item().Text($"MedRec: {FormRegis.Patient.NoRm}");
-                                c.Item().Text($"Patient: {FormRegis.Patient.Name}");
-                                c.Item().Text($"NoID: {FormRegis.Patient.NoId}");
+                                c.Item().Text($"MedRec: {FormRegis.Patient?.NoRm}");
+                                c.Item().Text($"Patient: {FormRegis.Patient?.Name}");
+                                c.Item().Text($"Identity Number: {FormRegis.Patient.NoId}");
+                                c.Item().Text($"Reg Type: {FormRegis.TypeRegistration}");
+                                c.Item().Text($"Service: {FormRegis.Service?.Name}");
+                                c.Item().Text($"Physicion: {FormRegis.Pratitioner?.Name}");
+                                c.Item().Text($"Payment: {FormRegis.Payment}");
+                                c.Item().Text($"Registration Date: {FormRegis.RegistrationDate}");
+                                c.Item().Text($"Schedule Time: {FormRegis.ScheduleTime}");
                             });
                         });
                         //page.Header().Text("Slip Registration").SemiBold().FontSize(30);
                     });
                 })
-                .ShowInPreviewerAsync();
+                .GeneratePdf("Slip Registration.pdf");
         }
 
         #region Relation Data
@@ -44,7 +48,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<GeneralConsultanServiceDto> GeneralConsultanServices = new();
         private List<UserDto> IsPatient = new();
         private List<UserDto> patients = new List<UserDto>();
-        private int PatientIds = new();
+        private long PatientIds = new();
         private IEnumerable<GeneralConsultanServiceDto> SelectPatient = [];
 
         private List<UserDto> IsPratition = new();
@@ -151,12 +155,12 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private int Value
+        private long Value
         {
             get => PatientsId;
             set
             {
-                int PatientsId = value;
+                long PatientsId = value;
                 this.PatientsId = value;
 
                 var item = patients.FirstOrDefault(x => x.Id == PatientsId);
@@ -202,9 +206,9 @@ namespace McDermott.Web.Components.Pages.Transaction
         }
 
         private string Code { get; set; } = "";
-        private int _NursingDiagnosis { get; set; }
+        private long _NursingDiagnosis { get; set; }
 
-        private int NursingDiagnosis
+        private long NursingDiagnosis
         {
             get => _NursingDiagnosis;
             set
@@ -218,9 +222,9 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         public class NurseStation
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
             public string Status { get; set; }
-            public int Count { get; set; }
+            public long Count { get; set; }
         }
 
         public IEnumerable<NurseStation> NurseStations { get; set; } = new List<NurseStation>
@@ -252,11 +256,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Gas And Oil"
         };
 
-        private int PatientsId = 0;
+        private long PatientsId = 0;
 
-        private int PractitionerId = 0;
+        private long PractitionerId = 0;
 
-        private int Age = 0;
+        private long Age = 0;
         private DateTime? Birthdate { get; set; }
         private string IdentityNum { get; set; }
         private string _PaymentMethod { get; set; }
@@ -266,8 +270,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private class InsuranceTemp
         {
-            public int InsurancePolicyId { get; set; }
-            public int InsuranceId { get; set; }
+            public long InsurancePolicyId { get; set; }
+            public long InsuranceId { get; set; }
             public string InsuranceName { get; set; }
             public string PolicyNumber { get; set; }
 
@@ -285,11 +289,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Waiting",
             "In Consultation",
             "Consultation Done"
-        }; private int _InsurancePolicyId { get; set; }
+        }; private long _InsurancePolicyId { get; set; }
 
-        private int InsuranceId { get; set; }
+        private long InsuranceId { get; set; }
 
-        private int InsurancePolicyId
+        private long InsurancePolicyId
         {
             get => _InsurancePolicyId;
             set
@@ -298,11 +302,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private int _ServiceId { get; set; }
+        private long _ServiceId { get; set; }
 
-        private int _DoctorId { get; set; }
+        private long _DoctorId { get; set; }
 
-        private int DoctorId
+        private long DoctorId
         {
             get => _DoctorId;
             set
@@ -332,9 +336,9 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Grid Setting
 
-        private int _DiseasesId { get; set; }
+        private long _DiseasesId { get; set; }
 
-        private int DiseasesId
+        private long DiseasesId
         {
             get => _DiseasesId;
             set
@@ -348,7 +352,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private int ServiceId
+        private long ServiceId
         {
             get => _ServiceId;
             set
@@ -431,7 +435,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         //private async void SelectFiles(InputFileChangeEventArgs e)
         //{
-        //    int maxFileSize = 1 * 1024 * 1024;
+        //    long maxFileSize = 1 * 1024 * 1024;
         //    var allowedExtenstions = new string[] { ".png", ".jpg", ".jpeg", ".gif" };
 
         //    UserForm.SipFile = e.File.Name;
@@ -444,7 +448,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         #region Tab CPPT
 
         private IGrid GridTabCPPT { get; set; }
-        private int FocusedGridTabCPPTRowVisibleIndex { get; set; }
+        private long FocusedGridTabCPPTRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItemsCPPT { get; set; } = new ObservableRangeCollection<object>();
 
         private InputCPPTGeneralConsultanCPPT FormInputCPPTGeneralConsultan = new();
@@ -461,13 +465,13 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private class NursingDiagnosesTemp
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
             public string Problem { get; set; } = string.Empty;
         }
 
         private class DiagnosesTemp
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
 
             public string NameCode { get; set; }
         }
@@ -736,7 +740,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             await LoadData();
         }
 
-        private void GetInsurancePhysician(int value)
+        private void GetInsurancePhysician(long value)
         {
             if (string.IsNullOrWhiteSpace(PaymentMethod))
                 return;
@@ -753,12 +757,12 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private async Task GetScheduleTimesUser(int value)
+        private async Task GetScheduleTimesUser(long value)
         {
             var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == value));
         }
 
-        private async Task SetTimeSchedule(int patientId, DateTime date)
+        private async Task SetTimeSchedule(long patientId, DateTime date)
         {
             try
             {
@@ -768,8 +772,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 Times.AddRange(slots.Select(x => $"{x.WorkFromFormatString} - {x.WorkToFormatString}"));
 
-                if (Times.Count <= 0)
-                    FormRegis.ScheduleTime = null;
+                //if (Times.Count <= 0)
+                //    FormRegis.ScheduleTime = null;
             }
             catch { }
         }
@@ -1383,7 +1387,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             var value = e.Id;
 
-            int PatientsId = value;
+            long PatientsId = value;
             this.PatientsId = value;
 
             var item = patients.FirstOrDefault(x => x.Id == PatientsId);

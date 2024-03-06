@@ -6,9 +6,9 @@
 
         public class GetMenuByIdQuery : IRequest<MenuDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetMenuByIdQuery(int id)
+            public GetMenuByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteMenuRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteMenuRequest(int id)
+            public DeleteMenuRequest(long id)
             {
                 Id = id;
             }

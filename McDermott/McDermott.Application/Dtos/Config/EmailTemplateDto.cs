@@ -2,9 +2,9 @@
 {
     public class EmailTemplateDto : IMapFrom<EmailTemplate>
     {
-        public int Id { get; set; }
-        public int? ById { get; set; }
-        public int? ToPartnerId { get; set; }
+         public long Id { get; set; }
+        public long? ById { get; set; }
+        public long? ToPartnerId { get; set; }
 
         [StringLength(200)]
         public string? Subject { get; set; } = string.Empty;

@@ -25,13 +25,13 @@
             //            {
             //                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Ambil worksheet pertama
 
-            //                int rowCount = worksheet.Dimension.Rows;
-            //                int colCount = worksheet.Dimension.Columns;
+            //                long rowCount = worksheet.Dimension.Rows;
+            //                long colCount = worksheet.Dimension.Columns;
 
             //                // Lakukan sesuatu dengan data dari file Excel
-            //                for (int row = 1; row <= rowCount; row++)
+            //                for (long row = 1; row <= rowCount; row++)
             //                {
-            //                    for (int col = 1; col <= colCount; col++)
+            //                    for (long col = 1; col <= colCount; col++)
             //                    {
             //                        var cellValue = worksheet.Cells[row, col].Value;
             //                        // Lakukan sesuatu dengan nilai sel, misalnya, simpan ke dalam struktur data atau tampilkan di UI.
@@ -55,7 +55,7 @@
 
                 InvokeAsync(StateHasChanged);
             }
-            catch (Exception ee)
+            catch (Exception)
             {
                 throw;
             }
@@ -63,7 +63,6 @@
 
         private void woi()
         {
-            var a = "asd";
         }
 
         #region Default Grid Components

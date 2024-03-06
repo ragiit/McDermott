@@ -2,8 +2,8 @@
 {
     public class InsurancePolicy : BaseAuditableEntity
     {
-        public int UserId { get; set; } // Patient
-        public int InsuranceId { get; set; }
+        public long UserId { get; set; } // Patient
+        public long InsuranceId { get; set; }
         public string? PolicyNumber { get; set; }
         public bool Active { get; set; }
 

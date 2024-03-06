@@ -520,7 +520,7 @@
                                                         <DxFormLayoutGroup Caption="Input CPPT" ColSpanMd="12">
                                                             <Items>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="User" ColSpanMd="12">
-                                                                    <h3>@UserLogin.Name</h3>
+                                                                    <p>@UserLogin.Name</p>
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Subjective" ColSpanMd="12">
@@ -626,7 +626,7 @@
                                                                                 Text="Fetching Data...">
                                                                     <DxGrid @ref="GridTabCPPT" PagerNavigationMode="PagerNavigationMode.InputBox"
                                                                             Data="GeneralConsultanCPPTs"
-                                                                            PageSize="10"
+                                                                            PageSize="12"
                                                                             @bind-SelectedDataItems="@SelectedDataItemsCPPT"
                                                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                                                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
@@ -638,7 +638,7 @@
                                                                             PagerPosition="GridPagerPosition.Bottom"
                                                                             PageSizeSelectorVisible="true"
                                                                             CustomizeElement="GridCPPT_CustomizeElement"
-                                                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                                            PageSizeSelectorItems="@(new int[] { 12, 24, 68, 100 })"
                                                                             PageSizeSelectorAllRowsItemVisible="true"
                                                                             PagerSwitchToInputBoxButtonCount="10"
                                                                             FocusedRowChanged="GridTabCPPT_FocusedRowChanged"
@@ -888,8 +888,8 @@
                                                                     </DxMaskedInput>
                                                                 </DxFormLayoutItem>
 
-                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Plan" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@FormInputCPPTGeneralConsultan.Plan" NullText="Plan"
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Planning" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@FormInputCPPTGeneralConsultan.Plan" NullText="Planning"
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 

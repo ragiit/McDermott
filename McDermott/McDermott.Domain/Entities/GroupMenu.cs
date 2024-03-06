@@ -2,8 +2,8 @@
 {
     public class GroupMenu : BaseAuditableEntity
     {
-        public int GroupId { get; set; }
-        public int MenuId { get; set; }
+        public long GroupId { get; set; }
+        public long MenuId { get; set; }
         public bool? Create { get; set; }
         public bool? Read { get; set; }
         public bool? Update { get; set; }

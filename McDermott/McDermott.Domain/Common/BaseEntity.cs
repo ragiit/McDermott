@@ -6,6 +6,6 @@ namespace McDermott.Domain.Common
     public abstract class BaseEntity : IEntity
     {
         [Key, Column(Order = 0)]
-        public int Id { get; set; }
+        public long Id { get; set; }
     }
 }

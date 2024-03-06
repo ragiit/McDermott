@@ -6,9 +6,9 @@
 
         public class GetCountryQuery : IRequest<List<CountryDto>>;
 
-        public class GetCountryByIdQuery(int id) : IRequest<CountryDto>
+        public class GetCountryByIdQuery(long id) : IRequest<CountryDto>
         {
-            public int Id { get; set; } = id;
+             public long Id { get; set; } = id;
         }
 
         #endregion Get
@@ -45,17 +45,17 @@
 
         public class DeleteCountryRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteCountryRequest(int id)
+            public DeleteCountryRequest(long id)
             {
                 Id = id;
             }
         }
 
-        public class DeleteListCountryRequest(List<int> id) : IRequest<bool>
+        public class DeleteListCountryRequest(List<long> id) : IRequest<bool>
         {
-            public List<int> Id { get; set; } = id;
+            public List<long> Id { get; set; } = id;
         }
 
         #endregion Delete

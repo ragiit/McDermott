@@ -4,14 +4,14 @@
     {
         public class GetProvinceQuery : IRequest<List<ProvinceDto>>;
 
-        public class GetProvinceByIdQuery(int id) : IRequest<ProvinceDto>
+        public class GetProvinceByIdQuery(long id) : IRequest<ProvinceDto>
         {
-            public int Id { get; set; } = id;
+             public long Id { get; set; } = id;
         }
 
-        public class GetProvinceByCountry(int? countryId) : IRequest<List<ProvinceDto>>
+        public class GetProvinceByCountry(long? countryId) : IRequest<List<ProvinceDto>>
         {
-            public int? CountryId { get; set; } = countryId;
+            public long? CountryId { get; set; } = countryId;
         }
 
         public class CreateProvinceRequest(ProvinceDto ProvinceDto) : IRequest<ProvinceDto>
@@ -24,14 +24,14 @@
             public ProvinceDto ProvinceDto { get; set; } = ProvinceDto;
         }
 
-        public class DeleteProvinceRequest(int id) : IRequest<bool>
+        public class DeleteProvinceRequest(long id) : IRequest<bool>
         {
-            public int Id { get; set; } = id;
+             public long Id { get; set; } = id;
         }
 
-        public class DeleteListProvinceRequest(List<int> id) : IRequest<bool>
+        public class DeleteListProvinceRequest(List<long> id) : IRequest<bool>
         {
-            public List<int> Id { get; set; } = id;
+            public List<long> Id { get; set; } = id;
         }
     }
 }

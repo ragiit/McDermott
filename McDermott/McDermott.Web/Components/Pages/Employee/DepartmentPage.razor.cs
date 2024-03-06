@@ -9,8 +9,8 @@
         private List<UserDto> AllUsers = [];
         private List<UserDto> Users = [];
 
-        private int UpdateUserId { get; set; }
-        private int? SelectedUserId { get; set; }
+        private long UpdateUserId { get; set; }
+        private long? SelectedUserId { get; set; }
 
         private List<string> DepartmentCategories = new()
         {
@@ -185,7 +185,7 @@
 
             //try
             //{
-            //    int departmentId = SelectedDataItems[0].Adapt<DepartmentDto>().Id;
+            //    long departmentId = SelectedDataItems[0].Adapt<DepartmentDto>().Id;
             //    var user = AllUsers.FirstOrDefault(x => x.DepartmentId == departmentId);
 
             //    Users = AllUsers
@@ -203,7 +203,7 @@
 
             try
             {
-                int departmentId = SelectedDataItems[0].Adapt<DepartmentDto>().Id;
+                long departmentId = SelectedDataItems[0].Adapt<DepartmentDto>().Id;
                 var user = AllUsers.FirstOrDefault(x => x.DepartmentId == departmentId);
 
                 if (user is null)

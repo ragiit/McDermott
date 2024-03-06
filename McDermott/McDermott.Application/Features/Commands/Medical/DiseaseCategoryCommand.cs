@@ -6,9 +6,9 @@
 
         public class GetDiseaseCategoryByIdQuery : IRequest<DiseaseCategoryDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetDiseaseCategoryByIdQuery(int id)
+            public GetDiseaseCategoryByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteDiseaseCategoryRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteDiseaseCategoryRequest(int id)
+            public DeleteDiseaseCategoryRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListDiseaseCategoryRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListDiseaseCategoryRequest(List<int> id)
+            public DeleteListDiseaseCategoryRequest(List<long> id)
             {
                 Id = id;
             }

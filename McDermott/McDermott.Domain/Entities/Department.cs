@@ -2,9 +2,9 @@
 {
     public partial class Department : BaseAuditableEntity
     {
-        public int? CompanyId { get; set; }
-        public int? ParentDepartmentId { get; set; }
-        public int? ManagerId { get; set; }
+        public long? CompanyId { get; set; }
+        public long? ParentDepartmentId { get; set; }
+        public long? ManagerId { get; set; }
 
         [StringLength(200)]
         [Required]

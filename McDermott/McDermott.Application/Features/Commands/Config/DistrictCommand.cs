@@ -6,9 +6,9 @@
 
         public class GetDistrictByIdQuery : IRequest<DistrictDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetDistrictByIdQuery(int id)
+            public GetDistrictByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteDistrictRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteDistrictRequest(int id)
+            public DeleteDistrictRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListDistrictRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListDistrictRequest(List<int> id)
+            public DeleteListDistrictRequest(List<long> id)
             {
                 Id = id;
             }

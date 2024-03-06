@@ -2,8 +2,8 @@
 {
     public partial class BuildingLocation : BaseAuditableEntity
     {
-        public int BuildingId { get; set; }
-        public int LocationId { get; set; }
+        public long BuildingId { get; set; }
+        public long LocationId { get; set; }
 
         public virtual Building? Building { get; set; }
         public virtual Location? Location { get; set; }

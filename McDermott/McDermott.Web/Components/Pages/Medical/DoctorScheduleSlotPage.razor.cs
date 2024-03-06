@@ -6,9 +6,9 @@
 
         public class DoctorScheduleGrid
         {
-            public int PhysicionId { get; set; }
+            public long PhysicionId { get; set; }
             public string Physicion { get; set; } = string.Empty;
-            public List<int> DoctorScheduleIds { get; set; } = [];
+            public List<long> DoctorScheduleIds { get; set; } = [];
         };
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)

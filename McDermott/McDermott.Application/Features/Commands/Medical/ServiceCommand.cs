@@ -6,9 +6,9 @@
 
         public class GetServiceByIdQuery : IRequest<ServiceDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetServiceByIdQuery(int id)
+            public GetServiceByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteServiceRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteServiceRequest(int id)
+            public DeleteServiceRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListServiceRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListServiceRequest(List<int> id)
+            public DeleteListServiceRequest(List<long> id)
             {
                 Id = id;
             }

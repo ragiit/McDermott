@@ -16,6 +16,7 @@ global using McDermott.Web.Components.Layout;
 global using Microsoft.AspNetCore.Components.Forms;
 global using Microsoft.CodeAnalysis;
 global using System.Globalization;
+global using  System.Numerics;
 
 global using McDermott.Web.Extentions;
 

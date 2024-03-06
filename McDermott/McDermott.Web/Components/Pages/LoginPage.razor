@@ -234,11 +234,11 @@
             var user = await Mediator.Send(new GetUserQuery(x => x.Email == LoginForm.Email && x.Password == LoginForm.Password));
 
             if (!FormValidationState)
-        {
-            ToastService.ClearInfoToasts();
-            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
-            return;
-        }
+            {
+                ToastService.ClearInfoToasts();
+                ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+                return;
+            }
 
             if (user.Count > 0 && !string.IsNullOrWhiteSpace(LoginForm!.Email) && !string.IsNullOrWhiteSpace(LoginForm.Password))
             {
@@ -277,7 +277,7 @@
 
                 if (user[0].GroupId is not null)
                 {
-                    var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((int)user[0].GroupId));
+                    var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((long)user[0].GroupId));
 
                     var encryptMenu = Helper.Encrypt(JsonConvert.SerializeObject(g));
 

@@ -2,7 +2,7 @@
 {
     public class ServiceDto : IMapFrom<Service>
     {
-        public int Id { get; set; }
+         public long Id { get; set; }
 
         [StringLength(200)]
         [Required(ErrorMessage ="Name Must Failled in!")]
@@ -16,7 +16,7 @@
         public bool IsKiosk { get; set; } = false;
         public string Flag { get; set; } = string.Empty;
         public string KioskName { get; set; } = string.Empty;
-        public int? ServicedId { get; set; }
+        public long? ServicedId { get; set; }
         public virtual ServiceDto? Service { get; set; }
     }
 }

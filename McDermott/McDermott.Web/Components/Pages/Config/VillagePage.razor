@@ -16,7 +16,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                        Data="Villages"
+                                        Data="Data"
                                         PageSize="10"
                                         @bind-SelectedDataItems="@SelectedDataItems"
                                         FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -87,7 +87,7 @@
                                             var a = (VillageDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption"Caption="Name" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
                                                 <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>
@@ -97,8 +97,8 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
                                                 <DxComboBox ShowValidationIcon="true"
-                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                    Data="@Provinces"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@Provinces"
                                                             NullText="Select Province..."
                                                             @bind-Value="@a.ProvinceId"
                                                             TextFieldName="Name"
@@ -106,10 +106,10 @@
                                                 </DxComboBox>
                                                 <ValidationMessage For="@(()=>a.ProvinceId)" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption"Caption="City" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
                                                 <DxComboBox ShowValidationIcon="true"
-                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                    Data="@Cities"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@Cities"
                                                             NullText="Select City..."
                                                             @bind-Value="@a.CityId"
                                                             TextFieldName="Name"
@@ -119,8 +119,8 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="District" ColSpanMd="12">
                                                 <DxComboBox ShowValidationIcon="true"
-                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                    Data="@Districts"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@Districts"
                                                             NullText="Select District..."
                                                             @bind-Value="@a.DistrictId"
                                                             TextFieldName="Name"

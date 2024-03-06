@@ -185,7 +185,7 @@
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="NPWP" ColSpanMd="12">
                                                             <DxTextBox @bind-Text="@UserForm.Npwp" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="NPWP" />
                                                         </DxFormLayoutItem>
-                                                        
+
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Name" ColSpanMd="12">
                                                             <DxTextBox @bind-Text="@UserForm.EmergencyName" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Name" />
                                                         </DxFormLayoutItem>
@@ -509,15 +509,16 @@
                                         </DxFormLayoutGroup>
 
                                         <DxFormLayoutGroup Caption="Employee" ColSpanMd="12" Visible="@Convert.ToBoolean(UserForm.IsEmployee)">
-                                            <DxFormLayoutItem Caption="Job Position" CaptionCssClass="normal-caption">
-                                                <DxComboBox Data="@JobPositions"
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Job Position">
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@JobPositions"
                                                             NullText="Select Job Position..."
                                                             @bind-Value="@UserForm.JobPositionId"
                                                             TextFieldName="Name"
                                                             ValueFieldName="Id">
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="BPJS TK Number" CaptionCssClass="normal-caption">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="BPJS TK Number">
                                                 <DxMaskedInput @bind-Value="@UserForm.NoBpjsTk"
                                                                NullText="BPJS TK Number"
                                                                ShowValidationIcon="true"
@@ -525,26 +526,27 @@
                                                     <DxTextMaskProperties Placeholder="Placeholder" />
                                                 </DxMaskedInput>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Department" CaptionCssClass="normal-caption">
-                                                <DxComboBox Data="@Departments"
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Department">
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@Departments"
                                                             NullText="Select Department..."
                                                             @bind-Value="@UserForm.DepartmentId"
                                                             TextFieldName="Name"
                                                             ValueFieldName="Id">
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Join Date" CaptionCssClass="normal-caption">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Join Date">
                                                 <DxDateEdit @bind-Date="@UserForm.JoinDate" Mask="@DateTimeMask.ShortDate" NullText="Join Date" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="BPJS KS Number" CaptionCssClass="normal-caption">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="BPJS KS Number">
                                                 <DxMaskedInput @bind-Value="@UserForm.NoBpjsKs"
-                                                               NullText="BOJS KS Number"
+                                                               NullText="BPJS KS Number"
                                                                ShowValidationIcon="true"
                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
                                                     <DxTextMaskProperties Placeholder="Placeholder" />
                                                 </DxMaskedInput>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="NIP" CaptionCssClass="normal-caption">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="NIP Number">
                                                 <DxMaskedInput @bind-Value="@UserForm.NIP"
                                                                NullText="NIP"
                                                                ShowValidationIcon="true"
@@ -552,13 +554,13 @@
                                                     <DxTextMaskProperties Placeholder="Placeholder" />
                                                 </DxMaskedInput>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Legacy" CaptionCssClass="normal-caption">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Legacy Number">
                                                 <DxTextBox @bind-Text="@UserForm.Legacy" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Legacy" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Oracle" CaptionCssClass="normal-caption">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Oracle Number">
                                                 <DxTextBox @bind-Text="@UserForm.Oracle" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Oracle" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="SAP" CaptionCssClass="normal-caption">
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="SAP Number">
                                                 <DxTextBox @bind-Text="@UserForm.SAP" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="SAP" />
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>

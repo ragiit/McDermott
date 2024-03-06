@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-
-namespace McDermott.Web.Extentions
+﻿namespace McDermott.Web.Extentions
 {
     public class FileUploadService : IFileUploadService
     {
@@ -50,7 +48,7 @@ namespace McDermott.Web.Extentions
 
                 ////await response.Body.WriteAsync(content, 0, content.Length);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }

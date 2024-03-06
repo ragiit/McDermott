@@ -2,8 +2,8 @@
 {
     public class JobPositionDto : IMapFrom<JobPosition>
     {
-        public int Id { get; set; }
-        public int? DepartmentId { get; set; }
+         public long Id { get; set; }
+        public long? DepartmentId { get; set; }
 
         [StringLength(200)]
         [Required]

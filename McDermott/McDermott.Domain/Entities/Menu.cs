@@ -7,7 +7,7 @@
 
         public string? Icon { get; set; }
         public string? ParentMenu { get; set; }
-        public int? Sequence { get; set; }
+        public long? Sequence { get; set; }
         public string? Html { get; set; }
         public string? Url { get; set; }
 

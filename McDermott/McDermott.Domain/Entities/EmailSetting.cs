@@ -5,7 +5,7 @@
         [StringLength(300)]
         public string? Description { get; set; }
 
-        public int? Sequence { get; set; }
+        public long? Sequence { get; set; }
         public bool? Smpt_Debug { get; set; }
         public string? Smtp_Encryption { get; set; }
 

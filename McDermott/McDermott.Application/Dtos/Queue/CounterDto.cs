@@ -2,15 +2,15 @@
 {
     public class CounterDto : IMapFrom<Counter>
     {
-        public int Id { get; set; }
+         public long Id { get; set; }
 
         [Required]
         public string Name { get; set; }
 
         public bool IsActive { get; set; }
-        public int? ServiceId { get; set; }
-        public int? ServiceKId { get; set; }
-        public int? PhysicianId { get; set; }
+        public long? ServiceId { get; set; }
+        public long? ServiceKId { get; set; }
+        public long? PhysicianId { get; set; }
 
         public string? Status { get; set; } = string.Empty;
 

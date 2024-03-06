@@ -2,12 +2,12 @@
 {
     public class EmailSettingDto : IMapFrom<EmailSetting>
     {
-        public int Id { get; set; }
+         public long Id { get; set; }
 
         [StringLength(300)]
         public string? Description { get; set; } = string.Empty;
 
-        public int? Sequence { get; set; }
+        public long? Sequence { get; set; }
         public bool? Smtp_Debug { get; set; }
 
         [Required(ErrorMessage = "Connection Security Must Be Filled In!")]

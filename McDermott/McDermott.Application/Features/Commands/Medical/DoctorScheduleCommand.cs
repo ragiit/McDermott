@@ -14,9 +14,9 @@
 
         public class GetDoctorScheduleByIdQuery : IRequest<DoctorScheduleDto>
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
 
-            public GetDoctorScheduleByIdQuery(int id)
+            public GetDoctorScheduleByIdQuery(long id)
             {
                 Id = id;
             }
@@ -29,16 +29,16 @@
 
         public class GetDoctorScheduleSlotByDoctorScheduleIdRequest : IRequest<List<DoctorScheduleSlotDto>>
         {
-            public int DoctorScheduleId { get; set; }
-            public int PhysicianId { get; set; }
+            public long DoctorScheduleId { get; set; }
+            public long PhysicianId { get; set; }
 
-            public GetDoctorScheduleSlotByDoctorScheduleIdRequest(int DoctorScheduleId, int PhysicianId)
+            public GetDoctorScheduleSlotByDoctorScheduleIdRequest(long DoctorScheduleId, long PhysicianId)
             {
                 this.DoctorScheduleId = DoctorScheduleId;
                 this.PhysicianId = PhysicianId;
             }
 
-            public GetDoctorScheduleSlotByDoctorScheduleIdRequest(int DoctorScheduleId)
+            public GetDoctorScheduleSlotByDoctorScheduleIdRequest(long DoctorScheduleId)
             {
                 this.DoctorScheduleId = DoctorScheduleId;
             }
@@ -51,9 +51,9 @@
 
         public class GetDoctorScheduleDetailByScheduleIdQuery : IRequest<List<DoctorScheduleDetailDto>>
         {
-            public int DoctorScheduleId { get; set; }
+            public long DoctorScheduleId { get; set; }
 
-            public GetDoctorScheduleDetailByScheduleIdQuery(int DoctorScheduleId)
+            public GetDoctorScheduleDetailByScheduleIdQuery(long DoctorScheduleId)
             {
                 this.DoctorScheduleId = DoctorScheduleId;
             }
@@ -113,9 +113,9 @@
 
         public class DeleteDoctorScheduleDetailByScheduleIdRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteDoctorScheduleDetailByScheduleIdRequest(List<int> Id)
+            public DeleteDoctorScheduleDetailByScheduleIdRequest(List<long> Id)
             {
                 this.Id = Id;
             }
@@ -123,9 +123,9 @@
 
         public class DeleteDoctorScheduleRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
 
-            public DeleteDoctorScheduleRequest(int id)
+            public DeleteDoctorScheduleRequest(long id)
             {
                 Id = id;
             }
@@ -133,9 +133,9 @@
 
         public class DeleteDoctorScheduleLocationByIdRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteDoctorScheduleLocationByIdRequest(List<int> Id)
+            public DeleteDoctorScheduleLocationByIdRequest(List<long> Id)
             {
                 this.Id = Id;
             }
@@ -143,9 +143,9 @@
 
         public class DeleteListDoctorScheduleRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListDoctorScheduleRequest(List<int> id)
+            public DeleteListDoctorScheduleRequest(List<long> id)
             {
                 this.Id = id;
             }
@@ -153,9 +153,9 @@
 
         public class DeleteDoctorScheduleSlotRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
 
-            public DeleteDoctorScheduleSlotRequest(int id)
+            public DeleteDoctorScheduleSlotRequest(long id)
             {
                 Id = id;
             }
@@ -163,9 +163,9 @@
 
         public class DeleteListDoctorScheduleSlotRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListDoctorScheduleSlotRequest(List<int> id)
+            public DeleteListDoctorScheduleSlotRequest(List<long> id)
             {
                 this.Id = id;
             }
@@ -173,10 +173,10 @@
 
         public class DeleteDoctorScheduleSlotByPhysicionIdRequest : IRequest<bool>
         {
-            public List<int> PhysicianIds { get; set; }
-            public int DoctorScheduleId { get; set; }
+            public List<long> PhysicianIds { get; set; }
+            public long DoctorScheduleId { get; set; }
 
-            public DeleteDoctorScheduleSlotByPhysicionIdRequest(List<int> PhysicianIds, int DoctorScheduleId)
+            public DeleteDoctorScheduleSlotByPhysicionIdRequest(List<long> PhysicianIds, long DoctorScheduleId)
             {
                 this.PhysicianIds = PhysicianIds;
                 this.DoctorScheduleId = DoctorScheduleId;
@@ -185,10 +185,10 @@
 
         public class DeleteDoctorScheduleSlotByScheduleIdPhysicionIdRequest : IRequest<bool>
         {
-            public List<int> ScheduleId { get; set; }
-            public int PhysicionId { get; set; }
+            public List<long> ScheduleId { get; set; }
+            public long PhysicionId { get; set; }
 
-            public DeleteDoctorScheduleSlotByScheduleIdPhysicionIdRequest(List<int> ScheduleId, int physicionId)
+            public DeleteDoctorScheduleSlotByScheduleIdPhysicionIdRequest(List<long> ScheduleId, long physicionId)
             {
                 this.ScheduleId = ScheduleId;
                 this.PhysicionId = physicionId;
@@ -197,10 +197,10 @@
 
         public class DeleteListDoctorScheduleSlotByScheduleIdPhysicionIdRequest : IRequest<bool>
         {
-            public List<int> ScheduleId { get; set; }
-            public List<int> PhysicionId { get; set; }
+            public List<long> ScheduleId { get; set; }
+            public List<long> PhysicionId { get; set; }
 
-            public DeleteListDoctorScheduleSlotByScheduleIdPhysicionIdRequest(List<int> scheduleId, List<int> physicionId)
+            public DeleteListDoctorScheduleSlotByScheduleIdPhysicionIdRequest(List<long> scheduleId, List<long> physicionId)
             {
                 ScheduleId = scheduleId;
                 PhysicionId = physicionId;

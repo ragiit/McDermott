@@ -32,7 +32,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private string textPopUp = "";
         private string HeaderName { get; set; } = string.Empty;
         public IGrid Grid { get; set; }
-        private int ActiveTabIndex { get; set; } = 1;
+        private long ActiveTabIndex { get; set; } = 1;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
@@ -43,7 +43,7 @@ namespace McDermott.Web.Components.Pages.Queue
         #region Data Static And Variable Additional
 
         [Parameter]
-        public int id { get; set; }
+        public long id { get; set; }
 
         private List<string> type = new List<string>
         {
@@ -56,12 +56,12 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private string? NamePatient { get; set; } = string.Empty;
         private string? statBPJS { get; set; } = string.Empty;
-        private int? CountServiceId { get; set; }
+        private long? CountServiceId { get; set; }
 
         private KioskDto FormKios = new();
         private KioskQueueDto FormQueue = new();
         private bool showQueue { get; set; } = false;
-        private int _ServiceId { get; set; }
+        private long _ServiceId { get; set; }
         private string Bpjs { get; set; } = string.Empty;
         private IEnumerable<ServiceDto> SelectedServices = [];
         private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
@@ -70,7 +70,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Async Data And Auth
 
-        private int ServiceId
+        private long ServiceId
         {
             get => _ServiceId;
             set
@@ -229,7 +229,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #endregion Button Export, Import And Colmn Chooser
 
-        private async Task OnCanceled(int id)
+        private async Task OnCanceled(long id)
         {
             try
             {
@@ -292,7 +292,7 @@ namespace McDermott.Web.Components.Pages.Queue
                         FormKios.ServiceId = Services.FirstOrDefault(service => serviceIds.Contains(service.Id))?.Id;
                         var serviceId = FormKios.ServiceId;
 
-                        var matchingPhysicians = Physician.Where(phy => phy.DoctorServiceIds.Contains((int)serviceId));
+                        var matchingPhysicians = Physician.Where(phy => phy.DoctorServiceIds.Contains((long)serviceId));
 
                         if (matchingPhysicians.Any())
                         {
@@ -356,7 +356,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     else
                     {
                         var GetNoQueue = todayQueues.OrderByDescending(x => x.NoQueue).FirstOrDefault();
-                        FormQueue.NoQueue = (int)GetNoQueue.NoQueue + 1;
+                        FormQueue.NoQueue = (long)GetNoQueue.NoQueue + 1;
                     }
 
                     // mendapatkan service counter Id

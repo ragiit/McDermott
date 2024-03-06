@@ -32,7 +32,7 @@
             }
         }
 
-        internal class GetInsurancePolicyCountQueryHandler : IRequestHandler<GetInsurancePolicyCountQuery, int>
+        internal class GetInsurancePolicyCountQueryHandler : IRequestHandler<GetInsurancePolicyCountQuery, long>
         {
             private readonly IUnitOfWork _unitOfWork;
 
@@ -41,7 +41,7 @@
                 _unitOfWork = unitOfWork;
             }
 
-            public async Task<int> Handle(GetInsurancePolicyCountQuery query, CancellationToken cancellationToken)
+            public async Task<long> Handle(GetInsurancePolicyCountQuery query, CancellationToken cancellationToken)
             {
                 try
                 {

@@ -278,7 +278,7 @@
 
                     var countries = new List<CountryDto>();
 
-                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    for (long row = 2; row <= ws.Dimension.End.Row; row++)
                     {
                         var country = new CountryDto
                         {
@@ -433,10 +433,10 @@ public class UpdateInsurancePolicyRequest(InsurancePolicyDto InsurancePolicyDto)
 #endregion
 
 #region Delete
-public class DeleteInsurancePolicyRequest(int id = 0, List<int>? ids = null) : IRequest<bool>
+public class DeleteInsurancePolicyRequest(long id = 0, List<long>? ids = null) : IRequest<bool>
 {
-    public int Id { get; set; } = id;
-    public List<int> Ids { get; set; } = ids ?? [];
+    public long Id { get; set; } = id;
+    public List<long> Ids { get; set; } = ids ?? [];
 }
 #endregion
 ========================== END Command Handler ==========================

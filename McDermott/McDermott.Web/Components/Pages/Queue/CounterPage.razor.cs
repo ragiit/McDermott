@@ -36,15 +36,15 @@ namespace McDermott.Web.Components.Pages.Queue
         private bool EditItemsEnabled { get; set; }
         private bool showFormProcess { get; set; } = false;
         private bool GirdDetail { get; set; } = false;
-        private int CountCard { get; set; } = 0;
-        private int _ServiceId { get; set; }
-        private int _physicionId { get; set; }
-        private int idServiceK { get; set; }
-        private int ActiveTabIndex { get; set; } = 1;
+        private long CountCard { get; set; } = 0;
+        private long _ServiceId { get; set; }
+        private long _physicionId { get; set; }
+        private long idServiceK { get; set; }
+        private long ActiveTabIndex { get; set; } = 1;
         private string NameCounter { get; set; } = string.Empty;
         private string NameServices { get; set; } = string.Empty;
         private string NameServicesK { get; set; } = string.Empty;
-        private int? PhysicianId { get; set; }
+        private long? PhysicianId { get; set; }
         private string? userBy;
         private User? User = new();
 
@@ -54,7 +54,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Async Data And Auth
 
-        private int SelectServiced
+        private long SelectServiced
         {
             get => _ServiceId;
             set
@@ -71,7 +71,7 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        private int SelectPhysicion
+        private long SelectPhysicion
         {
             get => _physicionId;
             set
@@ -210,7 +210,7 @@ namespace McDermott.Web.Components.Pages.Queue
             textPopUp = "Add Data Counter";
         }
 
-        private async Task EditItem_Click(int Id)
+        private async Task EditItem_Click(long Id)
         {
             try
             {
@@ -222,14 +222,14 @@ namespace McDermott.Web.Components.Pages.Queue
             catch { }
         }
 
-        private void DeleteItem_Click(int Id)
+        private void DeleteItem_Click(long Id)
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
         #region Card
 
-        private async Task ShowOnProcess(int id)
+        private async Task ShowOnProcess(long id)
         {
             try
             {
@@ -251,7 +251,7 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        private async Task InActive_Click(int Id)
+        private async Task InActive_Click(long Id)
         {
             try
             {
@@ -279,7 +279,7 @@ namespace McDermott.Web.Components.Pages.Queue
             GirdDetail = false;
         }
 
-        private async Task DetailList(int Id)
+        private async Task DetailList(long Id)
         {
             try
             {
@@ -381,7 +381,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Methode Delete
 
-        private async Task OnDelete(int Id)
+        private async Task OnDelete(long Id)
         {
             try
             {
@@ -417,7 +417,7 @@ namespace McDermott.Web.Components.Pages.Queue
             catch { }
         }
 
-        private async Task StopProcess(int id)
+        private async Task StopProcess(long id)
         {
             try
             {
@@ -441,7 +441,7 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        private async Task ResumeProcess(int id)
+        private async Task ResumeProcess(long id)
         {
             try
             {

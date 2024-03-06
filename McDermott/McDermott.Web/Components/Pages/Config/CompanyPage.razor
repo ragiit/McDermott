@@ -21,7 +21,7 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
+                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                                 Data="Companys"
                                                 PageSize="10"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
@@ -67,7 +67,7 @@
                                             </ToolbarTemplate>
                                             <Columns>
                                                 <DxGridSelectionColumn width="15px" />
-                                                <DxGridDataColumn FieldName="Name" Caption="Name Company" SortIndex="0" />
+                                                <DxGridDataColumn FieldName="Name" Caption="Company Name" SortIndex="0" />
                                             </Columns>
                                         </DxGrid>
                                     </DxLoadingPanel>
@@ -121,7 +121,7 @@
                                                             <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
                                                                 <Template>
                                                                     <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                                        Data="@Provinces"
+                                                                                Data="@Provinces"
                                                                                 NullText="Select Province..."
                                                                                 @bind-Value="@formCompanies.ProvinceId"
                                                                                 TextFieldName="Name"
@@ -132,7 +132,7 @@
                                                             <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
                                                                 <Template>
                                                                     <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                                        Data="@Cities.Where(x => x.ProvinceId == formCompanies.ProvinceId)"
+                                                                                Data="@Cities.Where(x => x.ProvinceId == formCompanies.ProvinceId)"
                                                                                 NullText="Select City..."
                                                                                 @bind-Value="@formCompanies.CityId"
                                                                                 TextFieldName="Name"
@@ -143,7 +143,7 @@
                                                             <DxGridLayoutItem Row="3" Column="0" CssClass="mt">
                                                                 <Template>
                                                                     <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                                        Data="@Countries.Where(x => formCompanies.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == formCompanies.ProvinceId)?.CountryId)"
+                                                                                Data="@Countries.Where(x => formCompanies.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == formCompanies.ProvinceId)?.CountryId)"
                                                                                 NullText="Select Country..."
                                                                                 @bind-Value="@formCompanies.CountryId"
                                                                                 TextFieldName="Name"

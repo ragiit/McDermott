@@ -6,9 +6,9 @@
 
         public class GetCronisCategoryByIdQuery : IRequest<CronisCategoryDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetCronisCategoryByIdQuery(int id)
+            public GetCronisCategoryByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteCronisCategoryRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteCronisCategoryRequest(int id)
+            public DeleteCronisCategoryRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListCronisCategoryRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListCronisCategoryRequest(List<int> id)
+            public DeleteListCronisCategoryRequest(List<long> id)
             {
                 Id = id;
             }

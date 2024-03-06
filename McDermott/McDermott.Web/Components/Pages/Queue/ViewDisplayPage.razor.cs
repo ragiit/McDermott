@@ -3,7 +3,7 @@
     public partial class ViewDisplayPage
     {
         [Parameter]
-        public int id { get; set; }
+        public long id { get; set; }
 
         private string name = "wkwkwk";
     }

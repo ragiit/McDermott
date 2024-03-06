@@ -2,8 +2,8 @@
 {
     public class GeneralConsultanMedicalSupportDto : IMapFrom<GeneralConsultanMedicalSupport>
     {
-        public int Id { get; set; }
-        public int? GeneralConsultanServiceId { get; set; }
+         public long Id { get; set; }
+        public long? GeneralConsultanServiceId { get; set; }
 
         public string? LabEximinationName { get; set; }
         public string? LabEximinationAttachment { get; set; }

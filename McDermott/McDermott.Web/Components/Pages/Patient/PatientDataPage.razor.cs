@@ -33,7 +33,7 @@
         private bool SaveLiterals { get; set; } = true;
 
         [Parameter]
-        public int InsurancePoliciesCount { get; set; } = 0;
+        public long InsurancePoliciesCount { get; set; } = 0;
 
         public IGrid Grid { get; set; }
         public IGrid GridFamilyRelation { get; set; }
@@ -100,7 +100,7 @@
             StateHasChanged(); // Perbarui tampilan
         }
 
-        private void UpdateIntA(int newValue)
+        private void UpdateIntA(long newValue)
         {
             StateHasChanged(); // Perbarui tampilan
         }
@@ -127,7 +127,7 @@
 
             try
             {
-                UserForm.PatientAllergy.UserId = (int)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
+                UserForm.PatientAllergy.UserId = (long)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
             }
             catch { }
 
@@ -239,7 +239,7 @@
 
                 if (editModel.Id == 0)
                 {
-                    int newId;
+                    long newId;
                     do
                     {
                         newId = new Random().Next();
@@ -285,7 +285,7 @@
 
                     UserForm.NoRm = lastId is null
                              ? $"{date:dd-MM-yyyy}-0001"
-                             : $"{date:dd-MM-yyyy}-{(int.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
+                             : $"{date:dd-MM-yyyy}-{(long.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
 
                     var result = await Mediator.Send(new CreateUserRequest(UserForm));
                     UserForm.PatientAllergy.UserId = result.Id;
@@ -395,7 +395,7 @@
                 {
                     var a = SelectedDataItems.Adapt<List<UserDto>>();
 
-                    int userActive = (int)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
+                    long userActive = (long)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
 
                     await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
                 }

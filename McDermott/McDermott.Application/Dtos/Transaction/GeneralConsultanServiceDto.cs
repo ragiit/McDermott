@@ -2,22 +2,22 @@
 {
     public partial class GeneralConsultanServiceDto : IMapFrom<GeneralConsultanService>
     {
-        public int Id { get; set; }
+         public long Id { get; set; }
 
         [Required(ErrorMessage = "The Patient field is required.")]
-        public int? PatientId { get; set; }
+        public long? PatientId { get; set; }
 
-        public int? InsuranceId { get; set; }
+        public long? InsuranceId { get; set; }
 
-        public int? InsurancePolicyId { get; set; }
+        public long? InsurancePolicyId { get; set; }
 
         [Required(ErrorMessage = "The Service field is required.")]
-        public int? ServiceId { get; set; }
+        public long? ServiceId { get; set; }
 
         [Required(ErrorMessage = "The Physicion field is required.")]
-        public int? PratitionerId { get; set; }
+        public long? PratitionerId { get; set; }
 
-        public int? ClassType { get; set; }
+        public long? ClassType { get; set; }
         public string? StagingStatus { get; set; } = "Planned";
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }
@@ -39,7 +39,7 @@
         public string? ScheduleTime { get; set; }
 
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
-        public int? Age { get; set; }
+        public long? Age { get; set; }
 
         [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]

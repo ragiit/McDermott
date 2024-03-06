@@ -6,9 +6,9 @@
 
         public class GetVillageByIdQuery : IRequest<VillageDto>
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
 
-            public GetVillageByIdQuery(int id)
+            public GetVillageByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteVillageRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
 
-            public DeleteVillageRequest(int id)
+            public DeleteVillageRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListVillageRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListVillageRequest(List<int> id)
+            public DeleteListVillageRequest(List<long> id)
             {
                 Id = id;
             }

@@ -42,9 +42,9 @@
 
         public class GetGeneralConsultanServiceQuery : IRequest<List<GeneralConsultanServiceDto>>;
 
-        public class GetGeneralConsultanServiceByIdQuery(int id) : IRequest<GeneralConsultanServiceDto>
+        public class GetGeneralConsultanServiceByIdQuery(long id) : IRequest<GeneralConsultanServiceDto>
         {
-            public int Id { get; set; } = id;
+             public long Id { get; set; } = id;
         }
 
         public class GetGeneralConsultantClinicalAssesmentQuery(Expression<Func<GeneralConsultantClinicalAssesment, bool>>? predicate = null) : IRequest<List<GeneralConsultantClinicalAssesmentDto>>
@@ -66,9 +66,9 @@
 
         public class DeleteGeneralConsultanServiceRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteGeneralConsultanServiceRequest(int id)
+            public DeleteGeneralConsultanServiceRequest(long id)
             {
                 Id = id;
             }
@@ -76,9 +76,9 @@
 
         public class DeleteListGeneralConsultanServiceRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListGeneralConsultanServiceRequest(List<int> id)
+            public DeleteListGeneralConsultanServiceRequest(List<long> id)
             {
                 Id = id;
             }

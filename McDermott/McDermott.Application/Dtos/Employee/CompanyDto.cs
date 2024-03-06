@@ -2,12 +2,12 @@ namespace McDermott.Application.Dtos.Employee
 {
     public class CompanyDto : IMapFrom<Company>
     {
-        public int Id { get; set; }
-        public int? CityId { get; set; }
-        public int? ProvinceId { get; set; }
-        public int? CountryId { get; set; }
+         public long Id { get; set; }
+        public long? CityId { get; set; }
+        public long? ProvinceId { get; set; }
+        public long? CountryId { get; set; }
 
-        public int? CurrencyId { get; set; }
+        public long? CurrencyId { get; set; }
 
         [Required]
         [StringLength(200)]
