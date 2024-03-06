@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240306080212_AddTableDetailDisplayQueue")]
+    partial class AddTableDetailDisplayQueue
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -424,42 +427,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("CompanyId");
 
                     b.ToTable("Departments");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.DetailQueueDisplay", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CounterId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("QueueDisplayId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CounterId");
-
-                    b.HasIndex("QueueDisplayId");
-
-                    b.ToTable("DetailQueueDisplays");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Diagnosis", b =>
@@ -2642,23 +2609,6 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Company");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.DetailQueueDisplay", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.Counter", "Counter")
-                        .WithMany()
-                        .HasForeignKey("CounterId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("McDermott.Domain.Entities.QueueDisplay", "QueueDisplay")
-                        .WithMany()
-                        .HasForeignKey("QueueDisplayId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Counter");
-
-                    b.Navigation("QueueDisplay");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Diagnosis", b =>

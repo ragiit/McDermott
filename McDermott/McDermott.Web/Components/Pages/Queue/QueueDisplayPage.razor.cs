@@ -1,7 +1,9 @@
-﻿using McDermott.Application.Dtos.Queue;
+﻿using DevExpress.Blazor;
+using McDermott.Application.Dtos.Queue;
 using Microsoft.AspNetCore.Components.Forms;
 using OfficeOpenXml;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
+using static McDermott.Application.Features.Commands.Queue.DetailQueueDisplayCommand;
 using static McDermott.Application.Features.Commands.Queue.QueueDisplayCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
@@ -10,12 +12,18 @@ namespace McDermott.Web.Components.Pages.Queue
     {
         #region relation Data
 
+        private List<DetailQueueDisplayDto> DetailQueueDisplay = [];
         private List<QueueDisplayDto> QueueDisplay = [];
         private List<CounterDto> Counters = [];
+        public List<TempDetailQueueDisplayDto> TempDisplays = new();
         private GroupMenuDto UserAccessCRUID = new();
-        public QueueDisplayDto FormDisplays = new();
+        public TempDetailQueueDisplayDto FormDisplays = new();
+        public QueueDisplayDto Displays = new();
+        public DetailQueueDisplayDto DetDisplays = new();
 
         #endregion relation Data
+
+        #region Grid Properties
 
         private IEnumerable<CounterDto> selectedCounter { get; set; } = [];
         private bool IsAccess = false;
@@ -26,6 +34,11 @@ namespace McDermott.Web.Components.Pages.Queue
 
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+
+        #endregion Grid Properties
+
+        #region
+        private string? CountName { get; set; } = string.Empty;
 
         protected override async Task OnInitializedAsync()
         {
@@ -58,15 +71,41 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task LoadData()
         {
+            showPopUp = false;
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
+            DetailQueueDisplay = await Mediator.Send(new GetDetailQueueDisplayQuery());
             QueueDisplay = await Mediator.Send(new GetQueueDisplayQuery());
             Counters = await Mediator.Send(new GetCounterQuery());
             counteres = [.. Counters.Where(x => x.Status == "on process")];
-            //QueueDisplay.ForEach(x => x.NameCounter = string.Join(",", Counters.Where(z => x.CounterId != null && x.CounterId.Contains(z.Id)).Select(x => x.Name).ToList()));
+
+            // Join data DetailQueueDisplay dan QueueDisplay berdasarkan QueueDisplayId
+            var joinedData = DetailQueueDisplay.Join(QueueDisplay,
+                                                    detail => detail.QueueDisplayId,
+                                                    queue => queue.Id,
+                                                    (detail, queue) => new { Detail = detail, Queue = queue });
+
+            // Mengelompokkan data berdasarkan ID tampilan
+            var groupedData = joinedData.GroupBy(item => item.Queue.Id);
+
+            // Membuat objek TempDisplayDto dari data yang telah digabungkan
+            TempDisplays.Clear(); // Bersihkan koleksi sebelum menambahkan data baru
+
+            foreach (var group in groupedData)
+            {
+                var displayQueueName = group.First().Queue.Name;
+                var counterNames = string.Join(", ", group.Select(item => counteres.FirstOrDefault(counter => counter.Id == item.Detail.CounterId)?.Name));
+
+                TempDisplays.Add(new TempDetailQueueDisplayDto
+                {
+                    Name = displayQueueName,
+                    NameCounter = counterNames
+                });
+            }
             PanelVisible = false;
         }
 
+        #endregion
         #region Grid
 
         protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
@@ -210,10 +249,10 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Method OnRenderTo
 
-        private async Task OnRenderTo(QueueDisplayDto context)
+        private async Task OnRenderTo(DetailQueueDisplayDto context)
         {
             var DisplayId = context.Id;
-            NavigationManager.NavigateTo($"/queue/viewdisplay/{DisplayId}", true);
+            //NavigationManager.NavigateTo($"/queue/viewdisplay/{DisplayId}", true);
         }
 
         #endregion Method OnRenderTo
@@ -226,12 +265,12 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteQueueDisplayRequest(((QueueDisplayDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteDetailQueueDisplayRequest(((DetailQueueDisplayDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<QueueDisplayDto>>();
-                    await Mediator.Send(new DeleteListQueueDisplayRequest(a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<DetailQueueDisplayDto>>();
+                    await Mediator.Send(new DeleteListDetailQueueDisplayRequest(a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
@@ -251,17 +290,25 @@ namespace McDermott.Web.Components.Pages.Queue
                 if (string.IsNullOrWhiteSpace(FormDisplays.Name))
                     return;
 
-                if (FormDisplays.Id == 0)
+                if (FormDisplays != null)
                 {
+                    Displays.Name = FormDisplays.Name;
+
+                    var DisplayId = await Mediator.Send(new CreateQueueDisplayRequest(Displays));
+                    //var cekDisplayId = await Mediator.Send(new GetQueueDisplayByIdQuery(DisplayId));
+
                     var ListCounter = selectedCounter.Select(x => x.Id).ToList();
-                    //FormDisplays.CounterId?.AddRange(ListCounter);
-                    await Mediator.Send(new CreateQueueDisplayRequest(FormDisplays));
+                    foreach (var counter in ListCounter)
+                    {
+                        DetDisplays.QueueDisplayId = DisplayId.Id;
+                        DetDisplays.CounterId = counter;
+                        await Mediator.Send(new CreateDetailQueueDisplayRequest(DetDisplays));
+                    }
                 }
-                else
-                {
-                    //FormDisplays.CounterId = selectedCounter.Select(x => x.Id).ToList();
-                    await Mediator.Send(new UpdateQueueDisplayRequest(FormDisplays));
-                }
+
+                //    //FormDisplays.CounterId = selectedCounter.Select(x => x.Id).ToList();
+                //    await Mediator.Send(new UpdateQueueDisplayRequest(FormDisplays));
+
                 await LoadData();
             }
             catch (Exception ex)
@@ -271,5 +318,13 @@ namespace McDermott.Web.Components.Pages.Queue
         }
 
         #endregion Method save
+
+        // Model untuk menyimpan data tampilan grid
+        public class DisplayDataModel
+        {
+            public int Id { get; set; }
+            public string? Name { get; set; } = string.Empty;
+            public string? CounterNames { get; set; } = string.Empty;
+        }
     }
 }
