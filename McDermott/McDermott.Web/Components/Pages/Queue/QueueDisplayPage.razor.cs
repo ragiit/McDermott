@@ -63,7 +63,7 @@ namespace McDermott.Web.Components.Pages.Queue
             QueueDisplay = await Mediator.Send(new GetQueueDisplayQuery());
             Counters = await Mediator.Send(new GetCounterQuery());
             counteres = [.. Counters.Where(x => x.Status == "on process")];
-            QueueDisplay.ForEach(x => x.NameCounter = string.Join(",", Counters.Where(z => x.CounterId != null && x.CounterId.Contains(z.Id)).Select(x => x.Name).ToList()));
+            //QueueDisplay.ForEach(x => x.NameCounter = string.Join(",", Counters.Where(z => x.CounterId != null && x.CounterId.Contains(z.Id)).Select(x => x.Name).ToList()));
             PanelVisible = false;
         }
 
@@ -254,12 +254,12 @@ namespace McDermott.Web.Components.Pages.Queue
                 if (FormDisplays.Id == 0)
                 {
                     var ListCounter = selectedCounter.Select(x => x.Id).ToList();
-                    FormDisplays.CounterId?.AddRange(ListCounter);
+                    //FormDisplays.CounterId?.AddRange(ListCounter);
                     await Mediator.Send(new CreateQueueDisplayRequest(FormDisplays));
                 }
                 else
                 {
-                    FormDisplays.CounterId = selectedCounter.Select(x => x.Id).ToList();
+                    //FormDisplays.CounterId = selectedCounter.Select(x => x.Id).ToList();
                     await Mediator.Send(new UpdateQueueDisplayRequest(FormDisplays));
                 }
                 await LoadData();

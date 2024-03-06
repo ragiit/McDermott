@@ -2,6 +2,8 @@ using McDermott.Application.Extentions;
 using McDermott.Persistence.Extensions;
 using McDermott.Web.Components;
 using Serilog;
+using Microsoft.AspNetCore.ResponseCompression;
+using McDermott.Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,7 @@ builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = B
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredToast();
 builder.Services.AddHttpClient();
+builder.Services.AddSignalR();
 
 builder.Services.AddPersistenceLayer(builder.Configuration);
 
@@ -40,6 +43,8 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.MapHub<RealTimeHub>("/realTimeHub");
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 

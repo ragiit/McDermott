@@ -1,5 +1,5 @@
 ﻿using McDermott.Application.Dtos.Queue;
-using McDermott.Domain.Entities;
+
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 
@@ -33,6 +33,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region variabel data
 
+        private HubConnection hubConnection;
         private string NameCounter { get; set; } = string.Empty;
         private string NameServices { get; set; } = string.Empty;
         private string NameServicesK { get; set; } = string.Empty;
@@ -43,7 +44,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private bool ShowPresent { get; set; }
 
         [Parameter]
-        public int id { get; set; }
+        public int CounterId { get; set; }
 
         #endregion variabel data
 
@@ -63,7 +64,7 @@ namespace McDermott.Web.Components.Pages.Queue
             User = await oLocal.GetUserInfo();
             userBy = User.Name;
 
-            var general = await Mediator.Send(new GetCounterByIdQuery(id));
+            var general = await Mediator.Send(new GetCounterByIdQuery(CounterId));
             Services = await Mediator.Send(new GetServiceQuery());
             var physician = await Mediator.Send(new GetUserQuery());
             DataKiosksQueue = await Mediator.Send(new GetKioskQueueQuery());
@@ -161,6 +162,9 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     await Mediator.Send(new UpdateKioskQueueRequest(FormKiosksQueue));
                 }
+                var cek = CounterId;
+                
+                await hubConnection.SendAsync("ReceivedQueue", CounterId, FormKiosksQueue.ServiceKId, FormKiosksQueue.NoQueue);
                 await LoadData();
             }
             catch (Exception ex)

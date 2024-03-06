@@ -2,6 +2,7 @@
 using McDermott.Application.Dtos.Queue;
 using System;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
+using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 using static McDermott.Application.Features.Commands.Queue.QueueDisplayCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
@@ -11,6 +12,7 @@ namespace McDermott.Web.Components.Pages.Queue
         #region Data Relation
 
         private List<CompanyDto> companies = new();
+        private List<KioskQueueDto> kioskQueues = new();
         private List<QueueDisplayDto> queues = new();
         private CounterDto cqueues = new();
 
@@ -19,10 +21,12 @@ namespace McDermott.Web.Components.Pages.Queue
         #region static Variable
 
         [Parameter]
-        public int id { get; set; }
+        public int DisplayId { get; set; }
 
+        private HubConnection hubConnection;
         private List<int> CounterCount = new List<int>();
         private string currentTime;
+        private KioskQueueDto? Queuek { get; set; }
         #endregion static Variable
         private CultureInfo indonesianCulture = new CultureInfo("id-ID");
 
@@ -48,7 +52,15 @@ namespace McDermott.Web.Components.Pages.Queue
 
         protected override async Task OnInitializedAsync()
         {
-            //await UpdateTime();
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/realTimeHub"))
+                .Build();
+            hubConnection.On<int, int, int>("ReceivedQueue", (CounterId, ServiceKId, NoQueue) =>
+            {
+                ToastService.ShowInfo("oke " + CounterId);
+            });
+            await hubConnection.StartAsync();
+
             await LoadData();
         }
 
@@ -57,15 +69,17 @@ namespace McDermott.Web.Components.Pages.Queue
         private async Task LoadData()
         {
             queues = await Mediator.Send(new GetQueueDisplayQuery());
-            var CounterCout = queues.Where(x => x.Id == id).ToList();
+            var CounterCout = queues.Where(x => x.Id == DisplayId).ToList();
             var Counters = await Mediator.Send(new GetCounterQuery());
+            kioskQueues = await Mediator.Send(new GetKioskQueueQuery());
 
-            foreach (var i in CounterCout[0].CounterId)
-            {
-                //var a = queues.ForEach(x => x.listIdCounter =int.Join(",", Counters.Where(z => x.CounterId != null && x.CounterId.Contains(z.Id)).Select(x => x.Id).ToList()));
+            //foreach (var i in CounterCout[0].CounterId)
+            //{
+            //    var a = Counters.Where(x => x.Id == i).FirstOrDefault();
+            //    Queuek = kioskQueues.Where(x => x.ServiceKId == a.ServiceKId).FirstOrDefault();
 
-                listcounter.Add(Counters.Where(x => x.Id == i).FirstOrDefault());
-            }
+            //    listcounter.Add(a);
+            //}
         }
 
         #endregion
