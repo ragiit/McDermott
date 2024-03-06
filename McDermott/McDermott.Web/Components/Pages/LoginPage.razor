@@ -8,17 +8,18 @@
 @using System.Text
 @using Newtonsoft.Json
 @using System.Security.Claims
+@using System.ComponentModel.DataAnnotations
 
 @inject CustomAuthenticationStateProvider CustomAuth
 
-<PageTitle>McDermott - Login</PageTitle>
+<PageTitle>Mc HealthCare - Login</PageTitle>
 
 <div class="hold-transition login-page">
     <div class="login-box">
         <!-- /.login-logo -->
         <div class="card card-outline card-primary">
             <div class="card-header text-center">
-                <a href="../../index2.html" class="h1"><b>Mc</b>Dermott</a>
+                <a href="../../index2.html" class="h1"><b>Mc</b>HealthCare</a>
             </div>
             <div class="card-body">
                 <p class="login-box-msg">Sign in to start your session</p>
@@ -53,55 +54,66 @@
 
                 </form> *@
 
-                <DxFormLayout CssClass="mt-auto col-md">
-                    <DxFormLayoutItem ColSpanMd="12" BeginRow="true">
-                        <label for="EmailId" class="demo-text mb-1">
-                            Email:
-                        </label>
-                        <DxMaskedInput Value="@User.Email"
-                                       Mask="@EmailMask"
-                                       NullText="mail@domain.com"
-                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                       InputId="EmailId"
-                                       ValueChanged="@((string value) => OnEmailChanged(value))"
-                                       MaskMode="MaskMode.RegEx">
-                            <Buttons>
-                                <DxEditorButton IconCssClass="fa-solid fa-envelope" />
-                            </Buttons>
-                            <ChildContent>
-                                <DxRegExMaskProperties MaskAutoCompleteMode="@MaskAutoCompleteMode.Strong"
-                                                       Placeholder="@('_')"
-                                                       PlaceholdersVisible="true" />
-                            </ChildContent>
-                        </DxMaskedInput>
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem ColSpanMd="12" BeginRow="true">
-                        <label for="PasswordId" class="demo-text mb-1">
-                            Password:
-                        </label>
-                        <DxTextBox @bind-Text="@User.Password"
-                                   InputId="PasswordId"
-                                   NullText="Password" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                   Password="true">
-                            <Buttons>
-                                <DxEditorButton IconCssClass="fa-solid fa-lock" />
-                            </Buttons>
-                        </DxTextBox>
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem ColSpanMd="12" BeginRow="true">
-                        <div class="row  justify-content-end">
-                            <div class="col-auto align-self-end">
-                                <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline" Click="OnLogin" IconCssClass="fa-solid fa-right-to-bracket" Text="Sign In" SubmitFormOnClick="true" />
+                <EditForm Model="@LoginForm" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
+                          OnInvalidSubmit="@HandleInvalidSubmit">
+                    <DataAnnotationsValidator />
+                    <DxFormLayout CssClass="col-md">
+                        <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Email" ColSpanMd="12" BeginRow="true">
+                            <DxMaskedInput @bind-Value="LoginForm.Email"
+                                           Mask="@EmailMask"
+                                           NullText="mail@domain.com"
+                                           ShowValidationIcon="true"
+                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                           InputId="EmailId"
+                                           MaskMode="MaskMode.RegEx">
+                                <Buttons>
+                                    <DxEditorButton IconCssClass="fa-solid fa-envelope" />
+                                </Buttons>
+                                <ChildContent>
+                                    <DxRegExMaskProperties MaskAutoCompleteMode="@MaskAutoCompleteMode.Strong"
+                                                           Placeholder="@('_')"
+                                                           PlaceholdersVisible="true" />
+                                </ChildContent>
+                            </DxMaskedInput>
+                            <ValidationMessage For="@(()=>LoginForm.Email)"   />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Password" ColSpanMd="12" BeginRow="true">
+                            <DxTextBox @bind-Text="@LoginForm.Password"
+                                       InputId="PasswordId"
+                                       ShowValidationIcon="true"
+                                       NullText="Password" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                       Password="true">
+                                <Buttons>
+                                    <DxEditorButton IconCssClass="fa-solid fa-lock" />
+                                </Buttons>
+                            </DxTextBox>
+                            <ValidationMessage For="@(()=>LoginForm.Password)"   />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem ColSpanMd="12" BeginRow="true">
+                            <div class="row  justify-content-end">
+                                <div class="col-auto align-self-end">
+                                    <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-right-to-bracket" Text="Sign In" SubmitFormOnClick="true" />
+                                </div>
                             </div>
-                        </div>
-                    </DxFormLayoutItem>
-                </DxFormLayout>
+                        </DxFormLayoutItem>
+                    </DxFormLayout>
+                </EditForm>
             </div>
         </div>
     </div>
 </div>
 
 @code {
+    private LoginTemp LoginForm = new();
+    public class LoginTemp
+    {
+        [Required]
+        public string? Email { get; set; }
+
+        [Required]
+        public string? Password { get; set; }
+    }
+
     #region MaskedInput
     string EmailMask { get; set; } = @"(\w|[.-])+@(\w|-)+\.(\w|-){2,4}";
     string EmailLink { get; set; } = "mailto:test@example.com";
@@ -113,6 +125,25 @@
     #endregion
     private GroupMenuDto UserAccessCRUID = new();
     private bool IsAccess = false;
+
+    private async Task HandleValidSubmit()
+    {
+        FormValidationState = true;
+
+        await OnLogin();
+    }
+
+    private bool FormValidationState = true;
+    private void HandleInvalidSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(LoginForm.Password) || string.IsNullOrWhiteSpace(LoginForm.Email))
+        {
+            ToastService.ClearInfoToasts();
+            FormValidationState = false;
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+            return;
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -159,7 +190,7 @@
         }
         catch (Exception ex)
         {
-            ToastService.ShowError(ex.Message);
+            ex.HandleException(ToastService);
             // Handle exception
             // You might want to show an error message or log the exception
         }
@@ -197,84 +228,99 @@
         // toastService.ShowWarning("Warning");
         // toastService.ShowError("Error");
 
-        var user = await Mediator.Send(new GetUserQuery(x => x.Email == User.Email && x.Password == User.Password));
-        if (user.Count > 0 && !string.IsNullOrWhiteSpace(User!.Email) && !string.IsNullOrWhiteSpace(User.Password))
+        try
         {
-            // Helper.UserLogin = user;
+            ToastService.ClearErrorToasts();
+            var user = await Mediator.Send(new GetUserQuery(x => x.Email == LoginForm.Email && x.Password == LoginForm.Password));
 
-            // var claims = new List<Claim>
-            // {
-            //     new Claim(ClaimTypes.Name, user.Name),
-            //     new Claim(ClaimTypes.Role, Convert.ToBoolean(user.IsEmployee) ? "Employee" : "")
-            // };
-            // // var claims = new List<Claim>
-            // // {
-            // //     new Claim(ClaimTypes.Name, "username"),
-            // //     new Claim(ClaimTypes.Role, "Admin"),
-            // //     // Tambahkan klaim tambahan jika diperlukan
-            // // };
+            if (!FormValidationState)
+        {
+            ToastService.ClearInfoToasts();
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+            return;
+        }
 
-            // var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            // var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-            // await HttpContextAccessor?.HttpContext?.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
-            // await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
-
-            // await oLocal.GetItemAsync<string>("asd");
-
-            // var a = (CustomAuthenticationStateProvider)AuthenticationStateProvider;
-            // await a.UpdateAuthenticationState(user);
-
-            // await _protectedSessionStorage.SetAsync("UserSession", b);
-            // await _protectedSessionStorage.SetAsync("UserMenuSession", DetailMenuDtos);
-
-            string serialize = JsonConvert.SerializeObject(user[0]);
-            var encrypt = Helper.Encrypt(serialize);
-
-            await oLocal.SetItemAsync("dotnet", encrypt);
-
-            if (user[0].GroupId is not null)
+            if (user.Count > 0 && !string.IsNullOrWhiteSpace(LoginForm!.Email) && !string.IsNullOrWhiteSpace(LoginForm.Password))
             {
-                var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((int)user[0].GroupId));
+                // Helper.UserLogin = user;
 
-                var encryptMenu = Helper.Encrypt(JsonConvert.SerializeObject(g));
+                // var claims = new List<Claim>
+                // {
+                //     new Claim(ClaimTypes.Name, user.Name),
+                //     new Claim(ClaimTypes.Role, Convert.ToBoolean(user.IsEmployee) ? "Employee" : "")
+                // };
+                // // var claims = new List<Claim>
+                // // {
+                // //     new Claim(ClaimTypes.Name, "username"),
+                // //     new Claim(ClaimTypes.Role, "Admin"),
+                // //     // Tambahkan klaim tambahan jika diperlukan
+                // // };
 
-                await oLocal.SetItemAsync("dotnet2", encryptMenu);
+                // var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                // var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                // await HttpContextAccessor?.HttpContext?.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+                // await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+
+                // await oLocal.GetItemAsync<string>("asd");
+
+                // var a = (CustomAuthenticationStateProvider)AuthenticationStateProvider;
+                // await a.UpdateAuthenticationState(user);
+
+                // await _protectedSessionStorage.SetAsync("UserSession", b);
+                // await _protectedSessionStorage.SetAsync("UserMenuSession", DetailMenuDtos);
+
+                string serialize = JsonConvert.SerializeObject(user[0]);
+                var encrypt = Helper.Encrypt(serialize);
+
+                await oLocal.SetItemAsync("dotnet", encrypt);
+
+                if (user[0].GroupId is not null)
+                {
+                    var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((int)user[0].GroupId));
+
+                    var encryptMenu = Helper.Encrypt(JsonConvert.SerializeObject(g));
+
+                    await oLocal.SetItemAsync("dotnet2", encryptMenu);
+                }
+                else
+                {
+                    await oLocal.SetItemAsync("dotnet2", new List<string>());
+                }
+
+                var a = (CustomAuthenticationStateProvider)CustomAuth;
+                await a.UpdateAuthState(user.Adapt<User>());
+
+                NavigationManager.NavigateTo("", forceLoad: true);
+
+                // var claims = new List<Claim>
+                //     {
+                //         new Claim("CustomClaimType", "CustomClaimValue")
+                //     };
+
+                // var userIdentity = new ClaimsIdentity(claims, "login");
+
+                // ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
+
+                // // Serialize principal
+                // var authenticationState = new AuthenticationState(principal);
+                // AuthenticationStateProvider.NotifyAuthenticationStateChanged(Task.FromResult(authenticationState));
+
+                // isSuccess = true;
             }
             else
             {
-                await oLocal.SetItemAsync("dotnet2", new List<string>());
+                ToastService.ShowError("Invalid Email or Password!");
+                // if (string.IsNullOrWhiteSpace(User.Email) || string.IsNullOrWhiteSpace(User.Password))
+                // {
+                //     text = "Please insert the Email and Password";
+                // }
+                // isSuccess = false;
             }
-
-            var a = (CustomAuthenticationStateProvider)CustomAuth;
-            await a.UpdateAuthState(user.Adapt<User>());
-
-            NavigationManager.NavigateTo("", forceLoad: true);
-
-            // var claims = new List<Claim>
-            //     {
-            //         new Claim("CustomClaimType", "CustomClaimValue")
-            //     };
-
-            // var userIdentity = new ClaimsIdentity(claims, "login");
-
-            // ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
-
-            // // Serialize principal
-            // var authenticationState = new AuthenticationState(principal);
-            // AuthenticationStateProvider.NotifyAuthenticationStateChanged(Task.FromResult(authenticationState));
-
-            // isSuccess = true;
         }
-        else
+        catch (Exception ex)
         {
-            ToastService.ShowError("Invalid Email or Password!");
-            // if (string.IsNullOrWhiteSpace(User.Email) || string.IsNullOrWhiteSpace(User.Password))
-            // {
-            //     text = "Please insert the Email and Password";
-            // }
-            // isSuccess = false;
+            ex.HandleException(ToastService);
         }
     }
-
 }

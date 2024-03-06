@@ -1,9 +1,41 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Previewer;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class GeneralConsultanServicePage
     {
+        private async Task OnPrint()
+        {
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+            var image = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\mcdermott_logo.png");
+            await QuestPDF.Fluent.Document
+                .Create(x =>
+                {
+                    x.Page(page =>
+                    {
+                        page.Margin(2, QuestPDF.Infrastructure.Unit.Centimetre);
+
+                        page.Header().Row(row =>
+                        {
+                            row.Spacing(25);
+                            row.ConstantItem(150).Image(File.ReadAllBytes(image));
+                            row.RelativeItem().Column(c =>
+                            {
+                                c.Item().Text("Slip Registration").FontSize(36).SemiBold();
+                                c.Item().Text($"MedRec: {FormRegis.Patient.NoRm}");
+                                c.Item().Text($"Patient: {FormRegis.Patient.Name}");
+                                c.Item().Text($"NoID: {FormRegis.Patient.NoId}");
+                            });
+                        });
+                        //page.Header().Text("Slip Registration").SemiBold().FontSize(30);
+                    });
+                })
+                .ShowInPreviewerAsync();
+        }
+
         #region Relation Data
 
         private string TabText = string.Empty;
@@ -732,10 +764,12 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == FormRegis.PratitionerId && x.StartDate.Date == date.Date && x.DoctorSchedule.ServiceId == FormRegis.ServiceId));
 
-                FormRegis.ScheduleTime = null;
                 Times.Clear();
 
                 Times.AddRange(slots.Select(x => $"{x.WorkFromFormatString} - {x.WorkToFormatString}"));
+
+                if (Times.Count <= 0)
+                    FormRegis.ScheduleTime = null;
             }
             catch { }
         }
@@ -1370,27 +1404,30 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             catch { }
 
-            if (PaymentMethod.Equals("BPJS"))
+            if (PaymentMethod is not null)
             {
-                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS == true).ToList();
-                Temps = all.Select(x => new InsuranceTemp
+                if (PaymentMethod.Equals("BPJS"))
                 {
-                    InsurancePolicyId = x.Id,
-                    InsuranceId = x.InsuranceId,
-                    InsuranceName = x.Insurance.Name,
-                    PolicyNumber = x.PolicyNumber
-                }).ToList();
-            }
-            else
-            {
-                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS != true).ToList();
-                Temps = all.Select(x => new InsuranceTemp
+                    var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS == true).ToList();
+                    Temps = all.Select(x => new InsuranceTemp
+                    {
+                        InsurancePolicyId = x.Id,
+                        InsuranceId = x.InsuranceId,
+                        InsuranceName = x.Insurance.Name,
+                        PolicyNumber = x.PolicyNumber
+                    }).ToList();
+                }
+                else
                 {
-                    InsurancePolicyId = x.Id,
-                    InsuranceId = x.InsuranceId,
-                    InsuranceName = x.Insurance.Name,
-                    PolicyNumber = x.PolicyNumber
-                }).ToList();
+                    var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS != true).ToList();
+                    Temps = all.Select(x => new InsuranceTemp
+                    {
+                        InsurancePolicyId = x.Id,
+                        InsuranceId = x.InsuranceId,
+                        InsuranceName = x.Insurance.Name,
+                        PolicyNumber = x.PolicyNumber
+                    }).ToList();
+                }
             }
 
             var patientAlergy = PatientAllergies.Where(x => x.UserId == item!.Id).FirstOrDefault();
@@ -1410,6 +1447,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             else
             {
+                PatientAllergy.Food = null;
+                PatientAllergy.Weather = null;
+                PatientAllergy.Farmacology = null;
                 FormRegis.IsWeather = false;
                 FormRegis.IsPharmacology = false;
                 FormRegis.IsFood = false;
