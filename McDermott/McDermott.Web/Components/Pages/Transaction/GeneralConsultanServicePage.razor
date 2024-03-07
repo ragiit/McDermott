@@ -36,75 +36,75 @@
                         {
                             <div class="card">
                                 <div class="card-body">
-                                                                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                                                            IsContentBlocked="true"
-                                                                                            ApplyBackgroundShading="true"
-                                                                                            IndicatorAreaVisible="false"
-                                                                                            Text="Fetching Data...">
-                                                                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                                                        Data="GeneralConsultanServices.OrderByDescending(x => x.IsAlertInformationSpecialCase)"
-                                                                                        PageSize="10"
-                                                                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                                                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                                                        KeyFieldName="Id"
-                                                                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                                                                        DataItemDeleting="OnDelete"
-                                                                                        EditMode="GridEditMode.PopupEditForm"
-                                                                                        PagerPosition="GridPagerPosition.Bottom"
-                                                                                        PageSizeSelectorVisible="true"
-                                                                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                                                        PageSizeSelectorAllRowsItemVisible="true"
-                                                                                        PagerSwitchToInputBoxButtonCount="10"
-                                                                                        AllowSelectRowByClick="true"
-                                                                                        FocusedRowEnabled="true"
-                                                                                        RowDoubleClick="OnRowDoubleClick"
-                                                                                        PagerVisibleNumericButtonCount="10"
-                                                                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                                                                        ShowGroupPanel="true"
-                                                                                        ShowFilterRow="true"
-                                                                                        CustomizeElement="Grid_CustomizeElement"
-                                                                                        AutoExpandAllGroupRows="true"
-                                                                                        ShowSearchBox="true"
-                                                                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                                                                        KeyboardNavigationEnabled="true">
-                                                                                            <ToolbarTemplate>
-                                                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanServices.Count > 0" />
-                                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanServices.Count > 0" />
-                                                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                                                        <Items>
-                                                                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                                                        </Items>
-                                                                                    </DxToolbarItem>
-                                                                                    <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                                                                </DxToolbar>
-                                                                            </ToolbarTemplate>
-                                                                                    <Columns>
-                                                                                        <DxGridSelectionColumn Width="15px" />
-                                                                                        <DxGridDataColumn FieldName="RegistrationDate" Caption="Registration Date"/>
-                                                                                        <DxGridDataColumn FieldName="Patient.Name" Caption="Patient" />
-                                                                                        <DxGridDataColumn FieldName="Payment" Caption="Payment Methode" />
-                                                                                        <DxGridDataColumn FieldName="Pratitioner.Name" Caption="Doctor" />
-                                                                                        <DxGridDataColumn FieldName="Service.Name" Caption="Service" />
-                                                                                        <DxGridDataColumn FieldName="StagingStatus" Caption="Status" />
-                                                                                        <DxGridDataColumn FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
-                                                                                            <CellDisplayTemplate>
-                @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto).IsAlertInformationSpecialCase)
-                                                                                            </CellDisplayTemplate>
-                                                                                        </DxGridDataColumn>
-                                                                                    </Columns>
-                                                                                    <GroupSummary>
-                                                                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="StagingStatus"/>
-                                                                                    </GroupSummary>
-                                                                                </DxGrid>
-                                                                            </DxLoadingPanel>
-                                                                        </div>
+                                                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                            IsContentBlocked="true"
+                                                                            ApplyBackgroundShading="true"
+                                                                            IndicatorAreaVisible="false"
+                                                                            Text="Fetching Data...">
+                                                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                                        Data="GeneralConsultanServices.OrderByDescending(x => x.IsAlertInformationSpecialCase)"
+                                                                        PageSize="10"
+                                                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                                        KeyFieldName="Id"
+                                                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                                                        DataItemDeleting="OnDelete"
+                                                                        EditMode="GridEditMode.PopupEditForm"
+                                                                        PagerPosition="GridPagerPosition.Bottom"
+                                                                        PageSizeSelectorVisible="true"
+                                                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                                        PageSizeSelectorAllRowsItemVisible="true"
+                                                                        PagerSwitchToInputBoxButtonCount="10"
+                                                                        AllowSelectRowByClick="true"
+                                                                        FocusedRowEnabled="true"
+                                                                        RowDoubleClick="OnRowDoubleClick"
+                                                                        PagerVisibleNumericButtonCount="10"
+                                                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                                                        ShowGroupPanel="true"
+                                                                        ShowFilterRow="true"
+                                                                        CustomizeElement="Grid_CustomizeElement"
+                                                                        AutoExpandAllGroupRows="true"
+                                                                        ShowSearchBox="true"
+                                                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                                                        KeyboardNavigationEnabled="true">
+                                                                            <ToolbarTemplate>
+                                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanServices.Count > 0" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanServices.Count > 0" />
+                                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                                        <Items>
+                                                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                                        </Items>
+                                                                    </DxToolbarItem>
+                                                                    <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                                                </DxToolbar>
+                                                            </ToolbarTemplate>
+                                                                    <Columns>
+                                                                        <DxGridSelectionColumn Width="15px" />
+                                                                        <DxGridDataColumn FieldName="RegistrationDate" Caption="Registration Date"/>
+                                                                        <DxGridDataColumn FieldName="Patient.Name" Caption="Patient" />
+                                                                        <DxGridDataColumn FieldName="Payment" Caption="Payment Methode" />
+                                                                        <DxGridDataColumn FieldName="Pratitioner.Name" Caption="Doctor" />
+                                                                        <DxGridDataColumn FieldName="Service.Name" Caption="Service" />
+                                                                        <DxGridDataColumn FieldName="StagingStatus" Caption="Status" />
+                                                                        <DxGridDataColumn FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
+                                                                            <CellDisplayTemplate>
+@GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto).IsAlertInformationSpecialCase)
+                                                                            </CellDisplayTemplate>
+                                                                        </DxGridDataColumn>
+                                                                    </Columns>
+                                                                    <GroupSummary>
+                                                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="StagingStatus"/>
+                                                                    </GroupSummary>
+                                                                </DxGrid>
+                                                            </DxLoadingPanel>
+                               </div>
                             </div>
                         }
                         else
