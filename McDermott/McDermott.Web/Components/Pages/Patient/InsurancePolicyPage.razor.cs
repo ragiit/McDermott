@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using OfficeOpenXml;
+﻿using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Patient
 {
@@ -22,14 +21,14 @@ namespace McDermott.Web.Components.Pages.Patient
         #region Data
 
         private bool IsBPJS = false;
-        private int? _InsuranceId = 0;
+        private long? _InsuranceId = 0;
 
-        private int? InsuranceId
+        private long? InsuranceId
         {
             get => _InsuranceId;
             set
             {
-                InsurancePoliciyForm.InsuranceId = (int)value;
+                InsurancePoliciyForm.InsuranceId = (long)value;
                 _InsuranceId = value;
 
                 IsBPJS = Insurances.Any(x => x.IsBPJS == true && x.Id == value) ? true : false;

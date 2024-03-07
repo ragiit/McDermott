@@ -136,7 +136,7 @@
 
                 return (true, z!);
             }
-            catch (JSDisconnectedException ex)
+            catch (JSDisconnectedException)
             {
                 return (false, new());
             }
@@ -159,7 +159,7 @@
         //    return await o.GetItemAsync<List<MenuDto>>("Menu");
         //}
 
-        public static void CustomNavigateToPage(this NavigationManager navigationManager, string page, int? id = 0)
+        public static void CustomNavigateToPage(this NavigationManager navigationManager, string page, long? id = null)
         {
             var action = id is null ? "add" : "edit";
             string url = $"{page}/{action}";
@@ -187,7 +187,6 @@
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStreamAsync();
-                    var fileName = "Hasil-Ronsen.jpeg"; // Change the file name if necessary
 
                     using (var ms = new MemoryStream())
                     {
@@ -208,7 +207,7 @@
                     // You might want to show an error message or log the error
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Handle exception
                 // You might want to show an error message or log the exception

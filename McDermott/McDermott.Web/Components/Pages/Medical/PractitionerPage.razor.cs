@@ -43,8 +43,12 @@
 
         private List<string> MartialStatuss = new()
         {
-            "Single",
-            "Married"
+           "Single",
+            "Married",
+            "Divorced",
+            "Widowed",
+            "Separated",
+            "Unmarried"
         };
 
         protected override async Task OnInitializedAsync()
@@ -236,7 +240,7 @@
             {
                 var a = SelectedDataItems.Adapt<List<UserDto>>();
 
-                int userActive = (int)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
+                long userActive = (long)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
 
                 _ = await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
             }

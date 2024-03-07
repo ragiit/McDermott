@@ -21,10 +21,10 @@ namespace McDermott.Web.Components.Pages.Queue
         #region static Variable
 
         [Parameter]
-        public int DisplayId { get; set; }
+        public long DisplayId { get; set; }
 
         private HubConnection hubConnection;
-        private List<int> CounterCount = new List<int>();
+        private List<long> CounterCount = new List<long>();
         private string currentTime;
         private KioskQueueDto? Queuek { get; set; }
         #endregion static Variable
@@ -55,7 +55,7 @@ namespace McDermott.Web.Components.Pages.Queue
             hubConnection = new HubConnectionBuilder()
                 .WithUrl(NavigationManager.ToAbsoluteUri("/realTimeHub"))
                 .Build();
-            hubConnection.On<int, int, int>("ReceivedQueue", (CounterId, ServiceKId, NoQueue) =>
+            hubConnection.On<long, long, long>("ReceivedQueue", (CounterId, ServiceKId, NoQueue) =>
             {
                 ToastService.ShowInfo("oke " + CounterId);
             });

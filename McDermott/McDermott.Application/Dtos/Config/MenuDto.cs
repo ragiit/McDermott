@@ -2,7 +2,7 @@
 {
     public class MenuDto : IMapFrom<Menu>
     {
-        public int Id { get; set; }
+         public long Id { get; set; }
 
         [Required]
         [StringLength(200)]
@@ -10,7 +10,7 @@
 
         public string? Icon { get; set; }
         public string? ParentMenu { get; set; }
-        public int? Sequence { get; set; }
+        public long? Sequence { get; set; }
         public string? Html { get; set; }
         public string? Url { get; set; }
     }

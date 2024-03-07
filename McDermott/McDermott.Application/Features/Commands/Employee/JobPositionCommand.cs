@@ -6,9 +6,9 @@
 
         public class GetJobPositionByIdQuery : IRequest<JobPositionDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetJobPositionByIdQuery(int id)
+            public GetJobPositionByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteJobPositionRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteJobPositionRequest(int id)
+            public DeleteJobPositionRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListJobPositionRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListJobPositionRequest(List<int> id)
+            public DeleteListJobPositionRequest(List<long> id)
             {
                 Id = id;
             }

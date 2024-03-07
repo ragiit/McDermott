@@ -8,9 +8,9 @@ namespace McDermott.Application.Features.Commands.Queue
 
         public class GetKioskByIdQuery : IRequest<KioskDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetKioskByIdQuery(int id)
+            public GetKioskByIdQuery(long id)
             {
                 Id = id;
             }
@@ -38,9 +38,9 @@ namespace McDermott.Application.Features.Commands.Queue
 
         public class DeleteKioskRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteKioskRequest(int id)
+            public DeleteKioskRequest(long id)
             {
                 Id = id;
             }
@@ -48,9 +48,9 @@ namespace McDermott.Application.Features.Commands.Queue
 
         public class DeleteListKioskRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListKioskRequest(List<int> id)
+            public DeleteListKioskRequest(List<long> id)
             {
                 Id = id;
             }

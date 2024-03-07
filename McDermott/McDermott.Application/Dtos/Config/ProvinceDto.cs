@@ -2,10 +2,10 @@
 {
     public class ProvinceDto : IMapFrom<Province>
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
-        public int? CountryId { get; set; }
+        public long? CountryId { get; set; }
 
         [Required]
         [StringLength(200)]

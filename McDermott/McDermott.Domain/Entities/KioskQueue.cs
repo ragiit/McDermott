@@ -2,10 +2,10 @@
 {
     public class KioskQueue : BaseAuditableEntity
     {
-        public int? KioskId { get; set; }
-        public int? ServiceId { get; set; }
-        public int? ServiceKId { get; set; }
-        public int? NoQueue { get; set; }
+        public long? KioskId { get; set; }
+        public long? ServiceId { get; set; }
+        public long? ServiceKId { get; set; }
+        public long? NoQueue { get; set; }
         public string? Status { get; set; }
 
         [SetToNull]

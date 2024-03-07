@@ -8,8 +8,8 @@ namespace McDermott.Domain.Entities
 {
     public class DetailQueueDisplay: BaseAuditableEntity
     {
-        public int? QueueDisplayId { get; set; }
-        public int? CounterId { get; set; }
+        public long? QueueDisplayId { get; set; }
+        public long? CounterId { get; set; }
 
         public virtual QueueDisplay? QueueDisplay { get; set; }
         public virtual Counter? Counter { get; set; }

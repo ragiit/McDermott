@@ -19,7 +19,7 @@
 
                     return result.Adapt<List<GeneralConsultanCPPTDto>>();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return [];
                 }

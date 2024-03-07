@@ -6,9 +6,9 @@
 
         public class GetGenderByIdQuery : IRequest<GenderDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetGenderByIdQuery(int id)
+            public GetGenderByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteGenderRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteGenderRequest(int id)
+            public DeleteGenderRequest(long id)
             {
                 Id = id;
             }

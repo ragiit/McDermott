@@ -272,9 +272,7 @@
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="NPWP" ColSpanMd="12">
                                                                 <DxTextBox @bind-Text="@UserForm.Npwp" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="NPWP" />
                                                             </DxFormLayoutItem>
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Relation" ColSpanMd="12">
-                                                                <DxTextBox @bind-Text="@UserForm.EmergencyRelation" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Relation" />
-                                                            </DxFormLayoutItem>
+                                                           
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Name" ColSpanMd="12">
                                                                 <DxTextBox @bind-Text="@UserForm.EmergencyName" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Name" />
                                                             </DxFormLayoutItem>
@@ -570,17 +568,17 @@
                                                             <Columns>
                                                                 <DxGridSelectionColumn Width="15px" />
                                                                 <DxGridDataColumn FieldName="FamilyMember.Name" Caption="Family Member" SortIndex="0" />
-                                                                <DxGridDataColumn FieldName="Relation" Caption="Relation" />
+                                                                <DxGridDataColumn FieldName="Family.Relation" Caption="Relation" />
                                                             </Columns>
                                                             <EditFormTemplate Context="EditFormContext2">
                                                                 @{
                                                                     var a = (PatientFamilyRelationDto)EditFormContext2.EditModel;
                                                                 }
                                                                 <DxFormLayout CssClass="w-100">
-                                                                    <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Patient" ColSpanMd="12">
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient" ColSpanMd="12">
                                                                         <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                     Data="@Patiens"
-                                                                                    NullText="Select Patient..."
+                                                                                    NullText="Select Family Member..."
                                                                                     @bind-Value="@a.FamilyMemberId"
                                                                                     TextFieldName="Name"
                                                                                     ValueFieldName="Id">

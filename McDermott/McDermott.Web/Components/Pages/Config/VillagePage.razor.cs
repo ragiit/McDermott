@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Config
+﻿using DevExpress.ClipboardSource.SpreadsheetML;
+
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class VillagePage
     {
@@ -6,9 +8,11 @@
         public IGrid Grid { get; set; }
         private List<ProvinceDto> Provinces = new();
         private List<DistrictDto> Districts = new();
-        private List<VillageDto> Villages = new();
         private List<CountryDto> Countrys = new();
         private List<CityDto> Cities = new();
+
+        private List<VillageDto> Villages = new();
+        private object Data { get; set; }
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
@@ -44,6 +48,11 @@
                     var result = await NavigationManager.CheckAccessUser(oLocal);
                     IsAccess = result.Item1;
                     UserAccessCRUID = result.Item2;
+
+                    await Grid.WaitForDataLoadAsync();
+                    Grid.ExpandGroupRow(1);
+                    await Grid.WaitForDataLoadAsync();
+                    Grid.ExpandGroupRow(2);
                 }
                 catch { }
             }
@@ -51,8 +60,19 @@
 
         private async Task LoadData()
         {
+            var a = await Mediator.Send(new GetVillageQuery());
+            var dataSource = new GridDevExtremeDataSource<VillageDto>(a.AsQueryable());
+            dataSource.CustomizeLoadOptions = (loadOptions) =>
+            {
+                // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+                // This can make SQL execution plans more efficient.
+                loadOptions.PrimaryKey = new[] { "Id" };
+                loadOptions.PaginateViaPrimaryKey = true;
+            };
+
+            Data = dataSource;
+
             SelectedDataItems = new ObservableRangeCollection<object>();
-            Villages = await Mediator.Send(new GetVillageQuery());
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)

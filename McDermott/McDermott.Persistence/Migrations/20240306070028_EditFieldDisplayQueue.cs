@@ -10,10 +10,10 @@ namespace McDermott.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<int>(
+            migrationBuilder.AlterColumn<long>(
                 name: "CounterId",
                 table: "QueueDisplays",
-                type: "int",
+                type: "bigint",
                 nullable: true,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)",
@@ -28,8 +28,8 @@ namespace McDermott.Persistence.Migrations
                 table: "QueueDisplays",
                 type: "nvarchar(max)",
                 nullable: true,
-                oldClrType: typeof(int),
-                oldType: "int",
+                oldClrType: typeof(long),
+                oldType: "bigint",
                 oldNullable: true);
         }
     }

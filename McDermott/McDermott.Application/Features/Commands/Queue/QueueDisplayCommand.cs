@@ -13,9 +13,9 @@ namespace McDermott.Application.Features.Commands.Queue
 
         public class GetQueueDisplayByIdQuery : IRequest<QueueDisplayDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetQueueDisplayByIdQuery(int id)
+            public GetQueueDisplayByIdQuery(long id)
             {
                 Id = id;
             }
@@ -43,9 +43,9 @@ namespace McDermott.Application.Features.Commands.Queue
 
         public class DeleteQueueDisplayRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteQueueDisplayRequest(int id)
+            public DeleteQueueDisplayRequest(long id)
             {
                 Id = id;
             }
@@ -53,9 +53,9 @@ namespace McDermott.Application.Features.Commands.Queue
 
         public class DeleteListQueueDisplayRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListQueueDisplayRequest(List<int> id)
+            public DeleteListQueueDisplayRequest(List<long> id)
             {
                 Id = id;
 

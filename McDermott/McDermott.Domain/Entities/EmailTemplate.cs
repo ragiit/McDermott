@@ -8,12 +8,12 @@
         [StringLength(200)]
         public string? From { get; set; }
 
-        public int? ById { get; set; }
+        public long? ById { get; set; }
 
         [StringLength(200)]
         public string? To { get; set; }
 
-        public int? ToPartnerId { get; set; }
+        public long? ToPartnerId { get; set; }
 
         [StringLength(200)]
         public string? Cc { get; set; }

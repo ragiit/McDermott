@@ -1,4 +1,4 @@
-﻿@page "/queue/viewdisplay/{DisplayId:int}"
+﻿@page "/queue/viewdisplay/{DisplayId:long}"
 @rendermode InteractiveServer
 
 <div class="wrapper">
@@ -34,7 +34,6 @@
                             </div>
                             <div class="card-body">
                                 <h1>@Queuek.NoQueue</h1>
-                                
                             </div>
                             <div class="card-footer bg-gradient-success py-0">
                                 <h3 class="text-center text-light">@view.Name</h3>

@@ -17,10 +17,10 @@
     private IGrid Grid { get; set; }
 
     [Parameter]
-    public int PhysicianId { get; set; } = new();
+    public long PhysicianId { get; set; } = new();
 
     [Parameter]
-    public List<int> DoctorScheduleIds { get; set; } = [];
+    public List<long> DoctorScheduleIds { get; set; } = [];
 
     public List<DoctorScheduleDto> DoctorSchedules { get; set; } = [];
 

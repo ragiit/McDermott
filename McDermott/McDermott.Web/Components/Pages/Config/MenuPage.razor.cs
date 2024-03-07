@@ -142,6 +142,11 @@
             {
                 var splits = editModel.Name.ToLower().Split(" ");
                 editModel.Url = $"{editModel.ParentMenu.ToLower().Trim()}/{string.Join("-", splits)}";
+
+                if (editModel.ParentMenu.Contains("Configuration"))
+                {
+                    editModel.Url = $"config/{string.Join("-", splits)}";
+                }
             }
 
             if (editModel.Id == 0)

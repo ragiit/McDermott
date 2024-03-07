@@ -6,9 +6,9 @@ namespace McDermott.Application.Features.Commands.Config
 
         public class GetOccupationalByIdQuery : IRequest<OccupationalDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetOccupationalByIdQuery(int id)
+            public GetOccupationalByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@ namespace McDermott.Application.Features.Commands.Config
 
         public class DeleteOccupationalRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteOccupationalRequest(int id)
+            public DeleteOccupationalRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@ namespace McDermott.Application.Features.Commands.Config
 
         public class DeleteListOccupationalRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListOccupationalRequest(List<int> id)
+            public DeleteListOccupationalRequest(List<long> id)
             {
                 Id = id;
             }

@@ -6,9 +6,9 @@
 
         public class GetInsuranceByIdQuery : IRequest<InsuranceDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetInsuranceByIdQuery(int id)
+            public GetInsuranceByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteInsuranceRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteInsuranceRequest(int id)
+            public DeleteInsuranceRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListInsuranceRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListInsuranceRequest(List<int> id)
+            public DeleteListInsuranceRequest(List<long> id)
             {
                 Id = id;
             }

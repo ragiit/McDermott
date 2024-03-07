@@ -6,9 +6,9 @@
 
         public class GetProcedureByIdQuery : IRequest<ProcedureDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetProcedureByIdQuery(int id)
+            public GetProcedureByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteProcedureRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteProcedureRequest(int id)
+            public DeleteProcedureRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListProcedureRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListProcedureRequest(List<int> id)
+            public DeleteListProcedureRequest(List<long> id)
             {
                 Id = id;
             }

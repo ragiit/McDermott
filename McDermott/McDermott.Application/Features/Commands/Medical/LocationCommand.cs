@@ -6,9 +6,9 @@
 
         public class GetLocationByIdQuery : IRequest<LocationDto>
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
 
-            public GetLocationByIdQuery(int id)
+            public GetLocationByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteLocationRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
 
-            public DeleteLocationRequest(int id)
+            public DeleteLocationRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListLocationRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListLocationRequest(List<int> id)
+            public DeleteListLocationRequest(List<long> id)
             {
                 Id = id;
             }

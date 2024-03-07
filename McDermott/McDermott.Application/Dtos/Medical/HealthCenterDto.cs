@@ -2,10 +2,10 @@
 {
     public class HealthCenterDto : IMapFrom<HealthCenter>
     {
-        public int Id { get; set; }
-        public int? CityId { get; set; }
-        public int? ProvinceId { get; set; }
-        public int? CountryId { get; set; }
+         public long Id { get; set; }
+        public long? CityId { get; set; }
+        public long? ProvinceId { get; set; }
+        public long? CountryId { get; set; }
 
         [Required]
         public string Name { get; set; } = string.Empty;

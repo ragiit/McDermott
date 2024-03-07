@@ -2,7 +2,7 @@
 {
     public class GeneralConsultanCPPT : BaseAuditableEntity
     {
-        public int GeneralConsultanServiceId { get; set; }
+        public long GeneralConsultanServiceId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Body { get; set; } = string.Empty;
         public DateTime DateTime { get; set; } = DateTime.Now;

@@ -2,8 +2,8 @@
 {
     public class GeneralConsultantClinicalAssesmentDto : IMapFrom<GeneralConsultantClinicalAssesment>
     {
-        public int Id { get; set; }
-        public int GeneralConsultanServiceId { get; set; }
+         public long Id { get; set; }
+        public long GeneralConsultanServiceId { get; set; }
         public double _Weight { get; set; }
 
         public double Weight
@@ -61,25 +61,25 @@
             }
         }
 
-        public int RR { get; set; }
-        public int Temp { get; set; }
+        public long RR { get; set; }
+        public long Temp { get; set; }
 
         [Required]
-        public int HR { get; set; }
+        public long HR { get; set; }
 
-        public int RBS { get; set; }
-        public int Systolic { get; set; }
-        public int DiastolicBP { get; set; }
-        public int SpO2 { get; set; }
+        public long RBS { get; set; }
+        public long Systolic { get; set; }
+        public long DiastolicBP { get; set; }
+        public long SpO2 { get; set; }
 
         public double BMIIndex { get; set; }
         public string BMIIndexString { get; set; } = "0";
 
         public string BMIState { get; set; } = "-";
 
-        public int E { get; set; }
-        public int V { get; set; }
-        public int M { get; set; }
+        public long E { get; set; }
+        public long V { get; set; }
+        public long M { get; set; }
 
         public virtual GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
     }

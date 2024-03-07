@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using OfficeOpenXml;
-using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;
+﻿using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

@@ -4,9 +4,9 @@
     {
         public string Name { get; set; }
         public string City { get; set; }
-        public int? Capacity { get; set; }
-        public int? BuiltYear { get; set; }
-        public int? PitchLength { get; set; }
-        public int? PitchWidth { get; set; }
+        public long? Capacity { get; set; }
+        public long? BuiltYear { get; set; }
+        public long? PitchLength { get; set; }
+        public long? PitchWidth { get; set; }
     }
 }

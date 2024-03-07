@@ -1,4 +1,5 @@
-﻿global using Mapster;
+﻿global using System.Numerics;
+global using Mapster;
 global using McDermott.Application.Dtos.Config;
 global using McDermott.Application.Dtos.Employee;
 global using McDermott.Application.Dtos.Medical;

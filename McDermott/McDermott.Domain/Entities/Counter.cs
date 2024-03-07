@@ -4,9 +4,9 @@
     {
         public string Name { get; set; }
         public bool IsActive { get; set; }
-        public int? ServiceId { get; set; }
-        public int? ServiceKId { get; set; }
-        public int? PhysicianId { get; set; }
+        public long? ServiceId { get; set; }
+        public long? ServiceKId { get; set; }
+        public long? PhysicianId { get; set; }
         public string? Status { get; set; }
 
         public virtual Service? Service { get; set; }

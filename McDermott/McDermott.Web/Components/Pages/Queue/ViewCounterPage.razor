@@ -1,4 +1,4 @@
-﻿@page "/queue/counter-view/{CounterId:int}"
+﻿@page "/queue/counter-view/{CounterId:long}"
 @rendermode InteractiveServer
 <PageTitle>McDermott - Counter View</PageTitle>
 <div class="wrapper">
@@ -13,7 +13,6 @@
                                 <div class="row justify-content-arround">
                                     <div class="col-md-4">
                                         <DxButton Text="Back" Click="CloseDetail" CssClass="fs-6 fw-bolder" IconCssClass="fa-solid fa-arrow-left" />
-
                                     </div>
                                     <div class="col-md-6">
                                         <h4>@NameCounter.ToUpper()</h4>
@@ -420,7 +419,6 @@
                                                 <DxTab Text="Finish" Enabled="@(FormCounters.Status == "finish")"></DxTab>
                                             </DxTabs>
                                         </div>
-
                                     </div>
                                     @*  <div class="row mt-3 justify-content-end">
                                 <div class="col-4">
@@ -438,7 +436,6 @@
                                                 <label class="col-sm-4 col-form-label">No. Queue</label>
                                                 <div class="col-sm-8">
                                                     <p class="form-control-plaintext"> @string.Format("{0:D3}", FormCounters.NoQueue)</p>
-
                                                 </div>
                                                 <label class="col-sm-4 col-form-label">Service</label>
                                                 <div class="col-sm-8">
@@ -457,7 +454,6 @@
                                                 <label class="col-sm-4 col-form-label">Physician</label>
                                                 <div class="col-sm-8">
                                                     <p class="form-control-plaintext">@((FormCounters.Kiosk.Physician?.Name) ?? "-") </p>
-
                                                 </div>
                                             </div>
                                         </div>
@@ -473,7 +469,6 @@
                                                     <DxComboBox Data="@ServiceK" @bind-Value="FormCounters.ServiceKId" NullText="Select Counter.." TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
-
                                         </div>
                                         <div class="col-3 align-self-center">
                                             <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Next" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-right-long" SubmitFormOnClick="true" Click="Click_Next"></DxButton>

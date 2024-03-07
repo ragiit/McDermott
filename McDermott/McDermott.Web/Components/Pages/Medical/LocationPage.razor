@@ -22,7 +22,7 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
 
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
+                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                             Data="Locations"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
@@ -76,15 +76,17 @@
                                             }
                                             <DxFormLayout CssClass="w-100">
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                    <div class="pop-warning">
-                                                        @EditFormContext.GetEditor("Name")
-                                                    </div>
+                                                    <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                    <ValidationMessage For="@(()=> a.Name)"   />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Type" ColSpanMd="12">
-                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                        Data="@Types" @bind-Value="@a.Type" NullText="Types" ShowValidationIcon="true" />
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Type" ColSpanMd="12">
+                                                    <DxComboBox
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                        Data="@Types" @bind-Value="@a.Type" NullText="Select Types..." ShowValidationIcon="true" />
+                                                    <ValidationMessage For="@(()=>a.Type)"   />
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
+
                                         </EditFormTemplate>
                                     </DxGrid>
                                 </DxLoadingPanel>

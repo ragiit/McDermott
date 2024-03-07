@@ -2,7 +2,7 @@
 {
     public class GeneralConsultanMedicalSupport : BaseAuditableEntity
     {
-        public int? GeneralConsultanServiceId { get; set; }
+        public long? GeneralConsultanServiceId { get; set; }
 
         public string? LabEximinationName { get; set; }
         public string? LabEximinationAttachment { get; set; }

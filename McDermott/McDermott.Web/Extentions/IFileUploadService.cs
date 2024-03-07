@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-
-namespace McDermott.Web.Extentions
+﻿namespace McDermott.Web.Extentions
 {
     public interface IFileUploadService
     {

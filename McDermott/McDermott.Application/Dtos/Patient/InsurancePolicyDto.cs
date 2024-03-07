@@ -2,9 +2,9 @@
 {
     public class InsurancePolicyDto : IMapFrom<InsurancePolicy>
     {
-        public int Id { get; set; }
-        public int UserId { get; set; } // Patient
-        public int InsuranceId { get; set; }
+        public long Id { get; set; }
+        public long UserId { get; set; } // Patient
+        public long InsuranceId { get; set; }
 
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? PolicyNumber { get; set; }

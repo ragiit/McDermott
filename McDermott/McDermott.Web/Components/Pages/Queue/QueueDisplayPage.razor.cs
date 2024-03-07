@@ -1,6 +1,5 @@
 ﻿using DevExpress.Blazor;
 using McDermott.Application.Dtos.Queue;
-using Microsoft.AspNetCore.Components.Forms;
 using OfficeOpenXml;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.DetailQueueDisplayCommand;
@@ -274,7 +273,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 }
                 await LoadData();
             }
-            catch (Exception ee)
+            catch (Exception)
             {
             }
         }

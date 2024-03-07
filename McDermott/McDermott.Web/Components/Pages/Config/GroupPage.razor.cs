@@ -7,7 +7,7 @@ namespace McDermott.Web.Components.Pages.Config
     {
         private GroupMenuDto UserAccessCRUID = new();
         private bool PanelVisible { get; set; } = true;
-        private int Id { get; set; }
+        private long Id { get; set; }
         public IGrid Grid { get; set; }
         public IGrid GridGropMenu { get; set; }
         private bool IsAddMenu { get; set; } = false;
@@ -470,7 +470,7 @@ namespace McDermott.Web.Components.Pages.Config
             //        });
             //    }
 
-            //    for (int i = 0; i < request.Count; i++)
+            //    for (long i = 0; i < request.Count; i++)
             //    {
             //        var check = Menus.FirstOrDefault(x => x.Id == request[i].MenuId);
             //        var cekP = Menus.FirstOrDefault(x => x.Name == check!.ParentMenu);
@@ -527,7 +527,7 @@ namespace McDermott.Web.Components.Pages.Config
             //        });
             //    }
 
-            //    for (int i = 0; i < request.Count; i++)
+            //    for (long i = 0; i < request.Count; i++)
             //    {
             //        var check = Menus.FirstOrDefault(x => x.Id == request[i].MenuId);
             //        var cekP = Menus.FirstOrDefault(x => x.Name == check!.ParentMenu);

@@ -6,9 +6,9 @@
 
         public class GetCityByIdQuery : IRequest<CityDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetCityByIdQuery(int id)
+            public GetCityByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteCityRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteCityRequest(int id)
+            public DeleteCityRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListCityRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListCityRequest(List<int> id)
+            public DeleteListCityRequest(List<long> id)
             {
                 Id = id;
             }

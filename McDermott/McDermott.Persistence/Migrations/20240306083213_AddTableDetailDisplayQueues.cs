@@ -15,10 +15,10 @@ namespace McDermott.Persistence.Migrations
                 name: "DetailQueueDisplays",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    QueueDisplayId = table.Column<int>(type: "int", nullable: true),
-                    CounterId = table.Column<int>(type: "int", nullable: true),
+                    QueueDisplayId = table.Column<long>(type: "bigint", nullable: true),
+                    CounterId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),

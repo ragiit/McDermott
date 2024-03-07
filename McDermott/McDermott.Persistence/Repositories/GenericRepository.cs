@@ -163,7 +163,7 @@ namespace McDermott.Persistence.Repositories
             }
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(long id)
         {
             try
             {
@@ -196,7 +196,7 @@ namespace McDermott.Persistence.Repositories
             }
         }
 
-        public async Task DeleteAsync(List<int> ids)
+        public async Task DeleteAsync(List<long> ids)
         {
             foreach (var id in ids)
             {
@@ -274,7 +274,7 @@ namespace McDermott.Persistence.Repositories
             }
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(long id)
         {
             try
             {
@@ -300,7 +300,7 @@ namespace McDermott.Persistence.Repositories
         //    }
         //}
 
-        public async Task<int> GetCountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<long> GetCountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
         {
             var query = _dbContext.Set<T>().AsQueryable();
 

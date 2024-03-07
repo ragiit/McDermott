@@ -2,9 +2,9 @@
 {
     public class BuildingLocationDto : IMapFrom<BuildingDto>
     {
-        public int Id { get; set; }
-        public int BuildingId { get; set; }
-        public int LocationId { get; set; }
+         public long Id { get; set; }
+        public long BuildingId { get; set; }
+        public long LocationId { get; set; }
 
         public BuildingDto? Building { get; set; }
         public LocationDto? Location { get; set; }

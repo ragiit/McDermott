@@ -4,7 +4,7 @@ namespace McDermott.Domain.Entities
 {
     public class GeneralConsultantClinicalAssesment : BaseAuditableEntity
     {
-        public int? GeneralConsultanServiceId { get; set; }
+        public long? GeneralConsultanServiceId { get; set; }
 
         [NotMapped]
         public double _Weight { get; set; }
@@ -22,22 +22,22 @@ namespace McDermott.Domain.Entities
             get; set;
         }
 
-        public int RR { get; set; }
-        public int Temp { get; set; }
-        public int HR { get; set; }
-        public int RBS { get; set; }
-        public int Systolic { get; set; }
-        public int DiastolicBP { get; set; }
-        public int SpO2 { get; set; }
+        public long RR { get; set; }
+        public long Temp { get; set; }
+        public long HR { get; set; }
+        public long RBS { get; set; }
+        public long Systolic { get; set; }
+        public long DiastolicBP { get; set; }
+        public long SpO2 { get; set; }
 
         public double BMIIndex { get; set; }
         public string BMIIndexString { get; set; } = "0";
 
         public string BMIState { get; set; } = "-";
 
-        public int E { get; set; }
-        public int V { get; set; }
-        public int M { get; set; }
+        public long E { get; set; }
+        public long V { get; set; }
+        public long M { get; set; }
 
         public void CalculateBMI(double height, double weight)
         {

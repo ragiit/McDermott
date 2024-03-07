@@ -6,7 +6,7 @@ namespace McDermott.Application.Interfaces.Repositories
     {
         IQueryable<T> Entities { get; }
 
-        Task<T> GetByIdAsync(int id);
+        Task<T> GetByIdAsync(long id);
 
         Task<List<T>> GetAllAsync(CancellationToken cancellationToken = default);
 
@@ -14,7 +14,7 @@ namespace McDermott.Application.Interfaces.Repositories
 
         Task<List<T>> GetAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IQueryable<T>>? includes = null, CancellationToken cancellationToken = default);
 
-        Task<int> GetCountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<long> GetCountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
 
         Task<T> AddAsync(T entity);
 
@@ -24,10 +24,10 @@ namespace McDermott.Application.Interfaces.Repositories
 
         Task<List<T>> UpdateAsync(List<T> entity);
 
-        Task DeleteAsync(int id);
+        Task DeleteAsync(long id);
 
         Task DeleteAsync(Expression<Func<T, bool>> predicate);
 
-        Task DeleteAsync(List<int> id);
+        Task DeleteAsync(List<long> id);
     }
 }

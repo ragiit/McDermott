@@ -42,31 +42,31 @@ namespace McDermott.Web.Components.Pages.Medical
         private DateTime StartDate = DateTime.Now;
         private DateTime EndDate = DateTime.Now;
 
-        private int newId = 0;
+        private long newId = 0;
         private string PhysicionName { get; set; }
 
-        private int _ServiceId { get; set; }
+        private long? _ServiceId { get; set; }
 
-        private int ServiceId
+        private long? ServiceId
         {
             get => _ServiceId;
             set
             {
                 Users = [];
-                DoctorSchedule.ServiceId = value;
+                DoctorSchedule.ServiceId = value.ToInt32();
                 SelectedPhysicions = [];
                 _ServiceId = value;
-                Users = AllUsers.Where(x => x.DoctorServiceIds.Contains(value)).AsEnumerable();
+                Users = AllUsers.Where(x => x.DoctorServiceIds.Contains(value.ToInt32())).AsEnumerable();
             }
         }
 
-        private int Value
+        private long Value
         {
             get => newId;
             set
             {
                 Names.Clear();
-                int newId = value; InvokeAsync(StateHasChanged);
+                long newId = value; InvokeAsync(StateHasChanged);
                 this.newId = value;
 
                 var item = Schedules.FirstOrDefault(x => x.Id == newId);
@@ -136,7 +136,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         public class Item
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
             public string Name { get; set; }
         }
 
@@ -291,8 +291,8 @@ namespace McDermott.Web.Components.Pages.Medical
                 var result = new List<DoctorScheduleSlotDto>();
 
                 // Memuat data yang dibutuhkan sebelum loop tanggal
-                var doctorDetailsDict = new Dictionary<int, List<DoctorScheduleDetailDto>>();
-                var doctorSlotsDict = new Dictionary<int, List<DoctorScheduleSlotDto>>();
+                var doctorDetailsDict = new Dictionary<long, List<DoctorScheduleDetailDto>>();
+                var doctorSlotsDict = new Dictionary<long, List<DoctorScheduleSlotDto>>();
 
                 foreach (DoctorScheduleDto doctorSchedule in SelectedSchedules)
                 {
@@ -342,7 +342,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
                 //for (DateTime date = StartDate; date <= EndDate; date = date.Date.AddDays(1))
                 //{
-                //    int tempId = 0;
+                //    long tempId = 0;
                 //    var doctorDetails = new List<DoctorScheduleDetailDto>();
                 //    var doctorSlots = new List<DoctorScheduleSlotDto>();
 

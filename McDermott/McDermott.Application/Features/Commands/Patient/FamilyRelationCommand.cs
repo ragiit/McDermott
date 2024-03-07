@@ -35,10 +35,10 @@
         #endregion
 
         #region DELETE 
-        public class DeleteFamilyRequest(int id = 0, List<int>? ids = null) : IRequest<bool>
+        public class DeleteFamilyRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
-            public int Id { get; set; } = id;
-            public List<int> Ids { get; set; } = ids ?? [];
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
         }
         #endregion
     }

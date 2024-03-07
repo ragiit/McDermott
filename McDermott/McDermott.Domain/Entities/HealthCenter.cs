@@ -2,9 +2,9 @@
 {
     public class HealthCenter : BaseAuditableEntity
     {
-        public int? CityId { get; set; }
-        public int? ProvinceId { get; set; }
-        public int? CountryId { get; set; }
+        public long? CityId { get; set; }
+        public long? ProvinceId { get; set; }
+        public long? CountryId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
         public string? Phone { get; set; }

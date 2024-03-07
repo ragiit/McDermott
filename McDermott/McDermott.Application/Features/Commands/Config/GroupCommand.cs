@@ -6,9 +6,9 @@
 
         public class GetGroupByIdQuery : IRequest<GroupDto>
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
 
-            public GetGroupByIdQuery(int id)
+            public GetGroupByIdQuery(long id)
             {
                 Id = id;
             }
@@ -16,9 +16,9 @@
 
         public class DeleteListGroupMenuRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListGroupMenuRequest(List<int> id)
+            public DeleteListGroupMenuRequest(List<long> id)
             {
                 this.Id = id;
             }
@@ -26,9 +26,9 @@
 
         public class DeleteGroupMenuByIdRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteGroupMenuByIdRequest(List<int> Id)
+            public DeleteGroupMenuByIdRequest(List<long> Id)
             {
                 this.Id = Id;
             }
@@ -36,9 +36,9 @@
 
         public class GetGroupMenuByGroupIdRequest : IRequest<List<GroupMenuDto>>
         {
-            public int GroupId { get; set; }
+            public long GroupId { get; set; }
 
-            public GetGroupMenuByGroupIdRequest(int GroupId)
+            public GetGroupMenuByGroupIdRequest(long GroupId)
             {
                 this.GroupId = GroupId;
             }
@@ -46,11 +46,11 @@
 
         public class UpdateGroupMenuRequest : IRequest<bool>
         {
-            public List<int> _ids;
+            public List<long> _ids;
 
             public List<GroupMenuDto> GroupMenuDto { get; set; }
 
-            public UpdateGroupMenuRequest(List<GroupMenuDto> GroupMenuDto, List<int> ids)
+            public UpdateGroupMenuRequest(List<GroupMenuDto> GroupMenuDto, List<long> ids)
             {
                 this.GroupMenuDto = GroupMenuDto;
                 this._ids = ids;
@@ -99,9 +99,9 @@
 
         public class DeleteGroupRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
 
-            public DeleteGroupRequest(int id)
+            public DeleteGroupRequest(long id)
             {
                 Id = id;
             }

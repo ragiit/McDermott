@@ -6,9 +6,9 @@
 
         public class GetBuildingByIdQuery : IRequest<BuildingDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetBuildingByIdQuery(int id)
+            public GetBuildingByIdQuery(long id)
             {
                 Id = id;
             }
@@ -26,9 +26,9 @@
 
         public class GetBuildingLocationByBuildingIdRequest : IRequest<List<BuildingLocationDto>>
         {
-            public int BuildingId { get; set; }
+            public long BuildingId { get; set; }
 
-            public GetBuildingLocationByBuildingIdRequest(int BuildingId)
+            public GetBuildingLocationByBuildingIdRequest(long BuildingId)
             {
                 this.BuildingId = BuildingId;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteBuildingLocationByIdRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteBuildingLocationByIdRequest(List<int> Id)
+            public DeleteBuildingLocationByIdRequest(List<long> Id)
             {
                 this.Id = Id;
             }
@@ -66,9 +66,9 @@
 
         public class DeleteBuildingRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteBuildingRequest(int id)
+            public DeleteBuildingRequest(long id)
             {
                 Id = id;
             }
@@ -76,9 +76,9 @@
 
         public class DeleteListBuildingRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListBuildingRequest(List<int> id)
+            public DeleteListBuildingRequest(List<long> id)
             {
                 Id = id;
             }

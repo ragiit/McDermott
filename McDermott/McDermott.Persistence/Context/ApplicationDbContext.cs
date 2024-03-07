@@ -125,6 +125,14 @@ namespace McDermott.Persistence.Context
               .WithOne(c => c.GeneralConsultanService)
               .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Department>()
+            .HasOne(e => e.Manager)
+            .WithMany();
+
+            modelBuilder.Entity<User>()
+          .HasOne(e => e.Department)
+          .WithMany();
+
             //modelBuilder.Entity<Province>()
             //  .HasMany(m => m.Districts)
             //  .WithOne(c => c.Province)
@@ -277,15 +285,15 @@ namespace McDermott.Persistence.Context
             //    GroupId = 1
             //});
 
-            modelBuilder.Entity<User>().HasIndex(u => u.UserName).IsUnique();
-            modelBuilder.Entity<City>().HasIndex(u => u.Name).IsUnique();
-            modelBuilder.Entity<Country>().HasIndex(u => u.Name).IsUnique();
-            modelBuilder.Entity<Gender>().HasIndex(u => u.Name).IsUnique();
-            modelBuilder.Entity<Group>().HasIndex(u => u.Name).IsUnique();
-            modelBuilder.Entity<Menu>().HasIndex(u => u.Name).IsUnique();
-            modelBuilder.Entity<Province>().HasIndex(u => u.Name).IsUnique();
-            modelBuilder.Entity<Religion>().HasIndex(u => u.Name).IsUnique();
-            modelBuilder.Entity<Village>().HasIndex(u => u.Name).IsUnique();
+            //modelBuilder.Entity<User>().HasIndex(u => u.UserName).IsUnique();
+            //modelBuilder.Entity<City>().HasIndex(u => u.Name).IsUnique();
+            //modelBuilder.Entity<Country>().HasIndex(u => u.Name).IsUnique();
+            //modelBuilder.Entity<Gender>().HasIndex(u => u.Name).IsUnique();
+            //modelBuilder.Entity<Group>().HasIndex(u => u.Name).IsUnique();
+            //modelBuilder.Entity<Menu>().HasIndex(u => u.Name).IsUnique();
+            //modelBuilder.Entity<Province>().HasIndex(u => u.Name).IsUnique();
+            //modelBuilder.Entity<Religion>().HasIndex(u => u.Name).IsUnique();
+            //modelBuilder.Entity<Village>().HasIndex(u => u.Name).IsUnique();
 
             // apply configuration dengan membaca assembly
             //modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);

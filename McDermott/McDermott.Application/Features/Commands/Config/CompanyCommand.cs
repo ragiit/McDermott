@@ -6,9 +6,9 @@ namespace McDermott.Application.Features.Commands.Config
 
         public class GetCompanyByIdQuery : IRequest<CompanyDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetCompanyByIdQuery(int id)
+            public GetCompanyByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@ namespace McDermott.Application.Features.Commands.Config
 
         public class DeleteCompanyRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteCompanyRequest(int id)
+            public DeleteCompanyRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@ namespace McDermott.Application.Features.Commands.Config
 
         public class DeleteListCompanyRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListCompanyRequest(List<int> Id)
+            public DeleteListCompanyRequest(List<long> Id)
             {
                 this.Id = Id;
             }

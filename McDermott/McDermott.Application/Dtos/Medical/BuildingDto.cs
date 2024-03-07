@@ -2,8 +2,8 @@
 {
     public class BuildingDto : IMapFrom<Building>
     {
-        public int Id { get; set; }
-        public int? HealthCenterId { get; set; }
+         public long Id { get; set; }
+        public long? HealthCenterId { get; set; }
 
         [Required]
         [StringLength(200)]

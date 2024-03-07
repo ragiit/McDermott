@@ -8,9 +8,9 @@ namespace McDermott.Application.Dtos.Queue
 {
     public class DetailQueueDisplayDto:IMapFrom<DetailQueueDisplay>
     {
-        public int Id { get; set; }
-        public int? QueueDisplayId { get; set; }
-        public int? CounterId { get; set; }
+        public long Id { get; set; }
+        public long? QueueDisplayId { get; set; }
+        public long? CounterId { get; set; }
         public string? CounterName {  get; set; } = string.Empty;
         public string? DisplayName {  get; set; } = string.Empty;
 

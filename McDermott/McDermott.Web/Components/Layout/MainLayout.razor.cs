@@ -61,7 +61,7 @@
                 }
 
                 var menus = await Mediator.Send(new GetMenuQuery());
-                var groups = await Mediator.Send(new GetGroupMenuByGroupIdRequest((int)user!.GroupId!)!);
+                var groups = await Mediator.Send(new GetGroupMenuByGroupIdRequest((long)user!.GroupId!)!);
 
                 var ids = groups.Select(x => x.MenuId).ToList();
 
@@ -70,7 +70,7 @@
 
                 if (user.GroupId is not null)
                 {
-                    var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((int)user.GroupId));
+                    var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((long)user.GroupId));
 
                     var encryptMenu = Helper.Encrypt(JsonConvert.SerializeObject(g));
 

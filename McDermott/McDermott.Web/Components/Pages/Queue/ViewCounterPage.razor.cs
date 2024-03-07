@@ -39,12 +39,12 @@ namespace McDermott.Web.Components.Pages.Queue
         private string NameServicesK { get; set; } = string.Empty;
         private string Phy { get; set; } = string.Empty;
         private string? userBy;
-        private int? sId { get; set; }
-        private int? PhysicianId { get; set; }
+        private long? sId { get; set; }
+        private long? PhysicianId { get; set; }
         private bool ShowPresent { get; set; }
 
         [Parameter]
-        public int CounterId { get; set; }
+        public long CounterId { get; set; }
 
         #endregion variabel data
 
@@ -146,7 +146,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Function Button
 
-        private async Task Click_Call(int id)
+        private async Task Click_Call(long id)
         {
             try
             {
@@ -163,7 +163,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     await Mediator.Send(new UpdateKioskQueueRequest(FormKiosksQueue));
                 }
                 var cek = CounterId;
-                
+
                 await hubConnection.SendAsync("ReceivedQueue", CounterId, FormKiosksQueue.ServiceKId, FormKiosksQueue.NoQueue);
                 await LoadData();
             }
@@ -191,7 +191,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     else
                     {
                         var GetNoQueue = TodayQueu.OrderByDescending(x => x.NoQueue).FirstOrDefault();
-                        FormCounters.NoQueue = (int)GetNoQueue.NoQueue + 1;
+                        FormCounters.NoQueue = (long)GetNoQueue.NoQueue + 1;
                     }
                     FormCounters.Status = null;
                     await Mediator.Send(new UpdateKioskQueueRequest(FormCounters));
@@ -207,7 +207,7 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        private async Task Click_Present(int Id)
+        private async Task Click_Present(long Id)
         {
             try
             {
@@ -226,7 +226,7 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        private async Task Click_Absent(int Id)
+        private async Task Click_Absent(long Id)
         {
             try
             {

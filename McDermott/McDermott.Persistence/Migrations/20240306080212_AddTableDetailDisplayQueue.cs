@@ -18,10 +18,10 @@ namespace McDermott.Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
+            migrationBuilder.AddColumn<long>(
                 name: "CounterId",
                 table: "QueueDisplays",
-                type: "int",
+                type: "bigint",
                 nullable: true);
         }
     }

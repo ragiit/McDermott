@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using OfficeOpenXml;
+﻿using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
@@ -10,7 +9,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         public class ActiveComponentDto
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
             public string Name { get; set; }
         }
 
@@ -201,7 +200,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
                 await LoadData();
             }
-            catch (Exception ee)
+            catch (Exception)
             {
             }
         }

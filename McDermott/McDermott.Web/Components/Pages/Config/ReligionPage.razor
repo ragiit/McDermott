@@ -15,7 +15,7 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
-                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
+                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                         Data="Religions"
                                         PageSize="10"
                                         @bind-SelectedDataItems="@SelectedDataItems"
@@ -79,11 +79,13 @@
 
                                     </Columns>
                                     <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (ReligionDto)EditFormContext.EditModel;
+                                        }
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name:" ColSpanMd="12">
-                                                <div class="pop-warning">
-                                                    @EditFormContext.GetEditor("Name")
-                                                </div>
+                                                <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>

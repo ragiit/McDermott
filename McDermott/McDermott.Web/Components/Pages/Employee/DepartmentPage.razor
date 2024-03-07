@@ -65,9 +65,9 @@
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
                                         <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                        <DxGridDataColumn FieldName="ParentName" Caption="Parent" />
+                                        <DxGridDataColumn FieldName="ParentDepartment.Name" Caption="Parent" />
                                         <DxGridDataColumn FieldName="Company.Name" Caption="Company" />
-                                        <DxGridDataColumn FieldName="Manager" />
+                                        <DxGridDataColumn FieldName="Manager.Name" Caption="Manager" />
                                         <DxGridDataColumn FieldName="DepartmentCategory" Caption="Category" />
                                     </Columns>
                                     <EditFormTemplate Context="EditFormContext">
@@ -76,26 +76,27 @@
                                         }
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
+                                                <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                <ValidationMessage For="@(() => a.Name)"   />
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Parent Department" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Parent Department" ColSpanMd="12">
                                                 <Template>
-                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
-                                                        Data="@ParentDepartments"
+                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                Data="@ParentDepartments"
                                                                 NullText="Select Parent Department..."
                                                                 FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="@a.ParentId"
+                                                                @bind-Value="@a.ParentDepartmentId"
                                                                 TextFieldName="Name"
                                                                 ValueFieldName="Id">
                                                     </DxComboBox>
                                                 </Template>
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Company" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Company" ColSpanMd="12">
                                                 <Template>
                                                     <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                        Data="@Companies"
+                                                                Data="@Companies"
                                                                 NullText="Select Company..."
                                                                 FilteringMode="@DataGridFilteringMode.Contains"
                                                                 @bind-Value="@a.CompanyId"
@@ -105,13 +106,13 @@
                                                 </Template>
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Manager" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Manager" ColSpanMd="12">
                                                 <Template>
                                                     <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                        Data="@Users"
+                                                                Data="@Users"
                                                                 NullText="Select Manager..."
                                                                 FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="@SelectedUserId"
+                                                                @bind-Value="@a.ManagerId"
                                                                 TextFieldName="Name"
                                                                 ValueFieldName="Id" />
                                                 </Template>
@@ -120,7 +121,7 @@
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Department Category" ColSpanMd="12">
                                                 <Template>
                                                     <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                        NullText="Select Department Category..." FilteringMode="@DataGridFilteringMode.Contains" Data="@DepartmentCategories" @bind-Value="@a.DepartmentCategory" />
+                                                                NullText="Select Department Category..." FilteringMode="@DataGridFilteringMode.Contains" Data="@DepartmentCategories" @bind-Value="@a.DepartmentCategory" />
                                                 </Template>
                                             </DxFormLayoutItem>
 

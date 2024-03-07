@@ -6,9 +6,9 @@ namespace McDermott.Application.Features.Commands.Medical
 
         public class GetSpecialityByIdQuery : IRequest<SpecialityDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetSpecialityByIdQuery(int id)
+            public GetSpecialityByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@ namespace McDermott.Application.Features.Commands.Medical
 
         public class DeleteSpecialityRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteSpecialityRequest(int id)
+            public DeleteSpecialityRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@ namespace McDermott.Application.Features.Commands.Medical
 
         public class DeleteListSpecialityRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListSpecialityRequest(List<int> id)
+            public DeleteListSpecialityRequest(List<long> id)
             {
                 this.Id = id;
             }

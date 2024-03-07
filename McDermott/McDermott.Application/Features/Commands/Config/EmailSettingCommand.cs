@@ -6,9 +6,9 @@
 
         public class GetEmailSettingByIdQuery : IRequest<EmailSettingDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetEmailSettingByIdQuery(int id)
+            public GetEmailSettingByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteEmailSettingRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteEmailSettingRequest(int id)
+            public DeleteEmailSettingRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListEmailSettingRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListEmailSettingRequest(List<int> id)
+            public DeleteListEmailSettingRequest(List<long> id)
             {
                 Id = id;
             }

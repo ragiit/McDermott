@@ -1,4 +1,4 @@
-﻿@page "/configuration/email-setting"
+﻿@page "/config/email-setting"
 @rendermode InteractiveServer
 
 <PageTitle>McDermott - Master Data Email Setting</PageTitle>
@@ -57,7 +57,6 @@
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && EmailSettings.Count > 0" />
                                             </DxToolbar>
 
-
                                         </ToolbarTemplate>
 
                                         <Columns>
@@ -104,7 +103,7 @@
                                                         <Template>
                                                         <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                     Data="@Stts_Ecrypt"
-                                                                        NullText="Select Ecryp  t..."
+                                                                        NullText="Select Ecrypt..."
                                                                         AllowUserInput="true"
                                                                         SelectedItemChanged="@((string city) => SelectedItemChanged(city))"
                                                                         @bind-Value="@FormEmails.Smtp_Encryption"
@@ -113,10 +112,10 @@
                                                             <ValidationMessage For="@(()=>FormEmails.Smtp_Encryption)" />
                                                         </Template>
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Username:" CaptionCssClass="required-caption normal-caption">
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Username" CaptionCssClass="required-caption normal-caption">
                                                         <DxTextBox @bind-Text="@FormEmails.Smtp_User" NullText="Username" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" /><ValidationMessage For="@(()=>FormEmails.Smtp_User)" />
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Password:" CaptionCssClass="required-caption normal-caption">
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Password" CaptionCssClass="required-caption normal-caption">
                                                         <DxTextBox @bind-Text="@FormEmails.Smtp_Pass"
                                                                    NullText="Password"
                                                                    Password="true"
@@ -177,6 +176,5 @@
             </div>
         </section>
     </div>
-
 
 }

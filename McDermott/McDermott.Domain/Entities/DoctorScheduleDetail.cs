@@ -2,7 +2,7 @@
 {
     public partial class DoctorScheduleDetail : BaseAuditableEntity
     {
-        public int DoctorScheduleId { get; set; }
+        public long DoctorScheduleId { get; set; }
 
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
@@ -14,7 +14,7 @@
 
         public TimeSpan WorkTo { get; set; }
 
-        public int Quota { get; set; } = 0;
+        public long Quota { get; set; } = 0;
         public bool UpdateToBpjs { get; set; } = false;
 
         public virtual DoctorSchedule? DoctorSchedule { get; set; }

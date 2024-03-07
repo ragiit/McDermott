@@ -11,7 +11,7 @@
         public string Quota { get; set; } = string.Empty;
         public bool IsPatient { get; set; }
         public bool IsKiosk { get; set; }
-        public int? ServicedId { get; set; }
+        public long? ServicedId { get; set; }
         public virtual Service? Serviced { get; set; }
     }
 }

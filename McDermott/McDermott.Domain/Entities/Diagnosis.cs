@@ -8,8 +8,8 @@
         [StringLength(50)]
         public string? Code { get; set; }
 
-        public int? DiseaseCategoryId { get; set; }
-        public int? CronisCategoryId { get; set; }
+        public long? DiseaseCategoryId { get; set; }
+        public long? CronisCategoryId { get; set; }
 
         public virtual DiseaseCategory? DiseaseCategory { get; set; }
         public virtual CronisCategory? CronisKategory { get; set; }

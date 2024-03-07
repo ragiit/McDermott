@@ -6,9 +6,9 @@
 
         public class GetHealthCenterByIdQuery : IRequest<HealthCenterDto>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public GetHealthCenterByIdQuery(int id)
+            public GetHealthCenterByIdQuery(long id)
             {
                 Id = id;
             }
@@ -36,9 +36,9 @@
 
         public class DeleteHealthCenterRequest : IRequest<bool>
         {
-            public int Id { get; set; }
+             public long Id { get; set; }
 
-            public DeleteHealthCenterRequest(int id)
+            public DeleteHealthCenterRequest(long id)
             {
                 Id = id;
             }
@@ -46,9 +46,9 @@
 
         public class DeleteListHealthCenterRequest : IRequest<bool>
         {
-            public List<int> Id { get; set; }
+            public List<long> Id { get; set; }
 
-            public DeleteListHealthCenterRequest(List<int> id)
+            public DeleteListHealthCenterRequest(List<long> id)
             {
                 this.Id = id;
             }
