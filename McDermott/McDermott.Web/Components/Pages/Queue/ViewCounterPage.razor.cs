@@ -198,6 +198,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     await Mediator.Send(new UpdateKioskQueueRequest(FormCounters));
                 }
                 ToastService.ShowSuccess("Data Success!");
+                await LoadData();
             }
             catch (Exception ex)
             {
