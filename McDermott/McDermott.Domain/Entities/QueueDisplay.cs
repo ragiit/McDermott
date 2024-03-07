@@ -9,8 +9,7 @@ namespace McDermott.Domain.Entities
     public class QueueDisplay:BaseAuditableEntity
     {
         public string? Name {  get; set; }
-        public List<long>? CounterId { get; set; }
-
+      
         public virtual List<Counter>? Counter {  get; set; }
     }
 }
