@@ -37,8 +37,8 @@ namespace McDermott.Web.Components.Pages.Queue
         private bool showFormProcess { get; set; } = false;
         private bool GirdDetail { get; set; } = false;
         private long CountCard { get; set; } = 0;
-        private long _ServiceId { get; set; }
-        private long _physicionId { get; set; }
+        private long? _ServiceId { get; set; }
+        private long? _physicionId { get; set; }
         private long idServiceK { get; set; }
         private long ActiveTabIndex { get; set; } = 1;
         private string NameCounter { get; set; } = string.Empty;
@@ -54,12 +54,16 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Async Data And Auth
 
-        private long SelectServiced
+        private long? SelectServiced
         {
             get => _ServiceId;
             set
             {
                 _ServiceId = value;
+
+                if (value is null)
+                    return;
+
                 counterForm.ServiceKId = value;
                 List<ServiceDto> service = new();
                 service = Services.Where(x => x.Id == value).ToList();
@@ -71,12 +75,16 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        private long SelectPhysicion
+        private long? SelectPhysicion
         {
             get => _physicionId;
             set
             {
                 _physicionId = value;
+
+                if (value is null)
+                    return;
+
                 counterForm.ServiceId = value;
                 List<ServiceDto> service = new();
                 service = Services.Where(x => x.Id == value).ToList();
@@ -86,7 +94,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     if (i != null)
                     {
-                        Phys = Physicians.Where(x => x.DoctorServiceIds.Contains(value)).ToList();
+                        Phys = Physicians.Where(x => x.DoctorServiceIds.Contains(value.GetValueOrDefault())).ToList();
                     }
                 }
 

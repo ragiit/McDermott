@@ -44,8 +44,9 @@
 
 <div class="wrapper">
 
-    @if (currentUrl.Contains("queue/kiosk/{id:long}"))
+    @if (currentUrl.Contains("queue/kiosk/"))
     {
+        @*    ToastService.ShowInfo(currentUrl);*@
         <McDermott.Web.Components.Pages.Queue.KioskPage></McDermott.Web.Components.Pages.Queue.KioskPage>
     }
     else
@@ -171,7 +172,7 @@
                 <!-- Brand Logo -->
                 <a href="/" class="brand-link">
                     <img src="https://www.ikariera.cz/uploads/companies/file/28129/22192/17871/c1c103e1-56b0-45cf-b02d-f6acbc7276b8/Logo%20-%20mcdermott_symbol_color%20500x500%2C%2050hrana.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-                    <span class="ms-2 brand-text font-weight-bold">McDermott</span>
+                    <span class="ms-2 brand-text font-weight-bold">McHealthCare</span>
                 </a>
 
                 <!-- Sidebar -->
@@ -292,7 +293,7 @@
             </div>
 
             <footer class="main-footer">
-                <strong>Copyright &copy; 2024-2029 <a href="https://www.mcdermott.com/">McDermott</a>.</strong>
+                <strong>Copyright &copy; 2024-2029 <a href="https://www.mcdermott.com/">McHealthCare</a>.</strong>
                 All rights reserved.
                 <div class="float-right d-none d-sm-inline-block">
                     <b>Version</b> 1.0.0

@@ -26,6 +26,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             showForm = false;
             PanelVisible = true;
+            SelectedDataItems = new ObservableRangeCollection<object>();
             Companys = await Mediator.Send(new GetCompanyQuery());
             //DetailCompanies = [.. Companys.ToList()];
             PanelVisible = false;

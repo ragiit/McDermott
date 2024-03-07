@@ -15,122 +15,131 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
-                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                        Data="Data"
-                                        PageSize="10"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                        KeyFieldName="Id"
-                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                        EditModelSaving="OnSave"
-                                        DataItemDeleting="OnDelete"
-                                        EditMode="GridEditMode.PopupEditForm"
-                                        PopupEditFormCssClass="pw-800"
-                                        PagerPosition="GridPagerPosition.Bottom"
-                                        AllowSelectRowByClick="true"
-                                        PageSizeSelectorVisible="true"
-                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        PageSizeSelectorAllRowsItemVisible="true"
-                                        PagerSwitchToInputBoxButtonCount="10"
-                                        FocusedRowEnabled="true"
-                                        PagerVisibleNumericButtonCount="10"
-                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                        ShowGroupPanel="true"
-                                        AutoExpandAllGroupRows="true"
-                                        ShowFilterRow="true"
-                                        CustomizeElement="Grid_CustomizeElement"
-                                        ShowSearchBox="true"
-                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                        KeyboardNavigationEnabled="true">
-                                    <ToolbarTemplate>
-                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Villages.Count > 0" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Villages.Count > 0" />
-                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                            <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                <Items>
-                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                </Items>
-                                            </DxToolbarItem>
-                                            <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                        </DxToolbar>
-                                        @*  <DxComboBox Data="EnumEditModeDatas"
-                                    NullText="Select Grid Edit Mode..."
-                                    TextFieldName="@nameof(EnumEditModeData.DisplayName)"
-                                    ValueFieldName="@nameof(EnumEditModeData.Value)"
-                                    @bind-Value="@Value"
-                                    AllowUserInput="true" /> *@
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="true"
+                                                Text="Fetching Data...">
 
-                                        @* <DxUpload Visible="@UploadVisible"
-                                    ExternalSelectButtonCssSelector="#upload"
-                                    ExternalDropZoneCssSelector="#upload"
-                                    ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
-                                    FileUploadStarted="@OnFileUploadStarted"
-                                    AllowedFileExtensions="@extentions"
-                                    MaxFileSize="15000000">
-                                    </DxUpload> *@
-                                    </ToolbarTemplate>
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                        <DxGridDataColumn FieldName="PostalCode" SortIndex="0" />
-                                        <DxGridDataColumn FieldName="Province.Name" Caption="Province" />
-                                        <DxGridDataColumn FieldName="City.Name" Caption="City" />
-                                        <DxGridDataColumn FieldName="District.Name" Caption="District" />
+                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                            Data="Data"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            EditModelSaving="OnSave"
+                                            DataItemDeleting="OnDelete"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
+                                            EditMode="GridEditMode.PopupEditForm"
+                                            PopupEditFormCssClass="pw-800"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            AllowSelectRowByClick="true"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            FocusedRowEnabled="true"
+                                            PagerVisibleNumericButtonCount="10"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            CssClass="ch-480"
+                                            ShowFilterRow="true"
+                                            CustomizeElement="Grid_CustomizeElement"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Villages.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Villages.Count > 0" />
+                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                                <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                            </DxToolbar>
+                                            @*  <DxComboBox Data="EnumEditModeDatas"
+                                        NullText="Select Grid Edit Mode..."
+                                        TextFieldName="@nameof(EnumEditModeData.DisplayName)"
+                                        ValueFieldName="@nameof(EnumEditModeData.Value)"
+                                        @bind-Value="@Value"
+                                        AllowUserInput="true" /> *@
 
-                                    </Columns>
-                                    <EditFormTemplate Context="EditFormContext">
-                                        @{
-                                            var a = (VillageDto)EditFormContext.EditModel;
-                                        }
-                                        <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
-                                                <ValidationMessage For="@(()=> a.Name)"   />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Postal Code" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@a.PostalCode" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Postal Code" />
-                                                <ValidationMessage For="@(()=> a.PostalCode)"   />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
-                                                <DxComboBox ShowValidationIcon="true"
-                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                            Data="@Provinces"
-                                                            NullText="Select Province..."
-                                                            @bind-Value="@a.ProvinceId"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id">
-                                                </DxComboBox>
-                                                <ValidationMessage For="@(()=>a.ProvinceId)" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
-                                                <DxComboBox ShowValidationIcon="true"
-                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                            Data="@Cities"
-                                                            NullText="Select City..."
-                                                            @bind-Value="@a.CityId"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id">
-                                                </DxComboBox>
-                                                <ValidationMessage For="@(()=>a.CityId)" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="District" ColSpanMd="12">
-                                                <DxComboBox ShowValidationIcon="true"
-                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                            Data="@Districts"
-                                                            NullText="Select District..."
-                                                            @bind-Value="@a.DistrictId"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id">
-                                                </DxComboBox>
-                                                <ValidationMessage For="@(()=>a.DistrictId)" />
-                                            </DxFormLayoutItem>
-                                        </DxFormLayout>
-                                    </EditFormTemplate>
-                                </DxGrid>
+                                            @* <DxUpload Visible="@UploadVisible"
+                                        ExternalSelectButtonCssSelector="#upload"
+                                        ExternalDropZoneCssSelector="#upload"
+                                        ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+                                        FileUploadStarted="@OnFileUploadStarted"
+                                        AllowedFileExtensions="@extentions"
+                                        MaxFileSize="15000000">
+                                        </DxUpload> *@
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="PostalCode" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Province.Name" Caption="Province" />
+                                            <DxGridDataColumn FieldName="City.Name" Caption="City" />
+                                            <DxGridDataColumn FieldName="District.Name" Caption="District" />
+
+                                        </Columns>
+                                        <EditFormTemplate Context="EditFormContext">
+                                            @{
+                                                var a = (VillageDto)EditFormContext.EditModel;
+                                            }
+                                            <DxFormLayout CssClass="w-100">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                    <ValidationMessage For="@(()=> a.Name)"   />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Postal Code" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.PostalCode" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Postal Code" />
+                                                    <ValidationMessage For="@(()=> a.PostalCode)"   />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                Data="@Provinces"
+                                                                NullText="Select Province..."
+                                                                @bind-Value="@a.ProvinceId"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id">
+                                                    </DxComboBox>
+                                                    <ValidationMessage For="@(()=>a.ProvinceId)" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                Data="@Cities"
+                                                                NullText="Select City..."
+                                                                @bind-Value="@a.CityId"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id">
+                                                    </DxComboBox>
+                                                    <ValidationMessage For="@(()=>a.CityId)" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="District" ColSpanMd="12">
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                Data="@Districts"
+                                                                NullText="Select District..."
+                                                                @bind-Value="@a.DistrictId"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id">
+                                                    </DxComboBox>
+                                                    <ValidationMessage For="@(()=>a.DistrictId)" />
+                                                </DxFormLayoutItem>
+                                            </DxFormLayout>
+                                        </EditFormTemplate>
+                                    </DxGrid>
+                                </DxLoadingPanel>
                             </div>
                         </div>
                     </div>

@@ -1,13 +1,31 @@
 ﻿@page "/patient/insurance-policy"
 @rendermode InteractiveServer
 
-<PageTitle>McDermott - Master Data Insurance Policy</PageTitle>
+@if (!IsPopUpForm)
+{
+    <PageTitle>McDermott - Master Data Insurance Policy</PageTitle>
+}
 
 @if (IsAccess)
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Insurance Policy" />
+        @if (!IsPopUpForm)
+        {
+            <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Insurance Policy" />
+        }
+        else
+        {
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Insurance Policy</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        }
 
         @if (!ShowForm)
         {
@@ -96,225 +114,229 @@
                                     <DataAnnotationsValidator />
                                     <DxFormLayout CssClass="mt">
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Patient" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Patient" ColSpanMd="12">
                                                 @* <DxComboBox Data="@Users"
                                         NullText="Select Patient..."
                                         @bind-Value="@InsurancePoliciyForm.UserId"
                                         TextFieldName="Name"
                                         ValueFieldName="Id">
                                         </DxComboBox> *@
-                                                <h3>@User.Name</h3>
+                                                <p>@User.Name</p>
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Insurance Company" ColSpanMd="6">
-                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                            Data="@Insurances"
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Company" ColSpanMd="12">
+                                                <DxComboBox Data="@Insurances"
                                                             NullText="Select Insurance Company..."
-                                                            @bind-Value="@InsuranceId"
+                                                            ShowValidationIcon="true"
+                                                            @bind-Value="@InsurancePoliciyForm.InsuranceId"
+                                                            FilteringMode="@DataGridFilteringMode.Contains"
                                                             TextFieldName="Name"
+                                                            SelectedItemChanged="@((InsuranceDto e) => SelectedItemInsuranceChanged(e))"
                                                             ValueFieldName="Id">
                                                 </DxComboBox>
+                                                <ValidationMessage For="@(()=>InsurancePoliciyForm.InsuranceId)"   />
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Policy Number" ColSpanMd="6">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Policy Number" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@InsurancePoliciyForm.PolicyNumber"
                                                            ShowValidationIcon="true"
                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                            NullText="Policy Number" />
+                                                <ValidationMessage For="@(()=>InsurancePoliciyForm.PolicyNumber)"   />
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Active" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Active" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@InsurancePoliciyForm.Active" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutGroup Caption="BPJS Integration" ColSpanMd="12" CssClass="mt-3" Visible="IsBPJS">
                                                 <Items>
 
-                                                    <DxFormLayoutItem Caption="Prolanis">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Prolanis">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.Prolanis"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Prolanis" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Treatment Class">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Treatment Class">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.Class"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Treatment Class" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Participant Name">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Participant Name">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.ParticipantName"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Participant Name" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Diagnosis">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.Diagnosa"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Diagnosis" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Card Number">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Card Number">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.NoCard"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Card Number" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Poly">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Poly">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.Poly"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Poly" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="NIK">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="NIK">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.NoId"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="NIK" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Doctor">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Doctor">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.Doctor"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Doctor" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Sex">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sex">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.Sex"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Sex" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Date of Birth">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date of Birth">
                                                         <DxDateEdit @bind-Date="@InsurancePoliciyForm.DateOfBirth"
                                                                     NullText="Date of Birth" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Nursing Class">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Nursing Class">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.NursingClass"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Nursing Class" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Card Print Date">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Card Print Date">
                                                         <DxDateEdit @bind-Date="@InsurancePoliciyForm.CardPrintDate"
                                                                     NullText="Card Print Date" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Medical Record Number">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record Number">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.MedicalRecordNo"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Medical Record Number" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="TAT">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="TAT">
                                                         <DxDateEdit @bind-Date="@InsurancePoliciyForm.TatDate"
                                                                     NullText="TAT" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Phone Number">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Phone Number">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.PhoneNumber"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Phone Number" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="TMT">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="TMT">
                                                         <DxDateEdit @bind-Date="@InsurancePoliciyForm.TmtDate"
                                                                     NullText="TMT" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="PPK Code">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PPK Code">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.ServicePPKCode"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="PPK Code" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Participant Status">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Participant Status">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.ParticipantStatus"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Participant Status" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="PPK Name">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PPK Name">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.ServicePPKName"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="PPK Name" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Service Type">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Service Type">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.ServiceType"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Service Type" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Service Participant">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Service Participant">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.ServiceParticipant"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Service Participant" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Current Age">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Current Age">
                                                         <DxDateEdit @bind-Date="@InsurancePoliciyForm.CurrentAge"
                                                                     NullText="Current Age" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Age At Time Of Service">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age At Time Of Service">
                                                         <DxDateEdit @bind-Date="@InsurancePoliciyForm.AgeAtTimeOfService"
                                                                     NullText="Age At Time Of Service" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="DinSos">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="DinSos">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.DinSos"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="DinSos" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Prolanis PBR">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Prolanis PBR">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.PronalisPBR"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Prolanis PBR" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="No. SKTM">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="No. SKTM">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.NoSKTM"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="No. SKTM" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Insurance No.">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Insurance No.">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.InsuranceNo"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Insurance No." />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Insurance Name">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Insurance Name">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.InsuranceName"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                    NullText="Insurance Name" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem Caption="Provider Name">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Provider Name">
                                                         <DxTextBox @bind-Text="@InsurancePoliciyForm.ProviderName"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"

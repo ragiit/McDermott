@@ -25,21 +25,16 @@
 
                     return result.Adapt<List<InsurancePolicyDto>>();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return [];
                 }
             }
         }
 
-        internal class GetInsurancePolicyCountQueryHandler : IRequestHandler<GetInsurancePolicyCountQuery, long>
+        internal class GetInsurancePolicyCountQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetInsurancePolicyCountQuery, long>
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetInsurancePolicyCountQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<long> Handle(GetInsurancePolicyCountQuery query, CancellationToken cancellationToken)
             {
@@ -48,7 +43,7 @@
                     return await _unitOfWork.Repository<InsurancePolicy>().GetCountAsync(
                       query.Predicate, cancellationToken);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return 0;
                 }

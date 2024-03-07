@@ -84,7 +84,9 @@
         [StringLength(200)]
         public string? ProviderName { get; set; }
 
+        [SetToNull]
         public virtual Insurance? Insurance { get; set; }
+        [SetToNull]
         public virtual User? User { get; set; }
     }
 }

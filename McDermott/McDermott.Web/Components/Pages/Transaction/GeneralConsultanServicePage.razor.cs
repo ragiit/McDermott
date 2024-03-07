@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using QuestPDF.Fluent;
-using QuestPDF.Previewer;
+﻿using QuestPDF.Fluent;
+
+using System.ComponentModel.DataAnnotations;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -8,8 +8,12 @@ namespace McDermott.Web.Components.Pages.Transaction
     {
         private async Task OnPrint()
         {
+            if (FormRegis.Id == 0)
+                return;
+
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
             var image = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\mcdermott_logo.png");
+            var file = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files\Slip_Registration.pdf");
             QuestPDF.Fluent.Document
                 .Create(x =>
                 {
@@ -25,7 +29,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                                 c.Item().Text("Slip Registration").FontSize(36).SemiBold();
                                 c.Item().Text($"MedRec: {FormRegis.Patient?.NoRm}");
                                 c.Item().Text($"Patient: {FormRegis.Patient?.Name}");
-                                c.Item().Text($"Identity Number: {FormRegis.Patient.NoId}");
+                                c.Item().Text($"Identity Number: {FormRegis.Patient?.NoId}");
                                 c.Item().Text($"Reg Type: {FormRegis.TypeRegistration}");
                                 c.Item().Text($"Service: {FormRegis.Service?.Name}");
                                 c.Item().Text($"Physicion: {FormRegis.Pratitioner?.Name}");
@@ -37,7 +41,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                         //page.Header().Text("Slip Registration").SemiBold().FontSize(30);
                     });
                 })
-                .GeneratePdf("Slip Registration.pdf");
+            .GeneratePdf(file);
+
+            await Helper.DownloadFile("Slip_Registration.pdf", HttpContextAccessor, HttpClient, JsRuntime);
+
+            //NavigationManager.NavigateTo(Path.Combine(Directory.GetCurrentDirectory(), @"Slip_Registration.pdf"), forceLoad: true);
         }
 
         #region Relation Data
@@ -818,8 +826,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 else
                 {
                     FormRegis.StagingStatus = "Confirmed";
-                    var result = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
-                    await LoadData();
+                    FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
                 }
             }
             catch (Exception ex)
@@ -1102,7 +1109,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                 GeneralConsultantClinical = new();
                 showForm = false;
 
-                await LoadData();
+                if (!IsReferTo)
+                    await LoadData();
+
                 ToastService.ShowSuccess("Successfully");
             }
             catch (Exception exx)
@@ -1346,7 +1355,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             if (PaymentMethod.Equals("BPJS"))
             {
-                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS == true).ToList();
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS == true && x.Active == true).ToList();
                 Temps = all.Select(x => new InsuranceTemp
                 {
                     InsurancePolicyId = x.Id,
@@ -1357,7 +1366,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             else
             {
-                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS != true).ToList();
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS != true && x.Active == true).ToList();
                 Temps = all.Select(x => new InsuranceTemp
                 {
                     InsurancePolicyId = x.Id,

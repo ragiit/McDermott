@@ -148,7 +148,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private async void OnRenderTo(KioskConfigDto context)
         {
             var configId = context.Id;
-            NavigationManager.NavigateTo($"/queue/kiosk/{configId}");
+            NavigationManager.NavigateTo($"queue/kiosk/{configId}", true);
         }
 
         private void OnCancel()
