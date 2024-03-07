@@ -26,6 +26,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private HubConnection hubConnection;
         private List<long> CounterCount = new List<long>();
         private string currentTime;
+        private long Cids { get; set; }
         private KioskQueueDto? Queuek { get; set; }
         #endregion static Variable
         private CultureInfo indonesianCulture = new CultureInfo("id-ID");
@@ -53,11 +54,11 @@ namespace McDermott.Web.Components.Pages.Queue
         protected override async Task OnInitializedAsync()
         {
             hubConnection = new HubConnectionBuilder()
-                .WithUrl(NavigationManager.ToAbsoluteUri("/realTimeHub"))
-                .Build();
+                    .WithUrl("http://localhost:5000/realTimeHub")
+                    .Build();
             hubConnection.On<long, long, long>("ReceivedQueue", (CounterId, ServiceKId, NoQueue) =>
             {
-                ToastService.ShowInfo("oke " + CounterId);
+                Cids = CounterId;
             });
             await hubConnection.StartAsync();
 

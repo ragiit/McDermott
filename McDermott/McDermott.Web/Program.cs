@@ -38,13 +38,16 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 app.UseSerilogRequestLogging();
-
+app.UseRouting();
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+
+
 app.MapHub<RealTimeHub>("/realTimeHub");
+
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 

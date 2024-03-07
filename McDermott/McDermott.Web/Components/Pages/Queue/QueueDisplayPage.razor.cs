@@ -78,29 +78,6 @@ namespace McDermott.Web.Components.Pages.Queue
             Counters = await Mediator.Send(new GetCounterQuery());
             counteres = [.. Counters.Where(x => x.Status == "on process")];
 
-            // Join data DetailQueueDisplay dan QueueDisplay berdasarkan QueueDisplayId
-            var joinedData = DetailQueueDisplay.Join(QueueDisplay,
-                                                    detail => detail.QueueDisplayId,
-                                                    queue => queue.Id,
-                                                    (detail, queue) => new { Detail = detail, Queue = queue });
-
-            // Mengelompokkan data berdasarkan ID tampilan
-            var groupedData = joinedData.GroupBy(item => item.Queue.Id);
-
-            // Membuat objek TempDisplayDto dari data yang telah digabungkan
-            TempDisplays.Clear(); // Bersihkan koleksi sebelum menambahkan data baru
-
-            foreach (var group in groupedData)
-            {
-                var displayQueueName = group.First().Queue.Name;
-                var counterNames = string.Join(", ", group.Select(item => counteres.FirstOrDefault(counter => counter.Id == item.Detail.CounterId)?.Name));
-
-                TempDisplays.Add(new TempDetailQueueDisplayDto
-                {
-                    Name = displayQueueName,
-                    NameCounter = counterNames
-                });
-            }
             PanelVisible = false;
         }
 
@@ -251,7 +228,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private async Task OnRenderTo(DetailQueueDisplayDto context)
         {
             var DisplayId = context.Id;
-            //NavigationManager.NavigateTo($"/queue/viewdisplay/{DisplayId}", true);
+            NavigationManager.NavigateTo($"/queue/viewdisplay/{DisplayId}", true);
         }
 
         #endregion Method OnRenderTo

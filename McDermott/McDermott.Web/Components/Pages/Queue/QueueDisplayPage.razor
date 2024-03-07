@@ -23,7 +23,7 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
                                     <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="TempDisplays"
+                                            Data="DetailQueueDisplay"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -68,8 +68,8 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" Caption="Queue Display" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="NameCounter" Caption="Counter" />
+                                            <DxGridDataColumn FieldName="DisplayName" Caption="Queue Display" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="CounterName" Caption="Counter" />
                                             <DxGridDataColumn Caption=" Action Display" >
                                                 <CellDisplayTemplate>
                                                     <DxButton RenderStyle="@ButtonRenderStyle.Success" IconCssClass="fa-solid fa-play mr-1" Text="Play" @onclick="() => OnRenderTo((DetailQueueDisplayDto)context.DataItem)"></DxButton>
