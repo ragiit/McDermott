@@ -54,13 +54,13 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             try
             {
+                await LoadData();
                 hubConnection = new HubConnectionBuilder()
                     .WithUrl("http://localhost:5000/realTimeHub")
                     .Build();
 
                 await hubConnection.StartAsync();
 
-                await LoadData();
             }
             catch { }
         }
@@ -171,7 +171,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 FormKiosksQueue.ServiceKId = data.ServiceKId;
                 FormKiosksQueue.Status = "call";
 
-                if (FormKiosksQueue.Id != null)
+                if (FormKiosksQueue.Id != 0)
                 {
                     await Mediator.Send(new UpdateKioskQueueRequest(FormKiosksQueue));
                 }

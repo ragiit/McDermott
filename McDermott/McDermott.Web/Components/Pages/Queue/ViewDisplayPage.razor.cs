@@ -1,7 +1,7 @@
-﻿using DevExpress.Blazor.Internal;
-using McDermott.Application.Dtos.Queue;
+﻿using McDermott.Application.Dtos.Queue;
 using System;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
+using static McDermott.Application.Features.Commands.Queue.DetailQueueDisplayCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 using static McDermott.Application.Features.Commands.Queue.QueueDisplayCommand;
 
@@ -13,7 +13,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private List<CompanyDto> companies = new();
         private List<KioskQueueDto> kioskQueues = new();
-        private List<QueueDisplayDto> queues = new();
+        private List<DetailQueueDisplayDto> DetQueues = new();
         private CounterDto cqueues = new();
 
         #endregion Data Relation
@@ -58,7 +58,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     .Build();
             hubConnection.On<long, long, long>("ReceivedQueue", (CounterId, ServiceKId, NoQueue) =>
             {
-                Cids = CounterId;
+                Cids = NoQueue;
             });
             await hubConnection.StartAsync();
 
@@ -69,8 +69,8 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task LoadData()
         {
-            queues = await Mediator.Send(new GetQueueDisplayQuery());
-            var CounterCout = queues.Where(x => x.Id == DisplayId).ToList();
+            var queues = await Mediator.Send(new GetDetailQueueDisplayQuery());
+            DetQueues = queues.ToList();
             var Counters = await Mediator.Send(new GetCounterQuery());
             kioskQueues = await Mediator.Send(new GetKioskQueueQuery());
 

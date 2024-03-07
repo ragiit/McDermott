@@ -17,9 +17,7 @@
                                     </p>
                                     <p class="mb-0">Phone. +62 778 411001</p>
                                 </div>
-                                <div class="col-4">
-                                    <h1>@Cids</h1>
-                                </div>
+                                
                                 <div class="col-4">
                                     <h5 class="text-center">@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy", indonesianCulture)</h5>
                                     <h2 class="text-center">@currentTime</h2>
@@ -30,7 +28,7 @@
                 </div>
             </div>
             <div class="row">
-                @foreach (var view in listcounter.Take(2))
+                @foreach (var view in DetQueues.Take(2))
                 {
                     <div class="col-6">
 
@@ -39,10 +37,10 @@
                                 <h3 class="text-center text-light">Number Queue</h3>
                             </div>
                             <div class="card-body">
-                                <h1>@Queuek.NoQueue</h1>
+                                <h1 class="text-center">@Cids</h1>
                             </div>
                             <div class="card-footer bg-gradient-success py-0">
-                                <h3 class="text-center text-light">@view.Name</h3>
+                                <h3 class="text-center text-light">@view.CounterName</h3>
                             </div>
                         </div>
                     </div>
