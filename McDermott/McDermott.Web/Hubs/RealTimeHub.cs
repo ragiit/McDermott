@@ -9,5 +9,10 @@ namespace McDermott.Web.Hubs
         {
             await Clients.All.SendAsync("ReceivedQueue", CounterId, ServerKId, NoQueue);
         }
+
+        public async Task SenCountry(CountryDto country)
+        {
+            await Clients.All.SendAsync("ReceivedCountry", country);
+        }
     }
 }

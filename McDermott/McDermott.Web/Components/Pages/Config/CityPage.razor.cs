@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Config
+﻿using Microsoft.AspNetCore.SignalR.Client;
+
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CityPage
     {
@@ -6,6 +8,8 @@
 
         private List<CityDto> Cities = [];
         private List<ProvinceDto> Provinces = [];
+        private List<CountryDto> Countriestk = [];
+        private HubConnection hubConnection;
         private GroupMenuDto UserAccessCRUID = new();
 
         private async Task SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
@@ -74,6 +78,7 @@
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
+        private string names {  get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -83,6 +88,15 @@
                 var result = await NavigationManager.CheckAccessUser(oLocal);
                 IsAccess = result.Item1;
                 UserAccessCRUID = result.Item2;
+
+                //hubConnection = new HubConnectionBuilder()
+                //    .WithUrl("http://localhost:5000/realTimeHub")
+                //    .Build();
+                //hubConnection.On<CountryDto>("ReceivedCountry", (e) =>
+                //{
+                //    names = e.Name;
+                //});
+                //await hubConnection.StartAsync();
             }
             catch { }
 

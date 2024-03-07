@@ -70,7 +70,8 @@ namespace McDermott.Web.Components.Pages.Queue
         private async Task LoadData()
         {
             var queues = await Mediator.Send(new GetDetailQueueDisplayQuery());
-            DetQueues = queues.ToList();
+            var DispId = queues.Where(x => x.Id == DisplayId).FirstOrDefault();
+            DetQueues = queues.Where(x => x.QueueDisplayId == DispId.QueueDisplayId).ToList();
             var Counters = await Mediator.Send(new GetCounterQuery());
             kioskQueues = await Mediator.Send(new GetKioskQueueQuery());
 

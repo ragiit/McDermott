@@ -1,10 +1,16 @@
-﻿using OfficeOpenXml;
+﻿using McDermott.Domain.Entities;
+using Microsoft.AspNetCore.SignalR.Client;
+using NuGet.Packaging.Signing;
+using OfficeOpenXml;
 
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CountryPage
     {
         private List<CountryDto> Countries = [];
+        private List<CountryDto> Countriest = [];
+        private List<CountryDto> Countriestk = [];
+        private HubConnection hubConnection;
         private GroupMenuDto UserAccessCRUID = new();
 
         private bool IsAccess = false;
@@ -21,6 +27,12 @@ namespace McDermott.Web.Components.Pages.Config
                 var result = await NavigationManager.CheckAccessUser(oLocal);
                 IsAccess = result.Item1;
                 UserAccessCRUID = result.Item2;
+
+                //hubConnection = new HubConnectionBuilder()
+                //    .WithUrl("http://localhost:5000/realTimeHub")
+                //    .Build();
+
+                //await hubConnection.StartAsync();
             }
             catch { }
 
@@ -48,6 +60,7 @@ namespace McDermott.Web.Components.Pages.Config
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Countries = await Mediator.Send(new GetCountryQuery());
+            Countriestk = Countriest.ToList();
             PanelVisible = false;
         }
 
@@ -309,6 +322,7 @@ namespace McDermott.Web.Components.Pages.Config
                 else
                     await Mediator.Send(new UpdateCountryRequest(editModel));
 
+                //await hubConnection.SendAsync("SendCountry", editModel);
                 await LoadData();
             }
             catch (Exception ex)
