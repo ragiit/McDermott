@@ -1,6 +1,4 @@
-﻿using DevExpress.ClipboardSource.SpreadsheetML;
-
-namespace McDermott.Web.Components.Pages.Config
+﻿namespace McDermott.Web.Components.Pages.Config
 {
     public partial class VillagePage
     {
@@ -19,6 +17,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
+            PanelVisible = true;
             try
             {
                 var result = await NavigationManager.CheckAccessUser(oLocal);
@@ -36,6 +35,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private bool IsAccess = false;
         private bool EditItemsEnabled;
+        private bool PanelVisible { get; set; } = true;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -45,14 +45,21 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 try
                 {
+                    if (Grid is not null)
+                    {
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(1);
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(2);
+                    }
+                }
+                catch { }
+
+                try
+                {
                     var result = await NavigationManager.CheckAccessUser(oLocal);
                     IsAccess = result.Item1;
                     UserAccessCRUID = result.Item2;
-
-                    await Grid.WaitForDataLoadAsync();
-                    Grid.ExpandGroupRow(1);
-                    await Grid.WaitForDataLoadAsync();
-                    Grid.ExpandGroupRow(2);
                 }
                 catch { }
             }
@@ -60,6 +67,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData()
         {
+            PanelVisible = true;
             var a = await Mediator.Send(new GetVillageQuery());
             var dataSource = new GridDevExtremeDataSource<VillageDto>(a.AsQueryable());
             dataSource.CustomizeLoadOptions = (loadOptions) =>
@@ -73,6 +81,7 @@ namespace McDermott.Web.Components.Pages.Config
             Data = dataSource;
 
             SelectedDataItems = new ObservableRangeCollection<object>();
+            PanelVisible = false;
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)

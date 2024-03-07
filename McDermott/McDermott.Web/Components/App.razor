@@ -110,6 +110,30 @@
     <script src="_content/Blazored.TextEditor/Blazored-BlazorQuill.js"></script>
 
     <script>
+        window.BlazorDownloadFileExample = (fileName) => {
+            const anchor = document.createElement('a');
+            anchor.setAttribute('download', fileName);
+            anchor.setAttribute('href', URL.createObjectURL(new Blob([], { type: 'application/octet-stream' })));
+            anchor.style.display = 'none';
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+        };
+
+        window.BlazorDownloadFile = async (fileName) => {
+            const response = await fetch(`/${fileName}`);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = fileName;
+            anchor.style.display = 'none';
+            document.body.appendChild(anchor);
+            anchor.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(anchor);
+        };
+
         // wwwroot/js/fileUtils.js
         window.downloadFile = ({ fileName, content }) => {
             const byteCharacters = atob(content);

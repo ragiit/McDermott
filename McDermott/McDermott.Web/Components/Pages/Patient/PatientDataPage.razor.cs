@@ -123,6 +123,9 @@
             ShowForm = false;
             AllPatientFamilyRelations.Clear();
             PatientFamilyRelations.Clear();
+            TabIndex = -1;
+            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataFamilyRelationItems = new ObservableRangeCollection<object>();
             UserForm = new();
 
             try
@@ -214,12 +217,28 @@
             TabIndex = -1;
         }
 
+        private bool PopUpVisible = false;
+
         private void OnClickSmartButton(string text)
         {
             //NavigationManager.NavigateTo("patient/insurance-policy");
             //var a = new InsurancePolicyPage();
             //a.User = UserForm;
+
+            if (text.Equals("Insurance Policy"))
+            {
+                PopUpVisible = true;
+                return;
+            }
             TabIndex = text.ToInt32();
+        }
+
+        private async Task OnClickCloseInsurancePolicyPopUp()
+        {
+            if (UserForm.Id != 0)
+            {
+                InsurancePoliciesCount = await Mediator.Send(new GetInsurancePolicyCountQuery(x => x.UserId == UserForm.Id));
+            }
         }
 
         private void OnSaveFamilyMember(GridEditModelSavingEventArgs e)
@@ -233,6 +252,9 @@
 
                 if (UserForm.Id != 0)
                     editModel.PatientId = UserForm.Id;
+
+                if (PatientFamilyRelations.Any(x => x.FamilyMemberId == editModel.FamilyMemberId && x.FamilyId == editModel.FamilyId))
+                    return;
 
                 editModel.FamilyMember = Users.FirstOrDefault(x => x.Id == editModel.FamilyMemberId);
                 editModel.Family = Families.FirstOrDefault(x => x.Id == editModel.FamilyId);

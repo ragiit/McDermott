@@ -3,13 +3,16 @@
     public class InsurancePolicyDto : IMapFrom<InsurancePolicy>
     {
         public long Id { get; set; }
+        [Required]
         public long UserId { get; set; } // Patient
+        [Required]
         public long InsuranceId { get; set; }
 
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? PolicyNumber { get; set; }
 
-        public bool Active { get; set; } = false;
+        [Required]
+        public bool Active { get; set; } = true;
 
         [StringLength(200)]
         public string? Prolanis { get; set; }

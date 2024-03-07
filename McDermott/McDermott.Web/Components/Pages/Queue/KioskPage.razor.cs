@@ -1,5 +1,4 @@
 ﻿using McDermott.Application.Dtos.Queue;
-using System.Linq;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 
@@ -44,7 +43,7 @@ namespace McDermott.Web.Components.Pages.Queue
         #region Data Static And Variable Additional
 
         [Parameter]
-        public long id { get; set; }
+        public long Id { get; set; }
 
         private List<string> type = new List<string>
         {
@@ -124,7 +123,7 @@ namespace McDermott.Web.Components.Pages.Queue
         //        {
         //            var timer = new Timer(new TimerCallback(_ =>
         //            {
-        //                UriHelper.NavigateTo(UriHelper.Uri, forceLoad: true);
+        //                UriHelper.NavigateTo(UriHelper.   ri, forceLoad: true);
         //            }), null, 2000, 2000);
         //        }
         //        catch { }
@@ -139,12 +138,22 @@ namespace McDermott.Web.Components.Pages.Queue
         protected override async Task OnInitializedAsync()
         {
             Kiosks = await Mediator.Send(new GetKioskQuery());
+
+            Id = $"{NavigationManager.Uri.Replace(NavigationManager.BaseUri + "queue/kiosk/", "")}".ToInt32();
             await LoadData();
             foreach (var i in KioskConf)
             {
                 HeaderName = i.Name;
                 break;
             }
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            await base.OnParametersSetAsync();
+
+            var ad = Id;
+            Id = Id;
         }
 
         private async Task LoadData()
@@ -159,7 +168,7 @@ namespace McDermott.Web.Components.Pages.Queue
             Kiosks = await Mediator.Send(new GetKioskQuery());
             Services = await Mediator.Send(new GetServiceQuery());
             var kconfig = await Mediator.Send(new GetKioskConfigQuery());
-            KioskConf = kconfig.Where(x => x.Id == id).ToList();
+            KioskConf = kconfig.Where(x => x.Id == Id).ToList();
             PanelVisible = false;
         }
 

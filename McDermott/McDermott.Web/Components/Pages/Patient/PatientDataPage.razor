@@ -41,7 +41,7 @@
                                         IconCssClass="fa-solid fa-users"
                                         Text="@($"Family Relation ini tab dibawah ")" /> *@
 
-                                                <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
+                                                <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("Insurance Policy"))"
                                                                IconCssClass="fa-solid fa-notes-medical"
                                                                Text="@($"{InsurancePoliciesCount} Insurance Policy")" />
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
@@ -272,7 +272,7 @@
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="NPWP" ColSpanMd="12">
                                                                 <DxTextBox @bind-Text="@UserForm.Npwp" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="NPWP" />
                                                             </DxFormLayoutItem>
-                                                           
+
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Name" ColSpanMd="12">
                                                                 <DxTextBox @bind-Text="@UserForm.EmergencyName" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Name" />
                                                             </DxFormLayoutItem>
@@ -631,3 +631,7 @@
         }
     </div>
 }
+
+<DxPopup HeaderText="Insurance Policy" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%" Closed="OnClickCloseInsurancePolicyPopUp">
+    <InsurancePolicyPage User="UserForm" IsPopUpForm="true"></InsurancePolicyPage>
+</DxPopup>

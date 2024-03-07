@@ -81,7 +81,7 @@
                                                         {
                                                             <DxToolbarItem Text="Closed" Click="@(() => InActive_Click(i.Id))" IconCssClass="fa-solid fa-circle-xmark" />
                                                         }
-                                                       
+
                                                     </Items>
                                                 </DxToolbarItem>
                                             </Items>
@@ -144,7 +144,7 @@
 
                         }
                     </div>
-                    <DxPopup HeaderText="@textPopUp" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" Width="35%">
+                    <DxPopup HeaderText="@textPopUp" @bind-Visible="@PopUpVisible" CloseOnOutsideClick="false" HeaderCssClass="fw-bold" Width="35%">
                         <EditForm Model="@counterForm" Context="EditFormContext">
                             <DxFormLayout CssClass="w-100">
                                 <DxFormLayoutItem ColSpanMd="12">
@@ -162,22 +162,28 @@
                     <DxPopup HeaderText="@textPopUp.ToUpper()" Width="55rem" Height="20em" @bind-Visible="@showFormProcess">
                         <EditForm Model="@counterForm" Context="EditFormContext">
                             <DxFormLayout CssClass="mt">
-                                <DxFormLayoutItem Caption="Service Counter" ColSpanMd="12">
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Service Counter" ColSpanMd="12">
                                     <DxComboBox Data="@ServiceK"
-                                                @bind-Value="@SelectServiced"save
+                                                @bind-Value="@SelectServiced"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                FilteringMode="@DataGridFilteringMode.Contains"
                                                 NullText="Select Service Counter.."
                                                 TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
                                 </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Service" ColSpanMd="12">
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Service" ColSpanMd="12">
                                     <DxComboBox Data="@ServiceP"
                                                 @bind-Value="@SelectPhysicion"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                FilteringMode="@DataGridFilteringMode.Contains"
                                                 NullText="Select Service.."
                                                 TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
                                 </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Physician" ColSpanMd="12">
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Physician" ColSpanMd="12">
                                     <DxComboBox Data="@Phys"
                                                 @bind-Value="@counterForm.PhysicianId"
                                                 NullText="Select Physician.."
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                FilteringMode="@DataGridFilteringMode.Contains"
                                                 TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem ColSpanMd="12">
@@ -196,4 +202,3 @@
         </div>
     </section>
 </div>
-

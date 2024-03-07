@@ -1,8 +1,10 @@
-﻿@page "/queue/kiosk/{id:long}"
+﻿@page "/queue/kiosk/{Id:long}"
+@page "/queue/kiosk"
+@rendermode InteractiveServer
 
 <PageTitle>McDermott - Transaction Kiosk</PageTitle>
 
-@if (id != null)
+@if (Id != 0)
 {
     @if (!showQueue)
     {
@@ -80,7 +82,7 @@
                                                                 else
                                                                 {
                                                                     <h6 class="text-danger">
-                                                                        <i class="fa-solid fa-circle" style="color: #d20404;"></i> 
+                                                                        <i class="fa-solid fa-circle" style="color: #d20404;"></i>
                                                                         @statBPJS
                                                                     </h6>
                                                                 }

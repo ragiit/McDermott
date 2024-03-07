@@ -4,6 +4,9 @@ namespace McDermott.Web.Components.Pages.Patient
 {
     public partial class InsurancePolicyPage
     {
+        [Parameter]
+        public bool IsPopUpForm { get; set; } = false;
+
         private List<CountryDto> Countries = [];
         private List<ProvinceDto> Provinces = [];
 
@@ -88,6 +91,7 @@ namespace McDermott.Web.Components.Pages.Patient
         private async Task LoadData()
         {
             PanelVisible = true;
+            ShowForm = false;
             SelectedDataItems = new ObservableRangeCollection<object>();
             Countries = await Mediator.Send(new GetCountryQuery());
 
@@ -104,6 +108,14 @@ namespace McDermott.Web.Components.Pages.Patient
         #endregion LoadData
 
         #region Grid Function
+
+        private void SelectedItemInsuranceChanged(InsuranceDto e)
+        {
+            if (e is null)
+                return;
+
+            IsBPJS = Insurances.Any(x => x.IsBPJS == true && x.Id == e.Id);
+        }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
@@ -139,11 +151,20 @@ namespace McDermott.Web.Components.Pages.Patient
         {
             try
             {
+                ToastService.ClearInfoToasts();
+                if (!FormValidationState)
+                {
+                    ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+                    return;
+                }
+
                 if (string.IsNullOrWhiteSpace(User.Name))
                 {
                     ToastService.ShowInfo("Please select the Patient first.");
                     return;
                 }
+
+                InsurancePoliciyForm.UserId = User.Id;
 
                 if (InsurancePoliciyForm.Id == 0)
                     await Mediator.Send(new CreateInsurancePolicyRequest(InsurancePoliciyForm));
