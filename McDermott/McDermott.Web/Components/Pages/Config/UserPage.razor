@@ -208,7 +208,7 @@
                                             </div>
                                             <div class="row w-100">
                                                 <div class="col-md-12">
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Same Domicile Address with KTP Address" ColSpanMd="12">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Residence Address" ColSpanMd="12">
                                                         <DxCheckBox @bind-Checked="@UserForm.IsSameDomicileAddress" />
                                                     </DxFormLayoutItem>
                                                 </div>
@@ -298,7 +298,7 @@
                                                     </DxGridLayout>
                                                 </Template>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Visible="@(!UserForm.IsSameDomicileAddress)" CaptionCssClass="normal-caption" Caption="Domicile Address" ColSpanMd="12">
+                                            <DxFormLayoutItem Visible="@(!UserForm.IsSameDomicileAddress)" CaptionCssClass="normal-caption" Caption="Residence Address" ColSpanMd="12">
                                                 <Template>
                                                     <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
                                                         <Rows>

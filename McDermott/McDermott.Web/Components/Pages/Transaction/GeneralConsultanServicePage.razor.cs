@@ -301,7 +301,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Nurse Station",
             "Waiting",
             "In Consultation",
-            "Consultation Done"
+            "Consultation Completed"  
         }; private long _InsurancePolicyId { get; set; }
 
         private long InsuranceId { get; set; }
