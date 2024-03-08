@@ -94,6 +94,9 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             if (firstRender)
             {
+                if (Grid is not null)
+                    Grid.AutoFitColumnWidths();
+
                 await LoadUser();
                 StateHasChanged();
 
@@ -257,6 +260,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Emergency",
             "MCU"
         };
+
+        private List<ClassTypeDto> ClassTypes = [];
 
         private List<string> Method = new List<string>
         {
@@ -726,6 +731,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             catch { }
             //var by =
 
+            PanelVisible = true;
+
+            ClassTypes = await Mediator.Send(new GetClassTypeQuery());
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
             NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
@@ -942,7 +950,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                         switch (FormRegis.StagingStatus)
                         {
                             case "Planned":
-                                await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                                FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+
+                                PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
 
                                 if (PatientAllergy.Id == 0)
                                     await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
@@ -988,6 +998,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                         {
                             case "Planned":
                                 await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+
+                                PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
 
                                 if (PatientAllergy.Id == 0)
                                     await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
@@ -1105,12 +1117,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                     }
                 }
 
-                FormRegis = new GeneralConsultanServiceDto();
-                GeneralConsultantClinical = new();
-                showForm = false;
-
-                if (!IsReferTo)
-                    await LoadData();
+                //FormRegis = new GeneralConsultanServiceDto();
+                //GeneralConsultantClinical = new();
+                //showForm = false;
 
                 ToastService.ShowSuccess("Successfully");
             }
@@ -1137,6 +1146,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsReferTo = false;
             PopUpVisible = false;
             PanelVisible = false;
+
+            if (Grid is not null)
+                Grid.AutoFitColumnWidths();
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
@@ -1162,9 +1174,18 @@ namespace McDermott.Web.Components.Pages.Transaction
             EditItemsEnabled = enabled;
         }
 
+        private bool IsDeletedConsultantService = false;
+
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedGridTabCPPTRowVisibleIndex = args.VisibleIndex;
+
+            try
+            {
+                IsDeletedConsultantService = ((GeneralConsultanServiceDto)args.DataItem)!.StagingStatus!.Equals("Planned") ? true : false;
+            }
+            catch { }
+
             UpdateEditItemsEnabled(true);
         }
 
@@ -1275,6 +1296,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<GeneralConsultanServiceDto>>();
+
+                    a = a.Where(x => x.StagingStatus == "Planned").ToList();
+
                     await Mediator.Send(new DeleteListGeneralConsultanServiceRequest(a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
@@ -1302,7 +1326,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private void OnReferToClick()
         {
-            FormRegis = SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>();
             IsReferTo = true;
             PopUpVisible = true;
         }
