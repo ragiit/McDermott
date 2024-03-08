@@ -72,7 +72,9 @@
                                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanServices.Count > 0" />
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanServices.Count > 0" />
+                                                    
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0  && GeneralConsultanServices.Count > 0" />
+                                                        
                                                                     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                                     <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                                     <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
@@ -554,44 +556,7 @@
                                                                                                                                                                                         </DxComboBox>
                                                                                                                                                                                     </DxFormLayoutItem>
 
-                @*  @if (Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
-                {
-
-                } *@
-                @*  else if ( (Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsNurse)))
-                {
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Nursing Diagnosis" ColSpanMd="12">
-                        <DxComboBox ShowValidationIcon="true" Data="@NursingDiagnosesTemps"
-                                    NullText="Select Nursing Diagnosis..."
-                                    @bind-Value="@FormInputCPPTGeneralConsultan.NursingDiagnosis"
-                                    TextFieldName="Problem"
-                                    ValueFieldName="Problem">
-                        </DxComboBox>
-                    </DxFormLayoutItem>
-                } *@
-                @*    else
-                {
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis" ColSpanMd="12">
-                        <DxComboBox ShowValidationIcon="true" Data="@DiagnosesTemps"
-                                    NullText="Select Diagnosis..."
-                                    @bind-Value="@FormInputCPPTGeneralConsultan.Diagnosis"
-                                    TextFieldName="NameCode"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    FilteringMode="@DataGridFilteringMode.Contains"
-                                    ValueFieldName="NameCode">
-                        </DxComboBox>
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Nursing Diagnosis" ColSpanMd="12">
-                        <DxComboBox ShowValidationIcon="true" Data="@NursingDiagnosesTemps"
-                                    NullText="Select Nursing Diagnosis..."
-                                    @bind-Value="@FormInputCPPTGeneralConsultan.NursingDiagnosis"
-                                    TextFieldName="Problem"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    FilteringMode="@DataGridFilteringMode.Contains"
-                                    ValueFieldName="Problem">
-                        </DxComboBox>
-                    </DxFormLayoutItem>
-                } *@
+                
                                                                                                                                                                             </Items>
                                                                                                                                                                         </DxFormLayoutGroup>
                                                                                                                                                                     </DxFormLayout>
@@ -1147,7 +1112,7 @@
                                                                                         Data="@Temps"
                                                                                         @bind-Value="@FormRegis.InsurancePolicyId"
                                                                                         NullText="Select Insurance ..">
-                                                                                    </DxComboBox ShowValidationIcon="true">
+                                                                                    </DxComboBox >
                                                                                     <ValidationMessage For="@(() => FormRegis.InsurancePolicyId)" />
                                                                                 </DxFormLayoutItem>
                                 }
