@@ -23,10 +23,12 @@ namespace McDermott.Web.Components.Pages.Queue
         [Parameter]
         public long DisplayId { get; set; }
 
+        public IGrid Grid { get; set; }
         private HubConnection hubConnection;
         private List<long> CounterCount = new List<long>();
         private string currentTime;
         private long Cids { get; set; }
+        private long ServiceKId { get; set; }
         private KioskQueueDto? Queuek { get; set; }
         #endregion static Variable
         private CultureInfo indonesianCulture = new CultureInfo("id-ID");
@@ -59,6 +61,7 @@ namespace McDermott.Web.Components.Pages.Queue
             hubConnection.On<long, long, long>("ReceivedQueue", (CounterId, ServiceKId, NoQueue) =>
             {
                 Cids = NoQueue;
+                StateHasChanged();
             });
             await hubConnection.StartAsync();
 
@@ -70,20 +73,28 @@ namespace McDermott.Web.Components.Pages.Queue
         private async Task LoadData()
         {
             var queues = await Mediator.Send(new GetDetailQueueDisplayQuery());
-            var DispId = queues.Where(x => x.Id == DisplayId).FirstOrDefault();
+            var DispId = queues.FirstOrDefault(x => x.Id == DisplayId);
             DetQueues = queues.Where(x => x.QueueDisplayId == DispId.QueueDisplayId).ToList();
             var Counters = await Mediator.Send(new GetCounterQuery());
-            kioskQueues = await Mediator.Send(new GetKioskQueueQuery());
+            var getCounId = Counters.FirstOrDefault(x => x.Id == DispId.CounterId);
+            var kioskQueue = await Mediator.Send(new GetKioskQueueQuery());
+            kioskQueues = kioskQueue.Where(x => x.ServiceKId == getCounId.ServiceKId && (x.Status == null || x.Status == "call")).ToList();
 
-            //foreach (var i in CounterCout[0].CounterId)
-            //{
-            //    var a = Counters.Where(x => x.Id == i).FirstOrDefault();
-            //    Queuek = kioskQueues.Where(x => x.ServiceKId == a.ServiceKId).FirstOrDefault();
-
-            //    listcounter.Add(a);
-            //}
         }
 
         #endregion
+
+        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        {
+            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+            {
+                e.CssClass = "alt-item";
+            }
+            else if (e.ElementType == GridElementType.HeaderCell)
+            {
+                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
+                e.CssClass = "header-bold";
+            }
+        }
     }
 }

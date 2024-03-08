@@ -270,6 +270,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     await Mediator.Send(new UpdateKioskQueueRequest(FormCounters));
                 }
                 ToastService.ShowError("Patient Absent!!");
+                await LoadData();
             }
             catch (Exception ex)
             {

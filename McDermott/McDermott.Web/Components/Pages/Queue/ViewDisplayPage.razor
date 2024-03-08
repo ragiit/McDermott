@@ -7,10 +7,10 @@
             <div class="row">
                 <div class="col">
                     <div class="card ">
-                        <div class="card-body bg-info rounded">
+                        <div class="card-body bg-gradient-info rounded">
                             <div class="row justify-content-between">
                                 <div class="col-4 ">
-                                    <h3 class="mt-2">Mc HealthCare</h3>
+                                    <h3 class="mt-2">McHealthCare</h3>
                                     <p class="mb-0">
                                         Jalan Bawal No. 1 – Batu Ampar
                                         Batam Island 29452, Riau Islands Province
@@ -37,7 +37,30 @@
                                 <h3 class="text-center text-light">Number Queue</h3>
                             </div>
                             <div class="card-body">
-                                <h1 class="text-center fs-1 fw-bolder">@Cids.ToString("D3")</h1>
+                                <div class="row">
+                                    <div class="col">
+                                        <h1 class="text-center fw-bolder" style="font-size:120px">@Cids.ToString("D3")</h1>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <DxGrid @ref="Grid"
+                                                Data="@kioskQueues"
+                                                ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                                                AllowSelectRowByClick="true"
+                                                PagerPosition="GridPagerPosition.Bottom"                                                
+                                                PageSizeSelectorAllRowsItemVisible="true"
+                                                PagerSwitchToInputBoxButtonCount="10"
+                                                PagerVisibleNumericButtonCount="10"
+                                                CustomizeElement="Grid_CustomizeElement"
+                                                KeyboardNavigationEnabled="true">
+                                            <Columns>
+                                                <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="10px" SortIndex="0" />
+                                                <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name"  />
+                                            </Columns>
+                                        </DxGrid>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-footer bg-gradient-success py-0">
                                 <h3 class="text-center text-light">@view.CounterName</h3>
