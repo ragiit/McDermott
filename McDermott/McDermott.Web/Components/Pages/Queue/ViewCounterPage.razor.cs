@@ -60,6 +60,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     .Build();
 
                 await hubConnection.StartAsync();
+                StateHasChanged();
             }
             catch { }
         }
@@ -180,7 +181,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
                 if (hubConnection.State == HubConnectionState.Connected)
                 {
-                    await hubConnection.SendAsync("SendQueue", CounterId, FormKiosksQueue.ServiceKId, FormKiosksQueue.NoQueue);
+                    await hubConnection.SendAsync("SendQueue", FormKiosksQueue);
                 }
                 await LoadData();
             }
@@ -272,6 +273,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     await Mediator.Send(new UpdateKioskQueueRequest(FormCounters));
                 }
                 ToastService.ShowError("Patient Absent!!");
+                await LoadData();
             }
             catch (Exception ex)
             {
