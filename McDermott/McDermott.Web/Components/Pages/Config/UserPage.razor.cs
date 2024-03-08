@@ -234,19 +234,26 @@
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-            if (SelectedDataItems is null)
+            try
             {
-                await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<UserDto>>();
+
+                    long userActive = (long)HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
+
+                    await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
+                }
+                await LoadData();
             }
-            else
+            catch (Exception ex)
             {
-                var a = SelectedDataItems.Adapt<List<UserDto>>();
-
-                long userActive = (long)HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
-
-                await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
+                ex.HandleException(ToastService);
             }
-            await LoadData();
         }
 
         private void ColumnChooserButton_Click()

@@ -71,6 +71,8 @@ namespace McDermott.Web.Components.Pages.Queue
                 User = await oLocal.GetUserInfo();
                 userBy = User.Name;
 
+                ShowPresent = false;
+
                 var general = await Mediator.Send(new GetCounterByIdQuery(CounterId));
                 Services = await Mediator.Send(new GetServiceQuery());
                 var physician = await Mediator.Send(new GetUserQuery());
