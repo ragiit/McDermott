@@ -1,4 +1,4 @@
-﻿@page "/transaction/general-consultan-service"
+﻿@page "/clinical-service/general-consultation-service"
 @rendermode InteractiveServer
 <PageTitle>McDermott - Transaction General Consultan Service</PageTitle>
 
@@ -21,7 +21,7 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item" @onclick="LoadData"><a href="/transaction/general-consultan-service">General Consultan Service</a></li>
+                            <li class="breadcrumb-item" @onclick="LoadData"><a href="/clinical-service/general-consultation-service">General Consultan Service</a></li>
                         </ol>
                     </div>
                 </div>
@@ -43,11 +43,12 @@
                                                                             IndicatorAreaVisible="false"
                                                                             Text="Fetching Data...">
                                                                 <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                                        Data="GeneralConsultanServices.OrderByDescending(x => x.IsAlertInformationSpecialCase)"
+                                                                        Data="GeneralConsultanServices.OrderByDescending(x => x.RegistrationDate).ThenByDescending(x => x.IsAlertInformationSpecialCase)"
                                                                         PageSize="10"
                                                                         @bind-SelectedDataItems="@SelectedDataItems"
                                                                         FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                                                         KeyFieldName="Id"
+                                                                        TextWrapEnabled="false"
                                                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                                         DataItemDeleting="OnDelete"
                                                                         EditMode="GridEditMode.PopupEditForm"
@@ -57,6 +58,7 @@
                                                                         PageSizeSelectorAllRowsItemVisible="true"
                                                                         PagerSwitchToInputBoxButtonCount="10"
                                                                         AllowSelectRowByClick="true"
+                                                                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                                                                         FocusedRowEnabled="true"
                                                                         RowDoubleClick="OnRowDoubleClick"
                                                                         PagerVisibleNumericButtonCount="10"
@@ -64,7 +66,6 @@
                                                                         ShowGroupPanel="true"
                                                                         ShowFilterRow="true"
                                                                         CustomizeElement="Grid_CustomizeElement"
-                                                                        AutoExpandAllGroupRows="true"
                                                                         ShowSearchBox="true"
                                                                         SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                                                         KeyboardNavigationEnabled="true">
@@ -72,7 +73,7 @@
                                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanServices.Count > 0" />
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanServices.Count > 0" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanServices.Count > 0 && IsDeletedConsultantService" />
                                                                     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                                     <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                                     <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
@@ -87,7 +88,7 @@
                                                             </ToolbarTemplate>
                                                                     <Columns>
                                                                         <DxGridSelectionColumn Width="15px" />
-                                                                        <DxGridDataColumn FieldName="RegistrationDate" Caption="Registration Date"/>
+                                                                        <DxGridDataColumn FieldName="RegistrationDate" DisplayFormat="ddd, dd MMM yyyy" Caption="Registration Date"/>
                                                                         <DxGridDataColumn FieldName="Patient.Name" Caption="Patient" />
                                                                         <DxGridDataColumn FieldName="Payment" Caption="Payment Methode" />
                                                                         <DxGridDataColumn FieldName="Pratitioner.Name" Caption="Doctor" />
@@ -256,6 +257,17 @@
                                                                             </div>
                                                                             <div class="col-md-6">
                                                                                 <DxFormLayout CssClass="mt ">
+                                                                                      <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Class Type" ColSpanMd="12">
+                                                                                        <DxComboBox ShowValidationIcon="true" Data="@ClassTypes"
+                                                                                                    NullText="Select Class Type.."
+                                                                                                    ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
+                                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                                    FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                                    TextFieldName="Name" ValueFieldName="Id"
+                                                                                                    @bind-Value="@FormRegis.ClassTypeId">
+                                                                                        </DxComboBox>
+                                                                                        <ValidationMessage For="@(() => FormRegis.ClassTypeId)" />
+                                                                                    </DxFormLayoutItem>
                                                                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
                                                                                         <DxComboBox ShowValidationIcon="true" Data="@Services"
                                                                                                     NullText="Select Service.."

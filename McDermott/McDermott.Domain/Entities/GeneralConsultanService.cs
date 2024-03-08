@@ -7,7 +7,7 @@
         public long? InsurancePolicyId { get; set; }
         public long? ServiceId { get; set; }
         public long? PratitionerId { get; set; }
-        public long? ClassType { get; set; }
+        public long? ClassTypeId { get; set; }
         public string? StagingStatus { get; set; }
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }
@@ -40,7 +40,7 @@
 
         [SetToNull] // Tandai properti yang harus diatur ke null
         public virtual InsurancePolicy? InsurancePolicy { get; set; }
-
+        [SetToNull]
         public virtual List<GeneralConsultanCPPT>? GeneralConsultanCPPTs { get; set; }
 
         [SetToNull] // Tandai properti yang harus diatur ke null
@@ -48,5 +48,7 @@
 
         [SetToNull] // Tandai properti yang harus diatur ke null
         public virtual List<GeneralConsultantClinicalAssesment>? GeneralConsultantClinicalAssesments { get; set; }
+        [SetToNull]
+        public virtual ClassType? ClassType { get; set; }
     }
 }

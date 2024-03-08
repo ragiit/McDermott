@@ -67,6 +67,7 @@ namespace McDermott.Persistence.Context
         public DbSet<DoctorSchedule> DoctorSchedules { get; set; }
         public DbSet<DoctorScheduleDetail> DoctorScheduleDetails { get; set; }
         public DbSet<DoctorScheduleSlot> DoctorScheduleSlots { get; set; }
+        public DbSet<ClassType> ClassTypes { get; set; }
 
         #endregion Patiente
 

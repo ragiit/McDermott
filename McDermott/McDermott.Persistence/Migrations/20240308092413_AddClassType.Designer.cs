@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240308092413_AddClassType")]
+    partial class AddClassType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1057,8 +1060,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("BirthDay")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("ClassTypeId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("ClassType")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1133,8 +1136,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("time");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClassTypeId");
 
                     b.HasIndex("InsuranceId");
 
@@ -2787,11 +2788,6 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanService", b =>
                 {
-                    b.HasOne("McDermott.Domain.Entities.ClassType", "ClassType")
-                        .WithMany()
-                        .HasForeignKey("ClassTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.Insurance", "Insurance")
                         .WithMany()
                         .HasForeignKey("InsuranceId")
@@ -2816,8 +2812,6 @@ namespace McDermott.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("ClassType");
 
                     b.Navigation("Insurance");
 

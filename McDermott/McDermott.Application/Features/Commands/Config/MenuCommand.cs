@@ -2,46 +2,44 @@
 {
     public class MenuCommand
     {
-        public class GetMenuQuery : IRequest<List<MenuDto>>;
-
-        public class GetMenuByIdQuery : IRequest<MenuDto>
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
+        public class GetMenuQuery(Expression<Func<Menu, bool>>? predicate = null) : IRequest<List<MenuDto>>
         {
-             public long Id { get; set; }
+            public Expression<Func<Menu, bool>> Predicate { get; } = predicate!;
+        }
+        #endregion
 
-            public GetMenuByIdQuery(long id)
-            {
-                Id = id;
-            }
+        #region CREATE
+        public class CreateMenuRequest(MenuDto MenuDto) : IRequest<MenuDto>
+        {
+            public MenuDto MenuDto { get; set; } = MenuDto;
         }
 
-        public class CreateMenuRequest : IRequest<MenuDto>
+        public class CreateListMenuRequest(List<MenuDto> GeneralConsultanCPPTDtos) : IRequest<List<MenuDto>>
         {
-            public MenuDto MenuDto { get; set; }
+            public List<MenuDto> MenuDtos { get; set; } = GeneralConsultanCPPTDtos;
+        }
+        #endregion
 
-            public CreateMenuRequest(MenuDto MenuDto)
-            {
-                this.MenuDto = MenuDto;
-            }
+        #region Update
+        public class UpdateMenuRequest(MenuDto MenuDto) : IRequest<MenuDto>
+        {
+            public MenuDto MenuDto { get; set; } = MenuDto;
         }
 
-        public class UpdateMenuRequest : IRequest<bool>
+        public class UpdateListMenuRequest(List<MenuDto> MenuDtos) : IRequest<List<MenuDto>>
         {
-            public MenuDto MenuDto { get; set; }
-
-            public UpdateMenuRequest(MenuDto MenuDto)
-            {
-                this.MenuDto = MenuDto;
-            }
+            public List<MenuDto> MenuDtos { get; set; } = MenuDtos;
         }
 
-        public class DeleteMenuRequest : IRequest<bool>
-        {
-             public long Id { get; set; }
+        #endregion
 
-            public DeleteMenuRequest(long id)
-            {
-                Id = id;
-            }
+        #region DELETE 
+        public class DeleteMenuRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
         }
+        #endregion
     }
 }
