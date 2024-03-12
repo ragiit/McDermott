@@ -141,7 +141,7 @@
             if (!string.IsNullOrWhiteSpace(editModel.ParentMenu))
             {
                 var splits = editModel.Name.ToLower().Split(" ");
-                editModel.Url = $"{editModel.ParentMenu.ToLower().Trim()}/{string.Join("-", splits)}";
+                editModel.Url = $"{string.Join("-", editModel.ParentMenu.ToLower().Trim().Split())}/{string.Join("-", splits)}";
 
                 if (editModel.ParentMenu.Contains("Configuration"))
                 {
@@ -159,12 +159,13 @@
                 {
                     var relatedMenus = await Mediator.Send(new GetMenuQuery(x => x.ParentMenu == SelectedDataItems[0].Adapt<MenuDto>().Name));
 
-                    var splits = editModel.Name.ToLower().Split(" "); 
+                    var splits = editModel.Name.ToLower().Split(" ");
 
                     if (editModel.Name.Contains("Configuration"))
                     {
                         editModel.Url = $"config/{string.Join("-", splits)}";
-                    }else
+                    }
+                    else
                     {
                         editModel.Url = $"{string.Join("-", splits)}/";
                     }
