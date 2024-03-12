@@ -1,12 +1,15 @@
 ﻿using McDermott.Application.Dtos.Queue;
 using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
 
 namespace McDermott.Web.Hubs
 {
     public class RealTimeHub : Hub
     {
-        public async Task SendQueue(KioskQueueDto queue)
+        public async Task SendQueue(List<KioskQueueDto> queue)
+        {
+            await Clients.All.SendAsync("SendQueue", queue);
+        }
+        public async Task ReceivedQueue(List<KioskQueueDto> queue)
         {
             await Clients.All.SendAsync("ReceivedQueue", queue);
         }

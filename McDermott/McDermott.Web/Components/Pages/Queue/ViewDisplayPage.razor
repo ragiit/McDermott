@@ -32,7 +32,7 @@
             <div class="row">
                 @foreach (var view in DetQueues.Take(2))
                 {
-                    <div class="col-6">
+                    <div class="col-md-6">
                         <div class="card">
                             <div class="card-header bg-gradient-info py-0">
                                 <h3 class="text-center text-light">Queue</h3>
@@ -40,7 +40,9 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col">
-                                        <h1 class="text-center fw-bolder" style="font-size:120px"> @((kioskQueues.NoQueue ?? 0).ToString("D3"))</h1>
+
+                                        <h1 class="text-center fw-bolder" style="font-size:120px"> @((Cids ?? 0).ToString("D3"))</h1>
+                                       
                                     </div>
                                 </div>
                                 <div class="row">
@@ -52,7 +54,7 @@
                                                         IndicatorAreaVisible="false"
                                                         Text="Fetching Data...">
                                             <DxGrid @ref="Grid"
-                                                    Data="@DataQueue"
+                                                    Data="@kioskQueues"
                                                     ColumnResizeMode="GridColumnResizeMode.NextColumn"
                                                     AllowSelectRowByClick="true"
                                                     PagerPosition="GridPagerPosition.Bottom"

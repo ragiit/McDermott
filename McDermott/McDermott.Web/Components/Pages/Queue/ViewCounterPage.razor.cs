@@ -175,16 +175,17 @@ namespace McDermott.Web.Components.Pages.Queue
 
                 if (FormKiosksQueue.Id != 0)
                 {
-                    await Mediator.Send(new UpdateKioskQueueRequest(FormKiosksQueue));
+                   var dataQueue = await Mediator.Send(new UpdateKioskQueueRequest(FormKiosksQueue));
+                    if (hubConnection.State == HubConnectionState.Connected)
+                    {
+                        await hubConnection.SendAsync("SendQueue", dataQueue);
+                    }
                 }
                 var cek = CounterId;
-
-                if (hubConnection.State == HubConnectionState.Connected)
-                {
-                    await hubConnection.SendAsync("SendQueue", FormKiosksQueue);
-                }
+                //DataKiosksQueue = FormKiosksQueue;
+               
                 await LoadData();
-            }
+            } 
             catch (Exception ex)
             {
                 ToastService.ShowError(ex.Message);

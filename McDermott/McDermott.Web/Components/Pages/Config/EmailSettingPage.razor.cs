@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
+﻿using DevExpress.Blazor.Internal.Editors;
+using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -255,6 +256,7 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         #endregion Save Function
+        #region Configurtaion Connection SMTP
 
         private string currentSmtpEncryption = "";
 
@@ -275,28 +277,6 @@ namespace McDermott.Web.Components.Pages.Config
             else if (e.Equals("none"))
             {
                 FormEmails.Smtp_Port = "";
-            }
-        }
-
-        private string OnSmtpEncryptionChange
-        {
-            get => currentSmtpEncryption;
-            set
-            {
-                currentSmtpEncryption = value;
-                FormEmails.Smtp_Encryption = value;
-                if (currentSmtpEncryption == "TLS (STARTTLS)")
-                {
-                    FormEmails.Smtp_Port = "25";
-                }
-                else if (currentSmtpEncryption == "SSL/TLS")
-                {
-                    FormEmails.Smtp_Port = "465";
-                }
-                else if (currentSmtpEncryption == "none")
-                {
-                    FormEmails.Smtp_Port = "";
-                }
             }
         }
 
@@ -329,5 +309,25 @@ namespace McDermott.Web.Components.Pages.Config
                 isLoading = false;
             }
         }
+        bool showPassword = false;
+        string showPasswordIcon = "fa-solid fa-eye-slash";
+
+        void TogglePasswordVisibility()
+        {
+            var a = FormEmails.Smtp_Pass;
+            showPassword = !showPassword;
+
+            if(showPassword == true)
+            {
+                showPasswordIcon = "fa-solid fa-eye";
+            }
+            else
+            {
+                showPasswordIcon = "fa-solid fa-eye-slash";
+            }
+        }
+     
+
+        #endregion
     }
 }
