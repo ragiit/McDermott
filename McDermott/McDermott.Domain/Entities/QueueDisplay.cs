@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
-    public class QueueDisplay:BaseAuditableEntity
+    public class QueueDisplay : BaseAuditableEntity
     {
-        public string? Name {  get; set; }
-      
-        public virtual List<Counter>? Counter {  get; set; }
+        public string? Name { get; set; }
+
+        [SetToNull]
+        public virtual List<Counter>? Counter { get; set; }
     }
 }

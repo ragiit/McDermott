@@ -11,7 +11,9 @@
         public long? DiseaseCategoryId { get; set; }
         public long? CronisCategoryId { get; set; }
 
+        [SetToNull]
         public virtual DiseaseCategory? DiseaseCategory { get; set; }
+        [SetToNull]
         public virtual CronisCategory? CronisKategory { get; set; }
     }
 }

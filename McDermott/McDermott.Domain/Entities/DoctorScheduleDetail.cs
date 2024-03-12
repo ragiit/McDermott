@@ -17,6 +17,7 @@
         public long Quota { get; set; } = 0;
         public bool UpdateToBpjs { get; set; } = false;
 
+        [SetToNull]
         public virtual DoctorSchedule? DoctorSchedule { get; set; }
     }
 }
