@@ -1,6 +1,7 @@
 ﻿using QuestPDF.Fluent;
 
 using System.ComponentModel.DataAnnotations;
+using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanClinicalAssesmentCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -69,14 +70,28 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Form Regis
 
-        public MarkupString GetIssuePriorityIconHtml(bool priority)
+        public MarkupString GetIssuePriorityIconHtml(GeneralConsultanServiceDto priority)
         {
-            if (priority == true)
+            if (priority is not null)
             {
+                if (!priority.IsAlertInformationSpecialCase && priority.ClassType is null)
+                    return new MarkupString("");
+
                 string priorytyClass = "danger";
-                string title = " Priority ";
+                string title = string.Empty;
+
+                if (priority.IsAlertInformationSpecialCase && priority.ClassType is not null)
+                    title = $" Priority, {priority.ClassType.Name}";
+                else
+                {
+                    if (priority.ClassType is not null)
+                        title = $"{priority.ClassType.Name}";
+                    if (priority.IsAlertInformationSpecialCase)
+                        title = $" Priority ";
+                }
 
                 string html = string.Format("<span class='badge bg-{0} py-1 px-2' title='{1} Priority'>{1}</span>", priorytyClass, title);
+
                 return new MarkupString(html);
             }
             return new MarkupString("");
@@ -301,7 +316,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Nurse Station",
             "Waiting",
             "In Consultation",
-            "Consultation Completed"  
+            "Consultation Completed"
         }; private long _InsurancePolicyId { get; set; }
 
         private long InsuranceId { get; set; }
@@ -734,7 +749,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             PanelVisible = true;
 
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
+
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
             NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
             var nursingDiagnosesTemps = NursingDiagnoses.Select(x => new NursingDiagnosesTemp
@@ -930,6 +945,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (!FormRegis.IsFood)
                     PatientAllergy.Food = null;
 
+                var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date < DateTime.Now.Date));
+
+                if (patient.Count > 0)
+                {
+                    ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
+                    return;
+                }
+
                 if (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null))
                 {
                     ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
@@ -940,7 +963,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     FormRegis.Id = 0;
                     FormRegis.StagingStatus = "Planned";
-                    await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                    PopUpVisible = false;
+                    FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
                 }
                 else
                 {
@@ -1121,7 +1145,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 //GeneralConsultantClinical = new();
                 //showForm = false;
 
-                ToastService.ShowSuccess("Successfully");
+                //ToastService.ShowSuccess("Successfully");
             }
             catch (Exception exx)
             {
@@ -1182,7 +1206,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                IsDeletedConsultantService = ((GeneralConsultanServiceDto)args.DataItem)!.StagingStatus!.Equals("Planned") ? true : false;
+                IsDeletedConsultantService = ((GeneralConsultanServiceDto)args.DataItem)!.StagingStatus!.Equals("Planned");
             }
             catch { }
 
@@ -1299,7 +1323,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     a = a.Where(x => x.StagingStatus == "Planned").ToList();
 
-                    await Mediator.Send(new DeleteListGeneralConsultanServiceRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteGeneralConsultanServiceRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
@@ -1322,12 +1346,24 @@ namespace McDermott.Web.Components.Pages.Transaction
         }
 
         private bool PopUpVisible = false;
+        private bool PopUpHistoricalMedical = false;
+        private bool PopUpAppoimentPending = false;
         private bool IsReferTo = false;
 
         private void OnReferToClick()
         {
             IsReferTo = true;
             PopUpVisible = true;
+        }
+
+        private void OnClickPopUpHistoricalMedical()
+        {
+            PopUpHistoricalMedical = true;
+        }
+
+        private void OnClickPopUpAppoimentPending()
+        {
+            PopUpAppoimentPending = true;
         }
 
         private void SelectedCountryChanged(string country)

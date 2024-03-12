@@ -56,7 +56,7 @@
         public bool IsPharmacology { get; set; } = false;
         public bool IsFood { get; set; } = false;
 
-        public virtual ClassTypeDto? ClassTypeDto { get; set; }
+        public virtual ClassTypeDto? ClassType { get; set; }
         public virtual UserDto? Patient { get; set; }
         public virtual UserDto? Pratitioner { get; set; }
         public virtual InsuranceDto? Insurance { get; set; }

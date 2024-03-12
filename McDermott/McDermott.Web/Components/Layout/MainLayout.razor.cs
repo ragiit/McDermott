@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Layout
+﻿using Microsoft.AspNetCore.Components.Routing;
+
+namespace McDermott.Web.Components.Layout
 {
     public partial class MainLayout
     {
@@ -22,6 +24,11 @@
                 await LoadUser();
                 StateHasChanged();
             }
+            try
+            {
+                var demoPageUrl = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Path).Replace(NavigationManager.BaseUri, "");
+            }
+            catch { }
         }
 
         private async Task LoadUser()
@@ -41,6 +48,69 @@
         //{
         //    currentUrl = NavigationManager.Uri;
         //}
+
+        protected override void OnInitialized()
+        {
+            NavigationManager.LocationChanged += HandleLocationChanged;
+            UpdateBreadcrumb(NavigationManager.Uri);
+        }
+
+        public class Breadcrumb
+        {
+            public string Name { get; set; }
+            public bool IsActive { get; set; }
+        }
+
+        private List<Breadcrumb> Breadcrumbs = [];
+
+        private void HandleLocationChanged(object sender, LocationChangedEventArgs args)
+        {
+            UpdateBreadcrumb(args.Location);
+        }
+
+        private void UpdateBreadcrumb(string uri)
+        {
+            string[] segments = uri.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+            // Mendapatkan URL saat ini
+            var uriw = new Uri(NavigationManager.Uri);
+
+            // Mendapatkan path dari URL
+
+            Breadcrumbs.Clear();
+            foreach (var segment in NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Path).Replace(NavigationManager.BaseUri, "").Split("/"))
+            {
+                var aa = segment;
+                //Breadcrumbs.Add(segment);
+            }
+
+            var asd = new List<Breadcrumb>();
+
+            var urls = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Path).Replace(NavigationManager.BaseUri, "").Split("/");
+
+            string path = uriw.AbsolutePath;
+
+            // Mendapatkan segmen terakhir dari path URL
+
+            var aaa = path.Split('/').Last();
+
+            Breadcrumbs.Clear();
+
+            for (int i = 1; i < urls.Length; i++)
+            {
+                var name = urls[i];
+                Breadcrumbs.Add(new Breadcrumb
+                {
+                    IsActive = aaa.ToLower() == name.ToLower(),
+                    Name = char.ToUpper(name[0]) + name.Substring(1)
+                });
+            }
+
+            var aaaaa = Breadcrumbs;
+
+            StateHasChanged();
+        }
+
         protected override async Task OnInitializedAsync()
         {
             try
