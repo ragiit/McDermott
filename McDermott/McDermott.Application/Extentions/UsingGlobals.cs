@@ -1,5 +1,4 @@
-﻿global using System.Numerics;
-global using Mapster;
+﻿global using Mapster;
 global using McDermott.Application.Dtos.Config;
 global using McDermott.Application.Dtos.Employee;
 global using McDermott.Application.Dtos.Medical;
@@ -28,4 +27,5 @@ global using static McDermott.Application.Features.Commands.Patient.PatientComma
 global using static McDermott.Application.Features.Commands.Patient.PatientFamilyRelationCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanCPPTCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanMedicalSupportCommand;
-global using static McDermott.Application.Features.Queries.Transaction.GeneralConsultanServiceQueryHandler;
+global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceCommand;
+global using static McDermott.Application.Features.Commands.Patient.ClassTypeCommand;

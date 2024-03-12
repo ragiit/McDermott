@@ -14,10 +14,14 @@
         public string? Street2 { get; set; }
         public string? WebsiteLink { get; set; }
 
+        [SetToNull]
         public virtual City? City { get; set; }
+        [SetToNull]
         public virtual Province? Province { get; set; }
+        [SetToNull]
         public virtual Country? Country { get; set; }
 
+        [SetToNull]
         public virtual List<Building>? Buildings { get; set; }
     }
 }

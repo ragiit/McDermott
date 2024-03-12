@@ -9,6 +9,7 @@
 
         public List<long>? PhysicionIds { get; set; }
 
+        [SetToNull]
         public virtual Service? Service { get; set; }
     }
 }

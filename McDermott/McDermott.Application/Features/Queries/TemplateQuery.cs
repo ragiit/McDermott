@@ -17,6 +17,10 @@ namespace McDermott.Application.Features.Queries
             try
             {
                 string cacheKey = $"GetTemplateQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
                 if (!_cache.TryGetValue(cacheKey, out List<Province>? result))
                 {
                     result = await _unitOfWork.Repository<Province>().GetAsync(

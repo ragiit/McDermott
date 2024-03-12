@@ -11,6 +11,7 @@
         public string? Html { get; set; }
         public string? Url { get; set; }
 
+        [SetToNull]
         public virtual List<GroupMenu>? GroupMenus { get; set; }
     }
 }

@@ -23,7 +23,9 @@
         public string? Message { get; set; }
         public string? Status { get; set; }
 
+        [SetToNull]
         public virtual User? By { get; set; }
+        [SetToNull]
         public virtual List<User>? ToPartner { get; set; }
     }
 }

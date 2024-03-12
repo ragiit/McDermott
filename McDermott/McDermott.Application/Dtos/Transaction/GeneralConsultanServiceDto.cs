@@ -2,7 +2,7 @@
 {
     public partial class GeneralConsultanServiceDto : IMapFrom<GeneralConsultanService>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
 
         [Required(ErrorMessage = "The Patient field is required.")]
         public long? PatientId { get; set; }
@@ -17,7 +17,7 @@
         [Required(ErrorMessage = "The Physicion field is required.")]
         public long? PratitionerId { get; set; }
 
-        public long? ClassType { get; set; }
+        public long? ClassTypeId { get; set; }
         public string? StagingStatus { get; set; } = "Planned";
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }
@@ -56,6 +56,7 @@
         public bool IsPharmacology { get; set; } = false;
         public bool IsFood { get; set; } = false;
 
+        public virtual ClassTypeDto? ClassType { get; set; }
         public virtual UserDto? Patient { get; set; }
         public virtual UserDto? Pratitioner { get; set; }
         public virtual InsuranceDto? Insurance { get; set; }

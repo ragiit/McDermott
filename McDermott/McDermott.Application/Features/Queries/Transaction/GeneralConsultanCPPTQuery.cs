@@ -28,37 +28,7 @@
 
         #endregion Get
 
-        #region Create
 
-        internal class CreateGeneralConsultantClinicalAssesmentHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateGeneralConsultantClinicalAssesmentRequest, GeneralConsultantClinicalAssesmentDto>
-        {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<GeneralConsultantClinicalAssesmentDto> Handle(CreateGeneralConsultantClinicalAssesmentRequest request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<GeneralConsultantClinicalAssesment>().AddAsync(request.GeneralConsultantClinicalAssesmentDto.Adapt<GeneralConsultantClinicalAssesment>());
-
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return result.Adapt<GeneralConsultantClinicalAssesmentDto>();
-            }
-        }
-
-        internal class CreateListGeneralConsultantClinicalAssesmentRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateListGeneralConsultanCPPTRequest, List<GeneralConsultanCPPTDto>>
-        {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<List<GeneralConsultanCPPTDto>> Handle(CreateListGeneralConsultanCPPTRequest request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<GeneralConsultanCPPT>().AddAsync(request.GeneralConsultanCPPTDtos.Adapt<List<GeneralConsultanCPPT>>());
-
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return result.Adapt<List<GeneralConsultanCPPTDto>>();
-            }
-        }
-
-        #endregion Create
 
         #region Update
 

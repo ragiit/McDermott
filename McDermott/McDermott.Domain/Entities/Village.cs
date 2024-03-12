@@ -13,8 +13,11 @@
         [StringLength(10)]
         public string? PostalCode { get; set; }
 
+        [SetToNull]
         public virtual Province? Province { get; set; }
+        [SetToNull]
         public virtual City? City { get; set; }
+        [SetToNull]
         public virtual District? District { get; set; }
     }
 }

@@ -3,95 +3,146 @@
 namespace McDermott.Application.Features.Queries.Config
 {
     public class MenuQueryHandler
+        (IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetMenuQuery, List<MenuDto>>,
+        IRequestHandler<CreateMenuRequest, MenuDto>,
+        IRequestHandler<CreateListMenuRequest, List<MenuDto>>,
+        IRequestHandler<UpdateMenuRequest, MenuDto>,
+        IRequestHandler<UpdateListMenuRequest, List<MenuDto>>,
+        IRequestHandler<DeleteMenuRequest, bool>
     {
-        internal class GetAllMenuQueryHandler : IRequestHandler<GetMenuQuery, List<MenuDto>>
+
+        #region GET
+        public async Task<List<MenuDto>> Handle(GetMenuQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllMenuQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetMenuQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                if (!_cache.TryGetValue(cacheKey, out List<Menu>? result))
+                {
+                    result = await _unitOfWork.Repository<Menu>().GetAsync(
+                        request.Predicate,
+                        cancellationToken: cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<MenuDto>>();
             }
-
-            public async Task<List<MenuDto>> Handle(GetMenuQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<Menu>().Entities
-                        .Select(Menu => Menu.Adapt<MenuDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
+        #endregion
 
-        internal class GetMenuByIdQueryHandler : IRequestHandler<GetMenuByIdQuery, MenuDto>
+        #region CREATE
+        public async Task<MenuDto> Handle(CreateMenuRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetMenuByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<MenuDto> Handle(GetMenuByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Menu>().GetByIdAsync(request.Id);
-
-                return result.Adapt<MenuDto>();
-            }
-        }
-
-        internal class CreateMenuHandler : IRequestHandler<CreateMenuRequest, MenuDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateMenuHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<MenuDto> Handle(CreateMenuRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Menu>().AddAsync(request.MenuDto.Adapt<Menu>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetMenuQuery_");
+
                 return result.Adapt<MenuDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateMenuHandler : IRequestHandler<UpdateMenuRequest, bool>
+        public async Task<List<MenuDto>> Handle(CreateListMenuRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateMenuHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Menu>().AddAsync(request.MenuDtos.Adapt<List<Menu>>());
 
-            public async Task<bool> Handle(UpdateMenuRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Menu>().UpdateAsync(request.MenuDto.Adapt<Menu>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetMenuQuery_");
+
+                return result.Adapt<List<MenuDto>>();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        #endregion
+
+        #region UPDATE
+        public async Task<MenuDto> Handle(UpdateMenuRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Menu>().UpdateAsync(request.MenuDto.Adapt<Menu>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetMenuQuery_");
+
+                return result.Adapt<MenuDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<MenuDto>> Handle(UpdateListMenuRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Menu>().UpdateAsync(request.MenuDtos.Adapt<List<Menu>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetMenuQuery_");
+
+                return result.Adapt<List<MenuDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        #endregion
+
+        #region DELETE
+        public async Task<bool> Handle(DeleteMenuRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<Menu>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<Menu>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetMenuQuery_");
 
                 return true;
             }
-        }
-
-        internal class DeleteMenuHandler : IRequestHandler<DeleteMenuRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteMenuHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteMenuRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Menu>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
+        #endregion
     }
 }

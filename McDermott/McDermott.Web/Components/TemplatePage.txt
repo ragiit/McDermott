@@ -85,11 +85,12 @@
                                                 </DxFormLayoutItem>
 
 
-                                                <DxFormLayoutItem Caption="Name:">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name:">
                                                     <DxTextBox @bind-Text="@UserForm.Name" 
                                                         ShowValidationIcon="true" 
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
                                                         NullText="Name" />
+                                                          <ValidationMessage For="@(()=>a.Name)" />
                                                 </DxFormLayoutItem>
 
                                                 <DxFormLayoutItem Caption="Practitioner:">

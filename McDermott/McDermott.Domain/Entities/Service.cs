@@ -12,6 +12,7 @@
         public bool IsPatient { get; set; }
         public bool IsKiosk { get; set; }
         public long? ServicedId { get; set; }
+        [SetToNull]
         public virtual Service? Serviced { get; set; }
     }
 }

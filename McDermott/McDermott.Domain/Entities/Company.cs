@@ -31,8 +31,11 @@
         public long? CurrencyId { get; set; }
         public string? Logo { get; set; }
 
+        [SetToNull]
         public virtual City? City { get; set; }
+        [SetToNull]
         public virtual Province? Province { get; set; }
+        [SetToNull]
         public virtual Country? Country { get; set; }
     }
 }

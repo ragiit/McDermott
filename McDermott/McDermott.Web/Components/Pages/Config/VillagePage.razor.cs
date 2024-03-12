@@ -69,13 +69,15 @@
         {
             PanelVisible = true;
             var a = await Mediator.Send(new GetVillageQuery());
-            var dataSource = new GridDevExtremeDataSource<VillageDto>(a.AsQueryable());
-            dataSource.CustomizeLoadOptions = (loadOptions) =>
+            var dataSource = new GridDevExtremeDataSource<VillageDto>(a.AsQueryable())
+            {
+                CustomizeLoadOptions = (loadOptions) =>
             {
                 // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
                 // This can make SQL execution plans more efficient.
                 loadOptions.PrimaryKey = new[] { "Id" };
                 loadOptions.PaginateViaPrimaryKey = true;
+            }
             };
 
             Data = dataSource;

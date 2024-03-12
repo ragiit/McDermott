@@ -141,7 +141,7 @@
             if (!string.IsNullOrWhiteSpace(editModel.ParentMenu))
             {
                 var splits = editModel.Name.ToLower().Split(" ");
-                editModel.Url = $"{editModel.ParentMenu.ToLower().Trim()}/{string.Join("-", splits)}";
+                editModel.Url = $"{string.Join("-", editModel.ParentMenu.ToLower().Trim().Split())}/{string.Join("-", splits)}";
 
                 if (editModel.ParentMenu.Contains("Configuration"))
                 {
@@ -152,7 +152,33 @@
             if (editModel.Id == 0)
                 await Mediator.Send(new CreateMenuRequest(editModel));
             else
+            {
                 await Mediator.Send(new UpdateMenuRequest(editModel));
+
+                if (string.IsNullOrWhiteSpace(editModel.ParentMenu))
+                {
+                    var relatedMenus = await Mediator.Send(new GetMenuQuery(x => x.ParentMenu == SelectedDataItems[0].Adapt<MenuDto>().Name));
+
+                    var splits = editModel.Name.ToLower().Split(" ");
+
+                    if (editModel.Name.Contains("Configuration"))
+                    {
+                        editModel.Url = $"config/{string.Join("-", splits)}";
+                    }
+                    else
+                    {
+                        editModel.Url = $"{string.Join("-", splits)}/";
+                    }
+
+                    relatedMenus.ForEach(x =>
+                    {
+                        x.ParentMenu = editModel.Name;
+                        x.Url = editModel.Url + string.Join("-", x.Name.ToLower().Split(" "));
+                    });
+
+                    await Mediator.Send(new UpdateListMenuRequest(relatedMenus));
+                }
+            }
 
             NavigationManager.NavigateTo("config/menu", true);
 

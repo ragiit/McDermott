@@ -9,8 +9,11 @@
         public long? PhysicianId { get; set; }
         public string? Status { get; set; }
 
+        [SetToNull]
         public virtual Service? Service { get; set; }
+        [SetToNull]
         public virtual Service? ServiceK { get; set; }
+        [SetToNull]
         public virtual User? Physician { get; set; }
     }
 }

@@ -3,9 +3,10 @@
     public class TemplateCommand
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
-        public class GetTemplateQuery(Expression<Func<Province, bool>>? predicate = null) : IRequest<List<ProvinceDto>>
+        public class GetTemplateQuery(Expression<Func<Province, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ProvinceDto>>
         {
             public Expression<Func<Province, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
         #endregion
 
