@@ -123,8 +123,9 @@
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Type" ColSpanMd="12">
                                                             <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains" Data="@IdentityTypes" @bind-Value="@UserForm.TypeId"></DxComboBox>
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Expired Identity" Visible="@(@UserForm.TypeId == null ? false : @UserForm.TypeId.Contains("VISA"))">
-                                                            <DxDateEdit @bind-Date="@UserForm.ExpiredId" Mask="@DateTimeMask.ShortDate" />
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Expired Identity"
+                                                                          Visible="@((UserForm.TypeId == null || UserForm.TypeId.Contains("VISA") || UserForm.TypeId.Contains("SIM")))">
+                                                            <DxDateEdit NullText="Expired Identity" @bind-Date="@UserForm.ExpiredId" Mask="@DateTimeMask.ShortDate" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Religion" ColSpanMd="12">
                                                             <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
@@ -165,7 +166,7 @@
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="NPWP" ColSpanMd="12">
                                                             <DxTextBox @bind-Text="@UserForm.Npwp" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="NPWP" />
                                                         </DxFormLayoutItem>
-                                                       
+
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Name" ColSpanMd="12">
                                                             <DxTextBox @bind-Text="@UserForm.EmergencyName" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Name" />
                                                         </DxFormLayoutItem>

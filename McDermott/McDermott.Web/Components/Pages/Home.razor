@@ -20,6 +20,9 @@
                 </NotAuthorized>
             </Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
 
+            @* <DxButton Click="Test" Text="Test"></DxButton>
+        <DxButton Click="Test2" Text="Test"></DxButton> *@
+
             @* <br />
 
         <div class="row">
@@ -693,6 +696,35 @@
         public long Amount { get; set; }
         public DateTime Date { get; set; }
     }
+
+    private async Task Test()
+    {
+        try
+        {
+            var aa = await Mediator.Send(new GetCountryQuery());
+            var z = aa[1000];
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+
+    }
+
+    private async Task Test2()
+    {
+        try
+        {
+            var aa = await Mediator.Send(new GetCountryQuery());
+            var z = aa[1000];
+        }
+        catch (Exception e)
+        {
+            e.HandleException(ToastService);
+        }
+
+    }
+
     public class Sales
     {
         static IList<SaleInfo> dataSource;

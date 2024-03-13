@@ -317,81 +317,13 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Waiting",
             "In Consultation",
             "Consultation Completed"
-        }; private long _InsurancePolicyId { get; set; }
-
-        private long InsuranceId { get; set; }
-
-        private long InsurancePolicyId
-        {
-            get => _InsurancePolicyId;
-            set
-            {
-                _InsurancePolicyId = value;
-            }
-        }
-
-        private long _ServiceId { get; set; }
-
-        private long _DoctorId { get; set; }
-
-        private long DoctorId
-        {
-            get => _DoctorId;
-            set
-            {
-                FormRegis.PratitionerId = value;
-                _DoctorId = value;
-                SetTimeSchedule(value, RegistrationDate);
-            }
-        }
-
-        private DateTime _RegistrationDate { get; set; } = DateTime.Now;
-
-        private DateTime RegistrationDate
-        {
-            get => _RegistrationDate;
-            set
-            {
-                FormRegis.RegistrationDate = value;
-                _RegistrationDate = value;
-                SetTimeSchedule(DoctorId, value);
-            }
-        }
+        };
 
         private List<string> Times = [];
 
         #endregion Data Statis
 
         #region Grid Setting
-
-        private long _DiseasesId { get; set; }
-
-        private long DiseasesId
-        {
-            get => _DiseasesId;
-            set
-            {
-                //_DiseasesId = value;
-                //FormInputCPPTGeneralConsultan.DiseasesId = value;
-                //var parent = Diagnoses.FirstOrDefault(z => z.Id == value).Name;
-                //DiseaseCategories = AllDiseaseCategories.Where(x => x.ParentCategory == parent).ToList();
-
-                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
-            }
-        }
-
-        private long ServiceId
-        {
-            get => _ServiceId;
-            set
-            {
-                _ServiceId = value;
-                FormRegis.ServiceId = value;
-                IsPratition = AllDoctors.Where(x => x.DoctorServiceIds.Contains(value)).ToList();
-
-                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
-            }
-        }
 
         private BaseAuthorizationLayout AuthorizationLayout = new();
         private bool IsAccess { get; set; } = false;
@@ -793,15 +725,20 @@ namespace McDermott.Web.Components.Pages.Transaction
             var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == value));
         }
 
-        private async Task SetTimeSchedule(long patientId, DateTime date)
+        private async Task SetTimeSchedule()
         {
             try
             {
-                var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == FormRegis.PratitionerId && x.StartDate.Date == date.Date && x.DoctorSchedule.ServiceId == FormRegis.ServiceId));
+                var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == FormRegis.PratitionerId && x.StartDate.Date == FormRegis.RegistrationDate.Date && x.DoctorSchedule.ServiceId == FormRegis.ServiceId));
 
                 Times.Clear();
 
                 Times.AddRange(slots.Select(x => $"{x.WorkFromFormatString} - {x.WorkToFormatString}"));
+
+                if (slots.Count <= 0)
+                    FormRegis.ScheduleTime = null;
+
+                StateHasChanged();
 
                 //if (Times.Count <= 0)
                 //    FormRegis.ScheduleTime = null;
@@ -817,6 +754,17 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
                     return;
+                }
+
+                if (FormRegis.Id == 0)
+                {
+                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date < DateTime.Now.Date));
+
+                    if (patient.Count > 0)
+                    {
+                        ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
+                        return;
+                    }
                 }
 
                 if (FormRegis.Id != 0)
@@ -945,12 +893,15 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (!FormRegis.IsFood)
                     PatientAllergy.Food = null;
 
-                var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date < DateTime.Now.Date));
-
-                if (patient.Count > 0)
+                if (FormRegis.Id == 0)
                 {
-                    ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
-                    return;
+                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date < DateTime.Now.Date));
+
+                    if (patient.Count > 0)
+                    {
+                        ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
+                        return;
+                    }
                 }
 
                 if (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null))
@@ -1206,6 +1157,9 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
+                if ((GeneralConsultanServiceDto)args.DataItem is null)
+                    return;
+
                 IsDeletedConsultantService = ((GeneralConsultanServiceDto)args.DataItem)!.StagingStatus!.Equals("Planned");
             }
             catch { }
@@ -1242,14 +1196,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                     var text = FormRegis.StagingStatus == "Physician" ? "In Consultation" : FormRegis.StagingStatus;
                     var index = Stagings.FindIndex(x => x == text);
 
-                    //FormRegis.StagingStatus = Stagings[index];
                     StagingText = Stagings[index + 1];
                 }
-
-                Value = FormRegis.PatientId.ToInt32();
-                ServiceId = FormRegis.ServiceId.ToInt32();
-                DoctorId = FormRegis.PratitionerId.ToInt32();
-                PaymentMethod = FormRegis.Payment;
 
                 switch (FormRegis.StagingStatus)
                 {
@@ -1372,7 +1320,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             ToastService.ShowInfo(country);
         }
 
-        private void SelectedItemServiceChanged(ServiceDto e)
+        private async Task SelectedItemServiceChanged(ServiceDto e)
         {
             try
             {
@@ -1380,25 +1328,36 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 {
                     FormRegis.PratitionerId = null;
+                    IsPratition.Clear();
                     return;
                 }
-                IsPratition = AllDoctors.Where(x => x.DoctorServiceIds.Contains(e.Id)).ToList();
+
+                IsPratition = AllDoctors.Where(x => x.DoctorServiceIds is not null && x.DoctorServiceIds.Contains(e.Id)).ToList();
+
+                await SetTimeSchedule();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
-        private async Task SelectedItemPhysicianChanged(UserDto e)
+        private async Task SelectedItemPhysicianChanged(UserDto? e)
         {
             try
             {
-                if (e == null)
-                {
-                    e = new UserDto();
-                }
-
-                await SetTimeSchedule(e.Id, RegistrationDate);
+                await SetTimeSchedule();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task SelectedItemRegistrationDateChanged(DateTime e)
+        {
+            FormRegis.RegistrationDate = e;
+            await SetTimeSchedule();
         }
 
         private void SelectedItemPaymentChanged(string e)

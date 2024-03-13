@@ -38,12 +38,11 @@
         [Required]
         public string? ScheduleTime { get; set; }
 
-        [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public long? Age { get; set; }
 
         [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
-        public DateTime? RegistrationDate { get; set; } = DateTime.Now;
+        public DateTime RegistrationDate { get; set; }
 
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }

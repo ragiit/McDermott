@@ -1,6 +1,4 @@
-﻿using OfficeOpenXml;
-
-namespace McDermott.Web.Components.Pages.Pharmacy
+﻿namespace McDermott.Web.Components.Pages.Pharmacy
 {
     public partial class ActiveComponentPage
     {
@@ -196,7 +194,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<CountryDto>>();
-                    await Mediator.Send(new DeleteListCountryRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteCountryRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }

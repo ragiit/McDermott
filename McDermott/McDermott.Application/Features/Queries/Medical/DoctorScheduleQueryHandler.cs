@@ -73,7 +73,9 @@
                         query.Predicate,
                             x => x
                             .Include(z => z.Physician)
-                            .Include(z => z.DoctorSchedule), cancellationToken);
+                            .Include(z => z.DoctorSchedule)
+                            .ThenInclude(z => z.Service),
+                            cancellationToken);
 
                     return result.Adapt<List<DoctorScheduleSlotDto>>();
                 }
