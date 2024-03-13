@@ -5,8 +5,9 @@
         public long? KioskId { get; set; }
         public long? ServiceId { get; set; }
         public long? ServiceKId { get; set; }
-        public long? NoQueue { get; set; }
-        public string? Status { get; set; }
+        public long? QueueNumber { get; set; }
+        public string? QueueStage { get; set; }
+        public string? QueueStatus { get; set; }
 
         [SetToNull]
         public virtual Kiosk? Kiosk { get; set; }

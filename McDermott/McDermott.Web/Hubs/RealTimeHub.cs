@@ -5,18 +5,14 @@ namespace McDermott.Web.Hubs
 {
     public class RealTimeHub : Hub
     {
-        public async Task SendQueue(List<KioskQueueDto> queue)
+        public async Task CallPatient(long Id, long NumberQueue)
         {
-            await Clients.All.SendAsync("SendQueue", queue);
-        }
-        public async Task ReceivedQueue(List<KioskQueueDto> queue)
-        {
-            await Clients.All.SendAsync("ReceivedQueue", queue);
+            await Clients.All.SendAsync("CallPatient", Id, NumberQueue);
         }
 
-        public async Task SenCountry(CountryDto country)
+        public async Task Presents(KioskQueueDto queue)
         {
-            await Clients.All.SendAsync("ReceivedCountry", country);
+            await Clients.All.SendAsync("Presents", queue);
         }
     }
 }

@@ -60,7 +60,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     .Build();
 
                 await hubConnection.StartAsync();
-                StateHasChanged();
+                InvokeAsync(StateHasChanged);
             }
             catch { }
         }
@@ -83,19 +83,19 @@ namespace McDermott.Web.Components.Pages.Queue
                 //var cekServicesK = service
                 if (general.ServiceId == null & general.PhysicianId == null)
                 {
-                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Status == null || x.Status == "call")];
+                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.QueueStage == null || x.QueueStage == "call")];
                 }
                 else if (general.ServiceId != null & general.PhysicianId == null)
                 {
-                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.ServiceId == general.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Status == null || x.Status == "call")];
+                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.ServiceId == general.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.QueueStage == null || x.QueueStage == "call")];
                 }
                 else if (general.ServiceId == null & general.PhysicianId != null)
                 {
-                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.Kiosk.PhysicianId == general.PhysicianId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Status == null || x.Status == "call")];
+                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.Kiosk.PhysicianId == general.PhysicianId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.QueueStage == null || x.QueueStage == "call")];
                 }
                 else if (general.ServiceId != null & general.PhysicianId != null)
                 {
-                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId && x.ServiceId == general.ServiceId && x.Status == null || x.Status == "call")];
+                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId && x.ServiceId == general.ServiceId && x.QueueStage == null || x.QueueStage == "call")];
                 }
                 NameCounter = $"Queue Listing Counter {general.Name}";
                 sId = general.ServiceId;
@@ -161,31 +161,27 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Function Button
 
-        private async Task Click_Call(long id)
+        private async Task Click_Call(KioskQueueDto context)
         {
             try
             {
-                var data = DataKiosksQueue.Where(x => x.Id == id).FirstOrDefault();
-                FormKiosksQueue.Id = data.Id;
-                FormKiosksQueue.KioskId = data.KioskId;
-                FormKiosksQueue.ServiceId = data.ServiceId;
-                FormKiosksQueue.NoQueue = data.NoQueue;
-                FormKiosksQueue.ServiceKId = data.ServiceKId;
-                FormKiosksQueue.Status = "call";
-
-                if (FormKiosksQueue.Id != 0)
+                var z = context;
+                
+                context.QueueStage = "call";
+                context.QueueStatus = "calling";
+               
+                if (context.Id != 0)
                 {
-                   var dataQueue = await Mediator.Send(new UpdateKioskQueueRequest(FormKiosksQueue));
-                    if (hubConnection.State == HubConnectionState.Connected)
-                    {
-                        await hubConnection.SendAsync("SendQueue", dataQueue);
-                    }
+                    var dataQueue = await Mediator.Send(new UpdateKioskQueueRequest(context));
+
+                    await hubConnection.SendAsync("CallPatient",context.Id, context.QueueNumber);
+
                 }
                 var cek = CounterId;
                 //DataKiosksQueue = FormKiosksQueue;
-               
+
                 await LoadData();
-            } 
+            }
             catch (Exception ex)
             {
                 ToastService.ShowError(ex.Message);
@@ -198,7 +194,7 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 if (FormCounters.Id == 0)
                 {
-                    FormCounters.Status = "finish";
+                    FormCounters.QueueStage = "finish";
                     await Mediator.Send(new UpdateKioskQueueRequest(FormCounters));
                 }
                 ToastService.ShowSuccess("Data Success!");
@@ -223,14 +219,15 @@ namespace McDermott.Web.Components.Pages.Queue
 
                     if (TodayQueu.Count == 0)
                     {
-                        FormCounters.NoQueue = 1;
+                        FormCounters.QueueNumber = 1;
                     }
                     else
                     {
-                        var GetNoQueue = TodayQueu.OrderByDescending(x => x.NoQueue).FirstOrDefault();
-                        FormCounters.NoQueue = (long)GetNoQueue.NoQueue + 1;
+                        var GetNoQueue = TodayQueu.OrderByDescending(x => x.QueueNumber).FirstOrDefault();
+                        FormCounters.QueueNumber = (long)GetNoQueue.QueueNumber + 1;
                     }
-                    FormCounters.Status = null;
+                    FormCounters.QueueStage = null;
+                    FormCounters.QueueStatus = "waiting";
                     await Mediator.Send(new UpdateKioskQueueRequest(FormCounters));
                     var datas = FormCounters;
                 }
@@ -252,7 +249,8 @@ namespace McDermott.Web.Components.Pages.Queue
                 FormCounters = DataKiosksQueue.Where(x => x.Id == Id).FirstOrDefault();
                 if (FormCounters.Id != 0)
                 {
-                    FormCounters.Status = "present";
+                    FormCounters.QueueStage = "present";
+                    FormCounters.QueueStatus = "on process";
                     await Mediator.Send(new UpdateKioskQueueRequest(FormCounters));
                 }
                 ToastService.ShowSuccess("Data Success!");
@@ -270,7 +268,8 @@ namespace McDermott.Web.Components.Pages.Queue
                 FormCounters = DataKiosksQueue.Where(x => x.Id == Id).FirstOrDefault();
                 if (FormCounters.Id != 0)
                 {
-                    FormCounters.Status = "absent";
+                    FormCounters.QueueStage = "absent";
+                    FormCounters.QueueStatus = "cancel";
                     await Mediator.Send(new UpdateKioskQueueRequest(FormCounters));
                 }
                 ToastService.ShowError("Patient Absent!!");

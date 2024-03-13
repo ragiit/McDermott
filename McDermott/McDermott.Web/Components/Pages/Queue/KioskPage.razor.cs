@@ -381,6 +381,7 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 var edit = FormKios;
+                
                 if (FormKios.Id == 0)
                 {
                     // Mendapatkan ID dari hasil CreateKioskRequest
@@ -393,12 +394,12 @@ namespace McDermott.Web.Components.Pages.Queue
                     // Menentukan nomor antrian
                     if (todayQueues.Count == 0)
                     {
-                        FormQueue.NoQueue = 1;
+                        FormQueue.QueueNumber = 1;
                     }
                     else
                     {
-                        var GetNoQueue = todayQueues.OrderByDescending(x => x.NoQueue).FirstOrDefault();
-                        FormQueue.NoQueue = (long)GetNoQueue.NoQueue + 1;
+                        var GetNoQueue = todayQueues.OrderByDescending(x => x.QueueNumber).FirstOrDefault();
+                        FormQueue.QueueNumber = (long)GetNoQueue.QueueNumber + 1;
                     }
 
                     // mendapatkan service counter Id
@@ -407,6 +408,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormQueue.KioskId = checkId.Id;
                     FormQueue.ServiceId = checkId.ServiceId;
                     FormQueue.ServiceKId = skId;
+                    FormQueue.QueueStatus = "waiting";
 
                     // Membuat KioskQueue baru
                     await Mediator.Send(new CreateKioskQueueRequest(FormQueue));

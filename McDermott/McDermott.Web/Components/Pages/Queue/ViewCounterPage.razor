@@ -85,13 +85,13 @@
                                                     CustomizeElement="Grid_CustomizeElement"
                                                     KeyboardNavigationEnabled="true">
                                                 <Columns>
-                                                    <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
+                                                    <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" Width="150px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" Width="170px" />
-                                                    <DxGridDataColumn FieldName="Status" Caption="Status" Width="70px">
+                                                    <DxGridDataColumn FieldName="QueueStage" Caption="Queue Stage" Width="70px">
                                                         <CellDisplayTemplate>
-                                                            @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).Status)
+                                                            @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>
                                                     </DxGridDataColumn>
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
@@ -99,13 +99,13 @@
                                                             @{
                                                                 var a = (KioskQueueDto)context.DataItem;
                                                             }
-                                                            @if (a.Status == null)
+                                                            @if (a.QueueStage == null)
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                             }
-                                                            else if (a.Status == "call")
+                                                            else if (a.QueueStage == "call")
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
                                                             }
@@ -181,11 +181,11 @@
                                                     CustomizeElement="Grid_CustomizeElement"
                                                     KeyboardNavigationEnabled="true">
                                                 <Columns>
-                                                    <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
+                                                    <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" />
-                                                    <DxGridDataColumn FieldName="Status" Caption="Status">
+                                                    <DxGridDataColumn FieldName="QueueStage" Caption="QueueStage">
                                                         <CellDisplayTemplate>
-                                                            @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).Status)
+                                                            @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>
                                                     </DxGridDataColumn>
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
@@ -193,13 +193,13 @@
                                                             @{
                                                                 var a = (KioskQueueDto)context.DataItem;
                                                             }
-                                                            @if (a.Status == null)
+                                                            @if (a.QueueStage == null)
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                             }
-                                                            else if (a.Status == "call")
+                                                            else if (a.QueueStage == "call")
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
                                                             }
@@ -275,12 +275,12 @@
                                                     CustomizeElement="Grid_CustomizeElement"
                                                     KeyboardNavigationEnabled="true">
                                                 <Columns>
-                                                    <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
+                                                    <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" Width="170px" />
-                                                    <DxGridDataColumn FieldName="Status" Caption="Status" Width="70px">
+                                                    <DxGridDataColumn FieldName="QueueStage" Caption="QueueStage" Width="70px">
                                                         <CellDisplayTemplate>
-                                                            @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).Status)
+                                                            @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>
                                                     </DxGridDataColumn>
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
@@ -288,13 +288,13 @@
                                                             @{
                                                                 var a = (KioskQueueDto)context.DataItem;
                                                             }
-                                                            @if (a.Status == null)
+                                                            @if (a.QueueStage == null)
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                             }
-                                                            else if (a.Status == "call")
+                                                            else if (a.QueueStage == "call")
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
                                                             }
@@ -370,12 +370,12 @@
                                                     CustomizeElement="Grid_CustomizeElement"
                                                     KeyboardNavigationEnabled="true">
                                                 <Columns>
-                                                    <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
+                                                    <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" Width="150px" />
-                                                    <DxGridDataColumn FieldName="Status" Caption="Status" Width="70px">
+                                                    <DxGridDataColumn FieldName="QueueStage" Caption="QueueStage" Width="70px">
                                                         <CellDisplayTemplate>
-                                                            @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).Status)
+                                                            @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>
                                                     </DxGridDataColumn>
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
@@ -383,13 +383,13 @@
                                                             @{
                                                                 var a = (KioskQueueDto)context.DataItem;
                                                             }
-                                                            @if (a.Status == null)
+                                                            @if (a.QueueStage == null)
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                             }
-                                                            else if (a.Status == "call")
+                                                            else if (a.QueueStage == "call")
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a.Id)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
                                                             }
@@ -413,10 +413,10 @@
                                         </div>
                                         <div class="col-8 align-self-end">
                                             <DxTabs>
-                                                <DxTab Text="Call" Enabled="@(FormCounters.Status == "call")"></DxTab>
-                                                <DxTab Text="Present" Enabled="@(FormCounters.Status == "present")"></DxTab>
-                                                <DxTab Text="Absent" Enabled="@(FormCounters.Status == "absent")"></DxTab>
-                                                <DxTab Text="Finish" Enabled="@(FormCounters.Status == "finish")"></DxTab>
+                                                <DxTab Text="Call" Enabled="@(FormCounters.QueueStage == "call")"></DxTab>
+                                                <DxTab Text="Present" Enabled="@(FormCounters.QueueStage == "present")"></DxTab>
+                                                <DxTab Text="Absent" Enabled="@(FormCounters.QueueStage == "absent")"></DxTab>
+                                                <DxTab Text="Finish" Enabled="@(FormCounters.QueueStage == "finish")"></DxTab>
                                             </DxTabs>
                                         </div>
                                     </div>
@@ -435,7 +435,7 @@
                                                 </div>
                                                 <label class="col-sm-4 col-form-label">No. Queue</label>
                                                 <div class="col-sm-8">
-                                                    <p class="form-control-plaintext"> @string.Format("{0:D3}", FormCounters.NoQueue)</p>
+                                                    <p class="form-control-plaintext"> @string.Format("{0:D3}", FormCounters.QueueNumber)</p>
                                                 </div>
                                                 <label class="col-sm-4 col-form-label">Service</label>
                                                 <div class="col-sm-8">

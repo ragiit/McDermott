@@ -42,7 +42,7 @@
                                     <div class="col">
 
                                         <h1 class="text-center fw-bolder" style="font-size:120px"> @((Cids ?? 0).ToString("D3"))</h1>
-                                       
+
                                     </div>
                                 </div>
                                 <div class="row">
@@ -63,10 +63,11 @@
                                                     PagerVisibleNumericButtonCount="10"
                                                     CustomizeElement="Grid_CustomizeElement"
                                                     KeyboardNavigationEnabled="true">
+                                                
                                                 <Columns>
-                                                    <DxGridDataColumn FieldName="NoQueue" Caption="No" DisplayFormat="{0:000}" Width="10px" SortIndex="0" />
+                                                    <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="10px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" />
-                                                    <DxGridDataColumn FieldName="Status" Caption="Status" />
+                                                    <DxGridDataColumn FieldName="QueueStatus" Caption="Status" />
                                                 </Columns>
                                             </DxGrid>
                                         </DxLoadingPanel>

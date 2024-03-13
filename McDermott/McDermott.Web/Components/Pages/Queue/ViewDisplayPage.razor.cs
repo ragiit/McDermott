@@ -31,9 +31,11 @@ namespace McDermott.Web.Components.Pages.Queue
         private List<long> CounterCount = new List<long>();
         private string currentTime;
         private long? Cids { get; set; }
+        private long? IdQueue { get; set; }
         private long ServiceKId { get; set; }
         private KioskQueueDto? Queuek { get; set; }
-
+        private Timer timer;
+        private int _counter;
         #endregion static Variable
 
         private CultureInfo indonesianCulture = new CultureInfo("id-ID");
@@ -66,43 +68,56 @@ namespace McDermott.Web.Components.Pages.Queue
         protected override async Task OnInitializedAsync()
         {
             DisplayId = $"{NavigationManager.Uri.Replace(NavigationManager.BaseUri + "queue/viewdisplay/", "")}".ToInt32();
-            await LoadData();
             hubConnection = new HubConnectionBuilder()
                     .WithUrl("http://localhost:5000/realTimeHub")
                     .Build();
-            hubConnection.On<List<KioskQueueDto>>("ReceivedQueue", (queue) =>
+            hubConnection.On<long, long>("CallPatient", (Id, numberQueue) =>
             {
-                kioskQueues = [.. queue.Where(q =>
-                  q.ServiceKId == getCounId.ServiceKId &&
-                    (q.Status == null || q.Status == "call"))];
-                Cids = kioskQueues.Select(x => x.NoQueue).FirstOrDefault(); ;
+                IdQueue = Id;
+                Cids = numberQueue;
                 InvokeAsync(StateHasChanged);
             });
             await hubConnection.StartAsync();
+            await LoadData();
+
+            timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
 
         }
 
-        private List<CounterDto> listcounter = [];
-
         private async Task LoadData()
         {
-            PanelVisible = true;
-            // Mengambil detail antrian berdasarkan ID tampilan
-            var queues = await Mediator.Send(new GetDetailQueueDisplayQuery());
-            var dispId = queues.FirstOrDefault(q => q.Id == DisplayId);
-            DetQueues = queues.Where(q => q.QueueDisplayId == dispId.QueueDisplayId).ToList();
+            _counter++;
+            await InvokeAsync(() =>
+            {
+                PanelVisible = true;
+            });
 
-            // Mengambil detail counter berdasarkan ID counter dari antrian terpilih
-            var counters = await Mediator.Send(new GetCounterQuery());
-            getCounId = counters.FirstOrDefault(c => c.Id == dispId.CounterId);
+            try
+            {
+                // Mengambil detail antrian berdasarkan ID tampilan
+                var queues = await Mediator.Send(new GetDetailQueueDisplayQuery());
+                var dispId = queues.FirstOrDefault(q => q.Id == DisplayId);
+                DetQueues = queues.Where(q => q.QueueDisplayId == dispId?.QueueDisplayId).ToList();
 
-            // Mengambil antrian kiosk berdasarkan layanan counter dan status "call" atau null
-            //var kioskQueues = await Mediator.Send(new GetKioskQueueQuery());
-            //var dataQueue = kioskQueues.Where(q =>
-            //    q.ServiceKId == getCounId.ServiceKId &&
-            //    (q.Status == null || q.Status == "call")).ToList();
-            Cids = DataQueue.Select(x => x.NoQueue).FirstOrDefault();
-            PanelVisible = false;
+                // Mengambil detail counter berdasarkan ID counter dari antrian terpilih
+                var counters = await Mediator.Send(new GetCounterQuery());
+                getCounId = counters.FirstOrDefault(c => c.Id == dispId?.CounterId);
+
+                // Mengambil antrian kiosk berdasarkan layanan counter dan status "call" atau null
+                var dataQueue = await Mediator.Send(new GetKioskQueueQuery());
+                kioskQueues = dataQueue.Where(q => q.ServiceKId == getCounId?.ServiceKId &&
+                                                    (q.QueueStage == null || q.QueueStage == "call")).ToList();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+
+            await InvokeAsync(() =>
+            {
+                PanelVisible = false; // Jika diperlukan, panel disembunyikan di sini
+                StateHasChanged(); // Memastikan bahwa perubahan UI diterapkan
+            });
         }
 
         #endregion Async Data
