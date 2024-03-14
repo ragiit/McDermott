@@ -81,6 +81,11 @@ namespace McDermott.Web.Components.Pages.Queue
             timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
         }
 
+        public void Dispose()
+        {
+            timer.Dispose();
+        }
+
         private async Task LoadData()
         {
             _counter++;
@@ -103,12 +108,9 @@ namespace McDermott.Web.Components.Pages.Queue
                 // Mengambil antrian kiosk berdasarkan layanan counter dan status "call" atau null
                 var dataQueue = await Mediator.Send(new GetKioskQueueQuery());
                 kioskQueues = dataQueue.Where(q => q.ServiceKId == getCounId?.ServiceKId &&
-                                                    (q.QueueStage == null || q.QueueStage == "call")).ToList();
+                                                    (q.QueueStage == null || q.QueueStage == "call" || q.QueueStage == "present")).ToList();
             }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
+            catch { }
 
             await InvokeAsync(() =>
             {

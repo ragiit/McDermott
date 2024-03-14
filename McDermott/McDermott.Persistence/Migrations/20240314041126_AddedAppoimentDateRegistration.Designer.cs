@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240314041126_AddedAppoimentDateRegistration")]
+    partial class AddedAppoimentDateRegistration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1017,34 +1020,10 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("GeneralConsultanServiceId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("IsNormalRestingECG")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsOtherECG")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSinusBradycardia")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSinusRhythm")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSinusTachycardia")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSupraventricularExtraSystole")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsVentriculatExtraSystole")
-                        .HasColumnType("bit");
-
                     b.Property<string>("LabEximinationAttachment")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LabEximinationName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OtherDesc")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RadiologyEximinationAttachment")

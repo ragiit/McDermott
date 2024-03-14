@@ -191,7 +191,7 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             try
             {
-                if (FormCounters.Id == 0)
+                if (FormCounters.Id != 0)
                 {
                     FormCounters.QueueStage = "finish";
                     await Mediator.Send(new UpdateKioskQueueRequest(FormCounters));

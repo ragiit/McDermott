@@ -4,9 +4,10 @@
     {
         #region Get
 
-        public class GetGeneralConsultanCPPTQuery(Expression<Func<GeneralConsultanCPPT, bool>>? predicate = null) : IRequest<List<GeneralConsultanCPPTDto>>
+        public class GetGeneralConsultanCPPTQuery(Expression<Func<GeneralConsultanCPPT, bool>>? predicate = null, bool RemoveCache = false) : IRequest<List<GeneralConsultanCPPTDto>>
         {
-            public Expression<Func<GeneralConsultanCPPT, bool>> Predicate { get; } = predicate;
+            public Expression<Func<GeneralConsultanCPPT, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = RemoveCache!;
         }
 
         #endregion Get
@@ -27,9 +28,13 @@
 
         #region Update
 
-        public class UpdateGeneralConsultanCPPTRequest(GeneralConsultanCPPTDto GeneralConsultanCPPTDto) : IRequest<bool>
+        public class UpdateGeneralConsultanCPPTRequest(GeneralConsultanCPPTDto GeneralConsultanCPPTDto) : IRequest<GeneralConsultanCPPTDto>
         {
             public GeneralConsultanCPPTDto GeneralConsultanCPPTDto { get; set; } = GeneralConsultanCPPTDto;
+        }
+        public class UpdateListGeneralConsultanCPPTRequest(List<GeneralConsultanCPPTDto> GeneralConsultanCPPTDtos) : IRequest<List<GeneralConsultanCPPTDto>>
+        {
+            public List<GeneralConsultanCPPTDto> GeneralConsultanCPPTDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
         #endregion Update

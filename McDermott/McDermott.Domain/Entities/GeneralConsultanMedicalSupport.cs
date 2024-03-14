@@ -18,7 +18,14 @@
         public string? DrugEximinationAttachment { get; set; }
         public bool? DrugNegative { get; set; }
         public bool? DrugPositive { get; set; }
-
+        public bool IsNormalRestingECG { get; set; } = false;
+        public bool IsSinusRhythm { get; set; } = false;
+        public bool IsSinusBradycardia { get; set; } = false;
+        public bool IsSinusTachycardia { get; set; } = false;
+        public bool IsVentriculatExtraSystole { get; set; } = false;
+        public bool IsSupraventricularExtraSystole { get; set; } = false;
+        public bool IsOtherECG { get; set; } = false;
+        public string? OtherDesc { get; set; }
         [SetToNull] // Tandai properti yang harus diatur ke null
         public GeneralConsultanService? GeneralConsultanService { get; set; }
     }

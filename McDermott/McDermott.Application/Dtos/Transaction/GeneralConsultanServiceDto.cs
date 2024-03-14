@@ -44,6 +44,9 @@
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime RegistrationDate { get; set; }
 
+        [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
+        public DateTime? AppoimentDate { get; set; }
+
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }
         public bool Temp { get; set; } = false;
@@ -54,6 +57,7 @@
         public bool IsWeather { get; set; } = false;
         public bool IsPharmacology { get; set; } = false;
         public bool IsFood { get; set; } = false;
+
 
         public virtual ClassTypeDto? ClassType { get; set; }
         public virtual UserDto? Patient { get; set; }

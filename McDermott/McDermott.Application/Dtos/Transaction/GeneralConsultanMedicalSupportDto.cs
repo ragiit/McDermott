@@ -2,7 +2,7 @@
 {
     public class GeneralConsultanMedicalSupportDto : IMapFrom<GeneralConsultanMedicalSupport>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
         public long? GeneralConsultanServiceId { get; set; }
 
         public string? LabEximinationName { get; set; }
@@ -73,7 +73,14 @@
                 }
             }
         }
-
+        public bool IsNormalRestingECG { get; set; } = false;
+        public bool IsSinusRhythm { get; set; } = false;
+        public bool IsSinusBradycardia { get; set; } = false;
+        public bool IsSinusTachycardia { get; set; } = false;
+        public bool IsVentriculatExtraSystole { get; set; } = false;
+        public bool IsSupraventricularExtraSystole { get; set; } = false;
+        public bool IsOtherECG { get; set; } = false;
+        public string? OtherDesc { get; set; }
         public GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
     }
 }

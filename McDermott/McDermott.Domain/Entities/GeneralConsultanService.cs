@@ -23,6 +23,7 @@
         public DateTime? StartDateSickLeave { get; set; }
         public DateTime? EndDateSickLeave { get; set; }
         public DateTime? RegistrationDate { get; set; }
+        public DateTime? AppoimentDate { get; set; }
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }
 
