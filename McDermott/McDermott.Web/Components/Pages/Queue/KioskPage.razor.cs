@@ -381,7 +381,7 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 var edit = FormKios;
-                
+
                 if (FormKios.Id == 0)
                 {
                     // Mendapatkan ID dari hasil CreateKioskRequest

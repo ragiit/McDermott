@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
-
-namespace McDermott.Web.Components.Pages.Config
+﻿namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CityPage
     {
@@ -78,7 +76,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
-        private string names {  get; set; }
+        private string names { get; set; }
 
         protected override async Task OnInitializedAsync()
         {

@@ -1,5 +1,4 @@
-﻿using DevExpress.Blazor.Internal.Editors;
-using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
+﻿using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -256,6 +255,7 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         #endregion Save Function
+
         #region Configurtaion Connection SMTP
 
         private string currentSmtpEncryption = "";
@@ -309,15 +309,16 @@ namespace McDermott.Web.Components.Pages.Config
                 isLoading = false;
             }
         }
-        bool showPassword = false;
-        string showPasswordIcon = "fa-solid fa-eye-slash";
 
-        void TogglePasswordVisibility()
+        private bool showPassword = false;
+        private string showPasswordIcon = "fa-solid fa-eye-slash";
+
+        private void TogglePasswordVisibility()
         {
             var a = FormEmails.Smtp_Pass;
             showPassword = !showPassword;
 
-            if(showPassword == true)
+            if (showPassword == true)
             {
                 showPasswordIcon = "fa-solid fa-eye";
             }
@@ -326,8 +327,7 @@ namespace McDermott.Web.Components.Pages.Config
                 showPasswordIcon = "fa-solid fa-eye-slash";
             }
         }
-     
 
-        #endregion
+        #endregion Configurtaion Connection SMTP
     }
 }

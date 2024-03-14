@@ -126,17 +126,16 @@
                             }
                             else
                             {
-                                
+
                                 <p for="tbOverview"> Name</p>
                                 <DxTextBox @bind-Text="@DoctorSchedule.Name"
                                            NullText="Name"
                                            InputId="tbOverview" />
 
-                      
                                 <p for="tbOverview">Service</p>
 
                                 <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    Data="@Services"    
+                                    Data="@Services"
                                             NullText="Select Service"
                                             FilteringMode="@DataGridFilteringMode.Contains"
                                             @bind-Value="@ServiceId"
@@ -145,7 +144,6 @@
                                             ValueFieldName="Id">
                                 </DxComboBox>
 
-                            
                                 <p for="tbOverview"> Physicion</p>
 
                                 <DxTagBox Data="@Users"

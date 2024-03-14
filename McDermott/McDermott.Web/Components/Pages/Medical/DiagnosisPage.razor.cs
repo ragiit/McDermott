@@ -1,6 +1,4 @@
 ﻿using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
-using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
-using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

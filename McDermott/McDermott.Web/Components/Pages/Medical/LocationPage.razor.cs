@@ -1,6 +1,4 @@
-﻿using static McDermott.Application.Features.Commands.Medical.LocationCommand;
-
-namespace McDermott.Web.Components.Pages.Medical
+﻿namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class LocationPage
     {

@@ -1,5 +1,4 @@
-﻿using OfficeOpenXml;
-using static McDermott.Application.Features.Commands.TemplateCommand;
+﻿using static McDermott.Application.Features.Commands.TemplateCommand;
 
 namespace McDermott.Web.Components.Pages
 {

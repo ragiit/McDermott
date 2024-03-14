@@ -166,16 +166,15 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 var z = context;
-                
+
                 context.QueueStage = "call";
                 context.QueueStatus = "calling";
-               
+
                 if (context.Id != 0)
                 {
                     var dataQueue = await Mediator.Send(new UpdateKioskQueueRequest(context));
 
-                    await hubConnection.SendAsync("CallPatient",context.Id, context.QueueNumber);
-
+                    await hubConnection.SendAsync("CallPatient", context.Id, context.QueueNumber);
                 }
                 var cek = CounterId;
                 //DataKiosksQueue = FormKiosksQueue;
