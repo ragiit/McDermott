@@ -1,0 +1,104 @@
+﻿@page "/clinic-service/reporting-&-analytic"
+@rendermode InteractiveServer
+
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Reporting & Analytic</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
+                        <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/clinic-service/reporting-&-analytic">General Consultan Service</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <DxTabs ScrollMode="TabsScrollMode.NavButtons" RenderMode="TabsRenderMode.AllTabs">
+                                <DxTabPage Text="Laporan kunjungan pasien per periode">
+                                    <div class="row justify-content-center mt-4">
+                                        <div class="col-md-6">
+                                            <form>
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <label>Pilih A</label>
+                                                        <input class="form-control" type="text" placeholder="hoho" />
+                                                        <label>Pilih Aja</label>
+                                                        <textarea class="form-control" type="text" placeholder="hoho"></textarea>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label>Pilih Aja</label>
+                                                        <input class="form-control" type="date" placeholder="hoho" />
+                                                    </div>
+                                                </div>
+                                                <div class="mt">
+                                                    <button class="btn btn-primary">teken aja</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </DxTabPage>
+                                <DxTabPage Text="Laporan kunjungan pesien per Department">
+                                    <div class="row justify-content-center mt-4">
+                                        <div class="col-md-6">
+                                            <form>
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <label>Pilih B</label>
+                                                        <input class="form-control" type="text" placeholder="hoho" />
+                                                        <label>Pilih Aja</label>
+                                                        <textarea class="form-control" type="text" placeholder="hoho" ></textarea>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label>Pilih Aja</label>
+                                                        <input class="form-control" type="date" placeholder="hoho" />
+                                                    </div>
+                                                </div>
+                                               <div class="mt">
+                                                    <button class="btn btn-primary">teken aja</button>
+                                               </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </DxTabPage>
+                                <DxTabPage Text="Laporan kunjungan pasien per family relation">
+
+                                </DxTabPage>
+                                <DxTabPage Text="Laporan pendaftaran pasien per periode">
+
+                                </DxTabPage>
+                                <DxTabPage Text="Laporan kunjungan pasien per diagnosis">
+
+                                </DxTabPage>
+                                <DxTabPage Text="Laporan pemeriksaan pasien per medical type">
+
+                                </DxTabPage>
+                                <DxTabPage Text="Laporan top diagnosa per periode">
+
+                                </DxTabPage>
+                                <DxTabPage Text="Laporan Kasus khusus">
+
+                                </DxTabPage>
+                                <DxTabPage Text="Laporan Masa berlaku lisensi tenaga medis">
+
+                                </DxTabPage>
+
+                            </DxTabs>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+</div>

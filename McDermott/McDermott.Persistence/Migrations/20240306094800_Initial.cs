@@ -357,7 +357,7 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.ServicedId,
                         principalTable: "Services",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -400,7 +400,7 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.CountryId,
                         principalTable: "Countries",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -426,13 +426,13 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.CronisCategoryId,
                         principalTable: "CronisCategories",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Diagnoses_DiseaseCategories_DiseaseCategoryId",
                         column: x => x.DiseaseCategoryId,
                         principalTable: "DiseaseCategories",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -461,13 +461,13 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_GroupMenus_Menus_MenuId",
                         column: x => x.MenuId,
                         principalTable: "Menus",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -492,7 +492,7 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.ServiceId,
                         principalTable: "Services",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -516,7 +516,7 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.ProvinceId,
                         principalTable: "Provinces",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -545,7 +545,7 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.DoctorScheduleId,
                         principalTable: "DoctorSchedules",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -580,19 +580,19 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.CityId,
                         principalTable: "Cities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Companies_Countries_CountryId",
                         column: x => x.CountryId,
                         principalTable: "Countries",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Companies_Provinces_ProvinceId",
                         column: x => x.ProvinceId,
                         principalTable: "Provinces",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -617,13 +617,13 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.CityId,
                         principalTable: "Cities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Districts_Provinces_ProvinceId",
                         column: x => x.ProvinceId,
                         principalTable: "Provinces",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -656,19 +656,19 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.CityId,
                         principalTable: "Cities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_HealthCenters_Countries_CountryId",
                         column: x => x.CountryId,
                         principalTable: "Countries",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_HealthCenters_Provinces_ProvinceId",
                         column: x => x.ProvinceId,
                         principalTable: "Provinces",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -695,19 +695,19 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.CityId,
                         principalTable: "Cities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Villages_Districts_DistrictId",
                         column: x => x.DistrictId,
                         principalTable: "Districts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Villages_Provinces_ProvinceId",
                         column: x => x.ProvinceId,
                         principalTable: "Provinces",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -732,7 +732,7 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.HealthCenterId,
                         principalTable: "HealthCenters",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -756,13 +756,13 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.BuildingId,
                         principalTable: "Buildings",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_BuildingLocations_Locations_LocationId",
                         column: x => x.LocationId,
                         principalTable: "Locations",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -791,19 +791,19 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.QueueDisplayId,
                         principalTable: "QueueDisplays",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Counters_Services_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "Services",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Counters_Services_ServiceKId",
                         column: x => x.ServiceKId,
                         principalTable: "Services",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -830,13 +830,13 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Departments_Departments_ParentDepartmentId",
                         column: x => x.ParentDepartmentId,
                         principalTable: "Departments",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -860,7 +860,7 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.DepartmentId,
                         principalTable: "Departments",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -887,7 +887,7 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.DoctorScheduleId,
                         principalTable: "DoctorSchedules",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1008,31 +1008,31 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.DomicileCityId,
                         principalTable: "Cities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Cities_IdCardCityId",
                         column: x => x.IdCardCityId,
                         principalTable: "Cities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Countries_DomicileCountryId",
                         column: x => x.DomicileCountryId,
                         principalTable: "Countries",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Countries_IdCardCountryId",
                         column: x => x.IdCardCountryId,
                         principalTable: "Countries",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Degrees_DegreeId",
                         column: x => x.DegreeId,
                         principalTable: "Degrees",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Departments_DepartmentId",
                         column: x => x.DepartmentId,
@@ -1043,73 +1043,73 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.DomicileDistrictId,
                         principalTable: "Districts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Districts_IdCardDistrictId",
                         column: x => x.IdCardDistrictId,
                         principalTable: "Districts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_EmailTemplates_EmailTemplateId",
                         column: x => x.EmailTemplateId,
                         principalTable: "EmailTemplates",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Genders_GenderId",
                         column: x => x.GenderId,
                         principalTable: "Genders",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_JobPositions_JobPositionId",
                         column: x => x.JobPositionId,
                         principalTable: "JobPositions",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Provinces_DomicileProvinceId",
                         column: x => x.DomicileProvinceId,
                         principalTable: "Provinces",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Provinces_IdCardProvinceId",
                         column: x => x.IdCardProvinceId,
                         principalTable: "Provinces",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Religions_ReligionId",
                         column: x => x.ReligionId,
                         principalTable: "Religions",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Specialities_SpecialityId",
                         column: x => x.SpecialityId,
                         principalTable: "Specialities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Villages_DomicileVillageId",
                         column: x => x.DomicileVillageId,
                         principalTable: "Villages",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Villages_IdCardVillageId",
                         column: x => x.IdCardVillageId,
                         principalTable: "Villages",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1164,13 +1164,13 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.InsuranceId,
                         principalTable: "Insurances",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_InsurancePolicies_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1199,19 +1199,19 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.ServiceId,
                         principalTable: "Services",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Kiosks_Users_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Kiosks_Users_PhysicianId",
                         column: x => x.PhysicianId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1237,7 +1237,7 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1263,19 +1263,19 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.FamilyId,
                         principalTable: "Families",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PatientFamilyRelations_Users_FamilyMemberId",
                         column: x => x.FamilyMemberId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PatientFamilyRelations_Users_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1320,31 +1320,31 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.InsurancePolicyId,
                         principalTable: "InsurancePolicies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_GeneralConsultanServices_Insurances_InsuranceId",
                         column: x => x.InsuranceId,
                         principalTable: "Insurances",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_GeneralConsultanServices_Services_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "Services",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_GeneralConsultanServices_Users_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_GeneralConsultanServices_Users_PratitionerId",
                         column: x => x.PratitionerId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1371,19 +1371,19 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.KioskId,
                         principalTable: "Kiosks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_KioskQueues_Services_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "Services",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_KioskQueues_Services_ServiceKId",
                         column: x => x.ServiceKId,
                         principalTable: "Services",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1851,7 +1851,7 @@ namespace McDermott.Persistence.Migrations
                 column: "PhysicianId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Departments_Users_ManagerId",
@@ -1859,7 +1859,7 @@ namespace McDermott.Persistence.Migrations
                 column: "ManagerId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_DoctorScheduleSlots_Users_PhysicianId",
@@ -1867,7 +1867,7 @@ namespace McDermott.Persistence.Migrations
                 column: "PhysicianId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_EmailTemplates_Users_ById",
@@ -1875,7 +1875,7 @@ namespace McDermott.Persistence.Migrations
                 column: "ById",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />

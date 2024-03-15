@@ -134,6 +134,20 @@ namespace McDermott.Persistence.Context
           .HasOne(e => e.Department)
           .WithMany();
 
+            modelBuilder.Entity<DetailQueueDisplay>()
+                .HasOne(m => m.QueueDisplay)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<DetailQueueDisplay>()
+                .HasOne(m => m.Counter)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<QueueDisplay>()
+                .HasMany(m => m.Counter)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+
+
             //modelBuilder.Entity<Province>()
             //  .HasMany(m => m.Districts)
             //  .WithOne(c => c.Province)
