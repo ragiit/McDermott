@@ -4,6 +4,8 @@
     {
         public long Id { get; set; }
 
+        public long? KioskQueueId { get; set; }
+
         [Required(ErrorMessage = "The Patient field is required.")]
         public long? PatientId { get; set; }
 
@@ -58,7 +60,7 @@
         public bool IsPharmacology { get; set; } = false;
         public bool IsFood { get; set; } = false;
 
-
+        public virtual KioskQueue? KioskQueue { get; set; }
         public virtual ClassTypeDto? ClassType { get; set; }
         public virtual UserDto? Patient { get; set; }
         public virtual UserDto? Pratitioner { get; set; }

@@ -2,6 +2,7 @@
 {
     public partial class GeneralConsultanService : BaseAuditableEntity
     {
+        public long? KioskQueueId { get; set; }
         public long? PatientId { get; set; }
         public long? InsuranceId { get; set; }
         public long? InsurancePolicyId { get; set; }
@@ -51,5 +52,7 @@
         public virtual List<GeneralConsultantClinicalAssesment>? GeneralConsultantClinicalAssesments { get; set; }
         [SetToNull]
         public virtual ClassType? ClassType { get; set; }
+        [SetToNull]
+        public virtual KioskQueue? KioskQueue { get; set; }
     }
 }

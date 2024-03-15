@@ -1345,6 +1345,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private bool PopUpHistoricalMedical = false;
         private bool PopUpAppoimentPending = false;
         private bool PopUpAppoiment = false;
+        private bool PopUpActionSpace = false;
         private bool IsReferTo = false;
         private bool IsAppoiment = false;
 
@@ -1385,6 +1386,11 @@ namespace McDermott.Web.Components.Pages.Transaction
         private void OnClickPopUpHistoricalMedical()
         {
             PopUpHistoricalMedical = true;
+        }
+
+        private void OnClickPopUpPopUpActionSpace()
+        {
+            PopUpActionSpace = true;
         }
 
         private void OnClickPopUpAppoimentPending()
