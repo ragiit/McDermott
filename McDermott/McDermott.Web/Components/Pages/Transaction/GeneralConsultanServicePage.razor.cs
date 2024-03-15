@@ -51,17 +51,14 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Relation Data
 
-        private string TabText = string.Empty;
         private PatientAllergyDto PatientAllergy = new();
         private GeneralConsultantClinicalAssesmentDto GeneralConsultantClinical = new();
         private List<GeneralConsultanServiceDto> GeneralConsultanServices = new();
         private List<UserDto> IsPatient = new();
         private List<UserDto> patients = new List<UserDto>();
-        private long PatientIds = new();
-        private IEnumerable<GeneralConsultanServiceDto> SelectPatient = [];
 
         private List<UserDto> IsPratition = new();
-        private List<UserDto> AllDoctors = new();
+        private List<UserDto> AllDoctors = [];
         private List<InsuranceDto> Insurances = [];
         private List<InsuranceDto> AllInsurances = [];
         private List<InsurancePolicyDto> InsurancePolicies = [];
@@ -832,7 +829,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             //patient
             patients = [.. user.Where(x => x.IsPatient == true).ToList()];
-            PatientIds = IsPatient.Select(x => x.Id).FirstOrDefault();
 
             //IsDocter
             IsPratition = [.. user.Where(x => x.IsDoctor == true).ToList()];
@@ -851,7 +847,33 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             FormValidationState = true;
 
-            await OnSave();
+            if (PopUpActionSpace)
+                await OnSaveActionSpace();
+            else
+                await OnSave();
+        }
+
+        private async Task OnSaveActionSpace()
+        {
+            try
+            {
+                if (FormRegis.Id == 0)
+                    return;
+
+                if (GeneralConsultanMedicalSupport.Id == 0)
+                {
+                    GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
+                    await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                }
+                else
+                    await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+
+                PopUpActionSpace = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private void GridCPPT_CustomizeElement(GridCustomizeElementEventArgs e)
@@ -1303,6 +1325,11 @@ namespace McDermott.Web.Components.Pages.Transaction
         private void OnCancelAppoimentPopup()
         {
             PopUpAppoiment = false;
+        }
+
+        private void OnCancelActionSpace()
+        {
+            PopUpActionSpace = false;
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)

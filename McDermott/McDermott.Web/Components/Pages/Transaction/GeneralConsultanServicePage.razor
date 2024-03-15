@@ -201,7 +201,7 @@
                                                                     IconCssClass="fa-solid fa-notes-medical"
                                                                     Text="Referral Prescription & Concoction" />
 
-                                                        <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
+                                                        <DxToolbarItem Alignment="ToolbarItemAlignment.Left" Visible="@(FormRegis.StagingStatus == "Physician")" BeginGroup="true"
                                                                     IconCssClass="fa-solid fa-notes-medical"
                                                                     Click="OnClickPopUpPopUpActionSpace"
                                                                     Text="Action Space" />
@@ -469,7 +469,7 @@ NullText="Select Registration..."
                                                 {
                                                     <DxTab Text="Clinical Assesment"></DxTab>
                                                     <DxTab Text="CPPT"></DxTab>
-                                                    <DxTab Text="Medical Support"></DxTab>
+                                                    <DxTab Visible="false" Text="Medical Support"></DxTab>
                                                 }
 
                                                 @if (FormRegis.StagingStatus.Equals("Nurse Station"))
@@ -1514,133 +1514,194 @@ NullText="Select Registration..."
 </DxPopup>
 
 <DxPopup HeaderText="Action Space" @bind-Visible="@PopUpActionSpace" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
-     <DxFormLayout>
-        <DxFormLayoutGroup ColSpanMd="12" Caption="Lab Result"  ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
-            <Items>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
-                    <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.LabEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
-                    <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.LabEximinationAttachment"
-                        ShowValidationIcon="true"
-                        ReadOnly="true"
-                        MaskMode="MaskMode.RegEx">
-                        <Buttons>
-                            <InputFile id="labFile" OnChange="@SelectFilesLab" multiple="false" style="display:none" />
-                            <DxEditorButton Click="SelectFileLab" IconCssClass="fa-solid fa-upload" />
-                            <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.LabEximinationAttachment)" IconCssClass="fa-solid fa-download" />
-                            <DxEditorButton Click="RemoveSelectedFileLab" IconCssClass="fa-solid fa-trash" />
-                        </Buttons>
-                    </DxMaskedInput>
-                </DxFormLayoutItem>
-            </Items>
-        </DxFormLayoutGroup>
+    <EditForm Model="@FormRegis" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        <DxFormLayout>
+            <DxFormLayoutGroup ColSpanMd="12" Caption="Lab Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
+                <Items>
+                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
+                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
+                                    NullText="Select Practitioner..."
+                                    @bind-Value="@GeneralConsultanMedicalSupport.PractitionerLabEximinationId"
+                                    TextFieldName="Name"
+                                    ValueFieldName="Id"
+                                    SelectedItemChanged="@((UserDto? e) => SelectedItemPhysicianChanged(e))">
+                        </DxComboBox>
+                        <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerLabEximinationId)" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
+                        <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.LabEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
+                        <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.LabEximinationAttachment"
+                            ShowValidationIcon="true"
+                            ReadOnly="true"
+                            MaskMode="MaskMode.RegEx">
+                            <Buttons>
+                                <InputFile id="labFile" OnChange="@SelectFilesLab" multiple="false" style="display:none" />
+                                <DxEditorButton Click="SelectFileLab" IconCssClass="fa-solid fa-upload" />
+                                <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.LabEximinationAttachment)" IconCssClass="fa-solid fa-download" />
+                                <DxEditorButton Click="RemoveSelectedFileLab" IconCssClass="fa-solid fa-trash" />
+                            </Buttons>
+                        </DxMaskedInput>
+                    </DxFormLayoutItem>
+                </Items>
+            </DxFormLayoutGroup>
 
-        <DxFormLayoutGroup ColSpanMd="12" Caption="Radiology Result">
-            <Items>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
-                    <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.RadiologyEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
-                    <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.RadiologyEximinationAttachment"
-                        ShowValidationIcon="true"
-                        ReadOnly="true"
-                        MaskMode="MaskMode.RegEx">
-                        <Buttons>
-                            <InputFile id="radiologyFile" OnChange="@SelectFilesRadiology" multiple="false" style="display:none" />
-                            <DxEditorButton Click="SelectFileRadiology" IconCssClass="fa-solid fa-upload" />
-                            <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.RadiologyEximinationAttachment)" IconCssClass="fa-solid fa-download" />
-                            <DxEditorButton Click="RemoveSelectedFileRadiology" IconCssClass="fa-solid fa-trash" />
-                        </Buttons>
-                    </DxMaskedInput>
-                </DxFormLayoutItem>
-            </Items>
-        </DxFormLayoutGroup>
+            <DxFormLayoutGroup ColSpanMd="12" Caption="Radiology Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
+                <Items>
+                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
+                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
+                                    NullText="Select Practitioner..."
+                                    @bind-Value="@FormRegis.PratitionerId"
+                                    TextFieldName="Name"
+                                    ValueFieldName="Id"
+                                    SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))">
+                        </DxComboBox>
+                        <ValidationMessage For="@(() => FormRegis.PratitionerId)" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
+                        <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.RadiologyEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
+                        <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.RadiologyEximinationAttachment"
+                            ShowValidationIcon="true"
+                            ReadOnly="true"
+                            MaskMode="MaskMode.RegEx">
+                            <Buttons>
+                                <InputFile id="radiologyFile" OnChange="@SelectFilesRadiology" multiple="false" style="display:none" />
+                                <DxEditorButton Click="SelectFileRadiology" IconCssClass="fa-solid fa-upload" />
+                                <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.RadiologyEximinationAttachment)" IconCssClass="fa-solid fa-download" />
+                                <DxEditorButton Click="RemoveSelectedFileRadiology" IconCssClass="fa-solid fa-trash" />
+                            </Buttons>
+                        </DxMaskedInput>
+                    </DxFormLayoutItem>
+                </Items>
+            </DxFormLayoutGroup>
 
-        <DxFormLayoutGroup ColSpanMd="12" Caption="Alcohol Result">
-            <Items>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
-                    <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.AlcoholEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
-                        <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.AlcoholEximinationAttachment"
-                        ShowValidationIcon="true"
-                        ReadOnly="true"
-                        MaskMode="MaskMode.RegEx">
-                        <Buttons>
-                            <InputFile id="alcoholFile" OnChange="@SelectFilesAlcohol" multiple="false" style="display:none" />
-                            <DxEditorButton Click="SelectFileAlcohol" IconCssClass="fa-solid fa-upload" />
-                            <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.AlcoholEximinationAttachment)" IconCssClass="fa-solid fa-download" />
-                            <DxEditorButton Click="RemoveSelectedFileAlcohol" IconCssClass="fa-solid fa-trash" />
-                        </Buttons>
-                    </DxMaskedInput>
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Negative">
-                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AlcoholNegative" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Positive">
-                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AlcoholPositive" />
-                </DxFormLayoutItem>
-            </Items>
-        </DxFormLayoutGroup>
+            <DxFormLayoutGroup ColSpanMd="12" Caption="Alcohol Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
+                <Items>
+                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
+                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
+                                    NullText="Select Practitioner..."
+                                    @bind-Value="@FormRegis.PratitionerId"
+                                    TextFieldName="Name"
+                                    ValueFieldName="Id"
+                                    SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))">
+                        </DxComboBox>
+                        <ValidationMessage For="@(() => FormRegis.PratitionerId)" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
+                        <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.AlcoholEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
+                            <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.AlcoholEximinationAttachment"
+                            ShowValidationIcon="true"
+                            ReadOnly="true"
+                            MaskMode="MaskMode.RegEx">
+                            <Buttons>
+                                <InputFile id="alcoholFile" OnChange="@SelectFilesAlcohol" multiple="false" style="display:none" />
+                                <DxEditorButton Click="SelectFileAlcohol" IconCssClass="fa-solid fa-upload" />
+                                <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.AlcoholEximinationAttachment)" IconCssClass="fa-solid fa-download" />
+                                <DxEditorButton Click="RemoveSelectedFileAlcohol" IconCssClass="fa-solid fa-trash" />
+                            </Buttons>
+                        </DxMaskedInput>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Negative">
+                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AlcoholNegative" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Positive">
+                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AlcoholPositive" />
+                    </DxFormLayoutItem>
+                </Items>
+            </DxFormLayoutGroup>
 
-        <DxFormLayoutGroup ColSpanMd="12" Caption="Drug Result">
-            <Items>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
-                    <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.DrugEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
-                <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.DrugEximinationAttachment"
-                        ShowValidationIcon="true"
-                        ReadOnly="true"
-                        MaskMode="MaskMode.RegEx">
-                        <Buttons>
-                            <InputFile id="drugFile" OnChange="@SelectFilesDrug" multiple="false" style="display:none" />
-                            <DxEditorButton Click="SelectFileDrug" IconCssClass="fa-solid fa-upload" />
-                            <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.DrugEximinationAttachment)" IconCssClass="fa-solid fa-download" />
-                            <DxEditorButton Click="RemoveSelectedFileDrug" IconCssClass="fa-solid fa-trash" />
-                        </Buttons>
-                    </DxMaskedInput>
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Negative">
-                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.DrugNegative" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Positive">
-                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.DrugPositive" />
-                </DxFormLayoutItem>
-            </Items>
-        </DxFormLayoutGroup>
-            <DxFormLayoutGroup ColSpanMd="12" Caption="ECG">
-            <Items>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Resting ECG" ColSpanMd="12">
-                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsNormalRestingECG" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sinus Rhythm" ColSpanMd="12">
-                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusRhythm" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sinus Bradycardia" ColSpanMd="12">
-                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusBradycardia" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sinus Tachycardia" ColSpanMd="12">
-                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusTachycardia" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Ventriculat Extra Systole" ColSpanMd="12">
-                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsVentriculatExtraSystole" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Supraventricular Extra Systole" ColSpanMd="12">
-                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSupraventricularExtraSystole" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Other" ColSpanMd="12">
-                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsOtherECG" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption=" " Visible="Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherECG)" ColSpanMd="12">
-                    <DxMemo
-                        @bind-Text="GeneralConsultanMedicalSupport.OtherDesc"
-                        NullText="Other ..."
-                        ShowValidationIcon="true"
-                        Rows="1" />
-                </DxFormLayoutItem>
-            </Items>
-        </DxFormLayoutGroup>
-    </DxFormLayout>
+            <DxFormLayoutGroup ColSpanMd="12" Caption="Drug Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
+                <Items>
+                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
+                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
+                                    NullText="Select Practitioner..."
+                                    @bind-Value="@FormRegis.PratitionerId"
+                                    TextFieldName="Name"
+                                    ValueFieldName="Id"
+                                    SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))">
+                        </DxComboBox>
+                        <ValidationMessage For="@(() => FormRegis.PratitionerId)" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
+                        <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.DrugEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
+                    <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.DrugEximinationAttachment"
+                            ShowValidationIcon="true"
+                            ReadOnly="true"
+                            MaskMode="MaskMode.RegEx">
+                            <Buttons>
+                                <InputFile id="drugFile" OnChange="@SelectFilesDrug" multiple="false" style="display:none" />
+                                <DxEditorButton Click="SelectFileDrug" IconCssClass="fa-solid fa-upload" />
+                                <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.DrugEximinationAttachment)" IconCssClass="fa-solid fa-download" />
+                                <DxEditorButton Click="RemoveSelectedFileDrug" IconCssClass="fa-solid fa-trash" />
+                            </Buttons>
+                        </DxMaskedInput>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Negative">
+                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.DrugNegative" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Positive">
+                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.DrugPositive" />
+                    </DxFormLayoutItem>
+                </Items>
+
+            </DxFormLayoutGroup>
+                <DxFormLayoutGroup ColSpanMd="12" Caption="ECG" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
+                <Items>
+                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
+                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
+                                    NullText="Select Practitioner..."
+                                    @bind-Value="@FormRegis.PratitionerId"
+                                    TextFieldName="Name"
+                                    ValueFieldName="Id"
+                                    SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))">
+                        </DxComboBox>
+                        <ValidationMessage For="@(() => FormRegis.PratitionerId)" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Resting ECG" ColSpanMd="12">
+                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsNormalRestingECG" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sinus Rhythm" ColSpanMd="12">
+                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusRhythm" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sinus Bradycardia" ColSpanMd="12">
+                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusBradycardia" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sinus Tachycardia" ColSpanMd="12">
+                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusTachycardia" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Ventriculat Extra Systole" ColSpanMd="12">
+                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsVentriculatExtraSystole" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Supraventricular Extra Systole" ColSpanMd="12">
+                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSupraventricularExtraSystole" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Other" ColSpanMd="12">
+                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsOtherECG" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption=" " Visible="Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherECG)" ColSpanMd="12">
+                        <DxMemo
+                            @bind-Text="GeneralConsultanMedicalSupport.OtherDesc"
+                            NullText="Other ..."
+                            ShowValidationIcon="true"
+                            Rows="1" />
+                    </DxFormLayoutItem>
+                </Items>
+            </DxFormLayoutGroup>
+
+        </DxFormLayout>
+        <div class="row justify-content-end">
+            <div class="col-auto align-self-end">
+                <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"  ></DxButton>
+                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancelAppoimentPopup"></DxButton>
+            </div>
+        </div>
+    </EditForm>
 </DxPopup>
