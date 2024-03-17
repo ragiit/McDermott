@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Extentions
+﻿using Serilog;
+
+namespace McDermott.Web.Extentions
 {
     public static class Helper
     {
@@ -23,6 +25,14 @@
             {
                 errorMessage = "An error occurred: " + ex.Message;
             }
+
+            Log.Error(
+                  "\n" +
+                  "==================== START ERROR ====================" + "\n" +
+                  "Message: " + ex.Message + "\n" +
+                  "Inner Message: " + ex.InnerException?.Message + "\n" +
+                  "Stack Trace: " + ex.StackTrace + "\n" +
+                  "==================== END ERROR ====================" + "\n");
 
             toastService.ClearErrorToasts();
             toastService.ShowError(errorMessage);
@@ -171,6 +181,7 @@
         }
 
         public static int ToInt32(this object o) => Convert.ToInt32(o);
+        public static long ToLong(this object o) => Convert.ToInt64(o);
 
         public static async Task DownloadFile(string file, IHttpContextAccessor HttpContextAccessor, HttpClient Http, IJSRuntime JsRuntime)
         {

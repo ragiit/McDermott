@@ -1,6 +1,4 @@
-﻿using OfficeOpenXml;
-
-namespace McDermott.Web.Components.Pages.Medical
+﻿namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class NursingDiagnosesPage
     {

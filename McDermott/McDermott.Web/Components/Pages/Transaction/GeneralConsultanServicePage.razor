@@ -330,28 +330,35 @@ NullText="Select Registration..."
                                                                     FilteringMode="@DataGridFilteringMode.Contains"
                                                                     ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
                                                                     SelectedItemChanged="@((string e) => SelectedItemPaymentChanged(e))"
-                                                                    @bind-Value="@FormRegis.Payment">
+                                                                    @bind-Value="FormRegis.Payment">
                                                         </DxComboBox>
                                                             <ValidationMessage For="@(() => FormRegis.Payment)" />
                                                     </DxFormLayoutItem>
-@if (FormRegis.Payment == "Insurance" || FormRegis.Payment == "BPJS")
-{
-                                                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption=" " ColSpanMd="12">
-                                                                                                    <DxComboBox ShowValidationIcon="true"
-                                                                                                        ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
-                                                                                                        TextFieldName="ConcatInsurancePolicy"
-                                                                                                        ValueFieldName="InsurancePolicyId"
-                                                                                                        Data="@Temps"
-                                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                                        FilteringMode="@DataGridFilteringMode.Contains"
-                                                                                                        @bind-Value="@FormRegis.InsurancePolicyId"
-                                                                                                        NullText="Select Insurance ..">
-                                                                                                    </DxComboBox ShowValidationIcon="true">
-                                                                                                    <ValidationMessage For="@(() => FormRegis.InsurancePolicyId)" />
-                                                                                                </DxFormLayoutItem>
-}
+                                                    @if (FormRegis.Payment == "Insurance" || FormRegis.Payment == "BPJS")
+                                                    {
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption=" " ColSpanMd="12">
+                                                            <DxComboBox ShowValidationIcon="true"
+                                                                ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
+                                                                TextFieldName="ConcatInsurancePolicy"
+                                                                ValueFieldName="InsurancePolicyId"
+                                                                Data="@Temps"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
+                                                                @bind-Value="@FormRegis.InsurancePolicyId"
+                                                                NullText="Select Insurance ..">
+                                                            </DxComboBox ShowValidationIcon="true">
+                                                            <ValidationMessage For="@(() => FormRegis.InsurancePolicyId)" />
+                                                        </DxFormLayoutItem>
+                                                    }
                                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
-                                                        <DxDateEdit   ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))" @bind-Date="@RegistrationDate" Mask="@DateTimeMask.ShortDate" NullText="Select Registration Date" />
+                                                        <DxDateEdit
+                                                             DateChanged="@((DateTime e) => SelectedItemRegistrationDateChanged(e))"
+                                                             ReadOnly="@(!FormRegis.StagingStatus?.Equals("Planned") ?? false)"
+                                                             Date="@FormRegis.RegistrationDate"
+                                                             DateExpression="@(() => @FormRegis.RegistrationDate)"
+                                                             Mask="@DateTimeMask.ShortDate"
+                                                             NullText="Select Registration Date">
+                                                        </DxDateEdit>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Schedule Time" ColSpanMd="12">
                                                         <DxComboBox ShowValidationIcon="true" Data="@Times"
@@ -362,10 +369,10 @@ NullText="Select Registration..."
                                                                     @bind-Value="@FormRegis.ScheduleTime"/>
                                                             <ValidationMessage For="@(() => FormRegis.ScheduleTime)" />
                                                     </DxFormLayoutItem>
-                                                        <DxFormLayoutItem Visible="@(FormRegis.StagingStatus.Equals("Physician") || FormRegis.StagingStatus!.Equals("Finished"))" CaptionCssClass="normal-caption" Caption="Sick Leave" ColSpanMd="12">
-                                                            <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Physician"))" @bind-Checked="@FormRegis.IsSickLeave" />
-                                                        </DxFormLayoutItem>
-                                                        <DxFormLayoutItem Visible="@(FormRegis.IsSickLeave && (FormRegis.StagingStatus.Equals("Physician") || FormRegis.StagingStatus!.Equals("Finished")))" CaptionCssClass="required-caption normal-caption" Caption="Start-End Date" ColSpanMd="12">
+                                                    <DxFormLayoutItem Visible="@(FormRegis.StagingStatus.Equals("Physician") || FormRegis.StagingStatus!.Equals("Finished"))" CaptionCssClass="normal-caption" Caption="Sick Leave" ColSpanMd="12">
+                                                        <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Physician"))" @bind-Checked="@FormRegis.IsSickLeave" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Visible="@(FormRegis.IsSickLeave && (FormRegis.StagingStatus.Equals("Physician") || FormRegis.StagingStatus!.Equals("Finished")))" CaptionCssClass="required-caption normal-caption" Caption="Start-End Date" ColSpanMd="12">
                                                         <Template>
                                                             <DxGridLayout ColumnSpacing="8px">
                                                                 <Rows>
@@ -389,7 +396,7 @@ NullText="Select Registration..."
                                                                 </Items>
                                                             </DxGridLayout>
                                                         </Template>
-                                                        </DxFormLayoutItem>
+                                                    </DxFormLayoutItem>
                                                 </DxFormLayout>
                                             </div>
                                         </div>
@@ -1116,10 +1123,13 @@ else
                             <div class="col-md-6">
                                 <DxFormLayout CssClass="mt ">
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
-                                        <DxComboBox ShowValidationIcon="true" Data="@Services"
+                                        <DxComboBox ShowValidationIcon="true"
+                                                    Data="@Services"
                                                     NullText="Select Service.."
-                                                        SelectedItemChanged="@((ServiceDto e) => SelectedItemServiceChanged(e))"
-                                                    @bind-Value="@FormRegis.ServiceId" TextFieldName="Name" ValueFieldName="Id">
+                                                    SelectedItemChanged="@((ServiceDto e) => SelectedItemServiceChanged(e))"
+                                                    @bind-Value="@FormRegis.ServiceId"
+                                                    TextFieldName="Name"
+                                                    ValueFieldName="Id">
                                         </DxComboBox>
                                         <ValidationMessage For="@(() => FormRegis.ServiceId)" />
                                     </DxFormLayoutItem>
@@ -1142,21 +1152,30 @@ else
                                         </DxComboBox>
                                             <ValidationMessage For="@(() => FormRegis.Payment)" />
                                     </DxFormLayoutItem>
-                                @if (FormRegis.Payment == "Insurance" || FormRegis.Payment == "BPJS")
-                                {
-                                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption=" " ColSpanMd="12">
-                                                                                    <DxComboBox ShowValidationIcon="true"
-                                                                                        TextFieldName="ConcatInsurancePolicy"
-                                                                                        ValueFieldName="InsurancePolicyId"
-                                                                                        Data="@Temps"
-                                                                                        @bind-Value="@FormRegis.InsurancePolicyId"
-                                                                                        NullText="Select Insurance ..">
-                                                                                    </DxComboBox >
-                                                                                    <ValidationMessage For="@(() => FormRegis.InsurancePolicyId)" />
-                                                                                </DxFormLayoutItem>
-                                }
+                                    @if (FormRegis.Payment == "Insurance" || FormRegis.Payment == "BPJS")
+                                    {
+                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption=" " ColSpanMd="12">
+                                            <DxComboBox ShowValidationIcon="true"
+                                                TextFieldName="ConcatInsurancePolicy"
+                                                ValueFieldName="InsurancePolicyId"
+                                                Data="@Temps"
+                                                @bind-Value="@FormRegis.InsurancePolicyId"
+                                                NullText="Select Insurance ..">
+                                            </DxComboBox >
+                                            <ValidationMessage For="@(() => FormRegis.InsurancePolicyId)" />
+                                        </DxFormLayoutItem>
+                                    }
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
-                                        <DxDateEdit  @bind-Date="@RegistrationDate" Mask="@DateTimeMask.ShortDate" NullText="Select Registration Date" />
+                                       <DxComboBox
+                                                        Data="@RegisType"
+                                                        NullText="Select Registration..."
+                                                        AllowUserInput="true"
+                                                        ShowValidationIcon="true"
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                        SelectedItemChanged="@((string city) => SelectedItemChanged(city))"
+                                                        @bind-Value="@FormRegis.TypeRegistration">
+                                       </DxComboBox>
                                     </DxFormLayoutItem>
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Schedule Time" ColSpanMd="12">
                                         <DxComboBox ShowValidationIcon="true" Data="@Times"

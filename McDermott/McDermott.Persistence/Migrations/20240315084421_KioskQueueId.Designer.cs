@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240315084421_KioskQueueId")]
+    partial class KioskQueueId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1084,9 +1087,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool>("IsSickLeave")
                         .HasColumnType("bit");
 
-                    b.Property<long?>("KioskQueueId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Method")
                         .HasColumnType("nvarchar(max)");
 
@@ -1142,8 +1142,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("InsuranceId");
 
                     b.HasIndex("InsurancePolicyId");
-
-                    b.HasIndex("KioskQueueId");
 
                     b.HasIndex("PatientId");
 
@@ -2810,11 +2808,6 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("InsurancePolicyId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.KioskQueue", "KioskQueue")
-                        .WithMany()
-                        .HasForeignKey("KioskQueueId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.User", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
@@ -2835,8 +2828,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Insurance");
 
                     b.Navigation("InsurancePolicy");
-
-                    b.Navigation("KioskQueue");
 
                     b.Navigation("Patient");
 

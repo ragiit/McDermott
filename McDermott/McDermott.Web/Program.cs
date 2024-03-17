@@ -2,8 +2,9 @@ using McDermott.Application.Extentions;
 using McDermott.Persistence.Extensions;
 using McDermott.Web.Components;
 using Serilog;
-using Microsoft.AspNetCore.ResponseCompression;
 using McDermott.Web.Hubs;
+
+DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,6 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplicationLayer();
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
-DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredToast();
@@ -37,6 +37,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 app.UseSerilogRequestLogging();
 app.UseRouting();
 app.UseHttpsRedirection();
@@ -44,10 +45,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-
-
 app.MapHub<RealTimeHub>("/realTimeHub");
-
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 

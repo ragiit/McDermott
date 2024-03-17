@@ -173,7 +173,7 @@ namespace McDermott.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                LogError(nameof(DeleteAsync), ex.Message);
+                LogError(nameof(DeleteAsync), ex.Message, ex);
             }
         }
 
@@ -184,24 +184,30 @@ namespace McDermott.Persistence.Repositories
                 var entity = await _dbContext.Set<T>()
                                         .Where(predicate)
                                         .ToListAsync();
-                if (entity != null)
-                {
+                if (entity is not null)
                     _dbContext.Set<T>().RemoveRange(entity);
-                    await _dbContext.SaveChangesAsync();
-                }
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
-                LogError(nameof(DeleteAsync), ex.Message);
+                LogError(nameof(DeleteAsync), ex.Message, ex);
             }
         }
 
         public async Task DeleteAsync(List<long> ids)
         {
-            foreach (var id in ids)
+            try
             {
-                var entity = await _dbContext.Set<T>().FindAsync(id);
-                _dbContext.Set<T>().Remove(entity!);
+                foreach (var id in ids)
+                {
+                    var entity = await _dbContext.Set<T>().FindAsync(id);
+
+                    if (entity is not null)
+                        _dbContext.Set<T>().Remove(entity!);
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                LogError(nameof(DeleteAsync), ex.Message, ex);
             }
         }
 
@@ -223,9 +229,13 @@ namespace McDermott.Persistence.Repositories
             //Log.Information(method + " => {@result}", result);
         }
 
-        public void LogError(dynamic method, dynamic result)
+        public void LogError(dynamic method, dynamic result, Exception? ex = null)
         {
-            Log.Error(method + "ERROR => {@result}", result);
+            //Log.Error(ex, method + " {Handler} => {@Result}", method, ex);
+
+            Log.Error(method + "ERROR => {@result}", ex);
+            Log.Error("Ngeteh Njay", "Unhandled Exception occurred Halo");
+
         }
 
         public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
@@ -269,7 +279,7 @@ namespace McDermott.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                LogError(nameof(GetAsync), ex.Message);
+                LogError(nameof(GetAsync), ex.Message, ex);
                 throw;
             }
         }
@@ -286,7 +296,7 @@ namespace McDermott.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                LogError(nameof(GetAsync), ex.Message);
+                LogError(nameof(GetAsync), ex.Message, ex);
                 return default(T);
             }
         }

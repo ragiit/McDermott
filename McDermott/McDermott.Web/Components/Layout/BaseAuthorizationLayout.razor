@@ -60,7 +60,7 @@
         }
         catch (JSDisconnectedException ex)
         {
-            // Ignore
+            ex.HandleException(ToastService);
         }
     }
 
@@ -72,7 +72,7 @@
         }
         catch (JSDisconnectedException ex)
         {
-            // Ignore
+            ex.HandleException(ToastService);
         }
     }
 }

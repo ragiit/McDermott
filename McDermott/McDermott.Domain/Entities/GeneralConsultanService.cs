@@ -8,6 +8,7 @@
         public long? ServiceId { get; set; }
         public long? PratitionerId { get; set; }
         public long? ClassTypeId { get; set; }
+        public long? KioskQueueId { get; set; }
         public string? StagingStatus { get; set; }
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }
@@ -50,5 +51,7 @@
         public virtual List<GeneralConsultantClinicalAssesment>? GeneralConsultantClinicalAssesments { get; set; }
         [SetToNull]
         public virtual ClassType? ClassType { get; set; }
+        [SetToNull]
+        public virtual KioskQueue? KioskQueue { get; set; }
     }
 }

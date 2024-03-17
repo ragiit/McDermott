@@ -1,6 +1,4 @@
-﻿using OfficeOpenXml;
-
-namespace McDermott.Web.Components.Pages.Patient
+﻿namespace McDermott.Web.Components.Pages.Patient
 {
     public partial class InsurancePolicyPage
     {

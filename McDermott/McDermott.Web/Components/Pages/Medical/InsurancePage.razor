@@ -20,7 +20,7 @@
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
 
-                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox" 
+                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                         Data="Insurances"
                                         PageSize="10"
                                         @bind-SelectedDataItems="@SelectedDataItems"
@@ -109,7 +109,7 @@
                                                               Caption="BPJS" ColSpanMd="3">
                                                 <DxCheckBox @bind-Checked="a.IsBPJS" />
                                             </DxFormLayoutItem>
-                                        </DxFormLayout> 
+                                        </DxFormLayout>
                                     </EditFormTemplate>
                                 </DxGrid>
                             </DxLoadingPanel>

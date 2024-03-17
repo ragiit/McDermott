@@ -2,7 +2,6 @@
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using System.Reflection;
 
 namespace McDermott.Persistence.Context
@@ -347,8 +346,11 @@ namespace McDermott.Persistence.Context
             }
             catch (Exception e)
             {
-                Log.Error("Message: An error occurred while saving data: " + e.Message + "\n" + "Inner Message: An error occurred while saving data: " + e.InnerException?.Message);
-
+                //Log.Error(
+                //    "Message: An error occurred while saving data: " + e.Message + "\n" +
+                //    "Inner Message: An error occurred while saving data: " + e.InnerException?.Message + "\n" +
+                //    "Stack Trace: " + e.StackTrace);
+                //Log.Error(e, "Unhandled Exception occurred Halo");
                 throw;
             }
         }

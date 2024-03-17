@@ -33,6 +33,7 @@
             {
                 return await _unitOfWork.Repository<GroupMenu>().Entities
                      .Include(x => x.Menu)
+                     .Include(x => x.Group)
                      .Where(x => x.GroupId == request.GroupId)
                      .Select(x => x.Adapt<GroupMenuDto>())
                      .ToListAsync(cancellationToken);

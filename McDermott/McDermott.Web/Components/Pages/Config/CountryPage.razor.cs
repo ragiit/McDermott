@@ -1,24 +1,17 @@
-﻿using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.SignalR.Client;
-using NuGet.Packaging.Signing;
-using OfficeOpenXml;
-
-namespace McDermott.Web.Components.Pages.Config
+﻿namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CountryPage
     {
         private List<CountryDto> Countries = [];
-        private List<CountryDto> Countriest = [];
-        private List<CountryDto> Countriestk = [];
-        private HubConnection hubConnection;
         private GroupMenuDto UserAccessCRUID = new();
 
         private bool IsAccess = false;
+        private Timer _timer;
         private bool PanelVisible { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
 
         public IGrid Grid { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         protected override async Task OnInitializedAsync()
         {
@@ -36,7 +29,14 @@ namespace McDermott.Web.Components.Pages.Config
             }
             catch { }
 
-            await LoadData();
+            try
+            {
+                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -57,11 +57,29 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData()
         {
-            PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Countries = await Mediator.Send(new GetCountryQuery());
-            Countriestk = Countriest.ToList();
-            PanelVisible = false;
+            // Menggunakan InvokeAsync untuk memastikan manipulasi UI dilakukan di thread utama
+            await InvokeAsync(() =>
+                PanelVisible = true // Jika diperlukan, panel diperlihatkan di sini
+            );
+
+            // Memuat data
+            try
+            {
+                Countries = await Mediator.Send(new GetCountryQuery());
+            }
+            catch { }
+
+            // Refresh UI setelah memuat data selesai
+            await InvokeAsync(() =>
+            {
+                PanelVisible = false; // Jika diperlukan, panel disembunyikan di sini
+                StateHasChanged(); // Memastikan bahwa perubahan UI diterapkan
+            });
+        }
+
+        public void Dispose()
+        {
+            _timer.Dispose();
         }
 
         #region Grid
@@ -111,6 +129,7 @@ namespace McDermott.Web.Components.Pages.Config
                     await Mediator.Send(new CreateListCountryRequest(countries));
 
                     await LoadData();
+                    SelectedDataItems = [];
                 }
                 catch { }
             }
@@ -226,11 +245,6 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 e.CssClass = "alt-item";
             }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -298,8 +312,9 @@ namespace McDermott.Web.Components.Pages.Config
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<CountryDto>>();
-                    await Mediator.Send(new DeleteListCountryRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteCountryRequest(ids: a.Select(x => x.Id).ToList()));
                 }
+                SelectedDataItems = [];
                 await LoadData();
             }
             catch (Exception ex)
@@ -323,6 +338,7 @@ namespace McDermott.Web.Components.Pages.Config
                     await Mediator.Send(new UpdateCountryRequest(editModel));
 
                 //await hubConnection.SendAsync("SendCountry", editModel);
+                SelectedDataItems = [];
                 await LoadData();
             }
             catch (Exception ex)

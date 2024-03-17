@@ -1,10 +1,7 @@
 ﻿using McDermott.Application.Dtos.Queue;
-using McDermott.Domain.Entities;
-using System;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.DetailQueueDisplayCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
-using static McDermott.Application.Features.Commands.Queue.QueueDisplayCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
 {
@@ -36,6 +33,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private KioskQueueDto? Queuek { get; set; }
         private Timer timer;
         private int _counter;
+
         #endregion static Variable
 
         private CultureInfo indonesianCulture = new CultureInfo("id-ID");
@@ -81,7 +79,6 @@ namespace McDermott.Web.Components.Pages.Queue
             await LoadData();
 
             timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
         }
 
         private async Task LoadData()

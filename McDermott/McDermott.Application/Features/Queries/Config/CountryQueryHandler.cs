@@ -2,121 +2,150 @@
 
 namespace McDermott.Application.Features.Queries.Config
 {
-    public class CountryQueryHandler
+    public class CountryQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetCountryQuery, List<CountryDto>>,
+        IRequestHandler<CreateCountryRequest, CountryDto>,
+        IRequestHandler<CreateListCountryRequest, List<CountryDto>>,
+        IRequestHandler<UpdateCountryRequest, CountryDto>,
+        IRequestHandler<UpdateListCountryRequest, List<CountryDto>>,
+        IRequestHandler<DeleteCountryRequest, bool>
     {
-        internal class GetAllCountryQueryHandler : IRequestHandler<GetCountryQuery, List<CountryDto>>
+
+        #region GET
+        public async Task<List<CountryDto>> Handle(GetCountryQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllCountryQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetCountryQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Country>? result))
+                {
+                    result = await _unitOfWork.Repository<Country>().GetAsync(
+                        null,
+                        cancellationToken: cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<CountryDto>>();
             }
-
-            public async Task<List<CountryDto>> Handle(GetCountryQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                //return await _unitOfWork.Repository<Country>().Entities
-                //        .Select(country => country.Adapt<CountryDto>())
-                //        .AsNoTracking()
-                //        .ToListAsync(cancellationToken);
-
-                var result = await _unitOfWork.Repository<Country>().GetAllAsync();
-
-                return result.Adapt<List<CountryDto>>();
+                throw;
             }
         }
+        #endregion
 
-        internal class GetCountryByIdQueryHandler : IRequestHandler<GetCountryByIdQuery, CountryDto>
+        #region CREATE
+        public async Task<CountryDto> Handle(CreateCountryRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetCountryByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<CountryDto> Handle(GetCountryByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Country>().GetByIdAsync(request.Id);
-
-                return result.Adapt<CountryDto>();
-            }
-        }
-
-        internal class CreateCountryHandler : IRequestHandler<CreateCountryRequest, CountryDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateCountryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<CountryDto> Handle(CreateCountryRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Country>().AddAsync(request.CountryDto.Adapt<Country>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetCountryQuery_"); // Ganti dengan key yang sesuai 
+
                 return result.Adapt<CountryDto>();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-        internal class CreateListCountryRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateListCountryRequest, List<CountryDto>>
+        public async Task<List<CountryDto>> Handle(CreateListCountryRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<List<CountryDto>> Handle(CreateListCountryRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Country>().AddAsync(request.CountryDtos.Adapt<List<Country>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetCountryQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<List<CountryDto>>();
             }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        #endregion
+
+        #region UPDATE
+        public async Task<CountryDto> Handle(UpdateCountryRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Country>().UpdateAsync(request.CountryDto.Adapt<Country>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetCountryQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<CountryDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateCountryHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateCountryRequest, bool>
+        public async Task<List<CountryDto>> Handle(UpdateListCountryRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<bool> Handle(UpdateCountryRequest request, CancellationToken cancellationToken)
+            try
             {
-                await _unitOfWork.Repository<Country>().UpdateAsync(request.CountryDto.Adapt<Country>());
+                var result = await _unitOfWork.Repository<Country>().UpdateAsync(request.CountryDtos.Adapt<List<Country>>());
+
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetCountryQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<CountryDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        #endregion
+
+        #region DELETE
+        public async Task<bool> Handle(DeleteCountryRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<Country>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<Country>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetCountryQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteCountryHandler : IRequestHandler<DeleteCountryRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteCountryHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteCountryRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Country>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
-
-        internal class DeleteListCountryHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteListCountryRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<bool> Handle(DeleteListCountryRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Country>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-                return true;
-            }
-        }
+        #endregion
     }
 }

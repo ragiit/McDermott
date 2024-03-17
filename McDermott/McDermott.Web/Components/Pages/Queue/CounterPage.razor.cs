@@ -71,7 +71,6 @@ namespace McDermott.Web.Components.Pages.Queue
                 //get Service Flag P
                 ServiceP = Services.Where(x => x.ServicedId == value && x.IsPatient == true).ToList();
 
-                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
             }
         }
 
@@ -98,7 +97,6 @@ namespace McDermott.Web.Components.Pages.Queue
                     }
                 }
 
-                //var schedules = await Mediator.Send(new GetDoctorScheduleQuery());
             }
         }
 
@@ -148,6 +146,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 var result = await NavigationManager.CheckAccessUser(oLocal);
                 IsAccess = result.Item1;
                 UserAccessCRUID = result.Item2;
+                
             }
             catch { }
             //var by =
@@ -169,7 +168,7 @@ namespace McDermott.Web.Components.Pages.Queue
             Physicians = [.. Physician.Where(x => x.IsPhysicion == true)];
             countersActive = [.. counters.Where(x => x.IsActive == true)];
             countersInActive = [.. counters.Where(x => x.IsActive == false)];
-
+            var us = UserAccessCRUID.Group.Name;
             //CountCard = [.. counters.Select(x => x.Name);
             PanelVisible = false;
         }
