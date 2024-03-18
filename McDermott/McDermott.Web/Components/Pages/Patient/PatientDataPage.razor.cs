@@ -118,7 +118,7 @@
 
         #endregion MaskedInput
 
-      
+
         void CheckedChanged(bool value)
         {
             //UserForm.Name
@@ -290,6 +290,7 @@
         {
             try
             {
+                UserDto result=new();
                 if (!FormValidationState)
                     return;
 
@@ -307,16 +308,59 @@
                     UserForm.DomicileCountryId = UserForm.IdCardCountryId;
                 }
 
+
+
                 if (UserForm.Id == 0)
                 {
                     var date = DateTime.Now;
                     var lastId = Users.ToList().LastOrDefault();
 
+
                     UserForm.NoRm = lastId is null
                              ? $"{date:dd-MM-yyyy}-0001"
                              : $"{date:dd-MM-yyyy}-{(long.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
+                    if (UserForm.IsEmployeeRelation == true)
+                    {
+                        var checkName = Users.Where(x => x.Name.Contains("%" + UserForm.Name + "%")).FirstOrDefault();
+                        if (checkName != null)
+                        {
+                            UserForm.IsEmployee = true;
+                            await Mediator.Send(new UpdateUserRequest(UserForm));
 
-                    var result = await Mediator.Send(new CreateUserRequest(UserForm));
+                            UserForm.PatientAllergy.UserId = checkName.Id;
+                            if (UserForm.PatientAllergy.Id == 0)
+                                await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
+                            else
+                                await Mediator.Send(new UpdatePatientAllergyRequest(UserForm.PatientAllergy));
+
+                            await Mediator.Send(new DeletePatientFamilyRelationRequest(ids: AllPatientFamilyRelations.Select(x => x.Id).ToList()));
+
+                            PatientFamilyRelations.ForEach(x => { x.PatientId = UserForm.Id; x.Id = 0; });
+                            var temp = new List<PatientFamilyRelationDto>();
+                            PatientFamilyRelations.ForEach(x =>
+                            {
+                                temp.Add(new PatientFamilyRelationDto
+                                {
+                                    PatientId = x.FamilyMemberId.GetValueOrDefault(),
+                                    FamilyMemberId = x.PatientId,
+                                    FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation)!.Id
+                                });
+                            });
+
+                            PatientFamilyRelations.AddRange(temp);
+                            await Mediator.Send(new CreateListPatientFamilyRelationRequest(PatientFamilyRelations));
+                        }
+                        else
+                        {
+                            result = await Mediator.Send(new CreateUserRequest(UserForm));
+                        }
+                    }
+                    else
+                    {
+                        result = await Mediator.Send(new CreateUserRequest(UserForm));
+
+                    }
+
                     UserForm.PatientAllergy.UserId = result.Id;
 
                     await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
