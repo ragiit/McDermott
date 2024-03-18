@@ -168,7 +168,7 @@ namespace McDermott.Web.Components.Pages.Queue
             Physicians = [.. Physician.Where(x => x.IsPhysicion == true)];
             countersActive = [.. counters.Where(x => x.IsActive == true)];
             countersInActive = [.. counters.Where(x => x.IsActive == false)];
-            var us = UserAccessCRUID.Group.Name;
+            var bse = UserAccessCRUID.GroupId;
             //CountCard = [.. counters.Select(x => x.Name);
             PanelVisible = false;
         }

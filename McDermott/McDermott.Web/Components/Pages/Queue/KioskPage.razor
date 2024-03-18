@@ -1,9 +1,10 @@
 ﻿@page "/queue/kiosk/{Id:long}"
 @page "/queue/kiosk"
 @rendermode InteractiveServer
+@inject NavigationManager NavigationManager
 
-<PageTitle>McDermott - Transaction Kiosk</PageTitle>
-@if (IsAccess)
+<PageTitle>McHealthCare - Queue Kiosk</PageTitle>
+ @if (IsAccess)
 {
     @if (Id != 0)
     {
@@ -21,7 +22,7 @@
                             <div class="row justify-content-center">
                                 <div class="col-md-8">
                                     <div class="card mt-5">
-                                        <div class="card-header">
+                                        <div class="card-header bg-primary">
                                             <div class="row justify-content-center">
                                                 <div class="col-auto align-self-center">
                                                     <h4 class="fw-bold">@HeaderName.ToUpper()</h4>
@@ -53,7 +54,7 @@
                                                                     </DxGridLayoutItem>
                                                                     <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
                                                                         <Template>
-                                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search" SubmitFormOnClick="true" Click="OnSearch"></DxButton>
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search" SubmitFormOnClick="true" Click="OnSearch"></DxButton>
                                                                         </Template>
                                                                     </DxGridLayoutItem>
                                                                 </Items>
@@ -124,6 +125,7 @@
                                                         {
                                                             <DxFormLayoutItem ColSpanMd="12">
                                                                 <p class="text-center"> Data Not Found...</p>
+                                                                <h5 class="text-center fw-bold">Please Register Through The Nurse!</h5>
                                                             </DxFormLayoutItem>
                                                         }
                                                     }
@@ -137,7 +139,7 @@
                                                 <div class="card-footer">
                                                     <div class="row  justify-content-end">
                                                         <div class="col-auto align-self-end">
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true" Click="OnSave"></DxButton>
                                                             <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
                                                         </div>
                                                     </div>
@@ -214,4 +216,5 @@
 
         }
     }
-}
+} 
+

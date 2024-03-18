@@ -50,11 +50,17 @@
     }
     else
     {
-
         @if (currentUrl.Contains("queue/kiosk/"))
         {
             @*    ToastService.ShowInfo(currentUrl);*@
-            <McDermott.Web.Components.Pages.Queue.KioskPage></McDermott.Web.Components.Pages.Queue.KioskPage>
+            @if (User == null)
+            {
+                <McDermott.Web.Components.Pages.LoginPage />
+            }
+            else @if (!currentUrl.Contains("login"))
+            {
+                <McDermott.Web.Components.Pages.Queue.KioskPage></McDermott.Web.Components.Pages.Queue.KioskPage>
+            }
         }
         else
         {
@@ -81,14 +87,14 @@
                             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                         </li>
                         <li class="nav-item d-none d-sm-inline-block">
-                            <a href="" class="nav-link" >Home</a>
+                            <a href="" class="nav-link">Home</a>
                         </li>
-                        
-                        @if (currentUrl.Contains("clinic-service/reporting-&-analytic") )
+
+                        @if (currentUrl.Contains("clinic-service/reporting-&-analytic"))
                         {
                             <li class="nav-item d-none d-sm-inline-block">
                                 <a href="https://www.mcdermott.com/" class="nav-link">Report</a>
-                            </li>                            
+                            </li>
                         }
                     </ul>
 
@@ -247,23 +253,19 @@
 
                                         @foreach (var d in DetailMenuDtos.Where(x => x.ParentMenu == h.Name))
                                         {
-                                            var url = string.IsNullOrEmpty(d.Url) ? "test" : d.Url;
-                                            <ul class="nav nav-treeview">
-                                                <li class="nav-item">
-                                                    <NavLink href="@url" class="nav-link">
-                                                        <i class="far fa-circle nav-icon"></i>
-                                                        @*    @if (!string.IsNullOrWhiteSpace(d.Icon))
-                                    {
-                                    @((MarkupString)d.Icon)
-                                    }
-                                    else
-                                    {
+                                            if (!d.Name.Contains("kiosk"))
+                                            {
 
-                                    } *@
-                                                        <p class="ml-3">@d.Name</p>
-                                                    </NavLink>
-                                                </li>
-                                            </ul>
+                                                var url = string.IsNullOrEmpty(d.Url) ? "test" : d.Url;
+                                                <ul class="nav nav-treeview">
+                                                    <li class="nav-item">
+                                                        <NavLink href="@url" class="nav-link">
+                                                            <i class="far fa-circle nav-icon"></i>
+                                                            <p class="ml-3">@d.Name</p>
+                                                        </NavLink>
+                                                    </li>
+                                                </ul>
+                                            }
                                         }
                                     </li>
                                 }

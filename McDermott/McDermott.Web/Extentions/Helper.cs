@@ -135,13 +135,21 @@ namespace McDermott.Web.Extentions
 
                 var menus = JsonConvert.DeserializeObject<List<GroupMenuDto>>(menu);
                 var url = NavigationManager.Uri;
+                var baseUrl = NavigationManager.BaseUri;
+
+                Uri uri = new Uri(url);
+
+                // Dapatkan bagian yang Anda butuhkan (tanpa bagian terakhir yang menyatakan id)
+                string basUrl = uri.GetLeftPart(UriPartial.Path);
 
                 var z = menus?.Where(x => x.Menu.Url != null && x.Menu.Url.Contains(url.Replace(NavigationManager.BaseUri, ""))).FirstOrDefault();
-
-                if (z is null && url != NavigationManager.BaseUri)
+                if (url != baseUrl + "queue/kiosk/2")
                 {
-                    NavigationManager.NavigateTo("", true);
-                    return (false, new());
+                    if (z is null && url != NavigationManager.BaseUri)
+                    {
+                        NavigationManager.NavigateTo("", true);
+                        return (false, new());
+                    }
                 }
 
                 return (true, z!);

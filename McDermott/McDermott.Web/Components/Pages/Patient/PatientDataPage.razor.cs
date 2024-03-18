@@ -39,6 +39,8 @@
         public IGrid GridFamilyRelation { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private IReadOnlyList<object> SelectedDataFamilyRelationItems { get; set; } = new ObservableRangeCollection<object>();
+        enum Opinion { Yes, No, Abstain }
+        Opinion Value = Opinion.Abstain;
 
         private List<string> IdentityTypes = new()
         {
@@ -116,6 +118,11 @@
 
         #endregion MaskedInput
 
+      
+        void CheckedChanged(bool value)
+        {
+            //UserForm.Name
+        }
         private async Task LoadData()
         {
             PanelVisible = true;

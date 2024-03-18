@@ -33,10 +33,8 @@ namespace McDermott.Web.Components.Pages.Queue
         private string textPopUp = "";
         private string HeaderName { get; set; } = string.Empty;
         public IGrid Grid { get; set; }
-        private long ActiveTabIndex { get; set; } = 1;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
-        private bool EditItemsEnabled { get; set; }
         //private GroupMenuDto UserAccessCRUID = new();
 
         #endregion setings Grid
@@ -54,17 +52,18 @@ namespace McDermott.Web.Components.Pages.Queue
             "Legacy",
             "NIK"
         };
-
+        private IEnumerable<ServiceDto> SelectedServices = [];
         private KioskDto FormKios = new();
         private KioskQueueDto FormQueue = new();
+        private Group? group;
         private GeneralConsultanServiceDto FormGeneral= new();
         private string? NamePatient { get; set; } = string.Empty;
         private string? statBPJS { get; set; } = string.Empty;
+        private string Bpjs { get; set; } = string.Empty;
         private long? CountServiceId { get; set; }
         private long _ServiceId { get; set; }
         private bool showQueue { get; set; } = false;
-        private string Bpjs { get; set; } = string.Empty;
-        private IEnumerable<ServiceDto> SelectedServices = [];
+       
         #endregion Data Static And Variable Additional
 
         #region Async Data And Auth
@@ -75,10 +74,8 @@ namespace McDermott.Web.Components.Pages.Queue
             set
             {
                 _ServiceId = value;
-                LoadPhysicians(value);
-               
-                showPhysician = true;
-               
+                LoadPhysicians(value);               
+                showPhysician = true;               
             }
         }
 
@@ -108,6 +105,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
             if (firstRender)
             {
+
                 try
                 {
                     var result = await NavigationManager.CheckAccessUser(oLocal);
@@ -118,30 +116,46 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        private void ReloadPage()
-        {
-            NavigationManager.NavigateTo(NavigationManager.Uri, true);
-        }
-
         protected override async Task OnInitializedAsync()
         {
+            Id = $"{NavigationManager.Uri.Replace(NavigationManager.BaseUri + "queue/kiosk/", "")}".ToInt32();
             try
             {
                 var result = await NavigationManager.CheckAccessUser(oLocal);
                 IsAccess = result.Item1;
                 UserAccessCRUID = result.Item2;
+
             }
             catch { }
-            Kiosks = await Mediator.Send(new GetKioskQuery());
+            //var by =
 
-            Id = $"{NavigationManager.Uri.Replace(NavigationManager.BaseUri + "queue/kiosk/", "")}".ToInt32();
             await LoadData();
-            foreach (var i in KioskConf)
-            {
-                HeaderName = i.Name;
-                break;
-            }
         }
+
+        private void ReloadPage()
+        {
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
+        }
+
+        //protected override async Task OnInitializedAsync()
+        //{
+        //    try
+        //    {
+        //        var result = await NavigationManager.CheckAccessUser(oLocal);
+        //        IsAccess = result.Item1;
+        //        UserAccessCRUID = result.Item2;
+        //    }
+        //    catch { }
+        //    Kiosks = await Mediator.Send(new GetKioskQuery());
+
+        //    Id = $"{NavigationManager.Uri.Replace(NavigationManager.BaseUri + "queue/kiosk/", "")}".ToInt32();
+        //    await LoadData();
+        //    foreach (var i in KioskConf)
+        //    {
+        //        HeaderName = i.Name;
+        //        break;
+        //    }
+        //}
 
         protected override async Task OnParametersSetAsync()
         {
@@ -153,6 +167,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task LoadData()
         {
+            
             PanelVisible = true;
             StateHasChanged();
             showForm = false;
@@ -164,6 +179,7 @@ namespace McDermott.Web.Components.Pages.Queue
             Services = await Mediator.Send(new GetServiceQuery());
             var kconfig = await Mediator.Send(new GetKioskConfigQuery());
             KioskConf = kconfig.Where(x => x.Id == Id).ToList();
+            //var bse = UserAccessCRUID.GroupId;
             PanelVisible = false;
         }
 
@@ -189,15 +205,15 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
-        }
+        //private void UpdateEditItemsEnabled(bool enabled)
+        //{
+        //    EditItemsEnabled = enabled;
+        //}
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
+            //UpdateEditItemsEnabled(true);
         }
 
         #endregion Config Grid
@@ -413,6 +429,12 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormGeneral.PatientId = FormKios.PatientId;
                     FormGeneral.ServiceId = FormKios.ServiceId;
                     FormGeneral.KioskQueueId = QueueKioskId.Id;
+                    FormGeneral.RegistrationDate = DateTime.Now;
+                    if(checkId.PhysicianId != null)
+                    {
+                        FormGeneral.PratitionerId = FormKios.PhysicianId;
+
+                    }
                     await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormGeneral));
                 }
                 else
