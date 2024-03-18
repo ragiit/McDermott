@@ -314,6 +314,7 @@ namespace McDermott.Web.Components.Pages.Config
                         var all = GroupMenus.FirstOrDefault(x => x.Menu.Name is "All");
                         request.Add(new GroupMenuDto
                         {
+                            Id = 0,
                             MenuId = z.Id,
                             GroupId = group[0].Id,
                             Create = all.Create,
@@ -335,6 +336,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 GroupMenus.ForEach(x =>
                 {
+                    x.Id = 0;
                     x.GroupId = group[0].Id;
                 });
 
@@ -349,6 +351,7 @@ namespace McDermott.Web.Components.Pages.Config
                         {
                             GroupMenus.Add(new GroupMenuDto
                             {
+                                Id = 0,
                                 GroupId = group[0].Id,
                                 MenuId = cekP.Id,
                                 Menu = cekP
@@ -376,6 +379,7 @@ namespace McDermott.Web.Components.Pages.Config
                         var all = GroupMenus.FirstOrDefault(x => x.Menu.Name is "All");
                         request.Add(new GroupMenuDto
                         {
+                            Id = 0,
                             MenuId = z.Id,
                             GroupId = group[0].Id,
                             Create = all.Create,
@@ -399,6 +403,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 GroupMenus.ForEach(x =>
                 {
+                    x.Id = 0;
                     x.GroupId = group[0].Id;
                 });
 
@@ -413,6 +418,7 @@ namespace McDermott.Web.Components.Pages.Config
                         {
                             GroupMenus.Add(new GroupMenuDto
                             {
+                                Id = 0,
                                 GroupId = group[0].Id,
                                 MenuId = cekP.Id,
                                 Menu = cekP
