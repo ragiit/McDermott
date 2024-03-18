@@ -2,7 +2,55 @@
 {
     public partial class VillagePage
     {
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
         private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    await GetUserInfo();
+                }
+                catch { }
+
+                try
+                {
+                    if (Grid is not null)
+                    {
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(1);
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(2);
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
         public IGrid Grid { get; set; }
         private List<ProvinceDto> Provinces = new();
         private List<DistrictDto> Districts = new();
@@ -17,53 +65,17 @@
 
         protected override async Task OnInitializedAsync()
         {
-            PanelVisible = true;
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
-
             Countrys = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Districts = await Mediator.Send(new GetDistrictQuery());
             Cities = await Mediator.Send(new GetCityQuery());
+
+            await GetUserInfo();
             await LoadData();
         }
 
-        private bool IsAccess = false;
         private bool EditItemsEnabled;
         private bool PanelVisible { get; set; } = true;
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    if (Grid is not null)
-                    {
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(1);
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(2);
-                    }
-                }
-                catch { }
-
-                try
-                {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
-                }
-                catch { }
-            }
-        }
 
         private async Task LoadData()
         {

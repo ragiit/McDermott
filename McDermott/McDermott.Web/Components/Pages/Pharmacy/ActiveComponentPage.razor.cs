@@ -4,6 +4,7 @@
     {
         private List<ActiveComponentDto> ActiveComponent = [];
         private GroupMenuDto UserAccessCRUID = new();
+        private bool IsAccess = false;
 
         public class ActiveComponentDto
         {
@@ -11,7 +12,6 @@
             public string Name { get; set; }
         }
 
-        private bool IsAccess = false;
         private bool PanelVisible { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
 

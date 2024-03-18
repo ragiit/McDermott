@@ -19,6 +19,7 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredToast();
 builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
+builder.Services.AddScoped<UserInfoService>();
 
 builder.Services.AddPersistenceLayer(builder.Configuration);
 

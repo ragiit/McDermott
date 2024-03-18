@@ -20,11 +20,46 @@
         private List<InsurancePolicyDto> InsurancePolicies = [];
 
         private UserDto UserForm = new();
+
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
         private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    await GetUserInfo();
+                }
+                catch { }
+            }
+        }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
 
         private bool PanelVisible = false;
         private bool FormValidationState = true;
-        private bool IsAccess = false;
         private bool ShowForm { get; set; } = false;
         private bool IsDeleted { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
@@ -62,14 +97,6 @@
         {
             PanelVisible = true;
 
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
-
             Countries = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Cities = await Mediator.Send(new GetCityQuery());
@@ -81,6 +108,7 @@
             JobPositions = await Mediator.Send(new GetJobPositionQuery());
             Families = await Mediator.Send(new GetFamilyQuery());
 
+            await GetUserInfo();
             await LoadData();
 
             return;
@@ -138,22 +166,6 @@
             Patiens = Users.Where(x => x.IsPatient == true).ToList();
 
             PanelVisible = false;
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
-                }
-                catch { }
-            }
         }
 
         public string Alert { get; set; } = "";

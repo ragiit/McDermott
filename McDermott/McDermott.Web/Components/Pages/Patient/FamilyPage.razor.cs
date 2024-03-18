@@ -4,6 +4,43 @@
     {
         private bool PanelVisible { get; set; } = true;
 
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    await GetUserInfo();
+                }
+                catch { }
+            }
+        }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
         public IGrid Grid { get; set; }
         private List<FamilyDto> Familys = new();
         private List<FamilyDto> relations = new();
@@ -17,6 +54,7 @@
 
         protected override async Task OnInitializedAsync()
         {
+            await GetUserInfo();
             await LoadData();
         }
 

@@ -4,6 +4,7 @@ namespace McDermott.Application.Features.Queries.Config
 {
     public class UserQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetUserQuery, List<UserDto>>,
+        IRequestHandler<GetUserInfoGroupQuery, List<UserDto>>,
         IRequestHandler<GetDataUserForKioskQuery, List<UserDto>>,
         IRequestHandler<CreateUserRequest, UserDto>,
         IRequestHandler<UpdateUserRequest, UserDto>,
@@ -11,6 +12,34 @@ namespace McDermott.Application.Features.Queries.Config
     {
 
         #region Get  
+
+        public async Task<List<UserDto>> Handle(GetUserInfoGroupQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                string cacheKey = $"GetUserQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                if (!_cache.TryGetValue(cacheKey, out List<User>? result))
+                {
+                    result = await _unitOfWork.Repository<User>().GetAsync(
+                        null,
+                        includes: x => x.Include(z => z.Group),
+                        cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<UserDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<List<UserDto>> Handle(GetUserQuery request, CancellationToken cancellationToken)
         {
             try

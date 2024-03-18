@@ -17,7 +17,6 @@ global using Microsoft.AspNetCore.Components.Forms;
 global using Microsoft.CodeAnalysis;
 global using System.Globalization;
 global using Microsoft.AspNetCore.SignalR.Client;
-global using System.Numerics;
 
 global using McDermott.Web.Extentions;
 
@@ -63,6 +62,6 @@ global using static McDermott.Application.Features.Commands.Patient.InsurancePol
 global using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 global using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 global using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;
+global using static McDermott.Application.Features.Commands.Config.GroupMenuCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanCPPTCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanMedicalSupportCommand;
-global using static McDermott.Application.Features.Queries.Transaction.GeneralConsultanServiceQueryHandler;

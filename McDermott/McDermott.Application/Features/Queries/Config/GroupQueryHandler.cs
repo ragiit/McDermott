@@ -1,272 +1,152 @@
-﻿namespace McDermott.Application.Features.Queries.Config
+﻿
+
+namespace McDermott.Application.Features.Queries.Config
 {
-    public class GroupQueryHandler
+    public class GroupQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetGroupQuery, List<GroupDto>>,
+        IRequestHandler<CreateGroupRequest, GroupDto>,
+        IRequestHandler<CreateListGroupRequest, List<GroupDto>>,
+        IRequestHandler<UpdateGroupRequest, GroupDto>,
+        IRequestHandler<UpdateListGroupRequest, List<GroupDto>>,
+        IRequestHandler<DeleteGroupRequest, bool>
     {
-        internal class GetAllGroupQueryHandler : IRequestHandler<GetGroupQuery, List<GroupDto>>
+
+        #region GET
+        public async Task<List<GroupDto>> Handle(GetGroupQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllGroupQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                string cacheKey = $"GetGroupQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
 
-            public async Task<List<GroupDto>> Handle(GetGroupQuery query, CancellationToken cancellationToken)
-            {
-                return await _unitOfWork.Repository<Group>().Entities
-                        .Select(Group => Group.Adapt<GroupDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
-            }
-        }
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
 
-        internal class GetGroupMenusByGroupIdQuery : IRequestHandler<GetGroupMenuByGroupIdRequest, List<GroupMenuDto>>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetGroupMenusByGroupIdQuery(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<List<GroupMenuDto>> Handle(GetGroupMenuByGroupIdRequest request, CancellationToken cancellationToken)
-            {
-                return await _unitOfWork.Repository<GroupMenu>().Entities
-                     .Include(x => x.Menu)
-                     .Where(x => x.GroupId == request.GroupId)
-                     .Select(x => x.Adapt<GroupMenuDto>())
-                     .ToListAsync(cancellationToken);
-            }
-        }
-
-        internal class GetGroupByNameQueryHandler : IRequestHandler<GetGroupByNameQuery, GroupDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetGroupByNameQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<GroupDto> Handle(GetGroupByNameQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Group>().Entities.Where(x => x.Name == request.Name).AsNoTracking().FirstOrDefaultAsync();
-
-                return result.Adapt<GroupDto>();
-            }
-        }
-
-        internal class UpdateGroupMenuHandler : IRequestHandler<UpdateGroupMenuRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateGroupMenuHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(UpdateGroupMenuRequest request, CancellationToken cancellationToken)
-            {
-                foreach (var item in request._ids)
+                if (!_cache.TryGetValue(cacheKey, out List<Group>? result))
                 {
-                    await _unitOfWork.Repository<GroupMenu>().DeleteAsync(item);
+                    result = await _unitOfWork.Repository<Group>().GetAsync(
+                        null,
+                        null,
+                        cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }
 
-                foreach (var item in request.GroupMenuDto)
-                {
-                    var a = item.Adapt<GroupMenu>();
-                    await _unitOfWork.Repository<GroupMenu>().AddAsync(a);
-                }
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
 
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                return result.ToList().Adapt<List<GroupDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
+        #endregion
 
-        internal class CreateGroupMenuHandler : IRequestHandler<CreateGroupMenuRequest, bool>
+        #region CREATE
+        public async Task<GroupDto> Handle(CreateGroupRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateGroupMenuHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(CreateGroupMenuRequest request, CancellationToken cancellationToken)
-            {
-                try
-                {
-                    foreach (var item in request.GroupMenuDto)
-                    {
-                        var a = item.Adapt<GroupMenu>();
-                        if (a.MenuId == 0) continue; // kalo menunya itu "All"
-
-                        a.Menu = null;
-                        a.Id = 0;
-
-                        await _unitOfWork.Repository<GroupMenu>().AddAsync(a);
-                    }
-
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    return false;
-                }
-            }
-        }
-
-        internal class GetGroupByIdQueryHandler : IRequestHandler<GetGroupByIdQuery, GroupDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetGroupByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<GroupDto> Handle(GetGroupByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Group>().GetByIdAsync(request.Id);
-
-                return result.Adapt<GroupDto>();
-            }
-        }
-
-        internal class CreateGroupHandler : IRequestHandler<CreateGroupRequest, GroupDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateGroupHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<GroupDto> Handle(CreateGroupRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Group>().AddAsync(request.GroupDto.Adapt<Group>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai 
+
                 return result.Adapt<GroupDto>();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-        internal class UpdateGroupHandler : IRequestHandler<UpdateGroupRequest, bool>
+        public async Task<List<GroupDto>> Handle(CreateListGroupRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateGroupHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Group>().AddAsync(request.GroupDtos.Adapt<List<Group>>());
 
-            public async Task<bool> Handle(UpdateGroupRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Group>().UpdateAsync(request.GroupDto.Adapt<Group>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<GroupDto>>();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        #endregion
+
+        #region UPDATE
+        public async Task<GroupDto> Handle(UpdateGroupRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Group>().UpdateAsync(request.GroupDto.Adapt<Group>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<GroupDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<GroupDto>> Handle(UpdateListGroupRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Group>().UpdateAsync(request.GroupDtos.Adapt<List<Group>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<GroupDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        #endregion
+
+        #region DELETE
+        public async Task<bool> Handle(DeleteGroupRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<Group>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<Group>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteGroupHandler : IRequestHandler<DeleteGroupRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteGroupHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteGroupRequest request, CancellationToken cancellationToken)
-            {
-                try
-                {
-                    await _unitOfWork.Repository<Group>().DeleteAsync(request.Id);
-
-                    var groupMenus = await _unitOfWork.Repository<GroupMenu>().GetAllAsync();
-                    groupMenus = groupMenus.Where(x => x.GroupId == request.Id).ToList();
-
-                    foreach (var item in groupMenus)
-                    {
-                        await _unitOfWork.Repository<GroupMenu>().DeleteAsync(item.Id);
-                    }
-
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    throw;
-                }
+                throw;
             }
         }
-
-        internal class DeleteGroupMenuByGroupIdHandler : IRequestHandler<DeleteGroupMenuByIdRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteGroupMenuByGroupIdHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteGroupMenuByIdRequest request, CancellationToken cancellationToken)
-            {
-                try
-                {
-                    await _unitOfWork.Repository<GroupMenu>().DeleteAsync(request.Id);
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    throw;
-                }
-            }
-        }
-
-        internal class DeleteListGroupMenuHandler : IRequestHandler<DeleteListGroupMenuRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListGroupMenuHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListGroupMenuRequest request, CancellationToken cancellationToken)
-            {
-                try
-                {
-                    await _unitOfWork.Repository<Group>().DeleteAsync(request.Id);
-
-                    foreach (var item in request.Id)
-                    {
-                        var groupMenus = await _unitOfWork.Repository<GroupMenu>().GetAllAsync();
-                        groupMenus = groupMenus.Where(x => x.GroupId == item).ToList();
-
-                        foreach (var i in groupMenus)
-                        {
-                            await _unitOfWork.Repository<GroupMenu>().DeleteAsync(i.Id);
-                        }
-                    }
-
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    throw;
-                }
-            }
-        }
+        #endregion
     }
 }

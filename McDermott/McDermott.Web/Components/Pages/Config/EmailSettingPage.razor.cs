@@ -13,8 +13,54 @@ namespace McDermott.Web.Components.Pages.Config
 
         #region Auth
 
-        private bool IsAccess = false;
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
         private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    await GetUserInfo();
+                }
+                catch { }
+
+                try
+                {
+                    if (Grid is not null)
+                    {
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(1);
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(2);
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
 
         #endregion Auth
 
@@ -67,31 +113,9 @@ namespace McDermott.Web.Components.Pages.Config
 
         #region Async Data And Auth Render
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
-                }
-                catch { }
-            }
-        }
-
         protected override async Task OnInitializedAsync()
         {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
+            await GetUserInfo();
             await LoadData();
         }
 

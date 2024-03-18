@@ -98,40 +98,42 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #endregion Form Regis
 
-        #region UserInfo
+        #region UserLoginAndAccessRole
 
-        private User UserLogin = new();
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            await base.OnAfterRenderAsync(firstRender);
+
             if (firstRender)
             {
-                if (Grid is not null)
-                    Grid.AutoFitColumnWidths();
-
-                await LoadUser();
-                StateHasChanged();
-
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
                 }
                 catch { }
             }
         }
 
-        private async Task LoadUser()
+        private async Task GetUserInfo()
         {
             try
             {
-                UserLogin = await oLocal.GetUserInfo();
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
             }
             catch { }
         }
 
-        #endregion UserInfo
+        #endregion UserLoginAndAccessRole
 
         private IEnumerable<DoctorScheduleDto> SelectedSchedules = [];
         private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
@@ -323,7 +325,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         #region Grid Setting
 
         private BaseAuthorizationLayout AuthorizationLayout = new();
-        private bool IsAccess { get; set; } = false;
         private bool PanelVisible { get; set; } = true;
         private bool showForm { get; set; } = false;
         private string textPopUp = "";
@@ -340,7 +341,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IReadOnlyList<object> SelectedDataItems2 { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
-        private GroupMenuDto UserAccessCRUID = new();
 
         private List<Temppp> Temppps { get; set; } = new List<Temppp>
         {
@@ -666,15 +666,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         protected override async Task OnInitializedAsync()
         {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
-            //var by =
-
             PanelVisible = true;
 
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
@@ -697,6 +688,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             DiagnosesTemps.AddRange(diagnosesTemps);
 
             AllDiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
+
             await LoadData();
         }
 

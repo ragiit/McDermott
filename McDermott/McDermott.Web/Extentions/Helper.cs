@@ -115,36 +115,72 @@ namespace McDermott.Web.Extentions
         //    }
         //}
 
-        public static async Task<(bool, GroupMenuDto)> CheckAccessUser(this NavigationManager NavigationManager, ILocalStorageService oLocal)
+        //public static async Task<(bool, GroupMenuDto)> CheckAccessUser(this NavigationManager NavigationManager, ILocalStorageService oLocal)
+        //{
+        //    try
+        //    {
+        //        dynamic user = await oLocal.GetItemAsync<string>("dotnet");
+        //        var menu = await oLocal.GetItemAsync<string>("dotnet2");
+
+        //        if (string.IsNullOrWhiteSpace(user) || string.IsNullOrEmpty(menu))
+        //        {
+        //            await oLocal.ClearAsync();
+
+        //            NavigationManager.NavigateTo("login", true);
+
+        //            return (false, new());
+        //        }
+
+        //        menu = Decrypt(menu);
+
+        //        var menus = JsonConvert.DeserializeObject<List<GroupMenuDto>>(menu);
+        //        var url = NavigationManager.Uri;
+
+        //        var z = menus?.Where(x => x.Menu.Url != null && x.Menu.Url.Contains(url.Replace(NavigationManager.BaseUri, ""))).FirstOrDefault();
+
+        //        if (z is null && url != NavigationManager.BaseUri)
+        //        {
+        //            NavigationManager.NavigateTo("", true);
+        //            return (false, new());
+        //        }
+
+        //        return (true, z!);
+        //    }
+        //    catch (JSDisconnectedException)
+        //    {
+        //        return (false, new());
+        //    }
+        //}
+
+        public static async Task<(bool, GroupMenuDto)> CheckAccessUser(this NavigationManager NavigationManager, IJSRuntime oLocal)
         {
             try
             {
-                dynamic user = await oLocal.GetItemAsync<string>("dotnet");
-                var menu = await oLocal.GetItemAsync<string>("dotnet2");
+                dynamic user = await oLocal.GetCookie(CookieHelper.USER_INFO);
+                //var menu = await oLocal.GetCookie(CookieHelper.USER_GROUP);
 
-                if (string.IsNullOrWhiteSpace(user) || string.IsNullOrEmpty(menu))
+                if (string.IsNullOrWhiteSpace(user) /*|| string.IsNullOrEmpty(menu)*/)
                 {
-                    await oLocal.ClearAsync();
-
+                    await oLocal.InvokeVoidAsync("clearAllCookies");
                     NavigationManager.NavigateTo("login", true);
 
                     return (false, new());
                 }
 
-                menu = Decrypt(menu);
+                //menu = Decrypt(menu);
 
-                var menus = JsonConvert.DeserializeObject<List<GroupMenuDto>>(menu);
-                var url = NavigationManager.Uri;
+                //var menus = JsonConvert.DeserializeObject<List<GroupMenuDto>>(menu);
+                //var url = NavigationManager.Uri;
 
-                var z = menus?.Where(x => x.Menu.Url != null && x.Menu.Url.Contains(url.Replace(NavigationManager.BaseUri, ""))).FirstOrDefault();
+                //var z = menus?.Where(x => x.Menu.Url != null && x.Menu.Url.Contains(url.Replace(NavigationManager.BaseUri, ""))).FirstOrDefault();
 
-                if (z is null && url != NavigationManager.BaseUri)
-                {
-                    NavigationManager.NavigateTo("", true);
-                    return (false, new());
-                }
+                //if (z is null && url != NavigationManager.BaseUri)
+                //{
+                //    NavigationManager.NavigateTo("", true);
+                //    return (false, new());
+                //}
 
-                return (true, z!);
+                return (true, null!);
             }
             catch (JSDisconnectedException)
             {

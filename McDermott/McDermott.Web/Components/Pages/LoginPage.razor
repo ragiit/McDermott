@@ -273,23 +273,26 @@
                 string serialize = JsonConvert.SerializeObject(user[0]);
                 var encrypt = Helper.Encrypt(serialize);
 
-                await oLocal.SetItemAsync("dotnet", encrypt);
+                // await oLocal.SetItemAsync("dotnet", encrypt);
+                await JsRuntime.InvokeVoidAsync("setCookie", CookieHelper.USER_INFO, encrypt, 1);
 
-                if (user[0].GroupId is not null)
-                {
-                    var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((long)user[0].GroupId));
+                // if (user[0].GroupId is not null)
+                // {
+                //     var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((long)user[0].GroupId));
 
-                    var encryptMenu = Helper.Encrypt(JsonConvert.SerializeObject(g));
+                //     var encryptMenu = Helper.Encrypt(JsonConvert.SerializeObject(g));
 
-                    await oLocal.SetItemAsync("dotnet2", encryptMenu);
-                }
-                else
-                {
-                    await oLocal.SetItemAsync("dotnet2", new List<string>());
-                }
+                //     await JsRuntime.InvokeVoidAsync("setCookie", CookieHelper.USER_GROUP, encryptMenu, 1);
+                //     await oLocal.SetItemAsync("dotnet2", encryptMenu);
+                // }
+                // else
+                // {
+                //     await JsRuntime.InvokeVoidAsync("setCookie", CookieHelper.USER_GROUP, string.Empty, 1);
+                //     await oLocal.SetItemAsync("dotnet2", new List<string>());
+                // }
 
                 var a = (CustomAuthenticationStateProvider)CustomAuth;
-                await a.UpdateAuthState(user.Adapt<User>());
+                await a.UpdateAuthState(user[0].Adapt<User>());
 
                 NavigationManager.NavigateTo("", forceLoad: true);
 
