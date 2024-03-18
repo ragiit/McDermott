@@ -7,8 +7,10 @@
         [Required]
         [StringLength(200)]
         public string Name { get; set; } = string.Empty; // Kecamatan
+
         [Required]
         public long? CityId { get; set; } // Kabupaten
+
         [Required]
         public long? ProvinceId { get; set; }
 

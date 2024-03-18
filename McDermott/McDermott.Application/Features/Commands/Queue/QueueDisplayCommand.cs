@@ -1,9 +1,4 @@
 ﻿using McDermott.Application.Dtos.Queue;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Features.Commands.Queue
 {
@@ -13,7 +8,7 @@ namespace McDermott.Application.Features.Commands.Queue
 
         public class GetQueueDisplayByIdQuery : IRequest<QueueDisplayDto>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public GetQueueDisplayByIdQuery(long id)
             {
@@ -43,7 +38,7 @@ namespace McDermott.Application.Features.Commands.Queue
 
         public class DeleteQueueDisplayRequest : IRequest<bool>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public DeleteQueueDisplayRequest(long id)
             {
@@ -58,7 +53,6 @@ namespace McDermott.Application.Features.Commands.Queue
             public DeleteListQueueDisplayRequest(List<long> id)
             {
                 Id = id;
-
             }
         }
     }

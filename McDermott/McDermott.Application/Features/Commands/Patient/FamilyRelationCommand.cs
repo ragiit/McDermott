@@ -3,13 +3,16 @@
     public class FamilyRelationCommand
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
+
         public class GetFamilyQuery(Expression<Func<Family, bool>>? predicate = null) : IRequest<List<FamilyDto>>
         {
             public Expression<Func<Family, bool>> Predicate { get; } = predicate!;
         }
-        #endregion
+
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
         #region CREATE
+
         public class CreateFamilyRequest(FamilyDto FamilyDto) : IRequest<FamilyDto>
         {
             public FamilyDto FamilyDto { get; set; } = FamilyDto;
@@ -19,9 +22,11 @@
         {
             public List<FamilyDto> FamilyDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
-        #endregion
+
+        #endregion CREATE
 
         #region Update
+
         public class UpdateFamilyRequest(FamilyDto FamilyDto) : IRequest<FamilyDto>
         {
             public FamilyDto FamilyDto { get; set; } = FamilyDto;
@@ -32,14 +37,16 @@
             public List<FamilyDto> FamilyDtos { get; set; } = FamilyDtos;
         }
 
-        #endregion
+        #endregion Update
 
-        #region DELETE 
+        #region DELETE
+
         public class DeleteFamilyRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
             public long Id { get; set; } = id ?? 0;
             public List<long> Ids { get; set; } = ids ?? [];
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

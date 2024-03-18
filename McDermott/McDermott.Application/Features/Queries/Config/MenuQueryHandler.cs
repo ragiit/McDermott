@@ -11,8 +11,8 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<UpdateListMenuRequest, List<MenuDto>>,
         IRequestHandler<DeleteMenuRequest, bool>
     {
-
         #region GET
+
         public async Task<List<MenuDto>> Handle(GetMenuQuery request, CancellationToken cancellationToken)
         {
             try
@@ -38,9 +38,11 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-        #endregion
+
+        #endregion GET
 
         #region CREATE
+
         public async Task<MenuDto> Handle(CreateMenuRequest request, CancellationToken cancellationToken)
         {
             try
@@ -73,13 +75,14 @@ namespace McDermott.Application.Features.Queries.Config
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
-        #endregion
+
+        #endregion CREATE
 
         #region UPDATE
+
         public async Task<MenuDto> Handle(UpdateMenuRequest request, CancellationToken cancellationToken)
         {
             try
@@ -115,9 +118,11 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-        #endregion
+
+        #endregion UPDATE
 
         #region DELETE
+
         public async Task<bool> Handle(DeleteMenuRequest request, CancellationToken cancellationToken)
         {
             try
@@ -143,6 +148,7 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

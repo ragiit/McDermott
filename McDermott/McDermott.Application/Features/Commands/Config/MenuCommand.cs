@@ -3,13 +3,16 @@
     public class MenuCommand
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
+
         public class GetMenuQuery(Expression<Func<Menu, bool>>? predicate = null) : IRequest<List<MenuDto>>
         {
             public Expression<Func<Menu, bool>> Predicate { get; } = predicate!;
         }
-        #endregion
+
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
         #region CREATE
+
         public class CreateMenuRequest(MenuDto MenuDto) : IRequest<MenuDto>
         {
             public MenuDto MenuDto { get; set; } = MenuDto;
@@ -19,9 +22,11 @@
         {
             public List<MenuDto> MenuDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
-        #endregion
+
+        #endregion CREATE
 
         #region Update
+
         public class UpdateMenuRequest(MenuDto MenuDto) : IRequest<MenuDto>
         {
             public MenuDto MenuDto { get; set; } = MenuDto;
@@ -32,14 +37,16 @@
             public List<MenuDto> MenuDtos { get; set; } = MenuDtos;
         }
 
-        #endregion
+        #endregion Update
 
-        #region DELETE 
+        #region DELETE
+
         public class DeleteMenuRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
             public long Id { get; set; } = id ?? 0;
             public List<long> Ids { get; set; } = ids ?? [];
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

@@ -28,12 +28,10 @@
                 if (request.Predicate is not null)
                     result = [.. result.AsQueryable().Where(request.Predicate)];
 
-
                 return result.ToList().Adapt<List<PatientFamilyRelationDto>>();
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -46,13 +44,12 @@
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetPatientFamilyRelationQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetPatientFamilyRelationQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<List<PatientFamilyRelationDto>>();
             }
             catch (Exception)
             {
-
                 throw;
             }
         }

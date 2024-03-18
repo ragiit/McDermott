@@ -2,56 +2,52 @@ namespace McDermott.Application.Features.Commands.Config
 {
     public class OccupationalCommand
     {
-        public class GetOccupationalQuery : IRequest<List<OccupationalDto>>;
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetOccupationalByIdQuery : IRequest<OccupationalDto>
+        public class GetOccupationalQuery(Expression<Func<Occupational, bool>>? predicate = null, bool removeCache = false) : IRequest<List<OccupationalDto>>
         {
-             public long Id { get; set; }
-
-            public GetOccupationalByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<Occupational, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateOccupationalRequest : IRequest<OccupationalDto>
-        {
-            public OccupationalDto OccupationalDto { get; set; }
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
-            public CreateOccupationalRequest(OccupationalDto OccupationalDto)
-            {
-                this.OccupationalDto = OccupationalDto;
-            }
+        #region CREATE
+
+        public class CreateOccupationalRequest(OccupationalDto OccupationalDto) : IRequest<OccupationalDto>
+        {
+            public OccupationalDto OccupationalDto { get; set; } = OccupationalDto;
         }
 
-        public class UpdateOccupationalRequest : IRequest<bool>
+        public class CreateListOccupationalRequest(List<OccupationalDto> GeneralConsultanCPPTDtos) : IRequest<List<OccupationalDto>>
         {
-            public OccupationalDto OccupationalDto { get; set; }
-
-            public UpdateOccupationalRequest(OccupationalDto OccupationalDto)
-            {
-                this.OccupationalDto = OccupationalDto;
-            }
+            public List<OccupationalDto> OccupationalDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
-        public class DeleteOccupationalRequest : IRequest<bool>
-        {
-             public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteOccupationalRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateOccupationalRequest(OccupationalDto OccupationalDto) : IRequest<OccupationalDto>
+        {
+            public OccupationalDto OccupationalDto { get; set; } = OccupationalDto;
         }
 
-        public class DeleteListOccupationalRequest : IRequest<bool>
+        public class UpdateListOccupationalRequest(List<OccupationalDto> OccupationalDtos) : IRequest<List<OccupationalDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListOccupationalRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<OccupationalDto> OccupationalDtos { get; set; } = OccupationalDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteOccupationalRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

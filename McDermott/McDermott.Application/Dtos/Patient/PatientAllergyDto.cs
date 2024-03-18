@@ -1,6 +1,4 @@
-﻿
-
-namespace McDermott.Application.Dtos.Patient
+﻿namespace McDermott.Application.Dtos.Patient
 {
     public class PatientAllergyDto : IMapFrom<PatientAllergy>
     {

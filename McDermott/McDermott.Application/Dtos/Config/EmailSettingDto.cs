@@ -2,7 +2,7 @@
 {
     public class EmailSettingDto : IMapFrom<EmailSetting>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
 
         [StringLength(300)]
         public string? Description { get; set; } = string.Empty;

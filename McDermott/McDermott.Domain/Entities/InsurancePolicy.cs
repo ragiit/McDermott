@@ -86,6 +86,7 @@
 
         [SetToNull]
         public virtual Insurance? Insurance { get; set; }
+
         [SetToNull]
         public virtual User? User { get; set; }
     }

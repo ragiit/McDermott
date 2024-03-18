@@ -2,7 +2,7 @@
 {
     public class DoctorScheduleDto : IMapFrom<DoctorSchedule>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
 
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;

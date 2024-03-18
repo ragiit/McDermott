@@ -2,10 +2,10 @@
 {
     public class ServiceDto : IMapFrom<Service>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
 
         [StringLength(200)]
-        [Required(ErrorMessage ="Name Must Failled in!")]
+        [Required(ErrorMessage = "Name Must Failled in!")]
         public string Name { get; set; } = string.Empty;
 
         [StringLength(5)]

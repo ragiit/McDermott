@@ -2,11 +2,14 @@
 {
     public class VillageDto : IMapFrom<Village>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
+
         [Required]
         public long? ProvinceId { get; set; }
+
         [Required]
         public long? CityId { get; set; } // Kabupaten
+
         [Required]
         public long? DistrictId { get; set; } // Kecamatan
 

@@ -3,14 +3,17 @@
     public class GroupMenuCommand
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
+
         public class GetGroupMenuQuery(Expression<Func<GroupMenu, bool>>? predicate = null, bool removeCache = false) : IRequest<List<GroupMenuDto>>
         {
             public Expression<Func<GroupMenu, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
-        #endregion
+
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
         #region CREATE
+
         public class CreateGroupMenuRequest(GroupMenuDto GroupMenuDto) : IRequest<GroupMenuDto>
         {
             public GroupMenuDto GroupMenuDto { get; set; } = GroupMenuDto;
@@ -20,9 +23,11 @@
         {
             public List<GroupMenuDto> GroupMenuDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
-        #endregion
+
+        #endregion CREATE
 
         #region Update
+
         public class UpdateGroupMenuRequest(GroupMenuDto GroupMenuDto) : IRequest<GroupMenuDto>
         {
             public GroupMenuDto GroupMenuDto { get; set; } = GroupMenuDto;
@@ -33,14 +38,16 @@
             public List<GroupMenuDto> GroupMenuDtos { get; set; } = GroupMenuDtos;
         }
 
-        #endregion
+        #endregion Update
 
-        #region DELETE 
+        #region DELETE
+
         public class DeleteGroupMenuRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
             public long Id { get; set; } = id ?? 0;
             public List<long> Ids { get; set; } = ids ?? [];
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

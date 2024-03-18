@@ -170,45 +170,18 @@ namespace McDermott.Web.Components.Pages.Config
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
 
-        private void GridGroup_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsGroupEnabled(true);
-        }
-
         private async Task LoadData()
         {
-            PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Group = new();
-            GroupMenus = new();
-            Groups = await Mediator.Send(new GetGroupQuery());
-            PanelVisible = false;
-        }
-
-        private void LoadGroupMenu()
-        {
-            GroupMenus = new();
-        }
-
-        //private async Task OnSave(GridEditModelSavingEventArgs e)
-        //{
-        //    var editModel = (GroupDto)e.EditModel;
-
-        //    if (string.IsNullOrWhiteSpace(editModel.Name))
-        //        return;
-
-        //    if (editModel.Id == 0)
-        //        await Mediator.Send(new CreateGroupRequest(editModel));
-        //    else
-        //        await Mediator.Send(new UpdateGroupRequest(editModel));
-
-        //    await LoadData();
-        //}
-
-        private void test(GridCommandColumnCellDisplayTemplateContext context)
-        {
-            Id = ((GroupDto)context.DataItem).Id;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = new ObservableRangeCollection<object>();
+                Group = new();
+                GroupMenus = new();
+                Groups = await Mediator.Send(new GetGroupQuery());
+                PanelVisible = false;
+            }
+            catch (Exception) { }
         }
 
         private void ColumnChooserButton_Click()
@@ -307,7 +280,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
 
-                if (GroupMenus.Where(x => x.Menu.Name is "All").Any())
+                if (GroupMenus.Any(x => x.Menu.Name is "All"))
                 {
                     Menus.ForEach(z =>
                     {
@@ -372,7 +345,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 var request = new List<GroupMenuDto>();
 
-                if (GroupMenus.Where(x => x.Menu.Name is "All").Any())
+                if (GroupMenus.Any(x => x.Menu.Name is "All"))
                 {
                     Menus.ForEach(z =>
                     {

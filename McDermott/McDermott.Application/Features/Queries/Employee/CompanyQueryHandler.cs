@@ -2,124 +2,160 @@ using static McDermott.Application.Features.Commands.Config.CompanyCommand;
 
 namespace McDermott.Application.Features.Queries.Employee
 {
-    public class CompanyQueryHandler
+    public class CompanyQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetCompanyQuery, List<CompanyDto>>,
+        IRequestHandler<CreateCompanyRequest, CompanyDto>,
+        IRequestHandler<CreateListCompanyRequest, List<CompanyDto>>,
+        IRequestHandler<UpdateCompanyRequest, CompanyDto>,
+        IRequestHandler<UpdateListCompanyRequest, List<CompanyDto>>,
+        IRequestHandler<DeleteCompanyRequest, bool>
     {
-        internal class GetAllCompanyQueryHandler : IRequestHandler<GetCompanyQuery, List<CompanyDto>>
+        #region GET
+
+        public async Task<List<CompanyDto>> Handle(GetCompanyQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllCompanyQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetCompanyQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Company>? result))
+                {
+                    result = await _unitOfWork.Repository<Company>().GetAsync(
+                        null,
+                        x => x
+                        .Include(z => z.Country)
+                        .Include(z => z.City)
+                        .Include(z => z.Province),
+                        cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<CompanyDto>>();
             }
-
-            public async Task<List<CompanyDto>> Handle(GetCompanyQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<Company>().Entities
-                        .Include(x => x.Country)
-                        .Include(x => x.Province)
-                        .Include(x => x.City)
-                        .Select(Company => Company.Adapt<CompanyDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery, CompanyDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<CompanyDto> Handle(CreateCompanyRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetCompanyByIdQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDto.Adapt<Company>());
 
-            public async Task<CompanyDto> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Company>().GetByIdAsync(request.Id);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<CompanyDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class CreateCompanyHandler : IRequestHandler<CreateCompanyRequest, CompanyDto>
+        public async Task<List<CompanyDto>> Handle(CreateListCompanyRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateCompanyHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDtos.Adapt<List<Company>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<CompanyDto>>();
             }
-
-            public async Task<CompanyDto> Handle(CreateCompanyRequest request, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                try
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<CompanyDto> Handle(UpdateCompanyRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDto.Adapt<Company>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<CompanyDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<CompanyDto>> Handle(UpdateListCompanyRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDtos.Adapt<List<Company>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<CompanyDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteCompanyRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
                 {
-                    var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDto.Adapt<Company>());
-
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    return result.Adapt<CompanyDto>();
+                    await _unitOfWork.Repository<Company>().DeleteAsync(request.Id);
                 }
-                catch (Exception e)
+
+                if (request.Ids.Count > 0)
                 {
-                    throw;
+                    await _unitOfWork.Repository<Company>().DeleteAsync(x => request.Ids.Contains(x.Id));
                 }
-            }
-        }
 
-        internal class UpdateCompanyHandler : IRequestHandler<UpdateCompanyRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateCompanyHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(UpdateCompanyRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDto.Adapt<Company>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteCompanyHandler : IRequestHandler<DeleteCompanyRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteCompanyHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteCompanyRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Company>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListCompanyHandler : IRequestHandler<DeleteListCompanyRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListCompanyHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListCompanyRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Company>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

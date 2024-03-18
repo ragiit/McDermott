@@ -7,6 +7,7 @@
 
         [SetToNull]
         public virtual QueueDisplay? QueueDisplay { get; set; }
+
         [SetToNull]
         public virtual Counter? Counter { get; set; }
     }

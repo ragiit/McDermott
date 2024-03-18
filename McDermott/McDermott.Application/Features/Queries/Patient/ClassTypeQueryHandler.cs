@@ -8,8 +8,8 @@
         IRequestHandler<UpdateListClassTypeRequest, List<ClassTypeDto>>,
         IRequestHandler<DeleteClassTypeRequest, bool>
     {
-
         #region GET
+
         public async Task<List<ClassTypeDto>> Handle(GetClassTypeQuery request, CancellationToken cancellationToken)
         {
             try
@@ -35,9 +35,11 @@
                 throw;
             }
         }
-        #endregion
+
+        #endregion GET
 
         #region CREATE
+
         public async Task<ClassTypeDto> Handle(CreateClassTypeRequest request, CancellationToken cancellationToken)
         {
             try
@@ -70,13 +72,14 @@
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
-        #endregion
+
+        #endregion CREATE
 
         #region UPDATE
+
         public async Task<ClassTypeDto> Handle(UpdateClassTypeRequest request, CancellationToken cancellationToken)
         {
             try
@@ -112,9 +115,11 @@
                 throw;
             }
         }
-        #endregion
+
+        #endregion UPDATE
 
         #region DELETE
+
         public async Task<bool> Handle(DeleteClassTypeRequest request, CancellationToken cancellationToken)
         {
             try
@@ -140,6 +145,7 @@
                 throw;
             }
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

@@ -2,7 +2,7 @@
 {
     public class CounterDto : IMapFrom<Counter>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         public string Name { get; set; }

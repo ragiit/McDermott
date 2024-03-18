@@ -2,7 +2,7 @@
 {
     public class DoctorScheduleDetailDto : IMapFrom<DoctorScheduleDetail>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
         public long DoctorScheduleId { get; set; }
 
         [Required]

@@ -7,6 +7,7 @@
 
         [SetToNull]
         public virtual Building? Building { get; set; }
+
         [SetToNull]
         public virtual Location? Location { get; set; }
     }

@@ -2,46 +2,52 @@
 {
     public class GenderCommand
     {
-        public class GetGenderQuery : IRequest<List<GenderDto>>;
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetGenderByIdQuery : IRequest<GenderDto>
+        public class GetGenderQuery(Expression<Func<Gender, bool>>? predicate = null, bool removeCache = false) : IRequest<List<GenderDto>>
         {
-             public long Id { get; set; }
-
-            public GetGenderByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<Gender, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateGenderRequest : IRequest<GenderDto>
-        {
-            public GenderDto GenderDto { get; set; }
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
-            public CreateGenderRequest(GenderDto GenderDto)
-            {
-                this.GenderDto = GenderDto;
-            }
+        #region CREATE
+
+        public class CreateGenderRequest(GenderDto GenderDto) : IRequest<GenderDto>
+        {
+            public GenderDto GenderDto { get; set; } = GenderDto;
         }
 
-        public class UpdateGenderRequest : IRequest<bool>
+        public class CreateListGenderRequest(List<GenderDto> GeneralConsultanCPPTDtos) : IRequest<List<GenderDto>>
         {
-            public GenderDto GenderDto { get; set; }
-
-            public UpdateGenderRequest(GenderDto GenderDto)
-            {
-                this.GenderDto = GenderDto;
-            }
+            public List<GenderDto> GenderDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
-        public class DeleteGenderRequest : IRequest<bool>
-        {
-             public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteGenderRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateGenderRequest(GenderDto GenderDto) : IRequest<GenderDto>
+        {
+            public GenderDto GenderDto { get; set; } = GenderDto;
         }
+
+        public class UpdateListGenderRequest(List<GenderDto> GenderDtos) : IRequest<List<GenderDto>>
+        {
+            public List<GenderDto> GenderDtos { get; set; } = GenderDtos;
+        }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteGenderRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

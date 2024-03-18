@@ -10,6 +10,7 @@
 
         [SetToNull]
         public virtual City? City { get; set; }
+
         [SetToNull]
         public virtual Province? Province { get; set; }
     }

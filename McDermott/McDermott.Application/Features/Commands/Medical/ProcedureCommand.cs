@@ -6,7 +6,7 @@
 
         public class GetProcedureByIdQuery : IRequest<ProcedureDto>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public GetProcedureByIdQuery(long id)
             {
@@ -36,7 +36,7 @@
 
         public class DeleteProcedureRequest : IRequest<bool>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public DeleteProcedureRequest(long id)
             {

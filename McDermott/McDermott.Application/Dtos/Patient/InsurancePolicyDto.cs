@@ -3,8 +3,10 @@
     public class InsurancePolicyDto : IMapFrom<InsurancePolicy>
     {
         public long Id { get; set; }
+
         [Required]
         public long UserId { get; set; } // Patient
+
         [Required]
         public long InsuranceId { get; set; }
 

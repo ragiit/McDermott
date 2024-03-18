@@ -6,7 +6,7 @@
 
         public class GetEmailTemplateByIdQuery : IRequest<EmailTemplateDto>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public GetEmailTemplateByIdQuery(long id)
             {
@@ -36,7 +36,7 @@
 
         public class DeleteEmailTemplateRequest : IRequest<bool>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public DeleteEmailTemplateRequest(long id)
             {

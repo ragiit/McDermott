@@ -2,7 +2,7 @@
 {
     public class GenderDto : IMapFrom<Gender>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         [StringLength(200)]

@@ -88,7 +88,7 @@ namespace McDermott.Web.Components.Pages.Config
             else
             {
                 var a = SelectedDataItems.Adapt<List<OccupationalDto>>();
-                await Mediator.Send(new DeleteListOccupationalRequest(a.Select(x => x.Id).ToList()));
+                await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
             }
             await LoadData();
         }

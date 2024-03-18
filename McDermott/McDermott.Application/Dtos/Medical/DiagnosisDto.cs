@@ -2,7 +2,7 @@
 {
     public partial class DiagnosisDto : IMapFrom<Diagnosis>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
 
         [StringLength(200)]
         [Required]

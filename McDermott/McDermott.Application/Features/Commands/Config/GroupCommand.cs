@@ -3,14 +3,17 @@
     public class GroupCommand
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
+
         public class GetGroupQuery(Expression<Func<Group, bool>>? predicate = null, bool removeCache = false) : IRequest<List<GroupDto>>
         {
             public Expression<Func<Group, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
-        #endregion
+
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
         #region CREATE
+
         public class CreateGroupRequest(GroupDto GroupDto) : IRequest<GroupDto>
         {
             public GroupDto GroupDto { get; set; } = GroupDto;
@@ -20,9 +23,11 @@
         {
             public List<GroupDto> GroupDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
-        #endregion
+
+        #endregion CREATE
 
         #region Update
+
         public class UpdateGroupRequest(GroupDto GroupDto) : IRequest<GroupDto>
         {
             public GroupDto GroupDto { get; set; } = GroupDto;
@@ -33,14 +38,16 @@
             public List<GroupDto> GroupDtos { get; set; } = GroupDtos;
         }
 
-        #endregion
+        #endregion Update
 
-        #region DELETE 
+        #region DELETE
+
         public class DeleteGroupRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
             public long Id { get; set; } = id ?? 0;
             public List<long> Ids { get; set; } = ids ?? [];
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

@@ -10,6 +10,7 @@ namespace McDermott.Application.Features.Queries.Transaction
         IRequestHandler<DeleteGeneralConsultantClinicalAssesmentRequest, bool>
     {
         #region GET
+
         public async Task<List<GeneralConsultantClinicalAssesmentDto>> Handle(GetGeneralConsultantClinicalAssesmentQuery request, CancellationToken cancellationToken)
         {
             try
@@ -37,13 +38,14 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
-        #endregion
+
+        #endregion GET
 
         #region Create
+
         public async Task<GeneralConsultantClinicalAssesmentDto> Handle(CreateGeneralConsultantClinicalAssesmentRequest request, CancellationToken cancellationToken)
         {
             try
@@ -76,7 +78,6 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -84,6 +85,7 @@ namespace McDermott.Application.Features.Queries.Transaction
         #endregion Create
 
         #region Update
+
         public async Task<GeneralConsultantClinicalAssesmentDto> Handle(UpdateGeneralConsultantClinicalAssesmentRequest request, CancellationToken cancellationToken)
         {
             try
@@ -101,9 +103,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                 throw;
             }
         }
-        #endregion
+
+        #endregion Update
 
         #region Delete
+
         public async Task<bool> Handle(DeleteGeneralConsultantClinicalAssesmentRequest request, CancellationToken cancellationToken)
         {
             try
@@ -129,6 +133,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 throw;
             }
         }
-        #endregion
+
+        #endregion Delete
     }
 }

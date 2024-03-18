@@ -2,56 +2,52 @@
 {
     public class JobPositionCommand
     {
-        public class GetJobPositionQuery : IRequest<List<JobPositionDto>>;
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetJobPositionByIdQuery : IRequest<JobPositionDto>
+        public class GetJobPositionQuery(Expression<Func<JobPosition, bool>>? predicate = null, bool removeCache = false) : IRequest<List<JobPositionDto>>
         {
-             public long Id { get; set; }
-
-            public GetJobPositionByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<JobPosition, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateJobPositionRequest : IRequest<JobPositionDto>
-        {
-            public JobPositionDto JobPositionDto { get; set; }
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
-            public CreateJobPositionRequest(JobPositionDto JobPositionDto)
-            {
-                this.JobPositionDto = JobPositionDto;
-            }
+        #region CREATE
+
+        public class CreateJobPositionRequest(JobPositionDto JobPositionDto) : IRequest<JobPositionDto>
+        {
+            public JobPositionDto JobPositionDto { get; set; } = JobPositionDto;
         }
 
-        public class UpdateJobPositionRequest : IRequest<bool>
+        public class CreateListJobPositionRequest(List<JobPositionDto> GeneralConsultanCPPTDtos) : IRequest<List<JobPositionDto>>
         {
-            public JobPositionDto JobPositionDto { get; set; }
-
-            public UpdateJobPositionRequest(JobPositionDto JobPositionDto)
-            {
-                this.JobPositionDto = JobPositionDto;
-            }
+            public List<JobPositionDto> JobPositionDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
-        public class DeleteJobPositionRequest : IRequest<bool>
-        {
-             public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteJobPositionRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateJobPositionRequest(JobPositionDto JobPositionDto) : IRequest<JobPositionDto>
+        {
+            public JobPositionDto JobPositionDto { get; set; } = JobPositionDto;
         }
 
-        public class DeleteListJobPositionRequest : IRequest<bool>
+        public class UpdateListJobPositionRequest(List<JobPositionDto> JobPositionDtos) : IRequest<List<JobPositionDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListJobPositionRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<JobPositionDto> JobPositionDtos { get; set; } = JobPositionDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteJobPositionRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

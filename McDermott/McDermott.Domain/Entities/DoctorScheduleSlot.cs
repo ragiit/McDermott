@@ -11,6 +11,7 @@
 
         [SetToNull]
         public virtual DoctorSchedule? DoctorSchedule { get; set; }
+
         [SetToNull]
         public virtual User? Physician { get; set; }
     }

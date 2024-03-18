@@ -65,7 +65,7 @@
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<ProvinceDto>>();
-                    await Mediator.Send(new DeleteListProvinceRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }

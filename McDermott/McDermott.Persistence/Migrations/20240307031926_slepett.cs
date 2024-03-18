@@ -18,8 +18,6 @@ namespace McDermott.Persistence.Migrations
                 name: "FK_DetailQueueDisplays_QueueDisplays_QueueDisplayId",
                 table: "DetailQueueDisplays");
 
-            
-
             migrationBuilder.AlterColumn<long>(
                 name: "QueueDisplayId",
                 table: "DetailQueueDisplays",
@@ -110,8 +108,6 @@ namespace McDermott.Persistence.Migrations
                 oldType: "bigint")
                 .Annotation("SqlServer:Identity", "1, 1")
                 .OldAnnotation("SqlServer:Identity", "1, 1");
-
-            
         }
     }
 }

@@ -2,7 +2,7 @@
 {
     public class PatientFamilyRelationDto : IMapFrom<PatientFamilyRelation>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
         public long PatientId { get; set; }
         public long? FamilyMemberId { get; set; }
         public long? FamilyId { get; set; }

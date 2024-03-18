@@ -8,6 +8,7 @@
         IRequestHandler<DeleteGeneralConsultanServiceRequest, bool>
     {
         #region GET
+
         public async Task<List<GeneralConsultanServiceDto>> Handle(GetGeneralConsultanServiceQuery request, CancellationToken cancellationToken)
         {
             try
@@ -42,9 +43,11 @@
                 throw;
             }
         }
-        #endregion
+
+        #endregion GET
 
         #region CREATE
+
         public async Task<GeneralConsultanServiceDto> Handle(CreateGeneralConsultanServiceRequest request, CancellationToken cancellationToken)
         {
             try
@@ -59,7 +62,6 @@
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -78,13 +80,14 @@
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
-        #endregion
+
+        #endregion CREATE
 
         #region Update
+
         public async Task<GeneralConsultanServiceDto> Handle(UpdateGeneralConsultanServiceRequest request, CancellationToken cancellationToken)
         {
             try
@@ -102,9 +105,11 @@
                 throw;
             }
         }
-        #endregion
+
+        #endregion Update
 
         #region Delete
+
         public async Task<bool> Handle(DeleteGeneralConsultanServiceRequest request, CancellationToken cancellationToken)
         {
             try
@@ -131,7 +136,6 @@
             }
         }
 
-
-        #endregion
+        #endregion Delete
     }
 }

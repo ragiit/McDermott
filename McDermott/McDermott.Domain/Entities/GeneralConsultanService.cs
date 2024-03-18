@@ -42,6 +42,7 @@
 
         [SetToNull] // Tandai properti yang harus diatur ke null
         public virtual InsurancePolicy? InsurancePolicy { get; set; }
+
         [SetToNull]
         public virtual List<GeneralConsultanCPPT>? GeneralConsultanCPPTs { get; set; }
 
@@ -50,8 +51,10 @@
 
         [SetToNull] // Tandai properti yang harus diatur ke null
         public virtual List<GeneralConsultantClinicalAssesment>? GeneralConsultantClinicalAssesments { get; set; }
+
         [SetToNull]
         public virtual ClassType? ClassType { get; set; }
+
         [SetToNull]
         public virtual KioskQueue? KioskQueue { get; set; }
     }

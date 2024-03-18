@@ -3,6 +3,7 @@
     public class UserCommand
     {
         #region Get
+
         public class GetUserQuery(Expression<Func<User, bool>>? predicate = null) : IRequest<List<UserDto>>
         {
             public Expression<Func<User, bool>> Predicate { get; } = predicate!;
@@ -52,7 +53,6 @@
         #endregion Update
 
         #region Delete
-
 
         public class DeleteUserRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {

@@ -2,56 +2,52 @@
 {
     public class CityCommand
     {
-        public class GetCityQuery : IRequest<List<CityDto>>;
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetCityByIdQuery : IRequest<CityDto>
+        public class GetCityQuery(Expression<Func<City, bool>>? predicate = null, bool removeCache = false) : IRequest<List<CityDto>>
         {
-             public long Id { get; set; }
-
-            public GetCityByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<City, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateCityRequest : IRequest<CityDto>
-        {
-            public CityDto CityDto { get; set; }
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
-            public CreateCityRequest(CityDto CityDto)
-            {
-                this.CityDto = CityDto;
-            }
+        #region CREATE
+
+        public class CreateCityRequest(CityDto CityDto) : IRequest<CityDto>
+        {
+            public CityDto CityDto { get; set; } = CityDto;
         }
 
-        public class UpdateCityRequest : IRequest<bool>
+        public class CreateListCityRequest(List<CityDto> GeneralConsultanCPPTDtos) : IRequest<List<CityDto>>
         {
-            public CityDto CityDto { get; set; }
-
-            public UpdateCityRequest(CityDto CityDto)
-            {
-                this.CityDto = CityDto;
-            }
+            public List<CityDto> CityDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
-        public class DeleteCityRequest : IRequest<bool>
-        {
-             public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteCityRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateCityRequest(CityDto CityDto) : IRequest<CityDto>
+        {
+            public CityDto CityDto { get; set; } = CityDto;
         }
 
-        public class DeleteListCityRequest : IRequest<bool>
+        public class UpdateListCityRequest(List<CityDto> CityDtos) : IRequest<List<CityDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListCityRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<CityDto> CityDtos { get; set; } = CityDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteCityRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

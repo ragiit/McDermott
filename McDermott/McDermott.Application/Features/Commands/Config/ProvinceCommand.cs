@@ -2,36 +2,52 @@
 {
     public class ProvinceCommand
     {
-        public class GetProvinceQuery : IRequest<List<ProvinceDto>>;
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetProvinceByIdQuery(long id) : IRequest<ProvinceDto>
+        public class GetProvinceQuery(Expression<Func<Province, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ProvinceDto>>
         {
-             public long Id { get; set; } = id;
+            public Expression<Func<Province, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class GetProvinceByCountry(long? countryId) : IRequest<List<ProvinceDto>>
-        {
-            public long? CountryId { get; set; } = countryId;
-        }
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
+
+        #region CREATE
 
         public class CreateProvinceRequest(ProvinceDto ProvinceDto) : IRequest<ProvinceDto>
         {
             public ProvinceDto ProvinceDto { get; set; } = ProvinceDto;
         }
 
-        public class UpdateProvinceRequest(ProvinceDto ProvinceDto) : IRequest<bool>
+        public class CreateListProvinceRequest(List<ProvinceDto> GeneralConsultanCPPTDtos) : IRequest<List<ProvinceDto>>
+        {
+            public List<ProvinceDto> ProvinceDtos { get; set; } = GeneralConsultanCPPTDtos;
+        }
+
+        #endregion CREATE
+
+        #region Update
+
+        public class UpdateProvinceRequest(ProvinceDto ProvinceDto) : IRequest<ProvinceDto>
         {
             public ProvinceDto ProvinceDto { get; set; } = ProvinceDto;
         }
 
-        public class DeleteProvinceRequest(long id) : IRequest<bool>
+        public class UpdateListProvinceRequest(List<ProvinceDto> ProvinceDtos) : IRequest<List<ProvinceDto>>
         {
-             public long Id { get; set; } = id;
+            public List<ProvinceDto> ProvinceDtos { get; set; } = ProvinceDtos;
         }
 
-        public class DeleteListProvinceRequest(List<long> id) : IRequest<bool>
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteProvinceRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
-            public List<long> Id { get; set; } = id;
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
         }
+
+        #endregion DELETE
     }
 }

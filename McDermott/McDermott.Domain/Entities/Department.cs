@@ -9,12 +9,15 @@
         [StringLength(200)]
         [Required]
         public string Name { get; set; } = string.Empty;
+
         public string? DepartmentCategory { get; set; }
 
         [SetToNull]
         public virtual User? Manager { get; set; }
+
         [SetToNull]
         public virtual Department? ParentDepartment { get; set; }
+
         [SetToNull]
         public virtual Company? Company { get; set; }
     }

@@ -2,7 +2,7 @@
 {
     public partial class FamilyDto : IMapFrom<Family>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         [StringLength(200)]

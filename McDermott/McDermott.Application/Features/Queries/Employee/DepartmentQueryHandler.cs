@@ -15,6 +15,10 @@ namespace McDermott.Application.Features.Queries.Employee
             try
             {
                 string cacheKey = $"GetDepartmentQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
                 if (!_cache.TryGetValue(cacheKey, out List<Department>? result))
                 {
                     result = await _unitOfWork.Repository<Department>().GetAsync(
@@ -47,7 +51,7 @@ namespace McDermott.Application.Features.Queries.Employee
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetDepartmentQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetDepartmentQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<DepartmentDto>();
             }
@@ -71,7 +75,6 @@ namespace McDermott.Application.Features.Queries.Employee
             }
             catch (Exception)
             {
-
                 throw;
             }
         }

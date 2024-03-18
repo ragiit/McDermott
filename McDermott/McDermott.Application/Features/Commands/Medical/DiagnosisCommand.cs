@@ -6,7 +6,7 @@
 
         public class GetDiagnosisByIdQuery : IRequest<DiagnosisDto>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public GetDiagnosisByIdQuery(long id)
             {
@@ -36,7 +36,7 @@
 
         public class DeleteDiagnosisRequest : IRequest<bool>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public DeleteDiagnosisRequest(long id)
             {

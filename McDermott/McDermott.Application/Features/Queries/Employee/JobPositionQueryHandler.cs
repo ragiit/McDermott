@@ -2,115 +2,157 @@
 
 namespace McDermott.Application.Features.Queries.Employee
 {
-    public class JobPositionQueryHandler
+    public class JobPositionQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetJobPositionQuery, List<JobPositionDto>>,
+        IRequestHandler<CreateJobPositionRequest, JobPositionDto>,
+        IRequestHandler<CreateListJobPositionRequest, List<JobPositionDto>>,
+        IRequestHandler<UpdateJobPositionRequest, JobPositionDto>,
+        IRequestHandler<UpdateListJobPositionRequest, List<JobPositionDto>>,
+        IRequestHandler<DeleteJobPositionRequest, bool>
     {
-        internal class GetAllJobPositionQueryHandler : IRequestHandler<GetJobPositionQuery, List<JobPositionDto>>
+        #region GET
+
+        public async Task<List<JobPositionDto>> Handle(GetJobPositionQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllJobPositionQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetJobPositionQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<JobPosition>? result))
+                {
+                    result = await _unitOfWork.Repository<JobPosition>().GetAsync(
+                        null,
+                        x => x.Include(z => z.Department),
+                        cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<JobPositionDto>>();
             }
-
-            public async Task<List<JobPositionDto>> Handle(GetJobPositionQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<JobPosition>().Entities
-                        .Include(x => x.Department)
-                        .Select(JobPosition => JobPosition.Adapt<JobPositionDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetJobPositionByIdQueryHandler : IRequestHandler<GetJobPositionByIdQuery, JobPositionDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<JobPositionDto> Handle(CreateJobPositionRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetJobPositionByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<JobPositionDto> Handle(GetJobPositionByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<JobPosition>().GetByIdAsync(request.Id);
-
-                return result.Adapt<JobPositionDto>();
-            }
-        }
-
-        internal class CreateJobPositionHandler : IRequestHandler<CreateJobPositionRequest, JobPositionDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateJobPositionHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<JobPositionDto> Handle(CreateJobPositionRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<JobPosition>().AddAsync(request.JobPositionDto.Adapt<JobPosition>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetJobPositionQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<JobPositionDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateJobPositionHandler : IRequestHandler<UpdateJobPositionRequest, bool>
+        public async Task<List<JobPositionDto>> Handle(CreateListJobPositionRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateJobPositionHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<JobPosition>().AddAsync(request.JobPositionDtos.Adapt<List<JobPosition>>());
 
-            public async Task<bool> Handle(UpdateJobPositionRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<JobPosition>().UpdateAsync(request.JobPositionDto.Adapt<JobPosition>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetJobPositionQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<JobPositionDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<JobPositionDto> Handle(UpdateJobPositionRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<JobPosition>().UpdateAsync(request.JobPositionDto.Adapt<JobPosition>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetJobPositionQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<JobPositionDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<JobPositionDto>> Handle(UpdateListJobPositionRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<JobPosition>().UpdateAsync(request.JobPositionDtos.Adapt<List<JobPosition>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetJobPositionQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<JobPositionDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteJobPositionRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<JobPosition>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<JobPosition>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetJobPositionQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteJobPositionHandler : IRequestHandler<DeleteJobPositionRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteJobPositionHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteJobPositionRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<JobPosition>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListJobPositionHandler : IRequestHandler<DeleteListJobPositionRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListJobPositionHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListJobPositionRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<JobPosition>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

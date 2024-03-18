@@ -17,7 +17,7 @@ namespace McDermott.Application.Extentions
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
             services.AddMemoryCache(); // Menambahkan layanan memory cache
-            services.AddDistributedMemoryCache(); // Menambahkan layanan distributed memory cache (opsional, digunakan jika Anda memerlukan cache di beberapa instance server) 
+            services.AddDistributedMemoryCache(); // Menambahkan layanan distributed memory cache (opsional, digunakan jika Anda memerlukan cache di beberapa instance server)
 
             //var authenticationState = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             //services.AddScoped<CustomAuthenticationStateProvider>(provider => new CustomAuthenticationStateProvider(authenticationState));

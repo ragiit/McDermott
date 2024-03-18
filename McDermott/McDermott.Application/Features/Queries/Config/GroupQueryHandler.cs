@@ -1,6 +1,4 @@
-﻿
-
-namespace McDermott.Application.Features.Queries.Config
+﻿namespace McDermott.Application.Features.Queries.Config
 {
     public class GroupQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetGroupQuery, List<GroupDto>>,
@@ -10,8 +8,8 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<UpdateListGroupRequest, List<GroupDto>>,
         IRequestHandler<DeleteGroupRequest, bool>
     {
-
         #region GET
+
         public async Task<List<GroupDto>> Handle(GetGroupQuery request, CancellationToken cancellationToken)
         {
             try
@@ -42,9 +40,11 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-        #endregion
+
+        #endregion GET
 
         #region CREATE
+
         public async Task<GroupDto> Handle(CreateGroupRequest request, CancellationToken cancellationToken)
         {
             try
@@ -53,7 +53,7 @@ namespace McDermott.Application.Features.Queries.Config
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<GroupDto>();
             }
@@ -77,13 +77,14 @@ namespace McDermott.Application.Features.Queries.Config
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
-        #endregion
+
+        #endregion CREATE
 
         #region UPDATE
+
         public async Task<GroupDto> Handle(UpdateGroupRequest request, CancellationToken cancellationToken)
         {
             try
@@ -119,9 +120,11 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-        #endregion
+
+        #endregion UPDATE
 
         #region DELETE
+
         public async Task<bool> Handle(DeleteGroupRequest request, CancellationToken cancellationToken)
         {
             try
@@ -147,6 +150,7 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

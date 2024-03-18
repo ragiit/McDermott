@@ -10,8 +10,7 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<UpdateUserRequest, UserDto>,
         IRequestHandler<DeleteUserRequest, bool>
     {
-
-        #region Get  
+        #region Get
 
         public async Task<List<UserDto>> Handle(GetUserInfoGroupQuery request, CancellationToken cancellationToken)
         {
@@ -108,6 +107,7 @@ namespace McDermott.Application.Features.Queries.Config
         #endregion Get
 
         #region Create
+
         public async Task<UserDto> Handle(CreateUserRequest request, CancellationToken cancellationToken)
         {
             try
@@ -131,9 +131,11 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
+
         #endregion Create
 
         #region Update
+
         public async Task<UserDto> Handle(UpdateUserRequest request, CancellationToken cancellationToken)
         {
             try
@@ -173,9 +175,11 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
+
         #endregion Update
 
         #region Delete
+
         public async Task<bool> Handle(DeleteUserRequest request, CancellationToken cancellationToken)
         {
             try
@@ -201,6 +205,7 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
+
         #endregion Delete
     }
 }

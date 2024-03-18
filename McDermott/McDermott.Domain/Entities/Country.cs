@@ -10,6 +10,7 @@
 
         [SetToNull]
         public virtual List<Company>? Companies { get; set; }
+
         [SetToNull]
         public virtual List<Province>? Provinces { get; set; }
     }

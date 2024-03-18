@@ -3,13 +3,16 @@
     public class ClassTypeCommand
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
+
         public class GetClassTypeQuery(Expression<Func<ClassType, bool>>? predicate = null) : IRequest<List<ClassTypeDto>>
         {
             public Expression<Func<ClassType, bool>> Predicate { get; } = predicate!;
         }
-        #endregion
+
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
         #region CREATE
+
         public class CreateClassTypeRequest(ClassTypeDto ClassTypeDto) : IRequest<ClassTypeDto>
         {
             public ClassTypeDto ClassTypeDto { get; set; } = ClassTypeDto;
@@ -19,9 +22,11 @@
         {
             public List<ClassTypeDto> ClassTypeDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
-        #endregion
+
+        #endregion CREATE
 
         #region Update
+
         public class UpdateClassTypeRequest(ClassTypeDto ClassTypeDto) : IRequest<ClassTypeDto>
         {
             public ClassTypeDto ClassTypeDto { get; set; } = ClassTypeDto;
@@ -32,14 +37,16 @@
             public List<ClassTypeDto> ClassTypeDtos { get; set; } = ClassTypeDtos;
         }
 
-        #endregion
+        #endregion Update
 
-        #region DELETE 
+        #region DELETE
+
         public class DeleteClassTypeRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
             public long Id { get; set; } = id ?? 0;
             public List<long> Ids { get; set; } = ids ?? [];
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

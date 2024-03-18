@@ -160,7 +160,7 @@
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<DistrictDto>>();
-                    await Mediator.Send(new DeleteListDistrictRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }

@@ -2,7 +2,7 @@
 {
     public partial class ProcedureDto : IMapFrom<Procedure>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         [StringLength(200)]

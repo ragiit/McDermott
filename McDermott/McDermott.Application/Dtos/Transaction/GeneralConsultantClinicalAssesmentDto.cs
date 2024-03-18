@@ -2,7 +2,7 @@
 {
     public class GeneralConsultantClinicalAssesmentDto : IMapFrom<GeneralConsultantClinicalAssesment>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
         public long GeneralConsultanServiceId { get; set; }
         public double _Weight { get; set; }
 
