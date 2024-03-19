@@ -24,8 +24,6 @@ namespace McDermott.Web.Components.Pages.Queue
         #region setings Grid
 
         private BaseAuthorizationLayout AuthorizationLayout = new();
-        private bool IsAccess { get; set; } = false;
-        private GroupMenuDto UserAccessCRUID = new();
         private bool PanelVisible { get; set; } = true;
 
         private bool showForm { get; set; } = false;
@@ -99,31 +97,49 @@ namespace McDermott.Web.Components.Pages.Queue
             Phys = filteredDoctors;
         }
 
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
 
             if (firstRender)
             {
-
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
                 }
                 catch { }
             }
         }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
 
         protected override async Task OnInitializedAsync()
         {
             Id = $"{NavigationManager.Uri.Replace(NavigationManager.BaseUri + "queue/kiosk/", "")}".ToInt32();
             try
             {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
+                await GetUserInfo();
 
             }
             catch { }
@@ -167,7 +183,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task LoadData()
         {
-            
+            var cs = UserAccessCRUID.Group.Name;
             PanelVisible = true;
             StateHasChanged();
             showForm = false;

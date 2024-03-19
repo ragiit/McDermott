@@ -398,7 +398,11 @@
                 {
                     if(UserForm.IsEmployeeRelation == true)
                     {
-                        UserForm.IsEmployee = true;
+                        var checkName = Users.Where(x => x.Name.Contains("%" + UserForm.Name + "%")).FirstOrDefault();
+                        if (checkName != null)
+                        {
+                            UserForm.IsEmployee = true;
+                        }
                     }
                     await Mediator.Send(new UpdateUserRequest(UserForm));
                     

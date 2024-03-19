@@ -16,9 +16,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Setting Grid
 
-        private string width = null, height = null;
-
-        private GroupMenuDto UserAccessCRUID = new();
+        private string width = null, height = null;   
         private bool PanelVisible { get; set; } = true;
         private bool PopUpVisible { get; set; } = false;
         private string TextPopUp { get; set; } = string.Empty;
@@ -30,7 +28,6 @@ namespace McDermott.Web.Components.Pages.Queue
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
 
-        private bool IsAccess { get; set; } = false;
 
         #endregion Setting Grid
 
@@ -56,6 +53,14 @@ namespace McDermott.Web.Components.Pages.Queue
         }
 
         #region async data
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -65,21 +70,30 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
                 }
                 catch { }
             }
         }
 
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
         protected override async Task OnInitializedAsync()
         {
             try
             {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
+                await GetUserInfo();
             }
             catch { }
 

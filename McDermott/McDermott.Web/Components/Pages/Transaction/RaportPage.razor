@@ -22,78 +22,58 @@
             <div class="row">
                 <div class="col">
                     <div class="card">
+                        <div class="card-header bg-primary">
+                            <h4 class="text-center"> Report & Analityc</h4>
+                        </div>
                         <div class="card-body">
-                            <DxTabs ScrollMode="TabsScrollMode.NavButtons" RenderMode="TabsRenderMode.AllTabs">
-                                <DxTabPage Text="Laporan kunjungan pasien per periode">
-                                    <div class="row justify-content-center mt-4">
-                                        <div class="col-md-6">
-                                            <form>
-                                                <div class="row">
-                                                    <div class="col-md-8">
-                                                        <label>Pilih A</label>
-                                                        <input class="form-control" type="text" placeholder="hoho" />
-                                                        <label>Pilih Aja</label>
-                                                        <textarea class="form-control" type="text" placeholder="hoho"></textarea>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label>Pilih Aja</label>
-                                                        <input class="form-control" type="date" placeholder="hoho" />
-                                                    </div>
-                                                </div>
-                                                <div class="mt">
-                                                    <button class="btn btn-primary">teken aja</button>
-                                                </div>
-                                            </form>
+                            <div class="row justify-content-center">
+                                <div class="col-md-7">
+                                    <DxFormLayout CssClass="mt">
+                                        <DxFormLayoutItem Caption="Type Report" ColSpanMd=" 12">
+                                            <DxComboBox Data="@ListReport"
+                                                        @bind-Value="@FormReports.report"
+                                                        NullText="Select Report..."
+                                                        SelectedItemChanged="@((string reports)=> selectedReport(reports))"
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                        FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
+                                        </DxFormLayoutItem>
+                                    </DxFormLayout>
+                                </div>
+                            </div>
+                            @if (showForm)
+                            {
+                                <hr />
+                                <div class="row justify-content-center">
+                                    <div class="col-md-8">
+                                        <div class="row">
+                                            <div class="col-md">
+                                                <DxFormLayout CssClass="mt-1">
+                                                    <DxFormLayoutItem Caption="Start Date" ColSpanMd="12">
+                                                        <DxDateEdit @bind-Date="@FormReports.StartDate"
+                                                                    CssClass="cw-320"
+                                                                    InputId="deOverview" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <DxFormLayout CssClass="mt-1">
+                                                    <DxFormLayoutItem Caption="End Date" ColSpanMd="12">
+                                                        <DxDateEdit @bind-Date="@FormReports.EndDate"
+                                                                    CssClass="cw-320"
+                                                                    InputId="deOverview" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                        </div>
+                                        <div class="row justify-content-end">
+                                            <div class=" col-md-4 ">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-file-arrow-down" Text="Download" Click="Download"></DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Text="Cancel"></DxButton>
+                                            </div>
                                         </div>
                                     </div>
-                                </DxTabPage>
-                                <DxTabPage Text="Laporan kunjungan pesien per Department">
-                                    <div class="row justify-content-center mt-4">
-                                        <div class="col-md-6">
-                                            <form>
-                                                <div class="row">
-                                                    <div class="col-md-8">
-                                                        <label>Pilih B</label>
-                                                        <input class="form-control" type="text" placeholder="hoho" />
-                                                        <label>Pilih Aja</label>
-                                                        <textarea class="form-control" type="text" placeholder="hoho" ></textarea>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label>Pilih Aja</label>
-                                                        <input class="form-control" type="date" placeholder="hoho" />
-                                                    </div>
-                                                </div>
-                                               <div class="mt">
-                                                    <button class="btn btn-primary">teken aja</button>
-                                               </div>
-                                            </form>
-                                        </div>
-                                    </div>
-
-                                </DxTabPage>
-                                <DxTabPage Text="Laporan kunjungan pasien per family relation">
-
-                                </DxTabPage>
-                                <DxTabPage Text="Laporan pendaftaran pasien per periode">
-
-                                </DxTabPage>
-                                <DxTabPage Text="Laporan kunjungan pasien per diagnosis">
-
-                                </DxTabPage>
-                                <DxTabPage Text="Laporan pemeriksaan pasien per medical type">
-
-                                </DxTabPage>
-                                <DxTabPage Text="Laporan top diagnosa per periode">
-
-                                </DxTabPage>
-                                <DxTabPage Text="Laporan Kasus khusus">
-
-                                </DxTabPage>
-                                <DxTabPage Text="Laporan Masa berlaku lisensi tenaga medis">
-
-                                </DxTabPage>
-
-                            </DxTabs>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>

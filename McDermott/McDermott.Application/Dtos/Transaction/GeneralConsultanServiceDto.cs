@@ -41,6 +41,7 @@
         public string? ScheduleTime { get; set; }
 
         public long? Age { get; set; }
+        public DateTime? CreateDate { get; set; }
 
         [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
