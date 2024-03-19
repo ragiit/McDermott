@@ -204,7 +204,7 @@
                                                         <DxToolbarItem Alignment="ToolbarItemAlignment.Left" Visible="@(FormRegis.StagingStatus == "Physician")" BeginGroup="true"
                                                                     IconCssClass="fa-solid fa-notes-medical"
                                                                     Click="OnClickPopUpPopUpActionSpace"
-                                                                    Text="Action Space" />
+                                                                    Text="Action Room" />
                                                     </Items>
                                                 </DxToolbar>
                                             </div>
@@ -1513,7 +1513,7 @@ NullText="Select Registration..."
     </EditForm>
 </DxPopup>
 
-<DxPopup HeaderText="Action Space" @bind-Visible="@PopUpActionSpace" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+<DxPopup HeaderText="Action Room" @bind-Visible="@PopUpActionSpace" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
     <EditForm Model="@FormRegis" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
         <DataAnnotationsValidator />
         <DxFormLayout>
@@ -1524,8 +1524,7 @@ NullText="Select Registration..."
                                     NullText="Select Practitioner..."
                                     @bind-Value="@GeneralConsultanMedicalSupport.PractitionerLabEximinationId"
                                     TextFieldName="Name"
-                                    ValueFieldName="Id"
-                                    SelectedItemChanged="@((UserDto? e) => SelectedItemPhysicianChanged(e))">
+                                    ValueFieldName="Id">
                         </DxComboBox>
                         <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerLabEximinationId)" />
                     </DxFormLayoutItem>
@@ -1553,12 +1552,11 @@ NullText="Select Registration..."
                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
                         <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
                                     NullText="Select Practitioner..."
-                                    @bind-Value="@FormRegis.PratitionerId"
+                                    @bind-Value="@GeneralConsultanMedicalSupport.PractitionerRadiologyEximinationId"
                                     TextFieldName="Name"
-                                    ValueFieldName="Id"
-                                    SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))">
+                                    ValueFieldName="Id" >
                         </DxComboBox>
-                        <ValidationMessage For="@(() => FormRegis.PratitionerId)" />
+                        <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerRadiologyEximinationId)" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
                         <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.RadiologyEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
@@ -1584,12 +1582,11 @@ NullText="Select Registration..."
                      <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
                         <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
                                     NullText="Select Practitioner..."
-                                    @bind-Value="@FormRegis.PratitionerId"
+                                    @bind-Value="@GeneralConsultanMedicalSupport.PractitionerAlcoholEximinationId"
                                     TextFieldName="Name"
-                                    ValueFieldName="Id"
-                                    SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))">
+                                    ValueFieldName="Id" >
                         </DxComboBox>
-                        <ValidationMessage For="@(() => FormRegis.PratitionerId)" />
+                        <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerAlcoholEximinationId)" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
                         <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.AlcoholEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
@@ -1621,12 +1618,11 @@ NullText="Select Registration..."
                      <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
                         <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
                                     NullText="Select Practitioner..."
-                                    @bind-Value="@FormRegis.PratitionerId"
+                                    @bind-Value="@GeneralConsultanMedicalSupport.PractitionerDrugEximinationId"
                                     TextFieldName="Name"
-                                    ValueFieldName="Id"
-                                    SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))">
+                                    ValueFieldName="Id" >
                         </DxComboBox>
-                        <ValidationMessage For="@(() => FormRegis.PratitionerId)" />
+                        <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerDrugEximinationId)" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
                         <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.DrugEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
@@ -1658,12 +1654,11 @@ NullText="Select Registration..."
                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
                         <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
                                     NullText="Select Practitioner..."
-                                    @bind-Value="@FormRegis.PratitionerId"
+                                    @bind-Value="@GeneralConsultanMedicalSupport.PractitionerECGId"
                                     TextFieldName="Name"
-                                    ValueFieldName="Id"
-                                    SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))">
+                                    ValueFieldName="Id">
                         </DxComboBox>
-                        <ValidationMessage For="@(() => FormRegis.PratitionerId)" />
+                        <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerECGId)" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Resting ECG" ColSpanMd="12">
                         <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsNormalRestingECG" />

@@ -232,7 +232,7 @@ namespace McDermott.Persistence.Repositories
             //Log.Error(ex, method + " {Handler} => {@Result}", method, ex);
 
             Log.Error(method + "ERROR => {@result}", ex);
-            Log.Error("Ngeteh Njay", "Unhandled Exception occurred Halo");
+            //Log.Error("Ngeteh Njay", "Unhandled Exception occurred Halo");
         }
 
         public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)

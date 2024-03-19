@@ -11,6 +11,7 @@ global using Microsoft.EntityFrameworkCore;
 global using System.ComponentModel.DataAnnotations;
 global using System.Linq.Expressions;
 global using Microsoft.Extensions.Caching.Memory;
+global using static McDermott.Application.Features.Commands.Medical.SampleTypeCommand;
 global using static McDermott.Application.Features.Commands.Config.GenderCommand;
 global using static McDermott.Application.Features.Commands.Config.GroupCommand;
 global using static McDermott.Application.Features.Commands.Config.ReligionCommand;
@@ -29,3 +30,5 @@ global using static McDermott.Application.Features.Commands.Transaction.GeneralC
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanMedicalSupportCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceCommand;
 global using static McDermott.Application.Features.Commands.Patient.ClassTypeCommand;
+global using static McDermott.Application.Features.Commands.Medical.LabUomCommand;
+global using static McDermott.Application.Features.Commands.Medical.LabTestCommand;

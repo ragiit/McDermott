@@ -2,11 +2,6 @@
 {
     public partial class ActionSpacePage
     {
-        private List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupports = [];
-        private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport = new();
-
-        #region Grid Properties
-
         #region UserLoginAndAccessRole
 
         [Inject]
@@ -44,6 +39,18 @@
 
         #endregion UserLoginAndAccessRole
 
+        private List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupports = [];
+        private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport = new();
+        private GeneralConsultanServiceDto GeneralConsultanService = new();
+        private List<UserDto> Doctors { get; set; } = [];
+        private List<IBrowserFile> BrowserFiles = [];
+
+        #region Grid Properties
+
+        private string StagingText = "In-Progress";
+        private bool ShowForm = false;
+        private bool FormValidationState = false;
+        private bool PopUpActionSpace = false;
         private bool PanelVisible { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
 
@@ -56,6 +63,10 @@
 
         protected override async Task OnInitializedAsync()
         {
+            PanelVisible = true;
+
+            Doctors = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true));
+
             await GetUserInfo();
             await LoadData();
         }
@@ -63,6 +74,8 @@
         private async Task LoadData()
         {
             PanelVisible = true;
+            ShowForm = false;
+            GeneralConsultanService = new();
             GeneralConsultanMedicalSupport = new();
             SelectedDataItems = [];
             GeneralConsultanMedicalSupports = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery());
@@ -70,6 +83,191 @@
         }
 
         #endregion LoadData
+
+        #region Methods
+
+        private async Task OnClickConfirm()
+        {
+            switch (GeneralConsultanMedicalSupport.Status)
+            {
+                case "Draft":
+                    StagingText = "Finish";
+                    GeneralConsultanMedicalSupport.Status = "In-Progress";
+                    break;
+
+                case "In-Progress":
+                case "Finish":
+                    StagingText = "Finish";
+                    GeneralConsultanMedicalSupport.Status = "Finish";
+                    break;
+
+                default:
+                    break;
+            }
+
+            await OnSave();
+        }
+
+        private async Task OnSave()
+        {
+            try
+            {
+                if (GeneralConsultanMedicalSupport.Id == 0)
+                    return;
+
+                BrowserFiles.Distinct();
+
+                foreach (var item in BrowserFiles)
+                {
+                    await FileUploadService.UploadFileAsync(item, 0, []);
+                }
+
+                GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task HandleValidSubmit()
+        {
+            FormValidationState = true;
+            await OnSave();
+        }
+
+        private void HandleInvalidSubmit()
+        {
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+            FormValidationState = false;
+        }
+
+        #endregion Methods
+
+        #region SaveDelete
+
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                if (SelectedDataItems is null || SelectedDataItems.Count == 1)
+                {
+                    await Mediator.Send(new DeleteGeneralConsultanMedicalSupportRequest(((GeneralConsultanMedicalSupportDto)e.DataItem).Id));
+                }
+                else
+                {
+                    await Mediator.Send(new DeleteGeneralConsultanMedicalSupportRequest(ids: SelectedDataItems.Adapt<List<GeneralConsultanMedicalSupportDto>>().Select(x => x.Id).ToList()));
+                }
+
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        #endregion SaveDelete
+
+        #region FileAttachmentLab
+
+        private void RemoveSelectedFileLab()
+        {
+            GeneralConsultanMedicalSupport.LabEximinationAttachment = null;
+        }
+
+        private async void SelectFilesLab(InputFileChangeEventArgs e)
+        {
+            BrowserFiles.Add(e.File);
+
+            GeneralConsultanMedicalSupport.LabEximinationAttachment = e.File.Name;
+        }
+
+        private async Task SelectFileLab()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "labFile");
+        }
+
+        private async Task DownloadFile(string fileName)
+        {
+            if (GeneralConsultanMedicalSupport.Id != 0 && !string.IsNullOrWhiteSpace(fileName))
+            {
+                await Helper.DownloadFile(fileName, HttpContextAccessor, HttpClient, JsRuntime);
+            }
+        }
+
+        #endregion FileAttachmentLab
+
+        #region FileAttachmentRadiology
+
+        private void RemoveSelectedFileRadiology()
+        {
+            GeneralConsultanMedicalSupport.RadiologyEximinationAttachment = null;
+        }
+
+        private void SelectFilesRadiology(InputFileChangeEventArgs e)
+        {
+            BrowserFiles.Add(e.File);
+
+            GeneralConsultanMedicalSupport.RadiologyEximinationAttachment = e.File.Name;
+
+            //await FileUploadService.UploadFileAsync(e.File, 1 * 1024 * 1024, []);
+        }
+
+        private async Task SelectFileRadiology()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "radiologyFile");
+        }
+
+        #endregion FileAttachmentRadiology
+
+        #region FileAttachmentAlcohol
+
+        private void RemoveSelectedFileAlcohol()
+        {
+            GeneralConsultanMedicalSupport.AlcoholEximinationAttachment = null;
+        }
+
+        private void SelectFilesAlcohol(InputFileChangeEventArgs e)
+        {
+            BrowserFiles.Add(e.File);
+
+            GeneralConsultanMedicalSupport.AlcoholEximinationAttachment = e.File.Name;
+
+            //await FileUploadService.UploadFileAsync(e.File, 1 * 1024 * 1024, []);
+        }
+
+        private async Task SelectFileAlcohol()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "alcoholFile");
+        }
+
+        #endregion FileAttachmentAlcohol
+
+        #region FileAttachmentDrug
+
+        private void RemoveSelectedFileDrug()
+        {
+            GeneralConsultanMedicalSupport.DrugEximinationAttachment = null;
+        }
+
+        private void SelectFilesDrug(InputFileChangeEventArgs e)
+        {
+            BrowserFiles.Add(e.File);
+
+            GeneralConsultanMedicalSupport.DrugEximinationAttachment = e.File.Name;
+
+            ToastService.ShowInfo(BrowserFiles.Count().ToString());
+
+            //await FileUploadService.UploadFileAsync(e.File, 1 * 1024 * 1024, []);
+        }
+
+        private async Task SelectFileDrug()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "drugFile");
+        }
+
+        #endregion FileAttachmentDrug
 
         #region Grid Function
 
@@ -91,49 +289,6 @@
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
 
-        #region SaveDelete
-
-        private async Task OnDelete(GridDataItemDeletingEventArgs e)
-        {
-            try
-            {
-                if (SelectedDataItems is null || SelectedDataItems.Count == 1)
-                {
-                    await Mediator.Send(new DeleteGeneralConsultanServiceRequest(((GeneralConsultanServiceDto)e.DataItem).Id));
-                }
-                else
-                {
-                    await Mediator.Send(new DeleteGeneralConsultanServiceRequest(ids: SelectedDataItems.Adapt<List<GeneralConsultanServiceDto>>().Select(x => x.Id).ToList()));
-                }
-
-                await LoadData();
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-        }
-
-        private async Task OnSave(GridEditModelSavingEventArgs e)
-        {
-            try
-            {
-                //GeneralConsultanService = (GeneralConsultanServiceDto)e.EditModel;
-                //if (GeneralConsultanService.Id == 0)
-                //    await Mediator.Send(new CreateTemplateRequest(GeneralConsultanService));
-                //else
-                //    await Mediator.Send(new UpdateTemplateRequest(GeneralConsultanService));
-
-                await LoadData();
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-        }
-
-        #endregion SaveDelete
-
         #region ToolBar Button
 
         private async Task Refresh_Click()
@@ -141,15 +296,20 @@
             await LoadData();
         }
 
-        private async Task NewItem_Click()
-        {
-            await Grid.StartEditNewRowAsync();
-        }
-
         private async Task EditItem_Click()
         {
+            ShowForm = true;
             GeneralConsultanMedicalSupport = SelectedDataItems[0].Adapt<GeneralConsultanMedicalSupportDto>();
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            var generalConsultanService = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanMedicalSupport.GeneralConsultanServiceId));
+
+            if (generalConsultanService.Count > 0)
+                GeneralConsultanService = generalConsultanService[0];
+        }
+
+        private void OnCancel()
+        {
+            ShowForm = false;
+            GeneralConsultanMedicalSupport = new();
         }
 
         private void DeleteItem_Click()

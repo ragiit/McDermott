@@ -23,13 +23,30 @@ namespace McDermott.Application.Features.Queries.Config
 
                 if (!_cache.TryGetValue(cacheKey, out List<Village>? result))
                 {
-                    result = await _unitOfWork.Repository<Village>().GetAsync(
-                        null,
-                        x => x
-                        .Include(z => z.Province)
-                        .Include(z => z.City)
-                        .Include(z => z.District),
-                        cancellationToken);
+
+                    //return await _unitOfWork.Repository<DetailQueueDisplay>().Entities
+                    //    .Include(x => x.QueueDisplay)
+                    //    .Include(x => x.Counter)
+                    //    .Select(DetailQueueDisplay => DetailQueueDisplay.Adapt<DetailQueueDisplayDto>())
+                    //    .AsNoTracking()
+                    //    .ToListAsync(cancellationToken);
+
+                    //result = await _unitOfWork.Repository<Village>().GetAsync(
+                    //    null,
+                    //    x => x
+                    //    .Include(z => z.Province)
+                    //    .Include(z => z.City)
+                    //    .Include(z => z.District),
+                    //    cancellationToken);
+
+                    result = await _unitOfWork.Repository<Village>().Entities
+                        .Include(x => x.Province)
+                        .Include(x => x.City)
+                        .Include(x => x.District)
+                        .OrderBy(x => x.Name)
+                        .Take(5)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }
