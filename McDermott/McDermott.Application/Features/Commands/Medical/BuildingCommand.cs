@@ -6,7 +6,7 @@
 
         public class GetBuildingByIdQuery : IRequest<BuildingDto>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public GetBuildingByIdQuery(long id)
             {
@@ -66,7 +66,7 @@
 
         public class DeleteBuildingRequest : IRequest<bool>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public DeleteBuildingRequest(long id)
             {

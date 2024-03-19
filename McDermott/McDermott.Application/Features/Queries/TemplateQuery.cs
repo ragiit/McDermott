@@ -10,8 +10,8 @@ namespace McDermott.Application.Features.Queries
         IRequestHandler<UpdateListTemplateRequest, List<ProvinceDto>>,
         IRequestHandler<DeleteTemplateRequest, bool>
     {
-
         #region GET
+
         public async Task<List<ProvinceDto>> Handle(GetTemplateQuery request, CancellationToken cancellationToken)
         {
             try
@@ -42,9 +42,11 @@ namespace McDermott.Application.Features.Queries
                 throw;
             }
         }
-        #endregion
+
+        #endregion GET
 
         #region CREATE
+
         public async Task<ProvinceDto> Handle(CreateTemplateRequest request, CancellationToken cancellationToken)
         {
             try
@@ -53,7 +55,7 @@ namespace McDermott.Application.Features.Queries
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetTemplateQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetTemplateQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<ProvinceDto>();
             }
@@ -77,13 +79,14 @@ namespace McDermott.Application.Features.Queries
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
-        #endregion
+
+        #endregion CREATE
 
         #region UPDATE
+
         public async Task<ProvinceDto> Handle(UpdateTemplateRequest request, CancellationToken cancellationToken)
         {
             try
@@ -119,9 +122,11 @@ namespace McDermott.Application.Features.Queries
                 throw;
             }
         }
-        #endregion
+
+        #endregion UPDATE
 
         #region DELETE
+
         public async Task<bool> Handle(DeleteTemplateRequest request, CancellationToken cancellationToken)
         {
             try
@@ -147,6 +152,7 @@ namespace McDermott.Application.Features.Queries
                 throw;
             }
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

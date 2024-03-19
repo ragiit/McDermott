@@ -1,6 +1,4 @@
-﻿using static McDermott.Application.Features.Commands.Config.GroupMenuCommand;
-
-namespace McDermott.Web.Components.Layout
+﻿namespace McDermott.Web.Components.Layout
 {
     public partial class BaseLayoutRazor
     { // Properti yang dapat di-override oleh halaman pengguna

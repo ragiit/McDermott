@@ -87,36 +87,52 @@
 
         [SetToNull]
         public virtual Group? Group { get; set; }
+
         [SetToNull]
         public virtual Gender? Gender { get; set; }
+
         [SetToNull]
         public virtual Country? IdCardCountry { get; set; } // KTP Negara
+
         [SetToNull]
         public virtual Province? IdCardProvince { get; set; } // KTP Province
+
         [SetToNull]
         public virtual City? IdCardCity { get; set; } // KTP Negara
+
         [SetToNull]
         public virtual District? IdCardDistrict { get; set; } // KTP Negara
+
         [SetToNull]
         public virtual Village? IdCardVillage { get; set; } // KTP Negara
+
         [SetToNull]
         public virtual Country? DomicileCountry { get; set; } // Domisili Negara
+
         [SetToNull]
         public virtual Province? DomicileProvince { get; set; } // Domisili Province
+
         [SetToNull]
         public virtual City? DomicileCity { get; set; } // Domisili City
+
         [SetToNull]
         public virtual District? DomicileDistrict { get; set; } // Domisili District
+
         [SetToNull]
         public virtual Village? DomicileVillage { get; set; } // Domisili Village
+
         [SetToNull]
         public virtual Religion? Religion { get; set; }
+
         [SetToNull]
         public virtual Speciality? Speciality { get; set; }
+
         [SetToNull]
         public virtual JobPosition? JobPosition { get; set; }
+
         [SetToNull]
         public virtual Department? Department { get; set; }
+
         [SetToNull]
         public virtual Degree? Degree { get; set; }
     }

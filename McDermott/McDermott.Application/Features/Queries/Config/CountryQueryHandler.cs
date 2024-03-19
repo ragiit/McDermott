@@ -10,8 +10,8 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<UpdateListCountryRequest, List<CountryDto>>,
         IRequestHandler<DeleteCountryRequest, bool>
     {
-
         #region GET
+
         public async Task<List<CountryDto>> Handle(GetCountryQuery request, CancellationToken cancellationToken)
         {
             try
@@ -41,9 +41,11 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-        #endregion
+
+        #endregion GET
 
         #region CREATE
+
         public async Task<CountryDto> Handle(CreateCountryRequest request, CancellationToken cancellationToken)
         {
             try
@@ -52,7 +54,7 @@ namespace McDermott.Application.Features.Queries.Config
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetCountryQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetCountryQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<CountryDto>();
             }
@@ -76,13 +78,14 @@ namespace McDermott.Application.Features.Queries.Config
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
-        #endregion
+
+        #endregion CREATE
 
         #region UPDATE
+
         public async Task<CountryDto> Handle(UpdateCountryRequest request, CancellationToken cancellationToken)
         {
             try
@@ -118,9 +121,11 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-        #endregion
+
+        #endregion UPDATE
 
         #region DELETE
+
         public async Task<bool> Handle(DeleteCountryRequest request, CancellationToken cancellationToken)
         {
             try
@@ -146,6 +151,7 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

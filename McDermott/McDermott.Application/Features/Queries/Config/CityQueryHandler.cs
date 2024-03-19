@@ -2,110 +2,157 @@
 
 namespace McDermott.Application.Features.Queries.Config
 {
-    public class CityQueryHandler
+    public class CityQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetCityQuery, List<CityDto>>,
+        IRequestHandler<CreateCityRequest, CityDto>,
+        IRequestHandler<CreateListCityRequest, List<CityDto>>,
+        IRequestHandler<UpdateCityRequest, CityDto>,
+        IRequestHandler<UpdateListCityRequest, List<CityDto>>,
+        IRequestHandler<DeleteCityRequest, bool>
     {
-        internal class GetAllCityQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetCityQuery, List<CityDto>>
-        {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        #region GET
 
-            public async Task<List<CityDto>> Handle(GetCityQuery query, CancellationToken cancellationToken)
+        public async Task<List<CityDto>> Handle(GetCityQuery request, CancellationToken cancellationToken)
+        {
+            try
             {
-                return await _unitOfWork.Repository<City>().Entities
-                        .Include(x => x.Province)
-                        .Select(City => City.Adapt<CityDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                string cacheKey = $"GetCityQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<City>? result))
+                {
+                    result = await _unitOfWork.Repository<City>().GetAsync(
+                        null,
+                        x => x.Include(z => z.Province),
+                        cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<CityDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-        internal class GetCityByIdQueryHandler : IRequestHandler<GetCityByIdQuery, CityDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<CityDto> Handle(CreateCityRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetCityByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<CityDto> Handle(GetCityByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<City>().GetByIdAsync(request.Id);
-
-                return result.Adapt<CityDto>();
-            }
-        }
-
-        internal class CreateCityHandler : IRequestHandler<CreateCityRequest, CityDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateCityHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<CityDto> Handle(CreateCityRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<City>().AddAsync(request.CityDto.Adapt<City>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetCityQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<CityDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateCityHandler : IRequestHandler<UpdateCityRequest, bool>
+        public async Task<List<CityDto>> Handle(CreateListCityRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateCityHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<City>().AddAsync(request.CityDtos.Adapt<List<City>>());
 
-            public async Task<bool> Handle(UpdateCityRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<City>().UpdateAsync(request.CityDto.Adapt<City>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetCityQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<CityDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<CityDto> Handle(UpdateCityRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<City>().UpdateAsync(request.CityDto.Adapt<City>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetCityQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<CityDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<CityDto>> Handle(UpdateListCityRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<City>().UpdateAsync(request.CityDtos.Adapt<List<City>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetCityQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<CityDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteCityRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<City>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<City>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetCityQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteCityHandler : IRequestHandler<DeleteCityRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteCityHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteCityRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<City>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListCityHandler : IRequestHandler<DeleteListCityRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListCityHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListCityRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<City>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

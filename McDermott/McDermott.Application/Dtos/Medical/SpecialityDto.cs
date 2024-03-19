@@ -2,7 +2,7 @@ namespace McDermott.Application.Dtos.Medical
 {
     public class SpecialityDto : IMapFrom<Speciality>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         [StringLength(200)]

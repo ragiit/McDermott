@@ -10,8 +10,8 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<UpdateListGroupMenuRequest, List<GroupMenuDto>>,
         IRequestHandler<DeleteGroupMenuRequest, bool>
     {
-
         #region GET
+
         public async Task<List<GroupMenuDto>> Handle(GetGroupMenuQuery request, CancellationToken cancellationToken)
         {
             try
@@ -44,9 +44,11 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-        #endregion
+
+        #endregion GET
 
         #region CREATE
+
         public async Task<GroupMenuDto> Handle(CreateGroupMenuRequest request, CancellationToken cancellationToken)
         {
             try
@@ -55,7 +57,7 @@ namespace McDermott.Application.Features.Queries.Config
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetGroupMenuQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetGroupMenuQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<GroupMenuDto>();
             }
@@ -79,13 +81,14 @@ namespace McDermott.Application.Features.Queries.Config
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
-        #endregion
+
+        #endregion CREATE
 
         #region UPDATE
+
         public async Task<GroupMenuDto> Handle(UpdateGroupMenuRequest request, CancellationToken cancellationToken)
         {
             try
@@ -121,9 +124,11 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-        #endregion
+
+        #endregion UPDATE
 
         #region DELETE
+
         public async Task<bool> Handle(DeleteGroupMenuRequest request, CancellationToken cancellationToken)
         {
             try
@@ -149,6 +154,7 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

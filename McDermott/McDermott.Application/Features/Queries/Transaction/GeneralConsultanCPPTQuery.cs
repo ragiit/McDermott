@@ -8,8 +8,8 @@
         IRequestHandler<UpdateListGeneralConsultanCPPTRequest, List<GeneralConsultanCPPTDto>>,
         IRequestHandler<DeleteGeneralConsultanCPPTRequest, bool>
     {
-
         #region GET
+
         public async Task<List<GeneralConsultanCPPTDto>> Handle(GetGeneralConsultanCPPTQuery request, CancellationToken cancellationToken)
         {
             try
@@ -40,9 +40,11 @@
                 throw;
             }
         }
-        #endregion
+
+        #endregion GET
 
         #region CREATE
+
         public async Task<GeneralConsultanCPPTDto> Handle(CreateGeneralConsultanCPPTRequest request, CancellationToken cancellationToken)
         {
             try
@@ -51,7 +53,7 @@
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetGeneralConsultanCPPTQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetGeneralConsultanCPPTQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<GeneralConsultanCPPTDto>();
             }
@@ -75,13 +77,14 @@
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
-        #endregion
+
+        #endregion CREATE
 
         #region UPDATE
+
         public async Task<GeneralConsultanCPPTDto> Handle(UpdateGeneralConsultanCPPTRequest request, CancellationToken cancellationToken)
         {
             try
@@ -117,9 +120,11 @@
                 throw;
             }
         }
-        #endregion
+
+        #endregion UPDATE
 
         #region DELETE
+
         public async Task<bool> Handle(DeleteGeneralConsultanCPPTRequest request, CancellationToken cancellationToken)
         {
             try
@@ -145,6 +150,7 @@
                 throw;
             }
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

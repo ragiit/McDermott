@@ -66,7 +66,7 @@
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<JobPositionDto>>();
-                    await Mediator.Send(new DeleteListJobPositionRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }

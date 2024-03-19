@@ -191,7 +191,7 @@
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<CityDto>>();
-                    await Mediator.Send(new DeleteListCityRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteCityRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }

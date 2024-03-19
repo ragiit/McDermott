@@ -2,117 +2,160 @@
 
 namespace McDermott.Application.Features.Queries.Config
 {
-    public class VillageQueryHandler
+    public class VillageQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetVillageQuery, List<VillageDto>>,
+        IRequestHandler<CreateVillageRequest, VillageDto>,
+        IRequestHandler<CreateListVillageRequest, List<VillageDto>>,
+        IRequestHandler<UpdateVillageRequest, VillageDto>,
+        IRequestHandler<UpdateListVillageRequest, List<VillageDto>>,
+        IRequestHandler<DeleteVillageRequest, bool>
     {
-        internal class GetAllVillageQueryHandler : IRequestHandler<GetVillageQuery, List<VillageDto>>
+        #region GET
+
+        public async Task<List<VillageDto>> Handle(GetVillageQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllVillageQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetVillageQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Village>? result))
+                {
+                    result = await _unitOfWork.Repository<Village>().GetAsync(
+                        null,
+                        x => x
+                        .Include(z => z.Province)
+                        .Include(z => z.City)
+                        .Include(z => z.District),
+                        cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<VillageDto>>();
             }
-
-            public async Task<List<VillageDto>> Handle(GetVillageQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<Village>().Entities
-                        .Include(x => x.City)
-                        .Include(x => x.Province)
-                        .Include(x => x.District)
-                        .Select(Village => Village.Adapt<VillageDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetVillageByIdQueryHandler : IRequestHandler<GetVillageByIdQuery, VillageDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<VillageDto> Handle(CreateVillageRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetVillageByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<VillageDto> Handle(GetVillageByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Village>().GetByIdAsync(request.Id);
-
-                return result.Adapt<VillageDto>();
-            }
-        }
-
-        internal class CreateVillageHandler : IRequestHandler<CreateVillageRequest, VillageDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateVillageHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<VillageDto> Handle(CreateVillageRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Village>().AddAsync(request.VillageDto.Adapt<Village>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetVillageQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<VillageDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateVillageHandler : IRequestHandler<UpdateVillageRequest, bool>
+        public async Task<List<VillageDto>> Handle(CreateListVillageRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateVillageHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Village>().AddAsync(request.VillageDtos.Adapt<List<Village>>());
 
-            public async Task<bool> Handle(UpdateVillageRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Village>().UpdateAsync(request.VillageDto.Adapt<Village>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetVillageQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<VillageDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<VillageDto> Handle(UpdateVillageRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Village>().UpdateAsync(request.VillageDto.Adapt<Village>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetVillageQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<VillageDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<VillageDto>> Handle(UpdateListVillageRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Village>().UpdateAsync(request.VillageDtos.Adapt<List<Village>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetVillageQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<VillageDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteVillageRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<Village>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<Village>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetVillageQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteVillageHandler : IRequestHandler<DeleteVillageRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteVillageHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteVillageRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Village>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListVillageHandler : IRequestHandler<DeleteListVillageRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListVillageHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListVillageRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Village>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

@@ -32,14 +32,19 @@
 
         [SetToNull] // Tandai properti yang harus diatur ke null
         public GeneralConsultanService? GeneralConsultanService { get; set; }
+
         [SetToNull]
         public User? PractitionerLabEximination { get; set; }
+
         [SetToNull]
         public User? PractitionerRadiologyEximination { get; set; }
+
         [SetToNull]
         public User? PractitionerAlcoholEximination { get; set; }
+
         [SetToNull]
         public User? PractitionerDrugEximination { get; set; }
+
         [SetToNull]
         public User? PractitionerECG { get; set; }
     }

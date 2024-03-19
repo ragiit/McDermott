@@ -2,7 +2,7 @@
 {
     public partial class DiseaseCategoryDto : IMapFrom<DiseaseCategory>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
         public string? ParentCategory { get; set; }
 
         [Required]

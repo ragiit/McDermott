@@ -2,56 +2,52 @@
 {
     public class VillageCommand
     {
-        public class GetVillageQuery : IRequest<List<VillageDto>>;
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetVillageByIdQuery : IRequest<VillageDto>
+        public class GetVillageQuery(Expression<Func<Village, bool>>? predicate = null, bool removeCache = false) : IRequest<List<VillageDto>>
         {
-            public long Id { get; set; }
-
-            public GetVillageByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<Village, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateVillageRequest : IRequest<VillageDto>
-        {
-            public VillageDto VillageDto { get; set; }
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
-            public CreateVillageRequest(VillageDto VillageDto)
-            {
-                this.VillageDto = VillageDto;
-            }
+        #region CREATE
+
+        public class CreateVillageRequest(VillageDto VillageDto) : IRequest<VillageDto>
+        {
+            public VillageDto VillageDto { get; set; } = VillageDto;
         }
 
-        public class UpdateVillageRequest : IRequest<bool>
+        public class CreateListVillageRequest(List<VillageDto> GeneralConsultanCPPTDtos) : IRequest<List<VillageDto>>
         {
-            public VillageDto VillageDto { get; set; }
-
-            public UpdateVillageRequest(VillageDto VillageDto)
-            {
-                this.VillageDto = VillageDto;
-            }
+            public List<VillageDto> VillageDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
-        public class DeleteVillageRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteVillageRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateVillageRequest(VillageDto VillageDto) : IRequest<VillageDto>
+        {
+            public VillageDto VillageDto { get; set; } = VillageDto;
         }
 
-        public class DeleteListVillageRequest : IRequest<bool>
+        public class UpdateListVillageRequest(List<VillageDto> VillageDtos) : IRequest<List<VillageDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListVillageRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<VillageDto> VillageDtos { get; set; } = VillageDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteVillageRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

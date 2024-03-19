@@ -8,7 +8,7 @@ namespace McDermott.Application.Features.Commands.Queue
 
         public class GetCounterByIdQuery : IRequest<CounterDto>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public GetCounterByIdQuery(long id)
             {
@@ -38,7 +38,7 @@ namespace McDermott.Application.Features.Commands.Queue
 
         public class DeleteCounterRequest : IRequest<bool>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public DeleteCounterRequest(long id)
             {

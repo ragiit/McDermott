@@ -11,6 +11,7 @@ namespace McDermott.Application.Features.Queries.Patient
         IRequestHandler<DeleteFamilyRequest, bool>
     {
         #region GET
+
         public async Task<List<FamilyDto>> Handle(GetFamilyQuery request, CancellationToken cancellationToken)
         {
             try
@@ -36,9 +37,11 @@ namespace McDermott.Application.Features.Queries.Patient
                 throw;
             }
         }
-        #endregion
+
+        #endregion GET
 
         #region CREATE
+
         public async Task<FamilyDto> Handle(CreateFamilyRequest request, CancellationToken cancellationToken)
         {
             try
@@ -47,7 +50,7 @@ namespace McDermott.Application.Features.Queries.Patient
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetFamilyQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetFamilyQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<FamilyDto>();
             }
@@ -71,13 +74,14 @@ namespace McDermott.Application.Features.Queries.Patient
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
-        #endregion
+
+        #endregion CREATE
 
         #region UPDATE
+
         public async Task<FamilyDto> Handle(UpdateFamilyRequest request, CancellationToken cancellationToken)
         {
             try
@@ -113,9 +117,11 @@ namespace McDermott.Application.Features.Queries.Patient
                 throw;
             }
         }
-        #endregion
+
+        #endregion UPDATE
 
         #region DELETE
+
         public async Task<bool> Handle(DeleteFamilyRequest request, CancellationToken cancellationToken)
         {
             try
@@ -141,6 +147,7 @@ namespace McDermott.Application.Features.Queries.Patient
                 throw;
             }
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

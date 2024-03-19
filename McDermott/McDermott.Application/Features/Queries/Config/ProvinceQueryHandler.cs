@@ -2,132 +2,157 @@
 
 namespace McDermott.Application.Features.Queries.Config
 {
-    public class ProvinceQueryHandler
+    public class ProvinceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetProvinceQuery, List<ProvinceDto>>,
+        IRequestHandler<CreateProvinceRequest, ProvinceDto>,
+        IRequestHandler<CreateListProvinceRequest, List<ProvinceDto>>,
+        IRequestHandler<UpdateProvinceRequest, ProvinceDto>,
+        IRequestHandler<UpdateListProvinceRequest, List<ProvinceDto>>,
+        IRequestHandler<DeleteProvinceRequest, bool>
     {
-        internal class GetAllProvinceQueryHandler : IRequestHandler<GetProvinceQuery, List<ProvinceDto>>
+        #region GET
+
+        public async Task<List<ProvinceDto>> Handle(GetProvinceQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllProvinceQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetProvinceQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Province>? result))
+                {
+                    result = await _unitOfWork.Repository<Province>().GetAsync(
+                        null,
+                        x => x.Include(z => z.Country),
+                        cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<ProvinceDto>>();
             }
-
-            public async Task<List<ProvinceDto>> Handle(GetProvinceQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<Province>().Entities
-                        .Include(x => x.Country)
-                        .Select(Province => Province.Adapt<ProvinceDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetProvinceByIdQueryHandler : IRequestHandler<GetProvinceByIdQuery, ProvinceDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<ProvinceDto> Handle(CreateProvinceRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetProvinceByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<ProvinceDto> Handle(GetProvinceByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Province>().GetByIdAsync(request.Id);
-
-                return result.Adapt<ProvinceDto>();
-            }
-        }
-
-        internal class GetProvinceByCountryHandler : IRequestHandler<GetProvinceByCountry, List<ProvinceDto>>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetProvinceByCountryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<List<ProvinceDto>> Handle(GetProvinceByCountry request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Province>().GetByIdAsync(request.CountryId ?? 0);
-
-                return result.Adapt<List<ProvinceDto>>();
-            }
-        }
-
-        internal class CreateProvinceHandler : IRequestHandler<CreateProvinceRequest, ProvinceDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateProvinceHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<ProvinceDto> Handle(CreateProvinceRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Province>().AddAsync(request.ProvinceDto.Adapt<Province>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetProvinceQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<ProvinceDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateProvinceHandler : IRequestHandler<UpdateProvinceRequest, bool>
+        public async Task<List<ProvinceDto>> Handle(CreateListProvinceRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateProvinceHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Province>().AddAsync(request.ProvinceDtos.Adapt<List<Province>>());
 
-            public async Task<bool> Handle(UpdateProvinceRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Province>().UpdateAsync(request.ProvinceDto.Adapt<Province>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetProvinceQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<ProvinceDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<ProvinceDto> Handle(UpdateProvinceRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Province>().UpdateAsync(request.ProvinceDto.Adapt<Province>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetProvinceQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<ProvinceDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<ProvinceDto>> Handle(UpdateListProvinceRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Province>().UpdateAsync(request.ProvinceDtos.Adapt<List<Province>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetProvinceQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<ProvinceDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteProvinceRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<Province>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<Province>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetProvinceQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteProvinceHandler : IRequestHandler<DeleteProvinceRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteProvinceHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteProvinceRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Province>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListProvinceHandler : IRequestHandler<DeleteListProvinceRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListProvinceHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListProvinceRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Province>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

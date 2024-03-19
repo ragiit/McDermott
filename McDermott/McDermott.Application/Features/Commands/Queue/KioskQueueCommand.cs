@@ -8,7 +8,7 @@ namespace McDermott.Application.Features.Commands.Queue
 
         public class GetKioskQueueByIdQuery : IRequest<KioskQueueDto>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public GetKioskQueueByIdQuery(long id)
             {
@@ -38,7 +38,7 @@ namespace McDermott.Application.Features.Commands.Queue
 
         public class DeleteKioskQueueRequest : IRequest<bool>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public DeleteKioskQueueRequest(long id)
             {

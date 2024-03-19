@@ -2,116 +2,159 @@
 
 namespace McDermott.Application.Features.Queries.Config
 {
-    public class DistrictQueryHandler
+    public class DistrictQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetDistrictQuery, List<DistrictDto>>,
+        IRequestHandler<CreateDistrictRequest, DistrictDto>,
+        IRequestHandler<CreateListDistrictRequest, List<DistrictDto>>,
+        IRequestHandler<UpdateDistrictRequest, DistrictDto>,
+        IRequestHandler<UpdateListDistrictRequest, List<DistrictDto>>,
+        IRequestHandler<DeleteDistrictRequest, bool>
     {
-        internal class GetAllDistrictQueryHandler : IRequestHandler<GetDistrictQuery, List<DistrictDto>>
+        #region GET
+
+        public async Task<List<DistrictDto>> Handle(GetDistrictQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllDistrictQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetDistrictQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<District>? result))
+                {
+                    result = await _unitOfWork.Repository<District>().GetAsync(
+                        null,
+                        x => x
+                        .Include(z => z.City)
+                        .Include(z => z.Province),
+                        cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<DistrictDto>>();
             }
-
-            public async Task<List<DistrictDto>> Handle(GetDistrictQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<District>().Entities
-                        .Include(x => x.City)
-                        .Include(x => x.Province)
-                        .Select(District => District.Adapt<DistrictDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetDistrictByIdQueryHandler : IRequestHandler<GetDistrictByIdQuery, DistrictDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<DistrictDto> Handle(CreateDistrictRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetDistrictByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<DistrictDto> Handle(GetDistrictByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<District>().GetByIdAsync(request.Id);
-
-                return result.Adapt<DistrictDto>();
-            }
-        }
-
-        internal class CreateDistrictHandler : IRequestHandler<CreateDistrictRequest, DistrictDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateDistrictHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<DistrictDto> Handle(CreateDistrictRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<District>().AddAsync(request.DistrictDto.Adapt<District>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetDistrictQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<DistrictDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateDistrictHandler : IRequestHandler<UpdateDistrictRequest, bool>
+        public async Task<List<DistrictDto>> Handle(CreateListDistrictRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateDistrictHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<District>().AddAsync(request.DistrictDtos.Adapt<List<District>>());
 
-            public async Task<bool> Handle(UpdateDistrictRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<District>().UpdateAsync(request.DistrictDto.Adapt<District>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetDistrictQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<DistrictDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<DistrictDto> Handle(UpdateDistrictRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<District>().UpdateAsync(request.DistrictDto.Adapt<District>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetDistrictQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<DistrictDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<DistrictDto>> Handle(UpdateListDistrictRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<District>().UpdateAsync(request.DistrictDtos.Adapt<List<District>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetDistrictQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<DistrictDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteDistrictRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<District>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<District>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetDistrictQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteDistrictHandler : IRequestHandler<DeleteDistrictRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteDistrictHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteDistrictRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<District>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListDistrictHandler : IRequestHandler<DeleteListDistrictRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListDistrictHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListDistrictRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<District>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

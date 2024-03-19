@@ -139,14 +139,14 @@
                                             <DxGridDataColumn FieldName="Read" />
                                             <DxGridDataColumn FieldName="Update" />
                                             <DxGridDataColumn FieldName="Delete" />
-                                            <DxGridDataColumn FieldName="Import" />
+                                            @* <DxGridDataColumn FieldName="Import" /> *@
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
                                             @{
                                                 var a = (GroupMenuDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Menu:" ColSpanMd="12">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Menu:" ColSpanMd="12">
                                                     <DxComboBox Data="@Menus"
                                                                 NullText="Select Menu..."
                                                                 FilteringMode="@DataGridFilteringMode.Contains"
@@ -167,9 +167,9 @@
                                                 <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Delete:" ColSpanMd="3">
                                                     @EditFormContext.GetEditor("Delete")
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Import:" ColSpanMd="3">
+                                                @* <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Import:" ColSpanMd="3">
                                                     @EditFormContext.GetEditor("Import")
-                                                </DxFormLayoutItem>
+                                                </DxFormLayoutItem> *@
                                             </DxFormLayout>
                                         </EditFormTemplate>
                                     </DxGrid>

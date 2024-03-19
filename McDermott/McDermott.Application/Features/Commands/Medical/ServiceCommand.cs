@@ -6,7 +6,7 @@
 
         public class GetServiceByIdQuery : IRequest<ServiceDto>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public GetServiceByIdQuery(long id)
             {
@@ -36,7 +36,7 @@
 
         public class DeleteServiceRequest : IRequest<bool>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public DeleteServiceRequest(long id)
             {

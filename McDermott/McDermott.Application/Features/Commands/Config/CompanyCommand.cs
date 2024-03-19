@@ -2,56 +2,52 @@ namespace McDermott.Application.Features.Commands.Config
 {
     public class CompanyCommand
     {
-        public class GetCompanyQuery : IRequest<List<CompanyDto>>;
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetCompanyByIdQuery : IRequest<CompanyDto>
+        public class GetCompanyQuery(Expression<Func<Company, bool>>? predicate = null, bool removeCache = false) : IRequest<List<CompanyDto>>
         {
-             public long Id { get; set; }
-
-            public GetCompanyByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<Company, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateCompanyRequest : IRequest<CompanyDto>
-        {
-            public CompanyDto CompanyDto { get; set; }
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
-            public CreateCompanyRequest(CompanyDto CompanyDto)
-            {
-                this.CompanyDto = CompanyDto;
-            }
+        #region CREATE
+
+        public class CreateCompanyRequest(CompanyDto CompanyDto) : IRequest<CompanyDto>
+        {
+            public CompanyDto CompanyDto { get; set; } = CompanyDto;
         }
 
-        public class UpdateCompanyRequest : IRequest<bool>
+        public class CreateListCompanyRequest(List<CompanyDto> GeneralConsultanCPPTDtos) : IRequest<List<CompanyDto>>
         {
-            public CompanyDto CompanyDto { get; set; }
-
-            public UpdateCompanyRequest(CompanyDto CompanyDto)
-            {
-                this.CompanyDto = CompanyDto;
-            }
+            public List<CompanyDto> CompanyDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
-        public class DeleteCompanyRequest : IRequest<bool>
-        {
-             public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteCompanyRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateCompanyRequest(CompanyDto CompanyDto) : IRequest<CompanyDto>
+        {
+            public CompanyDto CompanyDto { get; set; } = CompanyDto;
         }
 
-        public class DeleteListCompanyRequest : IRequest<bool>
+        public class UpdateListCompanyRequest(List<CompanyDto> CompanyDtos) : IRequest<List<CompanyDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListCompanyRequest(List<long> Id)
-            {
-                this.Id = Id;
-            }
+            public List<CompanyDto> CompanyDtos { get; set; } = CompanyDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteCompanyRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

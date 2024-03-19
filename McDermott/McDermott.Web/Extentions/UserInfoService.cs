@@ -24,6 +24,13 @@ namespace McDermott.Web.Extentions
 
                 User user = await _oLocal.GetCookieUserLogin();
 
+                if (user is null)
+                {
+                    await _oLocal.InvokeVoidAsync("deleteCookie", CookieHelper.USER_INFO);
+                    _navigationManager.NavigateTo("login", true);
+                    return (false, null!, null!);
+                }
+
                 var groups = await _mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)user!.GroupId!)!);
 
                 var userAccessCRUID = groups?.FirstOrDefault(x => x.Menu?.Url != null && x.Menu.Url.ToLower().Contains(url.ToLower().Replace(_navigationManager.BaseUri, "")));
@@ -31,12 +38,6 @@ namespace McDermott.Web.Extentions
                 if (userAccessCRUID is null && url != _navigationManager.BaseUri)
                 {
                     _navigationManager.NavigateTo("", true);
-                }
-
-                if (user is null)
-                {
-                    await _oLocal.InvokeVoidAsync("clearAllCookies");
-                    _navigationManager.NavigateTo("login", true);
                 }
 
                 isAccess = true;

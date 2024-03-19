@@ -2,56 +2,52 @@
 {
     public class ReligionCommand
     {
-        public class GetReligionQuery : IRequest<List<ReligionDto>>;
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetReligionByIdQuery : IRequest<ReligionDto>
+        public class GetReligionQuery(Expression<Func<Religion, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ReligionDto>>
         {
-             public long Id { get; set; }
-
-            public GetReligionByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<Religion, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateReligionRequest : IRequest<ReligionDto>
-        {
-            public ReligionDto ReligionDto { get; set; }
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
-            public CreateReligionRequest(ReligionDto ReligionDto)
-            {
-                this.ReligionDto = ReligionDto;
-            }
+        #region CREATE
+
+        public class CreateReligionRequest(ReligionDto ReligionDto) : IRequest<ReligionDto>
+        {
+            public ReligionDto ReligionDto { get; set; } = ReligionDto;
         }
 
-        public class UpdateReligionRequest : IRequest<bool>
+        public class CreateListReligionRequest(List<ReligionDto> GeneralConsultanCPPTDtos) : IRequest<List<ReligionDto>>
         {
-            public ReligionDto ReligionDto { get; set; }
-
-            public UpdateReligionRequest(ReligionDto ReligionDto)
-            {
-                this.ReligionDto = ReligionDto;
-            }
+            public List<ReligionDto> ReligionDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
-        public class DeleteReligionRequest : IRequest<bool>
-        {
-             public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteReligionRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateReligionRequest(ReligionDto ReligionDto) : IRequest<ReligionDto>
+        {
+            public ReligionDto ReligionDto { get; set; } = ReligionDto;
         }
 
-        public class DeleteListReligionRequest : IRequest<bool>
+        public class UpdateListReligionRequest(List<ReligionDto> ReligionDtos) : IRequest<List<ReligionDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListReligionRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<ReligionDto> ReligionDtos { get; set; } = ReligionDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteReligionRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

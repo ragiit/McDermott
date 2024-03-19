@@ -2,56 +2,52 @@
 {
     public class DistrictCommand
     {
-        public class GetDistrictQuery : IRequest<List<DistrictDto>>;
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetDistrictByIdQuery : IRequest<DistrictDto>
+        public class GetDistrictQuery(Expression<Func<District, bool>>? predicate = null, bool removeCache = false) : IRequest<List<DistrictDto>>
         {
-             public long Id { get; set; }
-
-            public GetDistrictByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<District, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateDistrictRequest : IRequest<DistrictDto>
-        {
-            public DistrictDto DistrictDto { get; set; }
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
-            public CreateDistrictRequest(DistrictDto DistrictDto)
-            {
-                this.DistrictDto = DistrictDto;
-            }
+        #region CREATE
+
+        public class CreateDistrictRequest(DistrictDto DistrictDto) : IRequest<DistrictDto>
+        {
+            public DistrictDto DistrictDto { get; set; } = DistrictDto;
         }
 
-        public class UpdateDistrictRequest : IRequest<bool>
+        public class CreateListDistrictRequest(List<DistrictDto> GeneralConsultanCPPTDtos) : IRequest<List<DistrictDto>>
         {
-            public DistrictDto DistrictDto { get; set; }
-
-            public UpdateDistrictRequest(DistrictDto DistrictDto)
-            {
-                this.DistrictDto = DistrictDto;
-            }
+            public List<DistrictDto> DistrictDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
-        public class DeleteDistrictRequest : IRequest<bool>
-        {
-             public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteDistrictRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateDistrictRequest(DistrictDto DistrictDto) : IRequest<DistrictDto>
+        {
+            public DistrictDto DistrictDto { get; set; } = DistrictDto;
         }
 
-        public class DeleteListDistrictRequest : IRequest<bool>
+        public class UpdateListDistrictRequest(List<DistrictDto> DistrictDtos) : IRequest<List<DistrictDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListDistrictRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<DistrictDto> DistrictDtos { get; set; } = DistrictDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteDistrictRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

@@ -2,7 +2,7 @@
 {
     public partial class CronisCategoryDto : IMapFrom<CronisCategory>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         [StringLength(250)]

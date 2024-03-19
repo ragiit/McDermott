@@ -76,6 +76,7 @@
                 }
             }
         }
+
         public long? PractitionerECGId { get; set; }
         public bool IsNormalRestingECG { get; set; } = false;
         public bool IsSinusRhythm { get; set; } = false;

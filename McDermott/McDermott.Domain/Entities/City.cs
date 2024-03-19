@@ -15,8 +15,10 @@
 
         [SetToNull]
         public virtual List<Company>? Companies { get; set; }
+
         [SetToNull]
         public virtual List<Village>? Villages { get; set; }
+
         [SetToNull]
         public virtual List<HealthCenter>? HealthCenters { get; set; }
     }

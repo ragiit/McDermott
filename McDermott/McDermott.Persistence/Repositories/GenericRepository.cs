@@ -42,7 +42,6 @@ namespace McDermott.Persistence.Repositories
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -73,7 +72,6 @@ namespace McDermott.Persistence.Repositories
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -235,7 +233,6 @@ namespace McDermott.Persistence.Repositories
 
             Log.Error(method + "ERROR => {@result}", ex);
             Log.Error("Ngeteh Njay", "Unhandled Exception occurred Halo");
-
         }
 
         public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)

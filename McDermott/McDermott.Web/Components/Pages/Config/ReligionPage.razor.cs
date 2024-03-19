@@ -142,7 +142,7 @@
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<ReligionDto>>();
-                    await Mediator.Send(new DeleteListReligionRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }

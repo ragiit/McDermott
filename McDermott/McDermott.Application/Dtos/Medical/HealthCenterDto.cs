@@ -2,7 +2,7 @@
 {
     public class HealthCenterDto : IMapFrom<HealthCenter>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
         public long? CityId { get; set; }
         public long? ProvinceId { get; set; }
         public long? CountryId { get; set; }

@@ -1,95 +1,156 @@
 ﻿namespace McDermott.Application.Features.Queries.Config
 {
-    public class GenderQueryHandler
+    public class GenderQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetGenderQuery, List<GenderDto>>,
+        IRequestHandler<CreateGenderRequest, GenderDto>,
+        IRequestHandler<CreateListGenderRequest, List<GenderDto>>,
+        IRequestHandler<UpdateGenderRequest, GenderDto>,
+        IRequestHandler<UpdateListGenderRequest, List<GenderDto>>,
+        IRequestHandler<DeleteGenderRequest, bool>
     {
-        internal class GetAllGenderQueryHandler : IRequestHandler<GetGenderQuery, List<GenderDto>>
+        #region GET
+
+        public async Task<List<GenderDto>> Handle(GetGenderQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllGenderQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetGenderQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Gender>? result))
+                {
+                    result = await _unitOfWork.Repository<Gender>().GetAsync(
+                        null,
+                        null,
+                        cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromHours(24)); // Simpan data dalam cache selama 10 menit
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<GenderDto>>();
             }
-
-            public async Task<List<GenderDto>> Handle(GetGenderQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<Gender>().Entities
-                        .Select(Gender => Gender.Adapt<GenderDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetGenderByIdQueryHandler : IRequestHandler<GetGenderByIdQuery, GenderDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<GenderDto> Handle(CreateGenderRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetGenderByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<GenderDto> Handle(GetGenderByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Gender>().GetByIdAsync(request.Id);
-
-                return result.Adapt<GenderDto>();
-            }
-        }
-
-        internal class CreateGenderHandler : IRequestHandler<CreateGenderRequest, GenderDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateGenderHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<GenderDto> Handle(CreateGenderRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Gender>().AddAsync(request.GenderDto.Adapt<Gender>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetGenderQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<GenderDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateGenderHandler : IRequestHandler<UpdateGenderRequest, bool>
+        public async Task<List<GenderDto>> Handle(CreateListGenderRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateGenderHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Gender>().AddAsync(request.GenderDtos.Adapt<List<Gender>>());
 
-            public async Task<bool> Handle(UpdateGenderRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Gender>().UpdateAsync(request.GenderDto.Adapt<Gender>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGenderQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<GenderDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<GenderDto> Handle(UpdateGenderRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Gender>().UpdateAsync(request.GenderDto.Adapt<Gender>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGenderQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<GenderDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<GenderDto>> Handle(UpdateListGenderRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Gender>().UpdateAsync(request.GenderDtos.Adapt<List<Gender>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGenderQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<GenderDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteGenderRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<Gender>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<Gender>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGenderQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteGenderHandler : IRequestHandler<DeleteGenderRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteGenderHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteGenderRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Gender>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
+
+        #endregion DELETE
     }
 }

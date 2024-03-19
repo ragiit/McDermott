@@ -3,14 +3,17 @@
     public class TemplateCommand
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
+
         public class GetTemplateQuery(Expression<Func<Province, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ProvinceDto>>
         {
             public Expression<Func<Province, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
-        #endregion
+
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
         #region CREATE
+
         public class CreateTemplateRequest(ProvinceDto TemplateDto) : IRequest<ProvinceDto>
         {
             public ProvinceDto TemplateDto { get; set; } = TemplateDto;
@@ -20,9 +23,11 @@
         {
             public List<ProvinceDto> TemplateDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
-        #endregion
+
+        #endregion CREATE
 
         #region Update
+
         public class UpdateTemplateRequest(ProvinceDto TemplateDto) : IRequest<ProvinceDto>
         {
             public ProvinceDto TemplateDto { get; set; } = TemplateDto;
@@ -33,14 +38,16 @@
             public List<ProvinceDto> TemplateDtos { get; set; } = TemplateDtos;
         }
 
-        #endregion
+        #endregion Update
 
-        #region DELETE 
+        #region DELETE
+
         public class DeleteTemplateRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
             public long Id { get; set; } = id ?? 0;
             public List<long> Ids { get; set; } = ids ?? [];
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

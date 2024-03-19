@@ -4,7 +4,7 @@ namespace McDermott.Application.Dtos.Medical
 {
     public class DoctorScheduleSlotDto : IMapFrom<DoctorScheduleSlot>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
         public long DoctorScheduleId { get; set; }
         public long? PhysicianId { get; set; }
         public DateTime StartDate { get; set; }

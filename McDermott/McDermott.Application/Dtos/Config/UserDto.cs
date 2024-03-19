@@ -140,12 +140,16 @@ namespace McDermott.Application.Dtos.Config
 
         [SetToNull]
         public virtual SpecialityDto? Speciality { get; set; }
+
         [SetToNull]
         public virtual GroupDto? Group { get; set; }
+
         [SetToNull]
         public virtual JobPositionDto? JobPosition { get; set; }
+
         [SetToNull]
         public virtual DepartmentDto? Department { get; set; }
+
         [SetToNull]
         public virtual PatientAllergyDto PatientAllergy { get; set; } = new();
     }

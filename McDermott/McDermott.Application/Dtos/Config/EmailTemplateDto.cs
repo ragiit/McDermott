@@ -2,7 +2,7 @@
 {
     public class EmailTemplateDto : IMapFrom<EmailTemplate>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
         public long? ById { get; set; }
         public long? ToPartnerId { get; set; }
 

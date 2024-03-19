@@ -6,7 +6,7 @@ namespace McDermott.Application.Features.Commands.Medical
 
         public class GetSpecialityByIdQuery : IRequest<SpecialityDto>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public GetSpecialityByIdQuery(long id)
             {
@@ -36,7 +36,7 @@ namespace McDermott.Application.Features.Commands.Medical
 
         public class DeleteSpecialityRequest : IRequest<bool>
         {
-             public long Id { get; set; }
+            public long Id { get; set; }
 
             public DeleteSpecialityRequest(long id)
             {

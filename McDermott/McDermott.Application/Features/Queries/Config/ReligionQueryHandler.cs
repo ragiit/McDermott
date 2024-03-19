@@ -1,113 +1,156 @@
 ﻿namespace McDermott.Application.Features.Queries.Config
 {
-    public class ReligionQueryHandler
+    public class ReligionQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetReligionQuery, List<ReligionDto>>,
+        IRequestHandler<CreateReligionRequest, ReligionDto>,
+        IRequestHandler<CreateListReligionRequest, List<ReligionDto>>,
+        IRequestHandler<UpdateReligionRequest, ReligionDto>,
+        IRequestHandler<UpdateListReligionRequest, List<ReligionDto>>,
+        IRequestHandler<DeleteReligionRequest, bool>
     {
-        internal class GetAllReligionQueryHandler : IRequestHandler<GetReligionQuery, List<ReligionDto>>
+        #region GET
+
+        public async Task<List<ReligionDto>> Handle(GetReligionQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllReligionQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetReligionQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Religion>? result))
+                {
+                    result = await _unitOfWork.Repository<Religion>().GetAsync(
+                        null,
+                        null,
+                        cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<ReligionDto>>();
             }
-
-            public async Task<List<ReligionDto>> Handle(GetReligionQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<Religion>().Entities
-                        .Select(Religion => Religion.Adapt<ReligionDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetReligionByIdQueryHandler : IRequestHandler<GetReligionByIdQuery, ReligionDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<ReligionDto> Handle(CreateReligionRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetReligionByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<ReligionDto> Handle(GetReligionByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Religion>().GetByIdAsync(request.Id);
-
-                return result.Adapt<ReligionDto>();
-            }
-        }
-
-        internal class CreateReligionHandler : IRequestHandler<CreateReligionRequest, ReligionDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateReligionHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<ReligionDto> Handle(CreateReligionRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Religion>().AddAsync(request.ReligionDto.Adapt<Religion>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetReligionQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<ReligionDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateReligionHandler : IRequestHandler<UpdateReligionRequest, bool>
+        public async Task<List<ReligionDto>> Handle(CreateListReligionRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateReligionHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Religion>().AddAsync(request.ReligionDtos.Adapt<List<Religion>>());
 
-            public async Task<bool> Handle(UpdateReligionRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Religion>().UpdateAsync(request.ReligionDto.Adapt<Religion>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetReligionQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<ReligionDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<ReligionDto> Handle(UpdateReligionRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Religion>().UpdateAsync(request.ReligionDto.Adapt<Religion>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetReligionQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<ReligionDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<ReligionDto>> Handle(UpdateListReligionRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Religion>().UpdateAsync(request.ReligionDtos.Adapt<List<Religion>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetReligionQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<ReligionDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteReligionRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<Religion>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<Religion>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetReligionQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteReligionHandler : IRequestHandler<DeleteReligionRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteReligionHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteReligionRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Religion>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListReligionHandler : IRequestHandler<DeleteListReligionRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListReligionHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListReligionRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Religion>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

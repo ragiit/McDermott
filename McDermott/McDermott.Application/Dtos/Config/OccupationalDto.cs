@@ -2,7 +2,7 @@ namespace McDermott.Application.Dtos.Config
 {
     public class OccupationalDto : IMapFrom<Occupational>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         [StringLength(200)]
