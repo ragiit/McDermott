@@ -17,6 +17,7 @@
         public long? PhysicianId { get; set; }
         public long? Queue { get; set; }
         public long? CounterId { get; set; }
+        public long? ClassTypeId { get; set; }
         public virtual CounterDto? Counter { get; set; }
         public virtual ServiceDto? Service { get; set; }
         public virtual UserDto? Patient { get; set; }

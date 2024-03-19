@@ -523,7 +523,7 @@
             EditItem();
         }
 
-        private async void EditItem()
+        private async Task EditItem()
         {
             try
             {

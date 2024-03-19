@@ -18,6 +18,7 @@ namespace McDermott.Web.Components.Pages.Queue
         public ServiceDto servs = new();
         public List<UserDto> Patients = new();
         public List<UserDto> Physician = new();
+        public List<ClassTypeDto> classTypes = new();
 
         #endregion Relation Data
 
@@ -54,14 +55,15 @@ namespace McDermott.Web.Components.Pages.Queue
         private KioskDto FormKios = new();
         private KioskQueueDto FormQueue = new();
         private Group? group;
-        private GeneralConsultanServiceDto FormGeneral= new();
+        private GeneralConsultanServiceDto FormGeneral = new();
         private string? NamePatient { get; set; } = string.Empty;
         private string? statBPJS { get; set; } = string.Empty;
         private string Bpjs { get; set; } = string.Empty;
         private long? CountServiceId { get; set; }
         private long _ServiceId { get; set; }
         private bool showQueue { get; set; } = false;
-       
+        private bool showClass { get; set; } = false;
+
         #endregion Data Static And Variable Additional
 
         #region Async Data And Auth
@@ -72,8 +74,8 @@ namespace McDermott.Web.Components.Pages.Queue
             set
             {
                 _ServiceId = value;
-                LoadPhysicians(value);               
-                showPhysician = true;               
+                LoadPhysicians(value);
+                showPhysician = true;
             }
         }
 
@@ -143,9 +145,14 @@ namespace McDermott.Web.Components.Pages.Queue
 
             }
             catch { }
-            //var by =
 
             await LoadData();
+            foreach (var i in KioskConf)
+            {
+                HeaderName = i.Name;
+                break;
+            }
+
         }
 
         private void ReloadPage()
@@ -153,26 +160,7 @@ namespace McDermott.Web.Components.Pages.Queue
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
 
-        //protected override async Task OnInitializedAsync()
-        //{
-        //    try
-        //    {
-        //        var result = await NavigationManager.CheckAccessUser(oLocal);
-        //        IsAccess = result.Item1;
-        //        UserAccessCRUID = result.Item2;
-        //    }
-        //    catch { }
-        //    Kiosks = await Mediator.Send(new GetKioskQuery());
-
-        //    Id = $"{NavigationManager.Uri.Replace(NavigationManager.BaseUri + "queue/kiosk/", "")}".ToInt32();
-        //    await LoadData();
-        //    foreach (var i in KioskConf)
-        //    {
-        //        HeaderName = i.Name;
-        //        break;
-        //    }
-        //}
-
+       
         protected override async Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
@@ -183,7 +171,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task LoadData()
         {
-            var cs = UserAccessCRUID.Group.Name;
+           
             PanelVisible = true;
             StateHasChanged();
             showForm = false;
@@ -195,7 +183,7 @@ namespace McDermott.Web.Components.Pages.Queue
             Services = await Mediator.Send(new GetServiceQuery());
             var kconfig = await Mediator.Send(new GetKioskConfigQuery());
             KioskConf = kconfig.Where(x => x.Id == Id).ToList();
-            //var bse = UserAccessCRUID.GroupId;
+            classTypes = await Mediator.Send(new GetClassTypeQuery());
             PanelVisible = false;
         }
 
@@ -361,13 +349,15 @@ namespace McDermott.Web.Components.Pages.Queue
                             LoadPhysicians(serviceId.Value);
                         }
 
-                        //var matchingPhysicians = Physician.Where(phy => phy.DoctorServiceIds.Contains(serviceId.Value));
-
-                        //if (matchingPhysicians.Any())
-                        //{
+                        var datagroup = await Mediator.Send(new GetGroupQuery());
+                        var NameGroup = datagroup.Where(x => x.Id == UserAccessCRUID.GroupId).FirstOrDefault();
+                        
+                        if(NameGroup.Name == "Nurse" || NameGroup.Name == "Perawat")
+                        {
+                            showClass = true;
+                        }
                         showPhysician = true;
-                        //    Phys.AddRange(matchingPhysicians.Where(phy => phy.IsDoctor == true));
-                        //}
+                       
                     }
                 }
             }
@@ -435,6 +425,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormQueue.KioskId = checkId.Id;
                     FormQueue.ServiceId = checkId.ServiceId;
                     FormQueue.ServiceKId = skId;
+                    FormQueue.ClassTypeId = FormKios.ClassTypeId;
                     FormQueue.QueueStatus = "waiting";
 
                     // Membuat KioskQueue baru
@@ -445,8 +436,9 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormGeneral.PatientId = FormKios.PatientId;
                     FormGeneral.ServiceId = FormKios.ServiceId;
                     FormGeneral.KioskQueueId = QueueKioskId.Id;
+                    FormGeneral.ClassTypeId = FormKios.ClassTypeId;
                     FormGeneral.RegistrationDate = DateTime.Now;
-                    if(checkId.PhysicianId != null)
+                    if (checkId.PhysicianId != null)
                     {
                         FormGeneral.PratitionerId = FormKios.PhysicianId;
 

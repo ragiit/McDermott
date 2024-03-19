@@ -31,9 +31,11 @@ namespace McDermott.Web.Extentions
                     return (false, null!, null!);
                 }
 
+                var sdf = "queue/kiosk/1".Contains("queue/kiosk");
+
                 var groups = await _mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)user!.GroupId!)!);
 
-                var userAccessCRUID = groups?.FirstOrDefault(x => x.Menu?.Url != null && x.Menu.Url.ToLower().Contains(url.ToLower().Replace(_navigationManager.BaseUri, "")));
+                var userAccessCRUID = groups?.FirstOrDefault(x => x.Menu?.Url != null && url.ToLower().Replace(_navigationManager.BaseUri, "").Contains( x.Menu.Url.ToLower()));
 
                 if (userAccessCRUID is null && url != _navigationManager.BaseUri)
                 {

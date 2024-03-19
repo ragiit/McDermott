@@ -8,6 +8,7 @@
         public long? QueueNumber { get; set; }
         public string? QueueStage { get; set; }
         public string? QueueStatus { get; set; }
+        public long? ClassTypeId { get; set; }
 
         [SetToNull]
         public virtual Kiosk? Kiosk { get; set; }
@@ -17,5 +18,8 @@
 
         [SetToNull]
         public virtual Service? ServiceK { get; set; }
+
+        [SetToNull]
+        public virtual ClassType? ClassType { get; set; }
     }
 }

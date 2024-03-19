@@ -90,6 +90,16 @@
                                                                     }
                                                                 </DxFormLayoutItem>
                                                             }
+                                                            @if(showClass){
+                                                                <DxFormLayoutItem Caption="Type Class" ColSpanMd="12">
+                                                                    <DxComboBox Data="@classTypes"
+                                                                                FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                NullText="Select Service.."
+                                                                                @bind-Value="@FormKios.ClassTypeId"
+                                                                                TextFieldName="Name"
+                                                                                ValueFieldName="Id" ShowValidationIcon="true"></DxComboBox>
+                                                                </DxFormLayoutItem>
+                                                            }
                                                             @if (CountServiceId > 1)
                                                             {
                                                                 <DxFormLayoutItem Caption="Service" ColSpanMd="12">
