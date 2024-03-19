@@ -1017,16 +1017,58 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("GeneralConsultanServiceId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("IsNormalRestingECG")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOtherECG")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSinusBradycardia")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSinusRhythm")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSinusTachycardia")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSupraventricularExtraSystole")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVentriculatExtraSystole")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LabEximinationAttachment")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LabEximinationName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OtherDesc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("PractitionerAlcoholEximinationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("PractitionerDrugEximinationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("PractitionerECGId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("PractitionerLabEximinationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("PractitionerRadiologyEximinationId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("RadiologyEximinationAttachment")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RadiologyEximinationName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
@@ -1038,6 +1080,16 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GeneralConsultanServiceId");
+
+                    b.HasIndex("PractitionerAlcoholEximinationId");
+
+                    b.HasIndex("PractitionerDrugEximinationId");
+
+                    b.HasIndex("PractitionerECGId");
+
+                    b.HasIndex("PractitionerLabEximinationId");
+
+                    b.HasIndex("PractitionerRadiologyEximinationId");
 
                     b.ToTable("GeneralConsultanMedicalSupports");
                 });
@@ -1053,6 +1105,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<string>("AdmissionQueue")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("AppoimentDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("BirthDay")
                         .HasColumnType("datetime2");
@@ -2790,7 +2845,42 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("GeneralConsultanServiceId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("McDermott.Domain.Entities.User", "PractitionerAlcoholEximination")
+                        .WithMany()
+                        .HasForeignKey("PractitionerAlcoholEximinationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.User", "PractitionerDrugEximination")
+                        .WithMany()
+                        .HasForeignKey("PractitionerDrugEximinationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.User", "PractitionerECG")
+                        .WithMany()
+                        .HasForeignKey("PractitionerECGId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.User", "PractitionerLabEximination")
+                        .WithMany()
+                        .HasForeignKey("PractitionerLabEximinationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.User", "PractitionerRadiologyEximination")
+                        .WithMany()
+                        .HasForeignKey("PractitionerRadiologyEximinationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("GeneralConsultanService");
+
+                    b.Navigation("PractitionerAlcoholEximination");
+
+                    b.Navigation("PractitionerDrugEximination");
+
+                    b.Navigation("PractitionerECG");
+
+                    b.Navigation("PractitionerLabEximination");
+
+                    b.Navigation("PractitionerRadiologyEximination");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanService", b =>

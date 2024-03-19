@@ -2,14 +2,16 @@
 {
     public class GeneralConsultanMedicalSupportDto : IMapFrom<GeneralConsultanMedicalSupport>
     {
-         public long Id { get; set; }
+        public long Id { get; set; }
         public long? GeneralConsultanServiceId { get; set; }
-
+        public long? PractitionerLabEximinationId { get; set; }
         public string? LabEximinationName { get; set; }
         public string? LabEximinationAttachment { get; set; }
+        public long? PractitionerRadiologyEximinationId { get; set; }
         public string? RadiologyEximinationName { get; set; }
         public string? RadiologyEximinationAttachment { get; set; }
 
+        public long? PractitionerAlcoholEximinationId { get; set; }
         public string? AlcoholEximinationName { get; set; }
         public string? AlcoholEximinationAttachment { get; set; }
 
@@ -42,6 +44,7 @@
             }
         }
 
+        public long? PractitionerDrugEximinationId { get; set; }
         public string? DrugEximinationName { get; set; }
         public string? DrugEximinationAttachment { get; set; }
 
@@ -73,7 +76,22 @@
                 }
             }
         }
+        public long? PractitionerECGId { get; set; }
+        public bool IsNormalRestingECG { get; set; } = false;
+        public bool IsSinusRhythm { get; set; } = false;
+        public bool IsSinusBradycardia { get; set; } = false;
+        public bool IsSinusTachycardia { get; set; } = false;
+        public bool IsVentriculatExtraSystole { get; set; } = false;
+        public bool IsSupraventricularExtraSystole { get; set; } = false;
+        public bool IsOtherECG { get; set; } = false;
+        public string? OtherDesc { get; set; }
+        public string? Status { get; set; } = "Draft";
 
         public GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
+        public UserDto? PractitionerLabEximination { get; set; }
+        public UserDto? PractitionerRadiologyEximination { get; set; }
+        public UserDto? PractitionerAlcoholEximination { get; set; }
+        public UserDto? PractitionerDrugEximination { get; set; }
+        public UserDto? PractitionerECG { get; set; }
     }
 }

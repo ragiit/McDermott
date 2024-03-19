@@ -14,8 +14,15 @@
 
         public IGrid Grid { get; set; }
         private List<SpecialityDto> Specialitys = new();
-        private bool IsAccess = false;
+
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
         private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -25,23 +32,29 @@
             {
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
                 }
                 catch { }
             }
         }
 
-        protected override async Task OnInitializedAsync()
+        private async Task GetUserInfo()
         {
             try
             {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
             }
             catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
+        protected override async Task OnInitializedAsync()
+        {
+            await GetUserInfo();
             await LoadData();
         }
 

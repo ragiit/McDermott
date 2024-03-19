@@ -25,11 +25,9 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private BaseAuthorizationLayout AuthorizationLayout = new();
-        private GroupMenuDto UserAccessCRUID = new();
         public IGrid Grid { get; set; }
         private List<string> NameCard = new();
         private string textPopUp = "";
-        private bool IsAccess { get; set; } = false;
         private bool PanelVisible { get; set; } = true;
         private bool PopUpVisible { get; set; } = false;
         private bool ArchiveCard { get; set; } = false;
@@ -123,6 +121,15 @@ namespace McDermott.Web.Components.Pages.Queue
             return new MarkupString("");
         }
 
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -131,21 +138,31 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
                 }
                 catch { }
             }
         }
 
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
         protected override async Task OnInitializedAsync()
         {
             try
             {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
+                await GetUserInfo();
                 
             }
             catch { }
@@ -168,7 +185,6 @@ namespace McDermott.Web.Components.Pages.Queue
             Physicians = [.. Physician.Where(x => x.IsPhysicion == true)];
             countersActive = [.. counters.Where(x => x.IsActive == true)];
             countersInActive = [.. counters.Where(x => x.IsActive == false)];
-            var bse = UserAccessCRUID.GroupId;
             //CountCard = [.. counters.Select(x => x.Name);
             PanelVisible = false;
         }

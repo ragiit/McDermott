@@ -1,4 +1,5 @@
-﻿<DxGrid Data="GroupMenus"
+﻿@using static McDermott.Application.Features.Commands.Config.GroupMenuCommand
+<DxGrid Data="GroupMenus"
         @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
         PageSize="5"
         ShowSearchBox="true"
@@ -37,7 +38,7 @@
 
         if (Group != null)
         {
-            GroupMenus = await Mediator.Send(new GetGroupMenuByGroupIdRequest(Group.Id));
+            GroupMenus = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id));
         }
     }
 

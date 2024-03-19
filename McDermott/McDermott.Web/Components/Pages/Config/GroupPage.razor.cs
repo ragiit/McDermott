@@ -5,7 +5,43 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class GroupPage
     {
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
         private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    await GetUserInfo();
+                }
+                catch { }
+            }
+        }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
         private bool PanelVisible { get; set; } = true;
         private long Id { get; set; }
         public IGrid Grid { get; set; }
@@ -40,7 +76,7 @@ namespace McDermott.Web.Components.Pages.Config
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<GroupDto>>();
-                    await Mediator.Send(new DeleteListGroupMenuRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteGroupMenuRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
@@ -52,39 +88,15 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
-
             Menus = await Mediator.Send(new GetMenuQuery());
             Menus.Insert(0, new MenuDto
             {
                 Id = 0,
                 Name = "All",
             });
+
+            await GetUserInfo();
             await LoadData();
-        }
-
-        private bool IsAccess = false;
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
-                }
-                catch { }
-            }
         }
 
         private async Task NewItem_Click()
@@ -103,8 +115,8 @@ namespace McDermott.Web.Components.Pages.Config
 
                 if (Group != null)
                 {
-                    DeletedGroupMenus = await Mediator.Send(new GetGroupMenuByGroupIdRequest(Group.Id));
-                    GroupMenus = await Mediator.Send(new GetGroupMenuByGroupIdRequest(Group.Id));
+                    DeletedGroupMenus = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id));
+                    GroupMenus = DeletedGroupMenus.Select(x => x).ToList();
                 }
             }
             catch (Exception e)
@@ -285,7 +297,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             if (Group.Id == 0)
             {
-                var existingName = await Mediator.Send(new GetGroupByNameQuery(GroupName));
+                var existingName = await Mediator.Send(new GetGroupQuery(x => x.Name == GroupName));
 
                 if (existingName is not null) return;
 
@@ -293,7 +305,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 var request = new List<GroupMenuDto>();
 
-                var group = await Mediator.Send(new GetGroupByNameQuery(Group.Name));
+                var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
 
                 if (GroupMenus.Where(x => x.Menu.Name is "All").Any())
                 {
@@ -303,7 +315,7 @@ namespace McDermott.Web.Components.Pages.Config
                         request.Add(new GroupMenuDto
                         {
                             MenuId = z.Id,
-                            GroupId = group.Id,
+                            GroupId = group[0].Id,
                             Create = all.Create,
                             Read = all.Read,
                             Update = all.Update,
@@ -312,7 +324,7 @@ namespace McDermott.Web.Components.Pages.Config
                         });
                     });
 
-                    await Mediator.Send(new CreateGroupMenuRequest(request));
+                    await Mediator.Send(new CreateListGroupMenuRequest(request));
 
                     ShowForm = false;
 
@@ -323,7 +335,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 GroupMenus.ForEach(x =>
                 {
-                    x.GroupId = group.Id;
+                    x.GroupId = group[0].Id;
                 });
 
                 for (int i = 0; i < GroupMenus.Count; i++)
@@ -337,7 +349,7 @@ namespace McDermott.Web.Components.Pages.Config
                         {
                             GroupMenus.Add(new GroupMenuDto
                             {
-                                GroupId = group.Id,
+                                GroupId = group[0].Id,
                                 MenuId = cekP.Id,
                                 Menu = cekP
                             });
@@ -345,15 +357,15 @@ namespace McDermott.Web.Components.Pages.Config
                     }
                 }
 
-                await Mediator.Send(new CreateGroupMenuRequest(GroupMenus));
+                await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
             }
             else
             {
                 var result = await Mediator.Send(new UpdateGroupRequest(Group));
 
-                var group = await Mediator.Send(new GetGroupByNameQuery(Group.Name));
+                var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
 
-                await Mediator.Send(new DeleteGroupMenuByIdRequest(DeletedGroupMenus.Select(x => x.Id).ToList()));
+                await Mediator.Send(new DeleteGroupMenuRequest(ids: DeletedGroupMenus.Select(x => x.Id).ToList()));
 
                 var request = new List<GroupMenuDto>();
 
@@ -365,7 +377,7 @@ namespace McDermott.Web.Components.Pages.Config
                         request.Add(new GroupMenuDto
                         {
                             MenuId = z.Id,
-                            GroupId = group.Id,
+                            GroupId = group[0].Id,
                             Create = all.Create,
                             Read = all.Read,
                             Update = all.Update,
@@ -374,7 +386,7 @@ namespace McDermott.Web.Components.Pages.Config
                         });
                     });
 
-                    await Mediator.Send(new CreateGroupMenuRequest(request));
+                    await Mediator.Send(new CreateListGroupMenuRequest(request));
 
                     ShowForm = false;
 
@@ -387,7 +399,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 GroupMenus.ForEach(x =>
                 {
-                    x.GroupId = group.Id;
+                    x.GroupId = group[0].Id;
                 });
 
                 for (int i = 0; i < GroupMenus.Count; i++)
@@ -401,7 +413,7 @@ namespace McDermott.Web.Components.Pages.Config
                         {
                             GroupMenus.Add(new GroupMenuDto
                             {
-                                GroupId = group.Id,
+                                GroupId = group[0].Id,
                                 MenuId = cekP.Id,
                                 Menu = cekP
                             });
@@ -409,9 +421,7 @@ namespace McDermott.Web.Components.Pages.Config
                     }
                 }
 
-                await Mediator.Send(new CreateGroupMenuRequest(GroupMenus));
-
-                await oLocal.SetItemAsync("Menu", string.Join(",", GroupMenus.Select(x => x.Menu?.Name)));
+                await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
 
                 NavigationManager.NavigateTo("config/group", true);
             }

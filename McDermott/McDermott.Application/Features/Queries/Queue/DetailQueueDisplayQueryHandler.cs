@@ -1,33 +1,29 @@
 ﻿using McDermott.Application.Dtos.Queue;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.Queue.DetailQueueDisplayCommand;
 
 namespace McDermott.Application.Features.Queries.Queue
 {
     public class DetailQueueDisplayQueryHandler
     {
-        internal class GetAllDetailQueueDisplayQueryHandler : IRequestHandler<GetDetailQueueDisplayQuery, List<DetailQueueDisplayDto>>
+        internal class GetAllDetailQueueDisplayQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetDetailQueueDisplayQuery, List<DetailQueueDisplayDto>>
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllDetailQueueDisplayQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+            private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
             public async Task<List<DetailQueueDisplayDto>> Handle(GetDetailQueueDisplayQuery query, CancellationToken cancellationToken)
             {
-                return await _unitOfWork.Repository<DetailQueueDisplay>().Entities
+                try
+                {
+                    return await _unitOfWork.Repository<DetailQueueDisplay>().Entities
                         .Include(x => x.QueueDisplay)
                         .Include(x => x.Counter)
-                        .AsNoTracking()
                         .Select(DetailQueueDisplay => DetailQueueDisplay.Adapt<DetailQueueDisplayDto>())
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
         }
 

@@ -24,7 +24,7 @@ namespace McDermott.Application.Features.Queries
                 if (!_cache.TryGetValue(cacheKey, out List<Province>? result))
                 {
                     result = await _unitOfWork.Repository<Province>().GetAsync(
-                        request.Predicate,
+                        null,
                         x => x.Include(z => z.Country),
                         cancellationToken);
 

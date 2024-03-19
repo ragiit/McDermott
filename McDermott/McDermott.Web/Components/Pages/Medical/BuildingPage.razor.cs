@@ -11,17 +11,13 @@
 
         #region Default Grid
 
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
         private GroupMenuDto UserAccessCRUID = new();
-        private bool PanelVisible { get; set; } = true;
-        private bool IsAddMenu { get; set; } = false;
-        private bool ShowForm { get; set; } = false;
-        public IGrid Grid { get; set; }
-        public IGrid GridBuildingLocation { get; set; }
-        private int FocusedRowVisibleIndex { get; set; }
-        private int FocusedRowBuildingLocationVisibleIndex { get; set; }
-        private bool EditItemsEnabled { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-        private IReadOnlyList<object> SelectedBuildingLocationDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -32,27 +28,43 @@
             {
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
                 }
                 catch { }
             }
         }
 
-        protected override async Task OnInitializedAsync()
+        private async Task GetUserInfo()
         {
             try
             {
-                HealthCenters = await Mediator.Send(new GetHealthCenterQuery());
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
             }
             catch { }
+        }
 
+        #endregion UserLoginAndAccessRole
+
+        private bool PanelVisible { get; set; } = true;
+        private bool IsAddMenu { get; set; } = false;
+        private bool ShowForm { get; set; } = false;
+        public IGrid Grid { get; set; }
+        public IGrid GridBuildingLocation { get; set; }
+        private int FocusedRowVisibleIndex { get; set; }
+        private int FocusedRowBuildingLocationVisibleIndex { get; set; }
+        private bool EditItemsEnabled { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedBuildingLocationDataItems { get; set; } = new ObservableRangeCollection<object>();
+
+        protected override async Task OnInitializedAsync()
+        {
+            HealthCenters = await Mediator.Send(new GetHealthCenterQuery());
             Locations = await Mediator.Send(new GetLocationQuery());
 
+            await GetUserInfo();
             await LoadData();
         }
 

@@ -8,6 +8,11 @@
             public Expression<Func<User, bool>> Predicate { get; } = predicate!;
         }
 
+        public class GetUserInfoGroupQuery(Expression<Func<User, bool>>? predicate = null) : IRequest<List<UserDto>>
+        {
+            public Expression<Func<User, bool>> Predicate { get; } = predicate!;
+        }
+
         public class GetDataUserForKioskQuery : IRequest<List<UserDto>>
         {
             public UserDto userDto { get; set; }

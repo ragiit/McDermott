@@ -4,6 +4,8 @@
     {
         public long Id { get; set; }
 
+        public long? KioskQueueId { get; set; }
+
         [Required(ErrorMessage = "The Patient field is required.")]
         public long? PatientId { get; set; }
 
@@ -39,11 +41,13 @@
         public string? ScheduleTime { get; set; }
 
         public long? Age { get; set; }
-        public long? KioskQueueId { get; set; }
 
         [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime RegistrationDate { get; set; }
+
+        [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
+        public DateTime? AppoimentDate { get; set; }
 
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }
@@ -56,12 +60,12 @@
         public bool IsPharmacology { get; set; } = false;
         public bool IsFood { get; set; } = false;
 
+        public virtual KioskQueue? KioskQueue { get; set; }
         public virtual ClassTypeDto? ClassType { get; set; }
         public virtual UserDto? Patient { get; set; }
         public virtual UserDto? Pratitioner { get; set; }
         public virtual InsuranceDto? Insurance { get; set; }
         public virtual ServiceDto? Service { get; set; }
         public virtual InsurancePolicyDto? InsurancePolicy { get; set; }
-        public virtual KioskQueue? KioskQueue { get; set; }
     }
 }

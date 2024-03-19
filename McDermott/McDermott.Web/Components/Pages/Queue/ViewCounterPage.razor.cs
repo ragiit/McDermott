@@ -69,7 +69,8 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             try
             {
-                User = await oLocal.GetUserInfo();
+                var userJson = await JsRuntime.InvokeAsync<string>("getCookie", CookieHelper.USER_INFO);
+                User = JsonConvert.DeserializeObject<User>(userJson);
                 userBy = User.Name;
 
                 ShowPresent = false;
@@ -191,7 +192,7 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             try
             {
-                if (FormCounters.Id == 0)
+                if (FormCounters.Id != 0)
                 {
                     FormCounters.QueueStage = "finish";
                     await Mediator.Send(new UpdateKioskQueueRequest(FormCounters));

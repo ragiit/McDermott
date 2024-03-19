@@ -31,12 +31,11 @@
     {
         try
         {
-            dynamic user = await oLocal.GetItemAsync<string>("dotnet");
-            var menu = await oLocal.GetItemAsync<string>("dotnet2");
+            dynamic user = await JsRuntime.InvokeAsync<string>("getCookie", CookieHelper.USER_INFO);
+            var menu = await JsRuntime.InvokeAsync<string>("getCookie", CookieHelper.USER_GROUP);
 
             if (string.IsNullOrWhiteSpace(user) || string.IsNullOrEmpty(menu))
             {
-                await oLocal.ClearAsync();
                 NavigationManager.NavigateTo("login", true);
 
                 return;

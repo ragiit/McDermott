@@ -15,9 +15,15 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
-        private bool IsAccess = false;
+
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
 
         private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -27,28 +33,33 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
                 }
                 catch { }
             }
         }
 
-        protected override async Task OnInitializedAsync()
+        private async Task GetUserInfo()
         {
             try
             {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
             }
             catch { }
+        }
 
+        #endregion UserLoginAndAccessRole
+
+        protected override async Task OnInitializedAsync()
+        {
             var a = await Mediator.Send(new GetDiseaseCategoryQuery());
             Diseases = [.. a.Where(x => x.ParentCategory != null || x.ParentCategory != "")];
             Cronises = await Mediator.Send(new GetCronisCategoryQuery());
 
+            await GetUserInfo();
             await LoadData();
         }
 

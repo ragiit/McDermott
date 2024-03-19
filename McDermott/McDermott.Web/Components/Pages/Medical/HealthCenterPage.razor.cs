@@ -6,8 +6,43 @@
         public List<CountryDto> Countries = [];
         public List<CityDto> Cities = [];
         public List<ProvinceDto> Provinces = [];
+
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
         private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    await GetUserInfo();
+                }
+                catch { }
+            }
+        }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
 
         private List<string> Types = new List<string>
         {
@@ -21,22 +56,6 @@
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
-                }
-                catch { }
-            }
-        }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
@@ -144,18 +163,12 @@
 
         protected override async Task OnInitializedAsync()
         {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
             PanelVisible = true;
             Countries = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Cities = await Mediator.Send(new GetCityQuery());
 
+            await GetUserInfo();
             await LoadData();
         }
 

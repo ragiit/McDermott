@@ -15,9 +15,15 @@
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
         private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
-        private string KioskName { get; set; } = String.Empty;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -27,13 +33,27 @@
             {
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
                 }
                 catch { }
             }
         }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
+        private string KioskName { get; set; } = String.Empty;
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
@@ -153,17 +173,11 @@
 
         protected override async Task OnInitializedAsync()
         {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
             PanelVisible = true;
 
             SelectedDataItems = new ObservableRangeCollection<object>();
 
+            await GetUserInfo();
             await LoadData();
         }
 

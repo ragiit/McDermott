@@ -2,13 +2,13 @@
 {
     public partial class GeneralConsultanService : BaseAuditableEntity
     {
+        public long? KioskQueueId { get; set; }
         public long? PatientId { get; set; }
         public long? InsuranceId { get; set; }
         public long? InsurancePolicyId { get; set; }
         public long? ServiceId { get; set; }
         public long? PratitionerId { get; set; }
         public long? ClassTypeId { get; set; }
-        public long? KioskQueueId { get; set; }
         public string? StagingStatus { get; set; }
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }
@@ -24,6 +24,7 @@
         public DateTime? StartDateSickLeave { get; set; }
         public DateTime? EndDateSickLeave { get; set; }
         public DateTime? RegistrationDate { get; set; }
+        public DateTime? AppoimentDate { get; set; }
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }
 

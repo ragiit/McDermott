@@ -51,17 +51,14 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Relation Data
 
-        private string TabText = string.Empty;
         private PatientAllergyDto PatientAllergy = new();
         private GeneralConsultantClinicalAssesmentDto GeneralConsultantClinical = new();
         private List<GeneralConsultanServiceDto> GeneralConsultanServices = new();
         private List<UserDto> IsPatient = new();
         private List<UserDto> patients = new List<UserDto>();
-        private long PatientIds = new();
-        private IEnumerable<GeneralConsultanServiceDto> SelectPatient = [];
 
         private List<UserDto> IsPratition = new();
-        private List<UserDto> AllDoctors = new();
+        private List<UserDto> AllDoctors = [];
         private List<InsuranceDto> Insurances = [];
         private List<InsuranceDto> AllInsurances = [];
         private List<InsurancePolicyDto> InsurancePolicies = [];
@@ -101,40 +98,42 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #endregion Form Regis
 
-        #region UserInfo
+        #region UserLoginAndAccessRole
 
-        private User UserLogin = new();
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            await base.OnAfterRenderAsync(firstRender);
+
             if (firstRender)
             {
-                if (Grid is not null)
-                    Grid.AutoFitColumnWidths();
-
-                await LoadUser();
-                StateHasChanged();
-
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
                 }
                 catch { }
             }
         }
 
-        private async Task LoadUser()
+        private async Task GetUserInfo()
         {
             try
             {
-                UserLogin = await oLocal.GetUserInfo();
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
             }
             catch { }
         }
 
-        #endregion UserInfo
+        #endregion UserLoginAndAccessRole
 
         private IEnumerable<DoctorScheduleDto> SelectedSchedules = [];
         private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
@@ -326,7 +325,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         #region Grid Setting
 
         private BaseAuthorizationLayout AuthorizationLayout = new();
-        private bool IsAccess { get; set; } = false;
         private bool PanelVisible { get; set; } = true;
         private bool showForm { get; set; } = false;
         private string textPopUp = "";
@@ -343,7 +341,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IReadOnlyList<object> SelectedDataItems2 { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
-        private GroupMenuDto UserAccessCRUID = new();
 
         private List<Temppp> Temppps { get; set; } = new List<Temppp>
         {
@@ -669,15 +666,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         protected override async Task OnInitializedAsync()
         {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
-            //var by =
-
             PanelVisible = true;
 
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
@@ -700,6 +688,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             DiagnosesTemps.AddRange(diagnosesTemps);
 
             AllDiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
+
             await LoadData();
         }
 
@@ -832,7 +821,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             //patient
             patients = [.. user.Where(x => x.IsPatient == true).ToList()];
-            PatientIds = IsPatient.Select(x => x.Id).FirstOrDefault();
 
             //IsDocter
             IsPratition = [.. user.Where(x => x.IsDoctor == true).ToList()];
@@ -851,7 +839,33 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             FormValidationState = true;
 
-            await OnSave();
+            if (PopUpActionSpace)
+                await OnSaveActionSpace();
+            else
+                await OnSave();
+        }
+
+        private async Task OnSaveActionSpace()
+        {
+            try
+            {
+                if (FormRegis.Id == 0)
+                    return;
+
+                if (GeneralConsultanMedicalSupport.Id == 0)
+                {
+                    GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
+                    await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                }
+                else
+                    await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+
+                PopUpActionSpace = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private void GridCPPT_CustomizeElement(GridCustomizeElementEventArgs e)
@@ -914,8 +928,24 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     FormRegis.Id = 0;
                     FormRegis.StagingStatus = "Planned";
+                    StagingText = "Confirmed";
                     PopUpVisible = false;
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                }
+                else if (IsAppoiment)
+                {
+                    if (FormRegis.AppoimentDate is null)
+                    {
+                        ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+                        return;
+                    }
+
+                    FormRegis.Id = 0;
+                    FormRegis.StagingStatus = "Planned";
+                    StagingText = "Confirmed";
+                    PopUpAppoiment = false;
+                    FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                    await LoadData();
                 }
                 else
                 {
@@ -1114,6 +1144,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             showForm = false;
             PanelVisible = true;
+            PatientAllergy = new();
             SelectedDataItems = new ObservableRangeCollection<object>();
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
             PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
@@ -1172,6 +1203,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             StagingText = "Confirmed";
             await SelectData();
             showForm = true;
+            IsReferTo = false;
+            IsAppoiment = false;
             FormRegis = new GeneralConsultanServiceDto();
             GeneralConsultantClinical = new GeneralConsultantClinicalAssesmentDto();
             FormInputCPPTGeneralConsultan = new InputCPPTGeneralConsultanCPPT();
@@ -1195,9 +1228,28 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     var text = FormRegis.StagingStatus == "Physician" ? "In Consultation" : FormRegis.StagingStatus;
                     var index = Stagings.FindIndex(x => x == text);
-
                     StagingText = Stagings[index + 1];
                 }
+
+                var patientAllergy = PatientAllergies.FirstOrDefault(x => x.UserId == FormRegis!.PatientId);
+
+                if (patientAllergy != null)
+                {
+                    PatientAllergy = patientAllergy;
+                    FormRegis.IsWeather = !string.IsNullOrWhiteSpace(patientAllergy.Weather);
+                    FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(patientAllergy.Farmacology);
+                    FormRegis.IsFood = !string.IsNullOrWhiteSpace(patientAllergy.Food);
+                }
+                else
+                {
+                    PatientAllergy = new PatientAllergyDto(); // Create a new instance if no allergy is found
+                    FormRegis.IsWeather = FormRegis.IsPharmacology = FormRegis.IsFood = false;
+                }
+
+                // Assign null to properties if patientAllergy is null or clear them if a new instance was created
+                PatientAllergy.Food ??= null;
+                PatientAllergy.Weather ??= null;
+                PatientAllergy.Farmacology ??= null;
 
                 switch (FormRegis.StagingStatus)
                 {
@@ -1257,6 +1309,21 @@ namespace McDermott.Web.Components.Pages.Transaction
             PopUpVisible = false;
         }
 
+        private void OnCancelReferTo()
+        {
+            PopUpVisible = false;
+        }
+
+        private void OnCancelAppoimentPopup()
+        {
+            PopUpAppoiment = false;
+        }
+
+        private void OnCancelActionSpace()
+        {
+            PopUpActionSpace = false;
+        }
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -1296,17 +1363,53 @@ namespace McDermott.Web.Components.Pages.Transaction
         private bool PopUpVisible = false;
         private bool PopUpHistoricalMedical = false;
         private bool PopUpAppoimentPending = false;
+        private bool PopUpAppoiment = false;
+        private bool PopUpActionSpace = false;
         private bool IsReferTo = false;
+        private bool IsAppoiment = false;
 
-        private void OnReferToClick()
+        private async Task OnReferToClick()
         {
             IsReferTo = true;
             PopUpVisible = true;
+
+            try
+            {
+                IsPratition = AllDoctors.Where(x => x.DoctorServiceIds is not null && x.DoctorServiceIds.Contains(FormRegis.ServiceId.GetValueOrDefault())).ToList();
+
+                await SetTimeSchedule();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task OnAppoimentPopUpClick()
+        {
+            IsAppoiment = true;
+            PopUpAppoiment = true;
+
+            try
+            {
+                IsPratition = AllDoctors.Where(x => x.DoctorServiceIds is not null && x.DoctorServiceIds.Contains(FormRegis.ServiceId.GetValueOrDefault())).ToList();
+
+                await SetTimeSchedule();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private void OnClickPopUpHistoricalMedical()
         {
             PopUpHistoricalMedical = true;
+        }
+
+        private void OnClickPopUpPopUpActionSpace()
+        {
+            PopUpActionSpace = true;
         }
 
         private void OnClickPopUpAppoimentPending()
@@ -1496,18 +1599,18 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             if (e.Equals("Emergency"))
             {
-                Method = new List<string>
-                {
+                Method =
+                [
                     "General",
                     "Work Related Injury",
                     "Road Accident Injury",
-                };
+                ];
                 FormRegis.TypeMedical = Method[0];
             }
             else if (e.Equals("MCU"))
             {
-                Method = new List<string>
-                {
+                Method =
+                [
                     "Annual MCU",
                     "Pre Employment MCU",
                     "Oil & Gas UK",
@@ -1515,7 +1618,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     "Covid19*",
                     "Drug & Alcohol Test",
                     "Maternity Checkup"
-                };
+                ];
                 FormRegis.TypeMedical = Method[0];
             }
             else if (e.Equals("General Consultation"))
