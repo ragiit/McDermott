@@ -644,9 +644,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             BrowserFiles.Add(e.File);
 
             GeneralConsultanMedicalSupport.DrugEximinationAttachment = e.File.Name;
-
-            ToastService.ShowInfo(BrowserFiles.Count().ToString());
-
             //await FileUploadService.UploadFileAsync(e.File, 1 * 1024 * 1024, []);
         }
 
@@ -851,6 +848,13 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 if (FormRegis.Id == 0)
                     return;
+
+                BrowserFiles.Distinct();
+
+                foreach (var item in BrowserFiles)
+                {
+                    await FileUploadService.UploadFileAsync(item, 0, []);
+                }
 
                 if (GeneralConsultanMedicalSupport.Id == 0)
                 {

@@ -272,7 +272,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 var existingName = await Mediator.Send(new GetGroupQuery(x => x.Name == GroupName));
 
-                if (existingName is not null) return;
+                if (existingName.Count > 0) return;
 
                 var result = await Mediator.Send(new CreateGroupRequest(Group));
 
@@ -280,22 +280,25 @@ namespace McDermott.Web.Components.Pages.Config
 
                 var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
 
-                if (GroupMenus.Any(x => x.Menu.Name is "All"))
+                if (GroupMenus.Any(x => x.Menu?.Name is "All"))
                 {
                     Menus.ForEach(z =>
                     {
-                        var all = GroupMenus.FirstOrDefault(x => x.Menu.Name is "All");
-                        request.Add(new GroupMenuDto
+                        if (z.Id != 0 && z.Name is not "All")
                         {
-                            Id = 0,
-                            MenuId = z.Id,
-                            GroupId = group[0].Id,
-                            Create = all.Create,
-                            Read = all.Read,
-                            Update = all.Update,
-                            Delete = all.Delete,
-                            Import = all.Import,
-                        });
+                            var all = GroupMenus.FirstOrDefault(x => x.Menu?.Name is "All");
+                            request.Add(new GroupMenuDto
+                            {
+                                Id = 0,
+                                MenuId = z.Id,
+                                GroupId = group[0].Id,
+                                Create = all.Create,
+                                Read = all.Read,
+                                Update = all.Update,
+                                Delete = all.Delete,
+                                Import = all.Import,
+                            });
+                        }
                     });
 
                     await Mediator.Send(new CreateListGroupMenuRequest(request));
@@ -345,22 +348,25 @@ namespace McDermott.Web.Components.Pages.Config
 
                 var request = new List<GroupMenuDto>();
 
-                if (GroupMenus.Any(x => x.Menu.Name is "All"))
+                if (GroupMenus.Any(x => x.Menu?.Name is "All"))
                 {
                     Menus.ForEach(z =>
                     {
-                        var all = GroupMenus.FirstOrDefault(x => x.Menu.Name is "All");
-                        request.Add(new GroupMenuDto
+                        if (z.Id != 0 && z.Name is not "All")
                         {
-                            Id = 0,
-                            MenuId = z.Id,
-                            GroupId = group[0].Id,
-                            Create = all.Create,
-                            Read = all.Read,
-                            Update = all.Update,
-                            Delete = all.Delete,
-                            Import = all.Import,
-                        });
+                            var all = GroupMenus.FirstOrDefault(x => x.Menu?.Name is "All");
+                            request.Add(new GroupMenuDto
+                            {
+                                Id = 0,
+                                MenuId = z.Id,
+                                GroupId = group[0].Id,
+                                Create = all.Create,
+                                Read = all.Read,
+                                Update = all.Update,
+                                Delete = all.Delete,
+                                Import = all.Import,
+                            });
+                        }
                     });
 
                     await Mediator.Send(new CreateListGroupMenuRequest(request));

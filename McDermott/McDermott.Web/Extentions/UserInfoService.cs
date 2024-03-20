@@ -35,7 +35,11 @@ namespace McDermott.Web.Extentions
 
                 var groups = await _mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)user!.GroupId!)!);
 
-                var userAccessCRUID = groups?.FirstOrDefault(x => x.Menu?.Url != null && url.ToLower().Replace(_navigationManager.BaseUri, "").Contains( x.Menu.Url.ToLower()));
+                var asdf = "queue/kiosk/1".Contains("queue/kiosk");
+
+                url = url.ToLower().Replace(_navigationManager.BaseUri, "");
+
+                var userAccessCRUID = groups?.FirstOrDefault(x => x.Menu?.Url != null && url.Contains(x.Menu.Url.ToLower()));
 
                 if (userAccessCRUID is null && url != _navigationManager.BaseUri)
                 {

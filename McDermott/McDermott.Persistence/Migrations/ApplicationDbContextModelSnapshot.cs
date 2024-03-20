@@ -1816,6 +1816,97 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("KioskQueues");
                 });
 
+            modelBuilder.Entity("McDermott.Domain.Entities.LabTest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("LabUomId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalRangeFemale")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalRangeMale")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Parameter")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResultType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResultValueType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("SampleTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LabUomId");
+
+                    b.HasIndex("SampleTypeId");
+
+                    b.ToTable("LabTests");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.LabUom", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LabUoms");
+                });
+
             modelBuilder.Entity("McDermott.Domain.Entities.Location", b =>
                 {
                     b.Property<long>("Id")
@@ -2188,6 +2279,39 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Religions");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.SampleType", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SampleTypes");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Service", b =>
@@ -3075,6 +3199,25 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Service");
 
                     b.Navigation("ServiceK");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.LabTest", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.LabUom", "LabUom")
+                        .WithMany()
+                        .HasForeignKey("LabUomId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("McDermott.Domain.Entities.SampleType", "SampleType")
+                        .WithMany()
+                        .HasForeignKey("SampleTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("LabUom");
+
+                    b.Navigation("SampleType");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.PatientAllergy", b =>

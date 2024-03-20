@@ -74,7 +74,7 @@
             }
 
             var fileExtension = Path.GetExtension(file.Name);
-            if (allowedExtensions is not null && allowedExtensions.Count() > 0 && !allowedExtensions.Contains(fileExtension))
+            if (allowedExtensions is not null && allowedExtensions.Length > 0 && !allowedExtensions.Contains(fileExtension))
             {
                 return (0, $"File: {file.Name}, File type not allowed");
             }
@@ -83,8 +83,9 @@
             var fileName = $"{file.Name}";
             var path = Path.Combine(uploadDirectory, fileName);
             await using var fs = new FileStream(path, FileMode.Create);
-            long size = maxFileSize == null || maxFileSize == 0 ? file.Size : maxFileSize.ToInt32();
+            long size = maxFileSize == null || maxFileSize == 0 ? file.Size : maxFileSize.ToLong();
             await file.OpenReadStream(size).CopyToAsync(fs);
+
             return (1, fileName);
         }
     }

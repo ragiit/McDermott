@@ -54,6 +54,9 @@ namespace McDermott.Persistence.Context
         public DbSet<Insurance> Insurances { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<BuildingLocation> BuildingLocations { get; set; }
+        public DbSet<LabTest> LabTests { get; set; }
+        public DbSet<LabUom> LabUoms { get; set; }
+        public DbSet<SampleType> SampleTypes { get; set; }
 
         #endregion Medical
 
@@ -96,9 +99,8 @@ namespace McDermott.Persistence.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder); // ---> sintaks ini sangat diperlukan bila menggunakan Identity, kalau dirumah update-database selalu error
+            base.OnModelCreating(modelBuilder);
 
-            // define DeleteBehaviour
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;

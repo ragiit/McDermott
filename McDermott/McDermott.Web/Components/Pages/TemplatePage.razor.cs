@@ -4,40 +4,14 @@ namespace McDermott.Web.Components.Pages
 {
     public partial class TemplatePage
     {
-        private ProvinceDto Province = new();
-        private List<CountryDto> Countries = [];
-        private List<ProvinceDto> Provinces = [];
+        #region UserLoginAndAccessRole
 
-        #region Grid Properties
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
 
         private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
-        private bool PanelVisible { get; set; } = true;
-        private int FocusedRowVisibleIndex { get; set; }
-
-        public IGrid Grid { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-
-        #endregion Grid Properties
-
-        #region LoadData
-
-        protected override async Task OnInitializedAsync()
-        {
-            PanelVisible = true;
-
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
-
-            Countries = await Mediator.Send(new GetCountryQuery());
-
-            await LoadData();
-        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -47,49 +21,42 @@ namespace McDermott.Web.Components.Pages
             {
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
                 }
                 catch { }
             }
         }
 
-        private async Task LoadData()
+        private async Task GetUserInfo()
         {
-            PanelVisible = true;
-            Province = new();
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Provinces = await Mediator.Send(new GetTemplateQuery());
-            PanelVisible = false;
-        }
-
-        #endregion LoadData
-
-        #region Grid Function
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+            try
             {
-                e.CssClass = "alt-item";
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
             }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
+            catch { }
         }
 
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndex = args.VisibleIndex;
-        }
+        #endregion UserLoginAndAccessRole
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
+        #region Relations
+
+        private ProvinceDto Province = new();
+        private List<CountryDto> Countries = [];
+        private List<ProvinceDto> Provinces = [];
+
+        #endregion Relations
+
+        #region Static
+
+        private bool PanelVisible { get; set; } = true;
+        private int FocusedRowVisibleIndex { get; set; }
+        public IGrid Grid { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+
+        #endregion Static
 
         #region SaveDelete
 
@@ -133,6 +100,54 @@ namespace McDermott.Web.Components.Pages
         }
 
         #endregion SaveDelete
+
+        #region LoadData
+
+        protected override async Task OnInitializedAsync()
+        {
+            PanelVisible = true;
+
+            Countries = await Mediator.Send(new GetCountryQuery());
+
+            await GetUserInfo();
+            await LoadData();
+        }
+
+        private async Task LoadData()
+        {
+            PanelVisible = true;
+            Province = new();
+            SelectedDataItems = new ObservableRangeCollection<object>();
+            Provinces = await Mediator.Send(new GetTemplateQuery());
+            PanelVisible = false;
+        }
+
+        #endregion LoadData
+
+        #region Grid Function
+
+        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        {
+            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+            {
+                e.CssClass = "alt-item";
+            }
+            if (e.ElementType == GridElementType.HeaderCell)
+            {
+                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
+                e.CssClass = "header-bold";
+            }
+        }
+
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+        }
+
+        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        {
+            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+        }
 
         #region ToolBar Button
 
