@@ -503,9 +503,13 @@
 
         private void NewItem_Click()
         {
-            UserForm = new();
-            PatientFamilyRelations.Clear();
-            ShowForm = true;
+            try
+            {
+                UserForm = new();
+                PatientFamilyRelations.Clear();
+                ShowForm = true;
+            }
+            catch { }
         }
 
         private async Task NewFamilyRelationItem_Click()
