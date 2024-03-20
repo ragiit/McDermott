@@ -69,9 +69,9 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             try
             {
-                var userJson = await JsRuntime.InvokeAsync<string>("getCookie", CookieHelper.USER_INFO);
-                User = JsonConvert.DeserializeObject<User>(userJson);
-                userBy = User.Name;
+                var us = await  JsRuntime.GetCookieUserLogin();
+
+                userBy = us.Name;
 
                 ShowPresent = false;
 
