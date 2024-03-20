@@ -13,7 +13,6 @@ namespace McDermott.Web.Components.Pages.Queue
         private List<QueueDisplayDto> QueueDisplay = [];
         private List<CounterDto> Counters = [];
         public List<TempDetailQueueDisplayDto> TempDisplays = new();
-        private GroupMenuDto UserAccessCRUID = new();
         public TempDetailQueueDisplayDto FormDisplays = new();
         public QueueDisplayDto Displays = new();
         public DetailQueueDisplayDto DetDisplays = new();
@@ -34,21 +33,16 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #endregion Grid Properties
 
-        #region
+        #region async Data
         private string? CountName { get; set; } = string.Empty;
 
-        protected override async Task OnInitializedAsync()
-        {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
+        #region UserLoginAndAccessRole
 
-            await LoadData();
-        }
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -58,12 +52,36 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
                 }
                 catch { }
             }
+        }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                await GetUserInfo();
+            }
+            catch { }
+
+            await LoadData();
         }
 
         private async Task LoadData()

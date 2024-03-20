@@ -3,7 +3,7 @@
 @rendermode InteractiveServer
 
 <div class="wrapper">
-    <section class="content">
+    @* <section class="content"> *@
 
         <div class="row">
             <div class="col">
@@ -54,7 +54,7 @@
                                                         IndicatorAreaVisible="false"
                                                         Text="Fetching Data...">
                                             <DxGrid @ref="Grid"
-                                                    Data="@kioskQueues"
+                                                    Data="@kioskQueues.Where(x=>x.ServiceKId == view.Counter.ServiceKId)"
                                                     ColumnResizeMode="GridColumnResizeMode.NextColumn"
                                                     AllowSelectRowByClick="true"
                                                     PagerPosition="GridPagerPosition.Bottom"
@@ -67,6 +67,7 @@
                                                 <Columns>
                                                     <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="10px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" />
+                                                    <DxGridDataColumn FieldName="ServiceK.Name" Caption="Service Name" />
                                                     <DxGridDataColumn FieldName="QueueStatus" Caption="Status" />
                                                 </Columns>
                                             </DxGrid>
@@ -82,5 +83,5 @@
                 }
             </div>
         </div>
-    </section>
+    @* </section> *@
 </div>

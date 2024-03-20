@@ -75,6 +75,7 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 _ServiceId = value;
                 LoadPhysicians(value);
+                FormKios.ServiceId = value;
                 showPhysician = true;
             }
         }
