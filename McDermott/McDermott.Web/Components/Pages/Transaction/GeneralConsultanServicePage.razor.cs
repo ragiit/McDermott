@@ -817,7 +817,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             var user = await Mediator.Send(new GetUserQuery());
 
             //patient
-            patients = [.. user.Where(x => x.IsPatient == true).ToList()];
+            patients = [.. user.Where(x => x.IsPatient == true || x.IsEmployeeRelation == true).ToList()];
 
             //IsDocter
             IsPratition = [.. user.Where(x => x.IsDoctor == true).ToList()];

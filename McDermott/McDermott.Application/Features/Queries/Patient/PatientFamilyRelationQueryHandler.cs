@@ -18,8 +18,7 @@
                                 .Include(z => z.FamilyMember)
                                 .Include(z => z.Family)
                                 .Include(z => z.Patient),
-                            cancellationToken
-                            );
+                                cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }
