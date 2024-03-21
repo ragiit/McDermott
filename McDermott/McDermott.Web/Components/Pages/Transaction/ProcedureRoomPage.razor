@@ -1,7 +1,7 @@
 ﻿@page "/clinic-service/procedure-room"
 @rendermode InteractiveServer
 
-<PageTitle>McDermott - Action Room</PageTitle>
+<PageTitle>McDermott - Procedure Room</PageTitle>
 
 @if (IsAccess)
 {
@@ -11,12 +11,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Action Room</h1>
+                        <h1>Procedure Room</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
-                            <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/clinic-service/action-room">Action Room</a></li>
+                            <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/clinic-service/action-room">Procedure Room</a></li>
                         </ol>
                     </div>
                 </div>
@@ -143,15 +143,26 @@
                                                             </DxComboBox>
                                                             <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerLabEximinationId)" />
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Lab Test" ColSpanMd="12">
-                                                            <DxComboBox ShowValidationIcon="true" Data="@LabTests"
-                                                                        NullText="Select Lab Test..."
-                                                                        @bind-Value="@GeneralConsultanMedicalSupport.LabResulLabExaminationtId"
-                                                                        TextFieldName="Name"
-                                                                        ValueFieldName="Id">
-                                                            </DxComboBox>
-                                                            @* <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.LabEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" /> *@
+                                                        @*    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Lab Test" ColSpanMd="12">
+                                                <DxComboBox ShowValidationIcon="true" Data="@LabTests"
+                                                NullText="Select Lab Test..."
+                                                @bind-Value="@GeneralConsultanMedicalSupport.LabResulLabExaminationtId"
+                                                TextFieldName="Name"
+                                                ValueFieldName="Id">
+                                                </DxComboBox>
+                                                <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.LabEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </DxFormLayoutItem> *@
+
+                                                        <DxFormLayoutItem Caption="Lab Test:" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                            <DxTagBox Data="@LabTests"
+                                                                      FilteringMode="@DataGridFilteringMode.Contains"
+                                                                      @bind-Values="@SelectedLabTests"
+                                                                      TextFieldName="Name"
+                                                                      ValueFieldName="Id"
+                                                                      NullText="Select Lab Test..."
+                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                         </DxFormLayoutItem>
+
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
                                                             <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.LabEximinationAttachment"
                                                                            ShowValidationIcon="true"

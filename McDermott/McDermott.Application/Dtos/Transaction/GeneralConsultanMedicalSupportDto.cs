@@ -7,6 +7,7 @@
         public long? PractitionerLabEximinationId { get; set; }
         public string? LabEximinationName { get; set; }
         public long? LabResulLabExaminationtId { get; set; }
+        public List<long>? LabResulLabExaminationtIds { get; set; }
         public string? LabEximinationAttachment { get; set; }
         public long? PractitionerRadiologyEximinationId { get; set; }
         public string? RadiologyEximinationName { get; set; }

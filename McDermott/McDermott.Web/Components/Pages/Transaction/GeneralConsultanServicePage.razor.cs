@@ -915,6 +915,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (!FormRegis.IsFood)
                     PatientAllergy.Food = null;
 
+                GeneralConsultanMedicalSupport.LabResulLabExaminationtIds = SelectedLabTests.Select(x => x.Id).ToList();
+
                 if (FormRegis.Id == 0)
                 {
                     var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
@@ -1281,6 +1283,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                         var support = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
                         if (support.Count > 0)
                             GeneralConsultanMedicalSupport = support[0];
+
+                        SelectedLabTests = LabTests.Where(x => GeneralConsultanMedicalSupport.LabResulLabExaminationtIds != null && GeneralConsultanMedicalSupport.LabResulLabExaminationtIds.Contains(x.Id)).ToList();
                         break;
 
                     case "Waiting":
@@ -1498,9 +1502,12 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
+        private IEnumerable<LabTestDto> SelectedLabTests = [];
+
         private async Task SelectedItemRegistrationDateChanged(DateTime e)
         {
             FormRegis.RegistrationDate = e;
+            FormRegis.AppoimentDate = e;
             await SetTimeSchedule();
         }
 
@@ -1562,6 +1569,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             this.PatientsId = value;
 
             var item = patients.FirstOrDefault(x => x.Id == PatientsId);
+            FormRegis.Patient = item;
 
             try
             {

@@ -237,7 +237,7 @@
                                                             <ValidationMessage For="@(() => FormRegis.PatientId)" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
-                                                     <DxTextBox @bind-Text="@(FormRegis.Patient.Name)" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
+                                                     <DxTextBox @bind-Text="@(FormRegis.Patient.NoRm)" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
 
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
@@ -1493,8 +1493,8 @@ NullText="Select Registration..."
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Schedule Time" ColSpanMd="12">
                                         <DxComboBox ShowValidationIcon="true" Data="@Times"
                                                     NullText="Select Time.."
-                                                    @bind-Value="@FormRegis.ScheduleTime"/>
-                                            <ValidationMessage For="@(() => FormRegis.ScheduleTime)" />
+                                                    @bind-Value="@FormRegis.AppoimentDate"/>
+                                            <ValidationMessage For="@(() => FormRegis.AppoimentDate)" />
                                     </DxFormLayoutItem>
                                      <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
                                        <DxDateEdit
@@ -1545,15 +1545,23 @@ NullText="Select Registration..."
                         </DxComboBox>
                         <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerLabEximinationId)" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Lab Test" ColSpanMd="12">
+                   @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Lab Test" ColSpanMd="12">
                         <DxComboBox ShowValidationIcon="true" Data="@LabTests"
                                     NullText="Select Lab Test..."
                                     @bind-Value="@GeneralConsultanMedicalSupport.LabResulLabExaminationtId"
                                     TextFieldName="Name"
                                     ValueFieldName="Id">
                         </DxComboBox>
-                        @* <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.LabEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" /> *@
-                    </DxFormLayoutItem>
+                    </DxFormLayoutItem> *@
+                    <DxFormLayoutItem Caption="Lab Test:" CaptionCssClass="normal-caption"  ColSpanMd="12">
+                                                            <DxTagBox Data="@LabTests"
+                                                                      FilteringMode="@DataGridFilteringMode.Contains"
+                                                                      @bind-Values="@SelectedLabTests"
+                                                                      NullText="Select Lab Test..."
+                                                                      TextFieldName="Name"
+                                                                      ValueFieldName="Id"
+                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        </DxFormLayoutItem>
                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
                         <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.LabEximinationAttachment"
                             ShowValidationIcon="true"

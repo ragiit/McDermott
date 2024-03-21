@@ -46,6 +46,7 @@
         private GeneralConsultanServiceDto GeneralConsultanService = new();
         private List<UserDto> Doctors { get; set; } = [];
         private List<LabTestDto> LabTests = [];
+        private IEnumerable<LabTestDto> SelectedLabTests = [];
         private List<IBrowserFile> BrowserFiles = [];
 
         private bool Loading = false;
@@ -125,6 +126,8 @@
                 {
                     await FileUploadService.UploadFileAsync(item, 0, []);
                 }
+
+                GeneralConsultanMedicalSupport.LabResulLabExaminationtIds = SelectedLabTests.Select(x => x.Id).ToList();
 
                 if (GeneralConsultanMedicalSupport.Status == "Finish")
                 {
@@ -319,6 +322,8 @@
 
             if (generalConsultanService.Count == 0)
                 return;
+
+            SelectedLabTests = LabTests.Where(x => GeneralConsultanMedicalSupport.LabResulLabExaminationtIds != null && GeneralConsultanMedicalSupport.LabResulLabExaminationtIds.Contains(x.Id)).ToList();
 
             GeneralConsultanService = generalConsultanService[0];
 

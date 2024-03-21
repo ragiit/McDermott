@@ -1,6 +1,4 @@
-﻿using MimeKit;
-
-namespace McDermott.Web.Components.Pages.Transaction
+﻿namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class RaportPage
     {
@@ -63,7 +61,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             var a = FormReports;
             if (FormReports.report == "Report of patient visits by period")
             {
-              await  VisitByPeriode(FormReports);
+                await VisitByPeriode(FormReports);
             }
         }
 
@@ -148,15 +146,52 @@ namespace McDermott.Web.Components.Pages.Transaction
             var header = new List<string>();
             header = new List<string>() { "Date", "Type Medical", "Patient Count" };
 
-            ws.Cells[2, 1].Value = FormReports.report;
-            ws.Cells[3, 1].Value = "Date Period";
-            ws.Cells[3, 2].Value = FormReports.StartDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo);
+            ws.Cells[1, 2].Value = FormReports.report;
+            ws.Cells[2, 1].Value = "Date Period";
+            ws.Cells[3, 1].Value = "Total number of visits";
+            ws.Cells[4, 1].Value = "Date";
+            ws.Cells[4, 2].Value = "Service";
+            ws.Cells[4, 3].Value = "Total Patiens";
 
-            ws.Cells[2, 1, 2, 3].Merge = true;
+            ws.Cells[1, 2].Style.Font.Bold = true;
+            ws.Cells[2, 1].Style.Font.Bold = true;
+            ws.Cells[3, 1].Style.Font.Bold = true;
+            ws.Cells[2, 2].Style.Font.Bold = true;
+            ws.Cells[4, 1].Style.Font.Bold = true;
+            ws.Cells[4, 2].Style.Font.Bold = true;
+            ws.Cells[4, 3].Style.Font.Bold = true;
+            ws.Cells[1, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[2, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[2, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[3, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[4, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[4, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[4, 3].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+
+            ws.Cells[2, 2].Value = FormReports.StartDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo);
+
+            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.RegistrationDate.GetValueOrDefault().Date >= FormReports.StartDate && x.RegistrationDate <= FormReports.EndDate));
+
+            int startRow = 5;
+
+            var namee = new List<string>();
+
+            foreach (var item in generals)
+            {
+                if (namee.Contains(item.Service?.Name))
+                    continue;
+
+                ws.Cells[startRow, 1].Value = item.AppoimentDate.GetValueOrDefault().Date.ToString("dd/MM/yyyy");
+                ws.Cells[startRow, 2].Value = item.Service?.Name;
+                ws.Cells[startRow, 3].Value = generals.Where(x => x.ServiceId == item.Id && x.RegistrationDate.Date == item.RegistrationDate.Date).Count();
+
+                namee.Add(item.Service?.Name);
+
+                startRow++;
+            }
 
             string fileTitle = "Rekapitulasi Request PGS.xls";
             string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-
 
             fileContent = pack.GetAsByteArray();
             await JsRuntime.InvokeVoidAsync("saveAsFile", fileTitle, Convert.ToBase64String(fileContent));
