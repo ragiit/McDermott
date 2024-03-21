@@ -9,7 +9,7 @@
                     <div class="card">
                         @if (!ShowPresent)
                         {
-                            <div class="card-header">
+                            <div class="card-header bg-primary">
                                 <div class="row justify-content-arround">
                                     <div class="col-md-4">
                                         <DxButton Text="Back" Click="CloseDetail" CssClass="fs-6 fw-bolder" IconCssClass="fa-solid fa-arrow-left" />
@@ -89,7 +89,7 @@
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" Width="150px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" Width="170px" />
-                                                    <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="70px">
+                                                    <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
                                                         <CellDisplayTemplate>
                                                             @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>
@@ -101,11 +101,17 @@
                                                             }
                                                             @if (a.QueueStage == null)
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                             }
                                                             else if (a.QueueStage == "call")
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
+                                                            }
+                                                            else if (a.QueueStage == "present")
+                                                            {
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
                                                             }
@@ -183,7 +189,7 @@
                                                 <Columns>
                                                     <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" />
-                                                    <DxGridDataColumn FieldName="QueueStage" Caption="QueueStage">
+                                                    <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
                                                         <CellDisplayTemplate>
                                                             @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>
@@ -195,11 +201,17 @@
                                                             }
                                                             @if (a.QueueStage == null)
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                             }
                                                             else if (a.QueueStage == "call")
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
+                                                            }
+                                                            else if (a.QueueStage == "present")
+                                                            {
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
                                                             }
@@ -278,7 +290,7 @@
                                                     <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" Width="170px" />
-                                                    <DxGridDataColumn FieldName="QueueStage" Caption="QueueStage" Width="70px">
+                                                    <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
                                                         <CellDisplayTemplate>
                                                             @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>
@@ -290,11 +302,17 @@
                                                             }
                                                             @if (a.QueueStage == null)
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                             }
                                                             else if (a.QueueStage == "call")
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
+                                                            }
+                                                            else if (a.QueueStage == "present")
+                                                            {
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
                                                             }
@@ -373,7 +391,7 @@
                                                     <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" Width="150px" />
-                                                    <DxGridDataColumn FieldName="QueueStage" Caption="QueueStage" Width="70px">
+                                                    <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
                                                         <CellDisplayTemplate>
                                                             @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>
@@ -385,11 +403,17 @@
                                                             }
                                                             @if (a.QueueStage == null)
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                             }
                                                             else if (a.QueueStage == "call")
                                                             {
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Info" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
+                                                            }
+                                                            else if (a.QueueStage == "present")
+                                                            {
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
                                                             }
@@ -404,7 +428,7 @@
                         }
                         else
                         {
-                            <DxPopup HeaderText="PATIENT DETAIL" @bind-visible="@ShowPresent" HeaderCssClass="fw-bold bg-info" Width="45%" EnableAdaptivity="false" CloseOnEscape="false"
+                            <DxPopup HeaderText="PATIENT DETAIL" @bind-visible="@ShowPresent" HeaderCssClass="fw-bold bg-primary" Width="45%" EnableAdaptivity="false" CloseOnEscape="false"
                                      CloseOnOutsideClick="false">
                                 <EditForm Model="@FormCounters" Context="EditFormContext">
                                     <div class="row justify-content-between">
@@ -474,7 +498,7 @@
                                             </DxFormLayout>
                                         </div>
                                         <div class="col-3 align-self-center">
-                                            <DxButton RenderStyle="ButtonRenderStyle.Info" Text="Next" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-right-long" SubmitFormOnClick="true" Click="Click_Next"></DxButton>
+                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Next" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-right-long" SubmitFormOnClick="true" Click="Click_Next"></DxButton>
                                         </div>
                                     </div>
                                 </EditForm>
