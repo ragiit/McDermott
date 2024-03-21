@@ -35,6 +35,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private HubConnection hubConnection;
         private string NameCounter { get; set; } = string.Empty;
+        private string NameClass { get; set; } = string.Empty;
         private string NameServices { get; set; } = string.Empty;
         private string NameServicesK { get; set; } = string.Empty;
         private string Phy { get; set; } = string.Empty;
@@ -97,6 +98,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 var physician = await Mediator.Send(new GetUserQuery());
                 DataKiosksQueue = await Mediator.Send(new GetKioskQueueQuery());
                 ServiceK = Services.Where(x => x.IsKiosk == true).ToList();
+                var GetClass = await Mediator.Send(new GetClassTypeQuery());
 
                 //var cekServicesK = service
                 if (general.ServiceId == null & general.PhysicianId == null)
@@ -113,9 +115,19 @@ namespace McDermott.Web.Components.Pages.Queue
                 }
                 else if (general.ServiceId != null & general.PhysicianId != null)
                 {
-                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId && x.ServiceId == general.ServiceId && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present"   )];
+                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId && x.ServiceId == general.ServiceId && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
                 }
-                NameCounter = $"Queue Listing Counter {general.Name}";
+                var ClassId = KiosksQueue.Select(x => x.ClassTypeId).FirstOrDefault();
+                var classList = GetClass.Where(x => x.Id == ClassId).FirstOrDefault();
+                if (classList == null)
+                {
+                    NameClass = "-";
+                }
+                else
+                {
+                    NameClass = classList.Name;
+                }
+                NameCounter = $"Queue Counter {general.Name}";
                 sId = general.ServiceId;
                 PhysicianId = general.PhysicianId;
 
@@ -148,7 +160,7 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        public MarkupString GetIssuePriorityIconHtml(string status)
+        public MarkupString GetIssueStageIconHtml(string status)
         {
             string priorityClass;
             string title;
@@ -163,6 +175,33 @@ namespace McDermott.Web.Components.Pages.Queue
                 case "present":
                     priorityClass = "success";
                     title = "Present";
+                    break;
+
+                default:
+                    return new MarkupString("");
+            }
+
+            string html = $"<div class='row '><div class='col-3'>" +
+                          $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+
+            return new MarkupString(html);
+        }
+
+        public MarkupString GetClassTypeIconHtml(string? classType)
+        {
+            string priorityClass;
+            string title;
+
+            switch (classType)
+            {
+                case "VVIP":
+                    priorityClass = "danger";
+                    title = "VVIP";
+                    break;
+
+                case "VIP":
+                    priorityClass = "danger";
+                    title = "VIP";
                     break;
 
                 default:
