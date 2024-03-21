@@ -117,6 +117,16 @@ namespace McDermott.Persistence.Context
               .WithOne(c => c.GeneralConsultanService)
               .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Group>()
+              .HasMany(m => m.GroupMenus)
+              .WithOne(c => c.Group)
+              .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Menu>()
+              .HasMany(m => m.GroupMenus)
+              .WithOne(c => c.Menu)
+              .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<GeneralConsultanService>()
               .HasMany(m => m.GeneralConsultanMedicalSupports)
               .WithOne(c => c.GeneralConsultanService)

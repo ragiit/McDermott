@@ -53,6 +53,7 @@ namespace McDermott.Web.Components.Pages.Queue
             "Legacy",
             "NIK"
         };
+
         private IEnumerable<ServiceDto> SelectedServices = [];
         private KioskDto FormKios = new();
         private KioskQueueDto FormQueue = new();
@@ -146,7 +147,6 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 await GetUserInfo();
-
             }
             catch { }
 
@@ -166,7 +166,6 @@ namespace McDermott.Web.Components.Pages.Queue
                 HeaderName = i.Name;
                 break;
             }
-
         }
 
         private void ReloadPage()
@@ -460,7 +459,6 @@ namespace McDermott.Web.Components.Pages.Queue
                     if (checkId.PhysicianId != null)
                     {
                         FormGeneral.PratitionerId = FormKios.PhysicianId;
-
                     }
                     await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormGeneral));
                 }

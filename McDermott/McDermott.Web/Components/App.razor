@@ -176,7 +176,7 @@
             document.body.removeChild(link);
         };
 
-        window.setCookie = function(name, value, days) {
+        window.setCookie = function (name, value, days) {
             var expires = "";
             if (days) {
                 var date = new Date();
@@ -186,7 +186,7 @@
             document.cookie = name + "=" + value + expires + "; path=/";
         };
 
-        window.clearAllCookies = function() {
+        window.clearAllCookies = function () {
             var cookies = document.cookie.split(";");
 
             for (var i = 0; i < cookies.length; i++) {
@@ -197,10 +197,10 @@
             }
         };
 
-        window.getCookie = function(name) {
+        window.getCookie = function (name) {
             var nameEQ = name + "=";
             var cookies = document.cookie.split(';');
-            for(var i = 0; i < cookies.length; i++) {
+            for (var i = 0; i < cookies.length; i++) {
                 var cookie = cookies[i];
                 while (cookie.charAt(0) == ' ') {
                     cookie = cookie.substring(1, cookie.length);
@@ -212,11 +212,11 @@
             return null;
         };
 
-        window.deleteCookie = function(name) {
+        window.deleteCookie = function (name) {
             document.cookie = name + '=; Max-Age=-99999999;';
         };
 
-        window.updateCookie = function(name, value, days) {
+        window.updateCookie = function (name, value, days) {
             var expires = "";
             if (days) {
                 var date = new Date();
@@ -258,6 +258,15 @@
             removeItem: function (key) {
                 localStorage.removeItem(key);
             }
+        };
+
+        window.saveAsFile = function (fileName, byteBase64) {
+            var link = document.createElement('a');
+            link.download = fileName;
+            link.href = 'data:application/vnd.openxmlformats-pfficedocument.spreadsheetml.sheet;base64' + byteBase64;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         };
 
     </script>

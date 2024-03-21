@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240320040913_CascadeMenu")]
+    partial class CascadeMenu
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1044,9 +1047,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("LabEximinationName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("LabResulLabExaminationtId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("OtherDesc")
                         .HasColumnType("nvarchar(max)");
 
@@ -1083,8 +1083,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GeneralConsultanServiceId");
-
-                    b.HasIndex("LabResulLabExaminationtId");
 
                     b.HasIndex("PractitionerAlcoholEximinationId");
 
@@ -2979,11 +2977,6 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("GeneralConsultanServiceId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("McDermott.Domain.Entities.LabTest", "LabResulLabExaminationt")
-                        .WithMany()
-                        .HasForeignKey("LabResulLabExaminationtId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.User", "PractitionerAlcoholEximination")
                         .WithMany()
                         .HasForeignKey("PractitionerAlcoholEximinationId")
@@ -3010,8 +3003,6 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("GeneralConsultanService");
-
-                    b.Navigation("LabResulLabExaminationt");
 
                     b.Navigation("PractitionerAlcoholEximination");
 

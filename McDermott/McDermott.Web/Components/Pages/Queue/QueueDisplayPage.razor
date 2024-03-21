@@ -70,9 +70,9 @@
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="QueueDisplay.Name" Caption="Queue Display" SortIndex="0" />
                                             <DxGridDataColumn FieldName="CounterName" Caption="Counter" />
-                                            <DxGridDataColumn Caption=" Action Display" >
+                                            <DxGridDataColumn Caption=" Action Display">
                                                 <CellDisplayTemplate>
-                                                    <DxButton RenderStyle="@ButtonRenderStyle.Success" IconCssClass="fa-solid fa-play mr-1" Text="Play" @onclick="() => OnRenderTo((DetailQueueDisplayDto)context.DataItem)"></DxButton>
+                                                    <DxButton RenderStyle="@ButtonRenderStyle.Success" CssClass="text-center" IconCssClass="fa-solid fa-play mr-1" Text="Start" @onclick="() => OnRenderTo((DetailQueueDisplayDto)context.DataItem)"></DxButton>
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
                                         </Columns>
@@ -96,9 +96,9 @@
                                                           InputId="tbCustomTags" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem ColSpanMd="12">
-                                                <div class="row justify-content-end" >
+                                                <div class="row justify-content-end">
                                                     <div class="col-5 align-self-end">
-                                                        <DxButton Text="Save" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Info" SubmitFormOnClick = "true" Click="OnSave"></DxButton>
+                                                        <DxButton Text="Save" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Info" SubmitFormOnClick="true" Click="OnSave"></DxButton>
                                                         <DxButton Text="Discard" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
                                                     </div>
                                                 </div>

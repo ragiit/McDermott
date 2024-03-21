@@ -43,6 +43,7 @@
         private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport = new();
         private GeneralConsultanServiceDto GeneralConsultanService = new();
         private List<UserDto> Doctors { get; set; } = [];
+        private List<LabTestDto> LabTests = [];
         private List<IBrowserFile> BrowserFiles = [];
 
         #region Grid Properties
@@ -65,7 +66,8 @@
         {
             PanelVisible = true;
 
-            Doctors = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true));
+            LabTests = await Mediator.Send(new GetLabTestQuery());
+            Doctors = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
 
             await GetUserInfo();
             await LoadData();
@@ -299,11 +301,30 @@
         private async Task EditItem_Click()
         {
             ShowForm = true;
+
             GeneralConsultanMedicalSupport = SelectedDataItems[0].Adapt<GeneralConsultanMedicalSupportDto>();
+
             var generalConsultanService = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanMedicalSupport.GeneralConsultanServiceId));
 
-            if (generalConsultanService.Count > 0)
-                GeneralConsultanService = generalConsultanService[0];
+            if (generalConsultanService.Count == 0)
+                return;
+
+            GeneralConsultanService = generalConsultanService[0];
+
+            switch (GeneralConsultanMedicalSupport.Status)
+            {
+                case "Draft":
+                    StagingText = "In-Progress";
+                    break;
+
+                case "In-Progress":
+                case "Finish":
+                    StagingText = "Finish";
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private void OnCancel()

@@ -7,35 +7,6 @@ namespace McDermott.Web.Components.Pages.Queue
 {
     public partial class QueueDisplayPage
     {
-        #region relation Data
-
-        private List<DetailQueueDisplayDto> DetailQueueDisplay = [];
-        private List<QueueDisplayDto> QueueDisplay = [];
-        private List<CounterDto> Counters = [];
-        public List<TempDetailQueueDisplayDto> TempDisplays = new();
-        public TempDetailQueueDisplayDto FormDisplays = new();
-        public QueueDisplayDto Displays = new();
-        public DetailQueueDisplayDto DetDisplays = new();
-
-        #endregion relation Data
-
-        #region Grid Properties
-
-        private IEnumerable<CounterDto> selectedCounter { get; set; } = [];
-        private bool IsAccess = false;
-        private bool PanelVisible { get; set; } = true;
-        private bool showPopUp { get; set; } = false;
-        private int FocusedRowVisibleIndex { get; set; }
-        private List<CounterDto>? counteres = [];
-
-        public IGrid Grid { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-
-        #endregion Grid Properties
-
-        #region async Data
-        private string? CountName { get; set; } = string.Empty;
-
         #region UserLoginAndAccessRole
 
         [Inject]
@@ -43,6 +14,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private GroupMenuDto UserAccessCRUID = new();
         private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -72,6 +44,34 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #endregion UserLoginAndAccessRole
 
+        #region relation Data
+
+        private List<DetailQueueDisplayDto> DetailQueueDisplay = [];
+        private List<QueueDisplayDto> QueueDisplay = [];
+        private List<CounterDto> Counters = [];
+        public List<TempDetailQueueDisplayDto> TempDisplays = new();
+        public TempDetailQueueDisplayDto FormDisplays = new();
+        public QueueDisplayDto Displays = new();
+        public DetailQueueDisplayDto DetDisplays = new();
+
+        #endregion relation Data
+
+        #region Grid Properties
+
+        private IEnumerable<CounterDto> selectedCounter { get; set; } = [];
+        private bool PanelVisible { get; set; } = true;
+        private bool showPopUp { get; set; } = false;
+        private int FocusedRowVisibleIndex { get; set; }
+        private List<CounterDto>? counteres = [];
+
+        public IGrid Grid { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+
+        #endregion Grid Properties
+
+        #region async Data
+
+        private string? CountName { get; set; } = string.Empty;
 
         protected override async Task OnInitializedAsync()
         {
@@ -97,7 +97,8 @@ namespace McDermott.Web.Components.Pages.Queue
             PanelVisible = false;
         }
 
-        #endregion
+        #endregion async Data
+
         #region Grid
 
         protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
