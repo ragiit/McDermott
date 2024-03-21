@@ -1,4 +1,5 @@
 ﻿using McDermott.Application.Dtos.Queue;
+using Org.BouncyCastle.Tls;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 
@@ -19,6 +20,7 @@ namespace McDermott.Web.Components.Pages.Queue
         public List<UserDto> Patients = new();
         public List<UserDto> Physician = new();
         public List<ClassTypeDto> classTypes = new();
+        public List<GroupDto> groups = new();
 
         #endregion Relation Data
 
@@ -64,6 +66,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private long _ServiceId { get; set; }
         private bool showQueue { get; set; } = false;
         private bool showClass { get; set; } = false;
+        private bool ActiveBack { get; set; } = false;
 
         #endregion Data Static And Variable Additional
 
@@ -147,6 +150,16 @@ namespace McDermott.Web.Components.Pages.Queue
             }
             catch { }
 
+
+            var NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId);
+            if (NameGroup == null)
+            {
+                ActiveBack = false;
+            }
+            else if (NameGroup.Name == "Nurse" || NameGroup.Name == "Perawat")
+            {
+                ActiveBack = true;
+            }
             await LoadData();
             foreach (var i in KioskConf)
             {
@@ -160,6 +173,7 @@ namespace McDermott.Web.Components.Pages.Queue
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
 
+
         protected override async Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
@@ -170,6 +184,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task LoadData()
         {
+
             PanelVisible = true;
             StateHasChanged();
             showForm = false;
@@ -182,6 +197,8 @@ namespace McDermott.Web.Components.Pages.Queue
             var kconfig = await Mediator.Send(new GetKioskConfigQuery());
             KioskConf = kconfig.Where(x => x.Id == Id).ToList();
             classTypes = await Mediator.Send(new GetClassTypeQuery());
+            groups = await Mediator.Send(new GetGroupQuery());
+
             PanelVisible = false;
         }
 
@@ -308,8 +325,9 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task OnSearch()
         {
-            var datagroup = await Mediator.Send(new GetGroupQuery());
-            var NameGroup = datagroup.Where(x => x.Id == UserAccessCRUID.GroupId).FirstOrDefault();
+
+            var group = await Mediator.Send(new GetGroupQuery());
+            var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId);
             var types = FormKios.Type;
             var InputSearch = FormKios.NumberType;
             Patients = await Mediator.Send(new GetDataUserForKioskQuery(types, InputSearch));
@@ -353,7 +371,11 @@ namespace McDermott.Web.Components.Pages.Queue
                             LoadPhysicians(serviceId.Value);
                         }
 
+
+
+
                         showPhysician = true;
+
                     }
                 }
             }

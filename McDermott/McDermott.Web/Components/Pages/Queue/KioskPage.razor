@@ -23,6 +23,11 @@
                                 <div class="col-md-8">
                                     <div class="card mt-5">
                                         <div class="card-header bg-primary">
+                                            <div class="row justify-content-start">
+                                                <div class="col-md-3">
+                                                    <DxButton Text="back" Visible="@ActiveBack"></DxButton>
+                                                </div>
+                                            </div>
                                             <div class="row justify-content-center">
                                                 <div class="col-auto align-self-center">
                                                     <h4 class="fw-bold">@HeaderName.ToUpper()</h4>
@@ -91,7 +96,7 @@
                                                                 </DxFormLayoutItem>
                                                             }
                                                             @if(showClass){
-                                                                <DxFormLayoutItem Caption="Type Class" ColSpanMd="12">
+                                                                <DxFormLayoutItem Caption="Patient Class" ColSpanMd="12">
                                                                     <DxComboBox Data="@classTypes"
                                                                                 FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 NullText="Select Service.."

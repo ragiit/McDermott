@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Transaction
+﻿using MimeKit;
+
+namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class RaportPage
     {
@@ -18,14 +20,14 @@
 
         private List<string> ListReport = new()
         {
-            "Report of patient visits per period",
-            "Report of patient visits per department",
-            "Report of patient visits per family relation",
-            "Report of patient registrations per period",
-            "Report of patient visits per diagnosis",
-            "Report of patient examinations per medical type",
-            "Top diagnosis report per period",
-            "pecial cases report",
+            "Report of patient visits by period",
+            "Report of patient visits by department",
+            "Report of patient visits by family relation",
+            "Report of patient registrations by period",
+            "Report of patient visits by diagnosis",
+            "Report of patient examinations by medical type",
+            "Top diagnosis report by period",
+            "Special cases report",
             "Report of validity period of medical personnel licenses"
         };
 
@@ -50,19 +52,19 @@
 
         private async Task Download()
         {
-            try
-            {
-                await GenerateExcell();
-            }
-            catch (Exception ex)
-            {
-                ToastService.ShowError(ex.Message);
-            }
-            //var a = FormReports;
-            //if(FormReports.report == "Report of patient visits per period")
+            //try
             //{
-            //    VisitByPeriode(FormReports);
+            //    await GenerateExcell();
             //}
+            //catch (Exception ex)
+            //{
+            //    ToastService.ShowError(ex.Message);
+            //}
+            var a = FormReports;
+            if (FormReports.report == "Report of patient visits by period")
+            {
+              await  VisitByPeriode(FormReports);
+            }
         }
 
         private async Task GenerateExcell()
@@ -118,16 +120,16 @@
             await JsRuntime.InvokeVoidAsync("saveAsFile", "Student.xlsx", Convert.ToBase64String(fileContent));
         }
 
-        private void VisitByPeriode(ReportDto FormReports)
+        private async Task VisitByPeriode(ReportDto FormReports)
         {
-            var stream = new MemoryStream();
+            byte[] fileContent;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             var pack = new ExcelPackage();
             var SheetTitle = FormReports.report;
             ExcelWorksheet ws = pack.Workbook.Worksheets.Add(SheetTitle);
 
-            var cultureInfo = new System.Globalization.CultureInfo("id-ID");
+            var cultureInfo = new System.Globalization.CultureInfo("en_US");
 
             var result = generalConsultans.Where(x => x.CreateDate.Value.Date >= FormReports.StartDate.Value.Date && x.CreateDate.Value.Date < FormReports.EndDate.Value.Date.AddDays(1) && x.StagingStatus == "Finished").ToList();
 
@@ -148,15 +150,16 @@
 
             ws.Cells[2, 1].Value = FormReports.report;
             ws.Cells[3, 1].Value = "Date Period";
-            ws.Cells[3, 2].Value = FormReports.StartDate.Value.Date.ToString("dd MMMM yyyy", cultureInfo) + "-" + FormReports.EndDate.Value.Date.ToString("dd MMMM yyyy", cultureInfo);
+            ws.Cells[3, 2].Value = FormReports.StartDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo);
 
             ws.Cells[2, 1, 2, 3].Merge = true;
 
             string fileTitle = "Rekapitulasi Request PGS.xls";
             string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-            pack.SaveAs(stream);
-            stream.Position = 0;
+
+            fileContent = pack.GetAsByteArray();
+            await JsRuntime.InvokeVoidAsync("saveAsFile", fileTitle, Convert.ToBase64String(fileContent));
             //return File(stream, contentType, );
         }
     }
