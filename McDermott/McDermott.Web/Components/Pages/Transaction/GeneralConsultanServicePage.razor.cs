@@ -57,6 +57,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<UserDto> IsPatient = new();
         private List<UserDto> patients = new List<UserDto>();
 
+        private List<LabTestDto> LabTests = [];
         private List<UserDto> IsPratition = new();
         private List<UserDto> AllDoctors = [];
         private List<InsuranceDto> Insurances = [];
@@ -669,6 +670,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
             NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
+            LabTests = await Mediator.Send(new GetLabTestQuery());
+
             var nursingDiagnosesTemps = NursingDiagnoses.Select(x => new NursingDiagnosesTemp
             {
                 Id = x.Id,
@@ -686,6 +689,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             AllDiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
 
+            await GetUserInfo();
             await LoadData();
         }
 
@@ -744,7 +748,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 if (FormRegis.Id == 0)
                 {
-                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date < DateTime.Now.Date));
+                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
 
                     if (patient.Count > 0)
                     {
@@ -846,6 +850,8 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
+                PopUpActionSpace = false;
+
                 if (FormRegis.Id == 0)
                     return;
 
@@ -863,8 +869,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                     await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
-
-                PopUpActionSpace = false;
             }
             catch (Exception ex)
             {
@@ -913,7 +917,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 if (FormRegis.Id == 0)
                 {
-                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date < DateTime.Now.Date));
+                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
 
                     if (patient.Count > 0)
                     {
@@ -1195,7 +1199,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if ((GeneralConsultanServiceDto)args.DataItem is null)
                     return;
 
-                IsDeletedConsultantService = ((GeneralConsultanServiceDto)args.DataItem)!.StagingStatus!.Equals("Planned");
+                IsDeletedConsultantService = ((GeneralConsultanServiceDto)args.DataItem)!.StagingStatus!.Equals("Planned") || ((GeneralConsultanServiceDto)args.DataItem)!.StagingStatus!.Equals("Canceled");
             }
             catch { }
 
@@ -1411,9 +1415,14 @@ namespace McDermott.Web.Components.Pages.Transaction
             PopUpHistoricalMedical = true;
         }
 
-        private void OnClickPopUpPopUpActionSpace()
+        private async Task OnClickPopUpPopUpActionSpace()
         {
             PopUpActionSpace = true;
+
+            var support = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+
+            if (support.Count > 0)
+                GeneralConsultanMedicalSupport = support[0];
         }
 
         private void OnClickPopUpAppoimentPending()

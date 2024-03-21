@@ -6,6 +6,7 @@
         public long? GeneralConsultanServiceId { get; set; }
         public long? PractitionerLabEximinationId { get; set; }
         public string? LabEximinationName { get; set; }
+        public long? LabResulLabExaminationtId { get; set; }
         public string? LabEximinationAttachment { get; set; }
         public long? PractitionerRadiologyEximinationId { get; set; }
         public string? RadiologyEximinationName { get; set; }
@@ -94,5 +95,6 @@
         public UserDto? PractitionerAlcoholEximination { get; set; }
         public UserDto? PractitionerDrugEximination { get; set; }
         public UserDto? PractitionerECG { get; set; }
+        public LabTestDto? LabResulLabExaminationt { get; set; }
     }
 }

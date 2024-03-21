@@ -89,7 +89,7 @@
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" Width="150px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" Width="170px" />
-                                                    <DxGridDataColumn FieldName="QueueStage" Caption="Queue Stage" Width="70px">
+                                                    <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="70px">
                                                         <CellDisplayTemplate>
                                                             @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>

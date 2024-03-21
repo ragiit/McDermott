@@ -12,17 +12,31 @@
 
 @inject CustomAuthenticationStateProvider CustomAuth
 
-<PageTitle>Mc HealthCare - Login</PageTitle>
+<PageTitle>McHealthCare - Login</PageTitle>
 
 <div class="hold-transition login-page">
     <div class="login-box">
         <!-- /.login-logo -->
+        @*  <div class="card-header text-center">
+        <a href="#" class="h1 no-underline">
+        <img src="https://www.ikariera.cz/uploads/companies/file/28129/22192/17871/c1c103e1-56b0-45cf-b02d-f6acbc7276b8/Logo%20-%20mcdermott_symbol_color%20500x500%2C%2050hrana.png" alt="Logo McHealthCare" style="max-width: 100px; height: auto; vertical-align: middle;"> <!-- Ganti url_ke_gambar_anda dengan URL gambar Anda -->
+        </a>
+        </div> *@
         <div class="card card-outline card-primary">
+            @*  <div class="card-header text-center">
+            <a href="../../index2.html" class="h1 no-underline"><b>Mc</b>HealthCare</a>
+            </div> *@
             <div class="card-header text-center">
-                <a href="../../index2.html" class="h1 no-underline"><b>Mc</b>HealthCare</a>
+                <a href="#" class="h1 no-underline">
+                    <img src="https://www.ikariera.cz/uploads/companies/file/28129/22192/17871/c1c103e1-56b0-45cf-b02d-f6acbc7276b8/Logo%20-%20mcdermott_symbol_color%20500x500%2C%2050hrana.png" alt="Logo McHealthCare" style="max-width: 100px; height: auto; vertical-align: middle;"> <!-- Ganti url_ke_gambar_anda dengan URL gambar Anda -->
+                </a>
             </div>
             <div class="card-body">
-                <p class="login-box-msg">Sign in to start your session</p>
+                @* <a href="../../index2.html" class="h1 no-underline"><b>Mc</b>HealthCare</a>
+                <b class="login-box-msg">Mc</b>HealthCare *@
+                @* <p class="text-center mt-2 mb-2">Sign in to start your session</p> *@
+                <h5 class="text-center mt-2"><b>Welcome</b></h5>
+                <p class="text-center mt-1 mb-2">Please login using your account to continue</p>
 
                 @*  <div hidden="@isSuccess" class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -58,7 +72,7 @@
                           OnInvalidSubmit="@HandleInvalidSubmit">
                     <DataAnnotationsValidator />
                     <DxFormLayout CssClass="col-md">
-                        <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Email" ColSpanMd="12" BeginRow="true">
+                        <DxFormLayoutItem CaptionCssClass="required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Email" ColSpanMd="12" BeginRow="true">
                             <DxMaskedInput @bind-Value="LoginForm.Email"
                                            Mask="@EmailMask"
                                            NullText="mail@domain.com"
@@ -77,7 +91,7 @@
                             </DxMaskedInput>
                             <ValidationMessage For="@(()=>LoginForm.Email)"   />
                         </DxFormLayoutItem>
-                        <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Password" ColSpanMd="12" BeginRow="true">
+                        <DxFormLayoutItem CaptionCssClass="required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Password" ColSpanMd="12" BeginRow="true">
                             <DxTextBox @bind-Text="@LoginForm.Password"
                                        InputId="PasswordId"
                                        ShowValidationIcon="true"
@@ -90,11 +104,12 @@
                             <ValidationMessage For="@(()=>LoginForm.Password)"   />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem ColSpanMd="12" BeginRow="true">
-                            <div class="row  justify-content-end">
-                                <div class="col-auto align-self-end">
-                                    <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-right-to-bracket" Text="Sign In" SubmitFormOnClick="true" />
+                            <div class="row">
+                                <div class="col-12">
+                                    <DxButton RenderStyleMode="@ButtonRenderStyleMode.Contained" CssClass="rounded-button w-100 mt-3" IconCssClass="fa-solid fa-right-to-bracket" Text="LOGIN" SubmitFormOnClick="true" />
                                 </div>
                             </div>
+                            @* <DxButton RenderStyleMode="@ButtonRenderStyleMode.Contained" RenderStyle="ButtonRenderStyle.Primary" CssClass="rounded-button mt-2" IconCssClass="fa-solid fa-right-to-bracket" Text="Sign In" SubmitFormOnClick="true" /> *@
                         </DxFormLayoutItem>
                     </DxFormLayout>
                 </EditForm>
@@ -102,6 +117,12 @@
         </div>
     </div>
 </div>
+
+<style>
+    .rounded-button {
+        border-radius: 13px; /* Sesuaikan dengan radius yang Anda inginkan */
+    }
+</style>
 
 @code {
     private LoginTemp LoginForm = new();
