@@ -89,9 +89,14 @@
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" Width="150px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" Width="170px" />
+                                                    <DxGridDataColumn FieldName="NameClass" Caption="Special Case" Width="90px">
+                                                        <CellDisplayTemplate>
+                                                            @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
+                                                        </CellDisplayTemplate>
+                                                    </DxGridDataColumn>
                                                     <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
                                                         <CellDisplayTemplate>
-                                                            @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
+                                                            @GetIssueStageIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>
                                                     </DxGridDataColumn>
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
@@ -189,9 +194,14 @@
                                                 <Columns>
                                                     <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" />
+                                                    <DxGridDataColumn FieldName="NameClass" Caption="Special Case" Width="90px">
+                                                        <CellDisplayTemplate>
+                                                            @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
+                                                        </CellDisplayTemplate>
+                                                    </DxGridDataColumn>
                                                     <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
                                                         <CellDisplayTemplate>
-                                                            @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
+                                                            @GetIssueStageIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>
                                                     </DxGridDataColumn>
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
@@ -290,9 +300,14 @@
                                                     <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" Width="170px" />
+                                                    <DxGridDataColumn FieldName="NameClass" Caption="Special Case" Width="90px">
+                                                        <CellDisplayTemplate>
+                                                            @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
+                                                        </CellDisplayTemplate>
+                                                    </DxGridDataColumn>
                                                     <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
                                                         <CellDisplayTemplate>
-                                                            @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
+                                                            @GetIssueStageIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>
                                                     </DxGridDataColumn>
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
@@ -391,9 +406,14 @@
                                                     <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" Width="150px" />
+                                                    <DxGridDataColumn FieldName="NameClass" Caption="Special Case" Width="90px">
+                                                        <CellDisplayTemplate>
+                                                            @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
+                                                        </CellDisplayTemplate>
+                                                    </DxGridDataColumn>
                                                     <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
                                                         <CellDisplayTemplate>
-                                                            @GetIssuePriorityIconHtml((context.DataItem as KioskQueueDto).QueueStage)
+                                                            @GetIssueStageIconHtml((context.DataItem as KioskQueueDto).QueueStage)
                                                         </CellDisplayTemplate>
                                                     </DxGridDataColumn>
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">

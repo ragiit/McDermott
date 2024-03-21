@@ -12,6 +12,7 @@
         public string? QueueStage { get; set; }
         public string? QueueStatus { get; set; }
         public long? ClassTypeId { get; set; }
+        public string? NameClass { get; set; } = string.Empty;
 
         public virtual KioskDto? Kiosk { get; set; }
         public virtual ServiceDto? Service { get; set; }
