@@ -52,6 +52,7 @@ namespace McDermott.Application.Features.Queries.Config
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetMenuQuery_");
+                _cache.Remove("GetGroupMenuQuery_");
 
                 return result.Adapt<MenuDto>();
             }
@@ -70,6 +71,7 @@ namespace McDermott.Application.Features.Queries.Config
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetMenuQuery_");
+                _cache.Remove("GetGroupMenuQuery_");
 
                 return result.Adapt<List<MenuDto>>();
             }
@@ -92,6 +94,7 @@ namespace McDermott.Application.Features.Queries.Config
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetMenuQuery_");
+                _cache.Remove("GetGroupMenuQuery_");
 
                 return result.Adapt<MenuDto>();
             }
@@ -110,6 +113,7 @@ namespace McDermott.Application.Features.Queries.Config
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetMenuQuery_");
+                _cache.Remove("GetGroupMenuQuery_");
 
                 return result.Adapt<List<MenuDto>>();
             }
@@ -140,6 +144,7 @@ namespace McDermott.Application.Features.Queries.Config
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetMenuQuery_");
+                _cache.Remove("GetGroupMenuQuery_");
 
                 return true;
             }

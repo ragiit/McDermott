@@ -60,16 +60,33 @@ namespace McDermott.Web.Components.Pages.Queue
                     .Build();
 
                 await hubConnection.StartAsync();
-                InvokeAsync(StateHasChanged);
+
+                await InvokeAsync(StateHasChanged);
             }
             catch { }
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            try
+            {
+                await base.OnAfterRenderAsync(firstRender);
+
+                if (firstRender)
+                {
+                    await oLocal.GetCookieUserLogin();
+                }
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private async Task LoadData()
         {
             try
             {
-                var us = await  JsRuntime.GetCookieUserLogin();
+                var us = await JsRuntime.GetCookieUserLogin();
 
                 userBy = us.Name;
 

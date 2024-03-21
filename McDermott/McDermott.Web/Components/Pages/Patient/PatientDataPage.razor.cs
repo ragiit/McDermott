@@ -3,6 +3,7 @@
     public partial class PatientDataPage
     {
         #region Relation Data
+
         private List<UserDto> Users = [];
         private List<UserDto> Patiens = [];
         private List<FamilyDto> Families = [];
@@ -21,7 +22,9 @@
         private List<InsurancePolicyDto> InsurancePolicies = [];
 
         private UserDto UserForm = new();
-        #endregion
+
+        #endregion Relation Data
+
         #region UserLoginAndAccessRole
 
         [Inject]
@@ -75,8 +78,11 @@
         public IGrid GridFamilyRelation { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private IReadOnlyList<object> SelectedDataFamilyRelationItems { get; set; } = new ObservableRangeCollection<object>();
-        enum Opinion { Yes, No, Abstain }
-        Opinion Value = Opinion.Abstain;
+
+        private enum Opinion
+        { Yes, No, Abstain }
+
+        private Opinion Value = Opinion.Abstain;
 
         private List<string> IdentityTypes = new()
         {
@@ -147,11 +153,11 @@
 
         #endregion MaskedInput
 
-
-        void CheckedChanged(bool value)
+        private void CheckedChanged(bool value)
         {
             //UserForm.Name
         }
+
         private async Task LoadData()
         {
             PanelVisible = true;
@@ -321,13 +327,10 @@
                     UserForm.DomicileCountryId = UserForm.IdCardCountryId;
                 }
 
-
-
                 if (UserForm.Id == 0)
                 {
                     var date = DateTime.Now;
                     var lastId = Users.ToList().LastOrDefault();
-
 
                     UserForm.NoRm = lastId is null
                              ? $"{date:dd-MM-yyyy}-0001"
@@ -371,7 +374,6 @@
                     else
                     {
                         result = await Mediator.Send(new CreateUserRequest(UserForm));
-
                     }
 
                     UserForm.PatientAllergy.UserId = result.Id;
@@ -396,7 +398,7 @@
                 }
                 else
                 {
-                    if(UserForm.IsEmployeeRelation == true)
+                    if (UserForm.IsEmployeeRelation == true)
                     {
                         var checkName = Users.Where(x => x.Name.Contains("%" + UserForm.Name + "%")).FirstOrDefault();
                         if (checkName != null)
@@ -405,7 +407,7 @@
                         }
                     }
                     await Mediator.Send(new UpdateUserRequest(UserForm));
-                    
+
                     UserForm.PatientAllergy.UserId = UserForm.Id;
                     if (UserForm.PatientAllergy.Id == 0)
                         await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
@@ -447,7 +449,7 @@
         {
             if (args.DataItem is not null)
             {
-                IsDeleted = (bool)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(((UserDto)args.DataItem).Id.ToString())!;
+                IsDeleted = ((UserDto)args.DataItem).Id == UserLogin.Id;
             }
 
             FocusedRowVisibleIndex = args.VisibleIndex;
@@ -522,9 +524,9 @@
             await GridFamilyRelation.StartEditRowAsync(FocusedRowFamilyMemberVisibleIndex);
         }
 
-        private void OnRowDoubleClick(GridRowClickEventArgs e)
+        private async Task OnRowDoubleClick(GridRowClickEventArgs e)
         {
-            EditItem();
+            await EditItem();
         }
 
         private async Task EditItem()

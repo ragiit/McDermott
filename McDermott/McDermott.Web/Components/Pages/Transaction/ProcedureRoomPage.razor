@@ -1,4 +1,4 @@
-﻿@page "/clinic-service/action-room"
+﻿@page "/clinic-service/procedure-room"
 @rendermode InteractiveServer
 
 <PageTitle>McDermott - Action Room</PageTitle>
@@ -106,7 +106,7 @@
                                 <div class="card-body">
                                     <div class="w-100">
                                         <div class="col align-self-center">
-                                            <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
+                                            <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary" Enabled="@(!GeneralConsultanMedicalSupport.Status.Equals("Finish") && !Loading)"></DxButton>
                                             @* <DxButton IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancelConfirm" RenderStyle="ButtonRenderStyle.Danger"></DxButton>  *@
                                         </div>
                                     </div>

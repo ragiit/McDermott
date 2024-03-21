@@ -125,7 +125,7 @@
                                             <DxTab Text="Confirmed" Enabled="@(FormRegis.StagingStatus == "Confirmed")"></DxTab>
                                             <DxTab Text="Nurse Station" Enabled="@(FormRegis.StagingStatus == "Nurse Station")"></DxTab>
                                             <DxTab Text="Waiting" Enabled="@(FormRegis.StagingStatus == "Waiting")"></DxTab>
-                                            <DxTab Text="Physician" Enabled="@(FormRegis.StagingStatus == "Physician")"></DxTab>
+                                            <DxTab Text="@(GeneralConsultanMedicalSupport != null && GeneralConsultanMedicalSupport.Id != 0 && GeneralConsultanMedicalSupport.Status != "Finish" ? "Procedure Room" : "Physician")" Enabled="@(FormRegis.StagingStatus == "Physician")"></DxTab>
                                             <DxTab Text="Finished" Enabled="@(FormRegis.StagingStatus == "Finished")"></DxTab>
                                             <DxTab Text="Canceled" Enabled="@(FormRegis.StagingStatus == "Canceled")"></DxTab>
                                         </DxTabs>
@@ -136,7 +136,9 @@
 
                         @if (FormRegis.StagingStatus != "Finished" && FormRegis.StagingStatus != "Canceled")
                         {
-                                <div class="card">
+                            @if (GeneralConsultanMedicalSupport != null && GeneralConsultanMedicalSupport.Id != 0 && GeneralConsultanMedicalSupport.Status == "Finish")
+                            {
+                                 <div class="card">
                                     <div class="card-body">
                                         <div class="w-100">
                                         <div class="col align-self-center">
@@ -147,7 +149,9 @@
                                     </div>
                                     </div>
                                 </div>
-}
+                            }
+
+                        }
 
                                 @* @if (FormRegis.StagingStatus == "Physician")
                                 {
@@ -203,8 +207,8 @@
 
                                                         <DxToolbarItem Alignment="ToolbarItemAlignment.Left" Visible="@(FormRegis.StagingStatus == "Physician")" BeginGroup="true"
                                                                     IconCssClass="fa-solid fa-notes-medical"
-                                                                    Click="OnClickPopUpPopUpActionSpace"
-                                                                    Text="Action Room" />
+                                                                    Click="OnClickPopUpPopUpProcedureRoom"
+                                                                    Text="Procedure Room" />
                                                     </Items>
                                                 </DxToolbar>
                                             </div>
@@ -233,10 +237,10 @@
                                                             <ValidationMessage For="@(() => FormRegis.PatientId)" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@FormRegis.NoRM" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
+                                                        <DxTextBox @bind-Text="@FormRegis.Patient.NoRm" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@FormRegis.IdentityNumber" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
+                                                        <DxTextBox @bind-Text="@FormRegis.Patient.NoId" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
                                                         <Template>
@@ -1513,7 +1517,7 @@ NullText="Select Registration..."
     </EditForm>
 </DxPopup>
 
-<DxPopup HeaderText="Action Room" @bind-Visible="@PopUpActionSpace" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+<DxPopup HeaderText="Procedure Room" @bind-Visible="@PopUpProcedureRoom" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
        <div class="row justify-content-end mb-3">
             <div class="col-auto align-self-end">
                 <DxTabs>
@@ -1710,7 +1714,7 @@ NullText="Select Registration..."
         <div class="row justify-content-end">
             <div class="col-auto align-self-end">
                 <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"  ></DxButton>
-                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancelAppoimentPopup"></DxButton>
+                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancelProcedureRoom"></DxButton>
             </div>
         </div>
     </EditForm>

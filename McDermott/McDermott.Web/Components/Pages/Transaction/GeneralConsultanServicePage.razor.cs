@@ -840,17 +840,17 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             FormValidationState = true;
 
-            if (PopUpActionSpace)
-                await OnSaveActionSpace();
+            if (PopUpProcedureRoom)
+                await OnSaveProcedureRoom();
             else
                 await OnSave();
         }
 
-        private async Task OnSaveActionSpace()
+        private async Task OnSaveProcedureRoom()
         {
             try
             {
-                PopUpActionSpace = false;
+                PopUpProcedureRoom = false;
 
                 if (FormRegis.Id == 0)
                     return;
@@ -865,10 +865,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (GeneralConsultanMedicalSupport.Id == 0)
                 {
                     GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
-                    await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                    GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
                 }
                 else
-                    await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                    GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
             }
             catch (Exception ex)
             {
@@ -1283,6 +1283,12 @@ namespace McDermott.Web.Components.Pages.Transaction
                             GeneralConsultanMedicalSupport = support[0];
                         break;
 
+                    case "Waiting":
+                        var support1 = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                        if (support1.Count > 0)
+                            GeneralConsultanMedicalSupport = support1[0];
+                        break;
+
                     default:
                         break;
                 }
@@ -1327,9 +1333,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             PopUpAppoiment = false;
         }
 
-        private void OnCancelActionSpace()
+        private void OnCancelProcedureRoom()
         {
-            PopUpActionSpace = false;
+            PopUpProcedureRoom = false;
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -1372,7 +1378,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private bool PopUpHistoricalMedical = false;
         private bool PopUpAppoimentPending = false;
         private bool PopUpAppoiment = false;
-        private bool PopUpActionSpace = false;
+        private bool PopUpProcedureRoom = false;
         private bool IsReferTo = false;
         private bool IsAppoiment = false;
 
@@ -1415,9 +1421,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             PopUpHistoricalMedical = true;
         }
 
-        private async Task OnClickPopUpPopUpActionSpace()
+        private async Task OnClickPopUpPopUpProcedureRoom()
         {
-            PopUpActionSpace = true;
+            PopUpProcedureRoom = true;
 
             var support = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
 

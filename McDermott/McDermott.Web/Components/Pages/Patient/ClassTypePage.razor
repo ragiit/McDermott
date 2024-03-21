@@ -1,7 +1,7 @@
-﻿@page "/patient/class-type"
+﻿@page "/patient/patient-type"
 @rendermode InteractiveServer
 
-<PageTitle>McDermott - Master Data Class Type</PageTitle>
+<PageTitle>McDermott - Master Data Patient Type</PageTitle>
 
 @if (IsAccess)
 {
@@ -10,12 +10,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Class Type</h1>
+                        <h1>Patient Type</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item" @onclick="LoadData">Class Type</li>
+                            <li class="breadcrumb-item" @onclick="LoadData">Patient Type</li>
                         </ol>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                                             PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                             PageSizeSelectorAllRowsItemVisible="true"
                                             PagerSwitchToInputBoxButtonCount="10"
-                                            PopupEditFormHeaderText="@(IsAdd ? "Create Class Type" : "Edit Class Type")"
+                                            PopupEditFormHeaderText="@(IsAdd ? "Create Patient Type" : "Edit Patient Type")"
                                             FocusedRowEnabled="true"
                                             PagerVisibleNumericButtonCount="10"
                                             FocusedRowChanged="Grid_FocusedRowChanged"

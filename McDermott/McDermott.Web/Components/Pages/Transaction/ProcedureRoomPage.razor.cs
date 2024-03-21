@@ -1,6 +1,6 @@
 ﻿namespace McDermott.Web.Components.Pages.Transaction
 {
-    public partial class ActionSpacePage
+    public partial class ProcedureRoomPage
     {
         #region UserLoginAndAccessRole
 
@@ -39,6 +39,8 @@
 
         #endregion UserLoginAndAccessRole
 
+        #region Properties
+
         private List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupports = [];
         private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport = new();
         private GeneralConsultanServiceDto GeneralConsultanService = new();
@@ -46,19 +48,17 @@
         private List<LabTestDto> LabTests = [];
         private List<IBrowserFile> BrowserFiles = [];
 
-        #region Grid Properties
-
+        private bool Loading = false;
         private string StagingText = "In-Progress";
         private bool ShowForm = false;
         private bool FormValidationState = false;
-        private bool PopUpActionSpace = false;
+        private bool PopUpProcedureRoom = false;
         private bool PanelVisible { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
-
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
-        #endregion Grid Properties
+        #endregion Properties
 
         #region LoadData
 
@@ -114,6 +114,8 @@
         {
             try
             {
+                Loading = true;
+
                 if (GeneralConsultanMedicalSupport.Id == 0)
                     return;
 
@@ -124,7 +126,16 @@
                     await FileUploadService.UploadFileAsync(item, 0, []);
                 }
 
+                if (GeneralConsultanMedicalSupport.Status == "Finish")
+                {
+                    GeneralConsultanService.StagingStatus = "Waiting";
+
+                    await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+                }
+
                 GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+
+                Loading = false;
             }
             catch (Exception ex)
             {

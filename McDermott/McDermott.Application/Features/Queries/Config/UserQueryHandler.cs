@@ -123,6 +123,7 @@ namespace McDermott.Application.Features.Queries.Config
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetUserQuery_");
+                _cache.Remove("GetGeneralConsultanServiceQuery_");
 
                 return result.Adapt<UserDto>();
             }
@@ -149,6 +150,7 @@ namespace McDermott.Application.Features.Queries.Config
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetUserQuery_");
+                _cache.Remove("GetGeneralConsultanServiceQuery_");
 
                 return result.Adapt<UserDto>();
             }
@@ -167,6 +169,7 @@ namespace McDermott.Application.Features.Queries.Config
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetUserQuery_");
+                _cache.Remove("GetGeneralConsultanServiceQuery_");
 
                 return result.Adapt<List<UserDto>>();
             }
@@ -197,6 +200,7 @@ namespace McDermott.Application.Features.Queries.Config
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetUserQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetGeneralConsultanServiceQuery_");
 
                 return true;
             }

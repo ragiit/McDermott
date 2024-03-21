@@ -190,7 +190,7 @@
                 }
             }
 
-            await Mediator.Send(new GetGroupMenuQuery(removeCache: true));
+            //await Mediator.Send(new GetGroupMenuQuery(removeCache: true));
 
             NavigationManager.NavigateTo("config/menu", true);
 
