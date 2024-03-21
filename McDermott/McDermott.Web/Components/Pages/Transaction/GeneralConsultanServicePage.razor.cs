@@ -1343,6 +1343,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             try
             {
                 if (SelectedDataItems is null)
+                    return;
+
+                if (SelectedDataItems is not null && SelectedDataItems.Count == 1)
                 {
                     await Mediator.Send(new DeleteGeneralConsultanServiceRequest(((GeneralConsultanServiceDto)e.DataItem).Id));
                 }
@@ -1350,7 +1353,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     var a = SelectedDataItems.Adapt<List<GeneralConsultanServiceDto>>();
 
-                    a = a.Where(x => x.StagingStatus == "Planned").ToList();
+                    a = a.Where(x => x.StagingStatus == "Planned" || x.StagingStatus == "Canceled").ToList();
 
                     await Mediator.Send(new DeleteGeneralConsultanServiceRequest(ids: a.Select(x => x.Id).ToList()));
                 }
@@ -1382,8 +1385,11 @@ namespace McDermott.Web.Components.Pages.Transaction
         private bool IsReferTo = false;
         private bool IsAppoiment = false;
 
+        private GeneralConsultanServiceDto GeneralConsultanTemp = new();
+
         private async Task OnReferToClick()
         {
+            GeneralConsultanTemp = FormRegis;
             IsReferTo = true;
             PopUpVisible = true;
 
@@ -1397,6 +1403,22 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 ex.HandleException(ToastService);
             }
+        }
+
+        private async Task CloseReferTo()
+        {
+            PopUpVisible = false;
+            var value = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
+            if (value.Count > 0)
+                FormRegis = value[0];
+        }
+
+        private async Task CloseAppoimentPopUp()
+        {
+            PopUpAppoiment = false;
+            var value = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
+            if (value.Count > 0)
+                FormRegis = value[0];
         }
 
         private async Task OnAppoimentPopUpClick()

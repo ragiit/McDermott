@@ -189,7 +189,7 @@
                                                                     Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
                                                                     IconCssClass="fa-solid fa-notes-medical"
                                                                     Click="OnAppoimentPopUpClick"
-                                                                    Text="Appoiment" />
+                                                                    Text="Follow Up" />
 
                                                         <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
                                                                     IconCssClass="fa-solid fa-notes-medical"
@@ -237,10 +237,11 @@
                                                             <ValidationMessage For="@(() => FormRegis.PatientId)" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@FormRegis.Patient.NoRm" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
+                                                     <DxTextBox @bind-Text="@(FormRegis.Patient.Name)" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
+
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@FormRegis.Patient.NoId" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
+                                                        <DxTextBox @bind-Text="@(FormRegis.Patient.NoId)" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
                                                         <Template>
@@ -302,9 +303,9 @@ NullText="Select Registration..."
                                             </div>
                                             <div class="col-md-6">
                                                 <DxFormLayout CssClass="mt ">
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Class Type" ColSpanMd="12">
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient Type" ColSpanMd="12">
                                                         <DxComboBox ShowValidationIcon="true" Data="@ClassTypes"
-                                                                    NullText="Select Class Type.."
+                                                                    NullText="Select Patient Type.."
                                                                     ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                     FilteringMode="@DataGridFilteringMode.Contains"
@@ -1090,14 +1091,15 @@ NullText="Select Registration..."
     </div>
 }
 
-<DxPopup HeaderText="Refer To" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+<DxPopup HeaderText="Refer To" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" CloseButtonClick="CloseReferTo" Width="90%">
     <EditForm Model="@FormRegis" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
         <DataAnnotationsValidator />
             <DxFormLayout>
                    <DxFormLayout>
                             <DxFormLayoutGroup Caption="General" ColSpanMd="12">
                                 <div class="row">
-                            <div class="col-md-6">
+
+                            <div class="col-md-12">
                                 <DxFormLayout  Enabled="false" CssClass="mt ">
                                     <DxFormLayoutItem  CaptionCssClass="required-caption normal-caption normal-caption" Caption="Patient" ColSpanMd="12">
                                         <DxComboBox ReadOnly
@@ -1171,7 +1173,8 @@ NullText="Select Registration..."
                                         </DxFormLayoutItem>
                                 </DxFormLayout>
                             </div>
-                            <div class="col-md-6">
+
+                            @* <div class="col-md-6">
                                 <DxFormLayout CssClass="mt ">
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
                                         <DxComboBox ShowValidationIcon="true"
@@ -1232,7 +1235,7 @@ NullText="Select Registration..."
                                             <ValidationMessage For="@(() => FormRegis.ScheduleTime)" />
                                     </DxFormLayoutItem>
                                 </DxFormLayout>
-                            </div>
+                            </div> *@
                         </div>
                         </DxFormLayoutGroup>
                         </DxFormLayout>
@@ -1352,7 +1355,7 @@ NullText="Select Registration..."
         </DxLoadingPanel>
 </DxPopup>
 
-<DxPopup HeaderText="Appointment" @bind-Visible="@PopUpAppoiment" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+<DxPopup HeaderText="Follow Up" @bind-Visible="@PopUpAppoiment" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Closed="CloseAppoimentPopUp" Width="90%">
     <EditForm Model="@FormRegis" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
         <DataAnnotationsValidator />
             <DxFormLayout>
@@ -1474,11 +1477,11 @@ NullText="Select Registration..."
                                                 Data="@Temps"
                                                 @bind-Value="@FormRegis.InsurancePolicyId"
                                                 NullText="Select Insurance ..">
-                                            </DxComboBox >
+                                            </DxComboBox>
                                             <ValidationMessage For="@(() => FormRegis.InsurancePolicyId)" />
                                         </DxFormLayoutItem>
                                     }
-                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
+                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up Date" ColSpanMd="12">
                                        <DxDateEdit
                                                 DateChanged="@((DateTime e) => SelectedItemRegistrationDateChanged(e))"
                                                 Date="@FormRegis.RegistrationDate"
@@ -1493,14 +1496,15 @@ NullText="Select Registration..."
                                                     @bind-Value="@FormRegis.ScheduleTime"/>
                                             <ValidationMessage For="@(() => FormRegis.ScheduleTime)" />
                                     </DxFormLayoutItem>
-                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Appoiment Date" ColSpanMd="12">
+                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
                                        <DxDateEdit
+                                                Enabled="false"
                                                 ShowValidationIcon="true"
-                                                @bind-Date="@FormRegis.AppoimentDate"
+                                                @bind-Date="@FormRegis.RegistrationDate"
                                                 Mask="@DateTimeMask.ShortDate"
                                                 NullText="Select Date">
                                         </DxDateEdit>
-                                        <ValidationMessage For="@(() => FormRegis.AppoimentDate)" />
+                                        <ValidationMessage For="@(() => FormRegis.RegistrationDate)" />
                                     </DxFormLayoutItem>
                                 </DxFormLayout>
                             </div>
@@ -1510,7 +1514,7 @@ NullText="Select Registration..."
             </DxFormLayout>
             <div class="row justify-content-end">
                 <div class="col-auto align-self-end">
-                    <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Appointment" SubmitFormOnClick="true"  ></DxButton>
+                    <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"  ></DxButton>
                     <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnCancelAppoimentPopup"></DxButton>
                 </div>
             </div>
