@@ -253,17 +253,48 @@ namespace McDermott.Web.Components.Pages.Queue
 
                 if (FormCounters.Id != 0)
                 {
-                    //Mendapatkan data berdasarkan Counter, service dan tanggal hari ini
-                    var TodayQueu = data.Where(x => x.ServiceId == FormCounters.ServiceId && x.ServiceKId == FormCounters.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date).ToList();
-
-                    if (TodayQueu.Count == 0)
+                    if (FormCounters.ClassTypeId != null)
                     {
-                        FormCounters.QueueNumber = 1;
+                        var TodayQueu = data.Where(x => x.ServiceId == FormCounters.ServiceId && x.ServiceKId == FormCounters.ServiceKId && x.ClassTypeId == FormCounters.ClassTypeId && x.CreatedDate.Value.Date == DateTime.Now.Date).ToList();
+                        if (TodayQueu.Count == 0)
+                        {
+                            FormCounters.QueueNumber = 1;
+                        }
+                        else
+                        {
+                            var GetNoQueue = TodayQueu.OrderByDescending(x => x.QueueNumber).FirstOrDefault();
+                            if (GetNoQueue.QueueNumber < 9)
+                            {
+                                FormCounters.QueueNumber = 1 * (long)GetNoQueue.QueueNumber + 2;
+                            }
+                            else
+                            {
+                                ToastService.ShowError("Penuh Eyy!!");
+                            }
+                        }
                     }
                     else
                     {
-                        var GetNoQueue = TodayQueu.OrderByDescending(x => x.QueueNumber).FirstOrDefault();
-                        FormCounters.QueueNumber = (long)GetNoQueue.QueueNumber + 1;
+                        //Mendapatkan data berdasarkan Counter, service dan tanggal hari ini
+                        var TodayQueu = data.Where(x => x.ServiceId == FormCounters.ServiceId && x.ServiceKId == FormCounters.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date).ToList();
+
+                        if (TodayQueu.Count == 0)
+                        {
+                            FormCounters.QueueNumber = 2;
+                        }
+                        else
+                        {
+                            var GetNoQueue = TodayQueu.OrderByDescending(x => x.QueueNumber).FirstOrDefault();
+                            if (GetNoQueue.QueueNumber < 10)
+                            {
+                                FormCounters.QueueNumber = 1 * ((long)GetNoQueue.QueueNumber + 2);
+                            }
+                            else
+                            {
+                                FormCounters.QueueNumber = 1 * ((long)GetNoQueue.QueueNumber + 1);
+                            }
+
+                        }
                     }
                     FormCounters.QueueStage = null;
                     FormCounters.QueueStatus = "waiting";

@@ -89,7 +89,7 @@
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" Width="150px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" Width="170px" />
-                                                    <DxGridDataColumn FieldName="NameClass" Caption="Special Case" Width="90px">
+                                                    <DxGridDataColumn FieldName="NameClass" Caption="Patient Type" Width="120px">
                                                         <CellDisplayTemplate>
                                                             @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
                                                         </CellDisplayTemplate>
@@ -194,7 +194,7 @@
                                                 <Columns>
                                                     <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" />
-                                                    <DxGridDataColumn FieldName="NameClass" Caption="Special Case" Width="90px">
+                                                    <DxGridDataColumn FieldName="NameClass" Caption="Patient Type" Width="120px">
                                                         <CellDisplayTemplate>
                                                             @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
                                                         </CellDisplayTemplate>
@@ -300,7 +300,7 @@
                                                     <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" Width="170px" />
-                                                    <DxGridDataColumn FieldName="NameClass" Caption="Special Case" Width="90px">
+                                                    <DxGridDataColumn FieldName="NameClass" Caption="Patient Type" Width="120px">
                                                         <CellDisplayTemplate>
                                                             @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
                                                         </CellDisplayTemplate>
@@ -406,7 +406,7 @@
                                                     <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
                                                     <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
                                                     <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" Width="150px" />
-                                                    <DxGridDataColumn FieldName="NameClass" Caption="Special Case" Width="90px">
+                                                    <DxGridDataColumn FieldName="NameClass" Caption="Patient Type" Width="120px">
                                                         <CellDisplayTemplate>
                                                             @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
                                                         </CellDisplayTemplate>

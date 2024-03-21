@@ -1,4 +1,5 @@
-﻿using McDermott.Application.Dtos.Queue;
+﻿using DevExpress.ClipboardSource.SpreadsheetML;
+using McDermott.Application.Dtos.Queue;
 using Org.BouncyCastle.Tls;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
@@ -422,19 +423,49 @@ namespace McDermott.Web.Components.Pages.Queue
                     // Mendapatkan ID dari hasil CreateKioskRequest
                     var checkId = await Mediator.Send(new CreateKioskRequest(FormKios));
 
-                    // Mendapatkan antrian kiosk
-                    var todayQueues = KioskQueues
-                        .Where(x => x.ServiceId == checkId.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date).ToList();
-
-                    // Menentukan nomor antrian
-                    if (todayQueues.Count == 0)
+                    if (FormKios.ClassTypeId != null)
                     {
-                        FormQueue.QueueNumber = 1;
+                        var TodayQueu = KioskQueues.Where(x => x.ServiceId == checkId.ServiceId  && x.ClassTypeId == FormKios.ClassTypeId && x.CreatedDate.Value.Date == DateTime.Now.Date).ToList();
+                        if (TodayQueu.Count == 0)
+                        {
+                            FormQueue.QueueNumber = 1;
+                        }
+                        else
+                        {
+                            var GetNoQueue = TodayQueu.OrderByDescending(x => x.QueueNumber).FirstOrDefault();
+                            if (GetNoQueue.QueueNumber < 9)
+                            {
+                                FormQueue.QueueNumber = 1 * (long)GetNoQueue.QueueNumber + 2;
+                            }
+                            else
+                            {
+                                ToastService.ShowError("Penuh Eyy!!");
+                                return;
+                            }
+                        }
                     }
                     else
                     {
-                        var GetNoQueue = todayQueues.OrderByDescending(x => x.QueueNumber).FirstOrDefault();
-                        FormQueue.QueueNumber = (long)GetNoQueue.QueueNumber + 1;
+                        //Mendapatkan data berdasarkan Counter, service dan tanggal hari ini
+                        var TodayQueu = KioskQueues.Where(x => x.ServiceId == checkId.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date).ToList();
+
+                        if (TodayQueu.Count == 0)
+                        {
+                            FormQueue.QueueNumber = 2;
+                        }
+                        else
+                        {
+                            var GetNoQueue = TodayQueu.OrderByDescending(x => x.QueueNumber).FirstOrDefault();
+                            if (GetNoQueue.QueueNumber < 10)
+                            {
+                                FormQueue.QueueNumber = 1 * ((long)GetNoQueue.QueueNumber + 2);
+                            }
+                            else
+                            {
+                                FormQueue.QueueNumber = 1 * ((long)GetNoQueue.QueueNumber + 1);
+                            }
+
+                        }
                     }
 
                     // mendapatkan service counter Id
