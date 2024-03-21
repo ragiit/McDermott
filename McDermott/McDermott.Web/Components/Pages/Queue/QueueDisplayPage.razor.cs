@@ -70,44 +70,8 @@ namespace McDermott.Web.Components.Pages.Queue
         #endregion Grid Properties
 
         #region async Data
+
         private string? CountName { get; set; } = string.Empty;
-
-        #region UserLoginAndAccessRole
-
-        [Inject]
-        public UserInfoService UserInfoService { get; set; }
-
-        private GroupMenuDto UserAccessCRUID = new();
-        private User UserLogin { get; set; } = new();
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                }
-                catch { }
-            }
-        }
-
-        private async Task GetUserInfo()
-        {
-            try
-            {
-                var user = await UserInfoService.GetUserInfo();
-                IsAccess = user.Item1;
-                UserAccessCRUID = user.Item2;
-                UserLogin = user.Item3;
-            }
-            catch { }
-        }
-
-        #endregion UserLoginAndAccessRole
-
 
         protected override async Task OnInitializedAsync()
         {
@@ -133,7 +97,8 @@ namespace McDermott.Web.Components.Pages.Queue
             PanelVisible = false;
         }
 
-        #endregion
+        #endregion async Data
+
         #region Grid
 
         protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
