@@ -1514,13 +1514,22 @@ NullText="Select Registration..."
 </DxPopup>
 
 <DxPopup HeaderText="Action Room" @bind-Visible="@PopUpActionSpace" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+       <div class="row justify-content-end mb-3">
+            <div class="col-auto align-self-end">
+                <DxTabs>
+                    <DxTab Text="Draft" Enabled="@(GeneralConsultanMedicalSupport.Status == "Draft")"></DxTab>
+                    <DxTab Text="In-Progress" Enabled="@(GeneralConsultanMedicalSupport.Status == "In-Progress")"></DxTab>
+                    <DxTab Text="Finish" Enabled="@(GeneralConsultanMedicalSupport.Status == "Finish")"></DxTab>
+                </DxTabs>
+            </div>
+        </div>
     <EditForm Model="@FormRegis" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
         <DataAnnotationsValidator />
         <DxFormLayout>
             <DxFormLayoutGroup ColSpanMd="12" Caption="Lab Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                 <Items>
                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
-                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
+                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors.Where(x => x.IsPhysicion == true)"
                                     NullText="Select Practitioner..."
                                     @bind-Value="@GeneralConsultanMedicalSupport.PractitionerLabEximinationId"
                                     TextFieldName="Name"
@@ -1528,8 +1537,14 @@ NullText="Select Registration..."
                         </DxComboBox>
                         <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerLabEximinationId)" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
-                        <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.LabEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Lab Test" ColSpanMd="12">
+                        <DxComboBox ShowValidationIcon="true" Data="@LabTests"
+                                    NullText="Select Lab Test..."
+                                    @bind-Value="@GeneralConsultanMedicalSupport.LabResulLabExaminationtId"
+                                    TextFieldName="Name"
+                                    ValueFieldName="Id">
+                        </DxComboBox>
+                        @* <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.LabEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" /> *@
                     </DxFormLayoutItem>
                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
                         <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.LabEximinationAttachment"
@@ -1550,7 +1565,7 @@ NullText="Select Registration..."
             <DxFormLayoutGroup ColSpanMd="12" Caption="Radiology Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                 <Items>
                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
-                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
+                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors.Where(x => x.IsPhysicion == true)"
                                     NullText="Select Practitioner..."
                                     @bind-Value="@GeneralConsultanMedicalSupport.PractitionerRadiologyEximinationId"
                                     TextFieldName="Name"
@@ -1580,7 +1595,7 @@ NullText="Select Registration..."
             <DxFormLayoutGroup ColSpanMd="12" Caption="Alcohol Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                 <Items>
                      <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
-                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
+                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors.Where(x => x.IsPhysicion == true)"
                                     NullText="Select Practitioner..."
                                     @bind-Value="@GeneralConsultanMedicalSupport.PractitionerAlcoholEximinationId"
                                     TextFieldName="Name"
@@ -1616,7 +1631,7 @@ NullText="Select Registration..."
             <DxFormLayoutGroup ColSpanMd="12" Caption="Drug Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                 <Items>
                      <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
-                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
+                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors.Where(x => x.IsPhysicion == true)"
                                     NullText="Select Practitioner..."
                                     @bind-Value="@GeneralConsultanMedicalSupport.PractitionerDrugEximinationId"
                                     TextFieldName="Name"
@@ -1652,7 +1667,7 @@ NullText="Select Registration..."
                 <DxFormLayoutGroup ColSpanMd="12" Caption="ECG" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                 <Items>
                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
-                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors"
+                        <DxComboBox ShowValidationIcon="true" Data="@AllDoctors.Where(x => x.IsPhysicion == true)"
                                     NullText="Select Practitioner..."
                                     @bind-Value="@GeneralConsultanMedicalSupport.PractitionerECGId"
                                     TextFieldName="Name"

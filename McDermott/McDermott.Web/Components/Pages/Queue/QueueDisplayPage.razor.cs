@@ -7,13 +7,49 @@ namespace McDermott.Web.Components.Pages.Queue
 {
     public partial class QueueDisplayPage
     {
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    await GetUserInfo();
+                }
+                catch { }
+            }
+        }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
         #region relation Data
 
         private List<DetailQueueDisplayDto> DetailQueueDisplay = [];
         private List<QueueDisplayDto> QueueDisplay = [];
         private List<CounterDto> Counters = [];
         public List<TempDetailQueueDisplayDto> TempDisplays = new();
-        private GroupMenuDto UserAccessCRUID = new();
         public TempDetailQueueDisplayDto FormDisplays = new();
         public QueueDisplayDto Displays = new();
         public DetailQueueDisplayDto DetDisplays = new();
@@ -23,7 +59,6 @@ namespace McDermott.Web.Components.Pages.Queue
         #region Grid Properties
 
         private IEnumerable<CounterDto> selectedCounter { get; set; } = [];
-        private bool IsAccess = false;
         private bool PanelVisible { get; set; } = true;
         private bool showPopUp { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
@@ -39,31 +74,8 @@ namespace McDermott.Web.Components.Pages.Queue
 
         protected override async Task OnInitializedAsync()
         {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
-
+            await GetUserInfo();
             await LoadData();
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
-                }
-                catch { }
-            }
         }
 
         private async Task LoadData()

@@ -1,18 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace McDermott.Web.Components.Pages.Transaction
+﻿namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class RaportPage
     {
         #region relation data
+
         private List<GeneralConsultanServiceDto> generalConsultans = [];
         private ReportDto FormReports = new();
-        #endregion
+
+        #endregion relation data
+
         #region variable static
+
         private string _selected;
         private string typeReport;
         private bool showForm { get; set; } = false;
-        DateTime DateTimeValue { get; set; } = DateTime.Now;
+        private DateTime DateTimeValue { get; set; } = DateTime.Now;
+
         private List<string> ListReport = new()
         {
             "Report of patient visits per period",
@@ -24,12 +27,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Top diagnosis report per period",
             "pecial cases report",
             "Report of validity period of medical personnel licenses"
-
         };
 
         private void selectedReport(string reports)
         {
-           if(reports == null)
+            if (reports == null)
             {
                 showForm = false;
             }
@@ -38,18 +40,82 @@ namespace McDermott.Web.Components.Pages.Transaction
                 showForm = true;
             }
         }
-        #endregion
+
+        #endregion variable static
+
         private async Task LoadData()
         {
             generalConsultans = await Mediator.Send(new GetGeneralConsultanServiceQuery());
         }
+
         private async Task Download()
         {
-            var a = FormReports;
-            if(FormReports.report == "Report of patient visits per period")
+            try
             {
-                VisitByPeriode(FormReports);
+                await GenerateExcell();
             }
+            catch (Exception ex)
+            {
+                ToastService.ShowError(ex.Message);
+            }
+            //var a = FormReports;
+            //if(FormReports.report == "Report of patient visits per period")
+            //{
+            //    VisitByPeriode(FormReports);
+            //}
+        }
+
+        private async Task GenerateExcell()
+        {
+            byte[] fileContent;
+            ExcelPackage.LicenseContext = LicenseContext.Commercial;
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("MySheet");
+
+                #region Header
+
+                worksheet.Cells[1, 1].Value = "Student";
+                worksheet.Cells[1, 1].Style.Font.Size = 12;
+                worksheet.Cells[1, 1].Style.Font.Bold = true;
+                worksheet.Cells[1, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+
+                worksheet.Cells[1, 2].Value = "Roll";
+                worksheet.Cells[1, 2].Style.Font.Size = 12;
+                worksheet.Cells[1, 2].Style.Font.Bold = true;
+                worksheet.Cells[1, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+
+                #endregion Header
+
+                #region Row
+
+                worksheet.Cells[2, 1].Value = "Argi";
+                worksheet.Cells[2, 1].Style.Font.Size = 12;
+                worksheet.Cells[2, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+
+                worksheet.Cells[2, 2].Value = "1001";
+                worksheet.Cells[2, 2].Style.Font.Size = 12;
+                worksheet.Cells[2, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+
+                #endregion Row
+
+                #region Row
+
+                worksheet.Cells[3, 1].Value = "Iwan";
+                worksheet.Cells[3, 1].Style.Font.Size = 12;
+                worksheet.Cells[3, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+
+                worksheet.Cells[3, 2].Value = "1002";
+                worksheet.Cells[3, 2].Style.Font.Size = 12;
+                worksheet.Cells[3, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+
+                #endregion Row
+
+                fileContent = package.GetAsByteArray();
+            }
+
+            await JsRuntime.InvokeVoidAsync("saveAsFile", "Student.xlsx", Convert.ToBase64String(fileContent));
         }
 
         private void VisitByPeriode(ReportDto FormReports)
@@ -57,15 +123,12 @@ namespace McDermott.Web.Components.Pages.Transaction
             var stream = new MemoryStream();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-
-
             var pack = new ExcelPackage();
             var SheetTitle = FormReports.report;
             ExcelWorksheet ws = pack.Workbook.Worksheets.Add(SheetTitle);
 
             var cultureInfo = new System.Globalization.CultureInfo("id-ID");
 
-           
             var result = generalConsultans.Where(x => x.CreateDate.Value.Date >= FormReports.StartDate.Value.Date && x.CreateDate.Value.Date < FormReports.EndDate.Value.Date.AddDays(1) && x.StagingStatus == "Finished").ToList();
 
             var data = new List<VisitByPeriod>();
@@ -75,7 +138,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     TotalVisit = result.Count(),
                     Services = item.TypeMedical,
-                    CountPatient= result.Where(x=>x.TypeMedical == item.TypeMedical).Count(),
+                    CountPatient = result.Where(x => x.TypeMedical == item.TypeMedical).Count(),
                 };
                 data.Add(report);
             }
@@ -85,11 +148,9 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             ws.Cells[2, 1].Value = FormReports.report;
             ws.Cells[3, 1].Value = "Date Period";
-            ws.Cells[3, 2].Value = FormReports.StartDate.Value.Date.ToString("dd MMMM yyyy", cultureInfo) +"-"+ FormReports.EndDate.Value.Date.ToString("dd MMMM yyyy", cultureInfo);
+            ws.Cells[3, 2].Value = FormReports.StartDate.Value.Date.ToString("dd MMMM yyyy", cultureInfo) + "-" + FormReports.EndDate.Value.Date.ToString("dd MMMM yyyy", cultureInfo);
 
             ws.Cells[2, 1, 2, 3].Merge = true;
-
-
 
             string fileTitle = "Rekapitulasi Request PGS.xls";
             string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -98,6 +159,5 @@ namespace McDermott.Web.Components.Pages.Transaction
             stream.Position = 0;
             //return File(stream, contentType, );
         }
-
     }
 }

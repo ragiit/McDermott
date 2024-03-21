@@ -51,6 +51,7 @@ namespace McDermott.Web.Components.Pages.Queue
             "Legacy",
             "NIK"
         };
+
         private IEnumerable<ServiceDto> SelectedServices = [];
         private KioskDto FormKios = new();
         private KioskQueueDto FormQueue = new();
@@ -142,7 +143,6 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 await GetUserInfo();
-
             }
             catch { }
 
@@ -152,7 +152,6 @@ namespace McDermott.Web.Components.Pages.Queue
                 HeaderName = i.Name;
                 break;
             }
-
         }
 
         private void ReloadPage()
@@ -160,7 +159,6 @@ namespace McDermott.Web.Components.Pages.Queue
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
 
-       
         protected override async Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
@@ -171,7 +169,6 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task LoadData()
         {
-           
             PanelVisible = true;
             StateHasChanged();
             showForm = false;
@@ -310,6 +307,8 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task OnSearch()
         {
+            var datagroup = await Mediator.Send(new GetGroupQuery());
+            var NameGroup = datagroup.Where(x => x.Id == UserAccessCRUID.GroupId).FirstOrDefault();
             var types = FormKios.Type;
             var InputSearch = FormKios.NumberType;
             Patients = await Mediator.Send(new GetDataUserForKioskQuery(types, InputSearch));
@@ -330,6 +329,10 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormKios.StageBpjs = false;
                     statBPJS = "InActive";
                 }
+                if (NameGroup.Name == "Nurse" || NameGroup.Name == "Perawat")
+                {
+                    showClass = true;
+                }
 
                 foreach (var kiosk in KioskConf)
                 {
@@ -349,15 +352,7 @@ namespace McDermott.Web.Components.Pages.Queue
                             LoadPhysicians(serviceId.Value);
                         }
 
-                        var datagroup = await Mediator.Send(new GetGroupQuery());
-                        var NameGroup = datagroup.Where(x => x.Id == UserAccessCRUID.GroupId).FirstOrDefault();
-                        
-                        if(NameGroup.Name == "Nurse" || NameGroup.Name == "Perawat")
-                        {
-                            showClass = true;
-                        }
                         showPhysician = true;
-                       
                     }
                 }
             }
@@ -441,7 +436,6 @@ namespace McDermott.Web.Components.Pages.Queue
                     if (checkId.PhysicianId != null)
                     {
                         FormGeneral.PratitionerId = FormKios.PhysicianId;
-
                     }
                     await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormGeneral));
                 }

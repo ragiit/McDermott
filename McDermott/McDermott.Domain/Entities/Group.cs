@@ -7,5 +7,8 @@
 
         [SetToNull]
         public virtual List<User>? Users { get; set; }
+
+        [SetToNull]
+        public virtual List<GroupMenu>? GroupMenus { get; set; }
     }
 }

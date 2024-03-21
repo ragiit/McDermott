@@ -12,7 +12,7 @@ namespace McDermott.Web.Components.Layout
 
         private async Task OnClickLogout()
         {
-            await JsRuntime.InvokeVoidAsync("clearAllCookies");
+            await JsRuntime.InvokeVoidAsync("deleteCookie", CookieHelper.USER_INFO);
 
             NavigationManager.NavigateTo("/login", true);
         }

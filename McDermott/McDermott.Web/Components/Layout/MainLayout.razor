@@ -253,7 +253,7 @@
 
                                         @foreach (var d in DetailMenuDtos.Where(x => x.ParentMenu == h.Name))
                                         {
-                                            if (!d.Name.Contains("kiosk"))
+                                            if (!d.Name.ToLower().Equals("kiosk"))
                                             {
 
                                                 var url = string.IsNullOrEmpty(d.Url) ? "test" : d.Url;
