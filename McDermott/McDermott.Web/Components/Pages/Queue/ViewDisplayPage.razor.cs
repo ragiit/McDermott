@@ -101,22 +101,25 @@ namespace McDermott.Web.Components.Pages.Queue
                 var dispId = queues.FirstOrDefault(q => q.Id == DisplayId);
                 DetQueues = queues.Where(q => q.QueueDisplayId == dispId?.QueueDisplayId).ToList();
 
-                
-                    // Mengambil detail counter berdasarkan ID counter dari antrian terpilih
-                    var counters = await Mediator.Send(new GetCounterQuery());
-                    getCounId = counters.FirstOrDefault(c => c.Id ==dispId?.CounterId);
+
+                // Mengambil detail counter berdasarkan ID counter dari antrian terpilih
+                var counters = await Mediator.Send(new GetCounterQuery());
+                foreach (var dId in DetQueues)
+                {
+                    getCounId = counters.FirstOrDefault(c => c.Id == dId.CounterId);
 
                     // Mengambil antrian kiosk berdasarkan layanan counter dan status "call" atau null
-                   
-               
-                if (getCounId != null)
-                {
-                    // Mengambil antrian kiosk berdasarkan ID counter dan status tertentu
-                    var dataQueue = await Mediator.Send(new GetKioskQueueQuery());
-                    kioskQueues = dataQueue.Where(q => q.ServiceKId == getCounId.ServiceKId &&
-                                                       q.CreatedDate.Value.Date == DateTime.Now.Date &&
-                                                       (q.QueueStage == null || q.QueueStage == "call" || q.QueueStage == "present"))
-                                           .ToList();
+
+
+                    if (getCounId != null)
+                    {
+                        // Mengambil antrian kiosk berdasarkan ID counter dan status tertentu
+                        var dataQueue = await Mediator.Send(new GetKioskQueueQuery());
+                        kioskQueues = dataQueue.Where(q => q.ServiceKId == getCounId.ServiceKId &&
+                                                           q.CreatedDate.Value.Date == DateTime.Now.Date &&
+                                                           (q.QueueStage == null || q.QueueStage == "call" || q.QueueStage == "present"))
+                                               .ToList();
+                    }
                 }
             }
             catch { }

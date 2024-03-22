@@ -5,7 +5,8 @@
         public long Id { get; set; }
         public long? QueueDisplayId { get; set; }
         public long? CounterId { get; set; }
-        public string? CounterName { get; set; } = string.Empty;
+        public string? CounterName { get; set; }
+        public string? DisplayName { get; set; }
         public string? Name { get; set; } = string.Empty;
 
         public virtual QueueDisplay? QueueDisplay { get; set; }

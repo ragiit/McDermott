@@ -1,4 +1,7 @@
-﻿using McDermott.Application.Dtos.Queue;
+﻿
+using McDermott.Application.Dtos.Queue;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Linq;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.DetailQueueDisplayCommand;
 using static McDermott.Application.Features.Commands.Queue.QueueDisplayCommand;
@@ -46,11 +49,10 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region relation Data
 
-        private List<DetailQueueDisplayDto> DetailQueueDisplay = [];
+        private List<DetailQueueDisplayDto> DetailQueueDisplay = new();
         private List<QueueDisplayDto> QueueDisplay = [];
         private List<CounterDto> Counters = [];
-        public List<TempDetailQueueDisplayDto> TempDisplays = new();
-        public TempDetailQueueDisplayDto FormDisplays = new();
+        public DetailQueueDisplayDto FormDisplays = new();
         public QueueDisplayDto Displays = new();
         public DetailQueueDisplayDto DetDisplays = new();
 
@@ -58,7 +60,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Grid Properties
 
-        private IEnumerable<CounterDto> selectedCounter { get; set; } = [];
+        private IEnumerable<CounterDto>? selectedCounter { get; set; } = [];
         private bool PanelVisible { get; set; } = true;
         private bool showPopUp { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
@@ -72,6 +74,7 @@ namespace McDermott.Web.Components.Pages.Queue
         #region async Data
 
         private string? CountName { get; set; } = string.Empty;
+        private string? disName { get; set; } = string.Empty;
 
         protected override async Task OnInitializedAsync()
         {
@@ -96,6 +99,8 @@ namespace McDermott.Web.Components.Pages.Queue
 
             PanelVisible = false;
         }
+
+
 
         #endregion async Data
 
@@ -190,7 +195,11 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+
+            FormDisplays = SelectedDataItems[0].Adapt<DetailQueueDisplayDto>();
+            FormDisplays.Name = FormDisplays.QueueDisplay.Name;
+
+            showPopUp = true;
         }
 
         private void DeleteItem_Click()
