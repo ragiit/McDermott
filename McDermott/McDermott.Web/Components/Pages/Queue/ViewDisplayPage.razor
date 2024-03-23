@@ -30,7 +30,7 @@
         </div>
         <div class="container-fluid">
             <div class="row">
-                @foreach (var view in DetQueues.Take(2))
+            @foreach (var view in getCount.Take(2))
                 {
                     <div class="col-md-6">
                         <div class="card">
@@ -54,7 +54,7 @@
                                                         IndicatorAreaVisible="false"
                                                         Text="Fetching Data...">
                                             <DxGrid @ref="Grid"
-                                                    Data="@kioskQueues"
+                                                Data="@kioskQueues.Where(q => q.ServiceKId == view.ServiceKId  && (q.QueueStage == null || q.QueueStage == "call" || q.QueueStage == "present"))"
                                                     ColumnResizeMode="GridColumnResizeMode.NextColumn"
                                                     AllowSelectRowByClick="true"
                                                     PagerPosition="GridPagerPosition.Bottom"
@@ -76,7 +76,7 @@
                                 </div>
                             </div>
                             <div class="card-footer bg-gradient-success py-0">
-                                <h3 class="text-center text-light">@view.CounterName</h3>
+                                <h3 class="text-center text-light">@view.Name</h3>
                             </div>
                         </div>
                     </div>

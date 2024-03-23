@@ -1,7 +1,10 @@
 ﻿using McDermott.Application.Dtos.Queue;
+using McDermott.Domain.Entities;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.DetailQueueDisplayCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
+using static McDermott.Application.Features.Commands.Queue.QueueDisplayCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
 {
@@ -12,8 +15,8 @@ namespace McDermott.Web.Components.Pages.Queue
         private List<CompanyDto> companies = new();
         private List<KioskQueueDto> kioskQueues = [];
         private List<KioskQueueDto> DataQueue = new();
-        private List<DetailQueueDisplayDto> DetQueues = new();
-        private CounterDto getCounId = new();
+        private QueueDisplayDto DetQueues = new();
+        private List<CounterDto> getCount = new();
 
         #endregion Data Relation
 
@@ -97,30 +100,24 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 // Mengambil detail antrian berdasarkan ID tampilan
-                var queues = await Mediator.Send(new GetDetailQueueDisplayQuery());
-                var dispId = queues.FirstOrDefault(q => q.Id == DisplayId);
-                DetQueues = queues.Where(q => q.QueueDisplayId == dispId?.QueueDisplayId).ToList();
-
-
-                // Mengambil detail counter berdasarkan ID counter dari antrian terpilih
-                var counters = await Mediator.Send(new GetCounterQuery());
-                foreach (var dId in DetQueues)
+                var queues = await Mediator.Send(new GetQueueDisplayByIdQuery(DisplayId));
+                var datakioskQueue = await Mediator.Send(new GetKioskQueueQuery());
+                long? cId = 0;
+                foreach (var i in queues.CounterIds)
                 {
-                    getCounId = counters.FirstOrDefault(c => c.Id == dId.CounterId);
-
-                    // Mengambil antrian kiosk berdasarkan layanan counter dan status "call" atau null
-
-
-                    if (getCounId != null)
+                    var DataCounter = await Mediator.Send(new GetCounterByIdQuery(i));
+                    var card = new CounterDto
                     {
-                        // Mengambil antrian kiosk berdasarkan ID counter dan status tertentu
-                        var dataQueue = await Mediator.Send(new GetKioskQueueQuery());
-                        kioskQueues = dataQueue.Where(q => q.ServiceKId == getCounId.ServiceKId &&
-                                                           q.CreatedDate.Value.Date == DateTime.Now.Date &&
-                                                           (q.QueueStage == null || q.QueueStage == "call" || q.QueueStage == "present"))
-                                               .ToList();
-                    }
+                        Id = i,
+                        Name = DataCounter.Name,
+                        ServiceKId = DataCounter.ServiceKId
+                    };
+                    getCount.Add(card);
+                    cId = DataCounter.ServiceKId;
                 }
+                kioskQueues = [.. datakioskQueue.Where(q => q.CreatedDate.Value.Date == DateTime.Now.Date)];
+
+
             }
             catch { }
 
