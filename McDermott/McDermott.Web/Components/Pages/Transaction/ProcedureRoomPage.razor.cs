@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Transaction
+﻿using System.Collections.Immutable;
+
+namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class ProcedureRoomPage
     {
@@ -41,6 +43,10 @@
 
         #region Properties
 
+        public List<LabResultDetailDto> LabResultDetails = [];
+        private LabResultDetailDto LabResultDetail = new();
+        private LabTestDto LabTest = new();
+
         private List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupports = [];
         private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport = new();
         private GeneralConsultanServiceDto GeneralConsultanService = new();
@@ -48,7 +54,18 @@
         private List<LabTestDto> LabTests = [];
         private IEnumerable<LabTestDto> SelectedLabTests = [];
         private List<IBrowserFile> BrowserFiles = [];
+        private List<long> DeletedLabTestIds = [];
 
+        private List<string> ResultValueTypes =
+          [
+              "Low",
+                "Normal",
+                "High",
+                "Positive",
+                "Negative",
+          ];
+
+        private bool IsAddOrUpdateOrDeleteLabResult = false;
         private bool Loading = false;
         private string StagingText = "In-Progress";
         private bool ShowForm = false;
@@ -56,8 +73,11 @@
         private bool PopUpProcedureRoom = false;
         private bool PanelVisible { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
+        private int FocusedRowLabTestVisibleIndex { get; set; }
         public IGrid Grid { get; set; }
+        private IGrid GridLabTest { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private IReadOnlyList<object> SelectedLabTestDataItems { get; set; } = [];
 
         #endregion Properties
 
@@ -111,6 +131,63 @@
             await OnSave();
         }
 
+        private async Task OnSaveLabTest(GridEditModelSavingEventArgs e)
+        {
+            IsAddOrUpdateOrDeleteLabResult = true;
+            var editModel = e.EditModel as LabResultDetailDto;
+            if (editModel.Id == 0)
+            {
+                long newId;
+                do
+                {
+                    newId = Helper.RandomNumber;
+                } while (LabResultDetails.Any(pfr => pfr.Id == newId));
+
+                editModel.Id = newId;
+                editModel.GeneralConsultanMedicalSupportId = GeneralConsultanMedicalSupport.Id;
+                LabResultDetails.Add(editModel);
+            }
+            else
+                LabResultDetails[FocusedRowLabTestVisibleIndex] = editModel;
+
+            LabResultDetail = new();
+        }
+
+        private async Task AddNewLabResult()
+        {
+            await GridLabTest.StartEditNewRowAsync();
+        }
+
+        private async Task OnDeleteLabTest()
+        {
+            IsAddOrUpdateOrDeleteLabResult = true;
+            //var aaa = SelectedLabTestDataItems.Adapt<List<LabResultDetailDto>>();
+
+            LabResultDetails.Remove(LabResultDetails.FirstOrDefault(x => x.Id == SelectedLabTestDataItems[0].Adapt<LabResultDetailDto>().Id));
+
+            SelectedLabTestDataItems = [];
+        }
+
+        private void SelectedItemParameter(LabTestDto e)
+        {
+            if (e is null)
+                return;
+
+            LabResultDetail.LabTestId = e.Id;
+
+            var labTest = e;
+
+            if (GeneralConsultanService.Patient.Gender.Equals("Male"))
+                labTest.NormalRangeByGender = labTest.NormalRangeMale;
+            else
+                labTest.NormalRangeByGender = labTest.NormalRangeFemale;
+
+            if (labTest.LabUom is null)
+                labTest.LabUom = new LabUomDto();
+
+            LabResultDetail.LabTest = labTest;
+        }
+
         private async Task OnSave()
         {
             try
@@ -137,6 +214,17 @@
                 }
 
                 GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+
+                if (IsAddOrUpdateOrDeleteLabResult)
+                {
+                    await Mediator.Send(new DeleteLabResultDetailRequest(ids: DeletedLabTestIds));
+
+                    LabResultDetails.ForEach(x => x.Id = 0);
+
+                    await Mediator.Send(new CreateListLabResultDetailRequest(LabResultDetails));
+
+                    IsAddOrUpdateOrDeleteLabResult = false;
+                }
 
                 Loading = false;
             }
@@ -300,6 +388,15 @@
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
+        private void GridLabTest_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowLabTestVisibleIndex = args.VisibleIndex;
+            if (args.DataItem is not null)
+                LabResultDetail = args.DataItem as LabResultDetailDto;
+            else
+                LabResultDetail = new();
+        }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -310,6 +407,21 @@
         private async Task Refresh_Click()
         {
             await LoadData();
+        }
+
+        private async Task AddItemLabTest_Click()
+        {
+            await GridLabTest.StartEditNewRowAsync();
+        }
+
+        private async Task UpdateItemLabTest_Click()
+        {
+            await GridLabTest.StartEditRowAsync(FocusedRowLabTestVisibleIndex);
+        }
+
+        private void DeleteItemLabTest_Click()
+        {
+            GridLabTest.ShowRowDeleteConfirmation(FocusedRowLabTestVisibleIndex);
         }
 
         private async Task EditItem_Click()
@@ -326,6 +438,20 @@
             SelectedLabTests = LabTests.Where(x => GeneralConsultanMedicalSupport.LabResulLabExaminationtIds != null && GeneralConsultanMedicalSupport.LabResulLabExaminationtIds.Contains(x.Id)).ToList();
 
             GeneralConsultanService = generalConsultanService[0];
+
+            LabResultDetails.Clear();
+            DeletedLabTestIds.Clear();
+
+            LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
+            DeletedLabTestIds = LabResultDetails.Select(x => x.Id).ToList();
+
+            LabResultDetails.ForEach(x =>
+            {
+                if (GeneralConsultanService.Patient.Gender.Equals("Male"))
+                    x.LabTest.NormalRangeByGender = x.LabTest.NormalRangeMale;
+                else
+                    x.LabTest.NormalRangeByGender = x.LabTest.NormalRangeFemale;
+            });
 
             switch (GeneralConsultanMedicalSupport.Status)
             {

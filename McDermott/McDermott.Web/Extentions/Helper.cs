@@ -4,6 +4,8 @@ namespace McDermott.Web.Extentions
 {
     public static class Helper
     {
+        public static long RandomNumber => new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second;
+
         public static void HandleException(this Exception ex, IToastService toastService)
         {
             string errorMessage = "An error occurred while saving data.";

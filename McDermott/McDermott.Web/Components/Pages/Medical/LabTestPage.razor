@@ -70,11 +70,11 @@
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="Name" SortIndex="0" />
                                             <DxGridDataColumn FieldName="SampleType.Name" Caption="Sample Type" />
-                                            <DxGridDataColumn FieldName="ResultType" Caption="Result Type" />
+                                            @* <DxGridDataColumn FieldName="ResultType" Caption="Result Type" /> *@
                                             <DxGridDataColumn FieldName="LabUom.Name" Caption="UoM" />
                                             <DxGridDataColumn FieldName="NormalRangeMale" Caption="Normal Range (Male)" />
                                             <DxGridDataColumn FieldName="NormalRangeFemale" Caption="Normal Range (Female)" />
-                                            <DxGridDataColumn FieldName="Parameter" Caption="Parameter" />
+                                            @* <DxGridDataColumn FieldName="Parameter" Caption="Parameter" /> *@
                                             <DxGridDataColumn FieldName="ResultValueType" Caption="Result Value Type" />
                                             <DxGridDataColumn FieldName="Remark" Caption="Remark" />
                                         </Columns>
@@ -101,7 +101,7 @@
                                                     </DxComboBox>
                                                     <ValidationMessage For="@(()=> a.SampleTypeId)"   />
                                                 </DxFormLayoutItem>
-
+@*
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result Type" ColSpanMd="12">
                                                     <DxComboBox ShowValidationIcon="true"
                                                                 Data="@ResultTypes"
@@ -111,13 +111,13 @@
                                                                 @bind-Value="@a.ResultType">
                                                     </DxComboBox>
                                                     <ValidationMessage For="@(()=> a.ResultType)"   />
-                                                </DxFormLayoutItem>
+                                                </DxFormLayoutItem> *@
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parameter" ColSpanMd="12">
+                                             @*    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parameter" ColSpanMd="12">
                                                     <DxTextBox ShowValidationIcon="true" @bind-Text="@a.Parameter" NullText="Parameter" InputCssClass="fw-normal" />
                                                     <ValidationMessage For="@(() => a.Parameter)" />
                                                 </DxFormLayoutItem>
-
+ *@
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Range (Male)" ColSpanMd="12">
                                                     <DxTextBox ShowValidationIcon="true" @bind-Text="@a.NormalRangeMale" NullText="Normal Range (Male)" InputCssClass="fw-normal" />
                                                     <ValidationMessage For="@(() => a.NormalRangeMale)" />

@@ -28,6 +28,14 @@ namespace McDermott.Application.Features.Queries
                         x => x.Include(z => z.Country),
                         cancellationToken);
 
+                    //return await _unitOfWork.Repository<Counter>().Entities
+                    //  .Include(x => x.Physician)
+                    //  .Include(x => x.Service)
+                    //  .AsNoTracking()
+                    //  .Select(Counter => Counter.Adapt<CounterDto>())
+                    //  .AsNoTracking()
+                    //  .ToListAsync(cancellationToken);
+
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }
 

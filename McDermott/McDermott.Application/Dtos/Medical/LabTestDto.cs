@@ -1,4 +1,6 @@
-﻿namespace McDermott.Application.Dtos.Medical
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace McDermott.Application.Dtos.Medical
 {
     public class LabTestDto : IMapFrom<LabTest>
     {
@@ -13,6 +15,9 @@
         public string? NormalRangeFemale { get; set; }
         public string? ResultValueType { get; set; }
         public string? Remark { get; set; }
+
+        [NotMapped]
+        public string? NormalRangeByGender { get; set; } = string.Empty;
 
         public SampleTypeDto? SampleType { get; set; }
         public LabUomDto? LabUom { get; set; }

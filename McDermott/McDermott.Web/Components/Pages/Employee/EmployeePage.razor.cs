@@ -188,7 +188,7 @@
         {
             if (args.DataItem is not null)
             {
-                IsDeleted = (bool)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(((UserDto)args.DataItem).Id.ToString())!;
+                IsDeleted = UserLogin.Id == ((UserDto)args.DataItem).Id;
             }
 
             FocusedRowVisibleIndex = args.VisibleIndex;

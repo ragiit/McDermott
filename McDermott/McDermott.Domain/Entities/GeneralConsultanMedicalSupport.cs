@@ -52,5 +52,8 @@
 
         [SetToNull]
         public LabTest? LabResulLabExaminationt { get; set; }
+
+        [SetToNull]
+        public List<LabResultDetail>? LabResultDetails { get; set; }
     }
 }
