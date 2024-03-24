@@ -169,7 +169,7 @@
                                                             </DxMaskedInput>
                                                         </DxFormLayoutItem>
 
-                                                        <b class="mt-3 ms-2">Lab Test</b>
+                                                        <b class="mt-4 ms-2">Lab Test</b>
                                                         <DxLoadingPanel @bind-Visible="PanelVisible"
                                                                         IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                                                         IsContentBlocked="true"
@@ -217,11 +217,12 @@
                                                         </DxToolbar>
                                                         </ToolbarTemplate> *@
                                                                 <Columns>
-                                                                    <DxGridDataColumn FieldName="LabTest.Parameter" Caption="Parameter" />
+                                                                    <DxGridDataColumn FieldName="LabTest.Name" Caption="Parameter" />
                                                                     <DxGridDataColumn FieldName="LabTest.NormalRangeByGender" Caption="Normal Range" />
                                                                     <DxGridDataColumn FieldName="LabTest.LabUom.Name" Caption="UoM" />
                                                                     <DxGridDataColumn FieldName="ResultValueType" Caption="Result" />
-                                                                    <DxGridDataColumn FieldName="LabTest.ResultType" Caption="Result Type" />
+                                                                    <DxGridDataColumn FieldName="LabTest.ResultValueType" Caption="Result Type" />
+                                                                    <DxGridDataColumn FieldName="LabTest.Remark" Caption="Remark" />
                                                                     <DxGridCommandColumn>
                                                                         <HeaderTemplate>
                                                                             @* <DxButton Text="New" Click="@(() => GridLabTest.StartEditNewRowAsync())"></DxButton> *@
@@ -267,11 +268,10 @@
 
                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Range" ColSpanMd="12">
                                                                             <DxTextBox ReadOnly ShowValidationIcon="true" @bind-Text="@LabTest.NormalRangeByGender" NullText="Normal Range (Male)" InputCssClass="fw-normal" />
-
                                                                         </DxFormLayoutItem>
 
                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="UoM" ColSpanMd="12">
-                                                                            <DxTextBox Enabled="false" ShowValidationIcon="true" @bind-Text="@(LabTest.LabUom.Name)" NullText="UoM" InputCssClass="fw-normal" />
+                                                                            <DxTextBox ReadOnly ShowValidationIcon="true" @bind-Text="@(LabUom.Name)" NullText="UoM" InputCssClass="fw-normal" />
                                                                         </DxFormLayoutItem>
 
                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result" ColSpanMd="12">

@@ -43,9 +43,10 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Properties
 
-        public List<LabResultDetailDto> LabResultDetails = [];
+        private List<LabResultDetailDto> LabResultDetails = [];
         private LabResultDetailDto LabResultDetail = new();
         private LabTestDto LabTest = new();
+        private LabUomDto LabUom = new();
 
         private List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupports = [];
         private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport = new();
@@ -134,7 +135,10 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task OnSaveLabTest(GridEditModelSavingEventArgs e)
         {
             IsAddOrUpdateOrDeleteLabResult = true;
-            var editModel = e.EditModel as LabResultDetailDto;
+            var editModel = LabResultDetail;
+
+            editModel.LabTest = LabTests.FirstOrDefault(l => l.Id == selectedLabTestId);
+
             if (editModel.Id == 0)
             {
                 long newId;
@@ -151,10 +155,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                 LabResultDetails[FocusedRowLabTestVisibleIndex] = editModel;
 
             LabResultDetail = new();
+            LabTest = new();
         }
 
         private async Task AddNewLabResult()
         {
+            LabResultDetail = new();
+            LabTest = new();
+            LabUom = new();
             await GridLabTest.StartEditNewRowAsync();
         }
 
@@ -168,12 +176,14 @@ namespace McDermott.Web.Components.Pages.Transaction
             SelectedLabTestDataItems = [];
         }
 
+        private long selectedLabTestId { get; set; }
+
         private void SelectedItemParameter(LabTestDto e)
         {
             if (e is null)
                 return;
 
-            LabResultDetail.LabTestId = e.Id;
+            selectedLabTestId = e.Id;
 
             var labTest = e;
 
@@ -182,10 +192,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             else
                 labTest.NormalRangeByGender = labTest.NormalRangeFemale;
 
-            if (labTest.LabUom is null)
-                labTest.LabUom = new LabUomDto();
+            labTest.LabUom ??= new LabUomDto();
 
-            LabResultDetail.LabTest = labTest;
+            LabTest = labTest;
+            LabUom = labTest.LabUom;
         }
 
         private async Task OnSave()
