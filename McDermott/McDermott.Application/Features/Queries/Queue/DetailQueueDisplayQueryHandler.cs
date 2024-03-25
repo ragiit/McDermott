@@ -14,8 +14,6 @@ namespace McDermott.Application.Features.Queries.Queue
                 try
                 {
                     return await _unitOfWork.Repository<DetailQueueDisplay>().Entities
-                        .Include(x => x.QueueDisplay)
-                        .Include(x => x.Counter)
                         .Select(DetailQueueDisplay => DetailQueueDisplay.Adapt<DetailQueueDisplayDto>())
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);

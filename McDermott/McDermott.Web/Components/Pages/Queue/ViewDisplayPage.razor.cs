@@ -17,6 +17,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private List<KioskQueueDto> DataQueue = new();
         private QueueDisplayDto DetQueues = new();
         private List<CounterDto> getCount = new();
+        private List<DetailQueueDisplayDto> QueueNumber = new();
 
         #endregion Data Relation
 

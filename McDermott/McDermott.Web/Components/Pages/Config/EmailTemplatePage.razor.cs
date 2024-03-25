@@ -132,9 +132,9 @@ namespace McDermott.Web.Components.Pages.Config
                 var Partner = await Mediator.Send(new GetUserQuery());
                 Cc = [.. Partner.Select(x => x.Email)];
                 ToPartner = [.. Partner.Where(x => x.IsPatient == true).ToList()];
-                var userJson = await JsRuntime.InvokeAsync<string>("getCookie", CookieHelper.USER_INFO);
-                User = JsonConvert.DeserializeObject<User>(userJson);
-                userBy = User.Name;
+                var us = await JsRuntime.GetCookieUserLogin();
+
+                userBy = us.Name;
                 EmailFormTemplate.ById = User.Id;
                 //_isInitComplete = true;
             }

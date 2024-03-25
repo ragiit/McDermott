@@ -3,6 +3,8 @@
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 
+using static McDermott.Application.Features.Commands.Queue.DetailQueueDisplayCommand;
+
 namespace McDermott.Web.Components.Pages.Queue
 {
     public partial class ViewCounterPage
@@ -231,9 +233,14 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     var dataQueue = await Mediator.Send(new UpdateKioskQueueRequest(context));
 
-                   
-                    
-                    await hubConnection.SendAsync("CallPatient", CounterId, context.Id);
+                    DetailQueueDisplayDto displayDet = new();
+                    displayDet.KioskQueueId = context.Id;
+                    displayDet.ServiceId = context.ServiceId;
+                    displayDet.ServicekId = context.ServiceKId;
+                    displayDet.NumberQueue = context.QueueNumber;
+                    await Mediator.Send(new CreateDetailQueueDisplayRequest(displayDet));
+
+                    //await hubConnection.SendAsync("CallPatient", CounterId, context.Id);
                 }
                 var cek = CounterId;
                 //DataKiosksQueue = FormKiosksQueue;
