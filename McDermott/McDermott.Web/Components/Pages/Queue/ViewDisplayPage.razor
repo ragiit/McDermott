@@ -5,83 +5,91 @@
 <div class="wrapper">
     @* <section class="content"> *@
 
-        <div class="row">
-            <div class="col">
-                <div class="card ">
-                    <div class="card-body bg-gradient-info rounded text-light">
-                        <div class="row justify-content-between">
-                            <div class="col-4 ">
-                                <h3 class="mt-2">McHealthCare</h3>
-                                <p class="mb-0">
-                                    Jalan Bawal No. 1 – Batu Ampar
-                                    Batam Island 29452, Riau Islands Province
-                                </p>
-                                <p class="mb-0">Phone. +62 778 411001</p>
-                            </div>
+    <div class="row">
+        <div class="col">
+            <div class="card ">
+                <div class="card-body bg-gradient-info rounded text-light">
+                    <div class="row justify-content-between">
+                        <div class="col-4 ">
+                            <h3 class="mt-2">McHealthCare</h3>
+                            <p class="mb-0">
+                                Jalan Bawal No. 1 – Batu Ampar
+                                Batam Island 29452, Riau Islands Province
+                            </p>
+                            <p class="mb-0">Phone. +62 778 411001</p>
+                        </div>
 
-                            <div class="col-4 align-self-center">
-                                <h5 class="text-center">@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy", indonesianCulture)</h5>
-                                <h1 class="text-center">@currentTime</h1>
-                            </div>
+                        <div class="col-4 align-self-center">
+                            <h5 class="text-center">@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy", indonesianCulture)</h5>
+                            <h1 class="text-center">@currentTime</h1>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="container-fluid">
-            <div class="row">
+    </div>
+    <div class="container-fluid">
+        <div class="row">
             @foreach (var view in getCount.Take(2))
-                {
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header bg-gradient-info py-0">
-                                <h3 class="text-center text-light">Queue</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col">
+            {
+                var filteredQueues = kioskQueues.Where(q => q.ServiceKId == view.ServiceKId && q.ServiceId == view.ServiceId && (q.QueueStage == null || q.QueueStage == "call" || q.QueueStage == "present")).ToList();
+                var count = filteredQueues.Count;
 
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-gradient-info py-0">
+                            <h3 class="text-center text-light">Queue</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    @if (view.Id == IdQueue)
+                                    {
                                         <h1 class="text-center fw-bolder" style="font-size:120px"> @((Cids ?? 0).ToString("D3"))</h1>
-
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                        IsContentBlocked="true"
-                                                        ApplyBackgroundShading="true"
-                                                        IndicatorAreaVisible="false"
-                                                        Text="Fetching Data...">
-                                            <DxGrid @ref="Grid"
-                                                Data="@kioskQueues.Where(q => q.ServiceKId == view.ServiceKId  && (q.QueueStage == null || q.QueueStage == "call" || q.QueueStage == "present"))"
-                                                    ColumnResizeMode="GridColumnResizeMode.NextColumn"
-                                                    AllowSelectRowByClick="true"
-                                                    PagerPosition="GridPagerPosition.Bottom"
-                                                    PageSizeSelectorAllRowsItemVisible="true"
-                                                    PagerSwitchToInputBoxButtonCount="10"
-                                                    PagerVisibleNumericButtonCount="10"
-                                                    CustomizeElement="Grid_CustomizeElement"
-                                                    KeyboardNavigationEnabled="true">
-
-                                                <Columns>
-                                                    <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="10px" SortIndex="0" />
-                                                    <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" />
-                                                    <DxGridDataColumn FieldName="Service.Name" Caption="Service Name" />
-                                                    <DxGridDataColumn FieldName="QueueStatus" Caption="Status" />
-                                                </Columns>
-                                            </DxGrid>
-                                        </DxLoadingPanel>
-                                    </div>
+                                    }
+                                    else
+                                    {
+                                        <h1 class="text-center fw-bolder" style="font-size:120px"> @((Cids ?? 0).ToString("D3"))</h1>
+                                    }
                                 </div>
                             </div>
-                            <div class="card-footer bg-gradient-success py-0">
-                                <h3 class="text-center text-light">@view.Name</h3>
+                            <div class="row">
+                                <div class="col">
+                                    <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                    IsContentBlocked="true"
+                                                    ApplyBackgroundShading="true"
+                                                    IndicatorAreaVisible="false"
+                                                    Text="Fetching Data...">
+                                        <DxGrid @ref="Grid"
+                                                Data="@filteredQueues"
+                                                ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                                                AllowSelectRowByClick="true"
+                                                PagerPosition="GridPagerPosition.Bottom"
+                                                PageSizeSelectorAllRowsItemVisible="true"
+                                                PagerSwitchToInputBoxButtonCount="10"
+                                                PagerVisibleNumericButtonCount="10"
+                                                CustomizeElement="Grid_CustomizeElement"
+                                                KeyboardNavigationEnabled="true">
+
+                                            <Columns>
+                                                <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="10px" SortIndex="0" />
+                                                <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" />
+                                                <DxGridDataColumn FieldName="Service.Name" Caption="Service Name" />
+                                                <DxGridDataColumn FieldName="QueueStatus" Caption="Status" />
+                                            </Columns>
+                                        </DxGrid>
+                                    </DxLoadingPanel>
+                                </div>
                             </div>
                         </div>
+                        <div class="card-footer bg-gradient-success py-0">
+                            <h3 class="text-center text-light">@view.Name</h3>
+                        </div>
                     </div>
-                }
-            </div>
+                </div>
+            }
         </div>
+    </div>
     @* </section> *@
 </div>

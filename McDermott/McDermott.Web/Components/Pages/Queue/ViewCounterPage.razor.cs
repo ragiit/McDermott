@@ -214,7 +214,9 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     var dataQueue = await Mediator.Send(new UpdateKioskQueueRequest(context));
 
-                    await hubConnection.SendAsync("CallPatient", context.Id, context.QueueNumber);
+                   
+                    
+                    await hubConnection.SendAsync("CallPatient", FormCounters.Id, context.QueueNumber);
                 }
                 var cek = CounterId;
                 //DataKiosksQueue = FormKiosksQueue;

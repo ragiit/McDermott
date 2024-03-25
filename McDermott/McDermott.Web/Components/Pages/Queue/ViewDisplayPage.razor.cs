@@ -110,9 +110,12 @@ namespace McDermott.Web.Components.Pages.Queue
                     {
                         Id = i,
                         Name = DataCounter.Name,
-                        ServiceKId = DataCounter.ServiceKId
+                        ServiceKId = DataCounter.ServiceKId,
+                        ServiceId = DataCounter.ServiceId
+                        
                     };
                     getCount.Add(card);
+                    var sa = getCount;
                     cId = DataCounter.ServiceKId;
                 }
                 kioskQueues = [.. datakioskQueue.Where(q => q.CreatedDate.Value.Date == DateTime.Now.Date)];
