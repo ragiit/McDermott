@@ -2,14 +2,9 @@
 {
     public class DetailQueueDisplayDto : IMapFrom<DetailQueueDisplay>
     {
-        public long Id { get; set; }
-        public long? QueueDisplayId { get; set; }
-        public long? CounterId { get; set; }
-        public string? CounterName { get; set; }
-        public string? DisplayName { get; set; }
-        public string? Name { get; set; } = string.Empty;
-
-        public virtual QueueDisplay? QueueDisplay { get; set; }
-        public virtual Counter? Counter { get; set; }
+        public long? KioskQueueId { get; set; }
+        public long? ServicekId { get; set; }
+        public long? ServiceId { get; set; }
+        public long? NumberQueue { get; set; }
     }
 }
