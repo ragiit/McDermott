@@ -31,6 +31,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private List<long> CounterCount = new List<long>();
         private string currentTime;
         private long? Cids { get; set; }
+        private long? cId { get; set; }
         private long? IdQueue { get; set; }
         private long ServiceKId { get; set; }
         private KioskQueueDto? Queuek { get; set; }
@@ -76,6 +77,14 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 IdQueue = Id;
                 Cids = numberQueue;
+                //foreach (var ic in getCount)
+                //{
+                //    if (ic.Id == Id)
+                //    {
+                //        Cids = numberQueue;
+                //        break;
+                //    }
+                //}
                 InvokeAsync(StateHasChanged);
             });
             await hubConnection.StartAsync();
@@ -102,7 +111,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 // Mengambil detail antrian berdasarkan ID tampilan
                 var queues = await Mediator.Send(new GetQueueDisplayByIdQuery(DisplayId));
                 var datakioskQueue = await Mediator.Send(new GetKioskQueueQuery());
-                long? cId = 0;
+                
                 foreach (var i in queues.CounterIds)
                 {
                     var DataCounter = await Mediator.Send(new GetCounterByIdQuery(i));
@@ -116,7 +125,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     };
                     getCount.Add(card);
                     var sa = getCount;
-                    cId = DataCounter.ServiceKId;
+                    cId = DataCounter.Id;
                 }
                 kioskQueues = [.. datakioskQueue.Where(q => q.CreatedDate.Value.Date == DateTime.Now.Date)];
 

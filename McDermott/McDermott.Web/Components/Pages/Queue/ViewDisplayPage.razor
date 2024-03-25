@@ -33,7 +33,7 @@
             @foreach (var view in getCount.Take(2))
             {
                 var filteredQueues = kioskQueues.Where(q => q.ServiceKId == view.ServiceKId && q.ServiceId == view.ServiceId && (q.QueueStage == null || q.QueueStage == "call" || q.QueueStage == "present")).ToList();
-                var count = filteredQueues.Count;
+                var count = kioskQueues.Where(n => n.Id == Cids && n.ServiceKId == view.ServiceKId && n.ServiceId == view.ServiceId).Select(x => x.QueueNumber).FirstOrDefault();
 
                 <div class="col-md-6">
                     <div class="card">
@@ -43,14 +43,9 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col">
-                                    @if (view.Id == IdQueue)
-                                    {
-                                        <h1 class="text-center fw-bolder" style="font-size:120px"> @((Cids ?? 0).ToString("D3"))</h1>
-                                    }
-                                    else
-                                    {
-                                        <h1 class="text-center fw-bolder" style="font-size:120px"> @((Cids ?? 0).ToString("D3"))</h1>
-                                    }
+
+                                    <h1 class="text-center fw-bolder" style="font-size:120px"> @((count ?? 0).ToString("D3"))</h1>
+
                                 </div>
                             </div>
                             <div class="row">
