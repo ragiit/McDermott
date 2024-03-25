@@ -2,13 +2,11 @@
 {
     public class DetailQueueDisplay : BaseAuditableEntity
     {
-        public long? QueueDisplayId { get; set; }
-        public long? CounterId { get; set; }
+        public long? KioskQueueId { get; set; }
+        public long? ServicekId { get; set; }
+        public long? ServiceId { get; set; }
+        public long? NumberQueue? { get; set; }
 
-        [SetToNull]
-        public virtual QueueDisplay? QueueDisplay { get; set; }
-
-        [SetToNull]
-        public virtual Counter? Counter { get; set; }
+        
     }
 }

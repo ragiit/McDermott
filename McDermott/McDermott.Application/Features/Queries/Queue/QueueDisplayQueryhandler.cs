@@ -17,7 +17,6 @@ namespace McDermott.Application.Features.Queries.Queue
             public async Task<List<QueueDisplayDto>> Handle(GetQueueDisplayQuery query, CancellationToken cancellationToken)
             {
                 return await _unitOfWork.Repository<QueueDisplay>().Entities
-                        .Include(x => x.Counter)
                         .AsNoTracking()
                         .Select(QueueDisplay => QueueDisplay.Adapt<QueueDisplayDto>())
                         .AsNoTracking()

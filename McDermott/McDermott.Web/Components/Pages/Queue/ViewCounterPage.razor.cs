@@ -101,19 +101,19 @@ namespace McDermott.Web.Components.Pages.Queue
                 var GetClass = await Mediator.Send(new GetClassTypeQuery());
 
                 //var cekServicesK = service
-                if (general.ServiceId == null & general.PhysicianId == null)
+                if (general.ServiceId == null && general.PhysicianId == null)
                 {
-                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
+                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && (x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present"))];
                 }
-                else if (general.ServiceId != null & general.PhysicianId == null)
+                else if (general.ServiceId != null && general.PhysicianId == null)
                 {
-                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.ServiceId == general.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
+                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.ServiceId == general.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date && (x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present"))];
                 }
-                else if (general.ServiceId == null & general.PhysicianId != null)
+                else if (general.ServiceId == null && general.PhysicianId != null)
                 {
                     KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.Kiosk.PhysicianId == general.PhysicianId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
                 }
-                else if (general.ServiceId != null & general.PhysicianId != null)
+                else if (general.ServiceId != null && general.PhysicianId != null)
                 {
                     KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId && x.ServiceId == general.ServiceId && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
                 }
@@ -233,7 +233,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
                    
                     
-                    await hubConnection.SendAsync("CallPatient", FormCounters.Id, context.QueueNumber);
+                    await hubConnection.SendAsync("CallPatient", CounterId, context.Id);
                 }
                 var cek = CounterId;
                 //DataKiosksQueue = FormKiosksQueue;
