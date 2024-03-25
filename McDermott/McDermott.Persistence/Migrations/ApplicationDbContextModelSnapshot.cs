@@ -1845,7 +1845,10 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("LabTestId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("ResultValueType")
+                    b.Property<string>("Result")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResultType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
@@ -1860,7 +1863,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("LabTestId");
 
-                    b.ToTable("LabResultDetail");
+                    b.ToTable("LabResultDetails");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.LabTest", b =>
