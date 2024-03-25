@@ -112,6 +112,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 // Mengambil detail antrian berdasarkan ID tampilan
                 var queues = await Mediator.Send(new GetQueueDisplayByIdQuery(DisplayId));
                 var datakioskQueue = await Mediator.Send(new GetKioskQueueQuery());
+                QueueNumber = await Mediator.Send(new GetDetailQueueDisplay());
                 
                 foreach (var i in queues.CounterIds)
                 {
