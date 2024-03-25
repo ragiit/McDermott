@@ -177,19 +177,23 @@
 
             var namee = new List<string>();
 
+            long totalPatiens = 0;
+
             foreach (var item in generals)
             {
                 if (namee.Contains(item.Service?.Name))
                     continue;
 
-                ws.Cells[startRow, 1].Value = item.AppoimentDate.GetValueOrDefault().Date.ToString("dd/MM/yyyy");
+                ws.Cells[startRow, 1].Value = item.AppoimentDate.GetValueOrDefault().Date.ToString("dd/MM/yyyy", cultureInfo);
                 ws.Cells[startRow, 2].Value = item.Service?.Name;
-                ws.Cells[startRow, 3].Value = generals.Where(x => x.ServiceId == item.Id && x.RegistrationDate.Date == item.RegistrationDate.Date).Count();
+                ws.Cells[startRow, 3].Value = generals.Where(x => x.ServiceId == item.ServiceId && x.RegistrationDate.Date == item.RegistrationDate.Date).Count();
 
                 namee.Add(item.Service?.Name);
 
                 startRow++;
             }
+
+            ws.Cells[3, 2].Value = totalPatiens;
 
             string fileTitle = "Report of Patient visits by Period.xls";
             string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
