@@ -148,7 +148,7 @@
 
             ws.Cells[1, 2].Value = FormReports.report;
             ws.Cells[2, 1].Value = "Date Period";
-            ws.Cells[3, 1].Value = "Total number of visits";
+            ws.Cells[3, 1].Value = "Total number of Visits";
             ws.Cells[4, 1].Value = "Date";
             ws.Cells[4, 2].Value = "Service";
             ws.Cells[4, 3].Value = "Total Patiens";
@@ -160,6 +160,7 @@
             ws.Cells[4, 1].Style.Font.Bold = true;
             ws.Cells[4, 2].Style.Font.Bold = true;
             ws.Cells[4, 3].Style.Font.Bold = true;
+
             ws.Cells[1, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
             ws.Cells[2, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
             ws.Cells[2, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
@@ -190,7 +191,7 @@
                 startRow++;
             }
 
-            string fileTitle = "Rekapitulasi Request PGS.xls";
+            string fileTitle = "Report of Patient visits by Period.xls";
             string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
             fileContent = pack.GetAsByteArray();

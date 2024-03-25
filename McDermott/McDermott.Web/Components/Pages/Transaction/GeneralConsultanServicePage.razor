@@ -6,6 +6,12 @@
     .highlighted-item > td {
         background-color: rgba(245, 198, 203, 0.5);
     }
+     .dxbl-wait-indicator {
+    --dxbl-wait-indicator-color: white;
+}
+ .dxbl-btn.dxbl-lg {
+    --dxbl-btn-line-height: 1.5rem;
+}
 </style>
 
 @if (IsAccess)
@@ -134,6 +140,51 @@
                         @*  </div>
                         </div> *@
 
+                                @if (FormRegis.StagingStatus != "Finished" && FormRegis.StagingStatus != "Canceled")
+                                {
+                                    if ((FormRegis.StagingStatus == "Procedure Room" || FormRegis.StagingStatus == "Physician"))
+                                    {
+                                        if (GeneralConsultanMedicalSupport.Status == "Finish" || GeneralConsultanMedicalSupport.Id == 0)
+                                        {
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="w-100">
+                                                        <div class="col align-self-center">
+                                                            <DxButton Enabled="!IsLoading" IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary">
+                                                                @*   <div class="d-flex">
+                                                                    <DxWaitIndicator Visible="IsLoading"/>
+                                                                    <span class="mx-2">Loading...</span>
+                                                                </div> *@
+                                                            </DxButton>
+                                                            <DxButton IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancel2" RenderStyle="ButtonRenderStyle.Danger">
+                                                                @*   <div class="d-flex">
+                                                                    <DxWaitIndicator Visible="IsLoading"/>
+                                                                    <span class="mx-2">Loading...</span>
+                                                                </div> *@
+                                                            </DxButton>
+                                                            <DxButton IconCssClass="fa-solid fa-print" Text="Print" Click="OnPrint" RenderStyle="ButtonRenderStyle.Success" RenderStyleMode="ButtonRenderStyleMode.Outline"></DxButton>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="w-100">
+                                                    <div class="col align-self-center">
+                                                        <DxButton Enabled="!IsLoading" IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
+                                                        <DxButton IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancel2" RenderStyle="ButtonRenderStyle.Danger"></DxButton>
+                                                        <DxButton IconCssClass="fa-solid fa-print" Text="Print" Click="OnPrint" RenderStyle="ButtonRenderStyle.Success" RenderStyleMode="ButtonRenderStyleMode.Outline"></DxButton>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+@*
                         @if (FormRegis.StagingStatus != "Finished" && FormRegis.StagingStatus != "Canceled")
                         {
                             @if (GeneralConsultanMedicalSupport != null && GeneralConsultanMedicalSupport.Id != 0 && GeneralConsultanMedicalSupport.Status == "Finish")
@@ -142,7 +193,13 @@
                                     <div class="card-body">
                                         <div class="w-100">
                                         <div class="col align-self-center">
-                                            <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
+                                            <DxButton IconCssClass="fa-solid fa-check"
+                                                Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary">
+                                                <div class="d-flex">
+                                                    <DxWaitIndicator Visible="IsLoading"/>
+                                                    <span class="mx-2">Loading...</span>
+                                                </div>
+                                            </DxButton>
                                             <DxButton IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancel2" RenderStyle="ButtonRenderStyle.Danger"></DxButton>
                                             <DxButton IconCssClass="fa-solid fa-print" Text="Print" Click="OnPrint" RenderStyle="ButtonRenderStyle.Success" RenderStyleMode="ButtonRenderStyleMode.Outline"></DxButton>
                                         </div>
@@ -151,7 +208,7 @@
                                 </div>
                             }
 
-                        }
+                        } *@
 
                                 @* @if (FormRegis.StagingStatus == "Physician")
                                 {
@@ -1075,7 +1132,9 @@ NullText="Select Registration..."
                                                                                 <div class="card-footer">
                                                                                     <div class="row  justify-content-end">
                                                                                         <div class="col-auto align-self-end">
-                                                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                                                            <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+
+                                                                                            </DxButton>
                                                                                             <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
                                                                                         </div>
                                                                                     </div>
@@ -1536,7 +1595,8 @@ NullText="Select Registration..."
         <DxFormLayout>
             <DxFormLayoutGroup ColSpanMd="12" Caption="Lab Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                 <Items>
-                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
+
+                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
                         <DxComboBox ShowValidationIcon="true" Data="@AllDoctors.Where(x => x.IsPhysicion == true)"
                                     NullText="Select Practitioner..."
                                     @bind-Value="@GeneralConsultanMedicalSupport.PractitionerLabEximinationId"
@@ -1545,23 +1605,7 @@ NullText="Select Registration..."
                         </DxComboBox>
                         <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerLabEximinationId)" />
                     </DxFormLayoutItem>
-                   @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Lab Test" ColSpanMd="12">
-                        <DxComboBox ShowValidationIcon="true" Data="@LabTests"
-                                    NullText="Select Lab Test..."
-                                    @bind-Value="@GeneralConsultanMedicalSupport.LabResulLabExaminationtId"
-                                    TextFieldName="Name"
-                                    ValueFieldName="Id">
-                        </DxComboBox>
-                    </DxFormLayoutItem> *@
-                    <DxFormLayoutItem Caption="Lab Test:" CaptionCssClass="normal-caption"  ColSpanMd="12">
-                                                            <DxTagBox Data="@LabTests"
-                                                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                                                      @bind-Values="@SelectedLabTests"
-                                                                      NullText="Select Lab Test..."
-                                                                      TextFieldName="Name"
-                                                                      ValueFieldName="Name"
-                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                        </DxFormLayoutItem>
+
                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
                         <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.LabEximinationAttachment"
                             ShowValidationIcon="true"
@@ -1575,6 +1619,138 @@ NullText="Select Registration..."
                             </Buttons>
                         </DxMaskedInput>
                     </DxFormLayoutItem>
+
+                      <b class="mt-4 ms-2">Lab Test</b>
+                                                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                        IsContentBlocked="true"
+                                                                        ApplyBackgroundShading="true"
+                                                                        IndicatorAreaVisible="false"
+                                                                        Text="Fetching Data...">
+                                                            <DxGrid @ref="GridLabTest" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                                    PageSize="12"
+                                                                    TextWrapEnabled="false"
+                                                                    @bind-SelectedDataItems="@SelectedLabTestDataItems"
+                                                                    Data="LabResultDetails"
+                                                                    KeyFieldName="Id"
+                                                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                                                    AllowSelectRowByClick="true"
+                                                                    EditModelSaving="OnSaveLabTest"
+                                                                    DataItemDeleting="OnDeleteLabTest"
+                                                                    EditMode="GridEditMode.PopupEditForm"
+                                                                    PopupEditFormCssClass="pw-800"
+                                                                    PagerPosition="GridPagerPosition.Bottom"
+                                                                    PageSizeSelectorVisible="true"
+                                                                    CustomizeElement="Grid_CustomizeElement"
+                                                                    PageSizeSelectorItems="@(new int[] { 12, 24, 68, 100 })"
+                                                                    PageSizeSelectorAllRowsItemVisible="true"
+                                                                    PagerSwitchToInputBoxButtonCount="10"
+                                                                    FocusedRowChanged="GridLabTest_FocusedRowChanged"
+                                                                    FocusedRowEnabled="true"
+                                                                    PagerVisibleNumericButtonCount="10"
+                                                                    AutoExpandAllGroupRows="true"
+                                                                    ShowSearchBox="true"
+                                                                    KeyboardNavigationEnabled="true">
+                                                                @*    <ToolbarTemplate>
+                                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                        <DxToolbarItem Text="New" Click="AddItemLabTest_Click" IconCssClass="fa-solid fa-plus" />
+                                                        <DxToolbarItem Text="Edit" Click="UpdateItemLabTest_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedLabTestDataItems.Count > 0" />
+                                                        <DxToolbarItem Text="Delete" Click="DeleteItemLabTest_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedLabTestDataItems.Count > 0 " />
+                                                        <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                        <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                        </Items>
+                                                        </DxToolbarItem>
+                                                        <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                                        </DxToolbar>
+                                                        </ToolbarTemplate> *@
+                                                                <Columns>
+                                                                    <DxGridDataColumn FieldName="LabTest.Name" Caption="Parameter" />
+                                                                    <DxGridDataColumn FieldName="LabTest.NormalRangeByGender" Caption="Normal Range" />
+                                                                    <DxGridDataColumn FieldName="LabTest.LabUom.Name" Caption="UoM" />
+                                                                    <DxGridDataColumn FieldName="Result" Caption="Result" />
+                                                                    <DxGridDataColumn FieldName="ResultType" Caption="Result Type" />
+                                                                    <DxGridDataColumn FieldName="LabTest.ResultValueType" Caption="Result Type" />
+                                                                    <DxGridDataColumn FieldName="LabTest.Remark" Caption="Remark" />
+                                                                    <DxGridCommandColumn>
+                                                                        <HeaderTemplate>
+                                                                            @* <DxButton Text="New" Click="@(() => GridLabTest.StartEditNewRowAsync())"></DxButton> *@
+                                                                            <a class="fa-solid fa-plus" @onclick="@(async () => await AddNewLabResult())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                                                                        </HeaderTemplate>
+                                                                        <CellDisplayTemplate>
+                                                                            <a class="fa-solid fa-pen-to-square text-warning" @onclick="@(async () => await GridLabTest.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                                                                            <a class="fa-solid fa-trash text-danger" @onclick="@(() => GridLabTest.ShowDataItemDeleteConfirmation(context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                                                                            @* <DxButton Text="Edit" Click="@(() => GridLabTest.StartEditRowAsync(context.VisibleIndex))"></DxButton>
+                                                                    <DxButton Text="Delete" Click="@(() => GridLabTest.ShowDataItemDeleteConfirmation(context.DataItem))"></DxButton> *@
+                                                                            @* <a class="oi oi-pencil" @onclick="@(() => GridLabTest.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                                                                    <a class="oi oi-x" @onclick="@(() => GridLabTest.ShowDataItemDeleteConfirmation(context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a> *@
+                                                                        </CellDisplayTemplate>
+                                                                    </DxGridCommandColumn>
+                                                                </Columns>
+                                                                <EditFormTemplate Context="EditFormContext22">
+                                                                    @*   @{
+                                                            var a = (LabResultDetailDto)EditFormContext22.EditModel;
+                                                            var gender = a.LabTest?.NormalRangeByGender ?? null;
+                                                            var uom = string.Empty;
+                                                            if (a.LabTest is not null)
+                                                            {
+                                                            if (a.LabTest.LabUom is not null)
+                                                            {
+                                                            uom = a.LabTest.LabUom.Name;
+                                                            }
+                                                            }
+                                                            } *@
+                                                                    <DxFormLayout CssClass="w-100">
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parameter" ColSpanMd="12">
+                                                                            <DxComboBox ShowValidationIcon="true"
+                                                                                        Data="@LabTests"
+                                                                                        NullText="Select Parameter..."
+                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                        @bind-Value="@LabResultDetail.LabTestId"
+                                                                                        TextFieldName="Name"
+                                                                                        SelectedItemChanged="@((LabTestDto e) => SelectedItemParameter(e))"
+                                                                                        ValueFieldName="Id">
+                                                                            </DxComboBox>
+                                                                            <ValidationMessage For="@(()=> LabResultDetail.LabTestId)"   />
+                                                                        </DxFormLayoutItem>
+
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Range" ColSpanMd="12">
+                                                                            <DxTextBox ReadOnly ShowValidationIcon="true" @bind-Text="@LabTest.NormalRangeByGender" NullText="Normal Range (Male)" InputCssClass="fw-normal" />
+                                                                        </DxFormLayoutItem>
+
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="UoM" ColSpanMd="12">
+                                                                            <DxTextBox ReadOnly ShowValidationIcon="true" @bind-Text="@(LabUom.Name)" NullText="UoM" InputCssClass="fw-normal" />
+                                                                        </DxFormLayoutItem>
+
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result" ColSpanMd="12">
+                                                                            <DxTextBox ShowValidationIcon="true" @bind-Text="@LabResultDetail.Result" NullText="Result" InputCssClass="fw-normal" />
+                                                                            <ValidationMessage For="@(() => LabResultDetail.Result)" />
+                                                                        </DxFormLayoutItem>
+
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result Type" ColSpanMd="12">
+                                                                            <DxComboBox ShowValidationIcon="true"
+                                                                                        Data="@ResultValueTypes"
+                                                                                        NullText="Select Result Type..."
+                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                        @bind-Value="@LabResultDetail.ResultType">
+                                                                            </DxComboBox>
+                                                                            <ValidationMessage For="@(()=> LabResultDetail.ResultType)"   />
+                                                                        </DxFormLayoutItem>
+
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Remark" ColSpanMd="12">
+                                                                            <DxTextBox ReadOnly ShowValidationIcon="true" @bind-Text="@LabTest.Remark" NullText="Remark" InputCssClass="fw-normal" />
+                                                                            <ValidationMessage For="@(() => LabTest.Remark)" />
+                                                                        </DxFormLayoutItem>
+                                                                    </DxFormLayout>
+                                                                </EditFormTemplate>
+                                                            </DxGrid>
+                                                        </DxLoadingPanel>
+
                 </Items>
             </DxFormLayoutGroup>
 
@@ -1725,7 +1901,16 @@ NullText="Select Registration..."
         </DxFormLayout>
         <div class="row justify-content-end">
             <div class="col-auto align-self-end">
-                <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"  ></DxButton>
+                <DxButton Enabled="!IsLoading"
+                        RenderStyle="ButtonRenderStyle.Info"
+                        RenderStyleMode="@ButtonRenderStyleMode.Outline"
+                        IconCssClass="fa-solid fa-floppy-disk"
+                        Text="Save" SubmitFormOnClick="true">
+                            @*  <div class="d-flex">
+                                <DxWaitIndicator Visible="IsLoading"/>
+                                <span class="mx-2">Saving...</span>
+                            </div> *@
+                </DxButton>
                 <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancelProcedureRoom"></DxButton>
             </div>
         </div>

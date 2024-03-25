@@ -7,6 +7,107 @@ namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class GeneralConsultanServicePage
     {
+        #region Grid Lab Test
+
+        private IGrid GridLabTest { get; set; }
+        private IReadOnlyList<object> SelectedLabTestDataItems { get; set; } = [];
+        private List<LabResultDetailDto> LabResultDetails = [];
+        private LabResultDetailDto LabResultDetail = new();
+        private LabTestDto LabTest = new();
+
+        private List<long> DeletedLabTestIds = [];
+        private int FocusedRowLabTestVisibleIndex { get; set; }
+        private LabUomDto LabUom = new();
+        private bool IsAddOrUpdateOrDeleteLabResult = false;
+
+        private List<string> ResultValueTypes =
+          [
+              "Low",
+                "Normal",
+                "High",
+                "Positive",
+                "Negative",
+          ];
+
+        private async Task OnSaveLabTest(GridEditModelSavingEventArgs e)
+        {
+            IsAddOrUpdateOrDeleteLabResult = true;
+            var editModel = LabResultDetail;
+
+            editModel.LabTest = LabTests.FirstOrDefault(l => l.Id == selectedLabTestId);
+
+            if (editModel.Id == 0)
+            {
+                long newId;
+                do
+                {
+                    newId = Helper.RandomNumber;
+                } while (LabResultDetails.Any(pfr => pfr.Id == newId));
+
+                editModel.Id = newId;
+                LabResultDetails.Add(editModel);
+            }
+            else
+                LabResultDetails[FocusedRowLabTestVisibleIndex] = editModel;
+
+            LabResultDetail = new();
+            LabTest = new();
+        }
+
+        private async Task AddNewLabResult()
+        {
+            LabResultDetail = new();
+            LabTest = new();
+            LabUom = new();
+            await GridLabTest.StartEditNewRowAsync();
+        }
+
+        private void GridLabTest_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowLabTestVisibleIndex = args.VisibleIndex;
+            if (args.DataItem is not null)
+                LabResultDetail = args.DataItem as LabResultDetailDto;
+            else
+                LabResultDetail = new();
+        }
+
+        private async Task OnDeleteLabTest()
+        {
+            IsAddOrUpdateOrDeleteLabResult = true;
+            //var aaa = SelectedLabTestDataItems.Adapt<List<LabResultDetailDto>>();
+
+            LabResultDetails.Remove(LabResultDetails.FirstOrDefault(x => x.Id == SelectedLabTestDataItems[0].Adapt<LabResultDetailDto>().Id));
+
+            SelectedLabTestDataItems = [];
+        }
+
+        private long selectedLabTestId { get; set; }
+
+        private void SelectedItemParameter(LabTestDto e)
+        {
+            if (e is null)
+                return;
+
+            selectedLabTestId = e.Id;
+
+            var labTest = e;
+
+            if (FormRegis.Patient is not null && FormRegis.Patient.Gender is not null)
+            {
+                if (FormRegis.Patient.Gender.Equals("Male"))
+                    labTest.NormalRangeByGender = labTest.NormalRangeMale;
+                else
+                    labTest.NormalRangeByGender = labTest.NormalRangeFemale;
+            }
+
+            labTest.LabUom ??= new LabUomDto();
+
+            LabTest = labTest;
+            LabUom = labTest.LabUom;
+        }
+
+        #endregion Grid Lab Test
+
         private async Task OnPrint()
         {
             if (FormRegis.Id == 0)
@@ -736,12 +837,24 @@ namespace McDermott.Web.Components.Pages.Transaction
             catch { }
         }
 
+        private bool IsLoading { get; set; } = false;
+
+        private async Task Send()
+        {
+            IsLoading = true;
+            ToastService.ShowInfo("Start");
+            await Task.Delay(5000);
+            IsLoading = false;
+        }
+
         private async Task OnClickConfirm()
         {
             try
             {
+                IsLoading = true;
                 if (FormRegis.PatientId == null || FormRegis.TypeRegistration == null || FormRegis.ServiceId is null || FormRegis.PratitionerId is null || FormRegis.ScheduleTime is null || (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null)))
                 {
+                    IsLoading = false;
                     ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
                     return;
                 }
@@ -752,6 +865,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     if (patient.Count > 0)
                     {
+                        IsLoading = false;
                         ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
                         return;
                     }
@@ -782,22 +896,53 @@ namespace McDermott.Web.Components.Pages.Transaction
                     {
                         FormRegis.StagingStatus = "Finished";
                     }
-                    await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+                    FormRegis = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
                 }
                 else
                 {
                     FormRegis.StagingStatus = "Confirmed";
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
                 }
+
+                var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
+                FormRegis = result[0];
+
+                var text1 = FormRegis.StagingStatus == "Physician" ? "Consultation Done" : FormRegis.StagingStatus;
+                var index1 = Stagings.FindIndex(x => x == text1);
+                if (text1 != "Consultation Done")
+                {
+                    FormRegis.StagingStatus = Stagings[index1 + 1];
+                    if (index1 + 1 == 4)
+                    {
+                        FormRegis.StagingStatus = "Physician";
+                    }
+                    else if (index1 + 1 == 5)
+                    {
+                        FormRegis.StagingStatus = "Finished";
+                    }
+                    try
+                    {
+                        StagingText = FormRegis.StagingStatus == "In Consultant" ? "Finished" : Stagings[index1 + 2];
+                    }
+                    catch { }
+                }
+
+                FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
+                FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
+                FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
+
+                IsLoading = false;
             }
             catch (Exception ex)
             {
+                IsLoading = false;
                 ToastService.ShowError(ex.Message);
             }
         }
 
         private async Task OnCancel2()
         {
+            IsLoading = true;
             if (FormRegis.Id != 0)
             {
                 FormRegis.StagingStatus = "Canceled";
@@ -806,6 +951,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 ToastService.ShowSuccess("Cancelled..");
             }
+            IsLoading = false;
         }
 
         private void SelectedService(DoctorScheduleDto docter)
@@ -838,12 +984,14 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task HandleValidSubmit()
         {
+            IsLoading = true;
             FormValidationState = true;
 
             if (PopUpProcedureRoom)
                 await OnSaveProcedureRoom();
             else
                 await OnSave();
+            IsLoading = false;
         }
 
         private async Task OnSaveProcedureRoom()
@@ -869,6 +1017,25 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                     GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+
+                if (IsAddOrUpdateOrDeleteLabResult)
+                {
+                    await Mediator.Send(new DeleteLabResultDetailRequest(ids: DeletedLabTestIds));
+
+                    LabResultDetails.ForEach(x => x.Id = 0);
+
+                    LabResultDetails.ForEach(x =>
+                    {
+                        x.Id = 0;
+                        x.GeneralConsultanMedicalSupportId = GeneralConsultanMedicalSupport.Id;
+                    });
+
+                    await Mediator.Send(new CreateListLabResultDetailRequest(LabResultDetails));
+
+                    IsAddOrUpdateOrDeleteLabResult = false;
+                }
+
+                ToastService.ShowSuccess("Saved Successfully");
             }
             catch (Exception ex)
             {
@@ -903,6 +1070,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
+                IsLoading = true;
                 ToastService.ClearInfoToasts();
 
                 if (!FormValidationState)
@@ -970,56 +1138,29 @@ namespace McDermott.Web.Components.Pages.Transaction
                                 PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
 
                                 if (PatientAllergy.Id == 0)
-                                    await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
+                                    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
                                 else
-                                    await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
+                                    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
 
                                 break;
 
                             default:
                                 break;
                         }
-
-                        //BrowserFiles.Distinct();
-
-                        //foreach (var item in BrowserFiles)
-                        //{
-                        //    await FileUploadService.UploadFileAsync(item, 0, []);
-                        //}
-
-                        //var result = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
-                        //GeneralConsultantClinical.GeneralConsultanServiceId = result.Id;
-                        //GeneralConsultanMedicalSupport.GeneralConsultanServiceId = result.Id;
-                        //PatientAllergy.UserId = result.PatientId ?? 0;
-                        //GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanServiceId = result.Id; x.Id = 0; });
-
-                        //await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
-                        //await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
-
-                        //if (PatientAllergy.Id == 0)
-                        //{
-                        //    await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
-                        //}
-                        //else
-                        //{
-                        //    await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
-                        //}
-
-                        //await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
                     }
                     else
                     {
                         switch (FormRegis.StagingStatus)
                         {
                             case "Planned":
-                                await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+                                FormRegis = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
 
                                 PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
 
                                 if (PatientAllergy.Id == 0)
-                                    await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
+                                    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
                                 else
-                                    await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
+                                    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
 
                                 break;
 
@@ -1028,11 +1169,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                                 if (GeneralConsultantClinical.Id == 0)
                                 {
                                     GeneralConsultantClinical.GeneralConsultanServiceId = FormRegis.Id;
-                                    await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                                    GeneralConsultantClinical = await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
                                 }
                                 else
                                 {
-                                    await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                                    GeneralConsultantClinical = await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
                                 }
 
                                 await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(ids: AllGeneralConsultanCPPTs.Select(x => x.Id).ToList()));
@@ -1046,12 +1187,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                                 if (GeneralConsultantClinical.Id == 0)
                                 {
                                     GeneralConsultantClinical.GeneralConsultanServiceId = FormRegis.Id;
-                                    await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                                    GeneralConsultantClinical = await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
                                 }
                                 else
                                 {
-                                    await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                                    GeneralConsultantClinical = await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
                                 }
+
+                                FormRegis = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
 
                                 await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(ids: AllGeneralConsultanCPPTs.Select(x => x.Id).ToList()));
 
@@ -1068,78 +1211,33 @@ namespace McDermott.Web.Components.Pages.Transaction
                                 if (GeneralConsultanMedicalSupport.Id == 0)
                                 {
                                     GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
-                                    await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                                    GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
                                 }
                                 else
                                 {
-                                    await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                                    GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
                                 }
                                 break;
 
                             default:
                                 break;
                         }
-
-                        //await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
-                        //GeneralConsultantClinical.GeneralConsultanServiceId = FormRegis.Id;
-                        //PatientAllergy.UserId = FormRegis.PatientId ?? 0;
-
-                        //GeneralConsultantClinical.GeneralConsultanService = FormRegis;
-                        //GeneralConsultanMedicalSupport.GeneralConsultanService = FormRegis;
-                        //await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
-                        //await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
-                        //await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(ids: GeneralConsultanCPPTs.Select(x => x.Id).ToList()));
-                        //// await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
-                        //GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = FormRegis; x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; x.GeneralConsultanService = null; });
-                        //await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
-
-                        //var userDtoSipFile = SelectedDataItems[0].Adapt<UserDto>().SipFile;
-
-                        //if (PatientAllergy.Id == 0)
-                        //{
-                        //    await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
-                        //}
-                        //else
-                        //{
-                        //    await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
-                        //}
-
-                        //BrowserFiles.Distinct();
-
-                        //foreach (var item in BrowserFiles)
-                        //{
-                        //    await FileUploadService.UploadFileAsync(item, 1 * 1024 * 1024, []);
-
-                        //}
-
-                        //if (UserForm.SipFile != userDtoSipFile)
-                        //{
-                        //    if (UserForm.SipFile != null)
-                        //        Helper.DeleteFile(UserForm.SipFile);
-
-                        //    if (userDtoSipFile != null)
-                        //        Helper.DeleteFile(userDtoSipFile);
-                        //}
-
-                        //UserForm.DoctorServiceIds = SelectedServices.Select(x => x.Id).ToList();
-                        //await Mediator.Send(new UpdateUserRequest(UserForm));
-
-                        //if (UserForm.SipFile != userDtoSipFile)
-                        //{
-                        //    if (UserForm.SipFile != null)
-                        //        await FileUploadService.UploadFileAsync(BrowserFile);
-                        //}
                     }
                 }
 
-                //FormRegis = new GeneralConsultanServiceDto();
-                //GeneralConsultantClinical = new();
-                //showForm = false;
+                var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
+                FormRegis = result[0];
 
-                //ToastService.ShowSuccess("Successfully");
+                FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
+                FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
+                FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
+
+                ToastService.ShowSuccess("Saved Successfully");
+                IsLoading = false;
             }
             catch (Exception exx)
             {
+                IsLoading = false;
                 exx.HandleException(ToastService);
             }
         }
@@ -1455,6 +1553,11 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             if (support.Count > 0)
                 GeneralConsultanMedicalSupport = support[0];
+
+            DeletedLabTestIds.Clear();
+
+            LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
+            DeletedLabTestIds = LabResultDetails.Select(x => x.Id).ToList();
         }
 
         private void OnClickPopUpAppoimentPending()

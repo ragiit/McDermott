@@ -7,6 +7,7 @@ namespace McDermott.Application.Features.Queries.Transaction
         IRequestHandler<CreateGeneralConsultantClinicalAssesmentRequest, GeneralConsultantClinicalAssesmentDto>,
         IRequestHandler<CreateListGeneralConsultantClinicalAssesmentRequest, List<GeneralConsultantClinicalAssesmentDto>>,
         IRequestHandler<UpdateGeneralConsultantClinicalAssesmentRequest, GeneralConsultantClinicalAssesmentDto>,
+        IRequestHandler<UpdateListGeneralConsultantClinicalAssesmentRequest, List<GeneralConsultantClinicalAssesmentDto>>,
         IRequestHandler<DeleteGeneralConsultantClinicalAssesmentRequest, bool>
     {
         #region GET
@@ -90,13 +91,30 @@ namespace McDermott.Application.Features.Queries.Transaction
         {
             try
             {
-                var result = await _unitOfWork.Repository<GeneralConsultantClinicalAssesment>().UpdateAsync(request.GeneralConsultantClinicalAssesmentDto.Adapt<List<GeneralConsultantClinicalAssesment>>());
+                var result = await _unitOfWork.Repository<GeneralConsultantClinicalAssesment>().UpdateAsync(request.GeneralConsultantClinicalAssesmentDto.Adapt<GeneralConsultantClinicalAssesment>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetGeneralConsultanClinicalAssesmentQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<GeneralConsultantClinicalAssesmentDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public async Task<List<GeneralConsultantClinicalAssesmentDto>> Handle(UpdateListGeneralConsultantClinicalAssesmentRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<GeneralConsultantClinicalAssesment>().UpdateAsync(request.GeneralConsultantClinicalAssesmentDtos.Adapt<List<GeneralConsultantClinicalAssesment>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGeneralConsultanClinicalAssesmentQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<GeneralConsultantClinicalAssesmentDto>>();
             }
             catch (Exception)
             {
@@ -133,6 +151,10 @@ namespace McDermott.Application.Features.Queries.Transaction
                 throw;
             }
         }
+
+
+
+
 
         #endregion Delete
     }

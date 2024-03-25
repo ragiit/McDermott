@@ -260,9 +260,7 @@
                 {
                     var a = SelectedDataItems.Adapt<List<UserDto>>();
 
-                    long userActive = (long)HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
-
-                    await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != UserLogin.Id).Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
@@ -299,7 +297,7 @@
         {
             if (args.DataItem is not null)
             {
-                /*IsDeleted = (bool)HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value.Equals(((UserDto)args.DataItem).Id.ToString())!;*/
+                IsDeleted = ((UserDto)args.DataItem).Id == UserLogin.Id;
             }
 
             FocusedRowVisibleIndex = args.VisibleIndex;

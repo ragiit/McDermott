@@ -73,16 +73,16 @@
 
         #region Update
 
-        internal class UpdatePatientAllergyRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdatePatientAllergyRequest, bool>
+        internal class UpdatePatientAllergyRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdatePatientAllergyRequest, PatientAllergyDto>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-            public async Task<bool> Handle(UpdatePatientAllergyRequest request, CancellationToken cancellationToken)
+            public async Task<PatientAllergyDto> Handle(UpdatePatientAllergyRequest request, CancellationToken cancellationToken)
             {
-                await _unitOfWork.Repository<PatientAllergy>().UpdateAsync(request.PatientAllergyDto.Adapt<PatientAllergy>());
+                var a = await _unitOfWork.Repository<PatientAllergy>().UpdateAsync(request.PatientAllergyDto.Adapt<PatientAllergy>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return true;
+                return a.Adapt<PatientAllergyDto>();
             }
         }
 

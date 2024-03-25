@@ -113,7 +113,7 @@
             ShowForm = false;
             UserForm = new UserDto();
             SelectedDataItems = new ObservableRangeCollection<object>();
-            Users = await Mediator.Send(new GetUserPractitionerQuery());
+            Users = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true));
 
             PanelVisible = false;
         }
@@ -252,9 +252,7 @@
             {
                 var a = SelectedDataItems.Adapt<List<UserDto>>();
 
-                long userActive = (long)_httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!.ToInt32()!;
-
-                _ = await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != userActive).Select(x => x.Id).ToList()));
+                _ = await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != UserLogin.Id).Select(x => x.Id).ToList()));
             }
             await LoadData();
         }
@@ -263,6 +261,7 @@
         {
             UserForm = new();
             ShowForm = true;
+            UserForm.IsPhysicion = true;
         }
 
         private void EditItem_Click()

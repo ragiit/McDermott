@@ -24,7 +24,7 @@
 
         #region Update
 
-        public class UpdatePatientAllergyRequest(PatientAllergyDto PatientAllergyDto) : IRequest<bool>
+        public class UpdatePatientAllergyRequest(PatientAllergyDto PatientAllergyDto) : IRequest<PatientAllergyDto>
         {
             public PatientAllergyDto PatientAllergyDto { get; set; } = PatientAllergyDto;
         }

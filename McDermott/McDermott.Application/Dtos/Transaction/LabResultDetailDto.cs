@@ -5,7 +5,8 @@
         public long Id { get; set; }
         public long GeneralConsultanMedicalSupportId { get; set; }
         public long? LabTestId { get; set; }
-        public string? ResultValueType { get; set; }
+        public string? Result { get; set; }
+        public string? ResultType { get; set; }
 
         public LabTestDto? LabTest { get; set; }
 
