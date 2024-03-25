@@ -5,7 +5,7 @@
         public long Id { get; set; }
         public string? Name { get; set; } = string.Empty;
         public string? NameCounter { get; set; } = string.Empty;
-        public List<long>? CounterId { get; set; } = [];
+        public List<long>? CounterIds { get; set; } = [];
         public virtual List<CounterDto>? Counter { get; set; }
     }
 }

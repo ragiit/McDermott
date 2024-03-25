@@ -5,11 +5,11 @@ namespace McDermott.Application.Features.Queries.Queue
 {
     public class DetailQueueDisplayQueryHandler
     {
-        internal class GetAllDetailQueueDisplayQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetDetailQueueDisplayQuery, List<DetailQueueDisplayDto>>
+        internal class GetAllDetailQueueDisplayQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetQueueDisplay, List<DetailQueueDisplayDto>>
         {
             private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-            public async Task<List<DetailQueueDisplayDto>> Handle(GetDetailQueueDisplayQuery query, CancellationToken cancellationToken)
+            public async Task<List<DetailQueueDisplayDto>> Handle(GetQueueDisplay query, CancellationToken cancellationToken)
             {
                 try
                 {
