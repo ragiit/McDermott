@@ -52,25 +52,25 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Async Data And Auth
 
-        private long? SelectServiced
-        {
-            get => _ServiceId;
-            set
-            {
-                _ServiceId = value;
+        //private long? SelectServiced
+        //{
+        //    get => _ServiceId;
+        //    set
+        //    {
+        //        _ServiceId = value;
 
-                if (value is null)
-                    return;
+        //        if (value is null)
+        //            return;
 
-                counterForm.ServiceKId = value;
-                List<ServiceDto> service = new();
-                service = Services.Where(x => x.Id == value).ToList();
+        //        counterForm.ServiceKId = value;
+        //        List<ServiceDto> service = new();
+        //        service = Services.Where(x => x.Id == value).ToList();
 
-                //get Service Flag P
-                ServiceP = Services.Where(x => x.ServicedId == value && x.IsPatient == true).ToList();
+        //        //get Service Flag P
+        //        ServiceP = Services.Where(x => x.ServicedId == value && x.IsPatient == true).ToList();
 
-            }
-        }
+        //    }
+        //}
 
         private long? SelectPhysicion
         {
@@ -185,7 +185,7 @@ namespace McDermott.Web.Components.Pages.Queue
             Physicians = [.. Physician.Where(x => x.IsPhysicion == true)];
             countersActive = [.. counters.Where(x => x.IsActive == true)];
             countersInActive = [.. counters.Where(x => x.IsActive == false)];
-            //CountCard = [.. counters.Select(x => x.Name);
+            ServiceP = [.. Services.Where(x => x.IsPatient == true)];
             PanelVisible = false;
         }
 
