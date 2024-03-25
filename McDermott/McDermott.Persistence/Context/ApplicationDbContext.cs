@@ -75,6 +75,7 @@ namespace McDermott.Persistence.Context
 
         #region Transaction
 
+        public DbSet<LabResultDetail> LabResultDetails { get; set; }
         public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
         public DbSet<GeneralConsultantClinicalAssesment> GeneralConsultantClinicalAssesments { get; set; }
         public DbSet<GeneralConsultanCPPT> GeneralConsultanCPPTs { get; set; }
@@ -337,7 +338,7 @@ namespace McDermott.Persistence.Context
         {
             try
             {
-                var currentUser = _httpContextAccessor.HttpContext.User.Identity.Name ?? "";
+                var currentUser = string.Empty;
 
                 var entries = ChangeTracker.Entries<BaseAuditableEntity>();
 
