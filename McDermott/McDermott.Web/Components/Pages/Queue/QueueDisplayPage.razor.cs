@@ -92,7 +92,6 @@ namespace McDermott.Web.Components.Pages.Queue
             showPopUp = false;
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
-            DetailQueueDisplay = await Mediator.Send(new GetQueueDisplay());
             QueueDisplay = await Mediator.Send(new GetQueueDisplayQuery());
             Counters = await Mediator.Send(new GetCounterQuery());
             counteres = [.. Counters.Where(x => x.Status == "on process")];

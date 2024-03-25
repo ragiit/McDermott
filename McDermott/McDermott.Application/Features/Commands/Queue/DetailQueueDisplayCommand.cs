@@ -4,7 +4,7 @@ namespace McDermott.Application.Features.Commands.Queue
 {
     public class DetailQueueDisplayCommand
     {
-        public class GetQueueDisplay : IRequest<List<DetailQueueDisplayDto>>;
+        public class GetDetailQueueDisplay : IRequest<List<DetailQueueDisplayDto>>;
 
         public class GetDetailQueueDisplayByIdQuery : IRequest<DetailQueueDisplayDto>
         {
