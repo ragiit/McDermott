@@ -148,8 +148,9 @@
             ws.Cells[2, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
 
             // Set wrap text for column 1 and 2
-            ws.Column(1).Style.WrapText = true;
-            ws.Column(2).Style.WrapText = true;
+            ws.Cells[1, 1].AutoFitColumns();
+            ws.Cells[2, 1].AutoFitColumns();
+            ws.Cells[2, 2].AutoFitColumns();
 
             var users = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true));
 
@@ -163,6 +164,8 @@
                     {
                         ws.Cells[startRow, 1].Value = item.Name;
                         ws.Cells[startRow, 2].Value = item.StrExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
+
+                        startRow++;
                     }
                 }
                 else if (item.IsNurse)
@@ -171,10 +174,10 @@
                     {
                         ws.Cells[startRow, 1].Value = item.Name;
                         ws.Cells[startRow, 2].Value = item.SipExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
+
+                        startRow++;
                     }
                 }
-
-                startRow++;
             }
 
             await SaveFileToSpreadSheetml(pack, $"{FormReports.report}.xlsx");
