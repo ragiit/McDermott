@@ -50,14 +50,7 @@
 
         private async Task Download()
         {
-            //try
-            //{
-            //    await GenerateExcell();
-            //}
-            //catch (Exception ex)
-            //{
-            //    ToastService.ShowError(ex.Message);
-            //}
+            
             var a = FormReports;
             if (FormReports.report == "Report of patient visits by period")
             {
