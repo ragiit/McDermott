@@ -71,23 +71,23 @@ namespace McDermott.Web.Components.Pages.Queue
         protected override async Task OnInitializedAsync()
         {
             DisplayId = $"{NavigationManager.Uri.Replace(NavigationManager.BaseUri + "queue/viewdisplay/", "")}".ToInt32();
-            hubConnection = new HubConnectionBuilder()
-                    .WithUrl("http://localhost:5000/realTimeHub")
-                    .Build();
-            hubConnection.On<long, long>("CallPatient", (Id, numberQueue) =>
-            {
-                IdQueue = Id;
-                Cids = numberQueue;
-                //foreach (var ic in getCount)
-                //{
-                //    if (ic.Id == Id)
-                //    {
-                //        Cids = numberQueue;
-                //        break;
-                //    }
-                //}
-                InvokeAsync(StateHasChanged);
-            });
+            //hubConnection = new HubConnectionBuilder()
+            //        .WithUrl("http://localhost:5000/realTimeHub")
+            //        .Build();
+            //hubConnection.On<long, long>("CallPatient", (Id, numberQueue) =>
+            //{
+            //    IdQueue = Id;
+            //    Cids = numberQueue;
+            //    //foreach (var ic in getCount)
+            //    //{
+            //    //    if (ic.Id == Id)
+            //    //    {
+            //    //        Cids = numberQueue;
+            //    //        break;
+            //    //    }
+            //    //}
+            //    InvokeAsync(StateHasChanged);
+            //});
             await hubConnection.StartAsync();
             await LoadData();
 

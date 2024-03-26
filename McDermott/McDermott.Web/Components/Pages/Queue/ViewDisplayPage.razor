@@ -30,7 +30,7 @@
     </div>
     <div class="container-fluid">
         <div class="row">
-            @foreach (var view in getCount.Take(2))
+            @foreach (var view in getCount)
             {
                 var filteredQueues = kioskQueues.Where(q => q.ServiceKId == view.ServiceKId && q.ServiceId == view.ServiceId && (q.QueueStage == null || q.QueueStage == "call" || q.QueueStage == "present")).ToList();
                 var count = QueueNumber.Where(n =>n.ServicekId == view.ServiceKId && n.ServiceId == view.ServiceId).Select(x => x.NumberQueue).FirstOrDefault();

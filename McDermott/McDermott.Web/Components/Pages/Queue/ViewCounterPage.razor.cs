@@ -37,7 +37,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private HubConnection hubConnection;
         private string NameCounter { get; set; } = string.Empty;
-        private string NameClass { get; set; } = string.Empty;
+        private string NameClasses { get; set; } 
         private string NameServices { get; set; } = string.Empty;
         private string NameServicesK { get; set; } = string.Empty;
         private string Phy { get; set; } = string.Empty;
@@ -119,15 +119,18 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId && x.ServiceId == general.ServiceId && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
                 }
-                var ClassId = KiosksQueue.Select(x => x.ClassTypeId).FirstOrDefault();
-                var classList = GetClass.Where(x => x.Id == ClassId).FirstOrDefault();
-                if (classList == null)
+                foreach (var cl in KiosksQueue)
                 {
-                    NameClass = "-";
-                }
-                else
-                {
-                    NameClass = classList.Name;
+                    var ClassId = KiosksQueue.Where(x=>x.ClassTypeId == cl.ClassTypeId).Select(x => x.ClassTypeId).FirstOrDefault();
+                    var classList = GetClass.Where(x => x.Id == ClassId).FirstOrDefault();
+                    if (classList == null)
+                    {
+                        cl.NameClass = "-";
+                    }
+                    else
+                    {
+                        cl.NameClass = classList.Name;
+                    }
                 }
                 NameCounter = $"Queue Counter {general.Name}";
                 sId = general.ServiceId;
