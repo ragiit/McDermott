@@ -51,7 +51,13 @@
 
         private async Task Download()
         {
+<<<<<<< HEAD
             switch (FormReports.report)
+=======
+            
+            var a = FormReports;
+            if (FormReports.report == "Report of patient visits by period")
+>>>>>>> malika
             {
                 case "Report of validity period of medical personnel licenses":
                     await ReportMedicalPersonalLicence(FormReports);
