@@ -146,7 +146,13 @@ namespace McDermott.Web.Components.Pages.Queue
             }
             catch (Exception ex)
             {
-                ex.HandleException(ToastService);
+                Console.WriteLine(
+                  "\n" +
+                  "==================== START ERROR ====================" + "\n" +
+                  "Message: " + ex.Message + "\n" +
+                  "Inner Message: " + ex.InnerException?.Message + "\n" +
+                  "Stack Trace: " + ex.StackTrace + "\n" +
+                  "==================== END ERROR ====================" + "\n");
             }
         }
 
@@ -331,7 +337,6 @@ namespace McDermott.Web.Components.Pages.Queue
                             {
                                 FormCounters.QueueNumber = 1 * ((long)GetNoQueue.QueueNumber + 1);
                             }
-
                         }
                     }
                     FormCounters.QueueStage = null;

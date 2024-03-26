@@ -230,7 +230,7 @@
                                                                             <a class="fa-solid fa-plus" @onclick="@(async () => await AddNewLabResult())" style="text-decoration: none;" href="javascript:void(0);"></a>
                                                                         </HeaderTemplate>
                                                                         <CellDisplayTemplate>
-                                                                            <a class="fa-solid fa-pen-to-square text-warning" @onclick="@(async () => await GridLabTest.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                                                                            <a class="fa-solid fa-pen-to-square text-warning" @onclick="@(async () => await EditLabResult(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
                                                                             <a class="fa-solid fa-trash text-danger" @onclick="@(() => GridLabTest.ShowDataItemDeleteConfirmation(context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
                                                                             @* <DxButton Text="Edit" Click="@(() => GridLabTest.StartEditRowAsync(context.VisibleIndex))"></DxButton>
                                                                     <DxButton Text="Delete" Click="@(() => GridLabTest.ShowDataItemDeleteConfirmation(context.DataItem))"></DxButton> *@

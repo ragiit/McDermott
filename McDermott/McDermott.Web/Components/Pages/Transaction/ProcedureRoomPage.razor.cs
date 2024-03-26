@@ -132,7 +132,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             await OnSave();
         }
 
-        private async Task OnSaveLabTest(GridEditModelSavingEventArgs e)
+        private void OnSaveLabTest(GridEditModelSavingEventArgs e)
         {
             IsAddOrUpdateOrDeleteLabResult = true;
             var editModel = LabResultDetail;
@@ -153,9 +153,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             else
                 LabResultDetails[FocusedRowLabTestVisibleIndex] = editModel;
-
-            LabResultDetail = new();
-            LabTest = new();
         }
 
         private async Task AddNewLabResult()
@@ -164,6 +161,34 @@ namespace McDermott.Web.Components.Pages.Transaction
             LabTest = new();
             LabUom = new();
             await GridLabTest.StartEditNewRowAsync();
+        }
+
+        private async Task EditLabResult(int index)
+        {
+            await GridLabTest.StartEditRowAsync(index);
+
+            var labTest = LabTests.FirstOrDefault(x => x.Id == LabResultDetail.LabTestId);
+
+            LabTest = new();
+            LabUom = new();
+
+            if (labTest is not null)
+            {
+                selectedLabTestId = labTest.Id;
+
+                if (GeneralConsultanService.Patient is not null && GeneralConsultanService.Patient.Gender is not null)
+                {
+                    if (GeneralConsultanService.Patient.Gender.Equals("Male"))
+                        labTest.NormalRangeByGender = labTest.NormalRangeMale;
+                    else
+                        labTest.NormalRangeByGender = labTest.NormalRangeFemale;
+                }
+
+                labTest.LabUom ??= new LabUomDto();
+
+                LabTest = labTest;
+                LabUom = labTest.LabUom;
+            }
         }
 
         private async Task OnDeleteLabTest()

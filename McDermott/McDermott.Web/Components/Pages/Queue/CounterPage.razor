@@ -1,7 +1,9 @@
 ﻿@* @page "/transaction/counter" *@
 @page "/queue/queue-counter"
 @rendermode InteractiveServer
+
 <PageTitle>McDermott - Queue Counter</PageTitle>
+
 <style>
     .dxbl-toolbar-dropdown-toggle {
         display: none;
@@ -69,8 +71,10 @@
                                                         @if (i.Status == "open")
                                                         {
                                                             <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="@(() => OnDelete(i.Id))" IconCssClass="fa-solid fa-trash" />
-                                                        }else{
-                                                            <DxToolbarItem Enabled ="false" Text="Delete" Click="@(() => OnDelete(i.Id))" IconCssClass="fa-solid fa-trash" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <DxToolbarItem Enabled="false" Text="Delete" Click="@(() => OnDelete(i.Id))" IconCssClass="fa-solid fa-trash" />
                                                         }
                                                         @if (i.Status == "open")
                                                         {

@@ -252,6 +252,7 @@
         try
         {
             ToastService.ClearErrorToasts();
+
             var user = await Mediator.Send(new GetUserQuery(x => x.Email == LoginForm.Email && x.Password == LoginForm.Password));
 
             if (!FormValidationState)
@@ -313,7 +314,7 @@
                 // }
 
                 var a = (CustomAuthenticationStateProvider)CustomAuth;
-                await a.UpdateAuthState(user[0].Adapt<User>());
+                await a.UpdateAuthState(encrypt);
 
                 NavigationManager.NavigateTo("", forceLoad: true);
 

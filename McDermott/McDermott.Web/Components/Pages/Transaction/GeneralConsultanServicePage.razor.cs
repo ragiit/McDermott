@@ -1,5 +1,5 @@
 ﻿using QuestPDF.Fluent;
-
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanClinicalAssesmentCommand;
 
@@ -154,12 +154,12 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private PatientAllergyDto PatientAllergy = new();
         private GeneralConsultantClinicalAssesmentDto GeneralConsultantClinical = new();
-        private List<GeneralConsultanServiceDto> GeneralConsultanServices = new();
-        private List<UserDto> IsPatient = new();
-        private List<UserDto> patients = new List<UserDto>();
+        private List<GeneralConsultanServiceDto> GeneralConsultanServices = [];
+        private List<UserDto> IsPatient = [];
+        private List<UserDto> patients = [];
 
         private List<LabTestDto> LabTests = [];
-        private List<UserDto> IsPratition = new();
+        private List<UserDto> IsPratition = [];
         private List<UserDto> AllDoctors = [];
         private List<InsuranceDto> Insurances = [];
         private List<InsuranceDto> AllInsurances = [];
@@ -238,8 +238,8 @@ namespace McDermott.Web.Components.Pages.Transaction
         #endregion UserLoginAndAccessRole
 
         private IEnumerable<DoctorScheduleDto> SelectedSchedules = [];
-        private IEnumerable<string> SelectedNames { get; set; } = new List<string>();
-        private List<string> Names { get; set; } = new();
+        private IEnumerable<string> SelectedNames { get; set; } = [];
+        private List<string> Names { get; set; } = [];
 
         #endregion Relation Data
 
@@ -301,7 +301,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                         Age = currentDate.Year - Birthdate!.Value.Year;
                     }
 
-                    FormRegis.Age = Age;
                     FormRegis.NoRM = item.NoRm;
                     FormRegis.IdentityNumber = item.NoId ?? "";
                     FormRegis.PatientId = item.Id;
@@ -539,10 +538,14 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             public string? Subjective { get; set; }
             public string? Objective { get; set; }
+
+            [DisplayName("Planning")]
             public string? Plan { get; set; }
+
             public string? Diagnosis { get; set; }
 
             [Required]
+            [DisplayName("Nurse Diagnosis")]
             public string? NursingDiagnosis { get; set; }
 
             public DateTime Date { get; set; } = DateTime.Now;
@@ -583,10 +586,17 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 if (value != null)
                 {
+                    string title = key;
+
+                    if (title.Equals("Plan"))
+                        title = "Planning";
+                    else if (title.Equals(""))
+                        title = "Nurse Diagnosis";
+
                     temps.Add(new GeneralConsultanCPPTDto
                     {
                         Id = new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second,
-                        Title = key,
+                        Title = title,
                         Body = value is null ? "" : value.ToString(), // Ubah ke string sesuai kebutuhan
                     });
                 }
@@ -901,31 +911,32 @@ namespace McDermott.Web.Components.Pages.Transaction
                 else
                 {
                     FormRegis.StagingStatus = "Confirmed";
+                    StagingText = "Nurse Station";
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
                 }
 
                 var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
                 FormRegis = result[0];
 
-                var text1 = FormRegis.StagingStatus == "Physician" ? "Consultation Done" : FormRegis.StagingStatus;
-                var index1 = Stagings.FindIndex(x => x == text1);
-                if (text1 != "Consultation Done")
-                {
-                    FormRegis.StagingStatus = Stagings[index1 + 1];
-                    if (index1 + 1 == 4)
-                    {
-                        FormRegis.StagingStatus = "Physician";
-                    }
-                    else if (index1 + 1 == 5)
-                    {
-                        FormRegis.StagingStatus = "Finished";
-                    }
-                    try
-                    {
-                        StagingText = FormRegis.StagingStatus == "In Consultant" ? "Finished" : Stagings[index1 + 2];
-                    }
-                    catch { }
-                }
+                //var text1 = FormRegis.StagingStatus == "Physician" ? "Consultation Done" : FormRegis.StagingStatus;
+                //var index1 = Stagings.FindIndex(x => x == text1);
+                //if (text1 != "Consultation Done")
+                //{
+                //    FormRegis.StagingStatus = Stagings[index1 + 1];
+                //    if (index1 + 1 == 4)
+                //    {
+                //        FormRegis.StagingStatus = "Physician";
+                //    }
+                //    else if (index1 + 1 == 5)
+                //    {
+                //        FormRegis.StagingStatus = "Finished";
+                //    }
+                //    try
+                //    {
+                //        StagingText = FormRegis.StagingStatus == "In Consultant" ? "Finished" : Stagings[index1 + 2];
+                //    }
+                //    catch { }
+                //}
 
                 FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
                 FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
@@ -1208,15 +1219,15 @@ namespace McDermott.Web.Components.Pages.Transaction
                                     await FileUploadService.UploadFileAsync(item, 0, []);
                                 }
 
-                                if (GeneralConsultanMedicalSupport.Id == 0)
-                                {
-                                    GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
-                                    GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
-                                }
-                                else
-                                {
-                                    GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
-                                }
+                                //if (GeneralConsultanMedicalSupport.Id == 0)
+                                //{
+                                //    GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
+                                //    GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                                //}
+                                //else
+                                //{
+                                //    GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                                //}
                                 break;
 
                             default:
@@ -1389,6 +1400,15 @@ namespace McDermott.Web.Components.Pages.Transaction
                         var support1 = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
                         if (support1.Count > 0)
                             GeneralConsultanMedicalSupport = support1[0];
+
+                        var clinicals1 = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                        if (clinicals1.Count > 0)
+                            GeneralConsultantClinical = clinicals1[0];
+
+                        GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                        AllGeneralConsultanCPPTs = GeneralConsultanCPPTs.Select(item => item).ToList();
+
+                        SelectedLabTests = LabTests.Where(x => GeneralConsultanMedicalSupport.LabResulLabExaminationtIds != null && GeneralConsultanMedicalSupport.LabResulLabExaminationtIds.Contains(x.Id)).ToList();
                         break;
 
                     default:
@@ -1654,7 +1674,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
             {
                 FormRegis.InsurancePolicyId = null;
-                FormRegis.Age = null;
+                //FormRegis.Age = null;
                 FormRegis.NoRM = null;
                 FormRegis.IdentityNumber = null;
                 PatientAllergy.Food = null;
@@ -1676,16 +1696,13 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                if (item.DateOfBirth != null)
+                if (item is not null && item.DateOfBirth != null)
                 {
-                    DateTime currentDate = DateTime.UtcNow;
-                    Birthdate = item.DateOfBirth;
-                    Age = currentDate.Year - Birthdate!.Value.Year;
+                    //FormRegis.Age = DateTime.Now.Year - item.DateOfBirth.GetValueOrDefault().Year;
                 }
 
-                FormRegis.Age = Age;
-                FormRegis.NoRM = item.NoRm;
-                FormRegis.IdentityNumber = item.NoId ?? "";
+                FormRegis.NoRM = item.NoRm ?? null;
+                FormRegis.IdentityNumber = item.NoId ?? null;
                 FormRegis.PatientId = item.Id;
             }
             catch { }
