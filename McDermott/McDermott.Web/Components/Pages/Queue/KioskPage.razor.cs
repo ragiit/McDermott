@@ -189,6 +189,7 @@ namespace McDermott.Web.Components.Pages.Queue
             PanelVisible = true;
             StateHasChanged();
             showForm = false;
+            FormKios = new();
             Physician = await Mediator.Send(new GetUserQuery());
             KioskQueues = await Mediator.Send(new GetKioskQueueQuery());
             ViewQueue = KioskQueues.OrderByDescending(x => x.CreatedDate).FirstOrDefault();
@@ -417,7 +418,7 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 var edit = FormKios;
-
+                showQueue = true;
                 if (FormKios.Id == 0)
                 {
                     // Mendapatkan ID dari hasil CreateKioskRequest
@@ -467,7 +468,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
                         }
                     }
-
+                    
                     // mendapatkan service counter Id
                     var skId = Services.Where(x => x.Id == checkId.ServiceId).Select(x => x.ServicedId).FirstOrDefault();
                     // Mengisi informasi antrian
@@ -479,7 +480,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
                     // Membuat KioskQueue baru
                     var QueueKioskId = await Mediator.Send(new CreateKioskQueueRequest(FormQueue));
-                    showQueue = true;
+                    
                     ToastService.ShowSuccess("Number Queue is Generated Succces!!");
 
                     FormGeneral.PatientId = FormKios.PatientId;

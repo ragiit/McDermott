@@ -58,11 +58,11 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 await LoadData();
-                hubConnection = new HubConnectionBuilder()
-                    .WithUrl("http://localhost:5000/realTimeHub")
-                    .Build();
+                //hubConnection = new HubConnectionBuilder()
+                //    .WithUrl("http://localhost:5000/realTimeHub")
+                //    .Build();
 
-                await hubConnection.StartAsync();
+                //await hubConnection.StartAsync();
 
                 await InvokeAsync(StateHasChanged);
             }
