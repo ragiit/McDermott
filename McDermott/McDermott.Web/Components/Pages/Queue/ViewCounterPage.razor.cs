@@ -58,11 +58,11 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 await LoadData();
-                hubConnection = new HubConnectionBuilder()
-                    .WithUrl("http://localhost:5000/realTimeHub")
-                    .Build();
+                //hubConnection = new HubConnectionBuilder()
+                //    .WithUrl("http://localhost:5000/realTimeHub")
+                //    .Build();
 
-                await hubConnection.StartAsync();
+                //await hubConnection.StartAsync();
 
                 await InvokeAsync(StateHasChanged);
             }
@@ -141,7 +141,13 @@ namespace McDermott.Web.Components.Pages.Queue
             }
             catch (Exception ex)
             {
-                ex.HandleException(ToastService);
+                Console.WriteLine(
+                  "\n" +
+                  "==================== START ERROR ====================" + "\n" +
+                  "Message: " + ex.Message + "\n" +
+                  "Inner Message: " + ex.InnerException?.Message + "\n" +
+                  "Stack Trace: " + ex.StackTrace + "\n" +
+                  "==================== END ERROR ====================" + "\n");
             }
         }
 
@@ -319,7 +325,6 @@ namespace McDermott.Web.Components.Pages.Queue
                             {
                                 FormCounters.QueueNumber = 1 * ((long)GetNoQueue.QueueNumber + 1);
                             }
-
                         }
                     }
                     FormCounters.QueueStage = null;
