@@ -1,4 +1,7 @@
-﻿namespace McDermott.Web.Components.Pages.Transaction
+﻿using OfficeOpenXml.Style;
+using System.Net;
+
+namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class RaportPage
     {
@@ -133,28 +136,22 @@
 
             var header = new List<string>() { "Name of Medical Personal", "Licence Validity Period" };
 
-            ws.Cells[1, 1, 1, 2].Merge = true;
+            TemplateClinicName(ws);
 
-            ws.Cells[1, 1].Value = FormReports.report;
-            ws.Cells[3, 1].Value = header[0];
-            ws.Cells[3, 2].Value = header[1];
+            ws.Cells[7, 1].Value = header[0];
+            ws.Cells[7, 2].Value = header[1];
 
-            ws.Cells[1, 1].Style.Font.Bold = true;
-            ws.Cells[3, 1].Style.Font.Bold = true;
-            ws.Cells[3, 2].Style.Font.Bold = true;
+            ws.Cells[7, 1].Style.Font.Bold = true;
+            ws.Cells[7, 2].Style.Font.Bold = true;
 
-            ws.Cells[1, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[3, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[3, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-
-            // Set wrap text for column 1 and 2
-            ws.Cells[1, 1].AutoFitColumns();
-            ws.Cells[3, 1].AutoFitColumns();
-            ws.Cells[3, 2].AutoFitColumns();
+            ws.Cells[4, 2].AutoFitColumns();
+            ws.Cells[7, 1].AutoFitColumns();
 
             var users = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true));
 
-            int startRow = 4;
+            int startRow = 8;
+
+            int count = 0;
 
             foreach (var item in users.OrderBy(x => x.Name))
             {
@@ -166,6 +163,7 @@
                         ws.Cells[startRow, 2].Value = item.SipExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
 
                         startRow++;
+                        count++;
                     }
                 }
                 else if (item.IsNurse)
@@ -176,11 +174,45 @@
                         ws.Cells[startRow, 2].Value = item.StrExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
 
                         startRow++;
+                        count++;
                     }
                 }
             }
 
+            var tableRange = ws.Cells[7, 1, 7 + count, 2];
+
+            // Create the table
+            var excelTable = ws.Tables.Add(tableRange, "Table");
+            excelTable.TableStyle = OfficeOpenXml.Table.TableStyles.Light1;
+
+            // Add borders to the table range
+            tableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+
+            // Add thick border to the header row
+            tableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
             await SaveFileToSpreadSheetml(pack, $"{FormReports.report}.xlsx");
+        }
+
+        private void TemplateClinicName(ExcelWorksheet ws)
+        {
+            ws.Cells[2, 2].Value = FormReports.report;
+            ws.Cells[3, 1].Value = "Clinic";
+            ws.Cells[3, 2].Value = "McHealthCare";
+            ws.Cells[4, 1].Value = "Address";
+            ws.Cells[4, 2].Value = "Jalan Bawal No. 1 – Batu Ampar Batam Island 29452, Riau Islands Province";
+            ws.Cells[5, 1].Value = "Date";
+            ws.Cells[5, 2].Value = DateTime.Now.Date.ToString("dd/MM/yyyy", new System.Globalization.CultureInfo("en_US"));
+
+            ws.Cells[2, 2].Style.Font.Bold = true;
+            ws.Cells[3, 1].Style.Font.Bold = true;
+            ws.Cells[3, 2].Style.Font.Bold = true;
+            ws.Cells[4, 1].Style.Font.Bold = true;
+            ws.Cells[5, 1].Style.Font.Bold = true;
         }
 
         private async Task VisitByPeriode(ReportDto FormReports)
@@ -195,42 +227,64 @@
 
             var header = new List<string>() { "Date", "Type Medical", "Patient Count" };
 
-            ws.Cells[1, 2].Value = FormReports.report;
-            ws.Cells[2, 1].Value = "Date Period";
-            ws.Cells[3, 1].Value = "Total number of Visits";
-            ws.Cells[4, 1].Value = "Date";
-            ws.Cells[4, 2].Value = "Service";
-            ws.Cells[4, 3].Value = "Total Patiens";
+            var currentProtocol = HttpContextAccessor.HttpContext.Request.Scheme;
 
-            ws.Cells[1, 2].Style.Font.Bold = true;
-            ws.Cells[2, 1].Style.Font.Bold = true;
-            ws.Cells[3, 1].Style.Font.Bold = true;
-            ws.Cells[2, 2].Style.Font.Bold = true;
-            ws.Cells[4, 1].Style.Font.Bold = true;
-            ws.Cells[4, 2].Style.Font.Bold = true;
-            ws.Cells[4, 3].Style.Font.Bold = true;
+            var currentHost = HttpContextAccessor.HttpContext.Request.Host.Value;
+            var baseUrl = $"{currentProtocol}://{currentHost}";
 
-            ws.Cells[1, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[2, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[2, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[3, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[4, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[4, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[4, 3].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            var apiUrl = $"{baseUrl}/mcdermott_logo.png";
 
-            // Set wrap text for column 1 and 2
-            ws.Column(1).Style.WrapText = true;
-            ws.Column(2).Style.WrapText = true;
+            //// Lokasi penyimpanan gambar sementara
+            //string imagePath = Path.Combine("wwwroot", "temp", "mcdermott_logo.png");
 
-            ws.Cells[2, 2].Value = FormReports.StartDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo);
+            //// Unduh gambar dari URL
+            //using (WebClient webClient = new WebClient())
+            //{
+            //    webClient.DownloadFile(apiUrl, imagePath);
+            //}
+
+            // Tambahkan gambar ke file Excel
+            //var picture1 = ws.Drawings.AddPicture("Image1", new FileInfo("wwwroot\\mcdermott_logo.png"));
+            //picture1.From.Column = 1; // Kolom 1
+            //picture1.From.Row = 1; // Baris 1
+            //picture1.SetSize(100, 100); // Atur ukuran gambar (opsional)
+
+            //var picture2 = ws.Drawings.AddPicture("Image2", new FileInfo("wwwroot\\mcdermott_logo.png"));
+            //picture2.From.Column = 1; // Kolom 1
+            //picture2.From.Row = 2; // Baris 2
+            //picture2.SetSize(100, 100); // Atur ukuran gambar (opsional)
+
+            //// Gabung sel untuk gambar
+            //ws.Cells[1, 1, 2, 2].Merge = true;
+
+            //// Atur properti style untuk sel gabungan
+            //ws.Cells[1, 1, 2, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            //ws.Cells[1, 1, 2, 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            TemplateClinicName(ws);
+
+            ws.Cells[6, 1].Value = "Date Period";
+            ws.Cells[6, 2].Value = FormReports.StartDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo);
+            ws.Cells[7, 1].Value = "Total number of Visits";
+
+            ws.Cells[6, 1].Style.Font.Bold = true;
+            ws.Cells[7, 1].Style.Font.Bold = true;
+            ws.Cells[7, 1].Style.Font.Bold = true;
+            ws.Cells[7, 1].Style.Font.Bold = true;
+            ws.Cells[9, 3].Style.Font.Bold = true;
 
             var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.RegistrationDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.RegistrationDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
 
-            int startRow = 5;
+            ws.Cells[9, 1].Value = "Date";
+            ws.Cells[9, 2].Value = "Service";
+            ws.Cells[9, 3].Value = "Total Patients";
+
+            int startRow = 10;
 
             var namee = new List<string>();
 
             long totalPatiens = 0;
+            int counts = 0;
 
             foreach (var item in generals)
             {
@@ -239,7 +293,7 @@
 
                 long count = generals.Where(x => x.ServiceId == item.ServiceId && x.RegistrationDate.Date == item.RegistrationDate.Date).Count();
 
-                ws.Cells[startRow, 1].Value = item.RegistrationDate.Date.ToString("dd/MM/yyyy");
+                ws.Cells[startRow, 1].Value = item.RegistrationDate.Date.ToString("dd/MM/yyyy", cultureInfo);
                 ws.Cells[startRow, 2].Value = item.Service?.Name;
                 ws.Cells[startRow, 3].Value = count;
 
@@ -248,9 +302,31 @@
                 namee.Add(item.Service?.Name!);
 
                 startRow++;
+                counts++;
             }
 
-            ws.Cells[3, 2].Value = totalPatiens;
+            ws.Cells[7, 2].Value = totalPatiens;
+
+            var tableRange = ws.Cells[9, 1, 9 + counts, 3];
+
+            // Create the table
+            var excelTable = ws.Tables.Add(tableRange, "Table");
+            excelTable.TableStyle = OfficeOpenXml.Table.TableStyles.Light1;
+
+            // Add borders to the table range
+            tableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+
+            // Add thick border to the header row
+            tableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+            ws.Cells[2, 2].AutoFitColumns();
+            ws.Cells[4, 2].AutoFitColumns();
+            ws.Cells[7, 1].AutoFitColumns();
+            ws.Cells[9, 3].AutoFitColumns();
 
             await SaveFileToSpreadSheetml(pack, "Report of Patient visits by Period.xlsx");
         }
