@@ -40,7 +40,20 @@
         [Required]
         public string? ScheduleTime { get; set; }
 
-        public long? Age { get; set; }
+        public long? Age
+        {
+            get
+            {
+                if (Patient is not null && Patient.DateOfBirth is null)
+                    return null;
+
+                var awikwok = DateTime.Now.Year - Patient.DateOfBirth.GetValueOrDefault().Year;
+
+                return awikwok;
+            }
+            set
+            { }
+        }
         public DateTime? CreateDate { get; set; }
 
         [Required]

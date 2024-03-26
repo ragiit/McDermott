@@ -112,7 +112,7 @@
 
             ShowForm = false;
             UserForm = new UserDto();
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
             Users = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true));
 
             PanelVisible = false;
@@ -123,7 +123,7 @@
             UserForm.SipFile = null;
         }
 
-        private async void SelectFiles(InputFileChangeEventArgs e)
+        private void SelectFiles(InputFileChangeEventArgs e)
         {
             BrowserFile = e.File;
             UserForm.SipFile = e.File.Name;
@@ -142,16 +142,12 @@
             }
         }
 
-        private async Task HandleFormSubmit()
-        {
-        }
-
         #region Grid
 
         private void OnRowDoubleClick(GridRowClickEventArgs e)
         {
             UserForm = SelectedDataItems[0].Adapt<UserDto>();
-            SelectedServices = Services.Where(x => UserForm.DoctorServiceIds.Contains(x.Id)).ToList();
+            SelectedServices = Services.Where(x => UserForm.DoctorServiceIds is not null && UserForm.DoctorServiceIds.Contains(x.Id)).ToList();
             ShowForm = true;
         }
 
@@ -182,10 +178,10 @@
 
             if (UserForm.Id == 0)
             {
-                _ = await FileUploadService.UploadFileAsync(BrowserFile);
+                await FileUploadService.UploadFileAsync(BrowserFile);
                 var a = SelectedServices.Select(x => x.Id).ToList();
                 UserForm.DoctorServiceIds?.AddRange(a);
-                _ = await Mediator.Send(new CreateUserRequest(UserForm));
+                await Mediator.Send(new CreateUserRequest(UserForm));
             }
             else
             {
@@ -269,7 +265,7 @@
             try
             {
                 UserForm = SelectedDataItems[0].Adapt<UserDto>();
-                SelectedServices = Services.Where(x => UserForm.DoctorServiceIds.Contains(x.Id)).ToList();
+                SelectedServices = Services.Where(x => UserForm.DoctorServiceIds is not null && UserForm.DoctorServiceIds.Contains(x.Id)).ToList();
                 ShowForm = true;
             }
             catch { }

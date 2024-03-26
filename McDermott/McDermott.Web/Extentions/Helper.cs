@@ -190,6 +190,7 @@ namespace McDermott.Web.Extentions
             }
         }
 
+        // udah ga dipakai lagi
         public static async Task<User> GetUserInfo(this ILocalStorageService o)
         {
             var data = await o.GetItemAsync<string>("dotnet");
@@ -207,6 +208,7 @@ namespace McDermott.Web.Extentions
         //    return await o.GetItemAsync<List<MenuDto>>("Menu");
         //}
 
+        // udah ga dipakai lagi
         public static void CustomNavigateToPage(this NavigationManager navigationManager, string page, long? id = null)
         {
             var action = id is null ? "add" : "edit";

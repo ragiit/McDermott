@@ -51,13 +51,7 @@
 
         private async Task Download()
         {
-<<<<<<< HEAD
             switch (FormReports.report)
-=======
-            
-            var a = FormReports;
-            if (FormReports.report == "Report of patient visits by period")
->>>>>>> malika
             {
                 case "Report of validity period of medical personnel licenses":
                     await ReportMedicalPersonalLicence(FormReports);
@@ -142,44 +136,44 @@
             ws.Cells[1, 1, 1, 2].Merge = true;
 
             ws.Cells[1, 1].Value = FormReports.report;
-            ws.Cells[2, 1].Value = header[0];
-            ws.Cells[2, 2].Value = header[1];
+            ws.Cells[3, 1].Value = header[0];
+            ws.Cells[3, 2].Value = header[1];
 
             ws.Cells[1, 1].Style.Font.Bold = true;
-            ws.Cells[2, 1].Style.Font.Bold = true;
-            ws.Cells[2, 2].Style.Font.Bold = true;
+            ws.Cells[3, 1].Style.Font.Bold = true;
+            ws.Cells[3, 2].Style.Font.Bold = true;
 
             ws.Cells[1, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[2, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[2, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[3, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[3, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
 
             // Set wrap text for column 1 and 2
             ws.Cells[1, 1].AutoFitColumns();
-            ws.Cells[2, 1].AutoFitColumns();
-            ws.Cells[2, 2].AutoFitColumns();
+            ws.Cells[3, 1].AutoFitColumns();
+            ws.Cells[3, 2].AutoFitColumns();
 
             var users = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true));
 
-            int startRow = 3;
+            int startRow = 4;
 
             foreach (var item in users.OrderBy(x => x.Name))
             {
                 if (item.IsPhysicion)
                 {
-                    if (item.StrExp is not null && item.StrExp.Value.Date >= FormReports.StartDate!.Value.Date && item.StrExp.Value.Date <= FormReports.EndDate!.Value.Date)
+                    if (item.SipExp is not null)
                     {
                         ws.Cells[startRow, 1].Value = item.Name;
-                        ws.Cells[startRow, 2].Value = item.StrExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
+                        ws.Cells[startRow, 2].Value = item.SipExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
 
                         startRow++;
                     }
                 }
                 else if (item.IsNurse)
                 {
-                    if (item.SipExp is not null && item.SipExp.Value.Date >= FormReports.StartDate!.Value.Date && item.SipExp.Value.Date <= FormReports.EndDate!.Value.Date)
+                    if (item.StrExp is not null)
                     {
                         ws.Cells[startRow, 1].Value = item.Name;
-                        ws.Cells[startRow, 2].Value = item.SipExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
+                        ws.Cells[startRow, 2].Value = item.StrExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
 
                         startRow++;
                     }
@@ -230,7 +224,7 @@
 
             ws.Cells[2, 2].Value = FormReports.StartDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo);
 
-            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.StagingStatus != "Canceled" && x.RegistrationDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.RegistrationDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
+            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.RegistrationDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.RegistrationDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
 
             int startRow = 5;
 

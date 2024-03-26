@@ -305,7 +305,7 @@ namespace McDermott.Web.Components.Pages.Medical
                     doctorDetailsDict[doctorScheduleId] = doctorDetails;
                 }
 
-                for (DateTime date = StartDate; date <= EndDate; date = date.Date.AddDays(1))
+                for (DateTime date = StartDate.Date; date <= EndDate.Date; date = date.Date.AddDays(1))
                 {
                     foreach (DoctorScheduleDto doctorSchedule in SelectedSchedules)
                     {
@@ -439,6 +439,8 @@ namespace McDermott.Web.Components.Pages.Medical
                 #endregion MyRegion
 
                 await Mediator.Send(new CreateDoctorScheduleSlotRequest(result));
+
+                ToastService.ShowSuccess("Generated Schedule Doctor Successfully");
             }
             catch { }
         }

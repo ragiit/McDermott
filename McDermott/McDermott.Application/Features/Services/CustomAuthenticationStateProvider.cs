@@ -8,37 +8,35 @@ using System.Text;
 
 namespace McDermott.Application.Features.Services
 {
-    public class CustomAuthenticationStateProvider : AuthenticationStateProvider
+    public class CustomAuthenticationStateProvider(ILocalStorageService sessionStorage, IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache) : AuthenticationStateProvider
     {
-        private readonly ILocalStorageService _sessionStorage;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private ClaimsPrincipal _ = new ClaimsPrincipal(new ClaimsIdentity());
-
-        public CustomAuthenticationStateProvider(ILocalStorageService sessionStorage, IHttpContextAccessor httpContextAccessor)
-        {
-            _sessionStorage = sessionStorage;
-            _httpContextAccessor = httpContextAccessor;
-        }
+        private readonly ILocalStorageService _sessionStorage = sessionStorage;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+        private readonly IMemoryCache _cache = memoryCache;
+        private ClaimsPrincipal _ = new(new ClaimsIdentity());
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             try
             {
-                var a = await _sessionStorage.GetItemAsync<string>("dotnet");
-                if (a == null)
-                    return await Task.FromResult(new AuthenticationState(_));
+                string cacheKey = $"USER_INFO";
 
-                var user = JsonConvert.DeserializeObject<User>(Decrypt(a));
-
-                var claimPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
+                if (!_cache.TryGetValue(cacheKey, out string result))
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    var user = JsonConvert.DeserializeObject<User>(Decrypt(result));
+
+                    var claimPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
+                    [
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Name)
-                }, "CustomAuth"));
+                    ], "CustomAuth"));
 
-                _httpContextAccessor.HttpContext.User = claimPrincipal;
+                    _httpContextAccessor.HttpContext.User = claimPrincipal;
 
-                return await Task.FromResult(new AuthenticationState(claimPrincipal));
+                    return await Task.FromResult(new AuthenticationState(claimPrincipal));
+                }
+                else
+                    return await Task.FromResult(new AuthenticationState(_));
             }
             catch (Exception)
             {
@@ -70,16 +68,17 @@ namespace McDermott.Application.Features.Services
             }
         }
 
-        public async Task UpdateAuthState(User user)
+        public async Task UpdateAuthState(string user)
         {
             ClaimsPrincipal claims = new();
             if (user is not null)
             {
-                //await _sessionStorage.SetItemAsync("us", user);
+                var User = JsonConvert.DeserializeObject<User>(Decrypt(user));
+
                 claims = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Name)
+                    new Claim(ClaimTypes.NameIdentifier, User.Id.ToString()),
+                    new Claim(ClaimTypes.Name, User.Name)
                 }, "CustomAuth"));
             }
             else
@@ -87,6 +86,7 @@ namespace McDermott.Application.Features.Services
                 //await _sessionStorage.DeleteAsync("us");
                 claims = _;
             }
+
             _httpContextAccessor.HttpContext.User = claims;
 
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claims)));
