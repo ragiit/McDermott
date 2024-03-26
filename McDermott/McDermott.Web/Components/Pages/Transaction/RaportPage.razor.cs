@@ -14,6 +14,7 @@
         private string _selected;
         private string typeReport;
         private bool showForm { get; set; } = false;
+        private bool LicenseValidityPeriode { get; set; } = false;
         private DateTime DateTimeValue { get; set; } = DateTime.Now;
 
         private List<string> ListReport = new()
@@ -50,18 +51,18 @@
 
         private async Task Download()
         {
-            //try
-            //{
-            //    await GenerateExcell();
-            //}
-            //catch (Exception ex)
-            //{
-            //    ToastService.ShowError(ex.Message);
-            //}
-            var a = FormReports;
-            if (FormReports.report == "Report of patient visits by period")
+            switch (FormReports.report)
             {
-                await VisitByPeriode(FormReports);
+                case "Report of validity period of medical personnel licenses":
+                    await ReportMedicalPersonalLicence(FormReports);
+                    break;
+
+                case "Report of patient visits by period":
+                    await VisitByPeriode(FormReports);
+                    break;
+
+                default:
+                    break;
             }
         }
 
@@ -118,9 +119,10 @@
             await JsRuntime.InvokeVoidAsync("saveAsFile", "Student.xlsx", Convert.ToBase64String(fileContent));
         }
 
-        private async Task VisitByPeriode(ReportDto FormReports)
+        #region Report
+
+        private async Task ReportMedicalPersonalLicence(ReportDto formReports)
         {
-            byte[] fileContent;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             var pack = new ExcelPackage();
@@ -129,22 +131,66 @@
 
             var cultureInfo = new System.Globalization.CultureInfo("en_US");
 
-            var result = generalConsultans.Where(x => x.CreateDate.Value.Date >= FormReports.StartDate.Value.Date && x.CreateDate.Value.Date < FormReports.EndDate.Value.Date.AddDays(1) && x.StagingStatus == "Finished").ToList();
+            var header = new List<string>() { "Name of Medical Personal", "Licence Validity Period" };
 
-            var data = new List<VisitByPeriod>();
-            foreach (var item in result)
+            ws.Cells[1, 1, 1, 2].Merge = true;
+
+            ws.Cells[1, 1].Value = FormReports.report;
+            ws.Cells[2, 1].Value = header[0];
+            ws.Cells[2, 2].Value = header[1];
+
+            ws.Cells[1, 1].Style.Font.Bold = true;
+            ws.Cells[2, 1].Style.Font.Bold = true;
+            ws.Cells[2, 2].Style.Font.Bold = true;
+
+            ws.Cells[1, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[2, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[2, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+
+            // Set wrap text for column 1 and 2
+            ws.Column(1).Style.WrapText = true;
+            ws.Column(2).Style.WrapText = true;
+
+            var users = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true));
+
+            int startRow = 3;
+
+            foreach (var item in users.OrderBy(x => x.Name))
             {
-                var report = new VisitByPeriod
+                if (item.IsPhysicion)
                 {
-                    TotalVisit = result.Count(),
-                    Services = item.TypeMedical,
-                    CountPatient = result.Where(x => x.TypeMedical == item.TypeMedical).Count(),
-                };
-                data.Add(report);
+                    if (item.StrExp is not null && item.StrExp.Value.Date >= FormReports.StartDate!.Value.Date && item.StrExp.Value.Date <= FormReports.EndDate!.Value.Date)
+                    {
+                        ws.Cells[startRow, 1].Value = item.Name;
+                        ws.Cells[startRow, 2].Value = item.StrExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
+                    }
+                }
+                else if (item.IsNurse)
+                {
+                    if (item.SipExp is not null && item.SipExp.Value.Date >= FormReports.StartDate!.Value.Date && item.SipExp.Value.Date <= FormReports.EndDate!.Value.Date)
+                    {
+                        ws.Cells[startRow, 1].Value = item.Name;
+                        ws.Cells[startRow, 2].Value = item.SipExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
+                    }
+                }
+
+                startRow++;
             }
 
-            var header = new List<string>();
-            header = new List<string>() { "Date", "Type Medical", "Patient Count" };
+            await SaveFileToSpreadSheetml(pack, $"{FormReports.report}.xlsx");
+        }
+
+        private async Task VisitByPeriode(ReportDto FormReports)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            var pack = new ExcelPackage();
+            var SheetTitle = FormReports.report;
+            ExcelWorksheet ws = pack.Workbook.Worksheets.Add(SheetTitle);
+
+            var cultureInfo = new System.Globalization.CultureInfo("en_US");
+
+            var header = new List<string>() { "Date", "Type Medical", "Patient Count" };
 
             ws.Cells[1, 2].Value = FormReports.report;
             ws.Cells[2, 1].Value = "Date Period";
@@ -169,9 +215,13 @@
             ws.Cells[4, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
             ws.Cells[4, 3].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
 
+            // Set wrap text for column 1 and 2
+            ws.Column(1).Style.WrapText = true;
+            ws.Column(2).Style.WrapText = true;
+
             ws.Cells[2, 2].Value = FormReports.StartDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo);
 
-            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.RegistrationDate.GetValueOrDefault().Date >= FormReports.StartDate && x.RegistrationDate <= FormReports.EndDate));
+            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.StagingStatus != "Canceled" && x.RegistrationDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.RegistrationDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
 
             int startRow = 5;
 
@@ -181,26 +231,32 @@
 
             foreach (var item in generals)
             {
-                if (namee.Contains(item.Service?.Name))
+                if (namee.Contains(item.Service?.Name!))
                     continue;
 
-                ws.Cells[startRow, 1].Value = item.AppoimentDate.GetValueOrDefault().Date.ToString("dd/MM/yyyy", cultureInfo);
-                ws.Cells[startRow, 2].Value = item.Service?.Name;
-                ws.Cells[startRow, 3].Value = generals.Where(x => x.ServiceId == item.ServiceId && x.RegistrationDate.Date == item.RegistrationDate.Date).Count();
+                long count = generals.Where(x => x.ServiceId == item.ServiceId && x.RegistrationDate.Date == item.RegistrationDate.Date).Count();
 
-                namee.Add(item.Service?.Name);
+                ws.Cells[startRow, 1].Value = item.RegistrationDate.Date.ToString("dd/MM/yyyy");
+                ws.Cells[startRow, 2].Value = item.Service?.Name;
+                ws.Cells[startRow, 3].Value = count;
+
+                totalPatiens += count;
+
+                namee.Add(item.Service?.Name!);
 
                 startRow++;
             }
 
             ws.Cells[3, 2].Value = totalPatiens;
 
-            string fileTitle = "Report of Patient visits by Period.xls";
-            string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-
-            fileContent = pack.GetAsByteArray();
-            await JsRuntime.InvokeVoidAsync("saveAsFile", fileTitle, Convert.ToBase64String(fileContent));
-            //return File(stream, contentType, );
+            await SaveFileToSpreadSheetml(pack, "Report of Patient visits by Period.xlsx");
         }
+
+        private async Task SaveFileToSpreadSheetml(ExcelPackage excelPackage, string title)
+        {
+            await JsRuntime.InvokeVoidAsync("saveAsFile", title, Convert.ToBase64String(excelPackage.GetAsByteArray()));
+        }
+
+        #endregion Report
     }
 }
