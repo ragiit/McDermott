@@ -75,6 +75,7 @@ namespace McDermott.Persistence.Context
 
         #region Transaction
 
+        public DbSet<LabResultDetail> LabResultDetails { get; set; }
         public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
         public DbSet<GeneralConsultantClinicalAssesment> GeneralConsultantClinicalAssesments { get; set; }
         public DbSet<GeneralConsultanCPPT> GeneralConsultanCPPTs { get; set; }
@@ -113,47 +114,63 @@ namespace McDermott.Persistence.Context
             // Contoh: Aturan cascade delete untuk hubungan many-to-many
 
             modelBuilder.Entity<GeneralConsultanService>()
-              .HasMany(m => m.GeneralConsultanCPPTs)
-              .WithOne(c => c.GeneralConsultanService)
-              .OnDelete(DeleteBehavior.Cascade);
+                  .HasMany(m => m.GeneralConsultanCPPTs)
+                  .WithOne(c => c.GeneralConsultanService)
+                  .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Group>()
-              .HasMany(m => m.GroupMenus)
-              .WithOne(c => c.Group)
-              .OnDelete(DeleteBehavior.Cascade);
+                  .HasMany(m => m.GroupMenus)
+                  .WithOne(c => c.Group)
+                  .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Menu>()
-              .HasMany(m => m.GroupMenus)
-              .WithOne(c => c.Menu)
-              .OnDelete(DeleteBehavior.Cascade);
+                  .HasMany(m => m.GroupMenus)
+                  .WithOne(c => c.Menu)
+                  .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GeneralConsultanService>()
-              .HasMany(m => m.GeneralConsultanMedicalSupports)
-              .WithOne(c => c.GeneralConsultanService)
-              .OnDelete(DeleteBehavior.Cascade);
+                  .HasMany(m => m.GeneralConsultanMedicalSupports)
+                  .WithOne(c => c.GeneralConsultanService)
+                  .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GeneralConsultanService>()
-              .HasMany(m => m.GeneralConsultantClinicalAssesments)
-              .WithOne(c => c.GeneralConsultanService)
-              .OnDelete(DeleteBehavior.Cascade);
+                  .HasMany(m => m.GeneralConsultantClinicalAssesments)
+                  .WithOne(c => c.GeneralConsultanService)
+                  .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GeneralConsultanMedicalSupport>()
-                .HasMany(m => m.LabResultDetails)
-                .WithOne(c => c.GeneralConsultanMedicalSupport)
-                .OnDelete(DeleteBehavior.Cascade);
+                  .HasMany(m => m.LabResultDetails)
+                  .WithOne(c => c.GeneralConsultanMedicalSupport)
+                  .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Department>()
-            .HasOne(e => e.Manager)
-            .WithMany();
+                .HasOne(e => e.Manager)
+                .WithMany();
 
             modelBuilder.Entity<User>()
-          .HasOne(e => e.Department)
-          .WithMany();
+            .HasOne(e => e.Department)
+            .WithMany();
 
-            modelBuilder.Entity<QueueDisplay>()
-                .HasMany(m => m.Counter)
-                .WithOne()
-                .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<User>()
+            // .HasMany(m => m.PatientFamilyRelations)
+            // .WithOne(c => c.Patient)
+            // .OnDelete(DeleteBehavior.Cascade);
+
+            //modelBuilder.Entity<User>()
+            // .HasMany(m => m.PatientFamilyRelations)
+            // .WithOne(c => c.FamilyMember)
+            // .OnDelete(DeleteBehavior.Cascade);
+
+            //modelBuilder.Entity<User>()
+            //    .HasMany(m => m.PatientAllergies)
+            //    .WithOne(c => c.User)
+            //    .OnDelete(DeleteBehavior.Cascade);
+
+
+            //modelBuilder.Entity<QueueDisplay>()
+            //    .HasMany(m => m.Counter)
+            //    .WithOne()
+            //    .OnDelete(DeleteBehavior.Cascade);
 
 
             //modelBuilder.Entity<Province>()
@@ -329,7 +346,7 @@ namespace McDermott.Persistence.Context
         {
             try
             {
-                var currentUser = _httpContextAccessor.HttpContext.User.Identity.Name ?? "";
+                var currentUser = string.Empty;
 
                 var entries = ChangeTracker.Entries<BaseAuditableEntity>();
 

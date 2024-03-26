@@ -13,9 +13,9 @@
         [StringLength(200)]
         public string DayOfWeek { get; set; } = string.Empty;
 
-        public TimeSpan WorkFrom { get; set; } = DateTime.Now.TimeOfDay;
+        public TimeSpan WorkFrom { get; set; } = new TimeSpan(8, 0, 0);
 
-        public TimeSpan WorkTo { get; set; } = DateTime.Now.TimeOfDay;
+        public TimeSpan WorkTo { get; set; } = new TimeSpan(12, 0, 0);
 
         //public string WorkFromFormatString
         //{ get { return WorkFrom.ToString(string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator) ? @"HH\:mm" : @"hh\:mm"); } }

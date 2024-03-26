@@ -187,10 +187,13 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             var labTest = e;
 
-            if (GeneralConsultanService.Patient.Gender.Equals("Male"))
-                labTest.NormalRangeByGender = labTest.NormalRangeMale;
-            else
-                labTest.NormalRangeByGender = labTest.NormalRangeFemale;
+            if (GeneralConsultanService.Patient is not null && GeneralConsultanService.Patient.Gender is not null)
+            {
+                if (GeneralConsultanService.Patient.Gender.Equals("Male"))
+                    labTest.NormalRangeByGender = labTest.NormalRangeMale;
+                else
+                    labTest.NormalRangeByGender = labTest.NormalRangeFemale;
+            }
 
             labTest.LabUom ??= new LabUomDto();
 
@@ -235,6 +238,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     IsAddOrUpdateOrDeleteLabResult = false;
                 }
+
+                ToastService.ShowSuccess("Saved Successfully");
 
                 Loading = false;
             }
@@ -457,10 +462,13 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             LabResultDetails.ForEach(x =>
             {
-                if (GeneralConsultanService.Patient.Gender.Equals("Male"))
-                    x.LabTest.NormalRangeByGender = x.LabTest.NormalRangeMale;
-                else
-                    x.LabTest.NormalRangeByGender = x.LabTest.NormalRangeFemale;
+                if (GeneralConsultanService.Patient.Gender is not null)
+                {
+                    if (GeneralConsultanService.Patient.Gender.Equals("Male"))
+                        x.LabTest.NormalRangeByGender = x.LabTest.NormalRangeMale;
+                    else
+                        x.LabTest.NormalRangeByGender = x.LabTest.NormalRangeFemale;
+                }
             });
 
             switch (GeneralConsultanMedicalSupport.Status)

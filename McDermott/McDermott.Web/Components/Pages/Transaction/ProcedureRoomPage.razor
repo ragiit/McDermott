@@ -220,7 +220,8 @@
                                                                     <DxGridDataColumn FieldName="LabTest.Name" Caption="Parameter" />
                                                                     <DxGridDataColumn FieldName="LabTest.NormalRangeByGender" Caption="Normal Range" />
                                                                     <DxGridDataColumn FieldName="LabTest.LabUom.Name" Caption="UoM" />
-                                                                    <DxGridDataColumn FieldName="ResultValueType" Caption="Result" />
+                                                                    <DxGridDataColumn FieldName="Result" Caption="Result" />
+                                                                    <DxGridDataColumn FieldName="ResultType" Caption="Result Type" />
                                                                     <DxGridDataColumn FieldName="LabTest.ResultValueType" Caption="Result Type" />
                                                                     <DxGridDataColumn FieldName="LabTest.Remark" Caption="Remark" />
                                                                     <DxGridCommandColumn>
@@ -275,8 +276,8 @@
                                                                         </DxFormLayoutItem>
 
                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result" ColSpanMd="12">
-                                                                            <DxTextBox ReadOnly ShowValidationIcon="true" @bind-Text="@LabTest.NormalRangeByGender" NullText="Result" InputCssClass="fw-normal" />
-                                                                            <ValidationMessage For="@(() => LabTest.NormalRangeMale)" />
+                                                                            <DxTextBox ShowValidationIcon="true" @bind-Text="@LabResultDetail.Result" NullText="Result" InputCssClass="fw-normal" />
+                                                                            <ValidationMessage For="@(() => LabResultDetail.Result)" />
                                                                         </DxFormLayoutItem>
 
                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result Type" ColSpanMd="12">
@@ -285,9 +286,9 @@
                                                                                         NullText="Select Result Type..."
                                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                         FilteringMode="@DataGridFilteringMode.Contains"
-                                                                                        @bind-Value="@LabResultDetail.ResultValueType">
+                                                                                        @bind-Value="@LabResultDetail.ResultType">
                                                                             </DxComboBox>
-                                                                            <ValidationMessage For="@(()=> LabResultDetail.ResultValueType)"   />
+                                                                            <ValidationMessage For="@(()=> LabResultDetail.ResultType)"   />
                                                                         </DxFormLayoutItem>
 
                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Remark" ColSpanMd="12">

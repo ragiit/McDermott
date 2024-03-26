@@ -4,7 +4,9 @@
     {
         public long GeneralConsultanMedicalSupportId { get; set; }
         public long? LabTestId { get; set; }
-        public string? ResultValueType { get; set; }
+
+        public string? Result { get; set; }
+        public string? ResultType { get; set; }
 
         [SetToNull]
         public LabTest? LabTest { get; set; } = new();

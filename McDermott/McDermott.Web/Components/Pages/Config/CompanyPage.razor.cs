@@ -138,13 +138,14 @@ namespace McDermott.Web.Components.Pages.Config
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<CompanyDto>>();
-                    await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteCompanyRequest(ids: a.Select(x => x.Id).ToList()));
                 }
 
                 await LoadData();
             }
-            catch
+            catch (Exception ex)
             {
+                ex.HandleException(ToastService);
             }
         }
 

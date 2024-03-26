@@ -1,6 +1,7 @@
 ﻿using McDermott.Application.Interfaces.Repositories;
 using McDermott.Domain.Common;
 using McDermott.Persistence.Context;
+using Serilog;
 using System.Collections;
 
 namespace McDermott.Persistence.Repositories
@@ -53,8 +54,15 @@ namespace McDermott.Persistence.Repositories
 
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            try
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error");
+            }
         }
 
         protected virtual void Dispose(bool disposing)
