@@ -30,10 +30,27 @@
     </div>
     <div class="container-fluid">
         <div class="row">
-            @foreach (var view in getCount)
+            @foreach (var view in getCount.Take(2))
             {
-                var filteredQueues = kioskQueues.Where(q => q.ServiceKId == view.ServiceKId && q.ServiceId == view.ServiceId && (q.QueueStage == null || q.QueueStage == "call" || q.QueueStage == "present")).ToList();
-                var count = QueueNumber.Where(n =>n.ServicekId == view.ServiceKId && n.ServiceId == view.ServiceId).Select(x => x.NumberQueue).FirstOrDefault();
+                List<KioskQueueDto> filteredQueues = new();
+                
+                if (view.ServiceId == null && view.ServiceKId != null)
+                {
+                     filteredQueues = kioskQueues.Where(x => x.ServiceKId == view.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && (x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")).ToList();
+@*                     count = QueueNumber.Where(n => n.ServicekId == view.ServiceKId).Select(x => x.NumberQueue).OrderByDescending(x => x).FirstOrDefault();
+ *@
+                }
+                else if (view.ServiceId != null && view.ServiceKId != null)
+                {
+                     filteredQueues =  kioskQueues.Where(x => x.ServiceKId == view.ServiceKId && x.ServiceId == view.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date && (x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")).ToList();
+                    @* count = QueueNumber.Where(n => n.ServicekId == view.ServiceKId && n.ServiceId == view.ServiceId).Select(x => x.NumberQueue).FirstOrDefault(); *@
+
+                }
+                
+                @* var filteredQueues = kioskQueues.Where(q => q.ServiceKId == view.ServiceKId && q.ServiceId == view.ServiceId && (q.QueueStage == null || q.QueueStage == "call" || q.QueueStage == "present")).ToList(); *@
+                 @* count = filteredQueues.Where(n =>n.ServiceKId == view.ServiceKId).Select(x => x.QueueNumber).FirstOrDefault(); *@
+                var count = QueueNumber.Where(n => n.ServicekId == view.ServiceKId).OrderByDescending(x => x.CreateDate).Select(x => x.NumberQueue).LastOrDefault();
+
 
                 <div class="col-md-6">
                     <div class="card">

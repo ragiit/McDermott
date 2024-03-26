@@ -193,29 +193,29 @@
                                                 <div class="card-body">
                                                     <h4 class="mt fw-bold text-center">Number Queue</h4>
 
-                                                    <h1 class="mt-1 fw-bolder display-1 text-center"> @string.Format("{0:D3}", ViewQueue.QueueNumber)</h1>
+                                                    <h1 class="mt-1 fw-bolder display-1 text-center"> @string.Format("{0:D3}", ViewQueue?.QueueNumber)</h1>
 
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row justify-content-around mt-3">
+                                    @* <div class="row justify-content-around mt-3">
                                         <div class="col-md-5">
                                             <h4 class="fw-bold">Attending : </h4>
                                         </div>
                                         <div class="col-md-5">
                                             <h4 class="fw-bold">Your Position : </h4>
                                         </div>
-                                    </div>
+                                    </div> *@
                                     <div class="row mt-3 border-start-0 border-end-0 justify-content-center">
                                         <div class="col-md-10 align-self-center" ml-5>
                                             <div class="row justify-content-between">
                                                 <div class="col-md-4">
                                                     <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-trash" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Canceled" Click="@(() => OnCanceled(ViewQueue.Id))"></DxButton>
                                                 </div>
-                                                <div class="col-md-4">
+                                                @* <div class="col-md-4">
                                                     <DxButton RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-print" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Print"></DxButton>
-                                                </div>
+                                                </div> *@
                                                 <div class="col-md-4">
                                                     <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Closed" Click="OnCancel"></DxButton>
                                                 </div>

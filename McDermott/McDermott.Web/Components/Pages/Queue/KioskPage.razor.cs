@@ -305,11 +305,15 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 if (id != 0)
                 {
-                    await Mediator.Send(new DeleteKioskQueueRequest(id));
+                    var cekId = await Mediator.Send(new GetGeneralConsultanServiceQuery()); //get Data General Consultation
+                    var GId = cekId.Where(x => x.KioskQueueId == id).Select(x=>x.Id).FirstOrDefault(); //Get Id in General Consultation where KioskQueueId = id
+                    await Mediator.Send(new DeleteGeneralConsultanServiceRequest(GId)); //Delete Data in General Consultation where id
+
+                    await Mediator.Send(new DeleteKioskQueueRequest(id)); // delete data kioskQueue in id
                 }
                 showQueue = false;
                 FormKios = new();
-                ToastService.ShowError("Antrian Dibatalkan!!");
+                ToastService.ShowError("Canceled Queue!!");
                 ReloadPage();
             }
             catch (Exception ex)
@@ -426,7 +430,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
                     if (FormKios.ClassTypeId != null)
                     {
-                        var TodayQueu = KioskQueues.Where(x => x.ServiceId == checkId.ServiceId  && x.ClassTypeId == FormKios.ClassTypeId && x.CreatedDate.Value.Date == DateTime.Now.Date).ToList();
+                        var TodayQueu = KioskQueues.Where(x => x.ServiceId == checkId.ServiceId && x.ClassTypeId == FormKios.ClassTypeId && x.CreatedDate.Value.Date == DateTime.Now.Date).ToList();
                         if (TodayQueu.Count == 0)
                         {
                             FormQueue.QueueNumber = 1;
@@ -468,7 +472,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
                         }
                     }
-                    
+
                     // mendapatkan service counter Id
                     var skId = Services.Where(x => x.Id == checkId.ServiceId).Select(x => x.ServicedId).FirstOrDefault();
                     // Mengisi informasi antrian
@@ -480,7 +484,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
                     // Membuat KioskQueue baru
                     var QueueKioskId = await Mediator.Send(new CreateKioskQueueRequest(FormQueue));
-                    
+
                     ToastService.ShowSuccess("Number Queue is Generated Succces!!");
 
                     FormGeneral.PatientId = FormKios.PatientId;

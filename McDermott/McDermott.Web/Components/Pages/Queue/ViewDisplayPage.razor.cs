@@ -88,7 +88,24 @@ namespace McDermott.Web.Components.Pages.Queue
             //    //}
             //    InvokeAsync(StateHasChanged);
             //});
-            await hubConnection.StartAsync();
+            //await hubConnection.StartAsync();
+            var queues = await Mediator.Send(new GetQueueDisplayByIdQuery(DisplayId));
+            foreach (var i in queues.CounterIds)
+            {
+                var DataCounter = await Mediator.Send(new GetCounterByIdQuery(i));
+                var card = new CounterDto
+                {
+                    Id = i,
+                    Name = DataCounter.Name,
+                    ServiceKId = DataCounter.ServiceKId,
+                    ServiceId = DataCounter.ServiceId
+
+                };
+                getCount.Add(card);
+                var sa = getCount;
+                cId = DataCounter.Id;
+            }
+
             await LoadData();
 
             timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
@@ -110,25 +127,11 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 // Mengambil detail antrian berdasarkan ID tampilan
-                var queues = await Mediator.Send(new GetQueueDisplayByIdQuery(DisplayId));
+
                 var datakioskQueue = await Mediator.Send(new GetKioskQueueQuery());
                 QueueNumber = await Mediator.Send(new GetDetailQueueDisplay());
+
                 
-                foreach (var i in queues.CounterIds)
-                {
-                    var DataCounter = await Mediator.Send(new GetCounterByIdQuery(i));
-                    var card = new CounterDto
-                    {
-                        Id = i,
-                        Name = DataCounter.Name,
-                        ServiceKId = DataCounter.ServiceKId,
-                        ServiceId = DataCounter.ServiceId
-                        
-                    };
-                    getCount.Add(card);
-                    var sa = getCount;
-                    cId = DataCounter.Id;
-                }
                 kioskQueues = [.. datakioskQueue.Where(q => q.CreatedDate.Value.Date == DateTime.Now.Date)];
 
 

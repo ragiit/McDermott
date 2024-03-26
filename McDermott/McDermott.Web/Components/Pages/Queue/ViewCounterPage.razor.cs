@@ -37,7 +37,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private HubConnection hubConnection;
         private string NameCounter { get; set; } = string.Empty;
-        private string NameClasses { get; set; } 
+        private string NameClasses { get; set; }
         private string NameServices { get; set; } = string.Empty;
         private string NameServicesK { get; set; } = string.Empty;
         private string Phy { get; set; } = string.Empty;
@@ -45,6 +45,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private long? sId { get; set; }
         private long? PhysicianId { get; set; }
         private bool ShowPresent { get; set; }
+        private bool PanelVisible { get; set; } = true;
 
         [Parameter]
         public long CounterId { get; set; }
@@ -94,7 +95,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 userBy = us.Name;
 
                 ShowPresent = false;
-
+                PanelVisible = true;
                 var general = await Mediator.Send(new GetCounterByIdQuery(CounterId));
                 Services = await Mediator.Send(new GetServiceQuery());
                 var physician = await Mediator.Send(new GetUserQuery());
@@ -121,7 +122,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 }
                 foreach (var cl in KiosksQueue)
                 {
-                    var ClassId = KiosksQueue.Where(x=>x.ClassTypeId == cl.ClassTypeId).Select(x => x.ClassTypeId).FirstOrDefault();
+                    var ClassId = KiosksQueue.Where(x => x.ClassTypeId == cl.ClassTypeId).Select(x => x.ClassTypeId).FirstOrDefault();
                     var classList = GetClass.Where(x => x.Id == ClassId).FirstOrDefault();
                     if (classList == null)
                     {
@@ -141,6 +142,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
                 NameServices = sId != null ? Services.FirstOrDefault(x => x.Id == sId)?.Name : "-";
                 Phy = PhysicianId != null ? physician.FirstOrDefault(x => x.Id == PhysicianId && x.IsPhysicion)?.Name : "-";
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -163,6 +165,13 @@ namespace McDermott.Web.Components.Pages.Queue
                 e.Style = "background-color: rgba(0, 0, 0, 0.08)";
                 e.CssClass = "header-bold";
             }
+        }
+
+        private async Task Refresh_Click()
+        {
+
+            await LoadData();
+
         }
 
         public MarkupString GetIssueStageIconHtml(string status)
