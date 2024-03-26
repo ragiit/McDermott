@@ -2,6 +2,8 @@
 @page "/queue/viewdisplay/"
 @rendermode InteractiveServer
 
+<PageTitle>McHealthCare - View Display</PageTitle>
+
 <div class="wrapper">
     @* <section class="content"> *@
 
@@ -33,7 +35,7 @@
             @foreach (var view in getCount.Take(2))
             {
                 var filteredQueues = kioskQueues.Where(q => q.ServiceKId == view.ServiceKId && q.ServiceId == view.ServiceId && (q.QueueStage == null || q.QueueStage == "call" || q.QueueStage == "present")).ToList();
-                var count = QueueNumber.Where(n =>n.ServicekId == view.ServiceKId && n.ServiceId == view.ServiceId).Select(x => x.NumberQueue).FirstOrDefault();
+                var count = QueueNumber.Where(n => n.ServicekId == view.ServiceKId && n.ServiceId == view.ServiceId).Select(x => x.NumberQueue).FirstOrDefault();
 
                 <div class="col-md-6">
                     <div class="card">
