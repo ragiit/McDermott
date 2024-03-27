@@ -60,7 +60,9 @@
                 case "Report of patient visits by period":
                     await VisitByPeriode(FormReports);
                     break;
-
+                case "Report of patient visits by department":
+                    await VisitByDepartement(FormReports);
+                    break;
                 default:
                     break;
             }
@@ -246,6 +248,77 @@
                 totalPatiens += count;
 
                 namee.Add(item.Service?.Name!);
+
+                startRow++;
+            }
+
+            ws.Cells[3, 2].Value = totalPatiens;
+
+            await SaveFileToSpreadSheetml(pack, "Report of Patient visits by Period.xlsx");
+        }
+
+        private async Task VisitByDepartement(ReportDto FormRepots)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            var pack = new ExcelPackage();
+            var SheetTitle = FormReports.report;
+            ExcelWorksheet ws = pack.Workbook.Worksheets.Add(SheetTitle);
+
+            var cultureInfo = new System.Globalization.CultureInfo("en_US");
+
+            var header = new List<string>() { "Date", "Type Medical", "Patient Count" };
+
+            ws.Cells[1, 2].Value = FormReports.report;
+            ws.Cells[2, 1].Value = "Date Period";
+            ws.Cells[3, 1].Value = "Total number of Visits";
+            ws.Cells[4, 1].Value = "Departement Name";
+            ws.Cells[4, 2].Value = "Total Patiens";
+
+            ws.Cells[1, 2].Style.Font.Bold = true;
+            ws.Cells[2, 1].Style.Font.Bold = true;
+            ws.Cells[3, 1].Style.Font.Bold = true;
+            ws.Cells[2, 2].Style.Font.Bold = true;
+            ws.Cells[4, 1].Style.Font.Bold = true;
+            ws.Cells[4, 2].Style.Font.Bold = true;
+            ws.Cells[4, 3].Style.Font.Bold = true;
+
+            ws.Cells[1, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[2, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[2, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[3, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[4, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[4, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+            ws.Cells[4, 3].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+
+            // Set wrap text for column 1 and 2
+            ws.Column(1).Style.WrapText = true;
+            ws.Column(2).Style.WrapText = true;
+
+            ws.Cells[2, 2].Value = FormReports.StartDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo);
+
+            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.RegistrationDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.RegistrationDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
+
+            int startRow = 5;
+
+            var namee = new List<string>();
+
+            long totalPatiens = 0;
+
+            foreach (var item in generals)
+            {
+                if (namee.Contains(item.Patient?.Department?.Name!))
+                    continue;
+
+                long count = generals.Where(x => x.Patient.DepartmentId == item.Patient.DepartmentId && x.RegistrationDate.Date == item.RegistrationDate.Date).Count();
+
+                //ws.Cells[startRow, 1].Value = item.RegistrationDate.Date.ToString("dd/MM/yyyy");
+                ws.Cells[startRow, 1].Value = item.Patient?.Department?.Name;
+                ws.Cells[startRow, 2].Value = count;
+
+                totalPatiens += count;
+
+                namee.Add(item.Patient?.Department?.Name!);
 
                 startRow++;
             }
