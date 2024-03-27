@@ -1,5 +1,4 @@
 ﻿using OfficeOpenXml.Style;
-using System.Net;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -64,6 +63,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                     await VisitByPeriode(FormReports);
                     break;
 
+                case "Report of patient visits by diagnosis":
+                    await VisitByDiagnosis(FormReports);
+                    break;
+
                 default:
                     break;
             }
@@ -123,6 +126,61 @@ namespace McDermott.Web.Components.Pages.Transaction
         }
 
         #region Report
+
+        private async Task VisitByDiagnosis(ReportDto formReports)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            var pack = new ExcelPackage();
+            var SheetTitle = FormReports.report;
+            ExcelWorksheet ws = pack.Workbook.Worksheets.Add(SheetTitle);
+
+            var cultureInfo = new System.Globalization.CultureInfo("en_US");
+
+            var header = new List<string>() { "Diagnosis", "Total Patient" };
+
+            TemplateClinicName(ws);
+
+            ws.Cells[6, 1].Value = "Date Period";
+            ws.Cells[6, 2].Value = FormReports.StartDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo);
+            ws.Cells[7, 1].Value = "Total number of Visits";
+            ws.Cells[8, 1].Value = "Diagnosis Umum";
+
+            ws.Cells[10, 1].Value = header[0];
+            ws.Cells[10, 2].Value = header[1];
+            ws.Cells[10, 1].Style.Font.Bold = true;
+            ws.Cells[10, 2].Style.Font.Bold = true;
+            ws.Cells[6, 1].Style.Font.Bold = true;
+            ws.Cells[7, 1].Style.Font.Bold = true;
+            ws.Cells[8, 1].Style.Font.Bold = true;
+            ws.Cells[10, 1].AutoFitColumns();
+            ws.Cells[10, 2].AutoFitColumns();
+
+            ws.Cells[4, 2].AutoFitColumns();
+
+            int startRow = 11;
+            int count = 0;
+
+            //Query
+
+            var tableRange = ws.Cells[7, 1, 7 + count, 2];
+
+            // Create the table
+            var excelTable = ws.Tables.Add(tableRange, "Table");
+            excelTable.TableStyle = OfficeOpenXml.Table.TableStyles.Light1;
+
+            // Add borders to the table range
+            tableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+
+            // Add thick border to the header row
+            tableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+            await SaveFileToSpreadSheetml(pack, $"{FormReports.report}.xlsx");
+        }
 
         private async Task ReportMedicalPersonalLicence(ReportDto formReports)
         {
@@ -268,8 +326,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             ws.Cells[7, 1].Value = "Total number of Visits";
 
             ws.Cells[6, 1].Style.Font.Bold = true;
-            ws.Cells[7, 1].Style.Font.Bold = true;
-            ws.Cells[7, 1].Style.Font.Bold = true;
             ws.Cells[7, 1].Style.Font.Bold = true;
             ws.Cells[9, 3].Style.Font.Bold = true;
 

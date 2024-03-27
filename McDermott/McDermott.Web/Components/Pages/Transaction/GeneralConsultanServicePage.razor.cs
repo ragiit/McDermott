@@ -960,6 +960,9 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
 
+                var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
+                FormRegis = result[0];
+
                 ToastService.ShowSuccess("Cancelled..");
             }
             IsLoading = false;
