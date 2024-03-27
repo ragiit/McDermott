@@ -19,21 +19,25 @@ namespace McDermott.Application.Features.Services
         {
             try
             {
-                string cacheKey = $"USER_INFO";
+                string cacheKey = "USER_INFO";
 
-                if (!_cache.TryGetValue(cacheKey, out string result))
+                if (_cache.TryGetValue(cacheKey, out dynamic result))
                 {
-                    var user = JsonConvert.DeserializeObject<User>(Decrypt(result));
+                    if (result is not null && !string.IsNullOrWhiteSpace(result))
+                    {
+                        var user = JsonConvert.DeserializeObject<User>(Decrypt(result));
 
-                    var claimPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
-                    [
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        var claimPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
+                        [
+                            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Name)
-                    ], "CustomAuth"));
+                        ], "CustomAuth"));
 
-                    _httpContextAccessor.HttpContext.User = claimPrincipal;
+                        _httpContextAccessor.HttpContext.User = claimPrincipal;
 
-                    return await Task.FromResult(new AuthenticationState(claimPrincipal));
+                        return await Task.FromResult(new AuthenticationState(claimPrincipal));
+                    }
+                    return await Task.FromResult(new AuthenticationState(_));
                 }
                 else
                     return await Task.FromResult(new AuthenticationState(_));
@@ -80,16 +84,19 @@ namespace McDermott.Application.Features.Services
                     new Claim(ClaimTypes.NameIdentifier, User.Id.ToString()),
                     new Claim(ClaimTypes.Name, User.Name)
                 }, "CustomAuth"));
+
+                _httpContextAccessor.HttpContext.User = claims;
+
+                _cache.Set("USER_INFO", user, TimeSpan.FromDays(1));
+                NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claims)));
             }
             else
             {
                 //await _sessionStorage.DeleteAsync("us");
                 claims = _;
+                _cache.Remove("USER_INFO");
+                NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claims)));
             }
-
-            _httpContextAccessor.HttpContext.User = claims;
-
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claims)));
         }
     }
 }

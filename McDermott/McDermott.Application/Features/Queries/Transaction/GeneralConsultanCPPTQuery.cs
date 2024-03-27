@@ -129,14 +129,24 @@
         {
             try
             {
-                if (request.Id > 0)
+                if (request.DeleteByGeneralServiceId != 0)
                 {
-                    await _unitOfWork.Repository<GeneralConsultanCPPT>().DeleteAsync(request.Id);
-                }
+                    var list = await _unitOfWork.Repository<GeneralConsultanCPPT>().Entities.Where(x => x.GeneralConsultanServiceId == request.DeleteByGeneralServiceId).ToListAsync(cancellationToken);
 
-                if (request.Ids.Count > 0)
+                    await _unitOfWork.Repository<GeneralConsultanCPPT>().DeleteAsync(x => list.Select(z => z.Id).Contains(x.Id));
+                }
+                else
                 {
-                    await _unitOfWork.Repository<GeneralConsultanCPPT>().DeleteAsync(x => request.Ids.Contains(x.Id));
+
+                    if (request.Id > 0)
+                    {
+                        await _unitOfWork.Repository<GeneralConsultanCPPT>().DeleteAsync(request.Id);
+                    }
+
+                    if (request.Ids.Count > 0)
+                    {
+                        await _unitOfWork.Repository<GeneralConsultanCPPT>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                    }
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

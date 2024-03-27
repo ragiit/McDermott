@@ -11,14 +11,16 @@
         <div class="container-fluid">
 
             <h1><label>Home</label></h1>
-            <Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+          @*   <Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
                 <Authorized>
                     <p>Welcome, @context.User.Identity.Name. @Greeting</p>
                 </Authorized>
                 <NotAuthorized>
                     <p>Welcome, Anonymous!</p>
                 </NotAuthorized>
-            </Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+            </Microsoft.AspNetCore.Components.Authorization.AuthorizeView> *@
+
+            <p>Welcome, @UserLogin.Name. @Greeting</p>
 
             @* <DxButton Click="Test" Text="Test"></DxButton>
         <DxButton Click="Test2" Text="Test"></DxButton> *@
@@ -577,7 +579,6 @@
     [CascadingParameter]
     private Task<AuthenticationState> AuthenticationState { get; set; }
 
-    private GroupMenuDto UserAccessCRUID = new();
     private string Greeting = "";
 
     protected override async Task OnInitializedAsync()
@@ -585,6 +586,8 @@
         var aa = await AuthenticationState;
         var bb = aa.User.Identity.Name;
         SalesData2 = await Sales.GetSalesAsync();
+
+        await GetUserInfo();
 
         var hour = DateTime.Now.Hour;
 
@@ -595,15 +598,22 @@
         else
             Greeting = "Good Evening!";
 
-        try
-        {
-            var result = await NavigationManager.CheckAccessUser(oLocal);
-            IsAccess = result.Item1;
-            UserAccessCRUID = result.Item2;
-        }
-        catch { }
+        // try
+        // {
+        //     var result = await NavigationManager.CheckAccessUser(oLocal);
+        //     IsAccess = result.Item1;
+        //     UserAccessCRUID = result.Item2;
+        // }
+        // catch { }
     }
 
+    #region UserLoginAndAccessRole
+
+    [Inject]
+    public UserInfoService UserInfoService { get; set; }
+
+    private GroupMenuDto UserAccessCRUID = new();
+    private User UserLogin { get; set; } = new();
     private bool IsAccess = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -614,13 +624,25 @@
         {
             try
             {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
+                await GetUserInfo();
             }
             catch { }
         }
     }
+
+    private async Task GetUserInfo()
+    {
+        try
+        {
+            var user = await UserInfoService.GetUserInfo();
+            IsAccess = user.Item1;
+            UserAccessCRUID = user.Item2;
+            UserLogin = user.Item3;
+        }
+        catch { }
+    }
+
+    #endregion UserLoginAndAccessRole
 
     BlazoredTextEditor QuillHtml;
     BlazoredTextEditor QuillNative;

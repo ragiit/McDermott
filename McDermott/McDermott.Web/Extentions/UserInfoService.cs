@@ -40,7 +40,7 @@ namespace McDermott.Web.Extentions
 
                 var userAccessCRUID = groups?.FirstOrDefault(x => x.Menu?.Url != null && url.Contains(x.Menu.Url.ToLower()));
 
-                if (userAccessCRUID is null && url != _navigationManager.BaseUri)
+                if (!string.IsNullOrWhiteSpace(url) && userAccessCRUID is null && url != _navigationManager.BaseUri)
                 {
                     _navigationManager.NavigateTo("", true);
                 }
