@@ -116,9 +116,9 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.Kiosk.PhysicianId == general.PhysicianId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
                 }
-                else if (general.ServiceId != null && general.PhysicianId != null)
+                else if (general.ServiceId != null && general.PhysicianId != null )
                 {
-                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.Kiosk.PhysicianId == general.PhysicianId && x.ServiceId == general.ServiceId && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
+                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date &&( x.Kiosk.PhysicianId == general.PhysicianId || x.Kiosk.PhysicianId == null) && x.ServiceId == general.ServiceId && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
                 }
                 foreach (var cl in KiosksQueue)
                 {
