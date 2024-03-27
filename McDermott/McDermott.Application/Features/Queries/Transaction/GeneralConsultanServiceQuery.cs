@@ -25,8 +25,9 @@
                         .Include(z => z.Insurance)
                         .Include(z => z.Pratitioner)
                         .Include(z => z.ClassType)
-                        .Include(z => z.Patient)
-                        .ThenInclude(z => z.Gender)
+                        .Include(z => z.Patient!.Gender)
+                        .Include(z => z.Patient.Department)
+                        //.ThenInclude(z => z.Gender)
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
 
