@@ -343,52 +343,39 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             var cultureInfo = new System.Globalization.CultureInfo("en_US");
 
-            var header = new List<string>() { "Date", "Type Medical", "Patient Count" };
+            var header = new List<string>() { "Type Medical", "Patient Count" };
 
-            ws.Cells[1, 2].Value = FormReports.report;
-            ws.Cells[2, 1].Value = "Date Period";
-            ws.Cells[3, 1].Value = "Total number of Visits";
-            ws.Cells[4, 1].Value = "Departement Name";
-            ws.Cells[4, 2].Value = "Total Patiens";
+            TemplateClinicName(ws);
 
-            ws.Cells[1, 2].Style.Font.Bold = true;
-            ws.Cells[2, 1].Style.Font.Bold = true;
-            ws.Cells[3, 1].Style.Font.Bold = true;
-            ws.Cells[2, 2].Style.Font.Bold = true;
-            ws.Cells[4, 1].Style.Font.Bold = true;
-            ws.Cells[4, 2].Style.Font.Bold = true;
-            ws.Cells[4, 3].Style.Font.Bold = true;
+            ws.Cells[6, 1].Value = "Date Period";
+            ws.Cells[6, 2].Value = FormReports.StartDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo);
+            ws.Cells[7, 1].Value = "Total number of Visits";
 
-            ws.Cells[1, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[2, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[2, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[3, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[4, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[4, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-            ws.Cells[4, 3].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-
-            // Set wrap text for column 1 and 2
-            ws.Column(1).Style.WrapText = true;
-            ws.Column(2).Style.WrapText = true;
-
-            ws.Cells[2, 2].Value = FormReports.StartDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo);
+            ws.Cells[6, 1].Style.Font.Bold = true;
+            ws.Cells[7, 1].Style.Font.Bold = true;
+            ws.Cells[7, 1].Style.Font.Bold = true;
+            ws.Cells[7, 1].Style.Font.Bold = true;
+            ws.Cells[9, 2].Style.Font.Bold = true;
 
             var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.RegistrationDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.RegistrationDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
 
-            int startRow = 5;
+            ws.Cells[9, 1].Value = "Service";
+            ws.Cells[9, 2].Value = "Total Patients";
+
+            int startRow = 10;
 
             var namee = new List<string>();
 
             long totalPatiens = 0;
+            int counts = 0;
 
             foreach (var item in generals)
             {
                 if (namee.Contains(item.Patient?.Department?.Name!))
                     continue;
 
-                long count = generals.Where(x => x.Patient.DepartmentId == item.Patient.DepartmentId && x.RegistrationDate.Date == item.RegistrationDate.Date).Count();
+                long count = generals.Where(x => x.Patient?.DepartmentId == item.Patient?.DepartmentId && x.RegistrationDate.Date == item.RegistrationDate.Date).Count();
 
-                //ws.Cells[startRow, 1].Value = item.RegistrationDate.Date.ToString("dd/MM/yyyy");
                 ws.Cells[startRow, 1].Value = item.Patient?.Department?.Name;
                 ws.Cells[startRow, 2].Value = count;
 
@@ -397,11 +384,33 @@ namespace McDermott.Web.Components.Pages.Transaction
                 namee.Add(item.Patient?.Department?.Name!);
 
                 startRow++;
+                counts++;
             }
 
-            ws.Cells[3, 2].Value = totalPatiens;
+            ws.Cells[7, 2].Value = totalPatiens;
 
-            await SaveFileToSpreadSheetml(pack, "Report of Patient visits by Period.xlsx");
+            var tableRange = ws.Cells[9, 1, 9 + counts, 2];
+
+            // Create the table
+            var excelTable = ws.Tables.Add(tableRange, "Table");
+            excelTable.TableStyle = OfficeOpenXml.Table.TableStyles.Light1;
+
+            // Add borders to the table range
+            tableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+
+            // Add thick border to the header row
+            tableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            tableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+            ws.Cells[2, 2].AutoFitColumns();
+            ws.Cells[4, 2].AutoFitColumns();
+            ws.Cells[7, 1].AutoFitColumns();
+            ws.Cells[9, 2].AutoFitColumns();
+
+            await SaveFileToSpreadSheetml(pack, "Report of Patient visits by Departement.xlsx");
         }
 
         private async Task SaveFileToSpreadSheetml(ExcelPackage excelPackage, string title)
