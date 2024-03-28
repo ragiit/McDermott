@@ -52,7 +52,7 @@ namespace McDermott.Persistence.Migrations
                 column: "CounterId",
                 principalTable: "Counters",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.SetNull);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_DetailQueueDisplays_QueueDisplays_QueueDisplayId",
@@ -60,7 +60,7 @@ namespace McDermott.Persistence.Migrations
                 column: "QueueDisplayId",
                 principalTable: "QueueDisplays",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.SetNull);
         }
 
         /// <inheritdoc />
