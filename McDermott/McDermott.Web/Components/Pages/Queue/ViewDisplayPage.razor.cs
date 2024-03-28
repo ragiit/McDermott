@@ -25,7 +25,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         [Parameter]
         public long DisplayId { get; set; }
-
+        //private long? count { get; set; }
         private bool PanelVisible { get; set; } = true;
         public IGrid Grid { get; set; }
         private HubConnection hubConnection;
@@ -103,7 +103,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 };
                 getCount.Add(card);
                 var sa = getCount;
-                cId = DataCounter.Id;
+                cId = DataCounter.ServiceKId;
             }
 
             await LoadData();
@@ -130,8 +130,8 @@ namespace McDermott.Web.Components.Pages.Queue
 
                 var datakioskQueue = await Mediator.Send(new GetKioskQueueQuery());
                 QueueNumber = await Mediator.Send(new GetDetailQueueDisplay());
+               
 
-                
                 kioskQueues = [.. datakioskQueue.Where(q => q.CreatedDate.Value.Date == DateTime.Now.Date)];
 
 
