@@ -63,6 +63,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                     await VisitByPeriode(FormReports);
                     break;
 
+                case "Report of patient visits by diagnosis":
+                    await VisitByDiagnosis(FormReports);
+                    break;
+
+                case "Report of patient visits by department":
+                    await VisitByDepartement(FormReports);
+                    break;
+
                 default:
                     break;
             }
@@ -157,9 +165,28 @@ namespace McDermott.Web.Components.Pages.Transaction
             int startRow = 11;
             int count = 0;
 
-            //Query
+            var cppts = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.CreatedDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.CreatedDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
 
-            var tableRange = ws.Cells[7, 1, 7 + count, 2];
+            //Query
+            var namee = new List<string>();
+
+            foreach (var item in cppts)
+            {
+                if (item.Title.Equals("Diagnosis") && namee.Contains(item.Body))
+                    continue;
+
+                var c = cppts.Where(x => x.Body == item.Body && x.Title == item.Title).Select(x => x.Body).Distinct().Count();
+
+                ws.Cells[startRow, 1].Value = item.Body;
+                ws.Cells[startRow, 2].Value = c;
+
+                namee.Add(item.Body);
+                ws.Cells[startRow, 1].AutoFitColumns();
+                ws.Cells[startRow, 2].AutoFitColumns();
+                count++;
+            }
+
+            var tableRange = ws.Cells[10, 1, 10 + count, 2];
 
             // Create the table
             var excelTable = ws.Tables.Add(tableRange, "Table");
@@ -325,7 +352,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             ws.Cells[7, 1].Style.Font.Bold = true;
             ws.Cells[9, 3].Style.Font.Bold = true;
 
-            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.RegistrationDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.RegistrationDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
+            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.CreatedDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.CreatedDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
 
             ws.Cells[9, 1].Value = "Date";
             ws.Cells[9, 2].Value = "Service";

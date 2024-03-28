@@ -91,7 +91,7 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
                                                 <DxComboBox ShowValidationIcon="true"
-                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                             Data="@Provinces"
                                                             NullText="Select Province..."
                                                             @bind-Value="@a.ProvinceId"
@@ -102,14 +102,14 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
                                                 <DxComboBox ShowValidationIcon="true"
-                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                    Data="@Cities"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@Cities"
                                                             NullText="Select City..."
                                                             @bind-Value="@a.CityId"
                                                             TextFieldName="Name"
                                                             ValueFieldName="Id">
                                                 </DxComboBox>
-                                                <ValidationMessage For="@(()=>a.CityId)"/>
+                                                <ValidationMessage For="@(()=>a.CityId)" />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>

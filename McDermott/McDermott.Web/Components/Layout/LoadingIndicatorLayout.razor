@@ -1,12 +1,42 @@
-﻿<DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                CssClass="w-100"
-                IndicatorVisible="indicatorVisible"
-                IndicatorAreaVisible="indicatorAreaVisible"
-                Visible="true"
-                Text="Processing..."
-                TextAlignment="textAlignment">
-    <div style="min-height: 50px;"></div>
-</DxLoadingPanel>
+﻿<style>
+    .loading-panel-container {
+        position: relative;
+        height: 60vh; /* Menggunakan tinggi viewport untuk mengisi seluruh tinggi layar */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+    }
+
+    .loading-panel {
+        position: absolute;
+    }
+
+</style>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="loading-panel-container">
+                            <DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            CssClass="loading-panel"
+                                            IndicatorVisible="indicatorVisible"
+                                            IndicatorAreaVisible="indicatorAreaVisible"
+                                            Visible="true"
+                                            Text="Processing..."
+                                            TextAlignment="textAlignment">
+                                <div style="min-height: 50px;"></div>
+                            </DxLoadingPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 @code {
     bool indicatorVisible = true;

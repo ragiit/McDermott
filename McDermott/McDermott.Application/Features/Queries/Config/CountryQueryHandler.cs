@@ -16,7 +16,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                string cacheKey = $"GetCountryQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                string cacheKey = $"GetCountryQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique 
 
                 if (request.RemoveCache)
                     _cache.Remove(cacheKey);

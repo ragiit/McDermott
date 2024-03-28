@@ -2,18 +2,6 @@
 @rendermode InteractiveServer
 <PageTitle>McDermott - Transaction General Consultation Service</PageTitle>
 
-<style>
-    .highlighted-item > td {
-        background-color: rgba(245, 198, 203, 0.5);
-    }
-     .dxbl-wait-indicator {
-    --dxbl-wait-indicator-color: white;
-}
- .dxbl-btn.dxbl-lg {
-    --dxbl-btn-line-height: 1.5rem;
-}
-</style>
-
 @if (IsAccess)
 {
     <div class="wrapper">
@@ -1149,6 +1137,29 @@ NullText="Select Registration..."
         </section>
     </div>
 }
+else
+{
+    <div class="wrapper">
+         <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>General Consultation Service</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
+                            <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/clinic-service/general-consultation-service">General Consultan Service</a></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    </div>
+    }
+       <LoadingIndicatorLayout></LoadingIndicatorLayout>
 
 <DxPopup HeaderText="Refer To" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" CloseButtonClick="CloseReferTo" Width="90%">
     <EditForm Model="@FormRegis" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">

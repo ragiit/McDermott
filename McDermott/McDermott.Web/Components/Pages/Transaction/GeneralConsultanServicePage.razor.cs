@@ -800,8 +800,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             AllDiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
 
-            await GetUserInfo();
             await LoadData();
+            await GetUserInfo();
         }
 
         private void GetInsurancePhysician(long value)
@@ -1274,9 +1274,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsReferTo = false;
             PopUpVisible = false;
             PanelVisible = false;
-
-            if (Grid is not null)
-                Grid.AutoFitColumnWidths();
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
