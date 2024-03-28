@@ -632,6 +632,14 @@
         }
     </div>
 }
+else
+{
+     <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Patient Data" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    </div>
+}
 
 <DxPopup HeaderText="Insurance Policy" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%" Closed="OnClickCloseInsurancePolicyPopUp">
     <InsurancePolicyPage User="UserForm" IsPopUpForm="true"></InsurancePolicyPage>

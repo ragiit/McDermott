@@ -193,7 +193,7 @@
             {
                 if (i.IsKiosk == true && i.IsPatient == false)
                 {
-                    i.Flag = "Kiosk";
+                    i.Flag = "Counter";
                     if (i.ServicedId != null && i.ServicedId != 0)
                     {
                         i.KioskName = Services.Where(x => x.Id == i.ServicedId).Select(z => z.Name).FirstOrDefault();
@@ -217,7 +217,7 @@
                 }
                 else if (i.IsKiosk == true && i.IsPatient == true)
                 {
-                    i.Flag = " Patient, Kiosk";
+                    i.Flag = " Patient, Counter";
                     if (i.ServicedId != null && i.ServicedId != 0)
                     {
                         i.KioskName = Services.Where(x => x.Id == i.ServicedId).Select(z => z.Name).FirstOrDefault();
