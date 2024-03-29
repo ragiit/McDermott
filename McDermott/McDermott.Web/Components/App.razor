@@ -57,6 +57,18 @@
     <HeadOutlet @rendermode="InteractiveServer" />
 
     <style>
+        .loading-panel-container {
+            position: relative;
+            height: 60vh; /* Menggunakan tinggi viewport untuk mengisi seluruh tinggi layar */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .loading-panel {
+            position: absolute;
+        }
 
         .alt-item > td {
             background-color: rgba(0, 0, 0, 0.05);

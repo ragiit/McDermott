@@ -21,6 +21,23 @@ builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<UserInfoService>();
 
+
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultScheme = "CustomAuth";
+//    options.DefaultScheme = "CustomAuth";
+//    // Hapus baris berikut karena Anda tidak menggunakan skema tantangan
+//    // options.DefaultChallengeScheme = "CustomAuth";
+//}).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie("CustomAuth", options =>
+//{
+//    options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+//    options.SlidingExpiration = true;
+//    options.AccessDeniedPath = "/Home/Forbidden";
+//    options.LoginPath = "/Identity/Account/Login";
+//});
+//builder.Services.AddAuthorization();
+
+
 builder.Services.AddPersistenceLayer(builder.Configuration);
 
 Log.Logger = new LoggerConfiguration()
@@ -41,6 +58,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging();
 app.UseRouting();
+//app.UseAuthentication(); // Gunakan autentikasi
+//app.UseAuthorization();  // Gunakan otorisasi
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
