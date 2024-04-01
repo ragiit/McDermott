@@ -5,6 +5,7 @@
             <FocusOnNavigate RouteData="routeData" Selector="h1" />
         </Found>
         <NotFound>
+            <PageTitle>Not Found</PageTitle>
             <LayoutView Layout="@(typeof(Layout.MainLayout))">
                 <div class="full-height">
                     <div class="page-not-found">
@@ -13,6 +14,8 @@
                     </div>
                 </div>
             </LayoutView>
+            <!-- Tambahkan pesan sementara Not Found di bawah -->
+            <h1>Not Found</h1>
         </NotFound>
     </Router>
 </Microsoft.AspNetCore.Components.Authorization.CascadingAuthenticationState>

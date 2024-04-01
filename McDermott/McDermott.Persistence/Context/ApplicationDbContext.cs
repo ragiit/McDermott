@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace McDermott.Persistence.Context
 {
@@ -149,8 +150,8 @@ namespace McDermott.Persistence.Context
                 .WithMany();
 
             modelBuilder.Entity<User>()
-            .HasOne(e => e.Department)
-            .WithMany();
+                .HasOne(e => e.Department)
+                .WithMany();
 
             //modelBuilder.Entity<User>()
             // .HasMany(m => m.PatientFamilyRelations)
@@ -347,7 +348,10 @@ namespace McDermott.Persistence.Context
         {
             try
             {
-                var currentUser = string.Empty;
+                var bb = _httpContextAccessor;
+                var a = _httpContextAccessor.HttpContext.User;
+
+                var currentUser = _httpContextAccessor is null ? string.Empty : _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name); ;
 
                 var entries = ChangeTracker.Entries<BaseAuditableEntity>();
 

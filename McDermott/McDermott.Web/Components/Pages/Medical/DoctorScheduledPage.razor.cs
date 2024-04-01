@@ -549,6 +549,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             ShowForm = true;
             DoctorScheduleDetails.Clear();
+            ServiceId = null;
             DoctorSchedule = new();
         }
 
@@ -580,6 +581,7 @@ namespace McDermott.Web.Components.Pages.Medical
             try
             {
                 DoctorSchedule = SelectedDataItems[0].Adapt<DoctorScheduleDto>();
+                ServiceId = DoctorSchedule.ServiceId;
                 ShowForm = true;
 
                 if (DoctorSchedule != null)

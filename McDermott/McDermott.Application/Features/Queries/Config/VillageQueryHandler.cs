@@ -62,6 +62,7 @@ namespace McDermott.Application.Features.Queries.Config
             }
         }
 
+
         #endregion GET
 
         #region CREATE

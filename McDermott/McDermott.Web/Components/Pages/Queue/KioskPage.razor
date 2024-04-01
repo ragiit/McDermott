@@ -4,7 +4,7 @@
 @inject NavigationManager NavigationManager
 
 <PageTitle>McHealthCare - Queue Kiosk</PageTitle>
- @if (IsAccess)
+@if (IsAccess)
 {
     @if (Id != 0)
     {
@@ -39,33 +39,36 @@
                                                 <DxFormLayout CssClass="mt w-100">
                                                     <DxFormLayoutItem Caption="Search type" ColSpanMd="12">
                                                         <DxComboBox Data="@type" NullText="Search type .."
-                                                                    @bind-Value="@FormKios.Type"></DxComboBox>
+                                                                    @bind-Value="@FormKios.Type"
+                                                                    SelectedItemChanged="@((string city) => SelectedItemChanged(city))"></DxComboBox>
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem Caption="Number" ColSpanMd="12">
-                                                        <Template>
-                                                            <DxGridLayout>
-                                                                <Rows>
-                                                                    <DxGridLayoutRow />
-                                                                </Rows>
-                                                                <Columns>
-                                                                    <DxGridLayoutColumn Width="25fr" />
-                                                                    <DxGridLayoutColumn Width="5fr" />
-                                                                </Columns>
-                                                                <Items>
-                                                                    <DxGridLayoutItem Row="0" Column="0" CssClass="mt ">
-                                                                        <Template>
-                                                                            <DxTextBox @bind-Text="@FormKios.NumberType" NullText="Number Type..." CssClass="" ShowValidationIcon="true"></DxTextBox>
-                                                                        </Template>
-                                                                    </DxGridLayoutItem>
-                                                                    <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
-                                                                        <Template>
-                                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search" SubmitFormOnClick="true" Click="OnSearch"></DxButton>
-                                                                        </Template>
-                                                                    </DxGridLayoutItem>
-                                                                </Items>
-                                                            </DxGridLayout>
-                                                        </Template>
-                                                    </DxFormLayoutItem>
+                                                   
+                                                        <DxFormLayoutItem Caption="@captions" ColSpanMd="12">
+                                                            <Template>
+                                                                <DxGridLayout>
+                                                                    <Rows>
+                                                                        <DxGridLayoutRow />
+                                                                    </Rows>
+                                                                    <Columns>
+                                                                        <DxGridLayoutColumn Width="25fr" />
+                                                                        <DxGridLayoutColumn Width="5fr" />
+                                                                    </Columns>
+                                                                    <Items>
+                                                                        <DxGridLayoutItem Row="0" Column="0" CssClass="mt ">
+                                                                            <Template>
+                                                                                <DxTextBox @bind-Text="@FormKios.NumberType" NullText="Number Type..." CssClass="" ShowValidationIcon="true"></DxTextBox>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                                            <Template>
+                                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search" SubmitFormOnClick="true" Click="OnSearch" CssClass="w-100 me-1"></DxButton>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                    </Items>
+                                                                </DxGridLayout>
+                                                            </Template>
+                                                        </DxFormLayoutItem>
+                                                    
                                                     @if (showForm)
                                                     {
                                                         @if (NamePatient != null)
@@ -95,7 +98,8 @@
                                                                     }
                                                                 </DxFormLayoutItem>
                                                             }
-                                                            @if(showClass){
+                                                            @if (showClass)
+                                                            {
                                                                 <DxFormLayoutItem Caption="Patient Class" ColSpanMd="12">
                                                                     <DxComboBox Data="@classTypes"
                                                                                 FilteringMode="@DataGridFilteringMode.Contains"
@@ -201,14 +205,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @* <div class="row justify-content-around mt-3">
-                                        <div class="col-md-5">
-                                            <h4 class="fw-bold">Attending : </h4>
-                                        </div>
-                                        <div class="col-md-5">
-                                            <h4 class="fw-bold">Your Position : </h4>
-                                        </div>
-                                    </div> *@
+
                                     <div class="row mt-3 border-start-0 border-end-0 justify-content-center">
                                         <div class="col-md-10 align-self-center" ml-5>
                                             <div class="row justify-content-between">
@@ -216,8 +213,8 @@
                                                     <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-trash" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Canceled" Click="@(() => OnCanceled(ViewQueue.Id))"></DxButton>
                                                 </div>
                                                 @* <div class="col-md-4">
-                                                    <DxButton RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-print" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Print"></DxButton>
-                                                </div> *@
+                                    <DxButton RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-print" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Print"></DxButton>
+                                    </div> *@
                                                 <div class="col-md-4">
                                                     <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Closed" Click="OnCancel"></DxButton>
                                                 </div>
@@ -233,4 +230,13 @@
 
         }
     }
+
+}
+else
+{
+    <div class="wrapper">
+        @* <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Kiosk" /> *@
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    </div>
 }

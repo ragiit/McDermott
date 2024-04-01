@@ -27,7 +27,7 @@ namespace McDermott.Persistence.Migrations
                 column: "ClassTypeId",
                 principalTable: "ClassTypes",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.SetNull);
         }
 
         /// <inheritdoc />

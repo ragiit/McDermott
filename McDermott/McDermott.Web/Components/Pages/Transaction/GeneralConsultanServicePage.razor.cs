@@ -590,7 +590,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     if (title.Equals("Plan"))
                         title = "Planning";
-                    else if (title.Equals(""))
+                    else if (title.Equals("NursingDiagnosis"))
                         title = "Nurse Diagnosis";
 
                     temps.Add(new GeneralConsultanCPPTDto
@@ -800,8 +800,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             AllDiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
 
-            await GetUserInfo();
             await LoadData();
+            await GetUserInfo();
         }
 
         private void GetInsurancePhysician(long value)
@@ -1190,7 +1190,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                                     GeneralConsultantClinical = await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
                                 }
 
-                                await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(ids: AllGeneralConsultanCPPTs.Select(x => x.Id).ToList()));
+                                await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: FormRegis.Id));
 
                                 GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
                                 await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
@@ -1210,7 +1210,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                                 FormRegis = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
 
-                                await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(ids: AllGeneralConsultanCPPTs.Select(x => x.Id).ToList()));
+                                await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: FormRegis.Id));
 
                                 GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
                                 await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
@@ -1274,9 +1274,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsReferTo = false;
             PopUpVisible = false;
             PanelVisible = false;
-
-            if (Grid is not null)
-                Grid.AutoFitColumnWidths();
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)

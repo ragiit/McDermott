@@ -171,13 +171,8 @@
             Departments = await Mediator.Send(new GetDepartmentQuery());
             JobPositions = await Mediator.Send(new GetJobPositionQuery());
 
-            try
-            {
-                await GetUserInfo();
-            }
-            catch { }
-
             await LoadData();
+            await GetUserInfo();
         }
 
         private async Task OnSave()

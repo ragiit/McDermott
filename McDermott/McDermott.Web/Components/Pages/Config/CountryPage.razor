@@ -35,7 +35,7 @@
                                             EditMode="GridEditMode.PopupEditForm"
                                             PopupEditFormCssClass="pw-800"
                                             PagerPosition="GridPagerPosition.Bottom"
-                                            PageSizeSelectorVisible="true"
+                                                PageSizeSelectorVisible="true"
                                             PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                             PageSizeSelectorAllRowsItemVisible="true"
                                             PagerSwitchToInputBoxButtonCount="10"
@@ -117,5 +117,13 @@
                 </div>
             </div>
         </section>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Country" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>
 }

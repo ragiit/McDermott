@@ -1,12 +1,30 @@
-﻿<DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                CssClass="w-100"
-                IndicatorVisible="indicatorVisible"
-                IndicatorAreaVisible="indicatorAreaVisible"
-                Visible="true"
-                Text="Processing..."
-                TextAlignment="textAlignment">
-    <div style="min-height: 50px;"></div>
-</DxLoadingPanel>
+﻿<style>
+
+</style>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="loading-panel-container">
+                            <DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            CssClass="loading-panel"
+                                            IndicatorVisible="indicatorVisible"
+                                            IndicatorAreaVisible="indicatorAreaVisible"
+                                            Visible="true"
+                                            Text="Processing..."
+                                            TextAlignment="textAlignment">
+                                <div style="min-height: 50px;"></div>
+                            </DxLoadingPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 @code {
     bool indicatorVisible = true;

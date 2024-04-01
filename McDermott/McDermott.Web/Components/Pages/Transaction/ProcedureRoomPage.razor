@@ -103,16 +103,18 @@
                                 </div>
                             </div>
 
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="w-100">
-                                        <div class="col align-self-center">
-                                            <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary" Enabled="@(!GeneralConsultanMedicalSupport.Status.Equals("Finish") && !Loading)"></DxButton>
-                                            @* <DxButton IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancelConfirm" RenderStyle="ButtonRenderStyle.Danger"></DxButton>  *@
+                            @if (GeneralConsultanMedicalSupport.Status is not null && !GeneralConsultanMedicalSupport.Status.Equals("Finish"))
+                            {
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="w-100">
+                                            <div class="col align-self-center">
+                                                <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary" Enabled="@(!GeneralConsultanMedicalSupport.Status.Equals("Finish") && !Loading)"></DxButton>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            }
 
                             <div class="card">
                                 <div class="card-body">
@@ -136,7 +138,7 @@
                                                 <DxFormLayoutGroup ColSpanMd="12" Caption="Lab Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                                                     <Items>
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
-                                                            <DxComboBox ShowValidationIcon="true" Data="@Doctors"
+                                                            <DxComboBox ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals("Finish"))" ShowValidationIcon="true" Data="@Doctors"
                                                                         NullText="Select Practitioner..."
                                                                         @bind-Value="@GeneralConsultanMedicalSupport.PractitionerLabEximinationId"
                                                                         TextFieldName="Name"
@@ -224,20 +226,23 @@
                                                                     <DxGridDataColumn FieldName="ResultType" Caption="Result Type" />
                                                                     <DxGridDataColumn FieldName="LabTest.ResultValueType" Caption="Result Type" />
                                                                     <DxGridDataColumn FieldName="LabTest.Remark" Caption="Remark" />
-                                                                    <DxGridCommandColumn>
-                                                                        <HeaderTemplate>
-                                                                            @* <DxButton Text="New" Click="@(() => GridLabTest.StartEditNewRowAsync())"></DxButton> *@
-                                                                            <a class="fa-solid fa-plus" @onclick="@(async () => await AddNewLabResult())" style="text-decoration: none;" href="javascript:void(0);"></a>
-                                                                        </HeaderTemplate>
-                                                                        <CellDisplayTemplate>
-                                                                            <a class="fa-solid fa-pen-to-square text-warning" @onclick="@(async () => await EditLabResult(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
-                                                                            <a class="fa-solid fa-trash text-danger" @onclick="@(() => GridLabTest.ShowDataItemDeleteConfirmation(context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
-                                                                            @* <DxButton Text="Edit" Click="@(() => GridLabTest.StartEditRowAsync(context.VisibleIndex))"></DxButton>
+                                                                    @if (GeneralConsultanMedicalSupport.Status is not null && !GeneralConsultanMedicalSupport.Status.Equals("Finish"))
+                                                                    {
+                                                                        <DxGridCommandColumn>
+                                                                            <HeaderTemplate>
+                                                                                @* <DxButton Text="New" Click="@(() => GridLabTest.StartEditNewRowAsync())"></DxButton> *@
+                                                                                <a r class="fa-solid fa-plus" @onclick="@(async () => await AddNewLabResult())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                                                                            </HeaderTemplate>
+                                                                            <CellDisplayTemplate>
+                                                                                <a class="fa-solid fa-pen-to-square text-warning" @onclick="@(async () => await EditLabResult(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                                                                                <a class="fa-solid fa-trash text-danger" @onclick="@(() => GridLabTest.ShowDataItemDeleteConfirmation(context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                                                                                @* <DxButton Text="Edit" Click="@(() => GridLabTest.StartEditRowAsync(context.VisibleIndex))"></DxButton>
                                                                     <DxButton Text="Delete" Click="@(() => GridLabTest.ShowDataItemDeleteConfirmation(context.DataItem))"></DxButton> *@
-                                                                            @* <a class="oi oi-pencil" @onclick="@(() => GridLabTest.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                                                                                @* <a class="oi oi-pencil" @onclick="@(() => GridLabTest.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
                                                                     <a class="oi oi-x" @onclick="@(() => GridLabTest.ShowDataItemDeleteConfirmation(context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a> *@
-                                                                        </CellDisplayTemplate>
-                                                                    </DxGridCommandColumn>
+                                                                            </CellDisplayTemplate>
+                                                                        </DxGridCommandColumn>
+                                                                    }
                                                                 </Columns>
                                                                 <EditFormTemplate Context="EditFormContext22">
                                                                     @*   @{
@@ -305,7 +310,7 @@
                                                 <DxFormLayoutGroup ColSpanMd="12" Caption="Radiology Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                                                     <Items>
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
-                                                            <DxComboBox ShowValidationIcon="true" Data="@Doctors"
+                                                            <DxComboBox ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals("Finish"))" ShowValidationIcon="true" Data="@Doctors"
                                                                         NullText="Select Practitioner..."
                                                                         @bind-Value="@GeneralConsultanMedicalSupport.PractitionerRadiologyEximinationId"
                                                                         TextFieldName="Name"
@@ -314,7 +319,7 @@
                                                             <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerRadiologyEximinationId)" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
-                                                            <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.RadiologyEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            <DxTextBox ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals("Finish"))" @bind-Text="@GeneralConsultanMedicalSupport.RadiologyEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
                                                             <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.RadiologyEximinationAttachment"
@@ -339,6 +344,7 @@
                                                                         NullText="Select Practitioner..."
                                                                         @bind-Value="@GeneralConsultanMedicalSupport.PractitionerAlcoholEximinationId"
                                                                         TextFieldName="Name"
+                                                                        ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals("Finish"))"
                                                                         ValueFieldName="Id">
                                                             </DxComboBox>
                                                             <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerAlcoholEximinationId)" />
@@ -373,6 +379,7 @@
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
                                                             <DxComboBox ShowValidationIcon="true" Data="@Doctors"
                                                                         NullText="Select Practitioner..."
+                                                                        ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals("Finish"))"
                                                                         @bind-Value="@GeneralConsultanMedicalSupport.PractitionerDrugEximinationId"
                                                                         TextFieldName="Name"
                                                                         ValueFieldName="Id">
@@ -409,6 +416,7 @@
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
                                                             <DxComboBox ShowValidationIcon="true" Data="@Doctors"
                                                                         NullText="Select Practitioner..."
+                                                                        ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals("Finish"))"
                                                                         @bind-Value="@GeneralConsultanMedicalSupport.PractitionerECGId"
                                                                         TextFieldName="Name"
                                                                         ValueFieldName="Id">
@@ -461,5 +469,31 @@
                 </div>
             </div>
         </section>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+<<<<<<< HEAD
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Procedure Room" />
+=======
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Procedure Room</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
+                            <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/clinic-service/procedure-room">Procedure Room</a></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+>>>>>>> 0494af93f4ac9364bdb6c5bb2c2e5a5161ced4e1
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>
 }

@@ -31,13 +31,13 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.CounterId,
                         principalTable: "Counters",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_DetailQueueDisplays_QueueDisplays_QueueDisplayId",
                         column: x => x.QueueDisplayId,
                         principalTable: "QueueDisplays",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateIndex(

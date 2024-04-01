@@ -13,11 +13,14 @@
         background-color: aliceblue;
     }
 
-        .cards:hover {
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-            transform: scaleX(1.1);
-        }
+    }
+
+    .cards:hover {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        transform: scaleX(1.1);
+    }
 </style>
+@if(IsAccess){
 <div class="wrapper ml-2 mr-2">
     <section class="content-header">
         <div class="container-fluid">
@@ -204,4 +207,13 @@
             </div>
         </div>
     </section>
-</div>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Counter" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    </div>
+}

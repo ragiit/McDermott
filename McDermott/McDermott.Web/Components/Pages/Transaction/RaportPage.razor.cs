@@ -66,6 +66,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                     await VisitByDepartement(FormReports);
                     break;
 
+                case "Report of patient visits by diagnosis":
+                    await VisitByDiagnosis(FormReports);
+                    break;
+
+                case "Report of patient visits by department":
+                    await VisitByDepartement(FormReports);
+                    break;
+
                 default:
                     break;
             }
@@ -160,9 +168,28 @@ namespace McDermott.Web.Components.Pages.Transaction
             int startRow = 11;
             int count = 0;
 
-            //Query
+            var cppts = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.CreatedDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.CreatedDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
 
-            var tableRange = ws.Cells[7, 1, 7 + count, 2];
+            //Query
+            var namee = new List<string>();
+
+            foreach (var item in cppts)
+            {
+                if (item.Title.Equals("Diagnosis") && namee.Contains(item.Body))
+                    continue;
+
+                var c = cppts.Where(x => x.Body == item.Body && x.Title == item.Title).Select(x => x.Body).Distinct().Count();
+
+                ws.Cells[startRow, 1].Value = item.Body;
+                ws.Cells[startRow, 2].Value = c;
+
+                namee.Add(item.Body);
+                ws.Cells[startRow, 1].AutoFitColumns();
+                ws.Cells[startRow, 2].AutoFitColumns();
+                count++;
+            }
+
+            var tableRange = ws.Cells[10, 1, 10 + count, 2];
 
             // Create the table
             var excelTable = ws.Tables.Add(tableRange, "Table");
@@ -191,20 +218,28 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             var cultureInfo = new System.Globalization.CultureInfo("en_US");
 
-            var header = new List<string>() { "Name of Medical Personal", "Licence Validity Period" };
+            var header = new List<string>() { "Name of Medical Personal", "Practice Licence Number", "Licence Validity Period" };
 
             TemplateClinicName(ws);
 
+            //Tambahkan gambar ke file Excel
+            var picture1 = ws.Drawings.AddPicture("Image1", new FileInfo("wwwroot\\mcdermott_logo.png"));
+            picture1.From.Column = 1; // Kolom 1
+            picture1.From.Row = 1; // Baris 1
+            picture1.SetSize(100, 100); // Atur ukuran gambar (opsional)
+
             ws.Cells[7, 1].Value = header[0];
             ws.Cells[7, 2].Value = header[1];
+            ws.Cells[7, 3].Value = header[2];
 
             ws.Cells[7, 1].Style.Font.Bold = true;
             ws.Cells[7, 2].Style.Font.Bold = true;
+            ws.Cells[7, 3].Style.Font.Bold = true;
 
             ws.Cells[4, 2].AutoFitColumns();
             ws.Cells[7, 1].AutoFitColumns();
 
-            var users = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true));
+            var users = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
 
             int startRow = 8;
 
@@ -217,26 +252,27 @@ namespace McDermott.Web.Components.Pages.Transaction
                     if (item.SipExp is not null)
                     {
                         ws.Cells[startRow, 1].Value = item.Name;
-                        ws.Cells[startRow, 2].Value = item.SipExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
+                        ws.Cells[startRow, 2].Value = item.SipNo;
+                        ws.Cells[startRow, 3].Value = item.SipExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
 
                         startRow++;
                         count++;
                     }
                 }
-                else if (item.IsNurse)
-                {
-                    if (item.StrExp is not null)
-                    {
-                        ws.Cells[startRow, 1].Value = item.Name;
-                        ws.Cells[startRow, 2].Value = item.StrExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
+                //else if (item.IsNurse)
+                //{
+                //    if (item.StrExp is not null)
+                //    {
+                //        ws.Cells[startRow, 1].Value = item.Name;
+                //        ws.Cells[startRow, 2].Value = item.StrExp.GetValueOrDefault().ToString("dd/MM/yyyy", cultureInfo);
 
-                        startRow++;
-                        count++;
-                    }
-                }
+                //        startRow++;
+                //        count++;
+                //    }
+                //}
             }
 
-            var tableRange = ws.Cells[7, 1, 7 + count, 2];
+            var tableRange = ws.Cells[7, 1, 7 + count, 3];
 
             // Create the table
             var excelTable = ws.Tables.Add(tableRange, "Table");
@@ -270,6 +306,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             ws.Cells[3, 2].Style.Font.Bold = true;
             ws.Cells[4, 1].Style.Font.Bold = true;
             ws.Cells[5, 1].Style.Font.Bold = true;
+            ws.Cells[2, 2, 2, 3].Merge = true;
+            ws.Cells[3, 2, 3, 3].Merge = true;
         }
 
         private async Task VisitByPeriode(ReportDto FormReports)
@@ -328,7 +366,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             ws.Cells[7, 1].Style.Font.Bold = true;
             ws.Cells[9, 3].Style.Font.Bold = true;
 
-            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.RegistrationDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.RegistrationDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
+            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.CreatedDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.CreatedDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
 
             ws.Cells[9, 1].Value = "Date";
             ws.Cells[9, 2].Value = "Service";

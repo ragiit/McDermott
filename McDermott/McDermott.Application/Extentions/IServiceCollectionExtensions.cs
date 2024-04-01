@@ -1,5 +1,6 @@
 ﻿using McDermott.Application.Features.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -13,6 +14,7 @@ namespace McDermott.Application.Extentions
 
             services.AddScoped<IUserService, UserService>();
 
+            services.AddScoped<ProtectedSessionStorage>();
             services.AddScoped<CustomAuthenticationStateProvider>();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 

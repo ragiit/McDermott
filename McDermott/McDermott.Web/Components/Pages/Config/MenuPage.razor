@@ -106,7 +106,7 @@
                                                 <DxSpinEdit ShowValidationIcon="true" MinValue="0" @bind-Value="@a.Sequence" NullText="Sequence" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="URL" ColSpanMd="12">
-                                                <DxTextBox ReadOnly="a.Id != 0"  @bind-Text="@a.Url" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Url" />
+                                                <DxTextBox ReadOnly="a.Id != 0" @bind-Text="@a.Url" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Url" />
                                                 <ValidationMessage For="@(()=> a.Url)"   />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
@@ -118,5 +118,13 @@
                 </div>
             </div>
         </section>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Menu" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>
 }
