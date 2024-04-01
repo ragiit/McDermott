@@ -70,10 +70,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                     await VisitByDiagnosis(FormReports);
                     break;
 
-                case "Report of patient visits by department":
-                    await VisitByDepartement(FormReports);
-                    break;
-
                 default:
                     break;
             }
