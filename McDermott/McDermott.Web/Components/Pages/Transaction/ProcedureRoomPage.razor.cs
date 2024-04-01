@@ -87,11 +87,11 @@ namespace McDermott.Web.Components.Pages.Transaction
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+            await GetUserInfo();
 
             LabTests = await Mediator.Send(new GetLabTestQuery());
             Doctors = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
 
-            await GetUserInfo();
             await LoadData();
         }
 

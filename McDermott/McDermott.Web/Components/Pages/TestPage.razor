@@ -1,0 +1,44 @@
+﻿@page "/test"
+@using DevExpress.Data.Linq
+@using Microsoft.AspNetCore.Authorization
+@* @attribute [Authorize(AuthenticationSchemes = "CustomAuth")] // Menentukan skema otentikasi *@
+@inherits OwningComponentBase
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+
+<h3>TestPage</h3>
+
+<DxGrid @ref="Grid"
+        Data="Data"
+        ShowGroupPanel="true"
+        VirtualScrollingEnabled="VirtualScrollingEnabled" PageSize="20"
+        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always" CssClass="ch-480"
+        KeyboardNavigationEnabled="true">
+    <Columns>
+        <DxGridDataColumn FieldName="Name" MinWidth="80" Width="10%" />
+    </Columns>
+</DxGrid>
+@code {
+    bool VirtualScrollingEnabled { get; set; } = true;
+    IGrid Grid { get; set; }
+    object Data { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Grid.WaitForDataLoadAsync();
+            Grid.ExpandGroupRow(1);
+            await Grid.WaitForDataLoadAsync();
+            Grid.ExpandGroupRow(2);
+        }
+    }
+}

@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Components.Routing;
+﻿using McDermott.Application.Features.Services;
+using Microsoft.AspNetCore.Components.Routing;
 
 namespace McDermott.Web.Components.Layout
 {
     public partial class MainLayout
     {
+        [Inject]
+        public CustomAuthenticationStateProvider CustomAuth { get; set; }
+
         private List<MenuDto> HeaderMenuDtos = [];
         private List<MenuDto> DetailMenuDtos = [];
         private User? User = new();
@@ -13,6 +17,9 @@ namespace McDermott.Web.Components.Layout
         private async Task OnClickLogout()
         {
             await JsRuntime.InvokeVoidAsync("deleteCookie", CookieHelper.USER_INFO);
+
+            var a = (CustomAuthenticationStateProvider)CustomAuth;
+            await a.UpdateAuthState(string.Empty);
 
             NavigationManager.NavigateTo("/login", true);
         }

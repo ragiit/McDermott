@@ -1,6 +1,9 @@
 ﻿@page "/"
 @using System.Drawing
+@using McDermott.Application.Features.Services
 @using Microsoft.AspNetCore.Components.Authorization
+
+@inject CustomAuthenticationStateProvider CustomAuth
 
 <PageTitle>McHealthCare</PageTitle>
 
@@ -11,14 +14,14 @@
         <div class="container-fluid">
 
             <h1><label>Home</label></h1>
-          @*   <Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
-                <Authorized>
-                    <p>Welcome, @context.User.Identity.Name. @Greeting</p>
-                </Authorized>
-                <NotAuthorized>
-                    <p>Welcome, Anonymous!</p>
-                </NotAuthorized>
-            </Microsoft.AspNetCore.Components.Authorization.AuthorizeView> *@
+            @*  <Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+        <Authorized>
+        <p>Welcome, @context.User.Identity.Name. @Greeting</p>
+        </Authorized>
+        <NotAuthorized>
+        <p>Welcome, Guest!</p>
+        </NotAuthorized>
+        </Microsoft.AspNetCore.Components.Authorization.AuthorizeView> *@
 
             <p>Welcome, @UserLogin.Name. @Greeting</p>
 
@@ -313,6 +316,28 @@
         </div>
     </div>
 }
+else
+{
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="loading-panel-container">
+                        <DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                        CssClass="loading-panel"
+                                        IndicatorVisible="true"
+                                        IndicatorAreaVisible="true"
+                                        Visible="true"
+                                        Text="Processing..."
+                                        TextAlignment="LoadingPanelTextAlignment.Right">
+                            <div style="min-height: 50px;"></div>
+                        </DxLoadingPanel>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
 @* <div class="card">
     <div class="card-body">
         <div class="container">
@@ -583,9 +608,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var aa = await AuthenticationState;
-        var bb = aa.User.Identity.Name;
-        SalesData2 = await Sales.GetSalesAsync();
+        // var aa = await AuthenticationState;
+        // var bb = aa.User.Identity.Name;
+        // SalesData2 = await Sales.GetSalesAsync();
+
+        await Task.Delay(5000);
 
         await GetUserInfo();
 
@@ -638,6 +665,11 @@
             IsAccess = user.Item1;
             UserAccessCRUID = user.Item2;
             UserLogin = user.Item3;
+
+            var a = (CustomAuthenticationStateProvider)CustomAuth;
+            string serialize = JsonConvert.SerializeObject(user.Item3);
+            var encrypt = Helper.Encrypt(serialize);
+            await a.UpdateAuthState(encrypt);
         }
         catch { }
     }
