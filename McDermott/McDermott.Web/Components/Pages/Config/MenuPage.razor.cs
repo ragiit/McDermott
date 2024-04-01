@@ -54,6 +54,9 @@
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             await Mediator.Send(new DeleteMenuRequest(((MenuDto)e.DataItem).Id));
+
+            NavigationManager.NavigateTo("config/menu", true);
+
             await LoadData();
         }
 

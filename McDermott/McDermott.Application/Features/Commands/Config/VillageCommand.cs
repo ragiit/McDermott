@@ -10,6 +10,12 @@
             public bool RemoveCache { get; } = removeCache!;
         }
 
+        public class GetVillageQuery2(Expression<Func<Village, bool>>? predicate = null, bool removeCache = false) : IRequest<IQueryable<VillageDto>>
+        {
+            public Expression<Func<Village, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
+        }
+
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
         #region CREATE

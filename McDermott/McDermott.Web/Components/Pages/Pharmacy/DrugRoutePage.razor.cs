@@ -1,6 +1,6 @@
 ﻿namespace McDermott.Web.Components.Pages.Pharmacy
 {
-    public partial class ActiveComponentPage
+    public partial class DrugRoutePage
     {
         #region UserLoginAndAccessRole
 
@@ -58,7 +58,7 @@
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
-        private List<ActiveComponentDto> ActiveComponents = [];
+        private List<DrugRouteDto> DrugRoutes = [];
 
         #endregion Static
 
@@ -74,7 +74,7 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
+            DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
             PanelVisible = false;
         }
 
@@ -137,11 +137,11 @@
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteActiveComponentRequest(((ActiveComponentDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteDrugRouteRequest(((DrugRouteDto)e.DataItem).Id));
                 }
                 else
                 {
-                    await Mediator.Send(new DeleteActiveComponentRequest(ids: SelectedDataItems.Adapt<List<ActiveComponentDto>>().Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteDrugRouteRequest(ids: SelectedDataItems.Adapt<List<DrugRouteDto>>().Select(x => x.Id).ToList()));
                 }
 
                 await LoadData();
@@ -154,12 +154,12 @@
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (ActiveComponentDto)e.EditModel;
+            var editModel = (DrugRouteDto)e.EditModel;
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateActiveComponentRequest(editModel));
+                await Mediator.Send(new CreateDrugRouteRequest(editModel));
             else
-                await Mediator.Send(new UpdateActiveComponentRequest(editModel));
+                await Mediator.Send(new UpdateDrugRouteRequest(editModel));
 
             await LoadData();
         }

@@ -32,3 +32,6 @@ global using static McDermott.Application.Features.Commands.Transaction.GeneralC
 global using static McDermott.Application.Features.Commands.Patient.ClassTypeCommand;
 global using static McDermott.Application.Features.Commands.Medical.LabUomCommand;
 global using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
+global using McDermott.Application.Dtos.Pharmacy;
+global using static McDermott.Application.Features.Commands.Pharmacy.DrugDosageCommand;
+global using static McDermott.Application.Features.Commands.Pharmacy.DrugRouteCommand;

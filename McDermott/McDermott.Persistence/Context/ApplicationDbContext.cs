@@ -86,7 +86,6 @@ namespace McDermott.Persistence.Context
         #endregion Transaction
 
         #region Pharmacy
-        DbSet<Signa> Signas { get; set; }
         #endregion
 
         #region Queue
@@ -103,6 +102,8 @@ namespace McDermott.Persistence.Context
         #region Pharmacy
         public DbSet<DrugRoute> DrugRoutes { get; set; }
         public DbSet<DrugDosage> DrugDosages { get; set; }
+        public DbSet<Signa> Signas { get; set; }
+        public DbSet<ActiveComponent> ActiveComponents { get; set; }
         #endregion
 
         #endregion DbSet

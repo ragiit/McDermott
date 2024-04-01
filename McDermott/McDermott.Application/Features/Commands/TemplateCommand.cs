@@ -2,7 +2,7 @@
 {
     public class TemplateCommand
     {
-        #region GET (Bisa berdasarkan kondisi WHERE juga)
+        #region GET 
 
         public class GetTemplateQuery(Expression<Func<Province, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ProvinceDto>>
         {
@@ -19,9 +19,9 @@
             public ProvinceDto TemplateDto { get; set; } = TemplateDto;
         }
 
-        public class CreateListTemplateRequest(List<ProvinceDto> GeneralConsultanCPPTDtos) : IRequest<List<ProvinceDto>>
+        public class CreateListTemplateRequest(List<ProvinceDto> TemplateDtos) : IRequest<List<ProvinceDto>>
         {
-            public List<ProvinceDto> TemplateDtos { get; set; } = GeneralConsultanCPPTDtos;
+            public List<ProvinceDto> TemplateDtos { get; set; } = TemplateDtos;
         }
 
         #endregion CREATE

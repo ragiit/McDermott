@@ -58,7 +58,9 @@
         private List<CityDto> Cities = new();
 
         private List<VillageDto> Villages = new();
-        private object Data { get; set; }
+
+        //private object Data { get; set; }
+        private IEnumerable<VillageDto> Data { get; set; }
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
@@ -80,21 +82,20 @@
         private async Task LoadData()
         {
             PanelVisible = true;
-            var a = await Mediator.Send(new GetVillageQuery());
-            var dataSource = new GridDevExtremeDataSource<VillageDto>(a.AsQueryable())
-            {
-                CustomizeLoadOptions = (loadOptions) =>
-            {
-                // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
-                // This can make SQL execution plans more efficient.
-                loadOptions.PrimaryKey = new[] { "Id" };
-                loadOptions.PaginateViaPrimaryKey = true;
-            }
-            };
+            //var dataSource = new GridDevExtremeDataSource<VillageDto>(a.AsQueryable())
+            //{
+            //    CustomizeLoadOptions = (loadOptions) =>
+            //{
+            //    // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+            //    // This can make SQL execution plans more efficient.
+            //    loadOptions.PrimaryKey = new[] { "Id" };
+            //    loadOptions.PaginateViaPrimaryKey = true;
+            //}
+            //};
 
-            Data = dataSource;
+            Data = await Mediator.Send(new GetVillageQuery2());
 
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
             PanelVisible = false;
         }
 

@@ -1,6 +1,6 @@
 ﻿namespace McDermott.Web.Components.Pages.Pharmacy
 {
-    public partial class ActiveComponentPage
+    public partial class DrugDosagePage
     {
         #region UserLoginAndAccessRole
 
@@ -58,7 +58,8 @@
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
-        private List<ActiveComponentDto> ActiveComponents = [];
+        private List<DrugDosageDto> DrugDosages = [];
+        private List<DrugRouteDto> DrugRoutes = [];
 
         #endregion Static
 
@@ -66,6 +67,10 @@
 
         protected override async Task OnInitializedAsync()
         {
+            IsAccess = false;
+
+            DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
+
             await GetUserInfo();
             await LoadData();
         }
@@ -74,7 +79,7 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
+            DrugDosages = await Mediator.Send(new GetDrugDosageQuery());
             PanelVisible = false;
         }
 
@@ -137,11 +142,11 @@
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteActiveComponentRequest(((ActiveComponentDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteDrugDosageRequest(((DrugDosageDto)e.DataItem).Id));
                 }
                 else
                 {
-                    await Mediator.Send(new DeleteActiveComponentRequest(ids: SelectedDataItems.Adapt<List<ActiveComponentDto>>().Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteDrugDosageRequest(ids: SelectedDataItems.Adapt<List<DrugDosageDto>>().Select(x => x.Id).ToList()));
                 }
 
                 await LoadData();
@@ -154,12 +159,12 @@
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (ActiveComponentDto)e.EditModel;
+            var editModel = (DrugDosageDto)e.EditModel;
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateActiveComponentRequest(editModel));
+                await Mediator.Send(new CreateDrugDosageRequest(editModel));
             else
-                await Mediator.Send(new UpdateActiveComponentRequest(editModel));
+                await Mediator.Send(new UpdateDrugDosageRequest(editModel));
 
             await LoadData();
         }

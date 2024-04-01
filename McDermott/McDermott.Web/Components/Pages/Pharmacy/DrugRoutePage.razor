@@ -1,13 +1,13 @@
-﻿@page "/pharmacy/active-components"
+﻿@page "/pharmacy/drug-routes"
 @rendermode InteractiveServer
 
-<PageTitle>McDermott - Master Data Active Component</PageTitle>
+<PageTitle>McDermott - Master Data Drug Routes</PageTitle>
 
 @if (IsAccess)
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Master Data Active Component" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Master Data Drug Routes" />
 
         <section class="content">
             <div class="container-fluid">
@@ -22,7 +22,7 @@
                                                 Text="Fetching Data...">
 
                                     <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="ActiveComponents"
+                                            Data="DrugRoutes"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -54,8 +54,8 @@
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && ActiveComponents.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && ActiveComponents.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && DrugRoutes.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && DrugRoutes.Count > 0" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                 <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                 <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
@@ -70,30 +70,30 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="AmountOfComponent" Caption="Amount Of Component" />
+                                            <DxGridDataColumn FieldName="Route" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Code" />
 
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
                                             @{
-                                                var a = (ActiveComponentDto)EditFormContext.EditModel;
+                                                var a = (DrugRouteDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
 
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Name"
+                                                    <DxTextBox @bind-Text="@a.Route"
                                                                ShowValidationIcon="true"
                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="Name" />
-                                                    <ValidationMessage For="@(()=> a.Name)"   />
+                                                               NullText="Route" />
+                                                    <ValidationMessage For="@(()=> a.Route)"   />
                                                 </DxFormLayoutItem>
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Amount Of Component" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.AmountOfComponent"
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.Code"
                                                                ShowValidationIcon="true"
                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="Amount Of Component" />
-                                                    <ValidationMessage For="@(()=> a.AmountOfComponent)"   />
+                                                               NullText="Code" />
+                                                    <ValidationMessage For="@(()=> a.Code)"   />
                                                 </DxFormLayoutItem>
 
                                             </DxFormLayout>
@@ -111,7 +111,7 @@
 else
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Master Data Active Component" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Master Data Drug Routes" />
 
         <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>
