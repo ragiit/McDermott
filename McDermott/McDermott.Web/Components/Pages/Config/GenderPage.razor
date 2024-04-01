@@ -3,7 +3,7 @@
 
 <PageTitle>McDermott - Master Data Gender</PageTitle>
 
-@if(IsAccess)
+@if (IsAccess)
 {
     <div class="wrapper">
 
@@ -23,6 +23,7 @@
                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                         EditModelSaving="OnSave"
                                         DataItemDeleting="OnDelete"
+                                        EditorRenderMode="GridEditorRenderMode.Detached"
                                         EditMode="GridEditMode.EditForm"
                                         PopupEditFormCssClass="pw-800"
                                         PagerPosition="GridPagerPosition.Bottom"

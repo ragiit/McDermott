@@ -2,8 +2,8 @@
 using MailKit.Net.Smtp;
 using MimeKit;
 using MimeKit.Text;
+using static McDermott.Application.Features.Commands.Config.EmailEmailTemplateCommand;
 using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
-using static McDermott.Application.Features.Commands.Config.EmailTemplateCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -147,7 +147,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             showForm = false;
             PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
             EmailTemplates = await Mediator.Send(new GetEmailTemplateQuery());
             PanelVisible = false;
         }

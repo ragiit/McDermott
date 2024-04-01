@@ -86,12 +86,8 @@ namespace McDermott.Application.Features.Queries.Config
                 if (request.Predicate is not null)
                     result = result.Where(request.Predicate);
 
-                // Menggunakan CancellationToken untuk operasi async
-                var villageDtos = await result
-                    .Select(village => village.Adapt<VillageDto>())
-                    .ToListAsync(cancellationToken);
 
-                return villageDtos.AsQueryable();
+                return result.Adapt<IQueryable<VillageDto>>();
             }
             catch (Exception)
             {

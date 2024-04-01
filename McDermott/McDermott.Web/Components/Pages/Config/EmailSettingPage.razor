@@ -29,9 +29,11 @@
                                     <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                             Data="EmailSettings"
                                             PageSize="10"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                             KeyFieldName="Id"
+                                            TextWrapEnabled="false"
                                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                             DataItemDeleting="OnDelete"
                                             PagerPosition="GridPagerPosition.Bottom"
@@ -120,9 +122,9 @@
                                                                NullText="Password"
                                                                Password="showPassword"
                                                                InputId="tbPassword" ShowValidationIcon="true">
-                                                               <Buttons>
+                                                        <Buttons>
                                                             <DxEditorButton IconCssClass="@showPasswordIcon" Tooltip="show password" Click="@TogglePasswordVisibility" />
-                                                               </Buttons>
+                                                        </Buttons>
                                                     </DxTextBox>
                                                     <ValidationMessage For="@(()=>FormEmails.Smtp_Pass)" />
                                                 </DxFormLayoutItem>

@@ -93,7 +93,7 @@
             //}
             //};
 
-            Data = await Mediator.Send(new GetVillageQuery2());
+            Data = await Mediator.Send(new GetVillageQuery());
 
             SelectedDataItems = [];
             PanelVisible = false;

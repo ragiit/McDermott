@@ -34,10 +34,12 @@
                                                 @bind-SelectedDataItems="@SelectedDataItems"
                                                 FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                                 KeyFieldName="Id"
+                                                EditorRenderMode="GridEditorRenderMode.Detached"
                                                 CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                 DataItemDeleting="OnDelete"
                                                 PagerPosition="GridPagerPosition.Bottom"
                                                 PageSizeSelectorVisible="true"
+                                                TextWrapEnabled="false"
                                                 PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                                 PageSizeSelectorAllRowsItemVisible="true"
                                                 PagerSwitchToInputBoxButtonCount="10"
@@ -71,10 +73,10 @@
                                             </ToolbarTemplate>
                                             <Columns>
                                                 <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn FieldName="From" Caption="From"  />
-                                                <DxGridDataColumn FieldName="Subject" Caption="Subject"  />
-                                                <DxGridDataColumn FieldName="To" Caption="To"  />
-                                                <DxGridDataColumn FieldName="Status" Caption="Status"  />
+                                                <DxGridDataColumn FieldName="From" Caption="From" />
+                                                <DxGridDataColumn FieldName="Subject" Caption="Subject" />
+                                                <DxGridDataColumn FieldName="To" Caption="To" />
+                                                <DxGridDataColumn FieldName="Status" Caption="Status" />
                                             </Columns>
                                         </DxGrid>
                                     </DxLoadingPanel>
@@ -125,7 +127,7 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem ColSpanMd="12">
                                                 <label>Body</label>
-                                                <BlazoredTextEditor  @ref="@QuillHtml" Placeholder="Enter non HTML format like centering...">
+                                                <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Enter non HTML format like centering...">
                                                     <ToolbarContent>
                                                         <select class="ql-header">
                                                             <option selected=""></option>
@@ -157,7 +159,7 @@
                                                             <button class="ql-link"></button>
                                                         </span>
                                                     </ToolbarContent>
-                                                    <EditorContent >
+                                                    <EditorContent>
                                                         @((MarkupString)@EmailFormTemplate.Message)
                                                     </EditorContent>
                                                 </BlazoredTextEditor>

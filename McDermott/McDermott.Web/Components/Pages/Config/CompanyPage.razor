@@ -23,6 +23,7 @@
                                                     Text="Fetching Data...">
                                         <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                                 Data="Companys"
+                                                EditorRenderMode="GridEditorRenderMode.Detached"
                                                 PageSize="10"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
                                                 FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
