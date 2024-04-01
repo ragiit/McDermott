@@ -62,9 +62,6 @@
                                                         <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                     </Items>
                                                 </DxToolbarItem>
-
-                                                @*                                                 <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                            *@
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
@@ -102,5 +99,13 @@
                 </div>
             </div>
         </section>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Family" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>
 }

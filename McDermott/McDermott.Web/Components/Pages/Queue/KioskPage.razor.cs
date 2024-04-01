@@ -52,9 +52,10 @@ namespace McDermott.Web.Components.Pages.Queue
             "Oracle",
             "SAP",
             "Legacy",
-            "NIK"
+            "Family Relation"
         };
 
+        private bool NumberType { get; set; } = true;
         private IEnumerable<ServiceDto> SelectedServices = [];
         private KioskDto FormKios = new();
         private KioskQueueDto FormQueue = new();
@@ -63,6 +64,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private string? NamePatient { get; set; } = string.Empty;
         private string? statBPJS { get; set; } = string.Empty;
         private string Bpjs { get; set; } = string.Empty;
+        private string captions { get; set; } = "Number";
         private long? CountServiceId { get; set; }
         private long _ServiceId { get; set; }
         private bool showQueue { get; set; } = false;
@@ -82,6 +84,14 @@ namespace McDermott.Web.Components.Pages.Queue
                 LoadPhysicians(value);
                 FormKios.ServiceId = value;
                 showPhysician = true;
+            }
+        }
+
+        public void SelectedItemChanged(string kiosk)
+        {
+            if(kiosk == "Family Relation")
+            {
+                captions = "Name Family";
             }
         }
 

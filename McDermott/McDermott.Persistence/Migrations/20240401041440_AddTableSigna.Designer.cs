@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240401041440_AddTableSigna")]
+    partial class AddTableSigna
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -743,74 +746,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("PhysicianId");
 
                     b.ToTable("DoctorScheduleSlots");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.DrugDosage", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("DrugRouteId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Frequency")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DrugRouteId");
-
-                    b.ToTable("DrugDosages");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.DrugRoute", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Route")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DrugRoutes");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.EmailSetting", b =>
@@ -2883,9 +2818,6 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("DistrictId");
 
-                    b.HasIndex("Id")
-                        .IsUnique();
-
                     b.HasIndex("ProvinceId");
 
                     b.ToTable("Villages");
@@ -3082,16 +3014,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("DoctorSchedule");
 
                     b.Navigation("Physician");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.DrugDosage", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.DrugRoute", "DrugRoute")
-                        .WithMany("DrugDosages")
-                        .HasForeignKey("DrugRouteId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("DrugRoute");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.EmailTemplate", b =>
@@ -3628,11 +3550,6 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.Degree", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.DrugRoute", b =>
-                {
-                    b.Navigation("DrugDosages");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.EmailTemplate", b =>

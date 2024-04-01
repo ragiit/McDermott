@@ -27,7 +27,7 @@ namespace McDermott.Persistence.Migrations
                 column: "KioskQueueId",
                 principalTable: "KioskQueues",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.SetNull);
         }
 
         /// <inheritdoc />

@@ -92,7 +92,8 @@
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
                                                                   Caption="Type" ColSpanMd="12">
-                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
                                                                 Data="@Types" @bind-Value="@a.Type" NullText="Types" />
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
@@ -121,5 +122,13 @@
                 </div>
             </div>
         </section>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Insurance" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>
 }

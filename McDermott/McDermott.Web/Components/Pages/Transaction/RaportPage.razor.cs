@@ -62,13 +62,12 @@ namespace McDermott.Web.Components.Pages.Transaction
                 case "Report of patient visits by period":
                     await VisitByPeriode(FormReports);
                     break;
+                case "Report of patient visits by department":
+                    await VisitByDepartement(FormReports);
+                    break;
 
                 case "Report of patient visits by diagnosis":
                     await VisitByDiagnosis(FormReports);
-                    break;
-
-                case "Report of patient visits by department":
-                    await VisitByDepartement(FormReports);
                     break;
 
                 default:
@@ -296,7 +295,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             ws.Cells[4, 1].Value = "Address";
             ws.Cells[4, 2].Value = "Jalan Bawal No. 1 – Batu Ampar Batam Island 29452, Riau Islands Province";
             ws.Cells[5, 1].Value = "Date";
-            ws.Cells[5, 2].Value = DateTime.Now.Date.ToString("dd/MM/yyyy", new System.Globalization.CultureInfo("en_US"));
+            ws.Cells[5, 2].Value = DateTime.Now.Date.ToString("dd  MMMM yyyy", new System.Globalization.CultureInfo("en_US"));
 
             ws.Cells[2, 2].Style.Font.Bold = true;
             ws.Cells[3, 1].Style.Font.Bold = true;
@@ -431,23 +430,20 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             var cultureInfo = new System.Globalization.CultureInfo("en_US");
 
-            var header = new List<string>() { "Type Medical", "Patient Count" };
+            var header = new List<string>() { "Date", "Type Medical", "Patient Count" };
 
             TemplateClinicName(ws);
 
             ws.Cells[6, 1].Value = "Date Period";
-            ws.Cells[6, 2].Value = FormReports.StartDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd/MM/yyyy", cultureInfo);
+            ws.Cells[6, 2].Value = FormReports.StartDate.Value.Date.ToString("dd MMMM yyyy", cultureInfo) + " - " + FormReports.EndDate.Value.Date.ToString("dd MMMM yyyy", cultureInfo);
             ws.Cells[7, 1].Value = "Total number of Visits";
 
             ws.Cells[6, 1].Style.Font.Bold = true;
             ws.Cells[7, 1].Style.Font.Bold = true;
-            ws.Cells[7, 1].Style.Font.Bold = true;
-            ws.Cells[7, 1].Style.Font.Bold = true;
-            ws.Cells[9, 2].Style.Font.Bold = true;
 
-            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.RegistrationDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.RegistrationDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
-
-            ws.Cells[9, 1].Value = "Service";
+            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.CreatedDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.CreatedDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
+            
+            ws.Cells[9, 1].Value = "Departement";
             ws.Cells[9, 2].Value = "Total Patients";
 
             int startRow = 10;
@@ -462,7 +458,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (namee.Contains(item.Patient?.Department?.Name!))
                     continue;
 
-                long count = generals.Where(x => x.Patient?.DepartmentId == item.Patient?.DepartmentId && x.RegistrationDate.Date == item.RegistrationDate.Date).Count();
+                long count = generals.Where(x => x.Patient?.DepartmentId == item.Patient?.DepartmentId ).Count();
 
                 ws.Cells[startRow, 1].Value = item.Patient?.Department?.Name;
                 ws.Cells[startRow, 2].Value = count;
@@ -496,9 +492,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             ws.Cells[2, 2].AutoFitColumns();
             ws.Cells[4, 2].AutoFitColumns();
             ws.Cells[7, 1].AutoFitColumns();
-            ws.Cells[9, 2].AutoFitColumns();
+            ws.Cells[9, 3].AutoFitColumns();
 
-            await SaveFileToSpreadSheetml(pack, "Report of Patient visits by Departement.xlsx");
+
+            await SaveFileToSpreadSheetml(pack, "Report of patient visits by department.xlsx");
         }
 
         private async Task SaveFileToSpreadSheetml(ExcelPackage excelPackage, string title)

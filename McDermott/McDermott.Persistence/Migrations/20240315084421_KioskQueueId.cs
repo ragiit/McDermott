@@ -28,7 +28,7 @@ namespace McDermott.Persistence.Migrations
                 column: "QueueDisplayId",
                 principalTable: "QueueDisplays",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.SetNull);
 
             
 
