@@ -96,6 +96,11 @@ namespace McDermott.Persistence.Context
 
         #endregion Queue
 
+        #region Pharmacy
+        public DbSet<DrugRoute> DrugRoutes { get; set; }
+        public DbSet<DrugDosage> DrugDosages { get; set; }
+        #endregion
+
         #endregion DbSet
 
         #region OnModelCreating
@@ -114,6 +119,16 @@ namespace McDermott.Persistence.Context
             //  .OnDelete(DeleteBehavior.Cascade);
 
             // Contoh: Aturan cascade delete untuk hubungan many-to-many
+
+            // Menentukan indeks menggunakan Fluent API
+            modelBuilder.Entity<Village>()
+                .HasIndex(p => p.Id)
+                .IsUnique();
+
+            modelBuilder.Entity<DrugRoute>()
+                 .HasMany(m => m.DrugDosages)
+                 .WithOne(c => c.DrugRoute)
+                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<GeneralConsultanService>()
                   .HasMany(m => m.GeneralConsultanCPPTs)
