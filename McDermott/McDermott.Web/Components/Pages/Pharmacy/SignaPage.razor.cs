@@ -1,35 +1,25 @@
-﻿namespace McDermott.Web.Components.Pages.Pharmacy
+﻿using McDermott.Application.Dtos.Pharmacy;
+using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
+
+namespace McDermott.Web.Components.Pages.Pharmacy
 {
     public partial class SignaPage
     {
         private List<SignaDto> Signas = [];
-        private GroupMenuDto UserAccessCRUID = new();
-
-        public class SignaDto
-        {
-            public long Id { get; set; }
-            public string Name { get; set; }
-        }
-
-        private bool IsAccess = false;
+       
         private bool PanelVisible { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
 
         public IGrid Grid { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        #region UserLoginAndAccessRole
 
-        protected override async Task OnInitializedAsync()
-        {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
 
-            await LoadData();
-        }
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -39,18 +29,44 @@
             {
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
                 }
                 catch { }
             }
         }
 
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                await GetUserInfo();
+            }
+            catch { }
+
+            await LoadData();
+        }
+
+        
+
         private async Task LoadData()
         {
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
+            Signas = await Mediator.Send(new GetSignaQuery());
             PanelVisible = false;
         }
 
@@ -84,21 +100,21 @@
                         return;
                     }
 
-                    var countries = new List<CountryDto>();
+                    var countries = new List<SignaDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var country = new CountryDto
+                        var Signa = new SignaDto
                         {
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim()
+                            
                         };
 
-                        //if (!Countries.Any(x => x.Name.Trim().ToLower() == country.Name.Trim().ToLower()) && !countries.Any(x => x.Name.Trim().ToLower() == country.Name.Trim().ToLower()))
-                        ////countries.Add(country);
+                        //if (!Countries.Any(x => x.Name.Trim().ToLower() == Signa.Name.Trim().ToLower()) && !countries.Any(x => x.Name.Trim().ToLower() == Signa.Name.Trim().ToLower()))
+                        ////countries.Add(Signa);
                     }
 
-                    await Mediator.Send(new CreateListCountryRequest(countries));
+                    await Mediator.Send(new CreateListSignaRequest(countries));
 
                     await LoadData();
                 }
@@ -189,13 +205,14 @@
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteCountryRequest(((CountryDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteSignaRequest(((SignaDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<CountryDto>>();
-                    await Mediator.Send(new DeleteCountryRequest(ids: a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<SignaDto>>();
+                    await Mediator.Send(new DeleteSignaRequest(ids: a.Select(x => x.Id).ToList()));
                 }
+                SelectedDataItems = [];
                 await LoadData();
             }
             catch (Exception)
@@ -207,15 +224,15 @@
         {
             try
             {
-                var editModel = (CountryDto)e.EditModel;
+                var editModel = (SignaDto)e.EditModel;
 
                 if (string.IsNullOrWhiteSpace(editModel.Name))
                     return;
 
                 if (editModel.Id == 0)
-                    await Mediator.Send(new CreateCountryRequest(editModel));
+                    await Mediator.Send(new CreateSignaRequest(editModel));
                 else
-                    await Mediator.Send(new UpdateCountryRequest(editModel));
+                    await Mediator.Send(new UpdateSignaRequest(editModel));
 
                 await LoadData();
             }

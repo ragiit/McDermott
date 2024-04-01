@@ -32,7 +32,7 @@ namespace McDermott.Application.Features.Queries.Config
 
                 // Filter result based on request.Predicate if it's not null
                 if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                    result = [.. result?.AsQueryable().Where(request.Predicate)];
 
                 return result.ToList().Adapt<List<CountryDto>>();
             }

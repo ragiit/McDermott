@@ -26,6 +26,10 @@ namespace McDermott.Application.Features.Commands.Pharmacy
         {
             public SignaDto SignaDto { get; set; } = SignaDto;
         }
+        public class CreateListSignaRequest(List<SignaDto> Signas) : IRequest<List<SignaDto>>
+        {
+            public List<SignaDto> SignaDtos { get; set; } = Signas;
+        }
 
         #endregion CREATE
 
