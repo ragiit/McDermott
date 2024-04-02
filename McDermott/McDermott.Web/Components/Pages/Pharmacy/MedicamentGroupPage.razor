@@ -33,13 +33,12 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
                                     <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="Medicaments"
+                                            Data="medicamentGroups"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                             KeyFieldName="Id"
                                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            EditModelSaving="OnSave"
                                             DataItemDeleting="OnDelete"
                                             AllowSelectRowByClick="true"
                                             PopupEditFormCssClass="pw-800"
@@ -61,8 +60,8 @@
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Medicaments.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Medicaments.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && medicamentGroups.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && medicamentGroups.Count > 0" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
 
                                             </DxToolbar>

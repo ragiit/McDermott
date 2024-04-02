@@ -1,13 +1,14 @@
-﻿using McDermott.Domain.Entities;
+﻿using McDermott.Application.Dtos.Pharmacy;
+using McDermott.Domain.Entities;
 using MediatR;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
-    public partial class MedicamentPage
+    public partial class MedicamentGroupPage
     {
         #region Relation Data
-        private List<MedicamentDto> medicaments = [];
+        private List<MedicamentGroupDto> medicamentGroups = [];
         #endregion
         #region variabel static
         private bool PanelVisible { get; set; } = false;
