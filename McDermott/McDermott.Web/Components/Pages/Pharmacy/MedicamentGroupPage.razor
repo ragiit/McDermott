@@ -1,4 +1,4 @@
-﻿@page "/pharmacy/medicament"
+﻿@page "/pharmacy/medicamentgroup"
 @rendermode InteractiveServer
 
 <PageTitle>Pharmacy - Medicament Group</PageTitle>
@@ -9,12 +9,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Counter</h1>
+                        <h1>Medicament Group</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item" @onclick="LoadData"><a href="/pharmacy/signa">Signa</a></li>
+                            <li class="breadcrumb-item" @onclick="LoadData"><a href="/pharmacy/medicamentgroup">Medicament Group</a></li>
                         </ol>
                     </div>
                 </div>
@@ -26,53 +26,104 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
-                                                Text="Fetching Data...">
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="medicamentGroups"
-                                            PageSize="10"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            DataItemDeleting="OnDelete"
-                                            AllowSelectRowByClick="true"
-                                            PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            ShowFilterRow="true"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
-                                        <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && medicamentGroups.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && medicamentGroups.Count > 0" />
-                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                @if (!showForm)
+                                {
+                                    <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                    IsContentBlocked="true"
+                                                    ApplyBackgroundShading="true"
+                                                    IndicatorAreaVisible="false"
+                                                    Text="Fetching Data...">
+                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                Data="medicamentGroups"
+                                                PageSize="10"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                KeyFieldName="Id"
+                                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                                EditorRenderMode="GridEditorRenderMode.Detached"
+                                                DataItemDeleting="OnDelete"
+                                                AllowSelectRowByClick="true"
+                                                PagerPosition="GridPagerPosition.Bottom"
+                                                PageSizeSelectorVisible="true"
+                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                PageSizeSelectorAllRowsItemVisible="true"
+                                                PagerSwitchToInputBoxButtonCount="10"
+                                                FocusedRowEnabled="true"
+                                                PagerVisibleNumericButtonCount="10"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                ShowGroupPanel="true"
+                                                AutoExpandAllGroupRows="true"
+                                                ShowFilterRow="true"
+                                                CustomizeElement="Grid_CustomizeElement"
+                                                ShowSearchBox="true"
+                                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                                KeyboardNavigationEnabled="true">
+                                            <ToolbarTemplate>
+                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && medicamentGroups.Count > 0" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && medicamentGroups.Count > 0" />
+                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                </DxToolbar>
+                                            </ToolbarTemplate>
+                                            <Columns>
+                                                <DxGridSelectionColumn Width="15px" />
+                                                <DxGridDataColumn FieldName="Name" Caption="Group Name" SortIndex="0" />
+                                                <DxGridDataColumn FieldName="Phycisian.Name" Caption="Phycisian" />
+                                            </Columns>
+                                        </DxGrid>
+                                    </DxLoadingPanel>
+                                }
+                                else
+                                {
+                                    <div class="card-header bg-primary">
+                                        <div class="row">
+                                            <div class="col-md-3 align-self-center">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-arrow-left-long" Text="Back" Click="Back_Click"></DxButton>
+                                            </div>
+                                            <div class="col">
+                                                <h4 class="text-center">Add Medicament Group</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <EditForm Model="MGFrom" Context="FormEditContext">
+                                            <DataAnnotationsValidator />
+                                            <DxFormLayout CssClass="mt">
+                                                <DxFormLayoutItem Caption="Name" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@MGFrom.Name"
+                                                               ShowValidationIcon="true"
+                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                               NullText="Name" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Is Concoction?" ColSpanMd="12">
+                                                    <DxCheckBox @bind-Checked="@Checkin"
+                                                                LabelPosition="LabelPosition.Left" CssClass="w-100" />
+                                                </DxFormLayoutItem>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <DxFormLayoutItem Caption="Phycisian" ColSpanMd="12">
+                                                            <DxComboBox Data="@Phy"
+                                                                        @bind-Value="@MGFrom.PhycisianId"
+                                                                        NullText="Select Phycisian..."
+                                                                        TextFieldName="Name"
+                                                                        ShowValidationIcon="true"
+                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        </DxFormLayoutItem>
+                                                    </div>
+                                                     @if (MGFrom.IsConcoction == true )
+                                                    {
+                                                        <div class="col-md-6">
+                                                            <h2>@chars</h2>
+                                                        </div>
+                                                    } 
+                                                </div>
+                                            </DxFormLayout>
+                                        </EditForm>
+                                    </div>
 
-                                            </DxToolbar>
-                                        </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" Caption="Signa" SortIndex="0" />
-                                        </Columns>
-                                        
-                                    </DxGrid>
-                                </DxLoadingPanel>
+                                }
                             </div>
                         </div>
                     </div>

@@ -1,6 +1,7 @@
 ﻿using McDermott.Application.Dtos.Pharmacy;
 using McDermott.Domain.Entities;
 using MediatR;
+using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
@@ -9,10 +10,51 @@ namespace McDermott.Web.Components.Pages.Pharmacy
     {
         #region Relation Data
         private List<MedicamentGroupDto> medicamentGroups = [];
+        private List<UserDto> Phy = new();
+        private MedicamentGroupDto MGFrom = new();
         #endregion
         #region variabel static
+        private IGrid Grid { get; set; }
         private bool PanelVisible { get; set; } = false;
+        private bool showForm { get; set; } = false;
+        private bool Checkins { get; set; } = false;
+
+        private string? chars { get; set; }
+        private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+
+        private bool? Checkin
+        {
+            get
+            {
+                //Checkins = ValueAccessingStrategy;
+                if ( Checkin == true)
+                {
+                    MGFrom.IsConcoction = true;
+                    return true;
+                }
+                else
+                {
+                    MGFrom.IsConcoction = false;
+                    return false;
+                }
+                
+            }
+            set
+            {
+                //if (MGFrom.IsConcoction == true)
+                //{
+                    MGFrom.IsConcoction = true;
+                    Concoctions = true;
+                    chars = "aw aw aw aw";
+                //}
+                //else
+                //{
+                //    MGFrom.IsConcoction = false;
+                //    Concoctions = false;
+                //}
+            }
+        }
         #endregion
 
         #region UserLoginAndAccessRole
@@ -68,7 +110,84 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
+            var user = await Mediator.Send(new GetUserQuery());
+            Phy = [.. user.Where(x => x.IsPhysicion == true)];
             PanelVisible = false;
+        }
+        #endregion
+
+        #region Grid
+
+        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        {
+            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+            {
+                e.CssClass = "alt-item";
+            }
+            if (e.ElementType == GridElementType.HeaderCell)
+            {
+                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
+                e.CssClass = "header-bold";
+            }
+        }
+
+        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        {
+            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+        }
+
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+        }
+
+        #endregion Grid
+        #region Click
+        private async Task NewItem_Click()
+        {
+            showForm = true;
+        }
+
+        private async Task Refresh_Click()
+        {
+            await LoadData();
+        }
+
+        private async Task EditItem_Click()
+        {
+            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+        }
+        private async Task Back_Click()
+        {
+            showForm = false;
+        }
+
+        private void DeleteItem_Click()
+        {
+            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+        #endregion
+
+        #region function Delete
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteMedicamentGroupRequest(((MedicamentGroupDto)e.DataItem).Id));
+                }
+                else
+                {
+                    await Mediator.Send(new DeleteMedicamentGroupRequest(ids: SelectedDataItems.Adapt<List<MedicamentGroupDto>>().Select(x => x.Id).ToList()));
+                }
+
+                await LoadData();
+            }
+            catch (Exception ee)
+            {
+                ee.HandleException(ToastService);
+            }
         }
         #endregion
     }
