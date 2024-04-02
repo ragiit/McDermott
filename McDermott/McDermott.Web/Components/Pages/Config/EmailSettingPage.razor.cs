@@ -123,7 +123,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             PopUpVisible = false;
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
             EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
             PanelVisible = false;
         }
@@ -242,7 +242,7 @@ namespace McDermott.Web.Components.Pages.Config
             else
             {
                 var a = SelectedDataItems.Adapt<List<EmailSettingDto>>();
-                await Mediator.Send(new DeleteListEmailSettingRequest(a.Select(x => x.Id).ToList()));
+                await Mediator.Send(new DeleteEmailSettingRequest(ids: a.Select(x => x.Id).ToList()));
             }
             await LoadData();
         }

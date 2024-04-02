@@ -34,6 +34,7 @@
                                                 KeyFieldName="Id"
                                                 CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                 EditModelSaving="OnSave"
+                                                EditorRenderMode="GridEditorRenderMode.Detached"
                                                 DataItemDeleting="OnDelete"
                                                 FocusedRowEnabled="true"
                                                 PopupEditFormCssClass="pw-800"
@@ -168,8 +169,8 @@
                                                     @EditFormContext.GetEditor("Delete")
                                                 </DxFormLayoutItem>
                                                 @* <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Import:" ColSpanMd="3">
-                                                    @EditFormContext.GetEditor("Import")
-                                                </DxFormLayoutItem> *@
+                                        @EditFormContext.GetEditor("Import")
+                                        </DxFormLayoutItem> *@
                                             </DxFormLayout>
                                         </EditFormTemplate>
                                     </DxGrid>

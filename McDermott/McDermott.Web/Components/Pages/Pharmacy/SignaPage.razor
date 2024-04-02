@@ -1,7 +1,7 @@
 ﻿@page "/pharmacy/signa"
 @rendermode InteractiveServer
 
-<PageTitle>McDermott - Master data Signa </PageTitle>
+<PageTitle>McHealthCare - Master Data Signa </PageTitle>
 
 @if (IsAccess)
 {
@@ -10,7 +10,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Counter</h1>
+                        <h1>Signa</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -69,7 +69,7 @@
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Signas.Count > 0" />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Signas.Count > 0" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                 
+
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>

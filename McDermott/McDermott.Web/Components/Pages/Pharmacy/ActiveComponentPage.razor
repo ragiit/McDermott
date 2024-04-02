@@ -1,12 +1,13 @@
-﻿@page "/pharmacy/active-component"
+﻿@page "/pharmacy/active-components"
 @rendermode InteractiveServer
 
-<PageTitle>McDermott - Master data Active Component </PageTitle>
+<PageTitle>McDermott - Master Data Active Component</PageTitle>
 
 @if (IsAccess)
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Active Component" />
+
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Master Data Active Component" />
 
         <section class="content">
             <div class="container-fluid">
@@ -14,16 +15,14 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
-                                <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
-
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                                 IsContentBlocked="true"
                                                 ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
+                                                IndicatorAreaVisible="true"
                                                 Text="Fetching Data...">
+
                                     <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="ActiveComponent"
+                                            Data="ActiveComponents"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -31,10 +30,11 @@
                                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                             EditModelSaving="OnSave"
                                             DataItemDeleting="OnDelete"
-                                            AllowSelectRowByClick="true"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
                                             EditMode="GridEditMode.PopupEditForm"
                                             PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PagerPosition="GridPagerPosition.Bottom" A
+                                            AllowSelectRowByClick="true"
                                             PageSizeSelectorVisible="true"
                                             PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                             PageSizeSelectorAllRowsItemVisible="true"
@@ -44,7 +44,9 @@
                                             FocusedRowChanged="Grid_FocusedRowChanged"
                                             ShowGroupPanel="true"
                                             AutoExpandAllGroupRows="true"
+                                            CssClass="ch-480"
                                             ShowFilterRow="true"
+                                            TextWrapEnabled="false"
                                             CustomizeElement="Grid_CustomizeElement"
                                             ShowSearchBox="true"
                                             SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
@@ -52,8 +54,8 @@
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && ActiveComponent.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && ActiveComponent.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && ActiveComponents.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && ActiveComponents.Count > 0" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                 <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                 <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
@@ -63,20 +65,37 @@
                                                         <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                     </Items>
                                                 </DxToolbarItem>
-                                                @* <DxToolbarItem Visible="@UserAccessCRUID.Import" Click="@ImportFile" Text="Import" IconCssClass="fa-solid fa-file-import" /> *@
+                                                <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" Caption="ActiveComponent" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="AmountOfComponent" Caption="Amount Of Component" />
+
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
+                                            @{
+                                                var a = (ActiveComponentDto)EditFormContext.EditModel;
+                                            }
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
-                                                    <div class="pop-warning">
-                                                        @EditFormContext.GetEditor("Name")
-                                                    </div>
+
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.Name"
+                                                               ShowValidationIcon="true"
+                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                               NullText="Name" />
+                                                    <ValidationMessage For="@(()=> a.Name)"   />
                                                 </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Amount Of Component" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.AmountOfComponent"
+                                                               ShowValidationIcon="true"
+                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                               NullText="Amount Of Component" />
+                                                    <ValidationMessage For="@(()=> a.AmountOfComponent)"   />
+                                                </DxFormLayoutItem>
+
                                             </DxFormLayout>
                                         </EditFormTemplate>
                                     </DxGrid>
@@ -92,7 +111,7 @@
 else
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Active Component" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Master Data Active Component" />
 
         <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>

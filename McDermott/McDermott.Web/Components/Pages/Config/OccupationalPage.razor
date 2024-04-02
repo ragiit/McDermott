@@ -21,6 +21,7 @@
                                         @bind-SelectedDataItems="@SelectedDataItems"
                                         FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                         KeyFieldName="Id"
+                                        EditorRenderMode="GridEditorRenderMode.Detached"
                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                         EditModelSaving="OnSave"
                                         DataItemDeleting="OnDelete"
@@ -68,7 +69,7 @@
                                             var a = (OccupationalDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption"Caption="Occupational:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Occupational:" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
                                                 <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>

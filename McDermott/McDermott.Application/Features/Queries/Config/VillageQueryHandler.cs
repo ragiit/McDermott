@@ -4,6 +4,7 @@ namespace McDermott.Application.Features.Queries.Config
 {
     public class VillageQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetVillageQuery, List<VillageDto>>,
+        IRequestHandler<GetVillageQuery2, IQueryable<VillageDto>>,
         IRequestHandler<CreateVillageRequest, VillageDto>,
         IRequestHandler<CreateListVillageRequest, List<VillageDto>>,
         IRequestHandler<UpdateVillageRequest, VillageDto>,
@@ -55,6 +56,38 @@ namespace McDermott.Application.Features.Queries.Config
                     result = [.. result.AsQueryable().Where(request.Predicate)];
 
                 return result.ToList().Adapt<List<VillageDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IQueryable<VillageDto>> Handle(GetVillageQuery2 request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                string cacheKey = $"GetVillageQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out IQueryable<Village>? result))
+                {
+                    result = _unitOfWork.Repository<Village>().Entities
+                            .Include(z => z.Province)
+                            .Include(z => z.City)
+                            .Include(z => z.District)
+                            .AsNoTracking();
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                if (request.Predicate is not null)
+                    result = result.Where(request.Predicate);
+
+
+                return result.Adapt<IQueryable<VillageDto>>();
             }
             catch (Exception)
             {

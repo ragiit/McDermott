@@ -1,57 +1,53 @@
 ﻿namespace McDermott.Application.Features.Commands.Config
 {
-    public class EmailTemplateCommand
+    public class EmailEmailTemplateCommand
     {
-        public class GetEmailTemplateQuery : IRequest<List<EmailTemplateDto>>;
+        #region GET 
 
-        public class GetEmailTemplateByIdQuery : IRequest<EmailTemplateDto>
+        public class GetEmailTemplateQuery(Expression<Func<EmailTemplate, bool>>? predicate = null, bool removeCache = false) : IRequest<List<EmailTemplateDto>>
         {
-            public long Id { get; set; }
-
-            public GetEmailTemplateByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<EmailTemplate, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateEmailTemplateRequest : IRequest<EmailTemplateDto>
-        {
-            public EmailTemplateDto EmailTemplateDto { get; set; }
+        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
-            public CreateEmailTemplateRequest(EmailTemplateDto EmailTemplateDto)
-            {
-                this.EmailTemplateDto = EmailTemplateDto;
-            }
+        #region CREATE
+
+        public class CreateEmailTemplateRequest(EmailTemplateDto EmailTemplateDto) : IRequest<EmailTemplateDto>
+        {
+            public EmailTemplateDto EmailTemplateDto { get; set; } = EmailTemplateDto;
         }
 
-        public class UpdateEmailTemplateRequest : IRequest<bool>
+        public class CreateListEmailTemplateRequest(List<EmailTemplateDto> EmailTemplateDtos) : IRequest<List<EmailTemplateDto>>
         {
-            public EmailTemplateDto EmailTemplateDto { get; set; }
-
-            public UpdateEmailTemplateRequest(EmailTemplateDto EmailTemplateDto)
-            {
-                this.EmailTemplateDto = EmailTemplateDto;
-            }
+            public List<EmailTemplateDto> EmailTemplateDtos { get; set; } = EmailTemplateDtos;
         }
 
-        public class DeleteEmailTemplateRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteEmailTemplateRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateEmailTemplateRequest(EmailTemplateDto EmailTemplateDto) : IRequest<EmailTemplateDto>
+        {
+            public EmailTemplateDto EmailTemplateDto { get; set; } = EmailTemplateDto;
         }
 
-        public class DeleteListEmailTemplateRequest : IRequest<bool>
+        public class UpdateListEmailTemplateRequest(List<EmailTemplateDto> EmailTemplateDtos) : IRequest<List<EmailTemplateDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListEmailTemplateRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<EmailTemplateDto> EmailTemplateDtos { get; set; } = EmailTemplateDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteEmailTemplateRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

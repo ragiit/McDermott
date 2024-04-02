@@ -39,6 +39,8 @@ namespace McDermott.Application.Features.Queries
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }
 
+                result ??= [];
+
                 // Filter result based on request.Predicate if it's not null
                 if (request.Predicate is not null)
                     result = [.. result.AsQueryable().Where(request.Predicate)];

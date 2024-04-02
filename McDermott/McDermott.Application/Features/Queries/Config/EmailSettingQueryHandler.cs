@@ -2,113 +2,158 @@
 
 namespace McDermott.Application.Features.Queries.Config
 {
-    public partial class EmailSettingQueryHandler
+    public partial class EmailSettingQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetEmailSettingQuery, List<EmailSettingDto>>,
+        IRequestHandler<CreateEmailSettingRequest, EmailSettingDto>,
+        IRequestHandler<CreateListEmailSettingRequest, List<EmailSettingDto>>,
+        IRequestHandler<UpdateEmailSettingRequest, EmailSettingDto>,
+        IRequestHandler<UpdateListEmailSettingRequest, List<EmailSettingDto>>,
+        IRequestHandler<DeleteEmailSettingRequest, bool>
     {
-        internal class GetAllEmailSettingQueryHandler : IRequestHandler<GetEmailSettingQuery, List<EmailSettingDto>>
+        #region GET
+
+        public async Task<List<EmailSettingDto>> Handle(GetEmailSettingQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllEmailSettingQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetEmailSettingQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<EmailSetting>? result))
+                {
+                    result = await _unitOfWork.Repository<EmailSetting>().Entities
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<EmailSettingDto>>();
             }
-
-            public async Task<List<EmailSettingDto>> Handle(GetEmailSettingQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<EmailSetting>().Entities
-                        .Select(EmailSetting => EmailSetting.Adapt<EmailSettingDto>())
-                       .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetEmailSettingByIdQueryHandler : IRequestHandler<GetEmailSettingByIdQuery, EmailSettingDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<EmailSettingDto> Handle(CreateEmailSettingRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetEmailSettingByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<EmailSettingDto> Handle(GetEmailSettingByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<EmailSetting>().GetByIdAsync(request.Id);
-
-                return result.Adapt<EmailSettingDto>();
-            }
-        }
-
-        internal class CreateEmailSettingHandler : IRequestHandler<CreateEmailSettingRequest, EmailSettingDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateEmailSettingHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<EmailSettingDto> Handle(CreateEmailSettingRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<EmailSetting>().AddAsync(request.EmailSettingDto.Adapt<EmailSetting>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetEmailSettingQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<EmailSettingDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateEmailSettingHandler : IRequestHandler<UpdateEmailSettingRequest, bool>
+        public async Task<List<EmailSettingDto>> Handle(CreateListEmailSettingRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateEmailSettingHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<EmailSetting>().AddAsync(request.EmailSettingDtos.Adapt<List<EmailSetting>>());
 
-            public async Task<bool> Handle(UpdateEmailSettingRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<EmailSetting>().UpdateAsync(request.EmailSettingDto.Adapt<EmailSetting>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetEmailSettingQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<EmailSettingDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<EmailSettingDto> Handle(UpdateEmailSettingRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<EmailSetting>().UpdateAsync(request.EmailSettingDto.Adapt<EmailSetting>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetEmailSettingQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<EmailSettingDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<EmailSettingDto>> Handle(UpdateListEmailSettingRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<EmailSetting>().UpdateAsync(request.EmailSettingDtos.Adapt<List<EmailSetting>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetEmailSettingQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<EmailSettingDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteEmailSettingRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<EmailSetting>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<EmailSetting>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetEmailSettingQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteEmailSettingHandler : IRequestHandler<DeleteEmailSettingRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteEmailSettingHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteEmailSettingRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<EmailSetting>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListEmailSettingHandler : IRequestHandler<DeleteListEmailSettingRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListEmailSettingHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListEmailSettingRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<EmailSetting>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

@@ -2,56 +2,52 @@
 {
     public partial class EmailSettingCommand
     {
-        public class GetEmailSettingQuery : IRequest<List<EmailSettingDto>>;
+        #region GET 
 
-        public class GetEmailSettingByIdQuery : IRequest<EmailSettingDto>
+        public class GetEmailSettingQuery(Expression<Func<EmailSetting, bool>>? predicate = null, bool removeCache = false) : IRequest<List<EmailSettingDto>>
         {
-            public long Id { get; set; }
-
-            public GetEmailSettingByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<EmailSetting, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateEmailSettingRequest : IRequest<EmailSettingDto>
-        {
-            public EmailSettingDto EmailSettingDto { get; set; }
+        #endregion  
 
-            public CreateEmailSettingRequest(EmailSettingDto EmailSettingDto)
-            {
-                this.EmailSettingDto = EmailSettingDto;
-            }
+        #region CREATE
+
+        public class CreateEmailSettingRequest(EmailSettingDto EmailSettingDto) : IRequest<EmailSettingDto>
+        {
+            public EmailSettingDto EmailSettingDto { get; set; } = EmailSettingDto;
         }
 
-        public class UpdateEmailSettingRequest : IRequest<bool>
+        public class CreateListEmailSettingRequest(List<EmailSettingDto> EmailSettingDtos) : IRequest<List<EmailSettingDto>>
         {
-            public EmailSettingDto EmailSettingDto { get; set; }
-
-            public UpdateEmailSettingRequest(EmailSettingDto EmailSettingDto)
-            {
-                this.EmailSettingDto = EmailSettingDto;
-            }
+            public List<EmailSettingDto> EmailSettingDtos { get; set; } = EmailSettingDtos;
         }
 
-        public class DeleteEmailSettingRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteEmailSettingRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateEmailSettingRequest(EmailSettingDto EmailSettingDto) : IRequest<EmailSettingDto>
+        {
+            public EmailSettingDto EmailSettingDto { get; set; } = EmailSettingDto;
         }
 
-        public class DeleteListEmailSettingRequest : IRequest<bool>
+        public class UpdateListEmailSettingRequest(List<EmailSettingDto> EmailSettingDtos) : IRequest<List<EmailSettingDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListEmailSettingRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<EmailSettingDto> EmailSettingDtos { get; set; } = EmailSettingDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteEmailSettingRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE 
     }
 }

@@ -1,5 +1,4 @@
 ﻿global using DevExpress.Blazor;
-global using McDermott.Application.Dtos;
 global using Mapster;
 global using Blazored.Toast;
 global using Blazored.Toast.Services;
@@ -25,11 +24,15 @@ global using McDermott.Application.Dtos.Medical;
 global using McDermott.Application.Dtos.Transaction;
 global using McDermott.Application.Dtos.Employee;
 global using McDermott.Application.Dtos.Patient;
+global using McDermott.Application.Dtos.Pharmacy;
 
 global using DevExpress.Data.XtraReports.Native;
-global using System.Security.Claims;
 
 global using OfficeOpenXml;
+
+global using static McDermott.Application.Features.Commands.Pharmacy.ActiveComponentCommand;
+global using static McDermott.Application.Features.Commands.Pharmacy.DrugDosageCommand;
+global using static McDermott.Application.Features.Commands.Pharmacy.DrugRouteCommand;
 global using static McDermott.Application.Features.Commands.Transaction.LabResultDetailCommand;
 global using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
 global using static McDermott.Application.Features.Commands.Medical.SampleTypeCommand;
@@ -57,7 +60,6 @@ global using static McDermott.Application.Features.Commands.Config.MenuCommand;
 global using static McDermott.Application.Features.Commands.Medical.HealthCenterCommand;
 global using static McDermott.Application.Features.Commands.Medical.SpecialityCommand;
 global using static McDermott.Application.Features.Commands.Patient.PatientCommand;
-global using static McDermott.Application.Features.Commands.Medical.PractitionerCommand;
 global using static McDermott.Application.Features.Commands.Config.CompanyCommand;
 global using static McDermott.Application.Features.Commands.Employee.EmployeeCommand;
 global using static McDermott.Application.Features.Commands.Patient.FamilyRelationCommand;

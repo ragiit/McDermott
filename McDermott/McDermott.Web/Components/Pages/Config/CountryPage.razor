@@ -24,6 +24,7 @@
                                                 Text="Fetching Data...">
                                     <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
                                             Data="Countries"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -35,7 +36,7 @@
                                             EditMode="GridEditMode.PopupEditForm"
                                             PopupEditFormCssClass="pw-800"
                                             PagerPosition="GridPagerPosition.Bottom"
-                                                PageSizeSelectorVisible="true"
+                                            PageSizeSelectorVisible="true"
                                             PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                             PageSizeSelectorAllRowsItemVisible="true"
                                             PagerSwitchToInputBoxButtonCount="10"
