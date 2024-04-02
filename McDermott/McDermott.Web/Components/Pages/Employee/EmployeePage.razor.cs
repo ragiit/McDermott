@@ -171,6 +171,9 @@
                 UserForm.DomicileCountryId = UserForm.IdCardCountryId;
             }
 
+            if (!string.IsNullOrWhiteSpace(UserForm.Password))
+                UserForm.Password = Helper.HashMD5(UserForm.Password);
+
             if (UserForm.Id == 0)
                 await Mediator.Send(new CreateUserRequest(UserForm));
             else

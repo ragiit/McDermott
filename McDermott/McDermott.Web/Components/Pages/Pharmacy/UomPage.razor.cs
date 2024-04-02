@@ -1,6 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Config
+﻿namespace McDermott.Web.Components.Pages.Pharmacy
 {
-    public partial class VillagePage
+    public partial class UomPage
     {
         #region UserLoginAndAccessRole
 
@@ -51,82 +51,45 @@
 
         #endregion UserLoginAndAccessRole
 
-        public IGrid Grid { get; set; }
-        private List<ProvinceDto> Provinces = new();
-        private List<DistrictDto> Districts = new();
-        private List<CountryDto> Countrys = new();
-        private List<CityDto> Cities = new();
+        #region Static
 
-        private List<VillageDto> Villages = new();
-
-        //private object Data { get; set; }
-        private IEnumerable<VillageDto> Data { get; set; }
-
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IGrid Grid { get; set; }
+        private bool PanelVisible { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+
+        private List<UomCategoryDto> UomCategories = [];
+        private List<UomDto> Uoms = [];
+
+        private List<string> Types = new List<string>
+        {
+            "Bigger than the reference Unit of Measure",
+            "Reference Unit of Measure for this category",
+            "Smaller than the reference Unit of Measure",
+        };
+
+        #endregion Static
+
+        #region Load
 
         protected override async Task OnInitializedAsync()
         {
-            Countrys = await Mediator.Send(new GetCountryQuery());
-            Provinces = await Mediator.Send(new GetProvinceQuery());
-            Districts = await Mediator.Send(new GetDistrictQuery());
-            Cities = await Mediator.Send(new GetCityQuery());
-
+            UomCategories = await Mediator.Send(new GetUomCategoryQuery());
             await GetUserInfo();
             await LoadData();
         }
 
-        private bool EditItemsEnabled;
-        private bool PanelVisible { get; set; } = true;
-
         private async Task LoadData()
         {
             PanelVisible = true;
-            //var dataSource = new GridDevExtremeDataSource<VillageDto>(a.AsQueryable())
-            //{
-            //    CustomizeLoadOptions = (loadOptions) =>
-            //{
-            //    // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
-            //    // This can make SQL execution plans more efficient.
-            //    loadOptions.PrimaryKey = new[] { "Id" };
-            //    loadOptions.PaginateViaPrimaryKey = true;
-            //}
-            //};
-
-            Data = await Mediator.Send(new GetVillageQuery());
-
             SelectedDataItems = [];
+            Uoms = await Mediator.Send(new GetUomQuery());
             PanelVisible = false;
         }
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
+        #endregion Load
 
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
-        }
-
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
-        }
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
+        #region Click
 
         private async Task NewItem_Click()
         {
@@ -181,37 +144,62 @@
         {
             try
             {
-                var aq = SelectedDataItems.Count;
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteVillageRequest(((VillageDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteUomRequest(((UomDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<VillageDto>>();
-                    await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteUomRequest(ids: SelectedDataItems.Adapt<List<UomDto>>().Select(x => x.Id).ToList()));
                 }
+
                 await LoadData();
             }
             catch (Exception ee)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+                ee.HandleException(ToastService);
             }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (VillageDto)e.EditModel;
-
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
+            var editModel = (UomDto)e.EditModel;
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateVillageRequest(editModel));
+                await Mediator.Send(new CreateUomRequest(editModel));
             else
-                await Mediator.Send(new UpdateVillageRequest(editModel));
+                await Mediator.Send(new UpdateUomRequest(editModel));
 
             await LoadData();
         }
+
+        #endregion Click
+
+        #region Grid
+
+        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        {
+            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+            {
+                e.CssClass = "alt-item";
+            }
+            if (e.ElementType == GridElementType.HeaderCell)
+            {
+                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
+                e.CssClass = "header-bold";
+            }
+        }
+
+        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        {
+            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+        }
+
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+        }
+
+        #endregion Grid
     }
 }

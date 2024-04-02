@@ -2,7 +2,11 @@
 {
     public class ActiveComponent : BaseAuditableEntity
     {
+        public long? UomId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string? AmountOfComponent { get; set; }
+
+        [SetToNull]
+        public virtual Uom? Uom { get; set; }
     }
 }

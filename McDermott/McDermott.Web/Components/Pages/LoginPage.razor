@@ -253,7 +253,8 @@
         {
             ToastService.ClearErrorToasts();
 
-            var user = await Mediator.Send(new GetUserQuery(x => x.Email == LoginForm.Email && x.Password == LoginForm.Password));
+            // var user = await Mediator.Send(new GetUserQuery(x => x.Email == LoginForm.Email && x.Password == LoginForm.Password));
+            var user = await Mediator.Send(new GetUserQuery(x => x.Email == LoginForm.Email && x.Password == Helper.HashMD5(LoginForm.Password)));
 
             if (!FormValidationState)
             {

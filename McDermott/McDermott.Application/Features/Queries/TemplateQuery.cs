@@ -23,10 +23,14 @@ namespace McDermott.Application.Features.Queries
 
                 if (!_cache.TryGetValue(cacheKey, out List<Province>? result))
                 {
-                    result = await _unitOfWork.Repository<Province>().GetAsync(
-                        null,
-                        x => x.Include(z => z.Country),
-                        cancellationToken);
+                    result = await _unitOfWork.Repository<Province>().Entities
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    //result = await _unitOfWork.Repository<Province>().GetAsync(
+                    //    null,
+                    //    x => x.Include(z => z.Country),
+                    //    cancellationToken);
 
                     //return await _unitOfWork.Repository<Counter>().Entities
                     //  .Include(x => x.Physician)

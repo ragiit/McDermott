@@ -99,7 +99,25 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadData();
         }
 
-        private async Task NewItem_Click()
+        private async Task Refresh_Click()
+        {
+            await LoadData();
+        }
+
+        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        {
+            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+            {
+                e.CssClass = "alt-item";
+            }
+            if (e.ElementType == GridElementType.HeaderCell)
+            {
+                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
+                e.CssClass = "header-bold";
+            }
+        }
+
+        private void NewItem_Click()
         {
             ShowForm = true;
             GroupMenus = [];
@@ -143,14 +161,26 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItemGroup_Click()
         {
+            GroupMenu = new();
             IsAddMenu = true;
             await GridGropMenu.StartEditNewRowAsync();
         }
 
-        private async Task EditItemGroup_Click()
+        private async Task EditItemGroup_Click(IGrid context)
         {
+            var aa = context;
+            GroupMenu = (GroupMenuDto)context.SelectedDataItem;
+            // Buat salinan objek yang akan diedit menggunakan Mapster
+            var editedGroupMenu = GroupMenu.Adapt<GroupMenuDto>(); // GroupMenu adalah objek yang sedang diedit
+
             IsAddMenu = false;
             await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenu);
+
+            var groupMenu = GroupMenus.FirstOrDefault(x => x.Id == editedGroupMenu.Id);
+
+            if (groupMenu is not null)
+                // Gunakan salinan objek yang diedit
+                this.GroupMenu = editedGroupMenu;
         }
 
         private void DeleteItemGrid_Click()
@@ -159,6 +189,13 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+            var state = GroupMenus.Count > 0 ? true : false;
+            UpdateEditItemsEnabled(state);
+        }
+
+        private void GridGroupMenu_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndexGroupMenu = args.VisibleIndex;
             var state = GroupMenus.Count > 0 ? true : false;
@@ -175,8 +212,11 @@ namespace McDermott.Web.Components.Pages.Config
             try
             {
                 PanelVisible = true;
-                SelectedDataItems = new ObservableRangeCollection<object>();
+                SelectedDataItemsGroupMenu = [];
+                GroupMenu = new();
+                SelectedDataItems = [];
                 Group = new();
+                ShowForm = false;
                 GroupMenus = new();
                 Groups = await Mediator.Send(new GetGroupQuery());
                 PanelVisible = false;
@@ -221,9 +261,26 @@ namespace McDermott.Web.Components.Pages.Config
             SelectedDataItemsGroupMenu = new ObservableRangeCollection<object>();
         }
 
-        private async Task OnSaveGroupMenu(GridEditModelSavingEventArgs e)
+        private bool FormValidationState = false;
+
+        private async Task HandleValidSubmit()
         {
-            var groupMenu = (GroupMenuDto)e.EditModel;
+            FormValidationState = true;
+
+            await SaveItemGroupMenuGrid_Click();
+        }
+
+        private void HandleInvalidSubmit()
+        {
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+            FormValidationState = false;
+        }
+
+        private GroupMenuDto GroupMenu { get; set; } = new();
+
+        private async Task OnSaveGroupMenu()
+        {
+            var groupMenu = GroupMenu;
 
             GroupMenuDto updateMenu = new();
 
@@ -237,9 +294,6 @@ namespace McDermott.Web.Components.Pages.Config
             }
             else
             {
-                if (!GroupMenus.Where(x => x.MenuId == groupMenu.MenuId).Any())
-                    return;
-
                 var q = SelectedDataItemsGroupMenu[0].Adapt<GroupMenuDto>();
 
                 updateMenu = GroupMenus.FirstOrDefault(x => x.MenuId == q.MenuId)!;
@@ -256,7 +310,8 @@ namespace McDermott.Web.Components.Pages.Config
                 GroupMenus[index] = groupMenu;
             }
 
-            SelectedDataItemsGroupMenu = new ObservableRangeCollection<object>();
+            SelectedDataItemsGroupMenu = [];
+            GroupMenu = new();
         }
 
         private void CancelItemGroupMenuGrid_Click()

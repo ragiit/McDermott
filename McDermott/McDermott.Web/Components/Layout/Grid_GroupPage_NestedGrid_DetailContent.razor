@@ -1,9 +1,11 @@
 ﻿@using static McDermott.Application.Features.Commands.Config.GroupMenuCommand
 <DxGrid Data="GroupMenus"
         @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-        PageSize="5"
+        PageSize="10"
         ShowSearchBox="true"
         ShowGroupPanel="true"
+        CustomizeElement="Grid_CustomizeElement"
+        TextWrapEnabled="false"
         AutoExpandAllGroupRows="true" KeyboardNavigationEnabled="true">
     <ToolbarTemplate>
         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
@@ -45,6 +47,18 @@
     private void ColumnChooserButton_Click()
     {
         Grid.ShowColumnChooser();
+    }
+    private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+        {
+            e.CssClass = "alt-item";
+        }
+        if (e.ElementType == GridElementType.HeaderCell)
+        {
+            e.Style = "background-color: rgba(0, 0, 0, 0.08)";
+            e.CssClass = "header-bold";
+        }
     }
 
     private async Task ExportXlsxItem_Click()

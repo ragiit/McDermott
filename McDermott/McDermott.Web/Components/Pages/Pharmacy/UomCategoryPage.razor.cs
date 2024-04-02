@@ -1,6 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Config
+﻿namespace McDermott.Web.Components.Pages.Pharmacy
 {
-    public partial class ReligionPage
+    public partial class UomCategoryPage
     {
         #region UserLoginAndAccessRole
 
@@ -22,6 +22,18 @@
                     await GetUserInfo();
                 }
                 catch { }
+
+                try
+                {
+                    if (Grid is not null)
+                    {
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(1);
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(2);
+                    }
+                }
+                catch { }
             }
         }
 
@@ -39,11 +51,26 @@
 
         #endregion UserLoginAndAccessRole
 
-        public IGrid Grid { get; set; }
-        private List<ReligionDto> Religions = new();
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        #region Static
+
+        private IGrid Grid { get; set; }
+        private bool PanelVisible { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
-        private bool EditItemsEnabled { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+
+        private List<UomCategoryDto> UomCategories = [];
+
+        private List<string> Types = new List<string>
+        {
+            "Default Weigth",
+            "Default Working Time ",
+            "Default Length ",
+            "Default Volume"
+        };
+
+        #endregion Static
+
+        #region Load
 
         protected override async Task OnInitializedAsync()
         {
@@ -53,38 +80,15 @@
 
         private async Task LoadData()
         {
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Religions = await Mediator.Send(new GetReligionQuery());
+            PanelVisible = true;
+            SelectedDataItems = [];
+            UomCategories = await Mediator.Send(new GetUomCategoryQuery());
+            PanelVisible = false;
         }
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
+        #endregion Load
 
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
-        }
-
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
-        }
+        #region Click
 
         private async Task NewItem_Click()
         {
@@ -101,14 +105,14 @@
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        private void ColumnChooserButton_Click()
+        {
+            Grid.ShowColumnChooser();
         }
 
         private async Task ExportXlsxItem_Click()
@@ -116,7 +120,7 @@
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
             {
                 ExportSelectedRowsOnly = true,
-            });
+            }); ;
         }
 
         private async Task ExportXlsItem_Click()
@@ -139,37 +143,62 @@
         {
             try
             {
-                var aq = SelectedDataItems.Count;
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteReligionRequest(((ReligionDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteUomCategoryRequest(((UomCategoryDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<ReligionDto>>();
-                    await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteUomCategoryRequest(ids: SelectedDataItems.Adapt<List<UomCategoryDto>>().Select(x => x.Id).ToList()));
                 }
+
                 await LoadData();
             }
             catch (Exception ee)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+                ee.HandleException(ToastService);
             }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (ReligionDto)e.EditModel;
-
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
+            var editModel = (UomCategoryDto)e.EditModel;
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateReligionRequest(editModel));
+                await Mediator.Send(new CreateUomCategoryRequest(editModel));
             else
-                await Mediator.Send(new UpdateReligionRequest(editModel));
+                await Mediator.Send(new UpdateUomCategoryRequest(editModel));
 
             await LoadData();
         }
+
+        #endregion Click
+
+        #region Grid
+
+        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        {
+            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+            {
+                e.CssClass = "alt-item";
+            }
+            if (e.ElementType == GridElementType.HeaderCell)
+            {
+                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
+                e.CssClass = "header-bold";
+            }
+        }
+
+        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        {
+            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+        }
+
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+        }
+
+        #endregion Grid
     }
 }

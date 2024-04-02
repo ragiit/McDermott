@@ -60,6 +60,7 @@
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && EmailTemplates.Count > 0" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && EmailTemplates.Count > 0" />
+                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                     <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                     <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
                                                         <Items>
@@ -68,7 +69,6 @@
                                                             <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                         </Items>
                                                     </DxToolbarItem>
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
                                                 </DxToolbar>
                                             </ToolbarTemplate>
                                             <Columns>

@@ -105,6 +105,11 @@ namespace McDermott.Web.Components.Pages.Config
             await Grid.StartEditNewRowAsync();
         }
 
+        private async Task Refresh_Click()
+        {
+            await LoadData();
+        }
+
         private async Task ExportXlsxItem_Click()
         {
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()

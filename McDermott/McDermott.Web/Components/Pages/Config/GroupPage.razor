@@ -9,7 +9,21 @@
 
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Group" />
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Group</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
+                            <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/config/group">Group</a></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <section class="content">
             <div class="container-fluid">
@@ -25,7 +39,8 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                        <DxGrid @ref="Grid"
+                                                PagerNavigationMode="PagerNavigationMode.InputBox"
                                                 Data="Groups"
                                                 PageSize="10"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
@@ -43,10 +58,12 @@
                                                 PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                                 PageSizeSelectorAllRowsItemVisible="true"
                                                 PagerSwitchToInputBoxButtonCount="10"
+                                                RowDoubleClick="EditItem_Click"
                                                 PagerVisibleNumericButtonCount="10"
                                                 FocusedRowChanged="Grid_FocusedRowChanged"
                                                 ShowGroupPanel="true"
                                                 AutoExpandAllGroupRows="true"
+                                                CustomizeElement="Grid_CustomizeElement"
                                                 ShowFilterRow="true"
                                                 ShowSearchBox="true"
                                                 SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
@@ -56,6 +73,7 @@
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Groups.Count > 0" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Groups.Count > 0" />
+                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                     <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                     <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
                                                         <Items>
@@ -64,7 +82,6 @@
                                                             <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                         </Items>
                                                     </DxToolbarItem>
-                                                    <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
                                                 </DxToolbar>
                                             </ToolbarTemplate>
                                             <Columns>
@@ -80,182 +97,122 @@
                                 else
                                 {
 
-                                    <p for="tbOverview required-caption"> Group</p>
-                                    <DxTextBox @bind-Text="@Group.Name"
-                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                               NullText="Group" />
+                                    <EditForm Model="@Group" Context="EditFormContext22" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                                        <DataAnnotationsValidator />
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionPosition="CaptionPosition.Vertical" Caption="Group*" CssClass="normal-caption" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@Group.Name"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Group..." />
+                                                <ValidationMessage For="@(() => Group.Name)"   />
+                                            </DxFormLayoutItem>
 
-                                    <br>
+                                            <DxFormLayoutItem Context="ItemContext" CaptionPosition="CaptionPosition.Vertical" Caption="Menu" CssClass="normal-caption" ColSpanMd="12">
+                                                <Template>
+                                                    <DxGrid @ref="GridGropMenu"
+                                                            Data="GroupMenus"
+                                                            @bind-SelectedDataItems="@SelectedDataItemsGroupMenu"
+                                                            PageSize="10"
+                                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                            KeyFieldName="MenuId"
+                                                            SelectionMode="GridSelectionMode.Multiple"
+                                                            AllowSelectRowByClick="true"
+                                                            EditModelSaving="OnSaveGroupMenu"
+                                                            DataItemDeleting="OnDeleteGroupMenu"
+                                                            EditMode="GridEditMode.PopupEditForm"
+                                                            PopupEditFormCssClass="pw-800"
+                                                            PagerPosition="GridPagerPosition.Bottom"
+                                                            PageSizeSelectorVisible="true"
+                                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                            PageSizeSelectorAllRowsItemVisible="true"
+                                                            TextWrapEnabled="false"
+                                                            PagerSwitchToInputBoxButtonCount="10"
+                                                            FocusedRowEnabled="true"
+                                                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                                            PagerVisibleNumericButtonCount="10"
+                                                            FocusedRowChanged="GridGroupMenu_FocusedRowChanged"
+                                                            ShowGroupPanel="true"
+                                                            AutoExpandAllGroupRows="true"
+                                                            ShowFilterRow="true"
+                                                            ShowSearchBox="true"
+                                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                                            KeyboardNavigationEnabled="true">
+                                                        <ToolbarTemplate>
+                                                            <DxToolbar Context="ToolbarContext" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                                <DxToolbarItem Context="ToolbarContext" Text="New" Click="NewItemGroup_Click" IconCssClass="fa-solid fa-plus" />
+                                                                <DxToolbarItem Context="ToolbarContext" Text="Edit" Click="() => EditItemGroup_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsGroupMenu.Count > 0 && GroupMenus.Count > 0" />
+                                                                <DxToolbarItem Context="ToolbarContext" Text="Delete" Click="DeleteItemGrid_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsGroupMenu.Count > 0 && GroupMenus.Count > 0" />
+                                                                @* <DxToolbarItem Context="ToolbarContext" Text="Save" RenderStyle="ButtonRenderStyle.Primary" BeginGroup="true" IconCssClass="fa-solid fa-floppy-disk" Click="SaveItemGroupMenuGrid_Click" Enabled="GroupMenus.Count > 0" />
+                                                        <DxToolbarItem Context="ToolbarContext" Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-rotate-left" Click="CancelItemGroupMenuGrid_Click" /> *@
+                                                                <DxToolbarItem Context="ToolbarContext" Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                                <DxToolbarItem Context="ToolbarContext" Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                                    <Items>
+                                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                                    </Items>
+                                                                </DxToolbarItem>
+                                                                @* <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" /> *@
+                                                            </DxToolbar>
+                                                        </ToolbarTemplate>
+                                                        <Columns>
+                                                            <DxGridSelectionColumn Context="ToolbarContext" Width="15px" />
+                                                            <DxGridDataColumn Context="ToolbarContext" FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
+                                                            <DxGridDataColumn Context="ToolbarContext" FieldName="Create" />
+                                                            <DxGridDataColumn Context="ToolbarContext" FieldName="Read" />
+                                                            <DxGridDataColumn Context="ToolbarContext" FieldName="Update" />
+                                                            <DxGridDataColumn Context="ToolbarContext" FieldName="Delete" />
+                                                            @* <DxGridDataColumn FieldName="Import" /> *@
+                                                        </Columns>
+                                                        <EditFormTemplate Context="EditFormContext">
+                                                            <DxFormLayout CssClass="w-100">
+                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Menu:" ColSpanMd="12">
+                                                                    <DxComboBox Data="@(Menus.Where(x => !string.IsNullOrWhiteSpace(x.ParentMenu) && !x.Name.Equals("All")))"
+                                                                                NullText="Select Menu..."
+                                                                                ShowValidationIcon="true"
+                                                                                FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                @bind-Value="@GroupMenu.MenuId"
+                                                                                TextFieldName="Name"
+                                                                                ValueFieldName="Id">
+                                                                    </DxComboBox>
+                                                                    <ValidationMessage For="@(() => GroupMenu.MenuId)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Create" ColSpanMd="3">
+                                                                    <DxCheckBox @bind-Checked="@GroupMenu.Create" />
+                                                                    <ValidationMessage For="@(()=> @GroupMenu.Create)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Read" ColSpanMd="3">
+                                                                    <DxCheckBox @bind-Checked="@GroupMenu.Read" />
+                                                                    <ValidationMessage For="@(()=> @GroupMenu.Read)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Update" ColSpanMd="3">
+                                                                    <DxCheckBox @bind-Checked="@GroupMenu.Update" />
+                                                                    <ValidationMessage For="@(()=> @GroupMenu.Update)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Delete" ColSpanMd="3">
+                                                                    <DxCheckBox @bind-Checked="@GroupMenu.Delete" />
+                                                                    <ValidationMessage For="@(()=> @GroupMenu.Delete)"   />
+                                                                </DxFormLayoutItem>
+                                                            </DxFormLayout>
+                                                        </EditFormTemplate>
+                                                    </DxGrid>
+                                                </Template>
+                                            </DxFormLayoutItem>
 
-                                    <DxGrid @ref="GridGropMenu"
-                                            Data="GroupMenus"
-                                            @bind-SelectedDataItems="@SelectedDataItemsGroupMenu"
-                                            PageSize="10"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="MenuId"
-                                            SelectionMode="GridSelectionMode.Multiple"
-                                            AllowSelectRowByClick="true"
-                                            EditModelSaving="OnSaveGroupMenu"
-                                            DataItemDeleting="OnDeleteGroupMenu"
-                                            EditMode="GridEditMode.PopupEditForm"
-                                            PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            TextWrapEnabled="false"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            ShowFilterRow="true"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
-                                        <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Text="New" Click="NewItemGroup_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Text="Edit" Click="EditItemGroup_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsGroupMenu.Count > 0 && GroupMenus.Count > 0" />
-                                                <DxToolbarItem Text="Delete" Click="DeleteItemGrid_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsGroupMenu.Count > 0 && GroupMenus.Count > 0" />
-                                                <DxToolbarItem Text="Save" IconCssClass="fa-solid fa-floppy-disk" Click="SaveItemGroupMenuGrid_Click" Enabled="GroupMenus.Count > 0" />
-                                                <DxToolbarItem Text="Cancel" IconCssClass="fa-solid fa-rotate-left" Click="CancelItemGroupMenuGrid_Click" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                                <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                            </DxToolbar>
-                                        </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="Create" />
-                                            <DxGridDataColumn FieldName="Read" />
-                                            <DxGridDataColumn FieldName="Update" />
-                                            <DxGridDataColumn FieldName="Delete" />
-                                            @* <DxGridDataColumn FieldName="Import" /> *@
-                                        </Columns>
-                                        <EditFormTemplate Context="EditFormContext">
-                                            @{
-                                                var a = (GroupMenuDto)EditFormContext.EditModel;
-                                            }
-                                            <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Menu:" ColSpanMd="12">
-                                                    <DxComboBox Data="@Menus"
-                                                                NullText="Select Menu..."
-                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="@a.MenuId"
-                                                                TextFieldName="Name"
-                                                                ValueFieldName="Id">
-                                                    </DxComboBox>
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Create:" ColSpanMd="3">
-                                                    @EditFormContext.GetEditor("Create")
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Read:" ColSpanMd="3">
-                                                    @EditFormContext.GetEditor("Read")
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Update:" ColSpanMd="3">
-                                                    @EditFormContext.GetEditor("Update")
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Delete:" ColSpanMd="3">
-                                                    @EditFormContext.GetEditor("Delete")
-                                                </DxFormLayoutItem>
-                                                @* <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Import:" ColSpanMd="3">
-                                        @EditFormContext.GetEditor("Import")
-                                        </DxFormLayoutItem> *@
-                                            </DxFormLayout>
-                                        </EditFormTemplate>
-                                    </DxGrid>
-
-                                    @*     <DxGrid @ref="GridGropMenu"
-                            CssClass="mt"
-                            Data="GroupMenus"
-                            PageSize="10"
-                            @bind-SelectedDataItems="@SelectedDataItemsGroupMenu"
-                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                            KeyFieldName="Id"
-                            EditModelSaving="OnSaveGroupMenu"
-                            DataItemDeleting="OnDeleteGroupMenu"
-                            EditMode="GridEditMode.PopupEditForm"
-                            PopupEditFormCssClass="pw-800"
-                            PagerPosition="GridPagerPosition.Bottom"
-                            FocusedRowChanged="Grid_FocusedRowChanged"
-                            PageSizeSelectorVisible="true"
-                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                            PageSizeSelectorAllRowsItemVisible="true"
-                            PagerSwitchToInputBoxButtonCount="10"
-                            FocusedRowEnabled="true"
-                            PagerVisibleNumericButtonCount="10"
-                            ShowGroupPanel="true"
-                            AutoExpandAllGroupRows="true"
-                            ShowFilterRow="true"
-                            ShowSearchBox="true"
-                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                            KeyboardNavigationEnabled="true">
-                            <ToolbarTemplate>
-                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                            <DxToolbarItem Text="New" Click="NewItemGroup_Click" IconCssClass="grid-toolbar-new" />
-                            <DxToolbarItem Text="Edit" Click="EditItemGroup_Click" IconCssClass="grid-toolbar-edit" Enabled="EditItemsGroupEnabled" />
-                            <DxToolbarItem Text="Delete" Click="DeleteItemGrid_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItemsGroupMenu.Count > 0" />
-                            <DxToolbarItem Text="Save" Click="SaveItemGroupMenuGrid_Click" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItemsGroupMenu != null" />
-                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="grid-toolbar-column-chooser" />
-                            <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="grid-toolbar-export">
-                            <Items>
-                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                            </Items>
-                            </DxToolbarItem>
-                            </DxToolbar>
-                            </ToolbarTemplate>
-                            <Columns>
-                            <DxGridSelectionColumn Width="15px" />
-                            <DxGridDataColumn FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
-                            <DxGridDataColumn FieldName="Create" />
-                            <DxGridDataColumn FieldName="Read" />
-                            <DxGridDataColumn FieldName="Update" />
-                            <DxGridDataColumn FieldName="Delete" />
-                            <DxGridDataColumn FieldName="Import" />
-                            </Columns>
-                            <EditFormTemplate Context="EditFormContext">
-                            @{
-                            var a = (GroupMenuDto)EditFormContext.EditModel;
-                            }
-                            <DxFormLayout CssClass="w-100">
-                            <DxFormLayoutItem Caption="Menu:" ColSpanMd="6">
-                            <DxComboBox Data="@Menus"
-                            NullText="Select Menu..."
-                            @bind-Value="@a.MenuId"
-                            TextFieldName="Name"
-                            ValueFieldName="Id">
-                            </DxComboBox>
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Create:" ColSpanMd="6">
-                            @EditFormContext.GetEditor("Create")
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Read:" ColSpanMd="6">
-                            @EditFormContext.GetEditor("Read")
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Update:" ColSpanMd="6">
-                            @EditFormContext.GetEditor("Update")
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Delete:" ColSpanMd="6">
-                            @EditFormContext.GetEditor("Delete")
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Create:" ColSpanMd="6">
-                            @EditFormContext.GetEditor("Import")
-                            </DxFormLayoutItem>
-                            </DxFormLayout>
-                            </EditFormTemplate>
-                            </DxGrid> *@
+                                            <DxFormLayoutItem CssClass="w-100 ms-2">
+                                                <Template>
+                                                    <div class="w-100 row justify-content-end">
+                                                        <div class="col-auto align-self-end">
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                                                            </DxButton>
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="CancelItemGroupMenuGrid_Click"></DxButton>
+                                                        </div>
+                                                    </div>
+                                                </Template>
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditForm>
                                 }
                             </div>
                         </div>

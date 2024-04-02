@@ -3,14 +3,19 @@ global using McDermott.Application.Dtos.Config;
 global using McDermott.Application.Dtos.Employee;
 global using McDermott.Application.Dtos.Medical;
 global using McDermott.Application.Dtos.Patient;
+global using McDermott.Application.Dtos.Pharmacy;
+global using McDermott.Application.Dtos.Inventory;
 global using McDermott.Application.Dtos.Transaction;
 global using McDermott.Application.Interfaces.Repositories;
 global using McDermott.Domain.Entities;
+
 global using MediatR;
 global using Microsoft.EntityFrameworkCore;
 global using System.ComponentModel.DataAnnotations;
 global using System.Linq.Expressions;
 global using Microsoft.Extensions.Caching.Memory;
+
+global using static McDermott.Application.Features.Commands.Inventory.UomCommand;
 global using static McDermott.Application.Features.Commands.Medical.SampleTypeCommand;
 global using static McDermott.Application.Features.Commands.Config.GenderCommand;
 global using static McDermott.Application.Features.Commands.Config.GroupCommand;
@@ -32,6 +37,5 @@ global using static McDermott.Application.Features.Commands.Transaction.GeneralC
 global using static McDermott.Application.Features.Commands.Patient.ClassTypeCommand;
 global using static McDermott.Application.Features.Commands.Medical.LabUomCommand;
 global using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
-global using McDermott.Application.Dtos.Pharmacy;
 global using static McDermott.Application.Features.Commands.Pharmacy.DrugDosageCommand;
 global using static McDermott.Application.Features.Commands.Pharmacy.DrugRouteCommand;
