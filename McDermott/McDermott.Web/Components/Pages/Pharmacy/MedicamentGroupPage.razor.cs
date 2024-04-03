@@ -20,6 +20,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private bool PanelVisible { get; set; } = false;
         private bool showForm { get; set; } = false;
         private bool Checkins { get; set; } = false;
+        private bool FormMedicaments { get; set; } = false;
         private bool Concotions { get; set; } = false;
         public bool KeyboardNavigationEnabled { get; set; }
         private string? chars { get; set; }
@@ -139,14 +140,15 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         }
 
         #endregion Grid
+
         #region Click
         private async Task NewItem_Click()
         {
             showForm = true;
-        } 
+        }
         private async Task NewItemMedicamentGroupDetail_Click()
         {
-            showForm = true;
+            FormMedicaments = true;
         }
 
         private async Task Refresh_Click()
@@ -165,7 +167,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task Back_Click()
         {
             showForm = false;
-        } 
+        }
         private async Task CancelItemMedicamentGroupDetailGrid_Click()
         {
             showForm = false;

@@ -118,7 +118,7 @@
                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                     ShowValidationIcon="true"></DxComboBox>
                                                     </DxFormLayoutItem>
-                                                    
+
                                                 </div>
                                                 <div class="col-md-6 ">
                                                     @if (Concotions)
@@ -141,7 +141,7 @@
                                                     }
                                                 </div>
                                             </DxFormLayout>
-                                            <hr/>
+                                            <hr />
                                             <DxGrid @ref="Grid"
                                                     Data="@medicamentGroups"
                                                     ShowGroupPanel="true"
@@ -167,27 +167,25 @@
                                                 <Columns>
                                                     <DxGridSelectionColumn Width="15px" />
                                                     <DxGridDataColumn FieldName="Name" Caption="Medicamen Name" SortIndex="0" />
-                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Active Component"  />
-                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Medicament Dosage"  />
+                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Active Component" />
+                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Medicament Dosage" />
                                                     <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Medicament Unit Of Dosage" />
                                                     @if (!Concotions)
                                                     {
-                                                        <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Allow Substitution"  />
-                                                        <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Dosage Frequency"  />
+                                                        <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Allow Substitution" />
+                                                        <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Dosage Frequency" />
                                                     }
                                                     <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Dosage" />
-                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Unit Of Dosage"  />
+                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Unit Of Dosage" />
                                                     @if (!Concotions)
                                                     {
-                                                        <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Qty Per Day"  />
+                                                        <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Qty Per Day" />
                                                         <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Day" />
                                                     }
-                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Total Qty"/>
-                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="comment"  />
+                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Total Qty" />
+                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="comment" />
                                                 </Columns>
                                             </DxGrid>
-
-
                                         </EditForm>
                                     </div>
 
