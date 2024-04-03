@@ -15,6 +15,7 @@ global using System.ComponentModel.DataAnnotations;
 global using System.Linq.Expressions;
 global using Microsoft.Extensions.Caching.Memory;
 
+global using static McDermott.Application.Features.Commands.Inventory.ProductCategoryCommand;
 global using static McDermott.Application.Features.Commands.Inventory.UomCommand;
 global using static McDermott.Application.Features.Commands.Medical.SampleTypeCommand;
 global using static McDermott.Application.Features.Commands.Config.GenderCommand;

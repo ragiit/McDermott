@@ -92,13 +92,16 @@ namespace McDermott.Persistence.Context
         #endregion Queue
 
         #region Pharmacy
+
         public DbSet<DrugRoute> DrugRoutes { get; set; }
         public DbSet<DrugDosage> DrugDosages { get; set; }
         public DbSet<Signa> Signas { get; set; }
         public DbSet<ActiveComponent> ActiveComponents { get; set; }
         public DbSet<UomCategory> UomCategories { get; set; }
         public DbSet<Uom> Uoms { get; set; }
-        #endregion
+        public DbSet<ProductCategory> ProductCategories { get; set; }
+
+        #endregion Pharmacy
 
         #endregion DbSet
 
@@ -192,12 +195,10 @@ namespace McDermott.Persistence.Context
             //    .WithOne(c => c.User)
             //    .OnDelete(DeleteBehavior.Cascade);
 
-
             //modelBuilder.Entity<QueueDisplay>()
             //    .HasMany(m => m.Counter)
             //    .WithOne()
             //    .OnDelete(DeleteBehavior.Cascade);
-
 
             //modelBuilder.Entity<Province>()
             //  .HasMany(m => m.Districts)
