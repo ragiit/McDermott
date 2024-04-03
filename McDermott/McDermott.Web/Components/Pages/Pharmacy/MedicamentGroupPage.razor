@@ -101,24 +101,41 @@
                                                     <DxCheckBox @bind-Checked="@Checkin"
                                                                 LabelPosition="LabelPosition.Left" CssClass="w-100" />
                                                 </DxFormLayoutItem>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <DxFormLayoutItem Caption="Phycisian" ColSpanMd="12">
-                                                            <DxComboBox Data="@Phy"
-                                                                        @bind-Value="@MGFrom.PhycisianId"
-                                                                        NullText="Select Phycisian..."
-                                                                        TextFieldName="Name"
-                                                                        ShowValidationIcon="true"
-                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                        </DxFormLayoutItem>
-                                                    </div>
-                                                     @if (MGFrom.IsConcoction == true )
-                                                    {
-                                                        <div class="col-md-6">
-                                                            <h2>@chars</h2>
-                                                        </div>
-                                                    } 
-                                                </div>
+                                                <DxGridLayout CssClass="w-100 ch-480">
+                                                    <Rows>
+                                                        <DxGridLayoutRow Height="100px" />
+                                                        <DxGridLayoutRow />
+                                                        <DxGridLayoutRow Height="auto" />
+                                                    </Rows>
+                                                    <Columns>
+                                                        <DxGridLayoutColumn Width="10fr" />
+                                                        <DxGridLayoutColumn Width="60%" />
+                                                        <DxGridLayoutColumn />
+                                                    </Columns>
+                                                    <Items>
+                                                        <DxGridLayoutItem Row="0" Column="0">
+                                                            <Template>
+                                                                <DxFormLayoutItem Caption="Phycisian" ColSpanMd="12">
+                                                                    <DxComboBox Data="@Phy"
+                                                                                @bind-Value="@MGFrom.PhycisianId"
+                                                                                NullText="Select Phycisian ..."
+                                                                                TextFieldName="Name"
+                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                ShowValidationIcon="true"></DxComboBox>
+                                                                </DxFormLayoutItem>
+                                                            </Template>
+                                                        </DxGridLayoutItem>
+                                                        @if (Concotions)
+                                                        {
+                                                            <DxGridLayoutItem Row="0" Column="1">
+                                                            <Template>
+                                                                <h3>hahahaha</h3>
+                                                                @* <DxComboBox @bind-Value="@MGFrom.RegimentOfUseId"></DxComboBox> *@
+                                                            </Template>
+                                                            </DxGridLayoutItem>
+                                                        }
+                                                    </Items>
+                                                </DxGridLayout>
                                             </DxFormLayout>
                                         </EditForm>
                                     </div>

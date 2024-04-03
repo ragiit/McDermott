@@ -18,41 +18,29 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private bool PanelVisible { get; set; } = false;
         private bool showForm { get; set; } = false;
         private bool Checkins { get; set; } = false;
+        private bool Concotions { get; set; } = false;
 
         private string? chars { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
-        private bool? Checkin
+        private bool Checkin
         {
-            get
+            get => Checkins;
+            set
             {
-                //Checkins = ValueAccessingStrategy;
-                if ( Checkin == true)
+                bool Checkins = value;
+                this.Checkins = value;
+                if (Checkins)
                 {
+                    Concotions = true;
                     MGFrom.IsConcoction = true;
-                    return true;
+                    chars = " awokkkkk";
                 }
                 else
                 {
-                    MGFrom.IsConcoction = false;
-                    return false;
+                    Concotions = false;
                 }
-                
-            }
-            set
-            {
-                //if (MGFrom.IsConcoction == true)
-                //{
-                    MGFrom.IsConcoction = true;
-                    Concoctions = true;
-                    chars = "aw aw aw aw";
-                //}
-                //else
-                //{
-                //    MGFrom.IsConcoction = false;
-                //    Concoctions = false;
-                //}
             }
         }
         #endregion
