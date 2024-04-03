@@ -1,6 +1,7 @@
 ﻿using McDermott.Application.Dtos.Pharmacy;
 using McDermott.Domain.Entities;
 using MediatR;
+using System.ComponentModel;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
@@ -11,6 +12,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #region Relation Data
         private List<MedicamentGroupDto> medicamentGroups = [];
         private List<UserDto> Phy = new();
+        private List<UomCategoryDto> UoMs = new();
         private MedicamentGroupDto MGFrom = new();
         #endregion
         #region variabel static
@@ -19,11 +21,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private bool showForm { get; set; } = false;
         private bool Checkins { get; set; } = false;
         private bool Concotions { get; set; } = false;
-
+        public bool KeyboardNavigationEnabled { get; set; }
         private string? chars { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-
+        [DefaultValue(ScrollBarMode.Visible)]
+        [Parameter]
+        public ScrollBarMode HorizontalScrollBarMode { get; set; }
         private bool Checkin
         {
             get => Checkins;
@@ -119,6 +123,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
+        void Grid_CustomizeFilterRowEditor(GridCustomizeFilterRowEditorEventArgs e)
+        {
+            if (e.FieldName == "CreatedDate" || e.FieldName == "ModifiedDate" || e.FieldName == "FixedDate")
+                ((ITextEditSettings)e.EditSettings).ClearButtonDisplayMode = DataEditorClearButtonDisplayMode.Never;
+        }
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -134,6 +143,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task NewItem_Click()
         {
             showForm = true;
+        } 
+        private async Task NewItemMedicamentGroupDetail_Click()
+        {
+            showForm = true;
         }
 
         private async Task Refresh_Click()
@@ -145,12 +158,24 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
+        private async Task SaveItemMedicamentGroupDetailGrid_Click()
+        {
+            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+        }
         private async Task Back_Click()
+        {
+            showForm = false;
+        } 
+        private async Task CancelItemMedicamentGroupDetailGrid_Click()
         {
             showForm = false;
         }
 
         private void DeleteItem_Click()
+        {
+            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+        private void DeleteItemMedicamentGroupDetail_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }

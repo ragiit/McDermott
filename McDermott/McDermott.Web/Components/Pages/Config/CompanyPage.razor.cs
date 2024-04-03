@@ -184,11 +184,6 @@ namespace McDermott.Web.Components.Pages.Config
             await Grid.StartEditNewRowAsync();
         }
 
-        private async Task Refresh_Click()
-        {
-            await LoadData();
-        }
-
         private async Task EditItem_Click()
         {
             var company = SelectedDataItems[0].Adapt<CompanyDto>();
