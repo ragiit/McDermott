@@ -6,6 +6,20 @@ namespace McDermott.Web.Extentions
     {
         public static long RandomNumber => new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second;
 
+        public static string HashMD5(string input)
+        {
+            byte[] inputBytes = Encoding.ASCII.GetBytes(input);
+            byte[] hashBytes = MD5.HashData(inputBytes);
+            StringBuilder sb = new();
+
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                sb.Append(hashBytes[i].ToString("x2"));
+            }
+
+            return sb.ToString();
+        }
+
         public static void HandleException(this Exception ex, IToastService toastService)
         {
             string errorMessage = "An error occurred while saving data.";

@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240402033939_UomCategory")]
+    partial class UomCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,9 +47,6 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("UomId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -54,8 +54,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UomId");
 
                     b.ToTable("ActiveComponents");
                 });
@@ -2591,56 +2589,6 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("Specialities");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("BiggerRatio")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Multiple")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RoundingPrecision")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("UomCategoryId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UomCategoryId");
-
-                    b.ToTable("Uoms");
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.UomCategory", b =>
                 {
                     b.Property<long>("Id")
@@ -3010,16 +2958,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("ProvinceId");
 
                     b.ToTable("Villages");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.ActiveComponent", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.Uom", "Uom")
-                        .WithMany("ActiveComponents")
-                        .HasForeignKey("UomId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Uom");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Building", b =>
@@ -3580,16 +3518,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Serviced");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.UomCategory", "UomCategory")
-                        .WithMany("Uoms")
-                        .HasForeignKey("UomCategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("UomCategory");
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.User", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.Degree", "Degree")
@@ -3839,16 +3767,6 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.QueueDisplay", b =>
                 {
                     b.Navigation("Counter");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>
-                {
-                    b.Navigation("ActiveComponents");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.UomCategory", b =>
-                {
-                    b.Navigation("Uoms");
                 });
 #pragma warning restore 612, 618
         }

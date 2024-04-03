@@ -26,6 +26,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 if (!_cache.TryGetValue(cacheKey, out List<ActiveComponent>? result))
                 {
                     result = await _unitOfWork.Repository<ActiveComponent>().Entities
+                        .Include(x => x.Uom)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 
@@ -146,6 +147,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetActiveComponentQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetUomQuery_");
 
                 return true;
             }

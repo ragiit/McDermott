@@ -3,11 +3,14 @@
     public class ActiveComponentDto : IMapFrom<ActiveComponent>
     {
         public long Id { get; set; }
+        public long? UomId { get; set; }
 
         [Required]
         public string Name { get; set; } = string.Empty;
 
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? AmountOfComponent { get; set; }
+
+        public UomDto? Uom { get; set; }
     }
 }

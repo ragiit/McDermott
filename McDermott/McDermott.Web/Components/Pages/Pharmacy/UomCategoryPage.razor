@@ -1,13 +1,13 @@
-﻿@page "/pharmacy/active-components"
+﻿@page "/inventory/uom-categories"
 @rendermode InteractiveServer
 
-<PageTitle>McDermott - Master Data Active Component</PageTitle>
+<PageTitle>McDermott - Master Data Unit of Measure Categories</PageTitle>
 
 @if (IsAccess)
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Master Data Active Component" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Master Data Unit of Measure Categories" />
 
         <section class="content">
             <div class="container-fluid">
@@ -22,7 +22,7 @@
                                                 Text="Fetching Data...">
 
                                     <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="ActiveComponents"
+                                            Data="UomCategories"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -54,8 +54,8 @@
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && ActiveComponents.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && ActiveComponents.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && UomCategories.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && UomCategories.Count > 0" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                 <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                 <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
@@ -71,13 +71,12 @@
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="AmountOfComponent" Caption="Amount Of Component" />
-                                            <DxGridDataColumn FieldName="Uom.Name" Caption="Unit of Measure" />
+                                            <DxGridDataColumn FieldName="Type" />
 
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
                                             @{
-                                                var a = (ActiveComponentDto)EditFormContext.EditModel;
+                                                var a = (UomCategoryDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
 
@@ -89,24 +88,15 @@
                                                     <ValidationMessage For="@(()=> a.Name)"   />
                                                 </DxFormLayoutItem>
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Amount Of Component" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.AmountOfComponent"
-                                                               ShowValidationIcon="true"
-                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="Amount Of Component" />
-                                                    <ValidationMessage For="@(()=> a.AmountOfComponent)"   />
-                                                </DxFormLayoutItem>
-
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Unit of Measure" ColSpanMd="12">
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Type" ColSpanMd="12">
                                                     <DxComboBox ShowValidationIcon="true"
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                                Data="@Uoms"
-                                                                NullText="Select UoM..."
-                                                                @bind-Value="@a.UomId"
-                                                                TextFieldName="Name"
-                                                                ValueFieldName="Id">
+                                                                Data="@Types"
+                                                                NullText="Select Type..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
+                                                                @bind-Value="@a.Type">
                                                     </DxComboBox>
-                                                    <ValidationMessage For="@(()=>a.UomId)" />
+                                                    <ValidationMessage For="@(()=> a.Type)"   />
                                                 </DxFormLayoutItem>
 
                                             </DxFormLayout>
@@ -124,7 +114,7 @@
 else
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Master Data Active Component" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Master Data Unit of Measure Categories" />
 
         <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>

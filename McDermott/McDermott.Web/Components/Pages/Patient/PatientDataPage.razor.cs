@@ -6,6 +6,7 @@
 
         private List<UserDto> Users = [];
         private List<UserDto> Patiens = [];
+        private List<UserDto> AllPatiens = [];
         private List<FamilyDto> Families = [];
         private List<CityDto> Cities = [];
         private List<CountryDto> Countries = [];
@@ -178,6 +179,7 @@
 
             Users = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
             Patiens = Users.Where(x => x.IsPatient == true).ToList();
+            AllPatiens = Users.Where(x => x.IsPatient == true).ToList();
 
             PanelVisible = false;
         }
@@ -327,6 +329,9 @@
                     UserForm.DomicileCountryId = UserForm.IdCardCountryId;
                 }
 
+                if (!string.IsNullOrWhiteSpace(UserForm.Password))
+                    UserForm.Password = Helper.HashMD5(UserForm.Password);
+
                 if (UserForm.Id == 0)
                 {
                     var date = DateTime.Now;
@@ -335,36 +340,14 @@
                     UserForm.NoRm = lastId is null
                              ? $"{date:dd-MM-yyyy}-0001"
                              : $"{date:dd-MM-yyyy}-{(long.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
+
                     if (UserForm.IsEmployeeRelation == true)
                     {
                         var checkName = Users.Where(x => x.Name.Contains("%" + UserForm.Name + "%")).FirstOrDefault();
                         if (checkName != null)
                         {
                             UserForm.IsEmployee = true;
-                            await Mediator.Send(new UpdateUserRequest(UserForm));
-
-                            UserForm.PatientAllergy.UserId = checkName.Id;
-                            if (UserForm.PatientAllergy.Id == 0)
-                                await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
-                            else
-                                await Mediator.Send(new UpdatePatientAllergyRequest(UserForm.PatientAllergy));
-
-                            await Mediator.Send(new DeletePatientFamilyRelationRequest(ids: AllPatientFamilyRelations.Select(x => x.Id).ToList()));
-
-                            PatientFamilyRelations.ForEach(x => { x.PatientId = UserForm.Id; x.Id = 0; });
-                            var temp = new List<PatientFamilyRelationDto>();
-                            PatientFamilyRelations.ForEach(x =>
-                            {
-                                temp.Add(new PatientFamilyRelationDto
-                                {
-                                    PatientId = x.FamilyMemberId.GetValueOrDefault(),
-                                    FamilyMemberId = x.PatientId,
-                                    FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation)!.Id
-                                });
-                            });
-
-                            PatientFamilyRelations.AddRange(temp);
-                            await Mediator.Send(new CreateListPatientFamilyRelationRequest(PatientFamilyRelations));
+                            UserForm = await Mediator.Send(new UpdateUserRequest(UserForm));
                         }
                         else
                         {
@@ -376,16 +359,20 @@
                         result = await Mediator.Send(new CreateUserRequest(UserForm));
                     }
 
-                    UserForm.PatientAllergy.UserId = result.Id;
+                    UserForm.PatientAllergy.UserId = UserForm.Id;
 
-                    await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
+                    if (UserForm.PatientAllergy.Id == 0)
+                        await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
+                    else
+                        await Mediator.Send(new UpdatePatientAllergyRequest(UserForm.PatientAllergy));
 
-                    PatientFamilyRelations.ForEach(x => { x.PatientId = result.Id; x.Id = 0; });
+                    await Mediator.Send(new DeletePatientFamilyRelationRequest(ids: AllPatientFamilyRelations.Select(x => x.Id).ToList()));
 
-                    var temps = new List<PatientFamilyRelationDto>();
+                    PatientFamilyRelations.ForEach(x => { x.PatientId = UserForm.Id; x.Id = 0; });
+                    var temp = new List<PatientFamilyRelationDto>();
                     PatientFamilyRelations.ForEach(x =>
                     {
-                        temps.Add(new PatientFamilyRelationDto
+                        temp.Add(new PatientFamilyRelationDto
                         {
                             PatientId = x.FamilyMemberId.GetValueOrDefault(),
                             FamilyMemberId = x.PatientId,
@@ -393,8 +380,12 @@
                         });
                     });
 
-                    PatientFamilyRelations.AddRange(temps);
+                    PatientFamilyRelations.AddRange(temp);
                     await Mediator.Send(new CreateListPatientFamilyRelationRequest(PatientFamilyRelations));
+
+                    UserForm.PatientAllergy.UserId = result.Id;
+
+                    await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
                 }
                 else
                 {
@@ -424,7 +415,7 @@
                         {
                             PatientId = x.FamilyMemberId.GetValueOrDefault(),
                             FamilyMemberId = x.PatientId,
-                            FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation)!.Id
+                            FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation).Id
                         });
                     });
 
@@ -512,8 +503,13 @@
             catch { }
         }
 
+        private List<UserDto> originalPatiens = [];
+
         private async Task NewFamilyRelationItem_Click()
         {
+            if (UserForm.Id != 0)
+                Patiens = AllPatiens.Where(x => x.Id != UserForm.Id).ToList();
+
             await GridFamilyRelation.StartEditNewRowAsync();
         }
 

@@ -8,14 +8,9 @@ using System.Security.Claims;
 
 namespace McDermott.Persistence.Context
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) : DbContext(options)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
         #region DbSet
 
@@ -85,9 +80,6 @@ namespace McDermott.Persistence.Context
 
         #endregion Transaction
 
-        #region Pharmacy
-        #endregion
-
         #region Queue
 
         public DbSet<KioskConfig> KioskConfigs { get; set; }
@@ -104,6 +96,8 @@ namespace McDermott.Persistence.Context
         public DbSet<DrugDosage> DrugDosages { get; set; }
         public DbSet<Signa> Signas { get; set; }
         public DbSet<ActiveComponent> ActiveComponents { get; set; }
+        public DbSet<UomCategory> UomCategories { get; set; }
+        public DbSet<Uom> Uoms { get; set; }
         #endregion
 
         #endregion DbSet
@@ -134,6 +128,16 @@ namespace McDermott.Persistence.Context
                  .HasMany(m => m.DrugDosages)
                  .WithOne(c => c.DrugRoute)
                  .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Uom>()
+                  .HasMany(m => m.ActiveComponents)
+                  .WithOne(c => c.Uom)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<UomCategory>()
+                  .HasMany(m => m.Uoms)
+                  .WithOne(c => c.UomCategory)
+                  .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<GeneralConsultanService>()
                   .HasMany(m => m.GeneralConsultanCPPTs)

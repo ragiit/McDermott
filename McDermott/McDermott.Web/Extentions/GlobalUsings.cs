@@ -25,11 +25,14 @@ global using McDermott.Application.Dtos.Transaction;
 global using McDermott.Application.Dtos.Employee;
 global using McDermott.Application.Dtos.Patient;
 global using McDermott.Application.Dtos.Pharmacy;
+global using McDermott.Application.Dtos.Inventory;
 
 global using DevExpress.Data.XtraReports.Native;
 
 global using OfficeOpenXml;
 
+global using static McDermott.Application.Features.Commands.Inventory.UomCommand;
+global using static McDermott.Application.Features.Commands.Inventory.UomCategoryCommand;
 global using static McDermott.Application.Features.Commands.Pharmacy.ActiveComponentCommand;
 global using static McDermott.Application.Features.Commands.Pharmacy.DrugDosageCommand;
 global using static McDermott.Application.Features.Commands.Pharmacy.DrugRouteCommand;

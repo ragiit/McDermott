@@ -197,6 +197,11 @@ namespace McDermott.Web.Components.Pages.Config
             textPopUp = "Form Template Email";
         }
 
+        private async Task Refresh_Click()
+        {
+            await LoadData();
+        }
+
         private async Task EditItem_Click()
         {
             await LoadUser();

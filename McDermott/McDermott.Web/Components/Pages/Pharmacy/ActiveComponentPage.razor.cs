@@ -59,6 +59,7 @@
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         private List<ActiveComponentDto> ActiveComponents = [];
+        private List<UomDto> Uoms = [];
 
         #endregion Static
 
@@ -66,6 +67,7 @@
 
         protected override async Task OnInitializedAsync()
         {
+            Uoms = await Mediator.Send(new GetUomQuery(x => x.Active == true));
             await GetUserInfo();
             await LoadData();
         }
