@@ -26,7 +26,7 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
-                                @if (!showForm)
+                                @if (!showForm && !FormMedicaments)
                                 {
                                     <DxLoadingPanel @bind-Visible="PanelVisible"
                                                     IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
@@ -76,7 +76,7 @@
                                         </DxGrid>
                                     </DxLoadingPanel>
                                 }
-                                else
+                                else if(showForm && !FormMedicaments)
                                 {
                                     <div class="card-header bg-primary">
                                         <div class="row">
@@ -188,7 +188,16 @@
                                             </DxGrid>
                                         </EditForm>
                                     </div>
-
+                                }
+                                else
+                                {
+                                    <DxPopup @bind-Visible="@FormMedicaments" CloseOnOutsideClick="false" HeaderCssClass="fw-bold HeaderText="Add Medicamen">
+                                        <EditForm Model="@FormMedicamenDetails" Context="EditFormContext">
+                                            <DxFormLayout CssClass="mt">
+                                                
+                                            </DxFormLayout>
+                                        </EditForm>
+                                    </DxPopup>
                                 }
                             </div>
                         </div>
@@ -196,5 +205,13 @@
                 </div>
             </div>
         </section>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Pharmacy - Medicamen Group" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>
 }

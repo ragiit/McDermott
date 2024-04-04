@@ -1,53 +1,25 @@
-﻿using McDermott.Application.Dtos.Pharmacy;
-using McDermott.Domain.Entities;
-using MediatR;
-using System.ComponentModel;
-using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
+﻿using MediatR;
+using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
-    public partial class MedicamentGroupPage
+    public partial class FormDrugPage
     {
         #region Relation Data
-        private List<MedicamentGroupDto> medicamentGroups = [];
-        private List<UserDto> Phy = new();
-        private List<UomCategoryDto> UoMs = new();
-        private MedicamentGroupDto MGFrom = new();
-        private MedicamentGroupDetailDto FormMedicamenDetails = new();
+        private List<FormDrugDto> DataFormDrugs = [];
+        private FormDrugDto FormDrugs = new();
         #endregion
 
-        #region variabel static
-        private IGrid Grid { get; set; }
-        private bool PanelVisible { get; set; } = false;
-        private bool showForm { get; set; } = false;
-        private bool Checkins { get; set; } = false;
-        private bool FormMedicaments { get; set; } = false;
-        private bool Concotions { get; set; } = false;
-        public bool KeyboardNavigationEnabled { get; set; }
-        private string? chars { get; set; }
+        #region Properties Grid
+        private IGrid Grid;
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        
-        private bool Checkin
-        {
-            get => Checkins;
-            set
-            {
-                bool Checkins = value;
-                this.Checkins = value;
-                if (Checkins)
-                {
-                    Concotions = true;
-                    MGFrom.IsConcoction = true;
-                    chars = " awokkkkk";
-                }
-                else
-                {
-                    Concotions = false;
-                }
-            }
-        }
+        #endregion
+
+        #region Variabel static
+        private bool showForm { get; set; } = false;
+        private bool PanelVisible { get; set; } = false;
         #endregion
 
         #region UserLoginAndAccessRole
@@ -101,10 +73,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task LoadData()
         {
+            showForm = false;
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
-            var user = await Mediator.Send(new GetUserQuery());
-            Phy = [.. user.Where(x => x.IsPhysicion == true)];
+            DataFormDrugs = await Mediator.Send(new GetFormDrugQuery());            
             PanelVisible = false;
         }
         #endregion
@@ -146,11 +118,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             showForm = true;
         }
-        private async Task NewItemMedicamentGroupDetail_Click()
-        {
-            FormMedicaments = true;
-        }
-
+       
         private async Task Refresh_Click()
         {
             await LoadData();
@@ -158,17 +126,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            var general = SelectedDataItems[0].Adapt<FormDrugDto>();
+            FormDrugs = general;
+            showForm = true;
         }
-        private async Task SaveItemMedicamentGroupDetailGrid_Click()
-        {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-        }
+        
         private async Task Back_Click()
-        {
-            showForm = false;
-        }
-        private async Task CancelItemMedicamentGroupDetailGrid_Click()
         {
             showForm = false;
         }
@@ -177,10 +140,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
-        private void DeleteItemMedicamentGroupDetail_Click()
+
+        private async Task onCancle()
         {
-            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+            await LoadData();
         }
+       
         #endregion
 
         #region function Delete
@@ -190,11 +155,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteMedicamentGroupRequest(((MedicamentGroupDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteFormDrugRequest(((FormDrugDto)e.DataItem).Id));
                 }
                 else
                 {
-                    await Mediator.Send(new DeleteMedicamentGroupRequest(ids: SelectedDataItems.Adapt<List<MedicamentGroupDto>>().Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteFormDrugRequest(ids: SelectedDataItems.Adapt<List<FormDrugDto>>().Select(x => x.Id).ToList()));
                 }
 
                 await LoadData();
@@ -202,6 +167,28 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             catch (Exception ee)
             {
                 ee.HandleException(ToastService);
+            }
+        }
+        #endregion
+
+        #region function Save
+        private async Task onSave()
+        {
+            try
+            {
+                if(FormDrugs.Id == 0)
+                {
+                    await Mediator.Send(new CreateFormDrugRequest(FormDrugs));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateFormDrugRequest(FormDrugs));
+                }
+
+                await LoadData();
+            }catch(Exception ex)
+            {
+                ex.HandleException(ToastService);
             }
         }
         #endregion

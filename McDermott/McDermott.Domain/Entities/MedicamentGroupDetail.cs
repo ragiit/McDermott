@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace McDermott.Domain.Entities
 {
-    public class MedicamentGroupDetail
+    public class MedicamentGroupDetail : BaseAuditableEntity
     {
-        public long? MegacamentGroupId { get; set;}
-        public int? MedicaneId { get; set; }
-        public int? ActiveComponent { get; set; }
-        public int? RegimentOfUseId { get; set; }
+        public long? MedicamentGroupId { get; set; }
+        public long? MedicaneId { get; set; }
+        public List<long>? ActiveComponentId { get; set; }
+        public long? UoMId { get; set; }
         public float? MedicaneUnitDosage { get; set; }
         public float? QtyByDay { get; set; }
         public float? Days { get; set; }
@@ -20,5 +20,12 @@ namespace McDermott.Domain.Entities
         public string? UnitOfDosage { get; set; }
         public string? UnitOfDosageCategory { get; set; }
         public string? Comment { get; set; }
+
+        [SetToNull]
+        public virtual List<ActiveComponent>? ActiveComponent { get; set; }
+        [SetToNull]
+        public virtual MedicamentGroup? MedicamentGroup { get; set; }
+        [SetToNull]
+        public virtual Uom? UoM { get; set; }
     }
 }

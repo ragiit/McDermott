@@ -10,8 +10,15 @@ namespace McDermott.Domain.Entities
     {
         public string? Name { get; set; }
         public bool? IsConcoction { get; set; }
-        public int? PhycisianId { get; set; }
-        public string? Form { get; set; }
-        
+        public long? PhycisianId { get; set; }
+        public long? UoMId { get; set; }
+        public long? FormDrugId { get; set; }
+
+        [SetToNull]
+        public virtual User? Phycisian { get; set; }
+        [SetToNull]
+        public virtual Uom? UoM { get; set; }
+        [SetToNull]
+        public virtual FormDrug? FormDrug { get; set; }
     }
 }

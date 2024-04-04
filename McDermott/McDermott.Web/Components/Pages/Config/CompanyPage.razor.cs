@@ -181,7 +181,6 @@ namespace McDermott.Web.Components.Pages.Config
             isDetail = false;
             showForm = true;
             textPopUp = "Add Data Companies";
-            await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()

@@ -100,6 +100,9 @@ namespace McDermott.Persistence.Context
         public DbSet<UomCategory> UomCategories { get; set; }
         public DbSet<Uom> Uoms { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<FormDrug> FormDrugs { get; set; }
+        public DbSet<MedicamentGroup> MedicamentGroups { get; set; }
+        public DbSet<MedicamentGroupDetail> MedicamentGroupDetails { get; set; }
 
         #endregion Pharmacy
 
@@ -141,6 +144,8 @@ namespace McDermott.Persistence.Context
                   .HasMany(m => m.Uoms)
                   .WithOne(c => c.UomCategory)
                   .OnDelete(DeleteBehavior.SetNull);
+
+            
 
             modelBuilder.Entity<GeneralConsultanService>()
                   .HasMany(m => m.GeneralConsultanCPPTs)
