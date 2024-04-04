@@ -1,7 +1,7 @@
-﻿@page "/pharmacy/formdrug"
+﻿@page "/pharmacy/drug-form"
 @rendermode InteractiveServer
 
-<PageTitle>Pharmacy - Form Drug</PageTitle>
+<PageTitle>Pharmacy - Drug Form</PageTitle>
 
 @if (IsAccess)
 {
@@ -10,12 +10,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Form Drug</h1>
+                        <h1>Drug Form</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item" @onclick="LoadData"><a href="/pharmacy/formdrug">Form Drug</a></li>
+                            <li class="breadcrumb-item" @onclick="LoadData"><a href="/pharmacy/formdrug">Drug Form</a></li>
                         </ol>
                     </div>
                 </div>
@@ -74,14 +74,14 @@
                                         </Columns>
                                     </DxGrid>
                                 </DxLoadingPanel>
-                                <DxPopup @bind-Visible="@showForm" HeaderText="Add Form Drug" CssClass="bg-primary">
+                                <DxPopup @bind-Visible="@showForm" HeaderText="Add Drug Form" CssClass="bg-primary">
                                     <EditForm Model="FormDrugs" Context="FormEdiContext">
                                         <DxFormLayout CssClass="mt">
                                             <DxFormLayoutItem Caption="Name" CaptionCssClass="required-caption" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@FormDrugs.Name" NullText=" Name FormDrug..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Code" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@FormDrugs.Code" NullText="Code Form Drug..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
+                                                <DxTextBox @bind-Text="@FormDrugs.Code" NullText="Code Drug Form..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                         <hr />
@@ -104,7 +104,7 @@
 else
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Pharmacy Form Drug" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Pharmacy Drug Form" />
 
         <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>

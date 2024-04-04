@@ -2,6 +2,7 @@
 using McDermott.Domain.Entities;
 using MediatR;
 using System.ComponentModel;
+using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
@@ -12,9 +13,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #region Relation Data
         private List<MedicamentGroupDto> medicamentGroups = [];
         private List<UserDto> Phy = new();
-        private List<UomCategoryDto> UoMs = new();
+        private List<UomDto> UoMs = new();
         private MedicamentGroupDto MGFrom = new();
-        private List<FormDrugDto> FormDrugs = new();
+        private List<DrugFormDto> FormDrugs = new();
         private MedicamentGroupDetailDto FormMedicamenDetails = new();
         #endregion
 
@@ -105,6 +106,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             var user = await Mediator.Send(new GetUserQuery());
+            FormDrugs = await Mediator.Send(new GetFormDrugQuery());
+            UoMs = await Mediator.Send(new GetUomQuery());
             Phy = [.. user.Where(x => x.IsPhysicion == true)];
             PanelVisible = false;
         }

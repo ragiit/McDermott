@@ -26,7 +26,7 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
-                                @if (!showForm && !FormMedicaments)
+                                @if (!showForm)
                                 {
                                     <DxLoadingPanel @bind-Visible="PanelVisible"
                                                     IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
@@ -76,7 +76,7 @@
                                         </DxGrid>
                                     </DxLoadingPanel>
                                 }
-                                else if(showForm && !FormMedicaments)
+                                else 
                                 {
                                     <div class="card-header bg-primary">
                                         <div class="row">
@@ -126,9 +126,11 @@
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem Caption="From" CaptionCssClass="normal-caption mr-5" ColSpanMd="12">
                                                             <DxComboBox Data="@FormDrugs"
-                                                                        @bind-Value="@MGFrom.RegimentOfUseId"
+                                                                        @bind-Value="@MGFrom.FormDrugId"
                                                                         NullText="Select From ..."
                                                                         CssClass="ml-3"
+                                                                        TextFieldName="Name"
+                                                                        ValueFieldName="Id"
                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                         ShowValidationIcon="true"></DxComboBox>
                                                         </DxFormLayoutItem>
@@ -160,39 +162,31 @@
                                                 </ToolbarTemplate>
                                                 <Columns>
                                                     <DxGridSelectionColumn Width="15px" />
-                                                    <DxGridDataColumn FieldName="Name" Caption="Medicamen Name" SortIndex="0" />
-                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Active Component" />
-                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Medicament Dosage" />
-                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Medicament Unit Of Dosage" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="Name" Caption="Medicamen Name" SortIndex="0" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Active Component" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Medicament Dosage" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Medicament Unit Of Dosage" />
                                                     @if (!Concotions)
                                                     {
-                                                        <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Allow Substitution" />
-                                                        <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Dosage Frequency" />
+                                                        <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Allow Substitution" />
+                                                        <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Dosage Frequency" />
                                                     }
-                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Dosage" />
-                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Unit Of Dosage" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Dosage" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Unit Of Dosage" />
                                                     @if (!Concotions)
                                                     {
-                                                        <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Qty Per Day" />
-                                                        <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Day" />
+                                                        <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Qty Per Day" />
+                                                        <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Day" />
                                                     }
-                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Total Qty" />
-                                                    <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="comment" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Total Qty" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="comment" />
                                                 </Columns>
                                             </DxGrid>
                                         </EditForm>
                                     </div>
+                                    
                                 }
-                                else
-                                {
-                                    <DxPopup @bind-Visible="@FormMedicaments" CloseOnOutsideClick="false" HeaderCssClass="fw-bold HeaderText="Add Medicamen">
-                                        <EditForm Model="@FormMedicamenDetails" Context="EditFormContext">
-                                            <DxFormLayout CssClass="mt">
-                                                
-                                            </DxFormLayout>
-                                        </EditForm>
-                                    </DxPopup>
-                                }
+                                
                             </div>
                         </div>
                     </div>

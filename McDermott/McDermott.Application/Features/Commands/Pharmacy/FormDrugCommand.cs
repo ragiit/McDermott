@@ -10,9 +10,9 @@ namespace McDermott.Application.Features.Commands.Pharmacy
     {
         #region GET
 
-        public class GetFormDrugQuery(Expression<Func<FormDrug, bool>>? predicate = null, bool removeCache = false) : IRequest<List<FormDrugDto>>
+        public class GetFormDrugQuery(Expression<Func<DrugForm, bool>>? predicate = null, bool removeCache = false) : IRequest<List<DrugFormDto>>
         {
-            public Expression<Func<FormDrug, bool>> Predicate { get; } = predicate!;
+            public Expression<Func<DrugForm, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
 
@@ -20,28 +20,28 @@ namespace McDermott.Application.Features.Commands.Pharmacy
 
         #region CREATE
 
-        public class CreateFormDrugRequest(FormDrugDto FormDrugDto) : IRequest<FormDrugDto>
+        public class CreateFormDrugRequest(DrugFormDto FormDrugDto) : IRequest<DrugFormDto>
         {
-            public FormDrugDto FormDrugDto { get; set; } = FormDrugDto;
+            public DrugFormDto FormDrugDto { get; set; } = FormDrugDto;
         }
 
-        public class CreateListFormDrugRequest(List<FormDrugDto> GeneralConsultanCPPTDtos) : IRequest<List<FormDrugDto>>
+        public class CreateListFormDrugRequest(List<DrugFormDto> GeneralConsultanCPPTDtos) : IRequest<List<DrugFormDto>>
         {
-            public List<FormDrugDto> FormDrugDtos { get; set; } = GeneralConsultanCPPTDtos;
+            public List<DrugFormDto> FormDrugDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
         #endregion CREATE
 
         #region Update
 
-        public class UpdateFormDrugRequest(FormDrugDto FormDrugDto) : IRequest<FormDrugDto>
+        public class UpdateFormDrugRequest(DrugFormDto FormDrugDto) : IRequest<DrugFormDto>
         {
-            public FormDrugDto FormDrugDto { get; set; } = FormDrugDto;
+            public DrugFormDto FormDrugDto { get; set; } = FormDrugDto;
         }
 
-        public class UpdateListFormDrugRequest(List<FormDrugDto> FormDrugDtos) : IRequest<List<FormDrugDto>>
+        public class UpdateListFormDrugRequest(List<DrugFormDto> FormDrugDtos) : IRequest<List<DrugFormDto>>
         {
-            public List<FormDrugDto> FormDrugDtos { get; set; } = FormDrugDtos;
+            public List<DrugFormDto> FormDrugDtos { get; set; } = FormDrugDtos;
         }
 
         #endregion Update

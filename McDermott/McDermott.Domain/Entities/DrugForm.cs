@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace McDermott.Domain.Entities
 {
-    public class FormDrug :BaseAuditableEntity
+    public class DrugForm :BaseAuditableEntity
     {
         public string? Code { get; set; }
         public string? Name { get; set; }

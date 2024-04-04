@@ -8,16 +8,16 @@ using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 namespace McDermott.Application.Features.Queries.Pharmacy
 {
     public class FormDrugQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-         IRequestHandler<GetFormDrugQuery, List<FormDrugDto>>,
-         IRequestHandler<CreateFormDrugRequest, FormDrugDto>,
-         IRequestHandler<CreateListFormDrugRequest, List<FormDrugDto>>,
-         IRequestHandler<UpdateFormDrugRequest, FormDrugDto>,
-         IRequestHandler<UpdateListFormDrugRequest, List<FormDrugDto>>,
+         IRequestHandler<GetFormDrugQuery, List<DrugFormDto>>,
+         IRequestHandler<CreateFormDrugRequest, DrugFormDto>,
+         IRequestHandler<CreateListFormDrugRequest, List<DrugFormDto>>,
+         IRequestHandler<UpdateFormDrugRequest, DrugFormDto>,
+         IRequestHandler<UpdateListFormDrugRequest, List<DrugFormDto>>,
          IRequestHandler<DeleteFormDrugRequest, bool>
     {
         #region GET
 
-        public async Task<List<FormDrugDto>> Handle(GetFormDrugQuery request, CancellationToken cancellationToken)
+        public async Task<List<DrugFormDto>> Handle(GetFormDrugQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -26,9 +26,9 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 if (request.RemoveCache)
                     _cache.Remove(cacheKey);
 
-                if (!_cache.TryGetValue(cacheKey, out List<FormDrug>? result))
+                if (!_cache.TryGetValue(cacheKey, out List<DrugForm>? result))
                 {
-                    result = await _unitOfWork.Repository<FormDrug>().GetAsync(
+                    result = await _unitOfWork.Repository<DrugForm>().GetAsync(
                         null,
                         cancellationToken: cancellationToken);
 
@@ -39,7 +39,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 if (request.Predicate is not null)
                     result = [.. result?.AsQueryable().Where(request.Predicate)];
 
-                return result.ToList().Adapt<List<FormDrugDto>>();
+                return result.ToList().Adapt<List<DrugFormDto>>();
             }
             catch (Exception)
             {
@@ -51,17 +51,17 @@ namespace McDermott.Application.Features.Queries.Pharmacy
 
         #region CREATE
 
-        public async Task<FormDrugDto> Handle(CreateFormDrugRequest request, CancellationToken cancellationToken)
+        public async Task<DrugFormDto> Handle(CreateFormDrugRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<FormDrug>().AddAsync(request.FormDrugDto.Adapt<FormDrug>());
+                var result = await _unitOfWork.Repository<DrugForm>().AddAsync(request.FormDrugDto.Adapt<DrugForm>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetFormDrugQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<FormDrugDto>();
+                return result.Adapt<DrugFormDto>();
             }
             catch (Exception)
             {
@@ -69,17 +69,17 @@ namespace McDermott.Application.Features.Queries.Pharmacy
             }
         }
 
-        public async Task<List<FormDrugDto>> Handle(CreateListFormDrugRequest request, CancellationToken cancellationToken)
+        public async Task<List<DrugFormDto>> Handle(CreateListFormDrugRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<FormDrug>().AddAsync(request.FormDrugDtos.Adapt<List<FormDrug>>());
+                var result = await _unitOfWork.Repository<DrugForm>().AddAsync(request.FormDrugDtos.Adapt<List<DrugForm>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetFormDrugQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<List<FormDrugDto>>();
+                return result.Adapt<List<DrugFormDto>>();
             }
             catch (Exception)
             {
@@ -91,17 +91,17 @@ namespace McDermott.Application.Features.Queries.Pharmacy
 
         #region UPDATE
 
-        public async Task<FormDrugDto> Handle(UpdateFormDrugRequest request, CancellationToken cancellationToken)
+        public async Task<DrugFormDto> Handle(UpdateFormDrugRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<FormDrug>().UpdateAsync(request.FormDrugDto.Adapt<FormDrug>());
+                var result = await _unitOfWork.Repository<DrugForm>().UpdateAsync(request.FormDrugDto.Adapt<DrugForm>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetFormDrugQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<FormDrugDto>();
+                return result.Adapt<DrugFormDto>();
             }
             catch (Exception)
             {
@@ -109,17 +109,17 @@ namespace McDermott.Application.Features.Queries.Pharmacy
             }
         }
 
-        public async Task<List<FormDrugDto>> Handle(UpdateListFormDrugRequest request, CancellationToken cancellationToken)
+        public async Task<List<DrugFormDto>> Handle(UpdateListFormDrugRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<FormDrug>().UpdateAsync(request.FormDrugDtos.Adapt<List<FormDrug>>());
+                var result = await _unitOfWork.Repository<DrugForm>().UpdateAsync(request.FormDrugDtos.Adapt<List<DrugForm>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetFormDrugQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<List<FormDrugDto>>();
+                return result.Adapt<List<DrugFormDto>>();
             }
             catch (Exception)
             {
@@ -137,12 +137,12 @@ namespace McDermott.Application.Features.Queries.Pharmacy
             {
                 if (request.Id > 0)
                 {
-                    await _unitOfWork.Repository<FormDrug>().DeleteAsync(request.Id);
+                    await _unitOfWork.Repository<DrugForm>().DeleteAsync(request.Id);
                 }
 
                 if (request.Ids.Count > 0)
                 {
-                    await _unitOfWork.Repository<FormDrug>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                    await _unitOfWork.Repository<DrugForm>().DeleteAsync(x => request.Ids.Contains(x.Id));
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

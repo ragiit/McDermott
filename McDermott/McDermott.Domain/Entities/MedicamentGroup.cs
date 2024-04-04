@@ -19,6 +19,6 @@ namespace McDermott.Domain.Entities
         [SetToNull]
         public virtual Uom? UoM { get; set; }
         [SetToNull]
-        public virtual FormDrug? FormDrug { get; set; }
+        public virtual DrugForm? FormDrug { get; set; }
     }
 }

@@ -100,7 +100,7 @@ namespace McDermott.Persistence.Context
         public DbSet<UomCategory> UomCategories { get; set; }
         public DbSet<Uom> Uoms { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
-        public DbSet<FormDrug> FormDrugs { get; set; }
+        public DbSet<DrugForm> FormDrugs { get; set; }
         public DbSet<MedicamentGroup> MedicamentGroups { get; set; }
         public DbSet<MedicamentGroupDetail> MedicamentGroupDetails { get; set; }
         public DbSet<ReorderingRule> ReorderingRules { get; set; }
