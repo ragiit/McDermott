@@ -39,5 +39,11 @@
 
         [SetToNull]
         public virtual Country? Country { get; set; }
+
+        [SetToNull]
+        public virtual List<ReorderingRule>? ReorderingRules { get; set; }
+
+        [SetToNull]
+        public virtual List<Location>? Locations { get; set; }
     }
 }

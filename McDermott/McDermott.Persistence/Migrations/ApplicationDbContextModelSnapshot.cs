@@ -2074,6 +2074,9 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("CompanyId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -2084,6 +2087,9 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<long?>("ParentLocationId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -2097,6 +2103,10 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("ParentLocationId");
 
                     b.ToTable("Locations");
                 });
@@ -2478,6 +2488,52 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("Religions");
                 });
 
+            modelBuilder.Entity("McDermott.Domain.Entities.ReorderingRule", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("CompanyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LocationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<float>("MaximumQuantity")
+                        .HasColumnType("real");
+
+                    b.Property<float>("MinimumQuantity")
+                        .HasColumnType("real");
+
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("LocationId");
+
+                    b.ToTable("ReorderingRules");
+                });
+
             modelBuilder.Entity("McDermott.Domain.Entities.SampleType", b =>
                 {
                     b.Property<long>("Id")
@@ -2639,8 +2695,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
-                    b.Property<string>("BiggerRatio")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<float?>("BiggerRatio")
+                        .HasColumnType("real");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -2655,8 +2711,8 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RoundingPrecision")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<float?>("RoundingPrecision")
+                        .HasColumnType("real");
 
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
@@ -3558,6 +3614,23 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("SampleType");
                 });
 
+            modelBuilder.Entity("McDermott.Domain.Entities.Location", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.Company", "Company")
+                        .WithMany("Locations")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("McDermott.Domain.Entities.Location", "ParentLocation")
+                        .WithMany()
+                        .HasForeignKey("ParentLocationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Company");
+
+                    b.Navigation("ParentLocation");
+                });
+
             modelBuilder.Entity("McDermott.Domain.Entities.PatientAllergy", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.User", "User")
@@ -3604,6 +3677,23 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.ReorderingRule", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.Company", "Company")
+                        .WithMany("ReorderingRules")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("McDermott.Domain.Entities.Location", "Location")
+                        .WithMany("ReorderingRules")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Service", b =>
@@ -3795,6 +3885,13 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Villages");
                 });
 
+            modelBuilder.Entity("McDermott.Domain.Entities.Company", b =>
+                {
+                    b.Navigation("Locations");
+
+                    b.Navigation("ReorderingRules");
+                });
+
             modelBuilder.Entity("McDermott.Domain.Entities.Country", b =>
                 {
                     b.Navigation("Companies");
@@ -3856,6 +3953,8 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.Location", b =>
                 {
                     b.Navigation("BuildingLocations");
+
+                    b.Navigation("ReorderingRules");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Menu", b =>

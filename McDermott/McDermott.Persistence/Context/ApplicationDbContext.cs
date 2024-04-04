@@ -100,6 +100,7 @@ namespace McDermott.Persistence.Context
         public DbSet<UomCategory> UomCategories { get; set; }
         public DbSet<Uom> Uoms { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<ReorderingRule> ReorderingRules { get; set; }
 
         #endregion Pharmacy
 
@@ -123,6 +124,13 @@ namespace McDermott.Persistence.Context
             // Contoh: Aturan cascade delete untuk hubungan many-to-many
 
             // Menentukan indeks menggunakan Fluent API
+
+            modelBuilder.Entity<Location>()
+            .HasOne(e => e.ParentLocation)
+            .WithMany() // Menggunakan WithMany karena properti ParentLocationId akan menjadi nullable
+            .HasForeignKey(e => e.ParentLocationId)
+            .OnDelete(DeleteBehavior.Restrict); // Mengizinkan ParentLocationId menjadi null saat entitas ParentLocation dihapus
+
             modelBuilder.Entity<Village>()
                 .HasIndex(p => p.Id)
                 .IsUnique();
@@ -131,6 +139,21 @@ namespace McDermott.Persistence.Context
                  .HasMany(m => m.DrugDosages)
                  .WithOne(c => c.DrugRoute)
                  .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Location>()
+                .HasMany(m => m.ReorderingRules)
+                .WithOne(c => c.Location)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Company>()
+                .HasMany(m => m.ReorderingRules)
+                .WithOne(c => c.Company)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Company>()
+               .HasMany(m => m.Locations)
+               .WithOne(c => c.Company)
+               .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Uom>()
                   .HasMany(m => m.ActiveComponents)
