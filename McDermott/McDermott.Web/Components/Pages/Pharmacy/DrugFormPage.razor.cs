@@ -4,11 +4,11 @@ using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
-    public partial class FormDrugPage
+    public partial class DrugFormPage
     {
         #region Relation Data
-        private List<FormDrugDto> DataFormDrugs = [];
-        private FormDrugDto FormDrugs = new();
+        private List<DrugFormDto> DataFormDrugs = [];
+        private DrugFormDto FormDrugs = new();
         #endregion
 
         #region Properties Grid
@@ -126,7 +126,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItem_Click()
         {
-            var general = SelectedDataItems[0].Adapt<FormDrugDto>();
+            var general = SelectedDataItems[0].Adapt<DrugFormDto>();
             FormDrugs = general;
             showForm = true;
         }
@@ -155,11 +155,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteFormDrugRequest(((FormDrugDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteFormDrugRequest(((DrugFormDto)e.DataItem).Id));
                 }
                 else
                 {
-                    await Mediator.Send(new DeleteFormDrugRequest(ids: SelectedDataItems.Adapt<List<FormDrugDto>>().Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteFormDrugRequest(ids: SelectedDataItems.Adapt<List<DrugFormDto>>().Select(x => x.Id).ToList()));
                 }
 
                 await LoadData();

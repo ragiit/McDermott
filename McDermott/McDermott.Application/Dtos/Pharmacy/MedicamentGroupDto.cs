@@ -13,7 +13,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public bool IsConcoction { get; set; } = false;
         public long? PhycisianId { get; set; }
         public long? RegimentOfUseId { get; set; }
-        public string? Form { get; set; }
+        public long? FormDrugId { get; set; }
         
 
         

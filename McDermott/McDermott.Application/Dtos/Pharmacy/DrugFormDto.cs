@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Pharmacy
 {
-    public class FormDrugDto :IMapFrom<FormDrug>
+    public class DrugFormDto :IMapFrom<DrugForm>
     {
         public long Id { get; set; }
         public string? Code { get; set; }
