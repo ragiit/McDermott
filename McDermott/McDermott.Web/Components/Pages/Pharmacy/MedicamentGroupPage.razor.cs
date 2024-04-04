@@ -14,6 +14,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<UserDto> Phy = new();
         private List<UomCategoryDto> UoMs = new();
         private MedicamentGroupDto MGFrom = new();
+        private List<FormDrugDto> FormDrugs = new();
         private MedicamentGroupDetailDto FormMedicamenDetails = new();
         #endregion
 

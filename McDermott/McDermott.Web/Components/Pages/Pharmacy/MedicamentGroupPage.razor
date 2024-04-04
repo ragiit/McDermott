@@ -90,19 +90,13 @@
                                         <EditForm Model="MGFrom" Context="FormEditContext">
                                             <DataAnnotationsValidator />
                                             <DxFormLayout CssClass="mt">
-                                                <DxFormLayoutItem Caption="Name gks" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
+                                                <DxFormLayoutItem Caption="Name" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@MGFrom.Name"
                                                                ShowValidationIcon="true"
                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                NullText="Name" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="From" ColSpanMd="12">
-                                                    <DxComboBox Data="@UoMs"
-                                                                @bind-Value="@MGFrom.RegimentOfUseId"
-                                                                NullText="Select From ..."
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                ShowValidationIcon="true"></DxComboBox>
-                                                </DxFormLayoutItem>
+                                               
                                                 <DxFormLayoutItem Caption="Is Concoction?" ColSpanMd="12">
                                                     <DxCheckBox @bind-Checked="@Checkin"
                                                                 LabelPosition="LabelPosition.Left" CssClass="w-100" />
@@ -131,7 +125,7 @@
                                                                         ShowValidationIcon="true"></DxComboBox>
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem Caption="From" CaptionCssClass="normal-caption mr-5" ColSpanMd="12">
-                                                            <DxComboBox Data="@UoMs"
+                                                            <DxComboBox Data="@FormDrugs"
                                                                         @bind-Value="@MGFrom.RegimentOfUseId"
                                                                         NullText="Select From ..."
                                                                         CssClass="ml-3"
