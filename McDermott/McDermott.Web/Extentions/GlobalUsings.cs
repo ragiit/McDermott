@@ -31,6 +31,7 @@ global using DevExpress.Data.XtraReports.Native;
 
 global using OfficeOpenXml;
 
+global using static McDermott.Application.Features.Commands.Pharmacy.ReorderingRuleCommand;
 global using static McDermott.Application.Features.Commands.Inventory.ProductCategoryCommand;
 global using static McDermott.Application.Features.Commands.Inventory.UomCommand;
 global using static McDermott.Application.Features.Commands.Inventory.UomCategoryCommand;

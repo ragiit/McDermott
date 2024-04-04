@@ -153,6 +153,10 @@ namespace McDermott.Web.Components.Pages.Config
         {
             Grid.ShowColumnChooser();
         }
+        private async Task Refresh_Click()
+        {
+            await LoadData();
+        }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
@@ -177,12 +181,6 @@ namespace McDermott.Web.Components.Pages.Config
             isDetail = false;
             showForm = true;
             textPopUp = "Add Data Companies";
-            await Grid.StartEditNewRowAsync();
-        }
-
-        private async Task Refresh_Click()
-        {
-            await LoadData();
         }
 
         private async Task EditItem_Click()
@@ -192,6 +190,11 @@ namespace McDermott.Web.Components.Pages.Config
             showForm = true;
             isDetail = false;
             textPopUp = "Edit Data Companies";
+        }
+
+        private async Task Back_Click()
+        {
+            showForm = false;
         }
 
         private void DeleteItem_Click()

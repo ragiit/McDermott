@@ -86,7 +86,7 @@
                                             </ToolbarTemplate>
                                             <Columns>
                                                 <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                                <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />
                                             </Columns>
                                             <DetailRowTemplate>
                                                 <Grid_GroupPage_NestedGrid_DetailContent Group="(GroupDto)context.DataItem"></Grid_GroupPage_NestedGrid_DetailContent>
@@ -199,19 +199,14 @@
                                                     </DxGrid>
                                                 </Template>
                                             </DxFormLayoutItem>
-
-                                            <DxFormLayoutItem CssClass="w-100 ms-2">
-                                                <Template>
-                                                    <div class="w-100 row justify-content-end">
-                                                        <div class="col-auto align-self-end">
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
-                                                            </DxButton>
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="CancelItemGroupMenuGrid_Click"></DxButton>
-                                                        </div>
-                                                    </div>
-                                                </Template>
-                                            </DxFormLayoutItem>
                                         </DxFormLayout>
+                                        <div class="w-100 row justify-content-end">
+                                            <div class="col-auto align-self-end">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                                                </DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="CancelItemGroupMenuGrid_Click"></DxButton>
+                                            </div>
+                                        </div>
                                     </EditForm>
                                 }
                             </div>

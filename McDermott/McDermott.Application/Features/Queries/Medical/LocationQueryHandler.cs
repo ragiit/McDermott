@@ -1,115 +1,185 @@
-﻿using static McDermott.Application.Features.Commands.Medical.LocationCommand;
+﻿
 
 namespace McDermott.Application.Features.Queries.Medical
 {
-    public class LocationQueryHandler
+    public class LocationQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetLocationQuery, List<LocationDto>>,
+        IRequestHandler<CreateLocationRequest, LocationDto>,
+        IRequestHandler<CreateListLocationRequest, List<LocationDto>>,
+        IRequestHandler<UpdateLocationRequest, LocationDto>,
+        IRequestHandler<UpdateListLocationRequest, List<LocationDto>>,
+        IRequestHandler<DeleteLocationRequest, bool>
     {
-        internal class GetAllLocationQueryHandler : IRequestHandler<GetLocationQuery, List<LocationDto>>
+        #region GET
+
+        public async Task<List<LocationDto>> Handle(GetLocationQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllLocationQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetLocationQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Location>? result))
+                {
+                    result = await _unitOfWork.Repository<Location>().Entities
+                       .Include(x => x.ParentLocation)
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<LocationDto>>();
             }
-
-            public async Task<List<LocationDto>> Handle(GetLocationQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<Location>().Entities
-                        .Select(Location => Location.Adapt<LocationDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetLocationByIdQueryHandler : IRequestHandler<GetLocationByIdQuery, LocationDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<LocationDto> Handle(CreateLocationRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetLocationByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<LocationDto> Handle(GetLocationByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Location>().GetByIdAsync(request.Id);
-
-                return result.Adapt<LocationDto>();
-            }
-        }
-
-        internal class CreateLocationHandler : IRequestHandler<CreateLocationRequest, LocationDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateLocationHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<LocationDto> Handle(CreateLocationRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Location>().AddAsync(request.LocationDto.Adapt<Location>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetLocationQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<LocationDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateLocationHandler : IRequestHandler<UpdateLocationRequest, bool>
+        public async Task<List<LocationDto>> Handle(CreateListLocationRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateLocationHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Location>().AddAsync(request.LocationDtos.Adapt<List<Location>>());
 
-            public async Task<bool> Handle(UpdateLocationRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Location>().UpdateAsync(request.LocationDto.Adapt<Location>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetLocationQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<LocationDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<LocationDto> Handle(UpdateLocationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Location>().UpdateAsync(request.LocationDto.Adapt<Location>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetLocationQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<LocationDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<LocationDto>> Handle(UpdateListLocationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Location>().UpdateAsync(request.LocationDtos.Adapt<List<Location>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetLocationQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<LocationDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteLocationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    var result = await _unitOfWork.Repository<Location>().Entities.Where(x => x.ParentLocationId == request.Id).ToListAsync(cancellationToken);
+
+                    foreach (var item in result)
+                    {
+                        item.ParentLocationId = null;
+                    }
+
+                    await _unitOfWork.Repository<Location>().UpdateAsync(result);
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    //await _unitOfWork.Repository<Location>().DeleteAsync(x => result.Select(z => z.Id).Contains(x.Id));
+
+                    await _unitOfWork.Repository<Location>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    foreach (var item in request.Ids)
+                    {
+                        var result = await _unitOfWork.Repository<Location>().Entities.Where(x => x.ParentLocationId == item).ToListAsync(cancellationToken);
+
+                        foreach (var item2 in result)
+                        {
+                            item2.ParentLocationId = null;
+                        }
+
+                        await _unitOfWork.Repository<Location>().UpdateAsync(result);
+                    }
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    await _unitOfWork.Repository<Location>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetLocationQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteLocationHandler : IRequestHandler<DeleteLocationRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteLocationHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteLocationRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Location>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListLocationHandler : IRequestHandler<DeleteListLocationRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListLocationHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListLocationRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Location>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

@@ -12,6 +12,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+
         #region UserLoginAndAccessRole
 
         [Inject]

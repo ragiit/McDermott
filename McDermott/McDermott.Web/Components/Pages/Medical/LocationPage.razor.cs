@@ -3,8 +3,10 @@
     public partial class LocationPage
     {
         public List<LocationDto> Locations = [];
+        public List<LocationDto> ParentLocations = [];
+        public List<CompanyDto> Companies = [];
 
-        private List<string> Types = new List<string>
+        private List<string> Types = new()
         {
             "Internal Location"
         };
@@ -63,14 +65,14 @@
         {
             try
             {
-                if (SelectedDataItems is null)
+                if (SelectedDataItems is not null && SelectedDataItems.Count == 1)
                 {
                     await Mediator.Send(new DeleteLocationRequest(((LocationDto)e.DataItem).Id));
                 }
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<LocationDto>>();
-                    await Mediator.Send(new DeleteListLocationRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteLocationRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
@@ -160,6 +162,8 @@
 
         protected override async Task OnInitializedAsync()
         {
+            Companies = await Mediator.Send(new GetCompanyQuery());
+
             await GetUserInfo();
             await LoadData();
         }
@@ -167,8 +171,9 @@
         private async Task LoadData()
         {
             PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
             Locations = await Mediator.Send(new GetLocationQuery());
+            ParentLocations = Locations.Where(x => x.ParentLocationId is null).ToList();
             PanelVisible = false;
         }
 

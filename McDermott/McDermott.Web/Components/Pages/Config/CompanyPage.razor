@@ -5,9 +5,23 @@
 @if (IsAccess)
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Company" />
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Company</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item" @onclick="LoadData"><a href="/config/companies">Company</a></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <div class="content">
+        <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
@@ -51,19 +65,11 @@
                                                 AllowSelectRowByClick="true"
                                                 KeyboardNavigationEnabled="true">
                                             <ToolbarTemplate>
-                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Companys.Count > 0" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Companys.Count > 0" />
                                                     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                        <Items>
-                                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                        </Items>
-                                                    </DxToolbarItem>
                                                     <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
                                                 </DxToolbar>
                                             </ToolbarTemplate>
@@ -79,6 +85,16 @@
                             {
                                 <EditForm Model="@formCompanies" Context="EditFormContext">
                                     <DataAnnotationsValidator />
+                                    <div class="card-header bg-primary">
+                                        <div class="row">
+                                            <div class="col-md-2 align-self-center">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-arrow-left-long" Text="Back" SubmitFormOnClick="true" Click="Back_Click"></DxButton>
+                                            </div>
+                                            <div class="col">
+                                                <h4 class="text-center">@textPopUp</h4>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="card-body">
                                         <DxFormLayout CssClass="mt">
                                             <DxFormLayoutItem CaptionCssClass="caption normal-caption" caption="Name" ColSpanMd="12">
@@ -168,7 +184,7 @@
                                     <div class="card-footer">
                                         <div class="row  justify-content-end">
                                             <div class="col-auto align-self-end">
-                                                <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSave"></DxButton>
                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnCancel"></DxButton>
                                             </div>
                                         </div>
@@ -180,7 +196,7 @@
                                 <div class="card-header">
                                     <div class="row  justify-content-beetween">
                                         <div class="col-4 align-self-start">
-                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Edit" SubmitFormOnClick="true" Click="EditItem_Click"></DxButton>
+                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Edit" SubmitFormOnClick="true" Click="EditItem_Click"></DxButton>
                                             <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancel"></DxButton>
                                         </div>
                                     </div>
@@ -273,7 +289,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     </div>
 }
 else

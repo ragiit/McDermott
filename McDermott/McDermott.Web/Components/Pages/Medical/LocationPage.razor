@@ -1,4 +1,4 @@
-﻿@page "/medical/location"
+﻿@page "/inventory/location"
 @rendermode InteractiveServer
 
 <PageTitle>McDermott - Master Data Location</PageTitle>
@@ -67,23 +67,54 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="Type" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="ParentLocation.Name" Caption="Parent Location" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Type" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Company.Name" Caption="Company" />
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
                                             @{
                                                 var a = (LocationDto)EditFormContext.EditModel;
+                                                a.Type = Types[0];
                                             }
                                             <DxFormLayout CssClass="w-100">
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
                                                     <ValidationMessage For="@(()=> a.Name)"   />
                                                 </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parent Location" ColSpanMd="12">
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                Data="@ParentLocations"
+                                                                NullText="Select Parent Location..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
+                                                                @bind-Value="@a.ParentLocationId"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id">
+                                                    </DxComboBox>
+                                                    <ValidationMessage For="@(()=> a.ParentLocationId)"   />
+                                                </DxFormLayoutItem>
+
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Type" ColSpanMd="12">
-                                                    <DxComboBox
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                        Data="@Types" @bind-Value="@a.Type" NullText="Select Types..." ShowValidationIcon="true" />
+                                                    <DxComboBox FilteringMode="@DataGridFilteringMode.Contains"
+                                                                Data="@Types" @bind-Value="@a.Type"
+                                                                NullText="Select Types..."
+                                                                ShowValidationIcon="true" />
                                                     <ValidationMessage For="@(()=>a.Type)"   />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Company" ColSpanMd="12">
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                Data="@Companies"
+                                                                NullText="Select Company..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
+                                                                @bind-Value="@a.CompanyId"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id">
+                                                    </DxComboBox>
+                                                    <ValidationMessage For="@(()=> a.CompanyId)"   />
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
 

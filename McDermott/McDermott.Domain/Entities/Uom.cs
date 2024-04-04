@@ -24,10 +24,10 @@ namespace McDermott.Domain.Entities
 
         public string? Multiple { get; set; }
 
-        public string? BiggerRatio { get; set; }
+        public float? BiggerRatio { get; set; }
 
         public bool Active { get; set; } = true;
-        public string? RoundingPrecision { get; set; }
+        public float? RoundingPrecision { get; set; }
 
         [SetToNull]
         public virtual UomCategory? UomCategory { get; set; }

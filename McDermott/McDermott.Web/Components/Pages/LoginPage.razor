@@ -69,7 +69,7 @@
                 </form> *@
 
                 <EditForm Model="@LoginForm" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
-                          OnInvalidSubmit="@HandleInvalidSubmit">
+                          OnInvalidSubmit="@HandleInvalidSubmit" FormName="FormUser">
                     <DataAnnotationsValidator />
                     <DxFormLayout CssClass="col-md">
                         <DxFormLayoutItem CaptionCssClass="required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Email" ColSpanMd="12" BeginRow="true">
@@ -236,11 +236,8 @@
         NavigationManager.NavigateTo("/", true);
     }
 
-    private User User = new User
-    {
-        // Email = "admin@example.com",
-        // Password = "123"
-    };
+    [SupplyParameterFromForm]
+    private User User { get; set; } = new();
 
     private async Task OnLogin()
     {
@@ -297,7 +294,7 @@
                 var encrypt = Helper.Encrypt(serialize);
 
                 // await oLocal.SetItemAsync("dotnet", encrypt);
-                await JsRuntime.InvokeVoidAsync("setCookie", CookieHelper.USER_INFO, encrypt, 1);
+                await JsRuntime.InvokeVoidAsync("setCookie", CookieHelper.USER_INFO, encrypt, 2);
 
                 // if (user[0].GroupId is not null)
                 // {

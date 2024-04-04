@@ -10,7 +10,7 @@
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
+        #endregion  
 
         #region CREATE
 

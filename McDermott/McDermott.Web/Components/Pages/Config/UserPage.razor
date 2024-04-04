@@ -51,6 +51,7 @@
                                                 CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                 EditModelSaving="OnSave"
                                                 DataItemDeleting="OnDelete"
+                                                TextWrapEnabled="false"
                                                 RowDoubleClick="OnRowDoubleClick"
                                                 FocusedRowEnabled="true"
                                                 PopupEditFormCssClass="pw-800"
@@ -87,14 +88,14 @@
                                             </ToolbarTemplate>
                                             <Columns>
                                                 <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                                <DxGridDataColumn FieldName="Email" />
-                                                <DxGridDataColumn FieldName="Group.Name" Caption="Group" />
-                                                <DxGridDataColumn FieldName="IsEmployee" Caption="Employee" />
-                                                <DxGridDataColumn FieldName="IsPatient" Caption="Patient" />
-                                                <DxGridDataColumn FieldName="IsUser" Caption="User" />
-                                                <DxGridDataColumn FieldName="IsPhysicion" Caption="Physicion" />
-                                                <DxGridDataColumn FieldName="IsNurse" Caption="Nurse" />
+                                                <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />
+                                                <DxGridDataColumn FieldName="Email" MinWidth="200" />
+                                                <DxGridDataColumn FieldName="Group.Name" MinWidth="200" Caption="Group" />
+                                                <DxGridDataColumn FieldName="IsEmployee" MinWidth="200" Caption="Employee" />
+                                                <DxGridDataColumn FieldName="IsPatient" MinWidth="200" Caption="Patient" />
+                                                <DxGridDataColumn FieldName="IsUser" MinWidth="200" Caption="User" />
+                                                <DxGridDataColumn FieldName="IsPhysicion" MinWidth="200" Caption="Physicion" />
+                                                <DxGridDataColumn FieldName="IsNurse" MinWidth="200" Caption="Nurse" />
                                             </Columns>
                                         </DxGrid>
                                     </DxLoadingPanel>

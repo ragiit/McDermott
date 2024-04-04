@@ -2,56 +2,52 @@
 {
     public class LocationCommand
     {
-        public class GetLocationQuery : IRequest<List<LocationDto>>;
+        #region GET 
 
-        public class GetLocationByIdQuery : IRequest<LocationDto>
+        public class GetLocationQuery(Expression<Func<Location, bool>>? predicate = null, bool removeCache = false) : IRequest<List<LocationDto>>
         {
-            public long Id { get; set; }
-
-            public GetLocationByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<Location, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateLocationRequest : IRequest<LocationDto>
-        {
-            public LocationDto LocationDto { get; set; }
+        #endregion  
 
-            public CreateLocationRequest(LocationDto LocationDto)
-            {
-                this.LocationDto = LocationDto;
-            }
+        #region CREATE
+
+        public class CreateLocationRequest(LocationDto LocationDto) : IRequest<LocationDto>
+        {
+            public LocationDto LocationDto { get; set; } = LocationDto;
         }
 
-        public class UpdateLocationRequest : IRequest<bool>
+        public class CreateListLocationRequest(List<LocationDto> LocationDtos) : IRequest<List<LocationDto>>
         {
-            public LocationDto LocationDto { get; set; }
-
-            public UpdateLocationRequest(LocationDto LocationDto)
-            {
-                this.LocationDto = LocationDto;
-            }
+            public List<LocationDto> LocationDtos { get; set; } = LocationDtos;
         }
 
-        public class DeleteLocationRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteLocationRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateLocationRequest(LocationDto LocationDto) : IRequest<LocationDto>
+        {
+            public LocationDto LocationDto { get; set; } = LocationDto;
         }
 
-        public class DeleteListLocationRequest : IRequest<bool>
+        public class UpdateListLocationRequest(List<LocationDto> LocationDtos) : IRequest<List<LocationDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListLocationRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<LocationDto> LocationDtos { get; set; } = LocationDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteLocationRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

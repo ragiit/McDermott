@@ -33,7 +33,7 @@
                                             EditorRenderMode="GridEditorRenderMode.Detached"
                                             EditMode="GridEditMode.PopupEditForm"
                                             PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom" A
+                                            PagerPosition="GridPagerPosition.Bottom"
                                             AllowSelectRowByClick="true"
                                             PageSizeSelectorVisible="true"
                                             PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
@@ -70,11 +70,11 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" Caption="Unit of Measure" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="UomCategory.Name" Caption="Category" />
-                                            <DxGridDataColumn FieldName="BiggerRatio" Caption="Bigger Ratio" />
-                                            <DxGridDataColumn FieldName="Type" />
-                                            <DxGridDataColumn FieldName="Active" />
+                                            <DxGridDataColumn FieldName="Name" MinWidth="200" Caption="Unit of Measure" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="UomCategory.Name" MinWidth="200" Caption="Category" />
+                                            <DxGridDataColumn FieldName="BiggerRatio" MinWidth="200" Caption="Bigger Ratio" />
+                                            <DxGridDataColumn FieldName="Type" MinWidth="200" />
+                                            <DxGridDataColumn FieldName="Active" MinWidth="200" />
 
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
@@ -178,10 +178,10 @@
                                                 </DxFormLayoutItem>
 
                                                 <DxFormLayoutItem Visible="@(!a.Type.Equals("Reference Unit of Measure for this category"))" CaptionCssClass="normal-caption" Caption="Ratio" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.BiggerRatio"
-                                                               ShowValidationIcon="true"
-                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="Ratio" />
+                                                    <DxSpinEdit @bind-Value="@a.BiggerRatio"
+                                                                NullText="Ratio..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                BindValueMode="BindValueMode.OnInput" />
                                                     <ValidationMessage For="@(()=> a.BiggerRatio)"   />
                                                 </DxFormLayoutItem>
 
@@ -198,11 +198,11 @@
                                                     <ValidationMessage For="@(()=> a.Multiple)"   />
                                                 </DxFormLayoutItem>
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="RoundingPrecision" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.RoundingPrecision"
-                                                               ShowValidationIcon="true"
-                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="RoundingPrecision" />
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Rounding Precision" ColSpanMd="12">
+                                                    <DxSpinEdit @bind-Value="@a.RoundingPrecision"
+                                                                NullText="Rounding Precision..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                BindValueMode="BindValueMode.OnInput" />
                                                     <ValidationMessage For="@(()=> a.RoundingPrecision)"   />
                                                 </DxFormLayoutItem>
 

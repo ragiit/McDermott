@@ -8,5 +8,7 @@
 
         [SetToNull]
         public virtual Uom? Uom { get; set; }
+
+        public virtual List<MedicamentGroupDetail>? MedicamentGroupDetails { get; set; }
     }
 }
