@@ -35,6 +35,7 @@
                                             PopupEditFormCssClass="pw-800"
                                             PagerPosition="GridPagerPosition.Bottom"
                                             AllowSelectRowByClick="true"
+                                            TextWrapEnabled="false"
                                             PageSizeSelectorVisible="true"
                                             PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                             PageSizeSelectorAllRowsItemVisible="true"
@@ -54,6 +55,7 @@
                                                 <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                 <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Chronises.Count > 0" />
                                                 <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Chronises.Count > 0" />
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                 <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                 <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
                                                     <Items>
@@ -62,7 +64,6 @@
                                                         <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                     </Items>
                                                 </DxToolbarItem>
-                                                <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>

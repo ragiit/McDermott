@@ -2,115 +2,159 @@
 
 namespace McDermott.Application.Features.Queries.Medical
 {
-    public class ServiceQueryHandler
+    public class ServiceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetServiceQuery, List<ServiceDto>>,
+        IRequestHandler<CreateServiceRequest, ServiceDto>,
+        IRequestHandler<CreateListServiceRequest, List<ServiceDto>>,
+        IRequestHandler<UpdateServiceRequest, ServiceDto>,
+        IRequestHandler<UpdateListServiceRequest, List<ServiceDto>>,
+        IRequestHandler<DeleteServiceRequest, bool>
     {
-        internal class GetAllServiceQueryHandler : IRequestHandler<GetServiceQuery, List<ServiceDto>>
+        #region GET
+
+        public async Task<List<ServiceDto>> Handle(GetServiceQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllServiceQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                string cacheKey = $"GetServiceQuery_";
 
-            public async Task<List<ServiceDto>> Handle(GetServiceQuery query, CancellationToken cancellationToken)
-            {
-                return await _unitOfWork.Repository<Service>().Entities
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Service>? result))
+                {
+                    result = await _unitOfWork.Repository<Service>().Entities
                         .Include(x => x.Serviced)
-                        .Select(Service => Service.Adapt<ServiceDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<ServiceDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-        internal class GetServiceByIdQueryHandler : IRequestHandler<GetServiceByIdQuery, ServiceDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<ServiceDto> Handle(CreateServiceRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetServiceByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<ServiceDto> Handle(GetServiceByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Service>().GetByIdAsync(request.Id);
-
-                return result.Adapt<ServiceDto>();
-            }
-        }
-
-        internal class CreateServiceHandler : IRequestHandler<CreateServiceRequest, ServiceDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateServiceHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<ServiceDto> Handle(CreateServiceRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Service>().AddAsync(request.ServiceDto.Adapt<Service>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<ServiceDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateServiceHandler : IRequestHandler<UpdateServiceRequest, bool>
+        public async Task<List<ServiceDto>> Handle(CreateListServiceRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateServiceHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Service>().AddAsync(request.ServiceDtos.Adapt<List<Service>>());
 
-            public async Task<bool> Handle(UpdateServiceRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Service>().UpdateAsync(request.ServiceDto.Adapt<Service>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<ServiceDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<ServiceDto> Handle(UpdateServiceRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Service>().UpdateAsync(request.ServiceDto.Adapt<Service>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<ServiceDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<ServiceDto>> Handle(UpdateListServiceRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Service>().UpdateAsync(request.ServiceDtos.Adapt<List<Service>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<ServiceDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteServiceRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<Service>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<Service>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteServiceHandler : IRequestHandler<DeleteServiceRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteServiceHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteServiceRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Service>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListServiceHandler : IRequestHandler<DeleteListServiceRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListServiceHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListServiceRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Service>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

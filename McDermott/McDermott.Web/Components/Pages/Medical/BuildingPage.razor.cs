@@ -149,17 +149,6 @@
             SelectedBuildingLocationDataItems = new ObservableRangeCollection<object>();
         }
 
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndex = args.VisibleIndex;
-            EditItemsEnabled = true;
-        }
-
-        private void GridBuildingLocation_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowBuildingLocationVisibleIndex = args.VisibleIndex;
-        }
-
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -171,6 +160,22 @@
                 e.Style = "background-color: rgba(0, 0, 0, 0.08)";
                 e.CssClass = "header-bold";
             }
+        }
+
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+            EditItemsEnabled = true;
+        }
+
+        private void GridBuildingLocation_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowBuildingLocationVisibleIndex = args.VisibleIndex;
+        }
+
+        private async Task Refresh_Click()
+        {
+            await LoadData();
         }
 
         private async Task NewItem_Click()

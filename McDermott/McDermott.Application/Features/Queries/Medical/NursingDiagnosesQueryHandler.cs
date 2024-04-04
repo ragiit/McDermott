@@ -1,92 +1,134 @@
 ﻿namespace McDermott.Application.Features.Queries.Medical
 {
-    public class NursingDiagnosesQueryHandler
+    public class NursingDiagnosesQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetNursingDiagnosesQuery, List<NursingDiagnosesDto>>,
+        IRequestHandler<CreateNursingDiagnosesRequest, NursingDiagnosesDto>,
+        IRequestHandler<CreateListNursingDiagnosesRequest, List<NursingDiagnosesDto>>,
+        IRequestHandler<UpdateNursingDiagnosesRequest, NursingDiagnosesDto>,
+        IRequestHandler<UpdateListNursingDiagnosesRequest, List<NursingDiagnosesDto>>,
+        IRequestHandler<DeleteNursingDiagnosesRequest, bool>
     {
-        #region Get
+        #region GET
 
-        internal class GetNursingDiagnosesQueryHandler : IRequestHandler<GetNursingDiagnosesQuery, List<NursingDiagnosesDto>>
+        public async Task<List<NursingDiagnosesDto>> Handle(GetNursingDiagnosesQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetNursingDiagnosesQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetNursingDiagnosesQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<NursingDiagnoses>? result))
+                {
+                    result = await _unitOfWork.Repository<NursingDiagnoses>().Entities
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<NursingDiagnosesDto>>();
             }
-
-            public async Task<List<NursingDiagnosesDto>> Handle(GetNursingDiagnosesQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                try
-                {
-                    var result = await _unitOfWork.Repository<NursingDiagnoses>().GetAsync(
-                        query.Predicate, cancellationToken: cancellationToken);
-
-                    return result.Adapt<List<NursingDiagnosesDto>>();
-                }
-                catch (Exception e)
-                {
-                    return [];
-                }
+                throw;
             }
         }
 
-        #endregion Get
+        #endregion GET
 
-        #region Create
+        #region CREATE
 
-        internal class CreateNursingDiagnosesHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateNursingDiagnosesRequest, NursingDiagnosesDto>
+        public async Task<NursingDiagnosesDto> Handle(CreateNursingDiagnosesRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<NursingDiagnosesDto> Handle(CreateNursingDiagnosesRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<NursingDiagnoses>().AddAsync(request.NursingDiagnosesDto.Adapt<NursingDiagnoses>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetNursingDiagnosesQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<NursingDiagnosesDto>();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-        internal class CreateListNursingDiagnosesRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateListNursingDiagnosesRequest, List<NursingDiagnosesDto>>
+        public async Task<List<NursingDiagnosesDto>> Handle(CreateListNursingDiagnosesRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<List<NursingDiagnosesDto>> Handle(CreateListNursingDiagnosesRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<NursingDiagnoses>().AddAsync(request.NursingDiagnosesDtos.Adapt<List<NursingDiagnoses>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetNursingDiagnosesQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<List<NursingDiagnosesDto>>();
             }
-        }
-
-        #endregion Create
-
-        #region Update
-
-        internal class UpdateNursingDiagnosesHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateNursingDiagnosesRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<bool> Handle(UpdateNursingDiagnosesRequest request, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                await _unitOfWork.Repository<NursingDiagnoses>().UpdateAsync(request.NursingDiagnosesDto.Adapt<NursingDiagnoses>());
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        #endregion Update
+        #endregion CREATE
 
-        #region Delete
+        #region UPDATE
 
-        internal class DeleteNursingDiagnosesHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteNursingDiagnosesRequest, bool>
+        public async Task<NursingDiagnosesDto> Handle(UpdateNursingDiagnosesRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
+            try
+            {
+                var result = await _unitOfWork.Repository<NursingDiagnoses>().UpdateAsync(request.NursingDiagnosesDto.Adapt<NursingDiagnoses>());
 
-            public async Task<bool> Handle(DeleteNursingDiagnosesRequest request, CancellationToken cancellationToken)
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetNursingDiagnosesQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<NursingDiagnosesDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<NursingDiagnosesDto>> Handle(UpdateListNursingDiagnosesRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<NursingDiagnoses>().UpdateAsync(request.NursingDiagnosesDtos.Adapt<List<NursingDiagnoses>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetNursingDiagnosesQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<NursingDiagnosesDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteNursingDiagnosesRequest request, CancellationToken cancellationToken)
+        {
+            try
             {
                 if (request.Id > 0)
                 {
@@ -100,10 +142,16 @@
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetNursingDiagnosesQuery_"); // Ganti dengan key yang sesuai
+
                 return true;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-        #endregion Delete
+        #endregion DELETE
     }
 }

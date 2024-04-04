@@ -71,13 +71,13 @@
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<ServiceDto>>();
-                    await Mediator.Send(new DeleteListServiceRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteServiceRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
             catch (Exception ee)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+                ee.HandleException(ToastService);
             }
         }
 
@@ -121,6 +121,11 @@
             FormService = new();
             PopUpVisible = true;
             TextPopUp = "Add Services";
+        }
+
+        private async Task Refresh_Click()
+        {
+            await LoadData();
         }
 
         private async Task EditItem_Click()

@@ -62,7 +62,6 @@
                                                         <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                     </Items>
                                                 </DxToolbarItem>
-                                                <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
@@ -78,6 +77,21 @@
                                                 a.Type = Types[0];
                                             }
                                             <DxFormLayout CssClass="w-100">
+
+                                                <div class="card w-100">
+                                                    <div class="card-body">
+                                                        <div class="w-100">
+                                                            <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
+                                                                <Items>
+                                                                    <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
+                                                                                   IconCssClass="fa-solid fa-notes-medical"
+                                                                                   Text="Products" />
+                                                                </Items>
+                                                            </DxToolbar>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
                                                     <ValidationMessage For="@(()=> a.Name)"   />

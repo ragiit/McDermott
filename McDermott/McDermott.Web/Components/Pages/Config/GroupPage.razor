@@ -134,6 +134,7 @@
                                                             FocusedRowChanged="GridGroupMenu_FocusedRowChanged"
                                                             ShowGroupPanel="true"
                                                             AutoExpandAllGroupRows="true"
+                                                            CustomizeElement="Grid_CustomizeElement"
                                                             ShowFilterRow="true"
                                                             ShowSearchBox="true"
                                                             SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
@@ -158,11 +159,11 @@
                                                         </ToolbarTemplate>
                                                         <Columns>
                                                             <DxGridSelectionColumn Context="ToolbarContext" Width="15px" />
-                                                            <DxGridDataColumn Context="ToolbarContext" FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
-                                                            <DxGridDataColumn Context="ToolbarContext" FieldName="Create" />
-                                                            <DxGridDataColumn Context="ToolbarContext" FieldName="Read" />
-                                                            <DxGridDataColumn Context="ToolbarContext" FieldName="Update" />
-                                                            <DxGridDataColumn Context="ToolbarContext" FieldName="Delete" />
+                                                            <DxGridDataColumn MinWidth="200" Context="ToolbarContext" FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
+                                                            <DxGridDataColumn MinWidth="200" Context="ToolbarContext" FieldName="Create" />
+                                                            <DxGridDataColumn MinWidth="200" Context="ToolbarContext" FieldName="Read" />
+                                                            <DxGridDataColumn MinWidth="200" Context="ToolbarContext" FieldName="Update" />
+                                                            <DxGridDataColumn MinWidth="200" Context="ToolbarContext" FieldName="Delete" />
                                                             @* <DxGridDataColumn FieldName="Import" /> *@
                                                         </Columns>
                                                         <EditFormTemplate Context="EditFormContext">

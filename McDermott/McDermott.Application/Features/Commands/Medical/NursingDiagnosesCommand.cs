@@ -2,16 +2,17 @@
 {
     public class NursingDiagnosesCommand
     {
-        #region Get
+        #region GET 
 
-        public class GetNursingDiagnosesQuery(Expression<Func<NursingDiagnoses, bool>>? predicate = null) : IRequest<List<NursingDiagnosesDto>>
+        public class GetNursingDiagnosesQuery(Expression<Func<NursingDiagnoses, bool>>? predicate = null, bool removeCache = false) : IRequest<List<NursingDiagnosesDto>>
         {
-            public Expression<Func<NursingDiagnoses, bool>> Predicate { get; } = predicate;
+            public Expression<Func<NursingDiagnoses, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        #endregion Get
+        #endregion  
 
-        #region Create
+        #region CREATE
 
         public class CreateNursingDiagnosesRequest(NursingDiagnosesDto NursingDiagnosesDto) : IRequest<NursingDiagnosesDto>
         {
@@ -23,18 +24,23 @@
             public List<NursingDiagnosesDto> NursingDiagnosesDtos { get; set; } = NursingDiagnosesDtos;
         }
 
-        #endregion Create
+        #endregion CREATE
 
         #region Update
 
-        public class UpdateNursingDiagnosesRequest(NursingDiagnosesDto NursingDiagnosesDto) : IRequest<bool>
+        public class UpdateNursingDiagnosesRequest(NursingDiagnosesDto NursingDiagnosesDto) : IRequest<NursingDiagnosesDto>
         {
             public NursingDiagnosesDto NursingDiagnosesDto { get; set; } = NursingDiagnosesDto;
         }
 
+        public class UpdateListNursingDiagnosesRequest(List<NursingDiagnosesDto> NursingDiagnosesDtos) : IRequest<List<NursingDiagnosesDto>>
+        {
+            public List<NursingDiagnosesDto> NursingDiagnosesDtos { get; set; } = NursingDiagnosesDtos;
+        }
+
         #endregion Update
 
-        #region Delete
+        #region DELETE
 
         public class DeleteNursingDiagnosesRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
@@ -42,6 +48,6 @@
             public List<long> Ids { get; set; } = ids ?? [];
         }
 
-        #endregion Delete
+        #endregion DELETE
     }
 }

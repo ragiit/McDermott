@@ -120,6 +120,11 @@
             await Grid.StartEditNewRowAsync();
         }
 
+        private async Task Refresh_Click()
+        {
+            await LoadData();
+        }
+
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);

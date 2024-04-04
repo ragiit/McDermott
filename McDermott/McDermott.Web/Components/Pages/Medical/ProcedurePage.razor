@@ -44,6 +44,7 @@
                                             PagerVisibleNumericButtonCount="10"
                                             FocusedRowChanged="Grid_FocusedRowChanged"
                                             ShowGroupPanel="true"
+                                            TextWrapEnabled="false"
                                             AutoExpandAllGroupRows="true"
                                             ShowFilterRow="true"
                                             CustomizeElement="Grid_CustomizeElement"
@@ -55,6 +56,7 @@
                                                 <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                 <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Procedures.Count > 0" />
                                                 <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Procedures.Count > 0" />
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                 <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                 <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
                                                     <Items>
@@ -63,7 +65,6 @@
                                                         <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                     </Items>
                                                 </DxToolbarItem>
-                                                <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>

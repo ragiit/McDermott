@@ -2,56 +2,52 @@
 {
     public class ServiceCommand
     {
-        public class GetServiceQuery : IRequest<List<ServiceDto>>;
+        #region GET 
 
-        public class GetServiceByIdQuery : IRequest<ServiceDto>
+        public class GetServiceQuery(Expression<Func<Service, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ServiceDto>>
         {
-            public long Id { get; set; }
-
-            public GetServiceByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<Service, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateServiceRequest : IRequest<ServiceDto>
-        {
-            public ServiceDto ServiceDto { get; set; }
+        #endregion  
 
-            public CreateServiceRequest(ServiceDto ServiceDto)
-            {
-                this.ServiceDto = ServiceDto;
-            }
+        #region CREATE
+
+        public class CreateServiceRequest(ServiceDto ServiceDto) : IRequest<ServiceDto>
+        {
+            public ServiceDto ServiceDto { get; set; } = ServiceDto;
         }
 
-        public class UpdateServiceRequest : IRequest<bool>
+        public class CreateListServiceRequest(List<ServiceDto> ServiceDtos) : IRequest<List<ServiceDto>>
         {
-            public ServiceDto ServiceDto { get; set; }
-
-            public UpdateServiceRequest(ServiceDto ServiceDto)
-            {
-                this.ServiceDto = ServiceDto;
-            }
+            public List<ServiceDto> ServiceDtos { get; set; } = ServiceDtos;
         }
 
-        public class DeleteServiceRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteServiceRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateServiceRequest(ServiceDto ServiceDto) : IRequest<ServiceDto>
+        {
+            public ServiceDto ServiceDto { get; set; } = ServiceDto;
         }
 
-        public class DeleteListServiceRequest : IRequest<bool>
+        public class UpdateListServiceRequest(List<ServiceDto> ServiceDtos) : IRequest<List<ServiceDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListServiceRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<ServiceDto> ServiceDtos { get; set; } = ServiceDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteServiceRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }
