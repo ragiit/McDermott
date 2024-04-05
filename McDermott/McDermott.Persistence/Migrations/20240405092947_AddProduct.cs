@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -189,7 +188,7 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_Medicaments_RouteId",
                 table: "Medicaments",
                 column: "RouteId");
-            
+
             migrationBuilder.CreateIndex(
                 name: "IX_Medicaments_SignaId",
                 table: "Medicaments",
@@ -287,7 +286,7 @@ namespace McDermott.Persistence.Migrations
                 type: "nvarchar(max)",
                 nullable: true);
 
-           
+
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Locations_Locations_ParentLocationId",
@@ -297,7 +296,7 @@ namespace McDermott.Persistence.Migrations
                 principalColumn: "Id",
                 onDelete: ReferentialAction.SetNull);
 
-           
+
         }
     }
 }
