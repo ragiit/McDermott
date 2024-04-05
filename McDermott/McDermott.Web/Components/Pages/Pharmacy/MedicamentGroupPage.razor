@@ -1,4 +1,4 @@
-﻿@page "/pharmacy/medicamentgroup"
+﻿@page "/pharmacy/medicament-group"
 @rendermode InteractiveServer
 
 <PageTitle>Pharmacy - Medicament Group</PageTitle>
@@ -76,7 +76,7 @@
                                         </DxGrid>
                                     </DxLoadingPanel>
                                 }
-                                else 
+                                else
                                 {
                                     <div class="card-header bg-primary">
                                         <div class="row">
@@ -96,7 +96,7 @@
                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                NullText="Name" />
                                                 </DxFormLayoutItem>
-                                               
+
                                                 <DxFormLayoutItem Caption="Is Concoction?" ColSpanMd="12">
                                                     <DxCheckBox @bind-Checked="@Checkin"
                                                                 LabelPosition="LabelPosition.Left" CssClass="w-100" />
@@ -121,6 +121,8 @@
                                                             <DxComboBox Data="@UoMs"
                                                                         @bind-Value="@MGFrom.RegimentOfUseId"
                                                                         NullText="Select Unit Of Dosage ..."
+                                                                        TextFieldName="Name"
+                                                                        ValueFieldName="Id"
                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                         ShowValidationIcon="true"></DxComboBox>
                                                         </DxFormLayoutItem>
@@ -128,7 +130,6 @@
                                                             <DxComboBox Data="@FormDrugs"
                                                                         @bind-Value="@MGFrom.FormDrugId"
                                                                         NullText="Select From ..."
-                                                                        CssClass="ml-3"
                                                                         TextFieldName="Name"
                                                                         ValueFieldName="Id"
                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -184,9 +185,79 @@
                                             </DxGrid>
                                         </EditForm>
                                     </div>
-                                    
+                                    <DxPopup @bind-Visible="@FormMedicaments" HeaderText="Add Detail Medicament Group">
+                                        <EditForm Model="@FormMedicamenDetails" Context="FormEditContext">
+                                            <DxFormLayout CssClass="mt w-100">
+                                                <DxFormLayoutItem Caption="Medicines Name" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@FormMedicamenDetails.MedicaneName" NullText="select Medicane Name"></DxTextBox>
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Active Component" ColSpanMd="12">
+                                                    <DxTagBox Data="@ActiveComponents"
+                                                              FilteringMode="@DataGridFilteringMode.Contains"
+                                                              @bind-Values="@selectedActiveComponents"
+                                                              NullText="Select Counter.."
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                              TextFieldName="Name" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Medicines Dosage" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@FormMedicamenDetails.MedicaneDosage"></DxTextBox>
+                                                    <ValidationMessage For="@(()=> FormMedicamenDetails.MedicaneDosage)" ) />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Medicines Unit Dosage" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@FormMedicamenDetails.MedicaneUnitDosage"></DxTextBox>
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Allow Subtitutions" ColSpanMd="12">
+                                                    <DxCheckBox @bind-Checked="@FormMedicamenDetails.AllowSubtitation"
+                                                                LabelPosition="LabelPosition.Left" CssClass="w-100" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Signa" ColSpanMd="12">
+                                                    <DxComboBox Data="@Signas"
+                                                                @bind-Value="@FormMedicamenDetails.SignaId"
+                                                                NullText="Select Dosage signa ..."
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                ShowValidationIcon="true"></DxComboBox>
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Dosage" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@FormMedicamenDetails.Dosage" NullText="0.00"></DxTextBox>
+                                                    <ValidationMessage For="@(()=> FormMedicamenDetails.Dosage)" ) />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Unit Of Dosage" ColSpanMd="12">
+                                                    <DxComboBox Data="@UoMs"
+                                                                @bind-Value="@FormMedicamenDetails.RegimentOfUseId"
+                                                                NullText="Select Unit Of Dosage ..."
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                ShowValidationIcon="true"></DxComboBox>
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Qty Per Day" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@FormMedicamenDetails.QtyByDay" NullText="0.00"></DxTextBox>
+                                                    <ValidationMessage For="@(()=> FormMedicamenDetails.QtyByDay)" ) />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Day" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@FormMedicamenDetails.Days" NullText="0.00"></DxTextBox>
+                                                    <ValidationMessage For="@(()=> FormMedicamenDetails.Days)" ) />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Total Qty" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@FormMedicamenDetails.TotalQty" NullText="0.00"></DxTextBox>
+                                                    <ValidationMessage For="@(()=> FormMedicamenDetails.TotalQty)" ) />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@FormMedicamenDetails.Comment"></DxTextBox>
+                                                </DxFormLayoutItem>
+                                            </DxFormLayout>
+                                            <hr />
+                                            <div class="row justify-content-end">
+                                                <div class="col-auto align-self-end">
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true" Click="onSaveDetail"></DxButton>
+                                                    @* <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="onCancle"></DxButton> *@
+                                                </div>
+                                            </div>
+                                        </EditForm>
+                                    </DxPopup>
                                 }
-                                
                             </div>
                         </div>
                     </div>

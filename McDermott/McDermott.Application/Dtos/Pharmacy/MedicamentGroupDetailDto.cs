@@ -11,14 +11,22 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long Id { get; set; }
         public long MedicamentGroupId { get; set; }
         public long? MedicamentId { get; set; }
-        public long? ActiveComponent { get; set; }
-        public float? MedicaneUnitDosage { get; set; }
-        public float? QtyByDay { get; set; }
-        public float? Days { get; set; }
-        public float? TotalQty { get; set; }
+        public List<long>? ActiveComponentId { get; set; }
+        public long? SignaId { get; set; }
+        public long? RegimentOfUseId { get; set; }
+        public bool? AllowSubtitation { get; set; } = false;
+        public string? MedicaneUnitDosage { get; set; }
+        [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
+        public string? MedicaneDosage { get; set; }
+        [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
+        public string? Dosage { get; set; }
+        [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
+        public string? QtyByDay { get; set; }
+        [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
+        public string? Days { get; set; }
+        [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
+        public string? TotalQty { get; set; }
         public string? MedicaneName { get; set; }
-        public string? UnitOfDosage { get; set; }
-        public string? UnitOfDosageCategory { get; set; }
         public string? Comment { get; set; }
     }
 }

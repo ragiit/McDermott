@@ -1,4 +1,5 @@
 ﻿using McDermott.Application.Dtos.Pharmacy;
+using McDermott.Application.Dtos.Queue;
 using McDermott.Domain.Entities;
 using MediatR;
 using System.ComponentModel;
@@ -14,9 +15,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<MedicamentGroupDto> medicamentGroups = [];
         private List<UserDto> Phy = new();
         private List<UomDto> UoMs = new();
+        private List<SignaDto> Signas = new();
+        private List<ActiveComponentDto> ActiveComponents = [];
         private MedicamentGroupDto MGFrom = new();
         private List<DrugFormDto> FormDrugs = new();
         private MedicamentGroupDetailDto FormMedicamenDetails = new();
+        private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         #endregion
 
         #region variabel static
@@ -30,7 +34,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private string? chars { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        
+
         private bool Checkin
         {
             get => Checkins;
@@ -108,6 +112,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             var user = await Mediator.Send(new GetUserQuery());
             FormDrugs = await Mediator.Send(new GetFormDrugQuery());
             UoMs = await Mediator.Send(new GetUomQuery());
+            ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
+            Signas = await Mediator.Send(new GetSignaQuery());
             Phy = [.. user.Where(x => x.IsPhysicion == true)];
             PanelVisible = false;
         }
@@ -207,6 +213,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 ee.HandleException(ToastService);
             }
+        }
+        #endregion
+        #region Function Save
+        private async Task onSaveDetail()
+        {
+            await LoadData();
         }
         #endregion
     }
