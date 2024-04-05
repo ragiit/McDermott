@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace McDermott.Domain.Entities
 {
-    public class ProductCategory : BaseAuditableEntity
+    public class Product :BaseAuditableEntity
     {
-        public string Name { get; set; } = string.Empty;
-        public string? CostingMethod { get; set; }
-        public string? InventoryValuation { get; set; }
+        public string? Name { get; set; }
 
+        public List<Medicament>? Medicaments { get; set; }
         public List<GeneralInformation>? GeneralInformation { get; set; }
     }
 }

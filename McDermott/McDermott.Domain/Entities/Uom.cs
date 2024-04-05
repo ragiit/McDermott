@@ -34,5 +34,8 @@ namespace McDermott.Domain.Entities
 
         [SetToNull]
         public virtual List<ActiveComponent>? ActiveComponents { get; set; }
+
+        public List<Medicament>? Medicaments { get; set; }
+        public List<GeneralInformation>? GeneralInformation { get; set; }
     }
 }

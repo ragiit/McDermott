@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace McDermott.Domain.Entities
+namespace McDermott.Application.Dtos.Pharmacy
 {
-    public class Signa : BaseAuditableEntity
+    public class ProductDto: IMapFrom<Product>
     {
+        public long id { get; set; }
         public string? Name { get; set; }
-
-        public List<Medicament>? Medicaments { get; set; }
     }
 }

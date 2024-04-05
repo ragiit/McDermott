@@ -29,5 +29,7 @@ namespace McDermott.Domain.Entities
         public virtual MedicamentGroup? MedicamentGroup { get; set; }
         [SetToNull]
         public virtual Uom? UoM { get; set; }
+        [SetToNull]
+        public virtual Medicament? Medicament { get; set; }
     }
 }
