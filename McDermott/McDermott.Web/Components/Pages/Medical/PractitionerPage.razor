@@ -33,6 +33,7 @@
                                                 CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                 EditModelSaving="OnSave"
                                                 DataItemDeleting="OnDelete"
+                                                EditorRenderMode="GridEditorRenderMode.Detached"
                                                 FocusedRowEnabled="true"
                                                 CustomizeElement="Grid_CustomizeElement"
                                                 PopupEditFormCssClass="pw-800"
@@ -69,10 +70,10 @@
                                             </ToolbarTemplate>
                                             <Columns>
                                                 <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                                <DxGridDataColumn FieldName="Email" />
-                                                <DxGridDataColumn FieldName="SipNo" Caption="SIP" />
-                                                <DxGridDataColumn FieldName="StrNo" Caption="STR" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="Email" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="SipNo" Caption="SIP" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="StrNo" Caption="STR" />
                                             </Columns>
                                         </DxGrid>
                                     </DxLoadingPanel>

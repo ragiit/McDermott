@@ -2,56 +2,52 @@
 {
     public class HealthCenterCommand
     {
-        public class GetHealthCenterQuery : IRequest<List<HealthCenterDto>>;
+        #region GET 
 
-        public class GetHealthCenterByIdQuery : IRequest<HealthCenterDto>
+        public class GetHealthCenterQuery(Expression<Func<HealthCenter, bool>>? predicate = null, bool removeCache = false) : IRequest<List<HealthCenterDto>>
         {
-            public long Id { get; set; }
-
-            public GetHealthCenterByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<HealthCenter, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateHealthCenterRequest : IRequest<HealthCenterDto>
-        {
-            public HealthCenterDto HealthCenterDto { get; set; }
+        #endregion  
 
-            public CreateHealthCenterRequest(HealthCenterDto HealthCenterDto)
-            {
-                this.HealthCenterDto = HealthCenterDto;
-            }
+        #region CREATE
+
+        public class CreateHealthCenterRequest(HealthCenterDto HealthCenterDto) : IRequest<HealthCenterDto>
+        {
+            public HealthCenterDto HealthCenterDto { get; set; } = HealthCenterDto;
         }
 
-        public class UpdateHealthCenterRequest : IRequest<bool>
+        public class CreateListHealthCenterRequest(List<HealthCenterDto> HealthCenterDtos) : IRequest<List<HealthCenterDto>>
         {
-            public HealthCenterDto HealthCenterDto { get; set; }
-
-            public UpdateHealthCenterRequest(HealthCenterDto HealthCenterDto)
-            {
-                this.HealthCenterDto = HealthCenterDto;
-            }
+            public List<HealthCenterDto> HealthCenterDtos { get; set; } = HealthCenterDtos;
         }
 
-        public class DeleteHealthCenterRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteHealthCenterRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateHealthCenterRequest(HealthCenterDto HealthCenterDto) : IRequest<HealthCenterDto>
+        {
+            public HealthCenterDto HealthCenterDto { get; set; } = HealthCenterDto;
         }
 
-        public class DeleteListHealthCenterRequest : IRequest<bool>
+        public class UpdateListHealthCenterRequest(List<HealthCenterDto> HealthCenterDtos) : IRequest<List<HealthCenterDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListHealthCenterRequest(List<long> id)
-            {
-                this.Id = id;
-            }
+            public List<HealthCenterDto> HealthCenterDtos { get; set; } = HealthCenterDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteHealthCenterRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

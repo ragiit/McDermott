@@ -2,56 +2,52 @@
 {
     public class DiagnosisCommand
     {
-        public class GetDiagnosisQuery : IRequest<List<DiagnosisDto>>;
+        #region GET 
 
-        public class GetDiagnosisByIdQuery : IRequest<DiagnosisDto>
+        public class GetDiagnosisQuery(Expression<Func<Diagnosis, bool>>? predicate = null, bool removeCache = false) : IRequest<List<DiagnosisDto>>
         {
-            public long Id { get; set; }
-
-            public GetDiagnosisByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<Diagnosis, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateDiagnosisRequest : IRequest<DiagnosisDto>
-        {
-            public DiagnosisDto DiagnosisDto { get; set; }
+        #endregion  
 
-            public CreateDiagnosisRequest(DiagnosisDto DiagnosisDto)
-            {
-                this.DiagnosisDto = DiagnosisDto;
-            }
+        #region CREATE
+
+        public class CreateDiagnosisRequest(DiagnosisDto DiagnosisDto) : IRequest<DiagnosisDto>
+        {
+            public DiagnosisDto DiagnosisDto { get; set; } = DiagnosisDto;
         }
 
-        public class UpdateDiagnosisRequest : IRequest<bool>
+        public class CreateListDiagnosisRequest(List<DiagnosisDto> DiagnosisDtos) : IRequest<List<DiagnosisDto>>
         {
-            public DiagnosisDto DiagnosisDto { get; set; }
-
-            public UpdateDiagnosisRequest(DiagnosisDto DiagnosisDto)
-            {
-                this.DiagnosisDto = DiagnosisDto;
-            }
+            public List<DiagnosisDto> DiagnosisDtos { get; set; } = DiagnosisDtos;
         }
 
-        public class DeleteDiagnosisRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteDiagnosisRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateDiagnosisRequest(DiagnosisDto DiagnosisDto) : IRequest<DiagnosisDto>
+        {
+            public DiagnosisDto DiagnosisDto { get; set; } = DiagnosisDto;
         }
 
-        public class DeleteListDiagnosisRequest : IRequest<bool>
+        public class UpdateListDiagnosisRequest(List<DiagnosisDto> DiagnosisDtos) : IRequest<List<DiagnosisDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListDiagnosisRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<DiagnosisDto> DiagnosisDtos { get; set; } = DiagnosisDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteDiagnosisRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

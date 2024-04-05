@@ -2,56 +2,52 @@ namespace McDermott.Application.Features.Commands.Medical
 {
     public class SpecialityCommand
     {
-        public class GetSpecialityQuery : IRequest<List<SpecialityDto>>;
+        #region GET 
 
-        public class GetSpecialityByIdQuery : IRequest<SpecialityDto>
+        public class GetSpecialityQuery(Expression<Func<Speciality, bool>>? predicate = null, bool removeCache = false) : IRequest<List<SpecialityDto>>
         {
-            public long Id { get; set; }
-
-            public GetSpecialityByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<Speciality, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateSpecialityRequest : IRequest<SpecialityDto>
-        {
-            public SpecialityDto SpecialityDto { get; set; }
+        #endregion
 
-            public CreateSpecialityRequest(SpecialityDto SpecialityDto)
-            {
-                this.SpecialityDto = SpecialityDto;
-            }
+        #region CREATE
+
+        public class CreateSpecialityRequest(SpecialityDto SpecialityDto) : IRequest<SpecialityDto>
+        {
+            public SpecialityDto SpecialityDto { get; set; } = SpecialityDto;
         }
 
-        public class UpdateSpecialityRequest : IRequest<bool>
+        public class CreateListSpecialityRequest(List<SpecialityDto> SpecialityDtos) : IRequest<List<SpecialityDto>>
         {
-            public SpecialityDto SpecialityDto { get; set; }
-
-            public UpdateSpecialityRequest(SpecialityDto SpecialityDto)
-            {
-                this.SpecialityDto = SpecialityDto;
-            }
+            public List<SpecialityDto> SpecialityDtos { get; set; } = SpecialityDtos;
         }
 
-        public class DeleteSpecialityRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteSpecialityRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateSpecialityRequest(SpecialityDto SpecialityDto) : IRequest<SpecialityDto>
+        {
+            public SpecialityDto SpecialityDto { get; set; } = SpecialityDto;
         }
 
-        public class DeleteListSpecialityRequest : IRequest<bool>
+        public class UpdateListSpecialityRequest(List<SpecialityDto> SpecialityDtos) : IRequest<List<SpecialityDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListSpecialityRequest(List<long> id)
-            {
-                this.Id = id;
-            }
+            public List<SpecialityDto> SpecialityDtos { get; set; } = SpecialityDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteSpecialityRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

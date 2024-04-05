@@ -30,6 +30,7 @@
                                             KeyFieldName="Id"
                                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                             EditModelSaving="OnSave"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
                                             DataItemDeleting="OnDelete"
                                             AllowSelectRowByClick="true"
                                             EditMode="GridEditMode.PopupEditForm"
@@ -67,8 +68,8 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="Code" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Code" />
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
                                             @{

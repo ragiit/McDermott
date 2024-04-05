@@ -1,113 +1,159 @@
-﻿namespace McDermott.Application.Features.Queries.Medical
+﻿
+
+namespace McDermott.Application.Features.Queries.Medical
 {
-    public class HealthCenterQueryHandler
+    public class HealthCenterQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetHealthCenterQuery, List<HealthCenterDto>>,
+        IRequestHandler<CreateHealthCenterRequest, HealthCenterDto>,
+        IRequestHandler<CreateListHealthCenterRequest, List<HealthCenterDto>>,
+        IRequestHandler<UpdateHealthCenterRequest, HealthCenterDto>,
+        IRequestHandler<UpdateListHealthCenterRequest, List<HealthCenterDto>>,
+        IRequestHandler<DeleteHealthCenterRequest, bool>
     {
-        internal class GetAllHealthCenterQueryHandler : IRequestHandler<GetHealthCenterQuery, List<HealthCenterDto>>
+        #region GET
+
+        public async Task<List<HealthCenterDto>> Handle(GetHealthCenterQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllHealthCenterQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetHealthCenterQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<HealthCenter>? result))
+                {
+                    result = await _unitOfWork.Repository<HealthCenter>().Entities
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<HealthCenterDto>>();
             }
-
-            public async Task<List<HealthCenterDto>> Handle(GetHealthCenterQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<HealthCenter>().Entities
-                        .Select(HealthCenter => HealthCenter.Adapt<HealthCenterDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetHealthCenterByIdQueryHandler : IRequestHandler<GetHealthCenterByIdQuery, HealthCenterDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<HealthCenterDto> Handle(CreateHealthCenterRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetHealthCenterByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<HealthCenterDto> Handle(GetHealthCenterByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<HealthCenter>().GetByIdAsync(request.Id);
-
-                return result.Adapt<HealthCenterDto>();
-            }
-        }
-
-        internal class CreateHealthCenterHandler : IRequestHandler<CreateHealthCenterRequest, HealthCenterDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateHealthCenterHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<HealthCenterDto> Handle(CreateHealthCenterRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<HealthCenter>().AddAsync(request.HealthCenterDto.Adapt<HealthCenter>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetHealthCenterQuery_");
+
                 return result.Adapt<HealthCenterDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateHealthCenterHandler : IRequestHandler<UpdateHealthCenterRequest, bool>
+        public async Task<List<HealthCenterDto>> Handle(CreateListHealthCenterRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateHealthCenterHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<HealthCenter>().AddAsync(request.HealthCenterDtos.Adapt<List<HealthCenter>>());
 
-            public async Task<bool> Handle(UpdateHealthCenterRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<HealthCenter>().UpdateAsync(request.HealthCenterDto.Adapt<HealthCenter>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetHealthCenterQuery_");
+
+                return result.Adapt<List<HealthCenterDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<HealthCenterDto> Handle(UpdateHealthCenterRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<HealthCenter>().UpdateAsync(request.HealthCenterDto.Adapt<HealthCenter>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetHealthCenterQuery_");
+
+                return result.Adapt<HealthCenterDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<HealthCenterDto>> Handle(UpdateListHealthCenterRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<HealthCenter>().UpdateAsync(request.HealthCenterDtos.Adapt<List<HealthCenter>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetHealthCenterQuery_");
+
+                return result.Adapt<List<HealthCenterDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteHealthCenterRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<HealthCenter>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<HealthCenter>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetHealthCenterQuery_");
 
                 return true;
             }
-        }
-
-        internal class DeleteHealthCenterHandler : IRequestHandler<DeleteHealthCenterRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteHealthCenterHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteHealthCenterRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<HealthCenter>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListHealthCenterHandler : IRequestHandler<DeleteListHealthCenterRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListHealthCenterHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListHealthCenterRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<HealthCenter>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

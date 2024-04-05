@@ -73,13 +73,13 @@
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<HealthCenterDto>>();
-                    await Mediator.Send(new DeleteListHealthCenterRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteHealthCenterRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
             catch (Exception ee)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+                ee.HandleException(ToastService);
             }
         }
 

@@ -72,7 +72,7 @@
             else
             {
                 var a = SelectedDataItems.Adapt<List<SpecialityDto>>();
-                await Mediator.Send(new DeleteListSpecialityRequest(a.Select(x => x.Id).ToList()));
+                await Mediator.Send(new DeleteSpecialityRequest(ids: a.Select(x => x.Id).ToList()));
             }
             await LoadData();
         }

@@ -41,6 +41,7 @@
                                             PagerVisibleNumericButtonCount="10"
                                             AllowSelectRowByClick="true"
                                             FocusedRowChanged="Grid_FocusedRowChanged"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
                                             ShowGroupPanel="true"
                                             AutoExpandAllGroupRows="true"
                                             TextWrapEnabled="false"
@@ -67,9 +68,9 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="Street1" Caption="Street" />
-                                            <DxGridDataColumn FieldName="WebsiteLink" Caption="Website Link" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Street1" Caption="Street" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="WebsiteLink" Caption="Website Link" />
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
                                             @{

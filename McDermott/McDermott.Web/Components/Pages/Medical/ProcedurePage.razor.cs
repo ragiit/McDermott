@@ -159,7 +159,7 @@ namespace McDermott.Web.Components.Pages.Medical
             else
             {
                 var a = SelectedDataItems.Adapt<List<ProcedureDto>>();
-                await Mediator.Send(new DeleteListProcedureRequest(a.Select(x => x.Id).ToList()));
+                await Mediator.Send(new DeleteProcedureRequest(ids: a.Select(x => x.Id).ToList()));
             }
             await LoadData();
         }

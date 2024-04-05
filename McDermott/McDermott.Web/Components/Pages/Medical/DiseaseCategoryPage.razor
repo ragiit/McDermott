@@ -38,6 +38,7 @@
                                             PageSizeSelectorAllRowsItemVisible="true"
                                             PagerSwitchToInputBoxButtonCount="10"
                                             FocusedRowEnabled="true"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
                                             TextWrapEnabled="false"
                                             PagerVisibleNumericButtonCount="10"
                                             FocusedRowChanged="Grid_FocusedRowChanged"
@@ -68,8 +69,8 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="ParentCategory" Caption="Parent" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="ParentCategory" Caption="Parent" SortIndex="0" />
 
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">

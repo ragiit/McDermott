@@ -1,4 +1,5 @@
-﻿namespace McDermott.Application.Dtos.Medical
+﻿
+namespace McDermott.Application.Dtos.Medical
 {
     public class LocationDto : IMapFrom<Location>
     {
@@ -10,6 +11,18 @@
         [Required]
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
+
+        [NotMapped]
+        public string NameAndParent
+        {
+            get
+            {
+                if (ParentLocation is null)
+                    return Name;
+
+                return $"{Name}/{ParentLocation.Name}";
+            }
+        }
 
         [Required]
         [StringLength(200)]

@@ -28,6 +28,7 @@
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                             KeyFieldName="Id"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
                                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                             EditModelSaving="OnSave"
                                             DataItemDeleting="OnDelete"
@@ -68,8 +69,8 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="Description" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Description" />
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
                                             @{

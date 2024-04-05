@@ -48,6 +48,7 @@
                                             ShowFilterRow="true"
                                             CustomizeElement="Grid_CustomizeElement"
                                             ShowSearchBox="true"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
                                             SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                             KeyboardNavigationEnabled="true">
                                         <ToolbarTemplate>
@@ -68,13 +69,13 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="Code" />
-                                            <DxGridDataColumn FieldName="IsBPJS" Caption="BPJS" />
-                                            <DxGridDataColumn FieldName="Type" />
-                                            <DxGridDataColumn FieldName="Presentase" />
-                                            <DxGridDataColumn FieldName="AdminFee" Caption="Admin Fee %" />
-                                            <DxGridDataColumn FieldName="AdminFeeMax" Caption="Admin Fee Max" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Code" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="IsBPJS" Caption="BPJS" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Type" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Presentase" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="AdminFee" Caption="Admin Fee %" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="AdminFeeMax" Caption="Admin Fee Max" />
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
                                             @{

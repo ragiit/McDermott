@@ -161,13 +161,13 @@ namespace McDermott.Web.Components.Pages.Medical
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<DiagnosisDto>>();
-                    await Mediator.Send(new DeleteListDiagnosisRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteDiagnosisRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
             catch (Exception ee)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message);
+                ee.HandleException(ToastService);
             }
         }
 

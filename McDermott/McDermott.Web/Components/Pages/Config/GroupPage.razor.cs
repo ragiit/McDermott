@@ -1,4 +1,5 @@
 ﻿using DevExpress.Blazor.Internal;
+using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -76,13 +77,13 @@ namespace McDermott.Web.Components.Pages.Config
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<GroupDto>>();
-                    await Mediator.Send(new DeleteGroupMenuRequest(ids: a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteGroupRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
             catch (Exception ee)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+                ee.HandleException(ToastService);
             }
         }
 
@@ -261,13 +262,23 @@ namespace McDermott.Web.Components.Pages.Config
             SelectedDataItemsGroupMenu = new ObservableRangeCollection<object>();
         }
 
-        private bool FormValidationState = false;
+        private bool FormValidationState = true;
 
         private async Task HandleValidSubmit()
         {
-            FormValidationState = true;
+            if (FormValidationState)
+                await SaveItemGroupMenuGrid_Click();
+            else
+                FormValidationState = true;
+        }
 
-            await SaveItemGroupMenuGrid_Click();
+        private void KeyPressHandler(KeyboardEventArgs args)
+        {
+            if (args.Key == "Enter")
+            {
+                FormValidationState = false;
+                return;
+            }
         }
 
         private void HandleInvalidSubmit()
@@ -316,13 +327,18 @@ namespace McDermott.Web.Components.Pages.Config
 
         private void CancelItemGroupMenuGrid_Click()
         {
-            GroupMenus = new();
-            SelectedDataItemsGroupMenu = new ObservableRangeCollection<object>();
+            GroupMenus = [];
+            Group = new();
+            SelectedDataItems = [];
+            SelectedDataItemsGroupMenu = [];
             ShowForm = false;
         }
 
         private async Task SaveItemGroupMenuGrid_Click()
         {
+            if (!FormValidationState)
+                return;
+
             if (Group.Id == 0)
             {
                 var existingName = await Mediator.Send(new GetGroupQuery(x => x.Name == GroupName));

@@ -2,123 +2,160 @@
 
 namespace McDermott.Application.Features.Queries.Medical
 {
-    public class DiagnosisQueryHandler
+    public class DiagnosisQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetDiagnosisQuery, List<DiagnosisDto>>,
+        IRequestHandler<CreateDiagnosisRequest, DiagnosisDto>,
+        IRequestHandler<CreateListDiagnosisRequest, List<DiagnosisDto>>,
+        IRequestHandler<UpdateDiagnosisRequest, DiagnosisDto>,
+        IRequestHandler<UpdateListDiagnosisRequest, List<DiagnosisDto>>,
+        IRequestHandler<DeleteDiagnosisRequest, bool>
     {
-        internal class GetAllDiagnosisQueryHandler : IRequestHandler<GetDiagnosisQuery, List<DiagnosisDto>>
+        #region GET
+
+        public async Task<List<DiagnosisDto>> Handle(GetDiagnosisQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllDiagnosisQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                string cacheKey = $"GetDiagnosisQuery_";
 
-            public async Task<List<DiagnosisDto>> Handle(GetDiagnosisQuery query, CancellationToken cancellationToken)
-            {
-                try
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Diagnosis>? result))
                 {
-                    return await _unitOfWork.Repository<Diagnosis>().Entities
+                    result = await _unitOfWork.Repository<Diagnosis>().Entities
                         .Include(x => x.DiseaseCategory)
                         .Include(x => x.CronisKategory)
-                        .Select(Diagnosis => Diagnosis.Adapt<DiagnosisDto>())
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
-                catch (Exception ee)
-                {
-                    throw;
-                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<DiagnosisDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-        internal class GetDiagnosisByIdQueryHandler : IRequestHandler<GetDiagnosisByIdQuery, DiagnosisDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<DiagnosisDto> Handle(CreateDiagnosisRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetDiagnosisByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<DiagnosisDto> Handle(GetDiagnosisByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Diagnosis>().GetByIdAsync(request.Id);
-
-                return result.Adapt<DiagnosisDto>();
-            }
-        }
-
-        internal class CreateDiagnosisHandler : IRequestHandler<CreateDiagnosisRequest, DiagnosisDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateDiagnosisHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<DiagnosisDto> Handle(CreateDiagnosisRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Diagnosis>().AddAsync(request.DiagnosisDto.Adapt<Diagnosis>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetDiagnosisQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<DiagnosisDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateDiagnosisHandler : IRequestHandler<UpdateDiagnosisRequest, bool>
+        public async Task<List<DiagnosisDto>> Handle(CreateListDiagnosisRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateDiagnosisHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Diagnosis>().AddAsync(request.DiagnosisDtos.Adapt<List<Diagnosis>>());
 
-            public async Task<bool> Handle(UpdateDiagnosisRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Diagnosis>().UpdateAsync(request.DiagnosisDto.Adapt<Diagnosis>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetDiagnosisQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<DiagnosisDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<DiagnosisDto> Handle(UpdateDiagnosisRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Diagnosis>().UpdateAsync(request.DiagnosisDto.Adapt<Diagnosis>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetDiagnosisQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<DiagnosisDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<DiagnosisDto>> Handle(UpdateListDiagnosisRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Diagnosis>().UpdateAsync(request.DiagnosisDtos.Adapt<List<Diagnosis>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetDiagnosisQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<DiagnosisDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteDiagnosisRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<Diagnosis>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<Diagnosis>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetDiagnosisQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteDiagnosisHandler : IRequestHandler<DeleteDiagnosisRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteDiagnosisHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteDiagnosisRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Diagnosis>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListDiagnosisHandler : IRequestHandler<DeleteListDiagnosisRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListDiagnosisHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListDiagnosisRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Diagnosis>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

@@ -28,11 +28,13 @@
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                             KeyFieldName="Id"
                                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
                                             EditModelSaving="OnSave"
                                             DataItemDeleting="OnDelete"
-                                            EditMode="GridEditMode.EditForm"
+                                            EditMode="GridEditMode.PopupEditForm"
                                             PopupEditFormCssClass="pw-800"
                                             PagerPosition="GridPagerPosition.Bottom"
+                                            AllowSelectRowByClick="true"
                                             PageSizeSelectorVisible="true"
                                             PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                             PageSizeSelectorAllRowsItemVisible="true"
@@ -66,7 +68,7 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn width="15px" />
-                                            <DxGridDataColumn FieldName="Name" Caption="Speciality" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" Caption="Speciality" SortIndex="0" />
                                             <!-- <DxGridDataColumn FieldName="Code"  Caption="Code" Width="0" MinWidth="0" /> -->
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
@@ -75,12 +77,12 @@
                                                 var a = (SpecialityDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Description:" ColSpanMd="6">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                     <div class="pop-warning">
                                                         @EditFormContext.GetEditor("Name")
                                                     </div>
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Code" ColSpanMd="6">
+                                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Code" ColSpanMd="12">
                                                     <!-- @EditFormContext.GetEditor("Code") -->
                                                     <DxTextBox @bind-Text="@a.Code" />
                                                 </DxFormLayoutItem>

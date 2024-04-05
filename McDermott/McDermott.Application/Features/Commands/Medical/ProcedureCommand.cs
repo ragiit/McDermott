@@ -2,56 +2,52 @@
 {
     public class ProcedureCommand
     {
-        public class GetProcedureQuery : IRequest<List<ProcedureDto>>;
+        #region GET 
 
-        public class GetProcedureByIdQuery : IRequest<ProcedureDto>
+        public class GetProcedureQuery(Expression<Func<Procedure, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ProcedureDto>>
         {
-            public long Id { get; set; }
-
-            public GetProcedureByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<Procedure, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateProcedureRequest : IRequest<ProcedureDto>
-        {
-            public ProcedureDto ProcedureDto { get; set; }
+        #endregion  
 
-            public CreateProcedureRequest(ProcedureDto ProcedureDto)
-            {
-                this.ProcedureDto = ProcedureDto;
-            }
+        #region CREATE
+
+        public class CreateProcedureRequest(ProcedureDto ProcedureDto) : IRequest<ProcedureDto>
+        {
+            public ProcedureDto ProcedureDto { get; set; } = ProcedureDto;
         }
 
-        public class UpdateProcedureRequest : IRequest<bool>
+        public class CreateListProcedureRequest(List<ProcedureDto> ProcedureDtos) : IRequest<List<ProcedureDto>>
         {
-            public ProcedureDto ProcedureDto { get; set; }
-
-            public UpdateProcedureRequest(ProcedureDto ProcedureDto)
-            {
-                this.ProcedureDto = ProcedureDto;
-            }
+            public List<ProcedureDto> ProcedureDtos { get; set; } = ProcedureDtos;
         }
 
-        public class DeleteProcedureRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteProcedureRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateProcedureRequest(ProcedureDto ProcedureDto) : IRequest<ProcedureDto>
+        {
+            public ProcedureDto ProcedureDto { get; set; } = ProcedureDto;
         }
 
-        public class DeleteListProcedureRequest : IRequest<bool>
+        public class UpdateListProcedureRequest(List<ProcedureDto> ProcedureDtos) : IRequest<List<ProcedureDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListProcedureRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<ProcedureDto> ProcedureDtos { get; set; } = ProcedureDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteProcedureRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

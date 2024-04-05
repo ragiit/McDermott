@@ -19,6 +19,7 @@ global using Microsoft.AspNetCore.SignalR.Client;
 
 global using McDermott.Web.Extentions;
 
+global using McDermott.Application.Dtos.Bpjs;
 global using McDermott.Application.Dtos.Config;
 global using McDermott.Application.Dtos.Medical;
 global using McDermott.Application.Dtos.Transaction;
@@ -31,6 +32,8 @@ global using DevExpress.Data.XtraReports.Native;
 
 global using OfficeOpenXml;
 
+global using static McDermott.Application.Features.Commands.Bpjs.BpjsClassificationCommand;
+global using static McDermott.Application.Features.Commands.Medical.BuildingLocationCommand;
 global using static McDermott.Application.Features.Commands.Pharmacy.ReorderingRuleCommand;
 global using static McDermott.Application.Features.Commands.Inventory.ProductCategoryCommand;
 global using static McDermott.Application.Features.Commands.Inventory.UomCommand;

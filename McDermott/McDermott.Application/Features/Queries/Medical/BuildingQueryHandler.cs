@@ -1,216 +1,175 @@
 ﻿namespace McDermott.Application.Features.Queries.Medical
 {
-    public class BuildingQueryHandler
+    public class BuildingQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetBuildingQuery, List<BuildingDto>>,
+        IRequestHandler<CreateBuildingRequest, BuildingDto>,
+        IRequestHandler<CreateListBuildingRequest, List<BuildingDto>>,
+        IRequestHandler<UpdateBuildingRequest, BuildingDto>,
+        IRequestHandler<UpdateListBuildingRequest, List<BuildingDto>>,
+        IRequestHandler<DeleteBuildingRequest, bool>
     {
-        internal class GetAllBuildingQueryHandler : IRequestHandler<GetBuildingQuery, List<BuildingDto>>
+        #region GET
+
+        public async Task<List<BuildingDto>> Handle(GetBuildingQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllBuildingQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                string cacheKey = $"GetBuildingQuery_";
 
-            public async Task<List<BuildingDto>> Handle(GetBuildingQuery query, CancellationToken cancellationToken)
-            {
-                return await _unitOfWork.Repository<Building>().Entities
-                        .Include(x => x.HealthCenter)
-                        .Select(Building => Building.Adapt<BuildingDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
-            }
-        }
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
 
-        internal class GetBuildingLocationsByBuildingIdQuery : IRequestHandler<GetBuildingLocationByBuildingIdRequest, List<BuildingLocationDto>>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetBuildingLocationsByBuildingIdQuery(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<List<BuildingLocationDto>> Handle(GetBuildingLocationByBuildingIdRequest request, CancellationToken cancellationToken)
-            {
-                return await _unitOfWork.Repository<BuildingLocation>().Entities
-                     .Include(x => x.Location)
-                     .Where(x => x.BuildingId == request.BuildingId)
-                     .Select(x => x.Adapt<BuildingLocationDto>())
-                     .AsNoTracking()
-                     .ToListAsync(cancellationToken);
-            }
-        }
-
-        internal class DeleteBuildingLocationByBuildingIdHandler : IRequestHandler<DeleteBuildingLocationByIdRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteBuildingLocationByBuildingIdHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteBuildingLocationByIdRequest request, CancellationToken cancellationToken)
-            {
-                try
+                if (!_cache.TryGetValue(cacheKey, out List<Building>? result))
                 {
-                    await _unitOfWork.Repository<BuildingLocation>().DeleteAsync(request.Id);
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+                    result = await _unitOfWork.Repository<Building>().Entities
+                       .Include(x => x.HealthCenter)
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
 
-                    return true;
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
-                catch (Exception e)
-                {
-                    throw;
-                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<BuildingDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-        internal class CreateBuildingLocationHandler : IRequestHandler<CreateBuildingLocationRequest, bool>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<BuildingDto> Handle(CreateBuildingRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateBuildingLocationHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(CreateBuildingLocationRequest request, CancellationToken cancellationToken)
-            {
-                try
-                {
-                    foreach (var item in request.BuildingLocationDtos)
-                    {
-                        await _unitOfWork.Repository<BuildingLocation>().AddAsync(item.Adapt<BuildingLocation>());
-                    }
-
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    return false;
-                }
-            }
-        }
-
-        internal class GetBuildingByIdQueryHandler : IRequestHandler<GetBuildingByIdQuery, BuildingDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetBuildingByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<BuildingDto> Handle(GetBuildingByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Building>().GetByIdAsync(request.Id);
-
-                return result.Adapt<BuildingDto>();
-            }
-        }
-
-        internal class CreateBuildingHandler : IRequestHandler<CreateBuildingRequest, BuildingDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateBuildingHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<BuildingDto> Handle(CreateBuildingRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Building>().AddAsync(request.BuildingDto.Adapt<Building>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetBuildingQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<BuildingDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateBuildingHandler : IRequestHandler<UpdateBuildingRequest, bool>
+        public async Task<List<BuildingDto>> Handle(CreateListBuildingRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateBuildingHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Building>().AddAsync(request.BuildingDtos.Adapt<List<Building>>());
 
-            public async Task<bool> Handle(UpdateBuildingRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Building>().UpdateAsync(request.BuildingDto.Adapt<Building>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return true;
+                _cache.Remove("GetBuildingQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<BuildingDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-        internal class DeleteBuildingHandler : IRequestHandler<DeleteBuildingRequest, bool>
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<BuildingDto> Handle(UpdateBuildingRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteBuildingHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                var result = await _unitOfWork.Repository<Building>().UpdateAsync(request.BuildingDto.Adapt<Building>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetBuildingQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<BuildingDto>();
             }
-
-            public async Task<bool> Handle(DeleteBuildingRequest request, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                try
+                throw;
+            }
+        }
+
+        public async Task<List<BuildingDto>> Handle(UpdateListBuildingRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Building>().UpdateAsync(request.BuildingDtos.Adapt<List<Building>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetBuildingQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<BuildingDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteBuildingRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
                 {
                     await _unitOfWork.Repository<Building>().DeleteAsync(request.Id);
 
                     var a = await _unitOfWork.Repository<BuildingLocation>().GetAllAsync();
-                    a = a.Where(x => x.BuildingId == request.Id).ToList();
 
-                    foreach (var item in a)
+                    foreach (var item in a.Where(x => x.BuildingId == request.Id).ToList())
                     {
                         await _unitOfWork.Repository<BuildingLocation>().DeleteAsync(item.Id);
                     }
-
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    return true;
                 }
-                catch (Exception e)
+
+                if (request.Ids.Count > 0)
                 {
-                    throw;
-                }
-            }
-        }
+                    await _unitOfWork.Repository<Building>().DeleteAsync(x => request.Ids.Contains(x.Id));
 
-        internal class DeleteListBuildingHandler : IRequestHandler<DeleteListBuildingRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListBuildingHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListBuildingRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Building>().DeleteAsync(request.Id);
-
-                foreach (var item in request.Id)
-                {
-                    var a = await _unitOfWork.Repository<BuildingLocation>().GetAllAsync();
-                    a = a.Where(x => x.BuildingId == item).ToList();
-
-                    foreach (var i in a)
+                    foreach (var item in request.Ids)
                     {
-                        await _unitOfWork.Repository<BuildingLocation>().DeleteAsync(i.Id);
+                        var a = await _unitOfWork.Repository<BuildingLocation>().GetAllAsync();
+
+                        foreach (var i in a.Where(x => x.BuildingId == item).ToList())
+                        {
+                            await _unitOfWork.Repository<BuildingLocation>().DeleteAsync(i.Id);
+                        }
                     }
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetBuildingQuery_"); // Ganti dengan key yang sesuai
+
                 return true;
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
+
+        #endregion DELETE
     }
 }

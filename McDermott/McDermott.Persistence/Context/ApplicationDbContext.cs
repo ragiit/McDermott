@@ -108,6 +108,9 @@ namespace McDermott.Persistence.Context
         public DbSet<MedicamentGroup> MedicamentGroups { get; set; }
         public DbSet<MedicamentGroupDetail> MedicamentGroupDetails { get; set; }
         public DbSet<ReorderingRule> ReorderingRules { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<GeneralInformation> GeneralInformations { get; set; }
+        public DbSet<Medicament> Medicaments { get; set; }
 
         #endregion Pharmacy
 
@@ -131,6 +134,39 @@ namespace McDermott.Persistence.Context
             // Contoh: Aturan cascade delete untuk hubungan many-to-many
 
             // Menentukan indeks menggunakan Fluent API
+            modelBuilder.Entity<Medicament>()
+                .HasOne(e => e.Product)
+                .WithMany(m => m.Medicaments)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Medicament>()
+                .HasOne(e => e.Route)
+                .WithMany(m => m.Medicaments)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Medicament>()
+                .HasOne(e => e.Signa)
+                .WithMany(m => m.Medicaments)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Medicament>()
+                .HasOne(e => e.Uom)
+                .WithMany(m => m.Medicaments)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<GeneralInformation>()
+                .HasOne(e => e.Product)
+                .WithMany(m => m.GeneralInformation)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<GeneralInformation>()
+               .HasOne(e => e.Uom)
+               .WithMany(m => m.GeneralInformation)
+               .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<GeneralInformation>()
+               .HasOne(e => e.ProductCategory)
+               .WithMany(m => m.GeneralInformation)
+               .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<GeneralInformation>()
+               .HasOne(e => e.Company)
+               .WithMany(m => m.GeneralInformation)
+               .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Location>()
             .HasOne(e => e.ParentLocation)

@@ -2,56 +2,52 @@
 {
     public class DiseaseCategoryCommand
     {
-        public class GetDiseaseCategoryQuery : IRequest<List<DiseaseCategoryDto>>;
+        #region GET 
 
-        public class GetDiseaseCategoryByIdQuery : IRequest<DiseaseCategoryDto>
+        public class GetDiseaseCategoryQuery(Expression<Func<DiseaseCategory, bool>>? predicate = null, bool removeCache = false) : IRequest<List<DiseaseCategoryDto>>
         {
-            public long Id { get; set; }
-
-            public GetDiseaseCategoryByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<DiseaseCategory, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateDiseaseCategoryRequest : IRequest<DiseaseCategoryDto>
-        {
-            public DiseaseCategoryDto DiseaseCategoryDto { get; set; }
+        #endregion  
 
-            public CreateDiseaseCategoryRequest(DiseaseCategoryDto DiseaseCategoryDto)
-            {
-                this.DiseaseCategoryDto = DiseaseCategoryDto;
-            }
+        #region CREATE
+
+        public class CreateDiseaseCategoryRequest(DiseaseCategoryDto DiseaseCategoryDto) : IRequest<DiseaseCategoryDto>
+        {
+            public DiseaseCategoryDto DiseaseCategoryDto { get; set; } = DiseaseCategoryDto;
         }
 
-        public class UpdateDiseaseCategoryRequest : IRequest<bool>
+        public class CreateListDiseaseCategoryRequest(List<DiseaseCategoryDto> DiseaseCategoryDtos) : IRequest<List<DiseaseCategoryDto>>
         {
-            public DiseaseCategoryDto DiseaseCategoryDto { get; set; }
-
-            public UpdateDiseaseCategoryRequest(DiseaseCategoryDto DiseaseCategoryDto)
-            {
-                this.DiseaseCategoryDto = DiseaseCategoryDto;
-            }
+            public List<DiseaseCategoryDto> DiseaseCategoryDtos { get; set; } = DiseaseCategoryDtos;
         }
 
-        public class DeleteDiseaseCategoryRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteDiseaseCategoryRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateDiseaseCategoryRequest(DiseaseCategoryDto DiseaseCategoryDto) : IRequest<DiseaseCategoryDto>
+        {
+            public DiseaseCategoryDto DiseaseCategoryDto { get; set; } = DiseaseCategoryDto;
         }
 
-        public class DeleteListDiseaseCategoryRequest : IRequest<bool>
+        public class UpdateListDiseaseCategoryRequest(List<DiseaseCategoryDto> DiseaseCategoryDtos) : IRequest<List<DiseaseCategoryDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListDiseaseCategoryRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<DiseaseCategoryDto> DiseaseCategoryDtos { get; set; } = DiseaseCategoryDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteDiseaseCategoryRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

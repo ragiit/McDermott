@@ -6,5 +6,6 @@
         public string? Code { get; set; }
 
         public virtual List<DrugDosage>? DrugDosages { get; set; }
+        public virtual List<Medicament>? Medicaments { get; set; }
     }
 }

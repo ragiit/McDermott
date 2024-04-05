@@ -2,56 +2,52 @@
 {
     public class CronisCategoryCommand
     {
-        public class GetCronisCategoryQuery : IRequest<List<CronisCategoryDto>>;
+        #region GET 
 
-        public class GetCronisCategoryByIdQuery : IRequest<CronisCategoryDto>
+        public class GetCronisCategoryQuery(Expression<Func<CronisCategory, bool>>? predicate = null, bool removeCache = false) : IRequest<List<CronisCategoryDto>>
         {
-            public long Id { get; set; }
-
-            public GetCronisCategoryByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<CronisCategory, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateCronisCategoryRequest : IRequest<CronisCategoryDto>
-        {
-            public CronisCategoryDto CronisCategoryDto { get; set; }
+        #endregion  
 
-            public CreateCronisCategoryRequest(CronisCategoryDto CronisCategoryDto)
-            {
-                this.CronisCategoryDto = CronisCategoryDto;
-            }
+        #region CREATE
+
+        public class CreateCronisCategoryRequest(CronisCategoryDto CronisCategoryDto) : IRequest<CronisCategoryDto>
+        {
+            public CronisCategoryDto CronisCategoryDto { get; set; } = CronisCategoryDto;
         }
 
-        public class UpdateCronisCategoryRequest : IRequest<bool>
+        public class CreateListCronisCategoryRequest(List<CronisCategoryDto> CronisCategoryDtos) : IRequest<List<CronisCategoryDto>>
         {
-            public CronisCategoryDto CronisCategoryDto { get; set; }
-
-            public UpdateCronisCategoryRequest(CronisCategoryDto CronisCategoryDto)
-            {
-                this.CronisCategoryDto = CronisCategoryDto;
-            }
+            public List<CronisCategoryDto> CronisCategoryDtos { get; set; } = CronisCategoryDtos;
         }
 
-        public class DeleteCronisCategoryRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteCronisCategoryRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateCronisCategoryRequest(CronisCategoryDto CronisCategoryDto) : IRequest<CronisCategoryDto>
+        {
+            public CronisCategoryDto CronisCategoryDto { get; set; } = CronisCategoryDto;
         }
 
-        public class DeleteListCronisCategoryRequest : IRequest<bool>
+        public class UpdateListCronisCategoryRequest(List<CronisCategoryDto> CronisCategoryDtos) : IRequest<List<CronisCategoryDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListCronisCategoryRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<CronisCategoryDto> CronisCategoryDtos { get; set; } = CronisCategoryDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteCronisCategoryRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

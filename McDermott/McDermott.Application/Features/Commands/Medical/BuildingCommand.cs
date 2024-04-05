@@ -2,86 +2,52 @@
 {
     public class BuildingCommand
     {
-        public class GetBuildingQuery : IRequest<List<BuildingDto>>;
+        #region GET 
 
-        public class GetBuildingByIdQuery : IRequest<BuildingDto>
+        public class GetBuildingQuery(Expression<Func<Building, bool>>? predicate = null, bool removeCache = false) : IRequest<List<BuildingDto>>
         {
-            public long Id { get; set; }
-
-            public GetBuildingByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<Building, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateBuildingRequest : IRequest<BuildingDto>
-        {
-            public BuildingDto BuildingDto { get; set; }
+        #endregion  
 
-            public CreateBuildingRequest(BuildingDto BuildingDto)
-            {
-                this.BuildingDto = BuildingDto;
-            }
+        #region CREATE
+
+        public class CreateBuildingRequest(BuildingDto BuildingDto) : IRequest<BuildingDto>
+        {
+            public BuildingDto BuildingDto { get; set; } = BuildingDto;
         }
 
-        public class GetBuildingLocationByBuildingIdRequest : IRequest<List<BuildingLocationDto>>
+        public class CreateListBuildingRequest(List<BuildingDto> BuildingDtos) : IRequest<List<BuildingDto>>
         {
-            public long BuildingId { get; set; }
-
-            public GetBuildingLocationByBuildingIdRequest(long BuildingId)
-            {
-                this.BuildingId = BuildingId;
-            }
+            public List<BuildingDto> BuildingDtos { get; set; } = BuildingDtos;
         }
 
-        public class DeleteBuildingLocationByIdRequest : IRequest<bool>
-        {
-            public List<long> Id { get; set; }
+        #endregion CREATE
 
-            public DeleteBuildingLocationByIdRequest(List<long> Id)
-            {
-                this.Id = Id;
-            }
+        #region Update
+
+        public class UpdateBuildingRequest(BuildingDto BuildingDto) : IRequest<BuildingDto>
+        {
+            public BuildingDto BuildingDto { get; set; } = BuildingDto;
         }
 
-        public class CreateBuildingLocationRequest : IRequest<bool>
+        public class UpdateListBuildingRequest(List<BuildingDto> BuildingDtos) : IRequest<List<BuildingDto>>
         {
-            public List<BuildingLocationDto> BuildingLocationDtos { get; set; }
-
-            public CreateBuildingLocationRequest(List<BuildingLocationDto> BuildingLocationDtos)
-            {
-                this.BuildingLocationDtos = BuildingLocationDtos;
-            }
+            public List<BuildingDto> BuildingDtos { get; set; } = BuildingDtos;
         }
 
-        public class UpdateBuildingRequest : IRequest<bool>
-        {
-            public BuildingDto BuildingDto { get; set; }
+        #endregion Update
 
-            public UpdateBuildingRequest(BuildingDto BuildingDto)
-            {
-                this.BuildingDto = BuildingDto;
-            }
+        #region DELETE
+
+        public class DeleteBuildingRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
         }
 
-        public class DeleteBuildingRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
-
-            public DeleteBuildingRequest(long id)
-            {
-                Id = id;
-            }
-        }
-
-        public class DeleteListBuildingRequest : IRequest<bool>
-        {
-            public List<long> Id { get; set; }
-
-            public DeleteListBuildingRequest(List<long> id)
-            {
-                Id = id;
-            }
-        }
+        #endregion DELETE
     }
 }

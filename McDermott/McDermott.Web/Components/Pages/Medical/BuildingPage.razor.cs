@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Medical
+﻿using Microsoft.AspNetCore.Components.Web;
+
+namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class BuildingPage
     {
@@ -68,11 +70,21 @@
             await LoadData();
         }
 
+        private void CancelClick()
+        {
+            Building = new();
+            BuildingLocations = [];
+            SelectedBuildingLocationDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = new ObservableRangeCollection<object>();
+            ShowForm = false;
+        }
+
         private async Task LoadData()
         {
             PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
             Buildings = await Mediator.Send(new GetBuildingQuery());
+            ShowForm = false;
             PanelVisible = false;
         }
 
@@ -92,7 +104,7 @@
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<BuildingDto>>();
-                    await Mediator.Send(new DeleteListBuildingRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteBuildingRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
@@ -178,11 +190,37 @@
             await LoadData();
         }
 
-        private async Task NewItem_Click()
+        private bool FormValidationState = false;
+
+        private void KeyPressHandler(KeyboardEventArgs args)
+        {
+            if (args.Key == "Enter")
+            {
+                FormValidationState = false;
+                return;
+            }
+        }
+
+        private async Task HandleValidSubmit()
+        {
+            if (FormValidationState)
+                await SaveItemBuildingLocationGrid_Click();
+            else
+                FormValidationState = true;
+        }
+
+        private void HandleInvalidSubmit()
+        {
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+            FormValidationState = false;
+        }
+
+        private void NewItem_Click()
         {
             ShowForm = true;
             BuildingLocations = [];
             Building = new();
+            Building.HealthCenterId = HealthCenters[0].Id;
         }
 
         private async Task EditItem_Click()
@@ -194,8 +232,8 @@
 
                 if (Building != null)
                 {
-                    DeletedBuildingLocations = await Mediator.Send(new GetBuildingLocationByBuildingIdRequest(Building.Id));
-                    BuildingLocations = await Mediator.Send(new GetBuildingLocationByBuildingIdRequest(Building.Id));
+                    DeletedBuildingLocations = await Mediator.Send(new GetBuildingLocationQuery(x => x.BuildingId == Building.Id));
+                    BuildingLocations = [.. DeletedBuildingLocations];
                 }
             }
             catch { }
@@ -264,13 +302,18 @@
         {
             var a = BuildingLocations;
 
-            if (a is null) return;
+            if (a is null || a.Count == 0)
+            {
+                ToastService.ClearInfoToasts();
+                ToastService.ShowInfo("Please add the Locations, at least 1 Location");
+                return;
+            }
 
             if (Building.Id == 0)
             {
                 var result = await Mediator.Send(new CreateBuildingRequest(Building));
 
-                await Mediator.Send(new DeleteBuildingLocationByIdRequest(DeletedBuildingLocations.Select(x => x.Id).ToList()));
+                await Mediator.Send(new DeleteBuildingLocationRequest(ids: DeletedBuildingLocations.Select(x => x.Id).ToList()));
 
                 a.ForEach(x =>
                 {
@@ -279,13 +322,13 @@
                     x.Location = null;
                 });
 
-                await Mediator.Send(new CreateBuildingLocationRequest(a));
+                await Mediator.Send(new CreateListBuildingLocationRequest(a));
             }
             else
             {
                 var result = await Mediator.Send(new UpdateBuildingRequest(Building));
 
-                await Mediator.Send(new DeleteBuildingLocationByIdRequest(DeletedBuildingLocations.Select(x => x.Id).ToList()));
+                await Mediator.Send(new DeleteBuildingLocationRequest(ids: DeletedBuildingLocations.Select(x => x.Id).ToList()));
 
                 a.ForEach(x =>
                 {
@@ -294,7 +337,7 @@
                     x.Location = null;
                 });
 
-                await Mediator.Send(new CreateBuildingLocationRequest(a));
+                await Mediator.Send(new CreateListBuildingLocationRequest(a));
             }
 
             ShowForm = false;

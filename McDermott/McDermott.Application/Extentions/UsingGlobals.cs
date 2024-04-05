@@ -1,20 +1,25 @@
-﻿global using Mapster;
-global using McDermott.Application.Dtos.Config;
+﻿global using McDermott.Application.Dtos.Config;
 global using McDermott.Application.Dtos.Employee;
 global using McDermott.Application.Dtos.Medical;
 global using McDermott.Application.Dtos.Patient;
 global using McDermott.Application.Dtos.Pharmacy;
 global using McDermott.Application.Dtos.Inventory;
 global using McDermott.Application.Dtos.Transaction;
+global using McDermott.Application.Dtos.Bpjs;
 global using McDermott.Application.Interfaces.Repositories;
 global using McDermott.Domain.Entities;
 
+global using Mapster;
+global using System.ComponentModel.DataAnnotations.Schema;
 global using MediatR;
 global using Microsoft.EntityFrameworkCore;
 global using System.ComponentModel.DataAnnotations;
 global using System.Linq.Expressions;
 global using Microsoft.Extensions.Caching.Memory;
 
+global using static McDermott.Application.Features.Commands.Bpjs.BpjsClassificationCommand;
+global using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
+global using static McDermott.Application.Features.Commands.Medical.BuildingLocationCommand;
 global using static McDermott.Application.Features.Commands.Medical.LocationCommand;
 global using static McDermott.Application.Features.Commands.Pharmacy.ReorderingRuleCommand;
 global using static McDermott.Application.Features.Commands.Inventory.ProductCategoryCommand;

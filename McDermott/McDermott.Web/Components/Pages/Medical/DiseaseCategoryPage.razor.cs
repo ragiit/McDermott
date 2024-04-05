@@ -153,13 +153,13 @@
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<DiseaseCategoryDto>>();
-                    await Mediator.Send(new DeleteListDiseaseCategoryRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteDiseaseCategoryRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
             catch (Exception ee)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message);
+                ee.HandleException(ToastService);
             }
         }
 

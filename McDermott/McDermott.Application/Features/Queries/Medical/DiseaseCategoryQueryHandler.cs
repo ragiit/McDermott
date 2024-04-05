@@ -2,114 +2,158 @@
 
 namespace McDermott.Application.Features.Queries.Medical
 {
-    public class DiseaseCategoryQueryHandler
+    public class DiseaseCategoryQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetDiseaseCategoryQuery, List<DiseaseCategoryDto>>,
+        IRequestHandler<CreateDiseaseCategoryRequest, DiseaseCategoryDto>,
+        IRequestHandler<CreateListDiseaseCategoryRequest, List<DiseaseCategoryDto>>,
+        IRequestHandler<UpdateDiseaseCategoryRequest, DiseaseCategoryDto>,
+        IRequestHandler<UpdateListDiseaseCategoryRequest, List<DiseaseCategoryDto>>,
+        IRequestHandler<DeleteDiseaseCategoryRequest, bool>
     {
-        internal class GetAllDiseaseCategoryQueryHandler : IRequestHandler<GetDiseaseCategoryQuery, List<DiseaseCategoryDto>>
+        #region GET
+
+        public async Task<List<DiseaseCategoryDto>> Handle(GetDiseaseCategoryQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllDiseaseCategoryQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetDiseaseCategoryQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<DiseaseCategory>? result))
+                {
+                    result = await _unitOfWork.Repository<DiseaseCategory>().Entities
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<DiseaseCategoryDto>>();
             }
-
-            public async Task<List<DiseaseCategoryDto>> Handle(GetDiseaseCategoryQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<DiseaseCategory>().Entities
-                        .Select(DiseaseCategory => DiseaseCategory.Adapt<DiseaseCategoryDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetDiseaseCategoryByIdQueryHandler : IRequestHandler<GetDiseaseCategoryByIdQuery, DiseaseCategoryDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<DiseaseCategoryDto> Handle(CreateDiseaseCategoryRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetDiseaseCategoryByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<DiseaseCategoryDto> Handle(GetDiseaseCategoryByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<DiseaseCategory>().GetByIdAsync(request.Id);
-
-                return result.Adapt<DiseaseCategoryDto>();
-            }
-        }
-
-        internal class CreateDiseaseCategoryHandler : IRequestHandler<CreateDiseaseCategoryRequest, DiseaseCategoryDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateDiseaseCategoryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<DiseaseCategoryDto> Handle(CreateDiseaseCategoryRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<DiseaseCategory>().AddAsync(request.DiseaseCategoryDto.Adapt<DiseaseCategory>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetDiseaseCategoryQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<DiseaseCategoryDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateDiseaseCategoryHandler : IRequestHandler<UpdateDiseaseCategoryRequest, bool>
+        public async Task<List<DiseaseCategoryDto>> Handle(CreateListDiseaseCategoryRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateDiseaseCategoryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<DiseaseCategory>().AddAsync(request.DiseaseCategoryDtos.Adapt<List<DiseaseCategory>>());
 
-            public async Task<bool> Handle(UpdateDiseaseCategoryRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<DiseaseCategory>().UpdateAsync(request.DiseaseCategoryDto.Adapt<DiseaseCategory>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetDiseaseCategoryQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<DiseaseCategoryDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<DiseaseCategoryDto> Handle(UpdateDiseaseCategoryRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<DiseaseCategory>().UpdateAsync(request.DiseaseCategoryDto.Adapt<DiseaseCategory>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetDiseaseCategoryQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<DiseaseCategoryDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<DiseaseCategoryDto>> Handle(UpdateListDiseaseCategoryRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<DiseaseCategory>().UpdateAsync(request.DiseaseCategoryDtos.Adapt<List<DiseaseCategory>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetDiseaseCategoryQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<DiseaseCategoryDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteDiseaseCategoryRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<DiseaseCategory>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<DiseaseCategory>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetDiseaseCategoryQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteDiseaseCategoryHandler : IRequestHandler<DeleteDiseaseCategoryRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteDiseaseCategoryHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteDiseaseCategoryRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<DiseaseCategory>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListDiseaseCategoryHandler : IRequestHandler<DeleteListDiseaseCategoryRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListDiseaseCategoryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListDiseaseCategoryRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<DiseaseCategory>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

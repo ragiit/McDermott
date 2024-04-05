@@ -33,6 +33,7 @@
                                         PageSizeSelectorVisible="true"
                                         PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                         PageSizeSelectorAllRowsItemVisible="true"
+                                        EditorRenderMode="GridEditorRenderMode.Detached"
                                         PagerSwitchToInputBoxButtonCount="10"
                                         FocusedRowEnabled="true"
                                         PagerVisibleNumericButtonCount="10"
@@ -62,11 +63,11 @@
                                     </ToolbarTemplate>
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn FieldName="Name" SortIndex="0" Width="200px" />
-                                        <DxGridDataColumn FieldName="Code" Width="100px" />
-                                        <DxGridDataColumn FieldName="Quota" Width="90px" />
-                                        <DxGridDataColumn FieldName="Flag" Width="130px" Caption="Flag" />
-                                        <DxGridDataColumn FieldName="KioskName" Caption=" Service Counter" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" Width="200px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Code" Width="100px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Quota" Width="90px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Flag" Width="130px" Caption="Flag" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="KioskName" Caption=" Service Counter" />
                                     </Columns>
                                 </DxGrid>
 

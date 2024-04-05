@@ -41,6 +41,7 @@
                                             PagerSwitchToInputBoxButtonCount="10"
                                             FocusedRowEnabled="true"
                                             PagerVisibleNumericButtonCount="10"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
                                             FocusedRowChanged="Grid_FocusedRowChanged"
                                             ShowGroupPanel="true"
                                             AutoExpandAllGroupRows="true"
@@ -62,13 +63,13 @@
                                                         <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
                                                     </Items>
                                                 </DxToolbarItem>
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Click="@ImportFile" Text="Import" IconCssClass="fa-solid fa-file-import" />
+                                                @* <DxToolbarItem Visible="@UserAccessCRUID.Import" Click="@ImportFile" Text="Import" IconCssClass="fa-solid fa-file-import" /> *@
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Problem" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="Code" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Problem" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Code" />
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
                                             @{

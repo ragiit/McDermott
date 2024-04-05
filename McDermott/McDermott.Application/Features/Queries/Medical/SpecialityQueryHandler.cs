@@ -1,113 +1,157 @@
 namespace McDermott.Application.Features.Queries.Medical
 {
-    public class SpecialityQueryHandler
+    public class SpecialityQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetSpecialityQuery, List<SpecialityDto>>,
+        IRequestHandler<CreateSpecialityRequest, SpecialityDto>,
+        IRequestHandler<CreateListSpecialityRequest, List<SpecialityDto>>,
+        IRequestHandler<UpdateSpecialityRequest, SpecialityDto>,
+        IRequestHandler<UpdateListSpecialityRequest, List<SpecialityDto>>,
+        IRequestHandler<DeleteSpecialityRequest, bool>
     {
-        internal class GetAllSpecialityQueryHandler : IRequestHandler<GetSpecialityQuery, List<SpecialityDto>>
+        #region GET
+
+        public async Task<List<SpecialityDto>> Handle(GetSpecialityQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllSpecialityQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetSpecialityQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Speciality>? result))
+                {
+                    result = await _unitOfWork.Repository<Speciality>().Entities
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<SpecialityDto>>();
             }
-
-            public async Task<List<SpecialityDto>> Handle(GetSpecialityQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<Speciality>().Entities
-                        .Select(Speciality => Speciality.Adapt<SpecialityDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetSpecialityByIdQueryHandler : IRequestHandler<GetSpecialityByIdQuery, SpecialityDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<SpecialityDto> Handle(CreateSpecialityRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetSpecialityByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<SpecialityDto> Handle(GetSpecialityByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Speciality>().GetByIdAsync(request.Id);
-
-                return result.Adapt<SpecialityDto>();
-            }
-        }
-
-        internal class CreateSpecialityHandler : IRequestHandler<CreateSpecialityRequest, SpecialityDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateSpecialityHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<SpecialityDto> Handle(CreateSpecialityRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Speciality>().AddAsync(request.SpecialityDto.Adapt<Speciality>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetSpecialityQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<SpecialityDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateSpecialityHandler : IRequestHandler<UpdateSpecialityRequest, bool>
+        public async Task<List<SpecialityDto>> Handle(CreateListSpecialityRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateSpecialityHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Speciality>().AddAsync(request.SpecialityDtos.Adapt<List<Speciality>>());
 
-            public async Task<bool> Handle(UpdateSpecialityRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Speciality>().UpdateAsync(request.SpecialityDto.Adapt<Speciality>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetSpecialityQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<SpecialityDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<SpecialityDto> Handle(UpdateSpecialityRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Speciality>().UpdateAsync(request.SpecialityDto.Adapt<Speciality>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetSpecialityQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<SpecialityDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<SpecialityDto>> Handle(UpdateListSpecialityRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Speciality>().UpdateAsync(request.SpecialityDtos.Adapt<List<Speciality>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetSpecialityQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<SpecialityDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteSpecialityRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<Speciality>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<Speciality>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetSpecialityQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteSpecialityHandler : IRequestHandler<DeleteSpecialityRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteSpecialityHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteSpecialityRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Speciality>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListSpecialityHandler : IRequestHandler<DeleteListSpecialityRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListSpecialityHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListSpecialityRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Speciality>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

@@ -194,13 +194,13 @@ namespace McDermott.Web.Components.Pages.Medical
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<CronisCategoryDto>>();
-                    await Mediator.Send(new DeleteListCronisCategoryRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteCronisCategoryRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
             catch (Exception ee)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+                ee.HandleException(ToastService);
             }
         }
 

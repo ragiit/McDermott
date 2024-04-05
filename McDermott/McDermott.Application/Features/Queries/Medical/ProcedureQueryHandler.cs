@@ -2,114 +2,158 @@
 
 namespace McDermott.Application.Features.Queries.Medical
 {
-    public class ProcedureQueryHandler
+    public class ProcedureQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetProcedureQuery, List<ProcedureDto>>,
+        IRequestHandler<CreateProcedureRequest, ProcedureDto>,
+        IRequestHandler<CreateListProcedureRequest, List<ProcedureDto>>,
+        IRequestHandler<UpdateProcedureRequest, ProcedureDto>,
+        IRequestHandler<UpdateListProcedureRequest, List<ProcedureDto>>,
+        IRequestHandler<DeleteProcedureRequest, bool>
     {
-        internal class GetAllProcedureQueryHandler : IRequestHandler<GetProcedureQuery, List<ProcedureDto>>
+        #region GET
+
+        public async Task<List<ProcedureDto>> Handle(GetProcedureQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllProcedureQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetProcedureQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Procedure>? result))
+                {
+                    result = await _unitOfWork.Repository<Procedure>().Entities
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<ProcedureDto>>();
             }
-
-            public async Task<List<ProcedureDto>> Handle(GetProcedureQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<Procedure>().Entities
-                        .Select(Procedure => Procedure.Adapt<ProcedureDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetProcedureByIdQueryHandler : IRequestHandler<GetProcedureByIdQuery, ProcedureDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<ProcedureDto> Handle(CreateProcedureRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetProcedureByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<ProcedureDto> Handle(GetProcedureByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Procedure>().GetByIdAsync(request.Id);
-
-                return result.Adapt<ProcedureDto>();
-            }
-        }
-
-        internal class CreateProcedureHandler : IRequestHandler<CreateProcedureRequest, ProcedureDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateProcedureHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<ProcedureDto> Handle(CreateProcedureRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Procedure>().AddAsync(request.ProcedureDto.Adapt<Procedure>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetProcedureQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<ProcedureDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateProcedureHandler : IRequestHandler<UpdateProcedureRequest, bool>
+        public async Task<List<ProcedureDto>> Handle(CreateListProcedureRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateProcedureHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Procedure>().AddAsync(request.ProcedureDtos.Adapt<List<Procedure>>());
 
-            public async Task<bool> Handle(UpdateProcedureRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Procedure>().UpdateAsync(request.ProcedureDto.Adapt<Procedure>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetProcedureQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<ProcedureDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<ProcedureDto> Handle(UpdateProcedureRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Procedure>().UpdateAsync(request.ProcedureDto.Adapt<Procedure>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetProcedureQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<ProcedureDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<ProcedureDto>> Handle(UpdateListProcedureRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Procedure>().UpdateAsync(request.ProcedureDtos.Adapt<List<Procedure>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetProcedureQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<ProcedureDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteProcedureRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<Procedure>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<Procedure>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetProcedureQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteProcedureHandler : IRequestHandler<DeleteProcedureRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteProcedureHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteProcedureRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Procedure>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListProcedureHandler : IRequestHandler<DeleteListProcedureRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListProcedureHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListProcedureRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Procedure>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }
