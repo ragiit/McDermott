@@ -14,6 +14,10 @@ namespace McDermott.Persistence.Context
 
         #region DbSet
 
+        #region BPJS
+        public DbSet<BpjsClassification> BpjsClassifications { get; set; }
+        #endregion
+
         #region Config
 
         public DbSet<City> Cities { get; set; }
