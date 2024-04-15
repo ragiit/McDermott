@@ -53,7 +53,7 @@
 
         #region Static
 
-        private IGrid Grid { get; set; }
+        private IGrid? Grid { get; set; }
         private bool PanelVisible { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
@@ -97,7 +97,7 @@
 
         private async Task NewItem_Click()
         {
-            await Grid.StartEditNewRowAsync();
+            await Grid!.StartEditNewRowAsync();
         }
 
         private async Task Refresh_Click()
@@ -107,22 +107,22 @@
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            await Grid!.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
         private void DeleteItem_Click()
         {
-            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+            Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
         private void ColumnChooserButton_Click()
         {
-            Grid.ShowColumnChooser();
+            Grid!.ShowColumnChooser();
         }
 
         private async Task ExportXlsxItem_Click()
         {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+            await Grid!.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
             {
                 ExportSelectedRowsOnly = true,
             }); ;
@@ -130,7 +130,7 @@
 
         private async Task ExportXlsItem_Click()
         {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
+            await Grid!.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
             {
                 ExportSelectedRowsOnly = true,
             });
@@ -138,7 +138,7 @@
 
         private async Task ExportCsvItem_Click()
         {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
+            await Grid!.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
             {
                 ExportSelectedRowsOnly = true,
             });

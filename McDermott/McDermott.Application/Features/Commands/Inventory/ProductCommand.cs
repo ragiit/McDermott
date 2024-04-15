@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
-namespace McDermott.Application.Features.Commands.Pharmacy
+namespace McDermott.Application.Features.Commands.Inventory
 {
-   public class ProductCommand
+    public class ProductCommand
     {
         #region GET 
 

@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
- 
+  
 
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
@@ -44,6 +44,8 @@
   <ItemGroup>
     <Folder Include="Logs\" />
   </ItemGroup>
+
+  
 
   
 

@@ -1,27 +1,10 @@
 ﻿using MediatR;
-using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
 
-
-namespace McDermott.Web.Components.Pages.Pharmacy
+namespace McDermott.Web.Components.Pages.Inventory
 {
-    public partial class DrugFormPage
+    public partial class ProductPage
     {
-        #region Relation Data
-        private List<DrugFormDto> DataFormDrugs = [];
-        private DrugFormDto FormDrugs = new();
-        #endregion
-
-        #region Properties Grid
-        private IGrid Grid;
-        private int FocusedRowVisibleIndex { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        #endregion
-
-        #region Variabel static
-        private bool showForm { get; set; } = false;
-        private bool PanelVisible { get; set; } = false;
-        #endregion
-
         #region UserLoginAndAccessRole
 
         [Inject]
@@ -42,6 +25,18 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     await GetUserInfo();
                 }
                 catch { }
+
+                try
+                {
+                    if (Grid is not null)
+                    {
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(1);
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(2);
+                    }
+                }
+                catch { }
             }
         }
 
@@ -59,27 +54,34 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         #endregion UserLoginAndAccessRole
 
-        #region async Data
+        #region Static
+
+        private IGrid? Grid { get; set; }
+        private bool PanelVisible { get; set; } = false;
+        private int FocusedRowVisibleIndex { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+
+        private List<ProductDto> Products = [];
+
+        #endregion Static
+
+        #region Load
+
         protected override async Task OnInitializedAsync()
         {
-            try
-            {
-                await GetUserInfo();
-            }
-            catch { }
-
+            await GetUserInfo();
             await LoadData();
         }
 
         private async Task LoadData()
         {
-            showForm = false;
             PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            DataFormDrugs = await Mediator.Send(new GetFormDrugQuery());            
+            SelectedDataItems = [];
+            Products = await Mediator.Send(new GetProductQuery());
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Load
 
         #region Grid
 
@@ -96,11 +98,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        void Grid_CustomizeFilterRowEditor(GridCustomizeFilterRowEditorEventArgs e)
-        {
-            if (e.FieldName == "CreatedDate" || e.FieldName == "ModifiedDate" || e.FieldName == "FixedDate")
-                ((ITextEditSettings)e.EditSettings).ClearButtonDisplayMode = DataEditorClearButtonDisplayMode.Never;
-        }
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -114,11 +111,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #endregion Grid
 
         #region Click
+
         private async Task NewItem_Click()
         {
-            showForm = true;
+            await Grid!.StartEditNewRowAsync();
         }
-       
+
         private async Task Refresh_Click()
         {
             await LoadData();
@@ -126,40 +124,54 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItem_Click()
         {
-            var general = SelectedDataItems[0].Adapt<DrugFormDto>();
-            FormDrugs = general;
-            showForm = true;
-        }
-        
-        private async Task Back_Click()
-        {
-            showForm = false;
+            await Grid!.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
         private void DeleteItem_Click()
         {
-            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+            Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private async Task onCancle()
+        private void ColumnChooserButton_Click()
         {
-            await LoadData();
+            Grid!.ShowColumnChooser();
         }
-       
-        #endregion
 
-        #region function Delete
+        private async Task ExportXlsxItem_Click()
+        {
+            await Grid!.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            }); ;
+        }
+
+        private async Task ExportXlsItem_Click()
+        {
+            await Grid!.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+        }
+
+        private async Task ExportCsvItem_Click()
+        {
+            await Grid!.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
+            {
+                ExportSelectedRowsOnly = true,
+            });
+        }
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteFormDrugRequest(((DrugFormDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteProductCategoryRequest(((ProductCategoryDto)e.DataItem).Id));
                 }
                 else
                 {
-                    await Mediator.Send(new DeleteFormDrugRequest(ids: SelectedDataItems.Adapt<List<DrugFormDto>>().Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteProductCategoryRequest(ids: SelectedDataItems.Adapt<List<ProductCategoryDto>>().Select(x => x.Id).ToList()));
                 }
 
                 await LoadData();
@@ -169,28 +181,19 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 ee.HandleException(ToastService);
             }
         }
-        #endregion
 
-        #region function Save
-        private async Task onSave()
+        private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            try
-            {
-                if(FormDrugs.Id == 0)
-                {
-                    await Mediator.Send(new CreateFormDrugRequest(FormDrugs));
-                }
-                else
-                {
-                    await Mediator.Send(new UpdateFormDrugRequest(FormDrugs));
-                }
+            var editModel = (ProductCategoryDto)e.EditModel;
 
-                await LoadData();
-            }catch(Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
+            if (editModel.Id == 0)
+                await Mediator.Send(new CreateProductCategoryRequest(editModel));
+            else
+                await Mediator.Send(new UpdateProductCategoryRequest(editModel));
+
+            await LoadData();
         }
-        #endregion
+
+        #endregion Click
     }
 }
