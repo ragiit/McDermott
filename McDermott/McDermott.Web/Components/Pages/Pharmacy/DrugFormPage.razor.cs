@@ -116,6 +116,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #region Click
         private async Task NewItem_Click()
         {
+            FormDrugs = new();
             showForm = true;
         }
        
