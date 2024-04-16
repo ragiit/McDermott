@@ -5,6 +5,21 @@ namespace McDermott.Web.Components.Pages.Inventory
 {
     public partial class ProductPage
     {
+        #region Relation Data
+        private List<ProductDto> Products = [];
+        #endregion
+
+        #region Static
+
+        private IGrid? Grid { get; set; }
+        private bool showForm { get; set; } = false;
+        private bool PanelVisible { get; set; } = false;
+        private int FocusedRowVisibleIndex { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+
+
+        #endregion Static
+
         #region UserLoginAndAccessRole
 
         [Inject]
@@ -53,17 +68,6 @@ namespace McDermott.Web.Components.Pages.Inventory
         }
 
         #endregion UserLoginAndAccessRole
-
-        #region Static
-
-        private IGrid? Grid { get; set; }
-        private bool PanelVisible { get; set; } = false;
-        private int FocusedRowVisibleIndex { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-
-        private List<ProductDto> Products = [];
-
-        #endregion Static
 
         #region Load
 
@@ -114,7 +118,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task NewItem_Click()
         {
-            await Grid!.StartEditNewRowAsync();
+            showForm = true;
         }
 
         private async Task Refresh_Click()
