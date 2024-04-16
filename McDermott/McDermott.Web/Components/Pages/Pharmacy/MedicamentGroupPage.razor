@@ -5,7 +5,7 @@
 @if (IsAccess)
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Pharmacy - Medicamen Group" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Medicamen Group" />
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -196,15 +196,18 @@
                                                     <DxCheckBox @bind-Checked="@FormMedicamenDetails.AllowSubtitation"
                                                                 LabelPosition="LabelPosition.Left" CssClass="w-100" />
                                                 </DxFormLayoutItem> *@
-                                                <DxFormLayoutItem Caption="Signa" ColSpanMd="12">
-                                                    <DxComboBox Data="@Signas"
-                                                                @bind-Value="@FormMedicamenDetails.SignaId"
-                                                                NullText="Select Dosage signa ..."
-                                                                TextFieldName="Name"
-                                                                ValueFieldName="Id"
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                ShowValidationIcon="true"></DxComboBox>
-                                                </DxFormLayoutItem>
+                                                @if (!Concotions)
+                                                {
+                                                    <DxFormLayoutItem Caption="Signa" ColSpanMd="12">
+                                                        <DxComboBox Data="@Signas"
+                                                        @bind-Value="@FormMedicamenDetails.SignaId"
+                                                        NullText="Select Dosage signa ..."
+                                                        TextFieldName="Name"
+                                                        ValueFieldName="Id"
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                        ShowValidationIcon="true"></DxComboBox>
+                                                    </DxFormLayoutItem>
+                                                }
                                                 <DxFormLayoutItem Caption="Dosage" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@FormMedicamenDetails.Dosage" NullText="0.00"></DxTextBox>
                                                     <ValidationMessage For="@(()=> FormMedicamenDetails.Dosage)" ) />
@@ -222,10 +225,13 @@
                                                     <DxTextBox @bind-Text="@FormMedicamenDetails.QtyByDay" NullText="0.00"></DxTextBox>
                                                     <ValidationMessage For="@(()=> FormMedicamenDetails.QtyByDay)" ) />
                                                 </DxFormLayoutItem> *@
-                                                 <DxFormLayoutItem Caption="Day" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@FormMedicamenDetails.Days" NullText="0.00"></DxTextBox>
-                                                    <ValidationMessage For="@(()=> FormMedicamenDetails.Days)" ) />
-                                                </DxFormLayoutItem> 
+                                                @if (!Concotions)
+                                                {
+                                                    <DxFormLayoutItem Caption="Day" ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="@FormMedicamenDetails.Days" NullText="0.00"></DxTextBox>
+                                                        <ValidationMessage For="@(()=> FormMedicamenDetails.Days)" ) />
+                                                    </DxFormLayoutItem>
+                                                }
                                                 <DxFormLayoutItem Caption="Total Qty" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@FormMedicamenDetails.TotalQty" NullText="0.00"></DxTextBox>
                                                     <ValidationMessage For="@(()=> FormMedicamenDetails.TotalQty)" ) />
@@ -237,7 +243,7 @@
                                             <hr />
                                             <div class="row justify-content-end">
                                                 <div class="col-auto align-self-end">
-                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true" Click="onSaveDetail"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="onSaveDetail"></DxButton>
                                                     @* <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="onCancle"></DxButton> *@
                                                 </div>
                                             </div>
@@ -255,7 +261,7 @@
 else
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Pharmacy - Medicamen Group" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Medicamen Group" />
 
         <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>
