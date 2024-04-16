@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Pharmacy.ProductCommand;
+using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
 
-namespace McDermott.Application.Features.Queries.Pharmacy
+namespace McDermott.Application.Features.Queries.Inventory
 {
     public class ProductQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetProductQuery, List<ProductDto>>,
@@ -28,7 +28,9 @@ namespace McDermott.Application.Features.Queries.Pharmacy
 
                 if (!_cache.TryGetValue(cacheKey, out List<Product>? result))
                 {
-                    result = await _unitOfWork.Repository<Product>().Entities                       
+                    result = await _unitOfWork.Repository<Product>().Entities
+                      .Include(x=>x.GeneralInformation)
+                      .Include(x=>x.Medicaments)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 
@@ -149,7 +151,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetProductQuery_"); // Ganti dengan key yang sesuai
-               
+
 
                 return true;
             }

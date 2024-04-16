@@ -9,7 +9,7 @@ namespace McDermott.Domain.Entities
     public class GeneralInformation :BaseAuditableEntity
     {
         public long? ProductId { get; set; }
-        public long? BpjsClasificationId { get; set; }
+        public long? BpjsClassificationId { get; set; }
         public long? UomId { get; set; }
         public long? ProductCategoryId { get; set; }
         public long? CompanyId { get; set; }
@@ -22,6 +22,7 @@ namespace McDermott.Domain.Entities
         public string? InternalReference { get; set; }
      
         public Product? Product { get; set; }
+        public BpjsClassification? BpjsClassification { get; set; }
         public Uom? Uom { get; set; }
         public ProductCategory? ProductCategory { get; set; }
         public Company? Company { get; set; }

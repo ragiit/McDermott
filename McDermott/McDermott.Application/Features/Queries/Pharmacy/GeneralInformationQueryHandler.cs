@@ -30,6 +30,10 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 {
                     result = await _unitOfWork.Repository<GeneralInformation>().Entities
                         .Include(x => x.Uom)
+                        .Include(x => x.Product)
+                        .Include(x => x.BpjsClassification)
+                        .Include(x => x.ProductCategory)
+                        .Include(x => x.Company)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 

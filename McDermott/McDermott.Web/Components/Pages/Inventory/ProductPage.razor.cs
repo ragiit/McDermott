@@ -1,6 +1,9 @@
-﻿namespace McDermott.Web.Components.Pages.Inventory
+﻿using MediatR;
+using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
+
+namespace McDermott.Web.Components.Pages.Inventory
 {
-    public partial class ProductCategoryPage
+    public partial class ProductPage
     {
         #region UserLoginAndAccessRole
 
@@ -58,20 +61,7 @@
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
-        private List<ProductCategoryDto> ProductCategories = [];
-
-        private List<string> CostingMethod = new List<string>
-        {
-            "Standart Price",
-            "First In Firs Out (FIFO)",
-            "Average Cost (AVCO)"
-        };
-
-        private List<string> InventoryValiation = new List<string>
-        {
-            "Manual",
-            "Automated"
-        };
+        private List<ProductDto> Products = [];
 
         #endregion Static
 
@@ -87,11 +77,38 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            ProductCategories = await Mediator.Send(new GetProductCategoryQuery());
+            Products = await Mediator.Send(new GetProductQuery());
             PanelVisible = false;
         }
 
         #endregion Load
+
+        #region Grid
+
+        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        {
+            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+            {
+                e.CssClass = "alt-item";
+            }
+            if (e.ElementType == GridElementType.HeaderCell)
+            {
+                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
+                e.CssClass = "header-bold";
+            }
+        }
+
+        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        {
+            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+        }
+
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+        }
+
+        #endregion Grid
 
         #region Click
 
@@ -178,32 +195,5 @@
         }
 
         #endregion Click
-
-        #region Grid
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndex = args.VisibleIndex;
-        }
-
-        #endregion Grid
     }
 }

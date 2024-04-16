@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
@@ -116,6 +116,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #region Click
         private async Task NewItem_Click()
         {
+            FormDrugs = new();
             showForm = true;
         }
        
