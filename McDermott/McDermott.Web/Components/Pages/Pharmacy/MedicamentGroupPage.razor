@@ -5,21 +5,7 @@
 @if (IsAccess)
 {
     <div class="wrapper">
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Medicament Group</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item" @onclick="LoadData"><a href="/pharmacy/medicamentgroup">Medicament Group</a></li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Pharmacy - Medicamen Group" />
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -169,14 +155,14 @@
                                                     <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Medicament Unit Of Dosage" />
                                                     @if (!Concotions)
                                                     {
-                                                        <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Allow Substitution" />
+                                                        @* <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Allow Substitution" /> *@
                                                         <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Dosage Frequency" />
                                                     }
                                                     <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Dosage" />
                                                     <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Unit Of Dosage" />
                                                     @if (!Concotions)
                                                     {
-                                                        <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Qty Per Day" />
+                                                        @* <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Qty Per Day" /> *@
                                                         <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Day" />
                                                     }
                                                     <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Total Qty" />
@@ -206,10 +192,10 @@
                                                 <DxFormLayoutItem Caption="Medicines Unit Dosage" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@FormMedicamenDetails.MedicaneUnitDosage"></DxTextBox>
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Allow Subtitutions" ColSpanMd="12">
+                                                @* <DxFormLayoutItem Caption="Allow Subtitutions" ColSpanMd="12">
                                                     <DxCheckBox @bind-Checked="@FormMedicamenDetails.AllowSubtitation"
                                                                 LabelPosition="LabelPosition.Left" CssClass="w-100" />
-                                                </DxFormLayoutItem>
+                                                </DxFormLayoutItem> *@
                                                 <DxFormLayoutItem Caption="Signa" ColSpanMd="12">
                                                     <DxComboBox Data="@Signas"
                                                                 @bind-Value="@FormMedicamenDetails.SignaId"
@@ -232,14 +218,14 @@
                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                 ShowValidationIcon="true"></DxComboBox>
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Qty Per Day" ColSpanMd="12">
+                                                @* <DxFormLayoutItem Caption="Qty Per Day" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@FormMedicamenDetails.QtyByDay" NullText="0.00"></DxTextBox>
                                                     <ValidationMessage For="@(()=> FormMedicamenDetails.QtyByDay)" ) />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Day" ColSpanMd="12">
+                                                </DxFormLayoutItem> *@
+                                                 <DxFormLayoutItem Caption="Day" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@FormMedicamenDetails.Days" NullText="0.00"></DxTextBox>
                                                     <ValidationMessage For="@(()=> FormMedicamenDetails.Days)" ) />
-                                                </DxFormLayoutItem>
+                                                </DxFormLayoutItem> 
                                                 <DxFormLayoutItem Caption="Total Qty" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@FormMedicamenDetails.TotalQty" NullText="0.00"></DxTextBox>
                                                     <ValidationMessage For="@(()=> FormMedicamenDetails.TotalQty)" ) />
