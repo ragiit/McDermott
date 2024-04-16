@@ -16,6 +16,12 @@ namespace McDermott.Application.Features.Commands.Pharmacy
             public bool RemoveCache { get; } = removeCache!;
         }
 
+        public class GetMedicamentGroupDetailQuery(Expression<Func<MedicamentGroupDetail, bool>>? predicate = null, bool removeCache = false) : IRequest<List<MedicamentGroupDetailDto>>
+        {
+            public Expression<Func<MedicamentGroupDetail, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
+        }
+
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
         #region CREATE
@@ -28,6 +34,16 @@ namespace McDermott.Application.Features.Commands.Pharmacy
         public class CreateListMedicamentGroupRequest(List<MedicamentGroupDto> MedicamentGroupDtos) : IRequest<List<MedicamentGroupDto>>
         {
             public List<MedicamentGroupDto> MedicamentGroupDtos { get; set; } = MedicamentGroupDtos;
+        }
+
+        public class CreateMedicamentGroupDetailRequest(MedicamentGroupDetailDto MedicamentGroupDetailDto) : IRequest<MedicamentGroupDetailDto>
+        {
+            public MedicamentGroupDetailDto MedicamentGroupDetailDto { get; set; } = MedicamentGroupDetailDto;
+        }
+
+        public class CreateListMedicamentGroupDetailRequest(List<MedicamentGroupDetailDto> MedicamentGroupDetailDtos) : IRequest<List<MedicamentGroupDetailDto>>
+        {
+            public List<MedicamentGroupDetailDto> MedicamentGroupDetailDtos { get; set; } = MedicamentGroupDetailDtos;
         }
 
         #endregion CREATE
@@ -44,11 +60,27 @@ namespace McDermott.Application.Features.Commands.Pharmacy
             public List<MedicamentGroupDto> MedicamentGroupDtos { get; set; } = MedicamentGroupDtos;
         }
 
+        public class UpdateMedicamentGroupDetailRequest(MedicamentGroupDetailDto MedicamentGroupDetailDto) : IRequest<MedicamentGroupDetailDto>
+        {
+            public MedicamentGroupDetailDto MedicamentGroupDetailDto { get; set; } = MedicamentGroupDetailDto;
+        }
+
+        public class UpdateListMedicamentGroupDetailRequest(List<MedicamentGroupDetailDto> MedicamentGroupDetailDtos) : IRequest<List<MedicamentGroupDetailDto>>
+        {
+            public List<MedicamentGroupDetailDto> MedicamentGroupDetailDtos { get; set; } = MedicamentGroupDetailDtos;
+        }
+
         #endregion Update
 
         #region DELETE
 
         public class DeleteMedicamentGroupRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        public class DeleteMedicamentGroupDetailRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
             public long Id { get; set; } = id ?? 0;
             public List<long> Ids { get; set; } = ids ?? [];

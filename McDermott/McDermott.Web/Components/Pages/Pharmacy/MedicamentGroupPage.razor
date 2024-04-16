@@ -126,7 +126,7 @@
                                             </DxFormLayout>
                                             <hr />
                                             <DxGrid @ref="Grid"
-                                                    Data="@medicamentGroups"
+                                                    Data="@medicamentGroupDetails"
                                                     ShowGroupPanel="true"
                                                     ShowFilterRow="true"
                                                     TextWrapEnabled="false"
@@ -142,9 +142,10 @@
                                                 <ToolbarTemplate>
                                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                         <DxToolbarItem Text="New" Click="NewItemMedicamentGroupDetail_Click" IconCssClass="fa-solid fa-plus" />
-                                                        <DxToolbarItem Text="Delete" Click="DeleteItemMedicamentGroupDetail_Click" IconCssClass="fa-solid fa-trash" />
-                                                        <DxToolbarItem Text="Save" IconCssClass="fa-solid fa-floppy-disk" Click="SaveItemMedicamentGroupDetailGrid_Click" />
-                                                        <DxToolbarItem Text="Cancel" IconCssClass="fa-solid fa-rotate-left" Click="CancelItemMedicamentGroupDetailGrid_Click" />
+                                                        <DxToolbarItem Text="Delete" Click="DeleteItemMedicamentGroupDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && medicamentGroupDetails.Count > 0" />
+                                                        <DxToolbarItem BeginGroup="true" Text="Save" IconCssClass="fa-solid fa-floppy-disk" Click="SaveItemMedicamentGroupDetailGrid_Click" />
+                                                        <DxToolbarItem Text="Cancel" IconCssClass="fa-solid fa-ban" Click="CancelItemMedicamentGroupDetailGrid_Click" />
+                                                        @* <DxToolbarItem BeginGroup="true" Text="Refresh" IconCssClass="fa-solid fa-rotate-left" Click="CancelItemMedicamentGroupDetailGrid_Click" /> *@
                                                     </DxToolbar>
                                                 </ToolbarTemplate>
                                                 <Columns>
@@ -209,7 +210,7 @@
                                                     </DxFormLayoutItem>
                                                 }
                                                 <DxFormLayoutItem Caption="Dosage" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@FormMedicamenDetails.Dosage" NullText="0.00"></DxTextBox>
+                                                    <DxTextBox Text="@FormMedicamenDetails.Dosage"  NullText="0.00" TextExpression="@(()=>FormMedicamenDetails.Dosage)" TextChanged="@onChangeTotalQty"></DxTextBox>
                                                     <ValidationMessage For="@(()=> FormMedicamenDetails.Dosage)" ) />
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem Caption="Unit Of Dosage" ColSpanMd="12">
@@ -228,7 +229,7 @@
                                                 @if (!Concotions)
                                                 {
                                                     <DxFormLayoutItem Caption="Day" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@FormMedicamenDetails.Days" NullText="0.00"></DxTextBox>
+                                                        <DxTextBox Text="@FormMedicamenDetails.Days" NullText="0.00" TextExpression="@(()=>FormMedicamenDetails.Days)" TextChanged="@onChangeTotalQtyDays"></DxTextBox>
                                                         <ValidationMessage For="@(()=> FormMedicamenDetails.Days)" ) />
                                                     </DxFormLayoutItem>
                                                 }

@@ -2,6 +2,7 @@
 using McDermott.Application.Dtos.Queue;
 using McDermott.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Components.Forms;
 using System.ComponentModel;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
@@ -13,6 +14,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
     {
         #region Relation Data
         private List<MedicamentGroupDto> medicamentGroups = [];
+        private List<MedicamentGroupDetailDto> medicamentGroupDetails = [];
         private List<UserDto> Phy = new();
         private List<UomDto> UoMs = new();
         private List<SignaDto> Signas = new();
@@ -31,9 +33,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private bool FormMedicaments { get; set; } = false;
         private bool Concotions { get; set; } = false;
         public bool KeyboardNavigationEnabled { get; set; }
+        private bool IsAddMedicament { get; set; } = false;
+        private double Dosages { get; set; }
         private string? chars { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private IReadOnlyList<object> SelectedMedicamentGroupDetailDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         private bool Checkin
         {
@@ -53,6 +58,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     Concotions = false;
                 }
             }
+        }
+
+
+        bool IsNumeric(string value)
+        {
+            return double.TryParse(value, out _);
         }
         #endregion
 
@@ -117,6 +128,23 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Phy = [.. user.Where(x => x.IsPhysicion == true)];
             PanelVisible = false;
         }
+
+        void onChangeTotalQty(string numDosage)
+        {
+            var a = Int64.Parse(numDosage);
+            var b = Int64.Parse(FormMedicamenDetails.Days);
+            FormMedicamenDetails.Dosage = numDosage;
+            var tempt = a * b;
+            FormMedicamenDetails.TotalQty = tempt.ToString();
+        }
+        void onChangeTotalQtyDays(string numDays)
+        {
+            var a = Int64.Parse(numDays);
+            var b = Int64.Parse(FormMedicamenDetails.Dosage);
+            FormMedicamenDetails.Days = numDays;
+            var tempt = a * b;
+            FormMedicamenDetails.TotalQty = tempt.ToString();
+        }
         #endregion
 
         #region Grid
@@ -154,10 +182,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #region Click
         private async Task NewItem_Click()
         {
+            
             showForm = true;
         }
         private async Task NewItemMedicamentGroupDetail_Click()
         {
+            FormMedicamenDetails = new();
+            IsAddMedicament = true;
+            FormMedicamenDetails.Days = "1";
             FormMedicaments = true;
         }
 
@@ -218,7 +250,29 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #region Function Save
         private async Task onSaveDetail()
         {
-            await LoadData();
+            try
+            {
+                MedicamentGroupDetailDto updateMedicamentGroupDetail = new();
+                if (IsAddMedicament)
+                {
+                    if (medicamentGroupDetails.Where(x => x.MedicamentId == FormMedicamenDetails.MedicamentId).Any())
+                        return;
+
+                    medicamentGroupDetails.Add(FormMedicamenDetails);
+                }
+
+                //if (IsAddMedicament)
+                //{
+
+                //}
+
+                SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
+                FormMedicaments = false;
+            }
+            catch(Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
         #endregion
     }

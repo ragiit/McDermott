@@ -9,7 +9,7 @@ namespace McDermott.Application.Dtos.Pharmacy
     public class MedicamentGroupDetailDto :IMapFrom<MedicamentGroupDetail>
     {
         public long Id { get; set; }
-        public long MedicamentGroupId { get; set; }
+        public long? MedicamentGroupId { get; set; }
         public long? MedicamentId { get; set; }
         public List<long>? ActiveComponentId { get; set; }
         public long? SignaId { get; set; }
@@ -18,6 +18,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public string? MedicaneUnitDosage { get; set; }
         [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? MedicaneDosage { get; set; }
+        
         [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? Dosage { get; set; }
         [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]

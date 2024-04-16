@@ -17,7 +17,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
-
+       
         #endregion Static
 
         #region UserLoginAndAccessRole
