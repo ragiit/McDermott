@@ -13,18 +13,23 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long? ProductId { get; set; }
         public long? SignaId { get; set; }
         public long? RouteId { get; set; }
+        public long? FormId { get; set; }
         public long? UomId { get; set; }
         public List<long>? ActiveComponentId { get; set; }
         public bool? PregnancyWarning { get; set; }
         public bool? Cronies { get; set; }
+        public bool? Pharmacologi { get; set; }
+        public bool? Weather { get; set; }
+        public bool? Food { get; set; }
         public string? MontlyMax { get; set; }
-        public string? Form { get; set; }
         public string? Dosage { get; set; }
 
         [SetToNull]
         public virtual ProductDto? Product { get; set; }
         [SetToNull]
         public virtual SignaDto? Signa { get; set; }
+        [SetToNull]
+        public virtual DrugFormDto? Form { get; set; }
         [SetToNull]
         public virtual DrugRouteDto? Route { get; set; }
         [SetToNull]

@@ -1,5 +1,8 @@
 ﻿using MediatR;
 using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
 {
@@ -7,6 +10,17 @@ namespace McDermott.Web.Components.Pages.Inventory
     {
         #region Relation Data
         private List<ProductDto> Products = [];
+        private List<MedicamentDto> Medicaments = [];
+        private List<BpjsClassificationDto> BpjsClassifications = [];
+        private List<UomDto> Uoms = [];
+        private List<DrugFormDto> DrugForms = [];
+        private List<DrugRouteDto> DrugRoutes = [];
+        private List<ProductCategoryDto> productCategories = [];
+        private List<ActiveComponentDto> ActiveComponents = [];
+        private List<SignaDto> Signas = [];
+        private ProductDetailDto FormProductDetails = new();
+        private ProductDto FormProducts = new();
+        private MedicamentDto FormMedicaments = new();
         #endregion
 
         #region Static
@@ -14,10 +28,58 @@ namespace McDermott.Web.Components.Pages.Inventory
         private IGrid? Grid { get; set; }
         private bool showForm { get; set; } = false;
         private bool PanelVisible { get; set; } = false;
+        private bool showTabs { get; set; } = true;
+        private bool Checkins { get; set; } = false;
+        private bool Chronis { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
 
-       
+        private List<string> ProductTypes = new List<string>
+        {
+            "Consumable",
+            "Service",
+            "Storable Product"
+        };
+
+        private List<string> HospitalProducts = new List<string>
+        {
+            "Medicament",
+            "Food & Drink"
+        };
+
+        private void SelectedItemChanged(string Hospital)
+        {
+            if (Hospital != "Medicament")
+            {
+                showTabs = false;
+            }
+            else
+            {
+                showTabs = true;
+            }
+        }
+
+        private bool Checkin
+        {
+            get => Checkins;
+            set
+            {
+                bool Checkins = value;
+                this.Checkins = value;
+                if (Checkins)
+                {
+                    Chronis = true;
+                    FormProductDetails.Cronies = true;
+
+                }
+                else
+                {
+                    Chronis = false;
+                }
+            }
+        }
+
         #endregion Static
 
         #region UserLoginAndAccessRole
@@ -80,6 +142,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task LoadData()
         {
             PanelVisible = true;
+            showForm = false;
             SelectedDataItems = [];
             Products = await Mediator.Send(new GetProductQuery());
             PanelVisible = false;
@@ -118,7 +181,20 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task NewItem_Click()
         {
+            
             showForm = true;
+            FormProductDetails = new();
+            FormProductDetails.ProductType = ProductTypes[0];
+            FormProductDetails.HospitalType = HospitalProducts[0];
+            BpjsClassifications = await Mediator.Send(new GetBpjsClassificationQuery());
+            Uoms = await Mediator.Send(new GetUomQuery());
+            productCategories = await Mediator.Send(new GetProductCategoryQuery());
+            DrugForms = await Mediator.Send(new GetFormDrugQuery());
+            DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
+            FormProductDetails.SalesPrice = "100";
+            Signas = await Mediator.Send(new GetSignaQuery());
+            ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
+            FormProductDetails.Tax = "11%";
         }
 
         private async Task Refresh_Click()
@@ -128,9 +204,45 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task EditItem_Click()
         {
-            await Grid!.StartEditRowAsync(FocusedRowVisibleIndex);
+            showForm = true;
+            var products = SelectedDataItems[0].Adapt<ProductDto>();
+            var medicamen = Medicaments.FirstOrDefault(z => z.ProductId == products?.Id);
+            FormProductDetails.Name = products.Name;
+            FormProductDetails.ProductCategoryId = products.ProductCategoryId;
+            FormProductDetails.ProductType = products.ProductType;
+            FormProductDetails.HospitalType = products.HospitalType;
+            FormProductDetails.BpjsClasificationId = products.BpjsClasificationId;
+            FormProductDetails.UomId = products.UomId;
+            FormProductDetails.PurchaseUomId = products.PurchaseUomId;
+            FormProductDetails.SalesPrice = products.SalesPrice;
+            FormProductDetails.Tax = products.Tax;
+            FormProductDetails.Cost = products.Cost;
+            FormProductDetails.ProductCategoryId = products.ProductCategoryId;
+            FormProductDetails.InternalReference = products.InternalReference;
+            if(products.HospitalType == "Medicament")
+            {
+                if (medicamen != null)
+                {
+                    FormProductDetails.FormId = medicamen.FormId;
+                    FormProductDetails.RouteId = medicamen.RouteId;
+                    FormProductDetails.Dosage = medicamen.Dosage;
+                    FormProductDetails.UomId = medicamen.UomId;
+                    FormProductDetails.Cronies = medicamen.Cronies;
+                    FormProductDetails.MontlyMax = medicamen.MontlyMax;
+                    FormProductDetails.SignaId = medicamen.SignaId;
+                    FormProductDetails.ActiveComponentId = medicamen.ActiveComponentId;
+                    FormProductDetails.PregnancyWarning = medicamen.PregnancyWarning;
+                    FormProductDetails.Pharmacologi = medicamen.Pharmacologi;
+                    FormProductDetails.Weather = medicamen.Weather;
+                    FormProductDetails.Food = medicamen.Food;
+                }
+            }
         }
 
+        private async void onDiscard()
+        {
+            await LoadData();
+        }
         private void DeleteItem_Click()
         {
             Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
@@ -186,18 +298,73 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
         }
 
-        private async Task OnSave(GridEditModelSavingEventArgs e)
+        #endregion Click
+        #region Save
+        private async Task OnSave()
         {
-            var editModel = (ProductCategoryDto)e.EditModel;
+            try
+            {
+                if (FormProductDetails.Id == 0)
+                {
+                    FormProducts.Name = FormProductDetails.Name;
+                    FormProducts.ProductCategoryId = FormProductDetails.ProductCategoryId;
+                    FormProducts.ProductType = FormProductDetails.ProductType;
+                    FormProducts.HospitalType = FormProductDetails.HospitalType;
+                    FormProducts.BpjsClasificationId = FormProductDetails.BpjsClasificationId;
+                    FormProducts.UomId = FormProductDetails.UomId;
+                    FormProducts.PurchaseUomId = FormProductDetails.PurchaseUomId;
+                    FormProducts.SalesPrice = FormProductDetails.SalesPrice;
+                    FormProducts.Tax = FormProductDetails.Tax;
+                    FormProducts.Cost = FormProductDetails.Cost;
+                    FormProducts.ProductCategoryId = FormProductDetails.ProductCategoryId;
+                    FormProducts.InternalReference = FormProductDetails.InternalReference;
+                    if (selectedActiveComponents != null)
+                    {
+                        var listActiveComponent = selectedActiveComponents.Select(x => x.Id).ToList();
+                        FormProductDetails.ActiveComponentId?.AddRange(listActiveComponent);
+                    }
+                     ProductDto getProduct = new();
+                    if (FormProducts.Id == 0)
+                    {
+                         getProduct = await Mediator.Send(new CreateProductRequest(FormProducts));
+                    }
+                    
+                    // Medicament
+                    if (FormProductDetails.HospitalType == "Medicament")
+                    {
+                        FormMedicaments.ProductId = getProduct.Id;
+                        FormMedicaments.FormId = FormProductDetails.FormId;
+                        FormMedicaments.RouteId = FormProductDetails.RouteId;
+                        FormMedicaments.Dosage = FormProductDetails.Dosage;
+                        FormMedicaments.UomId = FormProductDetails.UomMId;
+                        FormMedicaments.Cronies = FormProductDetails.Cronies;
+                        FormMedicaments.MontlyMax = FormProductDetails.MontlyMax;
+                        FormMedicaments.SignaId = FormProductDetails.SignaId;
+                        FormMedicaments.ActiveComponentId = FormProductDetails.ActiveComponentId;
+                        FormMedicaments.PregnancyWarning = FormProductDetails.PregnancyWarning;
+                        FormMedicaments.Pharmacologi = FormProductDetails.Pharmacologi;
+                        FormMedicaments.Weather = FormProductDetails.Weather;
+                        FormMedicaments.Food = FormProductDetails.Food;
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateProductCategoryRequest(editModel));
-            else
-                await Mediator.Send(new UpdateProductCategoryRequest(editModel));
+                        if (FormMedicaments.Id == 0)
+                        {
+                            await Mediator.Send(new CreateMedicamentRequest(FormMedicaments));
+                        }
+                        else
+                        {
+                            await Mediator.Send(new UpdateMedicamentRequest(FormMedicaments));
+                        }
+                    }
+                    await LoadData();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
 
             await LoadData();
         }
-
-        #endregion Click
+        #endregion
     }
 }

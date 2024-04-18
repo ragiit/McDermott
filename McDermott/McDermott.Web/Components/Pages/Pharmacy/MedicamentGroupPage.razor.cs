@@ -19,18 +19,19 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<UomDto> UoMs = new();
         private List<SignaDto> Signas = new();
         private List<ActiveComponentDto> ActiveComponents = [];
-        private MedicamentGroupDto MGFrom = new();
         private List<DrugFormDto> FormDrugs = new();
+        private MedicamentGroupDto MGFrom = new();
         private MedicamentGroupDetailDto FormMedicamenDetails = new();
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         #endregion
 
         #region variabel static
         private IGrid Grid { get; set; }
+        public IGrid GridDoctorScheduleDetail { get; set; }
         private bool PanelVisible { get; set; } = false;
         private bool showForm { get; set; } = false;
         private bool Checkins { get; set; } = false;
-        private bool FormMedicaments { get; set; } = false;
+        private bool PopUpFormMedicaments { get; set; } = false;
         private bool Concotions { get; set; } = false;
         public bool KeyboardNavigationEnabled { get; set; }
         private bool IsAddMedicament { get; set; } = false;
@@ -51,7 +52,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 {
                     Concotions = true;
                     MGFrom.IsConcoction = true;
-                    chars = " awokkkkk";
+                    
                 }
                 else
                 {
@@ -182,15 +183,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #region Click
         private async Task NewItem_Click()
         {
-            
+            medicamentGroupDetails.Clear();
             showForm = true;
         }
         private async Task NewItemMedicamentGroupDetail_Click()
         {
             FormMedicamenDetails = new();
             IsAddMedicament = true;
-            FormMedicamenDetails.Days = "1";
-            FormMedicaments = true;
+            await GridDoctorScheduleDetail.StartEditNewRowAsync();
         }
 
         private async Task Refresh_Click()
@@ -226,7 +226,28 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #endregion
 
         #region function Delete
+        
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteMedicamentGroupRequest(((MedicamentGroupDto)e.DataItem).Id));
+                }
+                else
+                {
+                    await Mediator.Send(new DeleteMedicamentGroupRequest(ids: SelectedDataItems.Adapt<List<MedicamentGroupDto>>().Select(x => x.Id).ToList()));
+                }
+
+                await LoadData();
+            }
+            catch (Exception ee)
+            {
+                ee.HandleException(ToastService);
+            }
+        }
+        private async Task OnDeleteDoctorScheduleDetail(GridDataItemDeletingEventArgs e)
         {
             try
             {
@@ -248,17 +269,18 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         }
         #endregion
         #region Function Save
-        private async Task onSaveDetail()
+        private async Task OnSaveDoctorScheduleDetail(GridEditModelSavingEventArgs e)
         {
             try
             {
+                var FormMedicamenGroupDetails = (MedicamentGroupDetailDto)e.EditModel;
                 MedicamentGroupDetailDto updateMedicamentGroupDetail = new();
                 if (IsAddMedicament)
                 {
-                    if (medicamentGroupDetails.Where(x => x.MedicamentId == FormMedicamenDetails.MedicamentId).Any())
+                    if (medicamentGroupDetails.Where(x => x.MedicamentId == FormMedicamenGroupDetails.MedicamentId).Any())
                         return;
 
-                    medicamentGroupDetails.Add(FormMedicamenDetails);
+                    medicamentGroupDetails.Add(FormMedicamenGroupDetails);
                 }
 
                 //if (IsAddMedicament)
@@ -267,7 +289,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 //}
 
                 SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
-                FormMedicaments = false;
+               
             }
             catch(Exception ex)
             {
