@@ -61,6 +61,7 @@
                                                 ShowGroupPanel="true"
                                                 AutoExpandAllGroupRows="true"
                                                 ShowFilterRow="true"
+                                                RowDoubleClick="EditItem_Click"
                                                 CustomizeElement="Grid_CustomizeElement"
                                                 ShowSearchBox="true"
                                                 SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
@@ -135,9 +136,11 @@
                                             </DxComboBox>
                                             <ValidationMessage For="@(()=> LabTest.ResultType)"   />
                                         </DxFormLayoutItem>
+                                    </DxFormLayout>
 
-                                        <hr/>
+                                    <hr />
 
+                                    <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Context="ItemContext" CaptionPosition="CaptionPosition.Vertical" Caption="Diagnosis" ColSpanMd="12">
                                             <Template>
                                                 <DxLoadingPanel @bind-Visible="PanelVisible"
@@ -255,7 +258,9 @@
                                                 </DxLoadingPanel>
                                             </Template>
                                         </DxFormLayoutItem>
+
                                     </DxFormLayout>
+
                                     <div class="w-100 row justify-content-end mb-2">
                                         <div class="col-auto align-self-end p-0 m-0">
                                             <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">

@@ -82,21 +82,20 @@ namespace McDermott.Web.Components.Pages.Medical
 
         #region SaveDelete
 
-        private void OnDelete(GridDataItemDeletingEventArgs e)
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
             {
-                if (SelectedDetailDataItems is null || SelectedDetailDataItems.Count == 1)
+                if (SelectedDataItems is null || SelectedDataItems.Count == 1)
                 {
-                    LabTestDetailForms.Remove((LabTestDetailDto)e.DataItem);
+                    await Mediator.Send(new DeleteLabTestRequest(((LabTestDto)e.DataItem).Id));
                 }
                 else
                 {
-                    foreach (var item in SelectedDetailDataItems.Adapt<List<LabTestDetailDto>>())
-                    {
-                        LabTestDetailForms.Remove(item);
-                    }
+                    await Mediator.Send(new DeleteLabTestRequest(ids: SelectedDataItems.Adapt<List<LabTestDto>>().Select(x => x.Id).ToList()));
                 }
+
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -156,7 +155,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task LoadData()
         {
             PanelVisible = true;
-            //LabTestDetail = new();s
+            ShowForm = false;
             SelectedDataItems = [];
             LabTests = await Mediator.Send(new GetLabTestQuery());
             PanelVisible = false;
