@@ -22,7 +22,7 @@ namespace McDermott.Domain.Entities
             }
         }
 
-        public string? Multiple { get; set; }
+        //public string? Multiple { get; set; }
 
         public float? BiggerRatio { get; set; }
 
