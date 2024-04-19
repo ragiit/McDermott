@@ -46,6 +46,7 @@
     .mr-9, .mx-9 {
         margin-right: 5rem !important;
     }
+
 </style>
 
 @if (IsAccess)
@@ -117,6 +118,23 @@
                                 }
                                 else
                                 {
+                                    <div class="row justify-content-end">
+                                        
+                                        <div class="col-md-3 col-sm-5 col-12">
+                                            <div class="info-box shadow border">
+                                                <button class="info-box-icon bg-info" style="border:none">40.00</button>
+
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">On Hand</span>
+                                                    <span class="info-box-number">Unit</span>
+                                                </div>
+                                                <!-- /.info-box-content -->
+                                            </div>
+                                            <!-- /.info-box -->
+                                        </div>
+                                      
+                                    </div>
+
                                     <EditForm Model="@FormProductDetails" Context="EditFormContext">
                                         <DataAnnotationsValidator />
                                         <DxFormLayout CssClass="mt w-100">
@@ -147,7 +165,7 @@
                                                                                 @bind-Value="@FormProductDetails.RouteId"
                                                                                 ShowValidationIcon="true"
                                                                                 NullText="Select Drug Route.."
-                                                                                TextFieldName="Name"
+                                                                                TextFieldName="Route"
                                                                                 ValueFieldName="Id"
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                 FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
@@ -165,7 +183,7 @@
                                                                             <Items>
                                                                                 <DxGridLayoutItem Row="0" Column="0" ColumnSpan="4">
                                                                                     <Template>
-                                                                                        <DxTextBox @bind-Text="@FormProductDetails.Dosage" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Street 2" />
+                                                                                        <DxTextBox @bind-Text="@FormProductDetails.Dosage" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="0.00" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem Row="0" Column="1" CssClass="ml-2" ColumnSpan="6">
