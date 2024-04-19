@@ -59,10 +59,10 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
-                        <div class="card">
-                            <div class="card-body">
-                                @if (!showForm)
-                                {
+                        @if (!showForm)
+                        {
+                            <div class="card">
+                                <div class="card-body">
                                     <DxLoadingPanel @bind-Visible="PanelVisible"
                                                     IsContentBlocked="true"
                                                     ApplyBackgroundShading="true"
@@ -115,26 +115,36 @@
                                             </Columns>
                                         </DxGrid>
                                     </DxLoadingPanel>
-                                }
-                                else
-                                {
-                                    <div class="row justify-content-end">
-                                        
-                                        <div class="col-md-3 col-sm-5 col-12">
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="card-body">
+                                <div class="card">
+                                    <div class="row justify-content-between my-3 mx-3">
+                                         <div class="col-md-3 col-sm-5 col-12 align-self-center">
+                                            <h5 class="fw-bolder ">Action: </h5>
+                                         </div>
+                                    
+                                        <div class="col-md-3 col-sm-5 col-12 ">
                                             <div class="info-box shadow border">
-                                                <button class="info-box-icon bg-info" style="border:none">40.00</button>
+                                                <button class="info-box-icon bg-info" style="border:none"><i class="fa-solid fa-boxes-stacked"></i></button>
 
                                                 <div class="info-box-content">
+                                                    <span class="info-box-number"> 40.00 Unit</span>
                                                     <span class="info-box-text">On Hand</span>
-                                                    <span class="info-box-number">Unit</span>
                                                 </div>
                                                 <!-- /.info-box-content -->
                                             </div>
                                             <!-- /.info-box -->
                                         </div>
-                                      
-                                    </div>
 
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
                                     <EditForm Model="@FormProductDetails" Context="EditFormContext">
                                         <DataAnnotationsValidator />
                                         <DxFormLayout CssClass="mt w-100">
@@ -286,6 +296,7 @@
                                                                             TextFieldName="Name"
                                                                             ValueFieldName="Id"
                                                                             ShowValidationIcon="true"
+                                                                            SelectedItemChanged="@((UomDto uomId)=>SelectedChangeUoM(uomId))"
                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                             FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
                                                             </DxFormLayoutItem>
@@ -340,9 +351,9 @@
                                             </div>
                                         </DxFormLayout>
                                     </EditForm>
-                                }
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 </div>
             </div>

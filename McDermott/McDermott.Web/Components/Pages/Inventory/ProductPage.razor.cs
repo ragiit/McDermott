@@ -67,6 +67,15 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
         }
 
+        private void SelectedChangeUoM (UomDto UomId)
+        {
+            if (UomId != null)
+            {
+                var UoMId = Uoms.Where(u => u.Id == UomId.Id).FirstOrDefault();
+                FormProductDetails.PurchaseUomId = UoMId.Id;
+            }
+        }
+
         private bool Checkin
         {
             get => Checkins;
