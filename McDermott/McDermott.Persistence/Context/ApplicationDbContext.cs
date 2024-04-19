@@ -109,7 +109,6 @@ namespace McDermott.Persistence.Context
         public DbSet<MedicamentGroupDetail> MedicamentGroupDetails { get; set; }
         public DbSet<ReorderingRule> ReorderingRules { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<GeneralInformation> GeneralInformations { get; set; }
         public DbSet<Medicament> Medicaments { get; set; }
 
         #endregion Pharmacy
@@ -150,23 +149,6 @@ namespace McDermott.Persistence.Context
                 .HasOne(e => e.Uom)
                 .WithMany(m => m.Medicaments)
                 .OnDelete(DeleteBehavior.SetNull);
-
-            modelBuilder.Entity<GeneralInformation>()
-                .HasOne(e => e.Product)
-                .WithMany(m => m.GeneralInformation)
-                .OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<GeneralInformation>()
-               .HasOne(e => e.Uom)
-               .WithMany(m => m.GeneralInformation)
-               .OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<GeneralInformation>()
-               .HasOne(e => e.ProductCategory)
-               .WithMany(m => m.GeneralInformation)
-               .OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<GeneralInformation>()
-               .HasOne(e => e.Company)
-               .WithMany(m => m.GeneralInformation)
-               .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Location>()
             .HasOne(e => e.ParentLocation)

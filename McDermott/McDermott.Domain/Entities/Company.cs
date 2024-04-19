@@ -46,6 +46,5 @@
         [SetToNull]
         public virtual List<Location>? Locations { get; set; }
 
-        public List<GeneralInformation>? GeneralInformation { get; set; }
     }
 }
