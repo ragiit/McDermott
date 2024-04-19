@@ -1,9 +1,5 @@
-﻿
-using McDermott.Application.Dtos.Queue;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Linq;
+﻿using McDermott.Application.Dtos.Queue;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
-using static McDermott.Application.Features.Commands.Queue.DetailQueueDisplayCommand;
 using static McDermott.Application.Features.Commands.Queue.QueueDisplayCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
@@ -95,11 +91,9 @@ namespace McDermott.Web.Components.Pages.Queue
             QueueDisplay = await Mediator.Send(new GetQueueDisplayQuery());
             Counters = await Mediator.Send(new GetCounterQuery());
             counteres = [.. Counters.Where(x => x.Status == "on process")];
-            QueueDisplay.ForEach(x => x.NameCounter = string.Join(",", counteres.Where(z=>x.CounterIds != null && x.CounterIds.Contains(z.Id)).Select(z => z.Name).ToList()));
+            QueueDisplay.ForEach(x => x.NameCounter = string.Join(",", counteres.Where(z => x.CounterIds != null && x.CounterIds.Contains(z.Id)).Select(z => z.Name).ToList()));
             PanelVisible = false;
         }
-
-
 
         #endregion async Data
 
@@ -194,7 +188,6 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task EditItem_Click()
         {
-
             FormDisplays = SelectedDataItems[0].Adapt<QueueDisplayDto>();
             selectedCounter = counteres.Where(x => FormDisplays.CounterIds.Contains(x.Id)).ToList();
 
@@ -309,7 +302,6 @@ namespace McDermott.Web.Components.Pages.Queue
                 }
                 else
                 {
-
                     FormDisplays.CounterIds = selectedCounter.Select(x => x.Id).ToList();
                     await Mediator.Send(new UpdateQueueDisplayRequest(FormDisplays));
                 }

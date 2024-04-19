@@ -8,7 +8,7 @@
         public string? Result { get; set; }
         public string? ResultType { get; set; }
 
-        public LabTestDto? LabTest { get; set; }
+        public LabTestDetailDto? LabTest { get; set; }
 
         public GeneralConsultanMedicalSupportDto? GeneralConsultanMedicalSupport { get; set; }
     }

@@ -1,6 +1,4 @@
 ﻿using McDermott.Application.Dtos.Queue;
-using McDermott.Domain.Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.DetailQueueDisplayCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
@@ -25,8 +23,10 @@ namespace McDermott.Web.Components.Pages.Queue
 
         [Parameter]
         public long DisplayId { get; set; }
+
         //private long? count { get; set; }
         private bool PanelVisible { get; set; } = true;
+
         public IGrid Grid { get; set; }
         private HubConnection hubConnection;
         private List<long> CounterCount = new List<long>();
@@ -99,7 +99,6 @@ namespace McDermott.Web.Components.Pages.Queue
                     Name = DataCounter.Name,
                     ServiceKId = DataCounter.ServiceKId,
                     ServiceId = DataCounter.ServiceId
-
                 };
                 getCount.Add(card);
                 var sa = getCount;
@@ -130,11 +129,8 @@ namespace McDermott.Web.Components.Pages.Queue
 
                 var datakioskQueue = await Mediator.Send(new GetKioskQueueQuery());
                 QueueNumber = await Mediator.Send(new GetDetailQueueDisplay());
-               
 
                 kioskQueues = [.. datakioskQueue.Where(q => q.CreatedDate.Value.Date == DateTime.Now.Date)];
-
-
             }
             catch { }
 

@@ -1,5 +1,4 @@
-﻿using MediatR;
-using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
@@ -9,6 +8,7 @@ namespace McDermott.Web.Components.Pages.Inventory
     public partial class ProductPage
     {
         #region Relation Data
+
         private List<ProductDto> Products = [];
         private List<MedicamentDto> Medicaments = [];
         private List<BpjsClassificationDto> BpjsClassifications = [];
@@ -21,7 +21,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         private ProductDetailDto FormProductDetails = new();
         private ProductDto FormProducts = new();
         private MedicamentDto FormMedicaments = new();
-        #endregion
+
+        #endregion Relation Data
 
         #region Static
 
@@ -71,7 +72,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     Chronis = true;
                     FormProductDetails.Cronies = true;
-
                 }
                 else
                 {
@@ -181,7 +181,6 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task NewItem_Click()
         {
-            
             showForm = true;
             FormProductDetails = new();
             FormProductDetails.ProductType = ProductTypes[0];
@@ -219,7 +218,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             FormProductDetails.Cost = products.Cost;
             FormProductDetails.ProductCategoryId = products.ProductCategoryId;
             FormProductDetails.InternalReference = products.InternalReference;
-            if(products.HospitalType == "Medicament")
+            if (products.HospitalType == "Medicament")
             {
                 if (medicamen != null)
                 {
@@ -243,6 +242,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             await LoadData();
         }
+
         private void DeleteItem_Click()
         {
             Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
@@ -299,7 +299,9 @@ namespace McDermott.Web.Components.Pages.Inventory
         }
 
         #endregion Click
+
         #region Save
+
         private async Task OnSave()
         {
             try
@@ -323,12 +325,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                         var listActiveComponent = selectedActiveComponents.Select(x => x.Id).ToList();
                         FormProductDetails.ActiveComponentId?.AddRange(listActiveComponent);
                     }
-                     ProductDto getProduct = new();
+                    ProductDto getProduct = new();
                     if (FormProducts.Id == 0)
                     {
-                         getProduct = await Mediator.Send(new CreateProductRequest(FormProducts));
+                        getProduct = await Mediator.Send(new CreateProductRequest(FormProducts));
                     }
-                    
+
                     // Medicament
                     if (FormProductDetails.HospitalType == "Medicament")
                     {
@@ -365,6 +367,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             await LoadData();
         }
-        #endregion
+
+        #endregion Save
     }
 }

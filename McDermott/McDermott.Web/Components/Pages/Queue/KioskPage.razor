@@ -42,7 +42,7 @@
                                                                     @bind-Value="@FormKios.Type"
                                                                     SelectedItemChanged="@((string city) => SelectedItemChanged(city))"></DxComboBox>
                                                     </DxFormLayoutItem>
-                                                   
+
                                                         <DxFormLayoutItem Caption="@captions" ColSpanMd="12">
                                                             <Template>
                                                                 <DxGridLayout>
@@ -68,7 +68,7 @@
                                                                 </DxGridLayout>
                                                             </Template>
                                                         </DxFormLayoutItem>
-                                                    
+
                                                     @if (showForm)
                                                     {
                                                         @if (NamePatient != null)
@@ -197,9 +197,7 @@
                                                 <div class="card-body">
                                                     <h4 class="mt fw-bold text-center">Number Queue</h4>
 
-
                                                     <h1 class="mt-1 fw-bolder display-1 text-center"> @string.Format("{0:D3}", ViewQueue is not null ? ViewQueue.QueueNumber : string.Empty)</h1>
-
 
                                                 </div>
                                             </div>

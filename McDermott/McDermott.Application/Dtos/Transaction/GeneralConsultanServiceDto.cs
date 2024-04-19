@@ -16,7 +16,7 @@
         [Required(ErrorMessage = "The Service field is required.")]
         public long? ServiceId { get; set; }
 
-        [Required(ErrorMessage = "The Physicion field is required.")]
+        //[Required(ErrorMessage = "The Physicion field is required.")]
         public long? PratitionerId { get; set; }
 
         public long? ClassTypeId { get; set; }
@@ -37,7 +37,6 @@
 
         public string? TypeMedical { get; set; }
 
-        [Required]
         public string? ScheduleTime { get; set; }
 
         public long? Age
@@ -58,7 +57,7 @@
 
         [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
-        public DateTime RegistrationDate { get; set; }
+        public DateTime RegistrationDate { get; set; } = DateTime.Now;
 
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime? AppoimentDate { get; set; }
@@ -68,8 +67,11 @@
         public bool Temp { get; set; } = false;
         public bool IsAlertInformationSpecialCase { get; set; } = false;
         public bool IsSickLeave { get; set; } = false;
+        public bool IsMaternityLeave { get; set; } = false;
         public DateTime? StartDateSickLeave { get; set; }
         public DateTime? EndDateSickLeave { get; set; }
+        public DateTime StartMaternityLeave { get; set; }
+        public DateTime? EndMaternityLeave { get; set; }
         public bool IsWeather { get; set; } = false;
         public bool IsPharmacology { get; set; } = false;
         public bool IsFood { get; set; } = false;

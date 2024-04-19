@@ -190,13 +190,13 @@
                                                     <ValidationMessage For="@(()=> a.Active)"   />
                                                 </DxFormLayoutItem>
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Multiple" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Multiple"
-                                                               ShowValidationIcon="true"
-                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="Multiple" />
-                                                    <ValidationMessage For="@(()=> a.Multiple)"   />
-                                                </DxFormLayoutItem>
+                                                @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Multiple" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@a.Multiple"
+                                            ShowValidationIcon="true"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            NullText="Multiple" />
+                                            <ValidationMessage For="@(()=> a.Multiple)"   />
+                                            </DxFormLayoutItem> *@
 
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Rounding Precision" ColSpanMd="12">
                                                     <DxSpinEdit @bind-Value="@a.RoundingPrecision"

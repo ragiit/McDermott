@@ -153,6 +153,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             Grid.ShowColumnChooser();
         }
+
         private async Task Refresh_Click()
         {
             await LoadData();

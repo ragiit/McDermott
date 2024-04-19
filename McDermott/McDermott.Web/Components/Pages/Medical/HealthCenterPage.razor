@@ -77,26 +77,26 @@
                                                 var a = (HealthCenterDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="6">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Type" ColSpanMd="6">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Type" ColSpanMd="12">
                                                     <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                 Data="@Types" @bind-Value="@a.Type" NullText="Types" ShowValidationIcon="true" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Phone" ColSpanMd="6">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Phone" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@a.Phone" NullText="Phone" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Mobile" ColSpanMd="6">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Mobile" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@a.Mobile" NullText="Mobile" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Email" ColSpanMd="6">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Email" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@a.Email" NullText="Email" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Website Link" ColSpanMd="6">
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Website Link" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@a.WebsiteLink" NullText="Website Link" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Address" ColSpanMd="12">
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Address" ColSpanMd="12">
                                                     <Template>
                                                         <DxGridLayout>
                                                             <Rows>
@@ -120,7 +120,7 @@
                                                                         <DxTextBox @bind-Text="@a.Street2" NullText="Street2" />
                                                                     </Template>
                                                                 </DxGridLayoutItem>
-                                                                <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
+                                                                <DxGridLayoutItem Row="2" Column="0">
                                                                     <Template>
                                                                         <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                     Data="@Provinces"
@@ -131,7 +131,7 @@
                                                                         </DxComboBox>
                                                                     </Template>
                                                                 </DxGridLayoutItem>
-                                                                <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
+                                                                <DxGridLayoutItem Row="2" Column="1">
                                                                     <Template>
                                                                         <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                     Data="@Cities.Where(x => x.ProvinceId == a.ProvinceId)"

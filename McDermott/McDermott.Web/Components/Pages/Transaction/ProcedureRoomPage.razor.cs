@@ -45,15 +45,15 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private List<LabResultDetailDto> LabResultDetails = [];
         private LabResultDetailDto LabResultDetail = new();
-        private LabTestDto LabTest = new();
+        private LabTestDetailDto LabTest = new();
         private LabUomDto LabUom = new();
 
         private List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupports = [];
         private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport = new();
         private GeneralConsultanServiceDto GeneralConsultanService = new();
         private List<UserDto> Doctors { get; set; } = [];
-        private List<LabTestDto> LabTests = [];
-        private IEnumerable<LabTestDto> SelectedLabTests = [];
+        private List<LabTestDetailDto> LabTests = [];
+        private IEnumerable<LabTestDetailDto> SelectedLabTests = [];
         private List<IBrowserFile> BrowserFiles = [];
         private List<long> DeletedLabTestIds = [];
 
@@ -89,7 +89,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             PanelVisible = true;
             await GetUserInfo();
 
-            LabTests = await Mediator.Send(new GetLabTestQuery());
+            //LabTests = await Mediator.Send(new GetLabTestQuery());
             Doctors = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
 
             await LoadData();
@@ -203,7 +203,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private long selectedLabTestId { get; set; }
 
-        private void SelectedItemParameter(LabTestDto e)
+        private void SelectedItemParameter(LabTestDetailDto e)
         {
             if (e is null)
                 return;

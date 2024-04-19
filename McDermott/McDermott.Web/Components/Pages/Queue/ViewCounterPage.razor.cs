@@ -1,9 +1,7 @@
 ﻿using McDermott.Application.Dtos.Queue;
-
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
-using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
-
 using static McDermott.Application.Features.Commands.Queue.DetailQueueDisplayCommand;
+using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
 {
@@ -116,9 +114,9 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.Kiosk.PhysicianId == general.PhysicianId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
                 }
-                else if (general.ServiceId != null && general.PhysicianId != null )
+                else if (general.ServiceId != null && general.PhysicianId != null)
                 {
-                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date &&( x.Kiosk.PhysicianId == general.PhysicianId || x.Kiosk.PhysicianId == null) && x.ServiceId == general.ServiceId && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
+                    KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && (x.Kiosk.PhysicianId == general.PhysicianId || x.Kiosk.PhysicianId == null) && x.ServiceId == general.ServiceId && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
                 }
                 foreach (var cl in KiosksQueue)
                 {
@@ -175,9 +173,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task Refresh_Click()
         {
-
             await LoadData();
-
         }
 
         public MarkupString GetIssueStageIconHtml(string status)

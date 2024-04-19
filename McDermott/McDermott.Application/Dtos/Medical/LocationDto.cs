@@ -20,7 +20,7 @@ namespace McDermott.Application.Dtos.Medical
                 if (ParentLocation is null)
                     return Name;
 
-                return $"{Name}/{ParentLocation.Name}";
+                return $"{ParentLocation.Name}/{Name}";
             }
         }
 

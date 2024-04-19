@@ -29,6 +29,7 @@ global using static McDermott.Application.Features.Commands.Config.GenderCommand
 global using static McDermott.Application.Features.Commands.Config.GroupCommand;
 global using static McDermott.Application.Features.Commands.Config.ReligionCommand;
 global using static McDermott.Application.Features.Commands.Config.UserCommand;
+global using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
 global using static McDermott.Application.Features.Commands.Employee.EmployeeCommand;
 global using static McDermott.Application.Features.Commands.Medical.BuildingCommand;
 global using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand;
@@ -44,6 +45,6 @@ global using static McDermott.Application.Features.Commands.Transaction.GeneralC
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceCommand;
 global using static McDermott.Application.Features.Commands.Patient.ClassTypeCommand;
 global using static McDermott.Application.Features.Commands.Medical.LabUomCommand;
-global using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
+global using static McDermott.Application.Features.Commands.Medical.LabTestDetailCommand;
 global using static McDermott.Application.Features.Commands.Pharmacy.DrugDosageCommand;
 global using static McDermott.Application.Features.Commands.Pharmacy.DrugRouteCommand;

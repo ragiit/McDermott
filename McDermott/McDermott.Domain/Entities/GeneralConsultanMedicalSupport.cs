@@ -21,13 +21,31 @@
         public string? DrugEximinationAttachment { get; set; }
         public bool? DrugNegative { get; set; }
         public bool? DrugPositive { get; set; }
+        public bool? AmphetaminesNegative { get; set; }
+        public bool? AmphetaminesPositive { get; set; }
+        public bool? BenzodiazepinesNegative { get; set; }
+        public bool? BenzodiazepinesPositive { get; set; }
+        public bool? CocaineMetabolitesNegative { get; set; }
+        public bool? CocaineMetabolitesPositive { get; set; }
+        public bool? OpiatesNegative { get; set; }
+        public bool? OpiatesPositive { get; set; }
+        public bool? MethamphetaminesNegative { get; set; }
+        public bool? MethamphetaminesPositive { get; set; }
+        public bool? THCCannabinoidMarijuanaNegative { get; set; }
+        public bool? THCCannabinoidMarijuanaPositive { get; set; }
+        public string? OtherExaminationAttachment { get; set; }
+        public bool IsOtherExaminationECG { get; set; } = false;
+        public string? OtherExaminationTypeECG { get; set; }
+        public string? OtherExaminationRemarkECG { get; set; }
         public long? PractitionerECGId { get; set; }
         public bool IsNormalRestingECG { get; set; } = false;
         public bool IsSinusRhythm { get; set; } = false;
         public bool IsSinusBradycardia { get; set; } = false;
         public bool IsSinusTachycardia { get; set; } = false;
-        public bool IsVentriculatExtraSystole { get; set; } = false;
-        public bool IsSupraventricularExtraSystole { get; set; } = false;
+
+        public long HR { get; set; }
+        //public bool IsVentriculatExtraSystole { get; set; } = false;
+        //public bool IsSupraventricularExtraSystole { get; set; } = false;
         public bool IsOtherECG { get; set; } = false;
         public string? OtherDesc { get; set; }
         public string? Status { get; set; }
@@ -51,7 +69,7 @@
         public User? PractitionerECG { get; set; }
 
         [SetToNull]
-        public LabTest? LabResulLabExaminationt { get; set; }
+        public LabTestDetail? LabResulLabExaminationt { get; set; }
 
         [SetToNull]
         public List<LabResultDetail>? LabResultDetails { get; set; }

@@ -62,6 +62,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 case "Report of patient visits by period":
                     await VisitByPeriode(FormReports);
                     break;
+
                 case "Report of patient visits by department":
                     await VisitByDepartement(FormReports);
                     break;
@@ -442,7 +443,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             ws.Cells[7, 1].Style.Font.Bold = true;
 
             var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.CreatedDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.CreatedDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
-            
+
             ws.Cells[9, 1].Value = "Departement";
             ws.Cells[9, 2].Value = "Total Patients";
 
@@ -458,7 +459,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (namee.Contains(item.Patient?.Department?.Name!))
                     continue;
 
-                long count = generals.Where(x => x.Patient?.DepartmentId == item.Patient?.DepartmentId ).Count();
+                long count = generals.Where(x => x.Patient?.DepartmentId == item.Patient?.DepartmentId).Count();
 
                 ws.Cells[startRow, 1].Value = item.Patient?.Department?.Name;
                 ws.Cells[startRow, 2].Value = count;
@@ -493,7 +494,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             ws.Cells[4, 2].AutoFitColumns();
             ws.Cells[7, 1].AutoFitColumns();
             ws.Cells[9, 3].AutoFitColumns();
-
 
             await SaveFileToSpreadSheetml(pack, "Report of patient visits by department.xlsx");
         }

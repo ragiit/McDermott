@@ -13,7 +13,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IReadOnlyList<object> SelectedLabTestDataItems { get; set; } = [];
         private List<LabResultDetailDto> LabResultDetails = [];
         private LabResultDetailDto LabResultDetail = new();
-        private LabTestDto LabTest = new();
+        private LabTestDetailDto LabTest = new();
 
         private List<long> DeletedLabTestIds = [];
         private int FocusedRowLabTestVisibleIndex { get; set; }
@@ -83,7 +83,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private long selectedLabTestId { get; set; }
 
-        private void SelectedItemParameter(LabTestDto e)
+        private void SelectedItemParameter(LabTestDetailDto e)
         {
             if (e is null)
                 return;
@@ -158,7 +158,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<UserDto> IsPatient = [];
         private List<UserDto> patients = [];
 
-        private List<LabTestDto> LabTests = [];
+        private List<LabTestDetailDto> LabTests = [];
         private List<UserDto> IsPratition = [];
         private List<UserDto> AllDoctors = [];
         private List<InsuranceDto> Insurances = [];
@@ -634,7 +634,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private void OnClickGetObjectives()
         {
-            FormInputCPPTGeneralConsultan.Objective = $"Weight: {GeneralConsultantClinical.Weight}, Height: {GeneralConsultantClinical.Height}, RR: {GeneralConsultantClinical.RR}, SpO2: {GeneralConsultantClinical.SpO2}, BMIIndex: {Math.Round(GeneralConsultantClinical.BMIIndex, 2).ToString()}, BMIState: {GeneralConsultantClinical.BMIState}, Temp: {GeneralConsultantClinical.Temp}, HR: {GeneralConsultantClinical.HR}, Systolic: {GeneralConsultantClinical.Systolic}, DiastolicBP: {GeneralConsultantClinical.DiastolicBP}, RBS: {GeneralConsultantClinical.RBS}, E: {GeneralConsultantClinical.E}, V: {GeneralConsultantClinical.V}, M: {GeneralConsultantClinical.M}";
+            FormInputCPPTGeneralConsultan.Objective = $"Weight: {GeneralConsultantClinical.Weight}, Height: {GeneralConsultantClinical.Height}, RR: {GeneralConsultantClinical.RR}, SpO2: {GeneralConsultantClinical.SpO2}, BMIIndex: {Math.Round(GeneralConsultantClinical.BMIIndex, 2).ToString()}, BMIState: {GeneralConsultantClinical.BMIState}, Temp: {GeneralConsultantClinical.Temp}, HR: {GeneralConsultantClinical.HR}, Systolic: {GeneralConsultantClinical.Systolic}, DiastolicBP: {GeneralConsultantClinical.DiastolicBP}, E: {GeneralConsultantClinical.E}, V: {GeneralConsultantClinical.V}, M: {GeneralConsultantClinical.M}";
         }
 
         #endregion Tab CPPT
@@ -781,7 +781,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
             NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
-            LabTests = await Mediator.Send(new GetLabTestQuery());
+            //LabTests = await Mediator.Send(new GetLabTestQuery());
 
             var nursingDiagnosesTemps = NursingDiagnoses.Select(x => new NursingDiagnosesTemp
             {
@@ -800,8 +800,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             AllDiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
 
-            await LoadData();
             await GetUserInfo();
+            await LoadData();
         }
 
         private void GetInsurancePhysician(long value)
@@ -862,7 +862,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             try
             {
                 IsLoading = true;
-                if (FormRegis.PatientId == null || FormRegis.TypeRegistration == null || FormRegis.ServiceId is null || FormRegis.PratitionerId is null || FormRegis.ScheduleTime is null || (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null)))
+                if (FormRegis.PatientId == null || FormRegis.TypeRegistration == null || FormRegis.ServiceId is null || (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null)))
                 {
                     IsLoading = false;
                     ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
@@ -942,6 +942,19 @@ namespace McDermott.Web.Components.Pages.Transaction
                 FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
                 FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
 
+                if (FormRegis.StagingStatus.Equals("Physician"))
+                {
+                    if (Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
+                    {
+                        IsPratition = [.. AllDoctors.Where(x => x.Id == UserLogin.Id).ToList()];
+                        FormRegis.PratitionerId = IsPratition.Count > 0 ? IsPratition[0].Id : null;
+                    }
+                    else
+                        IsPratition = [.. AllDoctors.Where(x => x.IsDoctor == true && x.IsPhysicion == true).ToList()];
+                }
+
+                await ReadHeightWeightPatient();
+
                 IsLoading = false;
             }
             catch (Exception ex)
@@ -949,6 +962,25 @@ namespace McDermott.Web.Components.Pages.Transaction
                 IsLoading = false;
                 ToastService.ShowError(ex.Message);
             }
+        }
+
+        private async Task ReadHeightWeightPatient()
+        {
+            if (FormRegis.Id == 0)
+                return;
+
+            var services = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != FormRegis.Id && x.PatientId == FormRegis.PatientId));
+
+            if (services.Count <= 0)
+                return;
+
+            var assesments = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == services.OrderByDescending(z => z.CreateDate).FirstOrDefault()!.Id));
+
+            if (assesments.Count <= 0)
+                return;
+
+            GeneralConsultantClinical.Weight = assesments[0].Weight;
+            GeneralConsultantClinical.Height = assesments[0].Height;
         }
 
         private async Task OnCancel2()
@@ -984,7 +1016,15 @@ namespace McDermott.Web.Components.Pages.Transaction
             patients = [.. user.Where(x => x.IsPatient == true || x.IsEmployeeRelation == true).ToList()];
 
             //IsDocter
-            IsPratition = [.. user.Where(x => x.IsDoctor == true).ToList()];
+
+            if (Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
+            {
+                IsPratition = [.. user.Where(x => x.Id == UserLogin.Id).ToList()];
+                FormRegis.PratitionerId = IsPratition.Count > 0 ? IsPratition[0].Id : null;
+            }
+            else
+                IsPratition = [.. user.Where(x => x.IsDoctor == true && x.IsPhysicion == true).ToList()];
+
             AllDoctors = [.. user.Where(x => x.IsDoctor == true).ToList()];
 
             //Insurance
@@ -1008,10 +1048,23 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsLoading = false;
         }
 
+        private bool IsPopUpPainScale { get; set; } = false;
+
+        private void OnClickPainScalePopUp()
+        {
+            IsPopUpPainScale = true;
+        }
+
         private async Task OnSaveProcedureRoom()
         {
             try
             {
+                if (GeneralConsultanMedicalSupport.IsOtherECG && string.IsNullOrWhiteSpace(GeneralConsultanMedicalSupport.OtherDesc))
+                {
+                    ToastService.ShowInfo("Other Description can't be empty!");
+                    return;
+                }
+
                 PopUpProcedureRoom = false;
 
                 if (FormRegis.Id == 0)
@@ -1320,11 +1373,11 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task NewItem_Click()
         {
             StagingText = "Confirmed";
+            FormRegis = new GeneralConsultanServiceDto();
             await SelectData();
             showForm = true;
             IsReferTo = false;
             IsAppoiment = false;
-            FormRegis = new GeneralConsultanServiceDto();
             GeneralConsultantClinical = new GeneralConsultantClinicalAssesmentDto();
             FormInputCPPTGeneralConsultan = new InputCPPTGeneralConsultanCPPT();
             GeneralConsultanCPPTs.Clear();
@@ -1334,12 +1387,16 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task EditItem_Click()
         {
             await EditItemVoid();
+            await ReadHeightWeightPatient();
         }
+
+        private bool LoadingForm { get; set; } = false;
 
         private async Task EditItemVoid()
         {
             try
             {
+                LoadingForm = true;
                 showForm = true;
 
                 FormRegis = SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>();
@@ -1394,6 +1451,17 @@ namespace McDermott.Web.Components.Pages.Transaction
                             GeneralConsultanMedicalSupport = support[0];
 
                         SelectedLabTests = LabTests.Where(x => GeneralConsultanMedicalSupport.LabResulLabExaminationtIds != null && GeneralConsultanMedicalSupport.LabResulLabExaminationtIds.Contains(x.Id)).ToList();
+
+                        if (Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
+                        {
+                            IsPratition = [.. AllDoctors.Where(x => x.Id == UserLogin.Id).ToList()];
+                            FormRegis.PratitionerId = IsPratition.Count > 0 ? IsPratition[0].Id : null;
+                        }
+                        else
+                            IsPratition = [.. AllDoctors.Where(x => x.IsDoctor == true && x.IsPhysicion == true).ToList()];
+
+                        FormRegis.StartMaternityLeave = DateTime.Now;
+                        FormRegis.EndMaternityLeave = DateTime.Now.AddMonths(3);
                         break;
 
                     case "Waiting":
@@ -1414,10 +1482,28 @@ namespace McDermott.Web.Components.Pages.Transaction
                     default:
                         break;
                 }
+
+                LoadingForm = false;
             }
             catch (Exception exx)
             {
+                LoadingForm = false;
                 exx.HandleException(ToastService);
+            }
+        }
+
+        private void CheckedChanged(bool value)
+        {
+            FormRegis.IsMaternityLeave = value;
+
+            if (value)
+            {
+                FormRegis.StartMaternityLeave = DateTime.Now;
+                FormRegis.EndMaternityLeave = DateTime.Now.AddMonths(3);
+            }
+            else
+            {
+                FormRegis.EndMaternityLeave = null;
             }
         }
 
@@ -1625,13 +1711,19 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private IEnumerable<LabTestDto> SelectedLabTests = [];
+        private IEnumerable<LabTestDetailDto> SelectedLabTests = [];
 
         private async Task SelectedItemRegistrationDateChanged(DateTime e)
         {
             FormRegis.RegistrationDate = e;
             FormRegis.AppoimentDate = e;
             await SetTimeSchedule();
+        }
+
+        private void SelectedMaternityStartDateChanged(DateTime e)
+        {
+            FormRegis.StartMaternityLeave = e;
+            FormRegis.EndMaternityLeave = FormRegis.StartMaternityLeave.AddMonths(3);
         }
 
         private void SelectedItemPaymentChanged(string e)

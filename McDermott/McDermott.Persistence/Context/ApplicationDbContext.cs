@@ -55,6 +55,7 @@ namespace McDermott.Persistence.Context
         public DbSet<Insurance> Insurances { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<BuildingLocation> BuildingLocations { get; set; }
+        public DbSet<LabTestDetail> LabTestDetails { get; set; }
         public DbSet<LabTest> LabTests { get; set; }
         public DbSet<LabUom> LabUoms { get; set; }
         public DbSet<SampleType> SampleTypes { get; set; }
@@ -137,18 +138,26 @@ namespace McDermott.Persistence.Context
                 .HasOne(e => e.Product)
                 .WithMany(m => m.Medicaments)
                 .OnDelete(DeleteBehavior.SetNull);
+
             modelBuilder.Entity<Medicament>()
                 .HasOne(e => e.Route)
                 .WithMany(m => m.Medicaments)
                 .OnDelete(DeleteBehavior.SetNull);
+
             modelBuilder.Entity<Medicament>()
                 .HasOne(e => e.Signa)
                 .WithMany(m => m.Medicaments)
                 .OnDelete(DeleteBehavior.SetNull);
+
             modelBuilder.Entity<Medicament>()
                 .HasOne(e => e.Uom)
                 .WithMany(m => m.Medicaments)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<LabTest>()
+               .HasOne(e => e.SampleType)
+               .WithMany(m => m.LabTests)
+               .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Location>()
             .HasOne(e => e.ParentLocation)
@@ -198,6 +207,11 @@ namespace McDermott.Persistence.Context
             modelBuilder.Entity<Group>()
                   .HasMany(m => m.GroupMenus)
                   .WithOne(c => c.Group)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<LabTest>()
+                  .HasMany(m => m.LabTestDetails)
+                  .WithOne(c => c.LabTest)
                   .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Menu>()

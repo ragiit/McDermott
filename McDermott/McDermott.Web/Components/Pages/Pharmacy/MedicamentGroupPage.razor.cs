@@ -1,10 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacy;
-using McDermott.Application.Dtos.Queue;
-using McDermott.Domain.Entities;
-using MediatR;
-using Microsoft.AspNetCore.Components.Forms;
-using System.ComponentModel;
-using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+﻿using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
@@ -13,6 +7,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
     public partial class MedicamentGroupPage
     {
         #region Relation Data
+
         private List<MedicamentGroupDto> medicamentGroups = [];
         private List<MedicamentGroupDetailDto> medicamentGroupDetails = [];
         private List<UserDto> Phy = new();
@@ -23,9 +18,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private MedicamentGroupDto MGFrom = new();
         private MedicamentGroupDetailDto FormMedicamenDetails = new();
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
-        #endregion
+
+        #endregion Relation Data
 
         #region variabel static
+
         private IGrid Grid { get; set; }
         public IGrid GridDoctorScheduleDetail { get; set; }
         private bool PanelVisible { get; set; } = false;
@@ -52,7 +49,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 {
                     Concotions = true;
                     MGFrom.IsConcoction = true;
-                    
                 }
                 else
                 {
@@ -61,12 +57,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-
-        bool IsNumeric(string value)
+        private bool IsNumeric(string value)
         {
             return double.TryParse(value, out _);
         }
-        #endregion
+
+        #endregion variabel static
 
         #region UserLoginAndAccessRole
 
@@ -106,6 +102,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #endregion UserLoginAndAccessRole
 
         #region async Data
+
         protected override async Task OnInitializedAsync()
         {
             try
@@ -130,7 +127,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             PanelVisible = false;
         }
 
-        void onChangeTotalQty(string numDosage)
+        private void onChangeTotalQty(string numDosage)
         {
             var a = Int64.Parse(numDosage);
             var b = Int64.Parse(FormMedicamenDetails.Days);
@@ -138,7 +135,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             var tempt = a * b;
             FormMedicamenDetails.TotalQty = tempt.ToString();
         }
-        void onChangeTotalQtyDays(string numDays)
+
+        private void onChangeTotalQtyDays(string numDays)
         {
             var a = Int64.Parse(numDays);
             var b = Int64.Parse(FormMedicamenDetails.Dosage);
@@ -146,7 +144,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             var tempt = a * b;
             FormMedicamenDetails.TotalQty = tempt.ToString();
         }
-        #endregion
+
+        #endregion async Data
 
         #region Grid
 
@@ -163,11 +162,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        void Grid_CustomizeFilterRowEditor(GridCustomizeFilterRowEditorEventArgs e)
+        private void Grid_CustomizeFilterRowEditor(GridCustomizeFilterRowEditorEventArgs e)
         {
             if (e.FieldName == "CreatedDate" || e.FieldName == "ModifiedDate" || e.FieldName == "FixedDate")
                 ((ITextEditSettings)e.EditSettings).ClearButtonDisplayMode = DataEditorClearButtonDisplayMode.Never;
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -181,11 +181,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #endregion Grid
 
         #region Click
+
         private async Task NewItem_Click()
         {
             medicamentGroupDetails.Clear();
             showForm = true;
         }
+
         private async Task NewItemMedicamentGroupDetail_Click()
         {
             FormMedicamenDetails = new();
@@ -202,14 +204,17 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
+
         private async Task SaveItemMedicamentGroupDetailGrid_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
+
         private async Task Back_Click()
         {
             showForm = false;
         }
+
         private async Task CancelItemMedicamentGroupDetailGrid_Click()
         {
             showForm = false;
@@ -219,14 +224,16 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+
         private void DeleteItemMedicamentGroupDetail_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
-        #endregion
+
+        #endregion Click
 
         #region function Delete
-        
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -247,6 +254,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 ee.HandleException(ToastService);
             }
         }
+
         private async Task OnDeleteDoctorScheduleDetail(GridDataItemDeletingEventArgs e)
         {
             try
@@ -267,8 +275,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 ee.HandleException(ToastService);
             }
         }
-        #endregion
+
+        #endregion function Delete
+
         #region Function Save
+
         private async Task OnSaveDoctorScheduleDetail(GridEditModelSavingEventArgs e)
         {
             try
@@ -285,17 +296,16 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 //if (IsAddMedicament)
                 //{
-
                 //}
 
                 SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
-               
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
         }
-        #endregion
+
+        #endregion Function Save
     }
 }

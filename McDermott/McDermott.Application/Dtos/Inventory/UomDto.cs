@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Globalization;
 
 namespace McDermott.Application.Dtos.Inventory
 {
@@ -25,7 +25,7 @@ namespace McDermott.Application.Dtos.Inventory
             }
         }
 
-        public string? Multiple { get; set; }
+        //public string? Multiple { get; set; }
 
         public float? BiggerRatio { get; set; }
 
@@ -33,5 +33,17 @@ namespace McDermott.Application.Dtos.Inventory
         public float? RoundingPrecision { get; set; }
 
         public UomCategoryDto? UomCategory { get; set; }
+
+        public UomDto()
+        {
+            // Set koma sebagai pemisah desimal untuk kultur default
+            CultureInfo customCulture = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ",";
+            CultureInfo.CurrentCulture = customCulture;
+
+            // Set nilai default untuk RoundingPrecision
+            RoundingPrecision = 0.01000F; // Perhatikan penggunaan koma di sini
+            BiggerRatio = 1.00000F; // Perhatikan penggunaan koma di sini
+        }
     }
 }

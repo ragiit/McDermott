@@ -193,6 +193,11 @@
             document.body.removeChild(link);
         };
 
+        window.hideSideBarr = function () {
+            var l = document.getElementById("hal");
+            l.click();
+        }
+
         window.setCookie = function (name, value, days) {
             var expires = "";
             if (days) {

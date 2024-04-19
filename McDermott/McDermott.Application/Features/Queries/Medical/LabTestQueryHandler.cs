@@ -24,8 +24,7 @@
                     result = await _unitOfWork.Repository<LabTest>().GetAsync(
                         null,
                         x => x
-                        .Include(z => z.SampleType)
-                        .Include(x => x.LabUom),
+                        .Include(z => z.SampleType),
                         cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit

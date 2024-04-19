@@ -9,7 +9,7 @@
         public string? ResultType { get; set; }
 
         [SetToNull]
-        public LabTest? LabTest { get; set; } = new();
+        public LabTestDetail? LabTest { get; set; } = new();
 
         [SetToNull]
         public GeneralConsultanMedicalSupport? GeneralConsultanMedicalSupport { get; set; }

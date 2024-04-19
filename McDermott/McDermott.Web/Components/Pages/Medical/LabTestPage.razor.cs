@@ -1,4 +1,7 @@
-﻿namespace McDermott.Web.Components.Pages.Medical
+﻿using Microsoft.AspNetCore.Components.Web;
+using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
+
+namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class LabTestPage
     {
@@ -42,7 +45,9 @@
         #region Relations
 
         private LabTestDto LabTest = new();
+        private List<LabTestDetailDto> LabDetailTests = [];
         private List<LabTestDto> LabTests = [];
+        private List<LabTestDetailDto> LabTestDetailForms = [];
         private List<LabUomDto> LabUoms = [];
         private List<SampleTypeDto> SampleTypes = [];
 
@@ -55,38 +60,43 @@
 
         private List<string> ResultValueTypes =
             [
-                "Numeric",
+                "Quantitative",
                 "Qualitative",
-                "Binary"
             ];
 
         #endregion Relations
 
         #region Static
 
+        private bool ShowForm { get; set; } = false;
+        private bool FormValidationState { get; set; } = true;
         private bool PanelVisible { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
+        private int FocusedRowDetailVisibleIndex { get; set; }
         public IGrid Grid { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        public IGrid GridDetail { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private IReadOnlyList<object> SelectedDetailDataItems { get; set; } = [];
 
         #endregion Static
 
         #region SaveDelete
 
-        private async Task OnDelete(GridDataItemDeletingEventArgs e)
+        private void OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
             {
-                if (SelectedDataItems is null || SelectedDataItems.Count == 1)
+                if (SelectedDetailDataItems is null || SelectedDetailDataItems.Count == 1)
                 {
-                    await Mediator.Send(new DeleteLabTestRequest(((LabTestDto)e.DataItem).Id));
+                    LabTestDetailForms.Remove((LabTestDetailDto)e.DataItem);
                 }
                 else
                 {
-                    await Mediator.Send(new DeleteLabTestRequest(ids: SelectedDataItems.Adapt<List<LabTestDto>>().Select(x => x.Id).ToList()));
+                    foreach (var item in SelectedDetailDataItems.Adapt<List<LabTestDetailDto>>())
+                    {
+                        LabTestDetailForms.Remove(item);
+                    }
                 }
-
-                await LoadData();
             }
             catch (Exception ex)
             {
@@ -98,13 +108,29 @@
         {
             try
             {
-                LabTest = ((LabTestDto)e.EditModel);
-                if (LabTest.Id == 0)
-                    await Mediator.Send(new CreateLabTestRequest(LabTest));
-                else
-                    await Mediator.Send(new UpdateLabTestRequest(LabTest));
+                var labTest = (LabTestDetailDto)e.EditModel;
 
-                await LoadData();
+                LabTestDetailDto update = new();
+
+                if (labTest.Id == 0)
+                {
+                    labTest.Id = Helper.RandomNumber;
+                    labTest.LabUom = LabUoms.FirstOrDefault(x => x.Id == labTest.LabUomId);
+
+                    LabTestDetailForms.Add(labTest);
+                }
+                else
+                {
+                    var q = SelectedDetailDataItems[0].Adapt<LabTestDetailDto>();
+
+                    update = LabTestDetailForms.FirstOrDefault(x => x.Id == q.Id)!;
+                    labTest.LabUom = LabUoms.FirstOrDefault(x => x.Id == labTest.LabUomId);
+
+                    var index = LabTestDetailForms.IndexOf(update!);
+                    LabTestDetailForms[index] = labTest;
+                }
+
+                SelectedDetailDataItems = [];
             }
             catch (Exception ex)
             {
@@ -130,7 +156,7 @@
         private async Task LoadData()
         {
             PanelVisible = true;
-            LabTest = new();
+            //LabTestDetail = new();s
             SelectedDataItems = [];
             LabTests = await Mediator.Send(new GetLabTestQuery());
             PanelVisible = false;
@@ -153,9 +179,9 @@
             }
         }
 
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        private void GridDetail_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
-            FocusedRowVisibleIndex = args.VisibleIndex;
+            FocusedRowDetailVisibleIndex = args.VisibleIndex;
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
@@ -215,20 +241,53 @@
             await LoadData();
         }
 
-        private async Task NewItem_Click()
+        private async Task NewItemDetail_Click()
         {
-            await Grid.StartEditNewRowAsync();
+            await GridDetail.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
-            LabTest = SelectedDataItems[0].Adapt<LabTestDto>();
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            ShowForm = true;
+            var labTest = await Mediator.Send(new GetLabTestQuery(x => x.Id == SelectedDataItems[0].Adapt<GroupDto>().Id));
+
+            if (labTest.Count > 0)
+            {
+                LabTest = labTest[0];
+                LabTestDetailForms = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id));
+            }
         }
 
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        private void NewItem_Click()
+        {
+            ShowForm = true;
+            LabTest = new();
+            LabTestDetailForms = [];
+        }
+
+        private async Task EditItemDetail_Click(IGrid context)
+        {
+            var selected = (LabTestDetailDto)context.SelectedDataItem;
+            // Buat salinan objek yang akan diedit menggunakan Mapster
+            var copy = selected.Adapt<LabTestDetailDto>(); // GroupMenu adalah objek yang sedang diedit
+
+            await GridDetail.StartEditRowAsync(FocusedRowDetailVisibleIndex);
+
+            var w = LabTestDetailForms.FirstOrDefault(x => x.Id == copy.Id);
+
+            //if (copy is not null)
+            // Gunakan salinan objek yang diedit
+            //this.GroupMenu = copy;
+        }
+
+        private void DeleteItemDetail_Click()
+        {
+            GridDetail.ShowRowDeleteConfirmation(FocusedRowDetailVisibleIndex);
         }
 
         private void ColumnChooserButton_Click()
@@ -268,5 +327,87 @@
         #endregion ToolBar Button
 
         #endregion Grid Function
+
+        #region Form Function
+
+        private void LoadLabTestDetail()
+        {
+        }
+
+        private void KeyPressHandler(KeyboardEventArgs args)
+        {
+            if (args.Key == "Enter")
+            {
+                FormValidationState = false;
+                return;
+            }
+        }
+
+        private void HandleInvalidSubmit()
+        {
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+            FormValidationState = false;
+        }
+
+        private async Task HandleValidSubmit()
+        {
+            if (FormValidationState)
+                await SaveItemLabTest();
+            else
+                FormValidationState = true;
+        }
+
+        private async Task SaveItemLabTest()
+        {
+            try
+            {
+                if (!FormValidationState && LabTestDetailForms.Count == 0)
+                {
+                    ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+                    return;
+                }
+
+                if (LabTest.Id == 0)
+                {
+                    var result = await Mediator.Send(new CreateLabTestRequest(LabTest));
+                    LabTestDetailForms.ForEach(x =>
+                    {
+                        x.Id = 0;
+                        x.LabTestId = result.Id;
+                    });
+                    await Mediator.Send(new CreateListLabTestDetailRequest(LabTestDetailForms));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateLabTestRequest(LabTest));
+
+                    LabTestDetailForms.ForEach(x =>
+                    {
+                        x.Id = 0;
+                        x.LabTestId = LabTest.Id;
+                    });
+                    await Mediator.Send(new CreateListLabTestDetailRequest(LabTestDetailForms));
+                }
+
+                ShowForm = false;
+                LabTest = new();
+                LabTestDetailForms = [];
+                SelectedDetailDataItems = [];
+
+                await LoadData();
+            }
+            catch (Exception e)
+            {
+                e.HandleException(ToastService);
+            }
+        }
+
+        private void CancelItem_Click()
+        {
+            SelectedDataItems = [];
+            ShowForm = false;
+        }
+
+        #endregion Form Function
     }
 }

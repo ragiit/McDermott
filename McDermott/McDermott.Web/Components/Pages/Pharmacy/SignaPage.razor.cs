@@ -1,12 +1,11 @@
-﻿using McDermott.Application.Dtos.Pharmacy;
-using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
+﻿using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
     public partial class SignaPage
     {
         private List<SignaDto> Signas = [];
-       
+
         private bool PanelVisible { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
 
@@ -61,8 +60,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await LoadData();
         }
 
-        
-
         private async Task LoadData()
         {
             PanelVisible = true;
@@ -108,7 +105,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         var Signa = new SignaDto
                         {
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                            
                         };
 
                         //if (!Countries.Any(x => x.Name.Trim().ToLower() == Signa.Name.Trim().ToLower()) && !countries.Any(x => x.Name.Trim().ToLower() == Signa.Name.Trim().ToLower()))

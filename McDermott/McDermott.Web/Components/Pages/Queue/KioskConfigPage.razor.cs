@@ -16,7 +16,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Setting Grid
 
-        private string width = null, height = null;   
+        private string width = null, height = null;
         private bool PanelVisible { get; set; } = true;
         private bool PopUpVisible { get; set; } = false;
         private string TextPopUp { get; set; } = string.Empty;
@@ -27,7 +27,6 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
-
 
         #endregion Setting Grid
 
@@ -53,6 +52,7 @@ namespace McDermott.Web.Components.Pages.Queue
         }
 
         #region async data
+
         #region UserLoginAndAccessRole
 
         [Inject]
@@ -89,6 +89,7 @@ namespace McDermott.Web.Components.Pages.Queue
         }
 
         #endregion UserLoginAndAccessRole
+
         protected override async Task OnInitializedAsync()
         {
             try

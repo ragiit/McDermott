@@ -94,7 +94,6 @@ namespace McDermott.Web.Components.Pages.Queue
                         Phys = Physicians.Where(x => x.DoctorServiceIds.Contains(value.GetValueOrDefault())).ToList();
                     }
                 }
-
             }
         }
 
@@ -163,7 +162,6 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 await GetUserInfo();
-                
             }
             catch { }
             //var by =

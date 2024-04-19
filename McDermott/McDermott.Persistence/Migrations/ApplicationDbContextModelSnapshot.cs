@@ -2122,11 +2122,55 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResultType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("SampleTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SampleTypeId");
+
+                    b.ToTable("LabTests");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.LabTestDetail", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LabTestId")
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("LabUomId")
                         .HasColumnType("bigint");
@@ -2153,9 +2197,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("ResultValueType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("SampleTypeId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -2164,11 +2205,11 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LabTestId");
+
                     b.HasIndex("LabUomId");
 
-                    b.HasIndex("SampleTypeId");
-
-                    b.ToTable("LabTests");
+                    b.ToTable("LabTestDetails");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.LabUom", b =>
@@ -3772,7 +3813,7 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("GeneralConsultanServiceId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("McDermott.Domain.Entities.LabTest", "LabResulLabExaminationt")
+                    b.HasOne("McDermott.Domain.Entities.LabTestDetail", "LabResulLabExaminationt")
                         .WithMany()
                         .HasForeignKey("LabResulLabExaminationtId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -4014,7 +4055,7 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("McDermott.Domain.Entities.LabTest", "LabTest")
+                    b.HasOne("McDermott.Domain.Entities.LabTestDetail", "LabTest")
                         .WithMany()
                         .HasForeignKey("LabTestId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -4026,19 +4067,29 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.LabTest", b =>
                 {
+                    b.HasOne("McDermott.Domain.Entities.SampleType", "SampleType")
+                        .WithMany("LabTests")
+                        .HasForeignKey("SampleTypeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("SampleType");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.LabTestDetail", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.LabTest", "LabTest")
+                        .WithMany("LabTestDetails")
+                        .HasForeignKey("LabTestId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("McDermott.Domain.Entities.LabUom", "LabUom")
                         .WithMany()
                         .HasForeignKey("LabUomId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.SampleType", "SampleType")
-                        .WithMany()
-                        .HasForeignKey("SampleTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                    b.Navigation("LabTest");
 
                     b.Navigation("LabUom");
-
-                    b.Navigation("SampleType");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Location", b =>
@@ -4503,6 +4554,11 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("McDermott.Domain.Entities.LabTest", b =>
+                {
+                    b.Navigation("LabTestDetails");
+                });
+
             modelBuilder.Entity("McDermott.Domain.Entities.Location", b =>
                 {
                     b.Navigation("BuildingLocations");
@@ -4537,6 +4593,11 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.QueueDisplay", b =>
                 {
                     b.Navigation("Counter");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.SampleType", b =>
+                {
+                    b.Navigation("LabTests");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Signa", b =>

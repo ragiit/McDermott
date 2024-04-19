@@ -67,7 +67,7 @@
         [Required]
         public long HR { get; set; }
 
-        public long RBS { get; set; }
+        public long PainScale { get; set; }
         public long Systolic { get; set; }
         public long DiastolicBP { get; set; }
         public long SpO2 { get; set; }
@@ -77,9 +77,9 @@
 
         public string BMIState { get; set; } = "-";
 
-        public long E { get; set; }
-        public long V { get; set; }
-        public long M { get; set; }
+        public long E { get; set; } = 4;
+        public long V { get; set; } = 5;
+        public long M { get; set; } = 6;
 
         public virtual GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
     }

@@ -266,7 +266,7 @@
                                                                                         FilteringMode="@DataGridFilteringMode.Contains"
                                                                                         @bind-Value="@LabResultDetail.LabTestId"
                                                                                         TextFieldName="Name"
-                                                                                        SelectedItemChanged="@((LabTestDto e) => SelectedItemParameter(e))"
+                                                                                        SelectedItemChanged="@((LabTestDetailDto e) => SelectedItemParameter(e))"
                                                                                         ValueFieldName="Id">
                                                                             </DxComboBox>
                                                                             <ValidationMessage For="@(()=> LabResultDetail.LabTestId)"   />
@@ -402,15 +402,280 @@
                                                                 </Buttons>
                                                             </DxMaskedInput>
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Negative">
-                                                            <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.DrugNegative" />
+                                                        @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Negative">
+                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.DrugNegative" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Positive">
+                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.DrugPositive" />
+                                                </DxFormLayoutItem> *@
+
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Amphetamines" ColSpanMd="12">
+                                                            <Template>
+                                                                <DxGridLayout>
+                                                                    <Rows>
+                                                                        <DxGridLayoutRow />
+                                                                    </Rows>
+                                                                    <Columns>
+                                                                        <DxGridLayoutColumn Width="70" />
+                                                                        <DxGridLayoutColumn Width="50" />
+                                                                        <DxGridLayoutColumn Width="70" />
+                                                                        <DxGridLayoutColumn Width="50" />
+                                                                        <DxGridLayoutColumn />
+                                                                    </Columns>
+                                                                    <Items>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="0">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Positive</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="1">
+                                                                            <Template>
+                                                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AmphetaminesPositive" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="2">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Negative</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="3">
+                                                                            <Template>
+                                                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AmphetaminesNegative" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="4">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Expect Range 1000 ng/ml</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                    </Items>
+                                                                </DxGridLayout>
+                                                            </Template>
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Positive">
-                                                            <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.DrugPositive" />
+
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Benzodiazepines" ColSpanMd="12">
+                                                            <Template>
+                                                                <DxGridLayout>
+                                                                    <Rows>
+                                                                        <DxGridLayoutRow />
+                                                                    </Rows>
+                                                                    <Columns>
+                                                                        <DxGridLayoutColumn Width="70" />
+                                                                        <DxGridLayoutColumn Width="50" />
+                                                                        <DxGridLayoutColumn Width="70" />
+                                                                        <DxGridLayoutColumn Width="50" />
+                                                                        <DxGridLayoutColumn />
+                                                                    </Columns>
+                                                                    <Items>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="0">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Positive</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="1">
+                                                                            <Template>
+                                                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.BenzodiazepinesPositive" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="2">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Negative</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="3">
+                                                                            <Template>
+                                                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.BenzodiazepinesNegative" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="4">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Expect Range 300 ng/ml</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                    </Items>
+                                                                </DxGridLayout>
+                                                            </Template>
+                                                        </DxFormLayoutItem>
+
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Cocaine / Metabolites" ColSpanMd="12">
+                                                            <Template>
+                                                                <DxGridLayout>
+                                                                    <Rows>
+                                                                        <DxGridLayoutRow />
+                                                                    </Rows>
+                                                                    <Columns>
+                                                                        <DxGridLayoutColumn Width="70" />
+                                                                        <DxGridLayoutColumn Width="50" />
+                                                                        <DxGridLayoutColumn Width="70" />
+                                                                        <DxGridLayoutColumn Width="50" />
+                                                                        <DxGridLayoutColumn />
+                                                                    </Columns>
+                                                                    <Items>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="0">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Positive</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="1">
+                                                                            <Template>
+                                                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.CocaineMetabolitesPositive" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="2">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Negative</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="3">
+                                                                            <Template>
+                                                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.CocaineMetabolitesNegative" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="4">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Expect Range 300 ng/ml</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                    </Items>
+                                                                </DxGridLayout>
+                                                            </Template>
+                                                        </DxFormLayoutItem>
+
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Opiates" ColSpanMd="12">
+                                                            <Template>
+                                                                <DxGridLayout>
+                                                                    <Rows>
+                                                                        <DxGridLayoutRow />
+                                                                    </Rows>
+                                                                    <Columns>
+                                                                        <DxGridLayoutColumn Width="70" />
+                                                                        <DxGridLayoutColumn Width="50" />
+                                                                        <DxGridLayoutColumn Width="70" />
+                                                                        <DxGridLayoutColumn Width="50" />
+                                                                        <DxGridLayoutColumn />
+                                                                    </Columns>
+                                                                    <Items>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="0">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Positive</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="1">
+                                                                            <Template>
+                                                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.OpiatesPositive" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="2">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Negative</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="3">
+                                                                            <Template>
+                                                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.OpiatesNegative" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="4">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Expect Range 50 ng/ml</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                    </Items>
+                                                                </DxGridLayout>
+                                                            </Template>
+                                                        </DxFormLayoutItem>
+
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Methamphetamines" ColSpanMd="12">
+                                                            <Template>
+                                                                <DxGridLayout>
+                                                                    <Rows>
+                                                                        <DxGridLayoutRow />
+                                                                    </Rows>
+                                                                    <Columns>
+                                                                        <DxGridLayoutColumn Width="70" />
+                                                                        <DxGridLayoutColumn Width="50" />
+                                                                        <DxGridLayoutColumn Width="70" />
+                                                                        <DxGridLayoutColumn Width="50" />
+                                                                        <DxGridLayoutColumn />
+                                                                    </Columns>
+                                                                    <Items>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="0">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Positive</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="1">
+                                                                            <Template>
+                                                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.MethamphetaminesPositive" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="2">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Negative</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="3">
+                                                                            <Template>
+                                                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.MethamphetaminesNegative" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="4">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Expect Range 1000 ng/ml</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                    </Items>
+                                                                </DxGridLayout>
+                                                            </Template>
+                                                        </DxFormLayoutItem>
+
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="THC / Cannabinoid (Marijuana)" ColSpanMd="12">
+                                                            <Template>
+                                                                <DxGridLayout>
+                                                                    <Rows>
+                                                                        <DxGridLayoutRow />
+                                                                    </Rows>
+                                                                    <Columns>
+                                                                        <DxGridLayoutColumn Width="70" />
+                                                                        <DxGridLayoutColumn Width="50" />
+                                                                        <DxGridLayoutColumn Width="70" />
+                                                                        <DxGridLayoutColumn Width="50" />
+                                                                        <DxGridLayoutColumn />
+                                                                    </Columns>
+                                                                    <Items>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="0">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Positive</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="1">
+                                                                            <Template>
+                                                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.THCCannabinoidMarijuanaPositive" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="2">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Negative</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="3">
+                                                                            <Template>
+                                                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.THCCannabinoidMarijuanaNegative" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem ColumnSpan="2" Row="0" Column="4">
+                                                                            <Template>
+                                                                                <h6 class="pt-1">Expect Range 50 ng/ml</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                    </Items>
+                                                                </DxGridLayout>
+                                                            </Template>
                                                         </DxFormLayoutItem>
                                                     </Items>
 
                                                 </DxFormLayoutGroup>
+
                                                 <DxFormLayoutGroup ColSpanMd="12" Caption="ECG" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                                                     <Items>
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
@@ -435,24 +700,149 @@
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sinus Tachycardia" ColSpanMd="12">
                                                             <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusTachycardia" />
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Ventriculat Extra Systole" ColSpanMd="12">
-                                                            <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsVentriculatExtraSystole" />
-                                                        </DxFormLayoutItem>
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Supraventricular Extra Systole" ColSpanMd="12">
-                                                            <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSupraventricularExtraSystole" />
+                                                        @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Ventriculat Extra Systole" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsVentriculatExtraSystole" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Supraventricular Extra Systole" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSupraventricularExtraSystole" />
+                                                </DxFormLayoutItem> *@
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="HR" ColSpanMd="12">
+                                                            <Template>
+                                                                <DxGridLayout>
+                                                                    <Rows>
+                                                                        <DxGridLayoutRow />
+                                                                    </Rows>
+                                                                    <Columns>
+                                                                        <DxGridLayoutColumn Width="350" />
+                                                                        <DxGridLayoutColumn />
+                                                                    </Columns>
+                                                                    <Items>
+                                                                        <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
+                                                                            <Template>
+                                                                                <DxSpinEdit ShowValidationIcon="true" MinValue="0" @bind-Value="@GeneralConsultanMedicalSupport.HR" NullText="HR" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                                            <Template>
+                                                                                <h6 class="pl-1 pt-2">BPM</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                    </Items>
+                                                                </DxGridLayout>
+
+                                                            </Template>
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Other" ColSpanMd="12">
                                                             <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsOtherECG" />
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption=" " Visible="Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherECG)" ColSpanMd="12">
-                                                            <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherDesc"
-                                                                    NullText="Other ..."
-                                                                    ShowValidationIcon="true"
-                                                                    Rows="1" />
+                                                        <DxFormLayoutItem ColSpanMd="12">
+                                                            @if (Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherECG))
+                                                            {
+                                                                <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherDesc"
+                                                                        NullText="Other Description..."
+                                                                        ShowValidationIcon="true"
+                                                                        Rows="1" />
+                                                            }
                                                         </DxFormLayoutItem>
+                                                        @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Other Examination" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsOtherExaminationECG" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem ColSpanMd="12">
+                                                <Template>
+                                                <DxGridLayout>
+                                                <Rows>
+                                                <DxGridLayoutRow />
+                                                <DxGridLayoutRow />
+                                                </Rows>
+                                                <Columns>
+                                                <DxGridLayoutColumn />
+                                                </Columns>
+                                                <Items>
+                                                <DxGridLayoutItem Row="0" Column="0">
+                                                <Template>
+                                                @if (Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherExaminationECG))
+                                                {
+                                                <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherExaminationTypeECG"
+                                                NullText="Examination Type..."
+                                                ShowValidationIcon="true"
+                                                Rows="1" />
+                                                }
+                                                </Template>
+                                                </DxGridLayoutItem>
+                                                <DxGridLayoutItem Row="1" Column="0" CssClass="mt-1">
+                                                <Template>
+                                                @if (Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherExaminationECG))
+                                                {
+                                                <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherExaminationRemarkECG"
+                                                NullText="Remark..."
+                                                ShowValidationIcon="true"
+                                                Rows="1" />
+                                                }
+                                                </Template>
+                                                </DxGridLayoutItem>
+                                                </Items>
+                                                </DxGridLayout>
+
+                                                </Template>
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
+                                                <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.DrugEximinationAttachment"
+                                                ShowValidationIcon="true"
+                                                ReadOnly="true"
+                                                MaskMode="MaskMode.RegEx">
+                                                <Buttons>
+                                                <InputFile id="drugFile" OnChange="@SelectFilesDrug" multiple="false" style="display:none" />
+                                                <DxEditorButton Click="SelectFileDrug" IconCssClass="fa-solid fa-upload" />
+                                                <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.DrugEximinationAttachment)" IconCssClass="fa-solid fa-download" />
+                                                <DxEditorButton Click="RemoveSelectedFileDrug" IconCssClass="fa-solid fa-trash" />
+                                                </Buttons>
+                                                </DxMaskedInput>
+                                                </DxFormLayoutItem> *@
                                                     </Items>
                                                 </DxFormLayoutGroup>
 
+                                                <DxFormLayoutGroup ColSpanMd="12" Caption="Other Examination" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
+                                                    <Items>
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Other Examination" ColSpanMd="12">
+                                                            <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsOtherExaminationECG" />
+                                                        </DxFormLayoutItem>
+                                                        @if (Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherExaminationECG))
+                                                        {
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption=" " ColSpanMd="12">
+                                                                <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherExaminationTypeECG"
+                                                                        NullText="Examination Type..."
+                                                                        ShowValidationIcon="true"
+                                                                        Rows="1" />
+                                                            </DxFormLayoutItem>
+                                                        }
+                                                        @if (Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherExaminationECG))
+                                                        {
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption=" " ColSpanMd="12">
+                                                                <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherExaminationRemarkECG"
+                                                                        NullText="Remark..."
+                                                                        ShowValidationIcon="true"
+                                                                        Rows="1" />
+                                                            </DxFormLayoutItem>
+
+                                                        }
+                                                        @if (Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherExaminationECG))
+                                                        {
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption=" " ColSpanMd="12">
+                                                                <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.OtherExaminationAttachment"
+                                                                               ShowValidationIcon="true"
+                                                                               ReadOnly="true"
+                                                                               MaskMode="MaskMode.RegEx">
+                                                                    <Buttons>
+                                                                        <InputFile id="drugFile" OnChange="@SelectFilesDrug" multiple="false" style="display:none" />
+                                                                        <DxEditorButton Click="SelectFileDrug" IconCssClass="fa-solid fa-upload" />
+                                                                        <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.OtherExaminationAttachment)" IconCssClass="fa-solid fa-download" />
+                                                                        <DxEditorButton Click="RemoveSelectedFileDrug" IconCssClass="fa-solid fa-trash" />
+                                                                    </Buttons>
+                                                                </DxMaskedInput>
+                                                            </DxFormLayoutItem>
+                                                        }
+                                                    </Items>
+                                                </DxFormLayoutGroup>
                                             </DxFormLayout>
                                             <div class="row justify-content-end">
                                                 <div class="col-auto align-self-end">

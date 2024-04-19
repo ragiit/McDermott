@@ -84,7 +84,7 @@
                     <!-- Left navbar links -->
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                            <a class="nav-link" id="hal" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                         </li>
                         <li class="nav-item d-none d-sm-inline-block">
                             <a href="" class="nav-link">Home</a>
@@ -216,6 +216,18 @@
             </div>
             </div> *@
 
+                        <!-- SidebarSearch Form -->
+                        @*   <div class="form-inline">
+            <div class="input-group" data-widget="sidebar-search">
+            <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+            <div class="input-group-append">
+            <button class="btn btn-sidebar">
+            <i class="fas fa-search fa-fw"></i>
+            </button>
+            </div>
+            </div>
+            </div> *@
+
                         <!-- Sidebar Menu -->
                         <nav class="mt-3">
                             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
@@ -271,15 +283,15 @@
                                 }
 
                                 @* <li class="nav-item mb-2">
-                                    <div class="input-group input-group-sm">
-                                    </div>
-                                    <NavLink @onclick="OnClickLogout" class="nav-link">
-                                        <i class="nav-icon fa-solid fa-right-from-bracket"></i>
-                                        <p>
-                                            Logout
-                                        </p>
-                                    </NavLink>
-                                </li> *@
+                    <div class="input-group input-group-sm">
+                    </div>
+                    <NavLink @onclick="OnClickLogout" class="nav-link">
+                    <i class="nav-icon fa-solid fa-right-from-bracket"></i>
+                    <p>
+                    Logout
+                    </p>
+                    </NavLink>
+                    </li> *@
 
                                 @*
                     @foreach (var h in HeaderMenuDtos)
@@ -340,10 +352,10 @@
                 </div>
 
                 <footer class="main-footer">
-                    <strong>Copyright &copy; 2024-2029 <a href="https://www.mcdermott.com/">McHealthCare</a>.</strong>
+                    <strong>Copyright &copy; 2024-2029 <a class="no-underline" href="https://www.mcdermott.com/">McHealthCare</a>.</strong>
                     All rights reserved.
                     <div class="float-right d-none d-sm-inline-block">
-                        <b>Version</b> 1.0.0
+                        <b>Version</b> @Helper.VERSION
                     </div>
                 </footer>
 

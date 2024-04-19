@@ -1,26 +1,30 @@
-﻿using MediatR;
-using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
-
+﻿using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
     public partial class DrugFormPage
     {
         #region Relation Data
+
         private List<DrugFormDto> DataFormDrugs = [];
         private DrugFormDto FormDrugs = new();
-        #endregion
+
+        #endregion Relation Data
 
         #region Properties Grid
+
         private IGrid Grid;
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        #endregion
+
+        #endregion Properties Grid
 
         #region Variabel static
+
         private bool showForm { get; set; } = false;
         private bool PanelVisible { get; set; } = false;
-        #endregion
+
+        #endregion Variabel static
 
         #region UserLoginAndAccessRole
 
@@ -60,6 +64,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #endregion UserLoginAndAccessRole
 
         #region async Data
+
         protected override async Task OnInitializedAsync()
         {
             try
@@ -76,10 +81,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             showForm = false;
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
-            DataFormDrugs = await Mediator.Send(new GetFormDrugQuery());            
+            DataFormDrugs = await Mediator.Send(new GetFormDrugQuery());
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion async Data
 
         #region Grid
 
@@ -96,11 +102,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        void Grid_CustomizeFilterRowEditor(GridCustomizeFilterRowEditorEventArgs e)
+        private void Grid_CustomizeFilterRowEditor(GridCustomizeFilterRowEditorEventArgs e)
         {
             if (e.FieldName == "CreatedDate" || e.FieldName == "ModifiedDate" || e.FieldName == "FixedDate")
                 ((ITextEditSettings)e.EditSettings).ClearButtonDisplayMode = DataEditorClearButtonDisplayMode.Never;
         }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -114,12 +121,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #endregion Grid
 
         #region Click
+
         private async Task NewItem_Click()
         {
             FormDrugs = new();
             showForm = true;
         }
-       
+
         private async Task Refresh_Click()
         {
             await LoadData();
@@ -131,7 +139,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             FormDrugs = general;
             showForm = true;
         }
-        
+
         private async Task Back_Click()
         {
             showForm = false;
@@ -146,10 +154,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             await LoadData();
         }
-       
-        #endregion
+
+        #endregion Click
 
         #region function Delete
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -170,14 +179,16 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 ee.HandleException(ToastService);
             }
         }
-        #endregion
+
+        #endregion function Delete
 
         #region function Save
+
         private async Task onSave()
         {
             try
             {
-                if(FormDrugs.Id == 0)
+                if (FormDrugs.Id == 0)
                 {
                     await Mediator.Send(new CreateFormDrugRequest(FormDrugs));
                 }
@@ -187,11 +198,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
 
                 await LoadData();
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
         }
-        #endregion
+
+        #endregion function Save
     }
 }

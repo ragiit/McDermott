@@ -62,6 +62,7 @@
 
         private List<string> Types = new List<string>
         {
+            "Default Unit",
             "Default Weigth",
             "Default Working Time ",
             "Default Length ",

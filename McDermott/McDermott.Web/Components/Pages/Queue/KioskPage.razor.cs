@@ -1,6 +1,4 @@
-﻿using DevExpress.ClipboardSource.SpreadsheetML;
-using McDermott.Application.Dtos.Queue;
-using Org.BouncyCastle.Tls;
+﻿using McDermott.Application.Dtos.Queue;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 
@@ -89,7 +87,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         public void SelectedItemChanged(string kiosk)
         {
-            if(kiosk == "Family Relation")
+            if (kiosk == "Family Relation")
             {
                 captions = "Name Family";
             }
@@ -161,7 +159,6 @@ namespace McDermott.Web.Components.Pages.Queue
             }
             catch { }
 
-
             var NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId);
             if (NameGroup == null)
             {
@@ -184,7 +181,6 @@ namespace McDermott.Web.Components.Pages.Queue
             NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
 
-
         protected override async Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
@@ -195,7 +191,6 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task LoadData()
         {
-
             PanelVisible = true;
             StateHasChanged();
             showForm = false;
@@ -316,7 +311,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 if (id != 0)
                 {
                     var cekId = await Mediator.Send(new GetGeneralConsultanServiceQuery()); //get Data General Consultation
-                    var GId = cekId.Where(x => x.KioskQueueId == id).Select(x=>x.Id).FirstOrDefault(); //Get Id in General Consultation where KioskQueueId = id
+                    var GId = cekId.Where(x => x.KioskQueueId == id).Select(x => x.Id).FirstOrDefault(); //Get Id in General Consultation where KioskQueueId = id
                     await Mediator.Send(new DeleteGeneralConsultanServiceRequest(GId)); //Delete Data in General Consultation where id
 
                     await Mediator.Send(new DeleteKioskQueueRequest(id)); // delete data kioskQueue in id
@@ -341,7 +336,6 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task OnSearch()
         {
-
             var group = await Mediator.Send(new GetGroupQuery());
             var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId);
             var types = FormKios.Type;
@@ -387,11 +381,7 @@ namespace McDermott.Web.Components.Pages.Queue
                             LoadPhysicians(serviceId.Value);
                         }
 
-
-
-
                         showPhysician = true;
-
                     }
                 }
             }
@@ -479,7 +469,6 @@ namespace McDermott.Web.Components.Pages.Queue
                             {
                                 FormQueue.QueueNumber = 1 * ((long)GetNoQueue.QueueNumber + 1);
                             }
-
                         }
                     }
 

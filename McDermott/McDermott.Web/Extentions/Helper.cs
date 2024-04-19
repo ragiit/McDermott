@@ -4,6 +4,8 @@ namespace McDermott.Web.Extentions
 {
     public static class Helper
     {
+        public static readonly string VERSION = "2.0.0";
+
         public static long RandomNumber => new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second;
 
         public static string HashMD5(string input)

@@ -21,8 +21,11 @@
         public string? ScheduleTime { get; set; }
         public bool IsAlertInformationSpecialCase { get; set; } = false;
         public bool IsSickLeave { get; set; } = false;
+        public bool IsMaternityLeave { get; set; } = false;
         public DateTime? StartDateSickLeave { get; set; }
         public DateTime? EndDateSickLeave { get; set; }
+        public DateTime? StartMaternityLeave { get; set; }
+        public DateTime? EndMaternityLeave { get; set; }
         public DateTime? RegistrationDate { get; set; }
         public DateTime? AppoimentDate { get; set; }
         public TimeSpan? WorkFrom { get; set; }

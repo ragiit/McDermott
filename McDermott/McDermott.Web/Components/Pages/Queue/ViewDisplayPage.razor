@@ -41,7 +41,7 @@
                 {
                     filteredQueues = kioskQueues.Where(x => x.ServiceKId == view.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && (x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")).ToList();
                      count = QueueNumber.Where(n => n.ServicekId == view.ServiceKId).OrderByDescending(x => x.CreateDate).Select(x => x.NumberQueue).LastOrDefault();
-                    
+
             }
                 else if (view.ServiceId != null && view.ServiceKId != null)
                 {
@@ -54,7 +54,6 @@
                 @* count = filteredQueues.Where(n =>n.ServiceKId == view.ServiceKId).Select(x => x.QueueNumber).FirstOrDefault(); *@
 @*                 var count = QueueNumber.Where(n => n.ServicekId == view.ServiceKId).OrderByDescending(x => x.CreateDate).Select(x => x.NumberQueue).LastOrDefault();
  *@
-
 
                 <div class="col-md-6">
                     <div class="card">

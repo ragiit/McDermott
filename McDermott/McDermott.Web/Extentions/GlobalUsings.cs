@@ -42,7 +42,7 @@ global using static McDermott.Application.Features.Commands.Pharmacy.ActiveCompo
 global using static McDermott.Application.Features.Commands.Pharmacy.DrugDosageCommand;
 global using static McDermott.Application.Features.Commands.Pharmacy.DrugRouteCommand;
 global using static McDermott.Application.Features.Commands.Transaction.LabResultDetailCommand;
-global using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
+global using static McDermott.Application.Features.Commands.Medical.LabTestDetailCommand;
 global using static McDermott.Application.Features.Commands.Medical.SampleTypeCommand;
 global using static McDermott.Application.Features.Commands.Medical.LabUomCommand;
 global using static McDermott.Application.Features.Commands.Patient.ClassTypeCommand;

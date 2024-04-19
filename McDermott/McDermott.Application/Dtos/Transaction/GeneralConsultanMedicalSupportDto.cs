@@ -49,6 +49,7 @@
         public long? PractitionerDrugEximinationId { get; set; }
         public string? DrugEximinationName { get; set; }
         public string? DrugEximinationAttachment { get; set; }
+        public string? OtherExaminationAttachment { get; set; }
 
         private bool _DrugNegative = false;
         private bool _DrugPositive = false;
@@ -79,15 +80,196 @@
             }
         }
 
+        private bool _AmphetaminesNegative = false;
+        private bool _AmphetaminesPositive = false;
+
+        public bool AmphetaminesNegative
+        {
+            get => _AmphetaminesNegative;
+            set
+            {
+                _AmphetaminesNegative = value;
+                if (value)
+                {
+                    _AmphetaminesPositive = false;
+                }
+            }
+        }
+
+        public bool AmphetaminesPositive
+        {
+            get => _AmphetaminesPositive;
+            set
+            {
+                _AmphetaminesPositive = value;
+                if (value)
+                {
+                    _AmphetaminesNegative = false;
+                }
+            }
+        }
+
+
+        private bool _BenzodiazepinesNegative = false;
+        private bool _BenzodiazepinesPositive = false;
+
+        public bool BenzodiazepinesNegative
+        {
+            get => _BenzodiazepinesNegative;
+            set
+            {
+                _BenzodiazepinesNegative = value;
+                if (value)
+                {
+                    _BenzodiazepinesPositive = false;
+                }
+            }
+        }
+
+        public bool BenzodiazepinesPositive
+        {
+            get => _BenzodiazepinesPositive;
+            set
+            {
+                _BenzodiazepinesPositive = value;
+                if (value)
+                {
+                    _BenzodiazepinesNegative = false;
+                }
+            }
+        }
+
+        // Lanjutkan dengan pola yang sama untuk properti-properti lainnya
+
+        private bool _CocaineMetabolitesNegative = false;
+        private bool _CocaineMetabolitesPositive = false;
+
+        public bool CocaineMetabolitesNegative
+        {
+            get => _CocaineMetabolitesNegative;
+            set
+            {
+                _CocaineMetabolitesNegative = value;
+                if (value)
+                {
+                    _CocaineMetabolitesPositive = false;
+                }
+            }
+        }
+
+        public bool CocaineMetabolitesPositive
+        {
+            get => _CocaineMetabolitesPositive;
+            set
+            {
+                _CocaineMetabolitesPositive = value;
+                if (value)
+                {
+                    _CocaineMetabolitesNegative = false;
+                }
+            }
+        }
+
+        private bool _OpiatesNegative = false;
+        private bool _OpiatesPositive = false;
+
+        public bool OpiatesNegative
+        {
+            get => _OpiatesNegative;
+            set
+            {
+                _OpiatesNegative = value;
+                if (value)
+                {
+                    _OpiatesPositive = false;
+                }
+            }
+        }
+
+        public bool OpiatesPositive
+        {
+            get => _OpiatesPositive;
+            set
+            {
+                _OpiatesPositive = value;
+                if (value)
+                {
+                    _OpiatesNegative = false;
+                }
+            }
+        }
+
+        private bool _MethamphetaminesNegative = false;
+        private bool _MethamphetaminesPositive = false;
+
+        public bool MethamphetaminesNegative
+        {
+            get => _MethamphetaminesNegative;
+            set
+            {
+                _MethamphetaminesNegative = value;
+                if (value)
+                {
+                    _MethamphetaminesPositive = false;
+                }
+            }
+        }
+
+        public bool MethamphetaminesPositive
+        {
+            get => _MethamphetaminesPositive;
+            set
+            {
+                _MethamphetaminesPositive = value;
+                if (value)
+                {
+                    _MethamphetaminesNegative = false;
+                }
+            }
+        }
+
+        private bool _THCCannabinoidMarijuanaNegative = false;
+        private bool _THCCannabinoidMarijuanaPositive = false;
+
+        public bool THCCannabinoidMarijuanaNegative
+        {
+            get => _THCCannabinoidMarijuanaNegative;
+            set
+            {
+                _THCCannabinoidMarijuanaNegative = value;
+                if (value)
+                {
+                    _THCCannabinoidMarijuanaPositive = false;
+                }
+            }
+        }
+
+        public bool THCCannabinoidMarijuanaPositive
+        {
+            get => _THCCannabinoidMarijuanaPositive;
+            set
+            {
+                _THCCannabinoidMarijuanaPositive = value;
+                if (value)
+                {
+                    _THCCannabinoidMarijuanaNegative = false;
+                }
+            }
+        }
+
         public long? PractitionerECGId { get; set; }
         public bool IsNormalRestingECG { get; set; } = false;
         public bool IsSinusRhythm { get; set; } = false;
         public bool IsSinusBradycardia { get; set; } = false;
+        public long HR { get; set; }
         public bool IsSinusTachycardia { get; set; } = false;
-        public bool IsVentriculatExtraSystole { get; set; } = false;
-        public bool IsSupraventricularExtraSystole { get; set; } = false;
+        //public bool IsVentriculatExtraSystole { get; set; } = false;
+        //public bool IsSupraventricularExtraSystole { get; set; } = false;
         public bool IsOtherECG { get; set; } = false;
         public string? OtherDesc { get; set; }
+        public bool IsOtherExaminationECG { get; set; } = false;
+        public string? OtherExaminationTypeECG { get; set; }
+        public string? OtherExaminationRemarkECG { get; set; }
         public string? Status { get; set; } = "Draft";
 
         public GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
@@ -96,6 +278,6 @@
         public UserDto? PractitionerAlcoholEximination { get; set; }
         public UserDto? PractitionerDrugEximination { get; set; }
         public UserDto? PractitionerECG { get; set; }
-        public LabTestDto? LabResulLabExaminationt { get; set; }
+        public LabTestDetailDto? LabResulLabExaminationt { get; set; }
     }
 }

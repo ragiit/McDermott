@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Config
+﻿using McDermott.Application.Features.Services;
+
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class UserPage
     {
@@ -38,6 +40,9 @@
         }
 
         #endregion UserLoginAndAccessRole
+
+        [Inject]
+        public CustomAuthenticationStateProvider CustomAuth { get; set; }
 
         private bool Loading = true;
         private bool PanelVisible { get; set; } = true;
@@ -223,12 +228,22 @@
                         Helper.DeleteFile(userDtoSipFile);
                 }
 
-                await Mediator.Send(new UpdateUserRequest(UserForm));
+                var result = await Mediator.Send(new UpdateUserRequest(UserForm));
 
                 if (UserForm.SipFile != userDtoSipFile)
                 {
                     if (UserForm.SipFile != null)
                         await FileUploadService.UploadFileAsync(BrowserFile);
+                }
+
+                if (UserLogin.Id == result.Id)
+                {
+                    await JsRuntime.InvokeVoidAsync("deleteCookie", CookieHelper.USER_INFO);
+
+                    var a = (CustomAuthenticationStateProvider)CustomAuth;
+                    await a.UpdateAuthState(string.Empty);
+
+                    await JsRuntime.InvokeVoidAsync("setCookie", CookieHelper.USER_INFO, Helper.Encrypt(JsonConvert.SerializeObject(result)), 2);
                 }
             }
 

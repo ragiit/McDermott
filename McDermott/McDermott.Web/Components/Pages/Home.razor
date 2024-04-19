@@ -315,6 +315,94 @@
         </DxChart> *@
         </div>
     </div>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Small boxes (Stat box) -->
+            <div class="row">
+
+                <div class="col-md-3 col-12">
+                    <!-- small box -->
+                    <div class="small-box bg-info">
+                        <div class="inner">
+                            <h3>@Dashboard.UserCount</h3>
+
+                            <p>Users</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <a href="config/users" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+
+                @*     <div class="col-md-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+            <div class="inner">
+            <h3>@Dashboard.EmployeeCount</h3>
+
+            <p>Employees</p>
+            </div>
+            <div class="icon">
+            <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+            </div>
+
+            <!-- ./col -->
+            <div class="col-md-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+            <div class="inner">
+            <h3>@Dashboard.PhysicianCount</h3>
+
+            <p>Phisicians</p>
+            </div>
+            <div class="icon">
+            <i class="fa-solid fa-user-doctor"></i>
+            </div>
+            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-md-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+            <div class="inner">
+            <h3>@Dashboard.NurseCount</h3>
+
+            <p>Nurses</p>
+            </div>
+            <div class="icon">
+            <i class="fa-solid fa-user-nurse"></i>
+            </div>
+            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-md-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+            <div class="inner">
+            <h3>@Dashboard.PatientCount</h3>
+
+            <p>Patients</p>
+            </div>
+            <div class="icon">
+            <i class="fa-solid fa-user"></i>
+            </div>
+            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+            </div> *@
+                <!-- ./col -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
 }
 else
 {
@@ -606,13 +694,22 @@ else
 
     private string Greeting = "";
 
+    private class DashboardTemp
+    {
+        public int UserCount { get; set; }
+        public int PatientCount { get; set; }
+        public int PhysicianCount { get; set; }
+        public int NurseCount { get; set; }
+        public int EmployeeCount { get; set; }
+    }
+
+    private DashboardTemp Dashboard { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
         // var aa = await AuthenticationState;
         // var bb = aa.User.Identity.Name;
         // SalesData2 = await Sales.GetSalesAsync();
-
-        await GetUserInfo();
 
         var hour = DateTime.Now.Hour;
 
@@ -622,6 +719,16 @@ else
             Greeting = "Good Afternoon!";
         else
             Greeting = "Good Evening!";
+
+        var users = await Mediator.Send(new GetUserQuery());
+        // Dashboard.UserCount = users.Where(x => x.IsUser == true).Count();
+        Dashboard.UserCount = users.Count();
+        Dashboard.PatientCount = users.Where(x => x.IsUser == true).Count();
+        Dashboard.PhysicianCount = users.Where(x => x.IsPhysicion == true).Count();
+        Dashboard.NurseCount = users.Where(x => x.IsNurse == true).Count();
+        Dashboard.EmployeeCount = users.Where(x => x.IsEmployee == true).Count();
+
+        await GetUserInfo();
 
         // try
         // {
