@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using McDermott.Domain.Entities;
+using MediatR;
 using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
@@ -45,7 +46,13 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<string> HospitalProducts = new List<string>
         {
             "Medicament",
-            "Food & Drink"
+            "Medical Supplies",
+            "Medical Equipment",
+            "Vactination",
+            "Consultation",
+            "Laboratory",
+            "Radiology",
+            "Procedure"
         };
 
         private void SelectedItemChanged(string Hospital)
@@ -181,10 +188,10 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task NewItem_Click()
         {
-            
+
             showForm = true;
             FormProductDetails = new();
-            FormProductDetails.ProductType = ProductTypes[0];
+            FormProductDetails.ProductType = ProductTypes[2];
             FormProductDetails.HospitalType = HospitalProducts[0];
             BpjsClassifications = await Mediator.Send(new GetBpjsClassificationQuery());
             Uoms = await Mediator.Send(new GetUomQuery());
@@ -219,7 +226,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             FormProductDetails.Cost = products.Cost;
             FormProductDetails.ProductCategoryId = products.ProductCategoryId;
             FormProductDetails.InternalReference = products.InternalReference;
-            if(products.HospitalType == "Medicament")
+            if (products.HospitalType == "Medicament")
             {
                 if (medicamen != null)
                 {
@@ -281,13 +288,30 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
+                Medicaments = await Mediator.Send(new GetMedicamentQuery());
+                var products = (ProductDto)e.DataItem;
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteProductCategoryRequest(((ProductCategoryDto)e.DataItem).Id));
+                    var idProduct = Medicaments.Where(m => m.ProductId == products.Id).FirstOrDefault();
+                    if (idProduct != null)
+                    {
+                        await Mediator.Send(new DeleteMedicamentRequest(idProduct.Id));
+                    }
+                    await Mediator.Send(new DeleteProductCategoryRequest(((ProductDto)e.DataItem).Id));
                 }
                 else
                 {
-                    await Mediator.Send(new DeleteProductCategoryRequest(ids: SelectedDataItems.Adapt<List<ProductCategoryDto>>().Select(x => x.Id).ToList()));
+                    List<long> MProductId = SelectedDataItems.Adapt<List<ProductDto>>().Select(x => x.Id).ToList();
+                    foreach(var data in MProductId)
+                    {
+                        
+                        var checkData = Medicaments.Where(m => m.ProductId == data).FirstOrDefault();
+                        if (checkData != null)
+                        {
+                            await Mediator.Send(new DeleteMedicamentRequest(checkData.Id));
+                        }
+                    }
+                    await Mediator.Send(new DeleteProductRequest(ids: SelectedDataItems.Adapt<List<ProductDto>>().Select(x => x.Id).ToList()));
                 }
 
                 await LoadData();
@@ -323,12 +347,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                         var listActiveComponent = selectedActiveComponents.Select(x => x.Id).ToList();
                         FormProductDetails.ActiveComponentId?.AddRange(listActiveComponent);
                     }
-                     ProductDto getProduct = new();
+                    ProductDto getProduct = new();
                     if (FormProducts.Id == 0)
                     {
-                         getProduct = await Mediator.Send(new CreateProductRequest(FormProducts));
+                        getProduct = await Mediator.Send(new CreateProductRequest(FormProducts));
                     }
-                    
+
                     // Medicament
                     if (FormProductDetails.HospitalType == "Medicament")
                     {

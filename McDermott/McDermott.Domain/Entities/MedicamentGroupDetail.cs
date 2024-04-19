@@ -18,12 +18,17 @@
         public string? Comment { get; set; }
 
         [SetToNull]
-        public virtual List<ActiveComponent>? ActiveComponent { get; set; }
+        public Product? Medicament { get; set; }
+
         [SetToNull]
-        public virtual MedicamentGroup? MedicamentGroup { get; set; }
+        public  List<ActiveComponent>? ActiveComponent { get; set; }
         [SetToNull]
-        public virtual Uom? UoM { get; set; }
+        public  MedicamentGroup? MedicamentGroup { get; set; }
         [SetToNull]
-        public virtual Medicament? Medicament { get; set; }
+        public  Uom? UoM { get; set; }
+        [SetToNull]
+        public  DrugDosage? RegimentOfUse { get; set; }
+        [SetToNull]
+        public Signa? Signa { get; set; }
     }
 }
