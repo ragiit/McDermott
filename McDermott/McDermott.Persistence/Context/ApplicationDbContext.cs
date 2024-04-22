@@ -111,6 +111,7 @@ namespace McDermott.Persistence.Context
         public DbSet<ReorderingRule> ReorderingRules { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Medicament> Medicaments { get; set; }
+        public DbSet<StockProduct> StockProducts { get; set; }
 
         #endregion Pharmacy
 

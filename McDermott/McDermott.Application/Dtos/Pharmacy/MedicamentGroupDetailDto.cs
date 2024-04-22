@@ -11,7 +11,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long Id { get; set; }
         public long? MedicamentGroupId { get; set; }
         public long? MedicamentId { get; set; }
-        public List<long>? ActiveComponentId { get; set; }
+        public List<long>? ActiveComponentId { get; set; } = [];
         public long? SignaId { get; set; }
         public long? RegimentOfUseId { get; set; }
         public bool? AllowSubtitation { get; set; } = false;
@@ -29,5 +29,8 @@ namespace McDermott.Application.Dtos.Pharmacy
         public string? TotalQty { get; set; }
         public string? MedicaneName { get; set; }
         public string? Comment { get; set; }
+        public string? ActiveComponentName { get; set; }
+
+        public UomDto? RegimentOfUse { get; set; }
     }
 }

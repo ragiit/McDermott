@@ -32,6 +32,7 @@ namespace McDermott.Application.Dtos.Inventory
     public class ProductDetailDto
     {
         public long Id { get; set; }
+        public long? MedicamentId { get; set; }
         public string? Name { get; set; }
         public long? ProductId { get; set; }
         public long? SignaId { get; set; }

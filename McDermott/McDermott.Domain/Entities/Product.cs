@@ -9,6 +9,7 @@ namespace McDermott.Domain.Entities
         public long? ProductCategoryId { get; set; }
         public long? CompanyId { get; set; }
         public long? PurchaseUomId { get; set; }
+        public bool? TraceAbility { get; set; }
         public string? ProductType { get; set; }
         public string? HospitalType { get; set; }
         public string? SalesPrice { get; set; }
