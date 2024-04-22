@@ -46,11 +46,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             var a = await Mediator.Send(new GetMedicamentQuery());
             var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
-            var checkUom = UoMs.Where(x => x.Id == ChekMedicament.UomId).FirstOrDefault();
-            FormMedicamenDetails.Dosage = ChekMedicament.Dosage;
-            FormMedicamenDetails.MedicaneDosage = ChekMedicament.Dosage;
-            FormMedicamenDetails.MedicaneUnitDosage = checkUom.Name;
-            FormMedicamenDetails.TotalQty =  (Int64.Parse(FormMedicamenDetails.Dosage) * Int64.Parse(FormMedicamenDetails.Days)).ToString();
+            var checkUom = UoMs.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
+            FormMedicamenDetails.MedicaneUnitDosage = checkUom?.Name;
+            FormMedicamenDetails.Dosage = ChekMedicament?.Dosage;
+            FormMedicamenDetails.MedicaneDosage = ChekMedicament?.Dosage;
+            FormMedicamenDetails.TotalQty = (Int64.Parse(FormMedicamenDetails.Dosage) * Int64.Parse(FormMedicamenDetails.Days)).ToString();
             if (FormMedicamenDetails.SignaId != null)
             {
                 FormMedicamenDetails.SignaId = ChekMedicament.SignaId;
@@ -58,7 +58,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
             FormMedicamenDetails.RegimentOfUseId = ChekMedicament.UomId;
             FormMedicamenDetails.MedicaneName = product.Name;
-            
+
         }
 
         private bool Checkin
