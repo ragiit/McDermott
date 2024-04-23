@@ -5,6 +5,7 @@ namespace McDermott.Application.Dtos.Inventory
     public class ProductDto : IMapFrom<Product>
     {
         public long Id { get; set; }
+        [Required(ErrorMessage = "Name Must Be Filled In!")]
         public string? Name { get; set; }
         public long? BpjsClasificationId { get; set; }
         public long? UomId { get; set; }
@@ -33,6 +34,7 @@ namespace McDermott.Application.Dtos.Inventory
     {
         public long Id { get; set; }
         public long? MedicamentId { get; set; }
+        [Required(ErrorMessage = "Name Must Be Filled In!")]
         public string? Name { get; set; }
         public long? ProductId { get; set; }
         public long? SignaId { get; set; }
