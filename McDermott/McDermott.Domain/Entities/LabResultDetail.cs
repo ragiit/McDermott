@@ -3,13 +3,19 @@
     public class LabResultDetail : BaseAuditableEntity
     {
         public long GeneralConsultanMedicalSupportId { get; set; }
-        public long? LabTestId { get; set; }
-
+        public string? Parameter { get; set; }
+        public string? NormalRange { get; set; } = string.Empty;
+        public long? LabUomId { get; set; }
         public string? Result { get; set; }
         public string? ResultType { get; set; }
+        public string? Remark { get; set; }
+
+        //[SetToNull]
+        //public LabTestDetail? LabTestDetail { get; set; } = new();
+
 
         [SetToNull]
-        public LabTestDetail? LabTest { get; set; } = new();
+        public LabUom? LabUom { get; set; }
 
         [SetToNull]
         public GeneralConsultanMedicalSupport? GeneralConsultanMedicalSupport { get; set; }

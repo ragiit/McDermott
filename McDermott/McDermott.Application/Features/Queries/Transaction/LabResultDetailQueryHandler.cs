@@ -26,8 +26,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 if (!_cache.TryGetValue(cacheKey, out List<LabResultDetail>? result))
                 {
                     result = await _unitOfWork.Repository<LabResultDetail>().Entities
-                      .Include(x => x.LabTest)
-                      .ThenInclude(x => x.LabUom)
+                      .Include(x => x.LabUom)
                       .Include(x => x.GeneralConsultanMedicalSupport)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);

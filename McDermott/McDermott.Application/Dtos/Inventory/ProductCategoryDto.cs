@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Inventory
+﻿namespace McDermott.Application.Dtos.Inventory
 {
     public class ProductCategoryDto : IMapFrom<ProductCategory>
     {
@@ -12,6 +6,7 @@ namespace McDermott.Application.Dtos.Inventory
 
         [Required]
         public string Name { get; set; } = string.Empty;
+        public string Code { get; set; } = string.Empty;
 
         public string? CostingMethod { get; set; }
         public string? InventoryValuation { get; set; }
