@@ -59,7 +59,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
-                        @if (!showForm)
+                        @if (!showForm && !StockProductView)
                         {
                             <div class="card">
                                 <div class="card-body">
@@ -118,7 +118,7 @@
                                 </div>
                             </div>
                         }
-                        else
+                        else if (showForm && !StockProductView)
                         {
                             @if (smartButtonShow)
                             {
@@ -152,9 +152,9 @@
                                         <DataAnnotationsValidator />
                                         <DxFormLayout CssClass="mt w-100">
                                             <DxFormLayoutItem Caption="Name" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@FormProductDetails.Name" 
-                                                NullText="Name Product" 
-                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"  ShowValidationIcon="true"></DxTextBox>
+                                                <DxTextBox @bind-Text="@FormProductDetails.Name"
+                                                           NullText="Name Product"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxTextBox>
                                                 <ValidationMessage For="@(()=>FormProductDetails.Name)" />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
@@ -357,6 +357,14 @@
                                             </div>
                                         </DxFormLayout>
                                     </EditForm>
+                                </div>
+                            </div>
+                        }
+                        else if (!showForm && StockProductView)
+                        {
+                            <div class="card">
+                                <div class="card-body">
+
                                 </div>
                             </div>
                         }

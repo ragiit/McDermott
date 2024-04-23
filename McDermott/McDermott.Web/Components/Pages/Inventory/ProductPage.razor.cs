@@ -29,6 +29,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private IGrid? Grid { get; set; }
         private bool smartButtonShow { get; set; } = false;
         private bool showForm { get; set; } = false;
+        private bool StockProductView { get; set; } = false;
         private bool PanelVisible { get; set; } = false;
         private bool showTabs { get; set; } = true;
         private bool Checkins { get; set; } = false;
@@ -282,7 +283,9 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task NewTableStock_Item()
         {
-            NavigationManager.NavigateTo($"/inventory/stock-product/{id}", true);
+            //NavigationManager.NavigateTo($"/inventory/stock-product/{id}", true);
+            var products = SelectedDataItems[0].Adapt<ProductDto>();
+            StockProductView = true;
         }
         private async void onDiscard()
         {
