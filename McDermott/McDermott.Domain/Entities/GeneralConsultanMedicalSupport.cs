@@ -49,6 +49,10 @@
         public bool IsOtherECG { get; set; } = false;
         public string? OtherDesc { get; set; }
         public string? Status { get; set; }
+        public long? LabTestId { get; set; }
+
+        [SetToNull]
+        public LabTest? LabTest { get; set; }
 
         [SetToNull] // Tandai properti yang harus diatur ke null
         public GeneralConsultanService? GeneralConsultanService { get; set; }

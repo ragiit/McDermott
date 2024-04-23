@@ -44,24 +44,31 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task SelectChangeItem(ProductDto product)
         {
-            var a = await Mediator.Send(new GetMedicamentQuery());
-            var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
-            if (ChekMedicament.UomId != null)
+            try
             {
+                var a = await Mediator.Send(new GetMedicamentQuery());
+                var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
                 var checkUom = UoMs.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
+                FormMedicamenDetails.MedicaneUnitDosage = checkUom?.Name;
+                FormMedicamenDetails.Dosage = ChekMedicament?.Dosage;
+                FormMedicamenDetails.MedicaneDosage = ChekMedicament?.Dosage;
+                if (FormMedicamenDetails.Dosage != null && FormMedicamenDetails.Days != null)
+                {
+                    var totalQty = (Int64.Parse(FormMedicamenDetails?.Dosage) * Int64.Parse(FormMedicamenDetails?.Days));
+                    FormMedicamenDetails.TotalQty = totalQty.ToString();
+                }
+                if (FormMedicamenDetails.SignaId != null)
+                {
+                    FormMedicamenDetails.SignaId = ChekMedicament.SignaId;
+                }
+                selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
+                FormMedicamenDetails.RegimentOfUseId = ChekMedicament.UomId;
+                FormMedicamenDetails.MedicaneName = product.Name;
             }
-            FormMedicamenDetails.MedicaneUnitDosage = checkUom?.Name;
-            FormMedicamenDetails.Dosage = ChekMedicament?.Dosage;
-            FormMedicamenDetails.MedicaneDosage = ChekMedicament?.Dosage;
-            FormMedicamenDetails.TotalQty = (Int64.Parse(FormMedicamenDetails.Dosage) * Int64.Parse(FormMedicamenDetails.Days)).ToString();
-            if (FormMedicamenDetails.SignaId != null)
+            catch (Exception ex)
             {
-                FormMedicamenDetails.SignaId = ChekMedicament.SignaId;
+                ex.HandleException(ToastService);
             }
-            selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
-            FormMedicamenDetails.RegimentOfUseId = ChekMedicament.UomId;
-            FormMedicamenDetails.MedicaneName = product.Name;
-
         }
 
         private bool Checkin

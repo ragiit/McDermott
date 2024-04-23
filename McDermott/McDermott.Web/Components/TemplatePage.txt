@@ -3,7 +3,7 @@
 @page "/patient/insurance-policy"
 @rendermode InteractiveServer
 
-<PageTitle>McDermott - Master Data Insurance Policy</PageTitle>
+<PageTitle>McHealthCare - Master Data Insurance Policy</PageTitle>
 
 @if (IsAccess)
 {

@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240422104025_UpdateFieldProductCategory")]
+    partial class UpdateFieldProductCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1261,9 +1264,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("LabResulLabExaminationtIds")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("LabTestId")
-                        .HasColumnType("bigint");
-
                     b.Property<bool?>("MethamphetaminesNegative")
                         .HasColumnType("bit");
 
@@ -1329,8 +1329,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("GeneralConsultanServiceId");
 
                     b.HasIndex("LabResulLabExaminationtId");
-
-                    b.HasIndex("LabTestId");
 
                     b.HasIndex("PractitionerAlcoholEximinationId");
 
@@ -2094,9 +2092,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long>("GeneralConsultanMedicalSupportId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("LabUomId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("NormalRange")
                         .HasColumnType("nvarchar(max)");
 
@@ -2112,6 +2107,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("ResultType")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Uom")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -2121,8 +2119,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GeneralConsultanMedicalSupportId");
-
-                    b.HasIndex("LabUomId");
 
                     b.ToTable("LabResultDetails");
                 });
@@ -2794,9 +2790,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("Tax")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("TraceAbility")
-                        .HasColumnType("bit");
-
                     b.Property<long?>("UomId")
                         .HasColumnType("bigint");
 
@@ -3157,58 +3150,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Specialities");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.StockProduct", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Batch")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Destinance")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("Expired")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("ProductId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("Qty")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Referency")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Source")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("StatusTransaction")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("StockProducts");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>
@@ -3895,11 +3836,6 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("LabResulLabExaminationtId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.LabTest", "LabTest")
-                        .WithMany()
-                        .HasForeignKey("LabTestId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.User", "PractitionerAlcoholEximination")
                         .WithMany()
                         .HasForeignKey("PractitionerAlcoholEximinationId")
@@ -3928,8 +3864,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("GeneralConsultanService");
 
                     b.Navigation("LabResulLabExaminationt");
-
-                    b.Navigation("LabTest");
 
                     b.Navigation("PractitionerAlcoholEximination");
 
@@ -4139,14 +4073,7 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("McDermott.Domain.Entities.LabUom", "LabUom")
-                        .WithMany()
-                        .HasForeignKey("LabUomId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("GeneralConsultanMedicalSupport");
-
-                    b.Navigation("LabUom");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.LabTest", b =>
@@ -4404,16 +4331,6 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Serviced");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.StockProduct", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>

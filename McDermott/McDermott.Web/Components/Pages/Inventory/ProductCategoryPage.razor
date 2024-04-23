@@ -1,7 +1,7 @@
 ﻿@page "/inventory/product-categories"
 @rendermode InteractiveServer
 
-<PageTitle>McDermott - Master Data Product Category</PageTitle>
+<PageTitle>McHealthCare - Master Data Product Category</PageTitle>
 
 @if (IsAccess)
 {
@@ -85,30 +85,27 @@
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="CostingMethod" Caption="Costing Method" />
-                                            <DxGridDataColumn FieldName="InventoryValuation" Caption="Inventory Valuation" />
+                                            <DxGridDataColumn FieldName="Code" Caption="Code" />
 
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
                                             @{
                                                 var a = (ProductCategoryDto)EditFormContext.EditModel;
-                                                a.CostingMethod = CostingMethod[0];
-                                                a.InventoryValuation = InventoryValiation[0];
                                             }
                                             <DxFormLayout CssClass="w-100">
-                                                <div class="card w-100">
-                                                    <div class="card-body">
-                                                        <div class="w-100">
-                                                            <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
-                                                                <Items>
-                                                                    <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
-                                                                                   IconCssClass="fa-solid fa-notes-medical"
-                                                                                   Text="Products" />
-                                                                </Items>
-                                                            </DxToolbar>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                @*  <div class="card w-100">
+                                            <div class="card-body">
+                                            <div class="w-100">
+                                            <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
+                                            <Items>
+                                            <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
+                                            IconCssClass="fa-solid fa-notes-medical"
+                                            Text="Products" />
+                                            </Items>
+                                            </DxToolbar>
+                                            </div>
+                                            </div>
+                                            </div> *@
 
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@a.Name"
@@ -118,26 +115,13 @@
                                                     <ValidationMessage For="@(()=> a.Name)"   />
                                                 </DxFormLayoutItem>
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Costing Method" ColSpanMd="12">
-                                                    <DxComboBox ShowValidationIcon="true"
-                                                                Data="@CostingMethod"
-                                                                NullText="Select Costing Method..."
-                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="@a.CostingMethod">
-                                                    </DxComboBox>
-                                                    <ValidationMessage For="@(()=> a.CostingMethod)"   />
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Code" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.Code"
+                                                               ShowValidationIcon="true"
+                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                               NullText="Code" />
+                                                    <ValidationMessage For="@(()=> a.Code)"   />
                                                 </DxFormLayoutItem>
-
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Inventory Valiation" ColSpanMd="12">
-                                                    <DxComboBox ShowValidationIcon="true"
-                                                                Data="@InventoryValiation"
-                                                                NullText="Select Inventory Valiation..."
-                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="@a.InventoryValuation">
-                                                    </DxComboBox>
-                                                    <ValidationMessage For="@(()=> a.InventoryValuation)"   />
-                                                </DxFormLayoutItem>
-
                                             </DxFormLayout>
                                         </EditFormTemplate>
                                     </DxGrid>
