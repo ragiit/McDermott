@@ -32,6 +32,8 @@ global using DevExpress.Data.XtraReports.Native;
 
 global using OfficeOpenXml;
 
+global using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
+global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanClinicalAssesmentCommand;
 global using static McDermott.Application.Features.Commands.Bpjs.BpjsClassificationCommand;
 global using static McDermott.Application.Features.Commands.Medical.BuildingLocationCommand;
 global using static McDermott.Application.Features.Commands.Pharmacy.ReorderingRuleCommand;

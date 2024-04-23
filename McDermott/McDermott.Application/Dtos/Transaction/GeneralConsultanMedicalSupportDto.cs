@@ -271,7 +271,9 @@
         public string? OtherExaminationTypeECG { get; set; }
         public string? OtherExaminationRemarkECG { get; set; }
         public string? Status { get; set; } = "Draft";
+        public long? LabTestId { get; set; }
 
+        public LabTestDto? LabTest { get; set; }
         public GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
         public UserDto? PractitionerLabEximination { get; set; }
         public UserDto? PractitionerRadiologyEximination { get; set; }

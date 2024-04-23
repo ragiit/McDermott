@@ -1,7 +1,7 @@
 ﻿@page "/inventory/location"
 @rendermode InteractiveServer
 
-<PageTitle>McDermott - Master Data Location</PageTitle>
+<PageTitle>McHealthCare - Master Data Location</PageTitle>
 
 @if (IsAccess)
 {
@@ -79,20 +79,6 @@
                                                 a.CompanyId = Companies[0].Id;
                                             }
                                             <DxFormLayout CssClass="w-100">
-
-                                                <div class="card w-100">
-                                                    <div class="card-body">
-                                                        <div class="w-100">
-                                                            <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
-                                                                <Items>
-                                                                    <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
-                                                                                   IconCssClass="fa-solid fa-notes-medical"
-                                                                                   Text="Products" />
-                                                                </Items>
-                                                            </DxToolbar>
-                                                        </div>
-                                                    </div>
-                                                </div>
 
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />

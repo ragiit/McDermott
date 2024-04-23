@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240423042329_addedLabTestUomGeneralSupport")]
+    partial class addedLabTestUomGeneralSupport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2794,9 +2797,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("Tax")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("TraceAbility")
-                        .HasColumnType("bit");
-
                     b.Property<long?>("UomId")
                         .HasColumnType("bigint");
 
@@ -3157,58 +3157,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Specialities");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.StockProduct", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Batch")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Destinance")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("Expired")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("ProductId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("Qty")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Referency")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Source")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("StatusTransaction")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("StockProducts");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>
@@ -4404,16 +4352,6 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Serviced");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.StockProduct", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>
