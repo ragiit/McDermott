@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,10 +10,6 @@ namespace McDermott.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_MedicamentGroupDetails_Medicaments_MedicamentId",
-                table: "MedicamentGroupDetails");
-
             migrationBuilder.AddColumn<bool>(
                 name: "TraceAbility",
                 table: "Products",
@@ -52,82 +47,20 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_MedicamentGroupDetails_RegimentOfUseId",
-                table: "MedicamentGroupDetails",
-                column: "RegimentOfUseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MedicamentGroupDetails_SignaId",
-                table: "MedicamentGroupDetails",
-                column: "SignaId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_StockProducts_ProductId",
                 table: "StockProducts",
                 column: "ProductId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_MedicamentGroupDetails_DrugDosages_RegimentOfUseId",
-                table: "MedicamentGroupDetails",
-                column: "RegimentOfUseId",
-                principalTable: "DrugDosages",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_MedicamentGroupDetails_Products_MedicamentId",
-                table: "MedicamentGroupDetails",
-                column: "MedicamentId",
-                principalTable: "Products",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_MedicamentGroupDetails_Signas_SignaId",
-                table: "MedicamentGroupDetails",
-                column: "SignaId",
-                principalTable: "Signas",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_MedicamentGroupDetails_DrugDosages_RegimentOfUseId",
-                table: "MedicamentGroupDetails");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_MedicamentGroupDetails_Products_MedicamentId",
-                table: "MedicamentGroupDetails");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_MedicamentGroupDetails_Signas_SignaId",
-                table: "MedicamentGroupDetails");
-
             migrationBuilder.DropTable(
                 name: "StockProducts");
-
-            migrationBuilder.DropIndex(
-                name: "IX_MedicamentGroupDetails_RegimentOfUseId",
-                table: "MedicamentGroupDetails");
-
-            migrationBuilder.DropIndex(
-                name: "IX_MedicamentGroupDetails_SignaId",
-                table: "MedicamentGroupDetails");
 
             migrationBuilder.DropColumn(
                 name: "TraceAbility",
                 table: "Products");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_MedicamentGroupDetails_Medicaments_MedicamentId",
-                table: "MedicamentGroupDetails",
-                column: "MedicamentId",
-                principalTable: "Medicaments",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
     }
 }
