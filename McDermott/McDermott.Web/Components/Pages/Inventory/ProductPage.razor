@@ -120,36 +120,42 @@
                         }
                         else
                         {
-                            <div class="card-body">
-                                <div class="card">
-                                    <div class="row justify-content-between my-3 mx-3">
-                                         <div class="col-md-3 col-sm-5 col-12 align-self-center">
-                                            <h5 class="fw-bolder ">Action: </h5>
-                                         </div>
-                                    
-                                        <div class="col-md-3 col-sm-5 col-12 ">
-                                            <div class="info-box shadow border">
-                                                <button class="info-box-icon bg-info" style="border:none"><i class="fa-solid fa-boxes-stacked"></i></button>
-
-                                                <div class="info-box-content">
-                                                    <span class="info-box-number"> 40.00 Unit</span>
-                                                    <span class="info-box-text">On Hand</span>
-                                                </div>
-                                                <!-- /.info-box-content -->
+                            @if (smartButtonShow)
+                            {
+                                <div class="card-body">
+                                    <div class="card">
+                                        <div class="row justify-content-between my-3 mx-3">
+                                            <div class="col-md-3 col-sm-5 col-12 align-self-center">
+                                                <h5 class="fw-bolder ">Action: </h5>
                                             </div>
-                                            <!-- /.info-box -->
-                                        </div>
 
+                                            <div class="col-md-3 col-sm-5 col-12 ">
+                                                <div class="info-box shadow border">
+                                                    <button class="info-box-icon bg-info" style="border:none" @onclick="@NewTableStock_Item"><i class="fa-solid fa-boxes-stacked"></i></button>
+
+                                                    <div class="info-box-content">
+                                                        <span class="info-box-number"> 40.00 Unit</span>
+                                                        <span class="info-box-text">On Hand</span>
+                                                    </div>
+                                                    <!-- /.info-box-content -->
+                                                </div>
+                                                <!-- /.info-box -->
+                                            </div>
+
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            }
                             <div class="card">
                                 <div class="card-body">
-                                    <EditForm Model="@FormProductDetails" Context="EditFormContext">
+                                    <EditForm Model="@FormProductDetails" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
                                         <DataAnnotationsValidator />
                                         <DxFormLayout CssClass="mt w-100">
-                                            <DxFormLayoutItem Caption="Name" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@FormProductDetails.Name" NullText="Name Product" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"></DxTextBox>
+                                            <DxFormLayoutItem Caption="Name" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@FormProductDetails.Name" 
+                                                NullText="Name Product" 
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"  ShowValidationIcon="true"></DxTextBox>
+                                                <ValidationMessage For="@(()=>FormProductDetails.Name)" />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                         <hr />
@@ -160,7 +166,7 @@
                                                     <DxTabPage Text="MEDICAMENT" TabIconCssClass="fa-solid fa-pills">
                                                         <DxFormLayout CssClass="mt w-100">
                                                             <div class="col-md-6">
-                                                                <DxFormLayoutItem Caption="Drug Form" CaptionCssClass="mr-1s" ColSpanMd="12">
+                                                                <DxFormLayoutItem Caption="Drug Form" CaptionCssClass="mr-1s normal-caption" ColSpanMd="12">
                                                                     <DxComboBox Data="@DrugForms"
                                                                                 @bind-Value="@FormProductDetails.FormId"
                                                                                 ShowValidationIcon="true"
@@ -170,7 +176,7 @@
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                 FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
                                                                 </DxFormLayoutItem>
-                                                                <DxFormLayoutItem Caption="Route" CaptionCssClass="mr-5s" ColSpanMd="12">
+                                                                <DxFormLayoutItem Caption="Route" CaptionCssClass="mr-5s normal-caption" ColSpanMd="12">
                                                                     <DxComboBox Data="@DrugRoutes"
                                                                                 @bind-Value="@FormProductDetails.RouteId"
                                                                                 ShowValidationIcon="true"
@@ -180,7 +186,7 @@
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                 FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
                                                                 </DxFormLayoutItem>
-                                                                <DxFormLayoutItem Caption="Dosage" CaptionCssClass="mr-4ss" ColSpanMd="12">
+                                                                <DxFormLayoutItem Caption="Dosage" CaptionCssClass="mr-4ss normal-caption" ColSpanMd="12">
                                                                     <Template>
                                                                         <DxGridLayout>
                                                                             <Rows>
@@ -196,7 +202,7 @@
                                                                                         <DxTextBox @bind-Text="@FormProductDetails.Dosage" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="0.00" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
-                                                                                <DxGridLayoutItem Row="0" Column="1" CssClass="ml-2" ColumnSpan="6">
+                                                                                <DxGridLayoutItem Row="0" Column="1" CssClass="ml-2 normal-caption" ColumnSpan="6">
                                                                                     <Template>
                                                                                         <DxComboBox Data="@Uoms"
                                                                                                     @bind-Value="@FormProductDetails.UomMId"
@@ -212,18 +218,18 @@
                                                                         </DxGridLayout>
                                                                     </Template>
                                                                 </DxFormLayoutItem>
-                                                                <DxFormLayoutItem Caption="Chronies" CaptionCssClass="mr-4" ColSpanMd="12">
+                                                                <DxFormLayoutItem Caption="Chronies" CaptionCssClass="mr-4 normal-caption" ColSpanMd="12">
                                                                     <DxCheckBox @bind-Checked="@Checkin" LabelPosition="LabelPosition.Left" CssClass="w-100" />
                                                                 </DxFormLayoutItem>
                                                                 @if (Chronis)
                                                                 {
-                                                                    <DxFormLayoutItem Caption="Montly Max" CaptionCssClass="mr-2" ColSpanMd="12">
+                                                                    <DxFormLayoutItem Caption="Montly Max" CaptionCssClass="mr-2 normal-caption" ColSpanMd="12">
                                                                         <DxTextBox @bind-Text="@FormProductDetails.MontlyMax" NullText="0.00" />
                                                                     </DxFormLayoutItem>
                                                                 }
                                                             </div>
                                                             <div class="col-md-6">
-                                                                <DxFormLayoutItem Caption="Frequency" CaptionCssClass="mr-6" ColSpanMd="12">
+                                                                <DxFormLayoutItem Caption="Frequency" CaptionCssClass="mr-6 normal-caption" ColSpanMd="12">
                                                                     <DxComboBox Data="@Signas"
                                                                                 @bind-Value="@FormProductDetails.SignaId"
                                                                                 TextFieldName="Name"
@@ -233,7 +239,7 @@
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                 FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
                                                                 </DxFormLayoutItem>
-                                                                <DxFormLayoutItem Caption="Active Component" CaptionCssClass="mr-2" ColSpanMd="12">
+                                                                <DxFormLayoutItem Caption="Active Component" CaptionCssClass="mr-2 normal-caption" ColSpanMd="12">
                                                                     <DxTagBox Data="@ActiveComponents"
                                                                               FilteringMode="@DataGridFilteringMode.Contains"
                                                                               @bind-Values="@selectedActiveComponents"
@@ -241,20 +247,20 @@
                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                               TextFieldName="Name" />
                                                                 </DxFormLayoutItem>
-                                                                <DxFormLayoutItem Caption="Pregnancy Warning" CaptionCssClass="mr-1" ColSpanMd="12">
+                                                                <DxFormLayoutItem Caption="Pregnancy Warning" CaptionCssClass="mr-1 normal-caption" ColSpanMd="12">
                                                                     <DxCheckBox @bind-Checked="@FormProductDetails.PregnancyWarning" LabelPosition="LabelPosition.Left" CssClass="w-100" />
                                                                 </DxFormLayoutItem>
                                                             </div>
                                                         </DxFormLayout>
                                                         <DxFormLayout CssClass="mt-1">
-                                                            <DxFormLayoutGroup Caption="Alergy Data" CaptionCssClass="fw-bold">
-                                                                <DxFormLayoutItem ColSpanMd="4" Caption="Pharmacology">
+                                                            <DxFormLayoutGroup Caption="Alergy Data" CaptionCssClass="fw-bold ">
+                                                                <DxFormLayoutItem ColSpanMd="4" Caption="Pharmacology" CaptionCssClass="normal-caption">
                                                                     <DxCheckBox @bind-Checked="@FormProductDetails.Pharmacologi" LabelPosition="LabelPosition.Left" CssClass="w-100" />
                                                                 </DxFormLayoutItem>
-                                                                <DxFormLayoutItem ColSpanMd="4" Caption="Weather">
+                                                                <DxFormLayoutItem ColSpanMd="4" Caption="Weather" CaptionCssClass="normal-caption">
                                                                     <DxCheckBox @bind-Checked="@FormProductDetails.Weather" LabelPosition="LabelPosition.Left" CssClass="w-100" />
                                                                 </DxFormLayoutItem>
-                                                                <DxFormLayoutItem ColSpanMd="4" Caption="Food">
+                                                                <DxFormLayoutItem ColSpanMd="4" Caption="Food" CaptionCssClass="normal-caption">
                                                                     <DxCheckBox @bind-Checked="@FormProductDetails.Food" LabelPosition="LabelPosition.Left" CssClass="w-100" />
                                                                 </DxFormLayoutItem>
                                                             </DxFormLayoutGroup>
@@ -346,7 +352,7 @@
                                         <hr />
                                         <DxFormLayout class="mt">
                                             <div class="col d-flex justify-content-end">
-                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="onDiscard"></DxButton>
                                             </div>
                                         </DxFormLayout>

@@ -12,8 +12,6 @@
 
         #endregion GET
 
-
-
         #region CREATE
 
         public class CreateProductCategoryRequest(ProductCategoryDto ProductCategoryDto) : IRequest<ProductCategoryDto>

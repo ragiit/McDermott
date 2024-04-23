@@ -1,4 +1,7 @@
-﻿using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
@@ -15,7 +18,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<SignaDto> Signas = new();
         private List<ActiveComponentDto> ActiveComponents = [];
         private List<DrugFormDto> FormDrugs = new();
-        private MedicamentGroupDto MGFrom = new();
+        private List<ProductDto> Products = [];
+        private MedicamentGroupDto MGForm = new();
         private MedicamentGroupDetailDto FormMedicamenDetails = new();
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
 
@@ -38,6 +42,35 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedMedicamentGroupDetailDataItems { get; set; } = new ObservableRangeCollection<object>();
 
+        private async Task SelectChangeItem(ProductDto product)
+        {
+            try
+            {
+                var a = await Mediator.Send(new GetMedicamentQuery());
+                var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
+                var checkUom = UoMs.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
+                FormMedicamenDetails.MedicaneUnitDosage = checkUom?.Name;
+                FormMedicamenDetails.Dosage = ChekMedicament?.Dosage;
+                FormMedicamenDetails.MedicaneDosage = ChekMedicament?.Dosage;
+                if (FormMedicamenDetails.Dosage != null && FormMedicamenDetails.Days != null)
+                {
+                    var totalQty = (Int64.Parse(FormMedicamenDetails?.Dosage) * Int64.Parse(FormMedicamenDetails?.Days));
+                    FormMedicamenDetails.TotalQty = totalQty.ToString();
+                }
+                if (FormMedicamenDetails.SignaId != null)
+                {
+                    FormMedicamenDetails.SignaId = ChekMedicament.SignaId;
+                }
+                selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
+                FormMedicamenDetails.RegimentOfUseId = ChekMedicament.UomId;
+                FormMedicamenDetails.MedicaneName = product.Name;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
         private bool Checkin
         {
             get => Checkins;
@@ -48,7 +81,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 if (Checkins)
                 {
                     Concotions = true;
-                    MGFrom.IsConcoction = true;
+                    MGForm.IsConcoction = true;
                 }
                 else
                 {
@@ -124,6 +157,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
             Signas = await Mediator.Send(new GetSignaQuery());
             Phy = [.. user.Where(x => x.IsPhysicion == true)];
+            Products = await Mediator.Send(new GetProductQuery());
             PanelVisible = false;
         }
 
@@ -291,7 +325,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     if (medicamentGroupDetails.Where(x => x.MedicamentId == FormMedicamenGroupDetails.MedicamentId).Any())
                         return;
 
+                    var listActiveComponent = selectedActiveComponents.Select(x => x.Id).ToList();
+                    FormMedicamenGroupDetails.ActiveComponentId?.AddRange(listActiveComponent);
                     medicamentGroupDetails.Add(FormMedicamenGroupDetails);
+                    medicamentGroupDetails.ForEach(x => x.ActiveComponentName = string.Join(",", ActiveComponents.Where(a => x.ActiveComponentId.Contains(a.Id)).Select(a => a.Name).ToList()));
+
                 }
 
                 //if (IsAddMedicament)
