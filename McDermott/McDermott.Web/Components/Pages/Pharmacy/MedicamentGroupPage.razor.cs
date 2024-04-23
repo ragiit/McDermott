@@ -46,7 +46,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             var a = await Mediator.Send(new GetMedicamentQuery());
             var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
-            var checkUom = UoMs.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
+            if (ChekMedicament.UomId != null)
+            {
+                var checkUom = UoMs.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
+            }
             FormMedicamenDetails.MedicaneUnitDosage = checkUom?.Name;
             FormMedicamenDetails.Dosage = ChekMedicament?.Dosage;
             FormMedicamenDetails.MedicaneDosage = ChekMedicament?.Dosage;
