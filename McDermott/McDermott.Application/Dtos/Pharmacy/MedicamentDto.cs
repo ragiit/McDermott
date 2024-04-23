@@ -14,7 +14,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long? SignaId { get; set; }
         public long? RouteId { get; set; }
         public long? FormId { get; set; }
-        public long? UomId { get; set; }
+        public long? UomId { get; set; } = null;
         public List<long>? ActiveComponentId { get; set; } = [];
         public bool? PregnancyWarning { get; set; }
         public bool? Cronies { get; set; }
