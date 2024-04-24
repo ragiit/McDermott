@@ -291,6 +291,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             FormProductDetails.Cost = products.Cost;
             FormProductDetails.ProductCategoryId = products.ProductCategoryId;
             FormProductDetails.InternalReference = products.InternalReference;
+            FormProductDetails.TraceAbility = products.TraceAbility;
             if (products.HospitalType == "Medicament")
             {
                 if (medicamen != null)
@@ -299,7 +300,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormProductDetails.FormId = medicamen.FormId;
                     FormProductDetails.RouteId = medicamen.RouteId;
                     FormProductDetails.Dosage = medicamen.Dosage;
-                    FormProductDetails.UomId = medicamen.UomId;
+                    FormProductDetails.UomMId = medicamen.UomId;
                     FormProductDetails.Cronies = medicamen.Cronies;
                     FormProductDetails.MontlyMax = medicamen.MontlyMax;
                     FormProductDetails.SignaId = medicamen.SignaId;
@@ -431,6 +432,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormProducts.Cost = FormProductDetails.Cost;
                     FormProducts.ProductCategoryId = FormProductDetails.ProductCategoryId;
                     FormProducts.InternalReference = FormProductDetails.InternalReference;
+                    FormProducts.TraceAbility = FormProductDetails.TraceAbility;
 
                     //Medicament
                     FormMedicaments.Id = FormProductDetails.MedicamentId ?? 0;
