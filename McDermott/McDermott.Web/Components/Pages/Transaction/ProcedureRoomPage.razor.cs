@@ -201,6 +201,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             else
                 LabResultDetails[FocusedRowLabTestVisibleIndex] = editModel;
+
+            IsAddOrUpdateOrDeleteLabResult = true;
         }
 
         private void OnResultTextChanged(ChangeEventArgs v)
@@ -350,7 +352,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
 
-                if (IsAddOrUpdateOrDeleteLabResult)
+                if ((GeneralConsultanMedicalSupport.LabTestId is not null && GeneralConsultanMedicalSupport.LabTestId != 0))
                 {
                     await Mediator.Send(new DeleteLabResultDetailRequest(ids: DeletedLabTestIds));
 

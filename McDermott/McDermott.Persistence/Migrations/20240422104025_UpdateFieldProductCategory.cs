@@ -13,7 +13,11 @@ namespace McDermott.Persistence.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_LabResultDetails_LabTestDetails_LabTestId",
                 table: "LabResultDetails");
+<<<<<<< HEAD
           
+=======
+
+>>>>>>> bc1c5433328f07c08b595762cf73bbefd9d5906a
             migrationBuilder.DropIndex(
                 name: "IX_LabResultDetails_LabTestId",
                 table: "LabResultDetails");
@@ -51,14 +55,22 @@ namespace McDermott.Persistence.Migrations
                 name: "Uom",
                 table: "LabResultDetails",
                 type: "nvarchar(max)",
+<<<<<<< HEAD
                 nullable: true);
 
+=======
+                nullable: true);     
+>>>>>>> bc1c5433328f07c08b595762cf73bbefd9d5906a
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
+<<<<<<< HEAD
         {
             
+=======
+        {   
+>>>>>>> bc1c5433328f07c08b595762cf73bbefd9d5906a
             migrationBuilder.DropColumn(
                 name: "Code",
                 table: "ProductCategories");
@@ -96,8 +108,12 @@ namespace McDermott.Persistence.Migrations
                 column: "LabTestId",
                 principalTable: "LabTestDetails",
                 principalColumn: "Id",
+<<<<<<< HEAD
                 onDelete: ReferentialAction.Restrict);
            
+=======
+                onDelete: ReferentialAction.Restrict); 
+>>>>>>> bc1c5433328f07c08b595762cf73bbefd9d5906a
         }
     }
 }

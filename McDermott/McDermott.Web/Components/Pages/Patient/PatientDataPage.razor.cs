@@ -374,10 +374,13 @@
 
                     UserForm.PatientAllergy.UserId = UserForm.Id;
 
-                    if (UserForm.PatientAllergy.Id == 0)
-                        await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
-                    else
-                        await Mediator.Send(new UpdatePatientAllergyRequest(UserForm.PatientAllergy));
+                    if (!string.IsNullOrWhiteSpace(UserForm.PatientAllergy.Farmacology) || !string.IsNullOrWhiteSpace(UserForm.PatientAllergy.Food) || !string.IsNullOrWhiteSpace(UserForm.PatientAllergy.Weather))
+                    {
+                        if (UserForm.PatientAllergy.Id == 0)
+                            await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
+                        else
+                            await Mediator.Send(new UpdatePatientAllergyRequest(UserForm.PatientAllergy));
+                    }
 
                     await Mediator.Send(new DeletePatientFamilyRelationRequest(ids: AllPatientFamilyRelations.Select(x => x.Id).ToList()));
 
@@ -413,10 +416,14 @@
                     await Mediator.Send(new UpdateUserRequest(UserForm));
 
                     UserForm.PatientAllergy.UserId = UserForm.Id;
-                    if (UserForm.PatientAllergy.Id == 0)
-                        await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
-                    else
-                        await Mediator.Send(new UpdatePatientAllergyRequest(UserForm.PatientAllergy));
+
+                    if (!string.IsNullOrWhiteSpace(UserForm.PatientAllergy.Farmacology) || !string.IsNullOrWhiteSpace(UserForm.PatientAllergy.Food) || !string.IsNullOrWhiteSpace(UserForm.PatientAllergy.Weather))
+                    {
+                        if (UserForm.PatientAllergy.Id == 0)
+                            await Mediator.Send(new CreatePatientAllergyRequest(UserForm.PatientAllergy));
+                        else
+                            await Mediator.Send(new UpdatePatientAllergyRequest(UserForm.PatientAllergy));
+                    }
 
                     await Mediator.Send(new DeletePatientFamilyRelationRequest(ids: AllPatientFamilyRelations.Select(x => x.Id).ToList()));
 
