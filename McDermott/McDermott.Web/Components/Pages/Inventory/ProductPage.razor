@@ -98,7 +98,7 @@
                                             <ToolbarTemplate>
                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Products.Count > 0" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItem_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Products.Count > 0" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Products.Count > 0" />
                                                     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
 
@@ -134,7 +134,7 @@
                                                     <DxButton class="info-box-icon bg-info" style="border:none" Click="NewTableStock_Item"><i class="fa-solid fa-boxes-stacked"></i></DxButton>
 
                                                     <div class="info-box-content">
-                                                        <span class="info-box-number"> 40.00 Unit</span>
+                                                        <h3 class="info-box-number"> @TotalQty?.ToString("0.00")</h3>
                                                         <span class="info-box-text">On Hand</span>
                                                     </div>
                                                     <!-- /.info-box-content -->
@@ -405,7 +405,8 @@
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStock_Click" IconCssClass="fa-solid fa-plus" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItemStock_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && StockProducts.Count > 0" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStock_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && StockProducts.Count > 0" />
-
+                                                   <DxToolbarItem BeginGroup="true" Text="Back To Product" Click="Back_Click" IconCssClass="fa-solid fa-arrow-left" />
+                                                   <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshStock_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                 </DxToolbar>
                                             </ToolbarTemplate>
                                             <Columns>
@@ -418,7 +419,7 @@
                                             </Columns>
                                         </DxGrid> 
                                     </DxLoadingPanel>
-                                    <DxPopup Visible="@FormStockPopUp" HeaderText="Add Stock Product" Width="70%">
+                                    <DxPopup Visible="@FormStockPopUp" HeaderText="Add Stock Product" Width="70%" CloseOnOutsideClick="false">
                                         <EditForm Model="@FormStockProduct" Context="EditFormContext">
                                             <DxFormLayout CssClass="mt">
                                                 <DxFormLayoutItem Caption="Location" CaptionCssClass="normal-caption" ColSpanMd="6">
@@ -439,6 +440,7 @@
                                                                 NullText="Select Product..."
                                                                 ShowValidationIcon="true"
                                                                 TextFieldName="Name"
+                                                                ReadOnly
                                                                 ValueFieldName="Id"
                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
                                                     </DxComboBox>
@@ -446,9 +448,10 @@
                                                 <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="normal-caption" ColSpanMd="6">
                                                     <DxComboBox Data="@Uoms"
                                                                 @bind-Value="@FormStockProduct.UomId"
-                                                                NullText="Select Unit of Measdure"
+                                                                NullText="Select Unit of Measure..."
                                                                 ValueFieldName="Id"
                                                                 TextFieldName="Name"
+                                                                ReadOnly
                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                 ShowValidationIcon="true"></DxComboBox>
                                                 </DxFormLayoutItem>
@@ -468,7 +471,7 @@
                                             <DxFormLayout CssClass="mt">
                                                 <div class="col d-flex justify-content-end">
                                                     <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="onSaveStock"></DxButton>
-                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="onDiscard"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="onDiscardStock"></DxButton>
                                                 </div>
                                             </DxFormLayout>
                                         </EditForm>

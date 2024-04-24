@@ -25,6 +25,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private ProductDto FormProducts = new();
         private StockProductDto FormStockProduct = new();
         private MedicamentDto FormMedicaments = new();
+        
 
         #endregion Relation Data
 
@@ -42,6 +43,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool Chronis { get; set; } = false;
         private bool IsLoading { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
+        private long? TotalQty { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsStock { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
@@ -261,11 +263,20 @@ namespace McDermott.Web.Components.Pages.Inventory
             await LoadData();
         }
 
-        private async Task EditItem_Click()
+        private async Task EditItem_Click(ProductDto? p = null)
         {
             showForm = true;
+           
             smartButtonShow = true;
-            var products = SelectedDataItems[0].Adapt<ProductDto>();
+            var products = new ProductDto();
+            if (p == null)
+            {
+               products = SelectedDataItems[0].Adapt<ProductDto>();
+            }
+            else
+            {
+                products = p;
+            }
             var medicamen = Medicaments.FirstOrDefault(z => z.ProductId == products.Id);
             FormProductDetails.Id = products.Id;
             FormProductDetails.Name = products.Name;
@@ -302,12 +313,19 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormProductDetails.Food = medicamen.Food;
                 }
             }
+            var stockIN = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "IN").ToList();
+            var stockOUT = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "OUT").ToList();
+            var countStockIn = stockIN.Sum(x=>x.Qty);
+            var countStockOUT = stockOUT.Sum(x=>x.Qty);
+            TotalQty = countStockIn - countStockOUT;
+            
         }
 
         private async void onDiscard()
         {
             await LoadData();
-        }
+        }  
+       
 
         private void DeleteItem_Click()
         {
@@ -478,7 +496,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         ToastService.ShowSuccess("Successfully Update Data...");
                     }
 
-                    await EditItem_Click();
+                    await EditItem_Click(getProduct);
                 }
                 else
                 {
@@ -488,14 +506,21 @@ namespace McDermott.Web.Components.Pages.Inventory
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
-            }
-
-            await LoadData();
+            }                       
         }
 
         #endregion Save
 
         #region Stock Produk
+        private async void onDiscardStock()
+        {
+            FormStockPopUp = false;
+            await NewTableStock_Item();
+        }
+        private async Task RefreshStock_Click()
+        {
+            await NewTableStock_Item();
+        }
         private async Task NewTableStock_Item()
         {
             try
@@ -503,11 +528,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 showForm = false;
                 PanelVisible = true;
                 StockProductView = true;
-                var products = SelectedDataItems[0].Adapt<ProductDto>();
-                var s = await Mediator.Send(new GetStockProductQuery());
-                StockProducts = [.. s.Where(x => x.ProductId == products.Id).ToList()];
-                NameProduct = products.Name;
-                Products = Products.Where(p => p.Id == products.Id).ToList();
+                var products = SelectedDataItems[0].Adapt<ProductDto>();                
+                StockProducts = [.. StockProducts.Where(x => x.ProductId == products.Id).ToList()];               
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -519,6 +541,10 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             FormStockProduct = new();
             FormStockPopUp = true;
+            var products = SelectedDataItems[0].Adapt<ProductDto>();
+            FormStockProduct.UomId = Products.Where(p => p.Id == products.Id).Select(x => x.UomId).FirstOrDefault();
+            FormStockProduct.ProductId = Products.Where(p => p.Id == products.Id).Select(x => x.Id).FirstOrDefault();
+            NameProduct = products.Name;
         }
         private async Task EditItemStock_Click()
         {
@@ -530,7 +556,10 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             GridStock!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
-
+        private async Task Back_Click()
+        {
+            await LoadData();
+        }
         private async Task onDeleteStock(GridDataItemDeletingEventArgs e)
         {
             try
@@ -561,7 +590,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     return;
                 }
-
+                FormStockProduct.StatusTransaction = "IN";
                 if (FormStockProduct.Id == 0)
                 {
                     await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
