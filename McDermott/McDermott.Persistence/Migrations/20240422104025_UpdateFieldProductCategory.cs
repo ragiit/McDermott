@@ -13,11 +13,7 @@ namespace McDermott.Persistence.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_LabResultDetails_LabTestDetails_LabTestId",
                 table: "LabResultDetails");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_MedicamentGroupDetails_Medicaments_MedicamentId",
-                table: "MedicamentGroupDetails");
-
+          
             migrationBuilder.DropIndex(
                 name: "IX_LabResultDetails_LabTestId",
                 table: "LabResultDetails");
@@ -57,64 +53,12 @@ namespace McDermott.Persistence.Migrations
                 type: "nvarchar(max)",
                 nullable: true);
 
-            migrationBuilder.CreateIndex(
-                name: "IX_MedicamentGroupDetails_RegimentOfUseId",
-                table: "MedicamentGroupDetails",
-                column: "RegimentOfUseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MedicamentGroupDetails_SignaId",
-                table: "MedicamentGroupDetails",
-                column: "SignaId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_MedicamentGroupDetails_DrugDosages_RegimentOfUseId",
-                table: "MedicamentGroupDetails",
-                column: "RegimentOfUseId",
-                principalTable: "DrugDosages",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_MedicamentGroupDetails_Products_MedicamentId",
-                table: "MedicamentGroupDetails",
-                column: "MedicamentId",
-                principalTable: "Products",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_MedicamentGroupDetails_Signas_SignaId",
-                table: "MedicamentGroupDetails",
-                column: "SignaId",
-                principalTable: "Signas",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_MedicamentGroupDetails_DrugDosages_RegimentOfUseId",
-                table: "MedicamentGroupDetails");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_MedicamentGroupDetails_Products_MedicamentId",
-                table: "MedicamentGroupDetails");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_MedicamentGroupDetails_Signas_SignaId",
-                table: "MedicamentGroupDetails");
-
-            migrationBuilder.DropIndex(
-                name: "IX_MedicamentGroupDetails_RegimentOfUseId",
-                table: "MedicamentGroupDetails");
-
-            migrationBuilder.DropIndex(
-                name: "IX_MedicamentGroupDetails_SignaId",
-                table: "MedicamentGroupDetails");
-
+            
             migrationBuilder.DropColumn(
                 name: "Code",
                 table: "ProductCategories");
@@ -153,14 +97,7 @@ namespace McDermott.Persistence.Migrations
                 principalTable: "LabTestDetails",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_MedicamentGroupDetails_Medicaments_MedicamentId",
-                table: "MedicamentGroupDetails",
-                column: "MedicamentId",
-                principalTable: "Medicaments",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+           
         }
     }
 }

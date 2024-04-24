@@ -131,7 +131,7 @@
 
                                             <div class="col-md-3 col-sm-5 col-12 ">
                                                 <div class="info-box shadow border">
-                                                    <button class="info-box-icon bg-info" style="border:none" @onclick="@NewTableStock_Item"><i class="fa-solid fa-boxes-stacked"></i></button>
+                                                    <DxButton class="info-box-icon bg-info" style="border:none" Click="NewTableStock_Item"><i class="fa-solid fa-boxes-stacked"></i></DxButton>
 
                                                     <div class="info-box-content">
                                                         <span class="info-box-number"> 40.00 Unit</span>
@@ -363,8 +363,117 @@
                         else if (!showForm && StockProductView)
                         {
                             <div class="card">
+                                <div class="card-header">
+                                    <h5> Stock Product @NameProduct</h5>
+                                </div>
                                 <div class="card-body">
+                                    <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                    IsContentBlocked="true"
+                                                    ApplyBackgroundShading="true"
+                                                    IndicatorAreaVisible="true"
+                                                    Text="Fetching Data...">
+                                        <DxGrid @ref="GridStock"
+                                                PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                Data="StockProducts"
+                                                PageSize="10"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                KeyFieldName="Id"
+                                                DataItemDeleting="OnDelete"
+                                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                                EditorRenderMode="GridEditorRenderMode.Detached"
+                                                PagerPosition="GridPagerPosition.Bottom"
+                                                AllowSelectRowByClick="true"
+                                                PageSizeSelectorVisible="true"
+                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                PageSizeSelectorAllRowsItemVisible="true"
+                                                PagerSwitchToInputBoxButtonCount="10"
+                                                FocusedRowEnabled="true"
+                                                PagerVisibleNumericButtonCount="10"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                ShowGroupPanel="true"
+                                                AutoExpandAllGroupRows="true"
+                                                CssClass="ch-480"
+                                                ShowFilterRow="true"
+                                                TextWrapEnabled="false"
+                                                CustomizeElement="Grid_CustomizeElement"
+                                                ShowSearchBox="true"
+                                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                                KeyboardNavigationEnabled="true">
+                                            <ToolbarTemplate>
+                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStock_Click" IconCssClass="fa-solid fa-plus" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItemStock_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && StockProducts.Count > 0" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStock_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && StockProducts.Count > 0" />
 
+                                                </DxToolbar>
+                                            </ToolbarTemplate>
+                                            <Columns>
+                                                <DxGridSelectionColumn Width="15px" />
+                                                <DxGridDataColumn FieldName="Source.Name" Caption="Location" SortIndex="0" />
+                                                <DxGridDataColumn FieldName="Product.Name" Caption="Product Name" />
+                                                <DxGridDataColumn FieldName="Qty" Caption="On Hand Qty" />
+                                                <DxGridDataColumn FieldName="Uom.Name" Caption="Unit Of Measure" />
+                                                <DxGridDataColumn FieldName="Expired" Caption="Expired Date" />
+                                            </Columns>
+                                        </DxGrid>
+                                    </DxLoadingPanel>
+                                    <DxPopup Visible="@FormStockPopUp" HeaderText="Add Stock Product" Width="70%">
+                                        <EditForm Model="@FormStockProduct" Context="EditFormContext">
+                                            <DxFormLayout CssClass="mt">
+                                                <DxFormLayoutItem Caption="Location" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                    <DxComboBox Data="Locations" @bind-Value="@FormStockProduct.SourceId"
+                                                                NullText="Select Location Source.."
+                                                                ShowValidationIcon="true"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                    </DxComboBox>
+                                                    
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption=" On Hand Qty" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                    <DxSpinEdit @bind-Value="@FormStockProduct.Qty" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Product" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                    <DxComboBox Data="Products" @bind-Value="@FormStockProduct.ProductId"
+                                                                NullText="Select Product..."
+                                                                ShowValidationIcon="true"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                    </DxComboBox>
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                    <DxComboBox Data="@Uoms"
+                                                                @bind-Value="@FormStockProduct.UomId"
+                                                                NullText="Select Unit of Measdure"
+                                                                ValueFieldName="Id"
+                                                                TextFieldName="Name"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                ShowValidationIcon="true"></DxComboBox>
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                    <DxDateEdit @bind-Date="FormStockProduct.Expired"
+                                                               
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                ShowValidationIcon="true"></DxDateEdit>
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Reference" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                    <DxMemo @bind-Text="@FormStockProduct.Referency"
+                                                            NullText="Reference.."
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                            ShowValidationIcon="true"></DxMemo>
+                                                </DxFormLayoutItem>
+                                            </DxFormLayout>
+                                            <hr/>
+                                            <DxFormLayout CssClass="mt">
+                                                <div class="col d-flex justify-content-end">
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="onSaveStock"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="onDiscard"></DxButton>
+                                                </div>
+                                            </DxFormLayout>
+                                        </EditForm>
+                                    </DxPopup>
                                 </div>
                             </div>
                         }

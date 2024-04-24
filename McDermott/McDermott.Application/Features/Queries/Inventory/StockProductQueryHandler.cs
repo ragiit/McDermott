@@ -29,6 +29,10 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (!_cache.TryGetValue(cacheKey, out List<StockProduct>? result))
                 {
                     result = await _unitOfWork.Repository<StockProduct>().Entities
+                        .Include(x=>x.Product)
+                        .Include(x=>x.Source)
+                        .Include(x=>x.Destinance)
+                        .Include(x=>x.Uom)
                        .AsNoTracking()
                        .ToListAsync(cancellationToken);
 
