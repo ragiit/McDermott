@@ -364,7 +364,7 @@
                         {
                             <div class="card">
                                 <div class="card-header">
-                                    <h5> Stock Product @NameProduct</h5>
+                                     <h5> Stock Product @NameProduct</h5> 
                                 </div>
                                 <div class="card-body">
                                     <DxLoadingPanel @bind-Visible="PanelVisible"
@@ -372,14 +372,14 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="true"
                                                     Text="Fetching Data...">
-                                        <DxGrid @ref="GridStock"
+                                         <DxGrid @ref="GridStock"
                                                 PagerNavigationMode="PagerNavigationMode.InputBox"
                                                 Data="StockProducts"
                                                 PageSize="10"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                @bind-SelectedDataItems="@SelectedDataItemsStock"
                                                 FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                                 KeyFieldName="Id"
-                                                DataItemDeleting="OnDelete"
+                                                DataItemDeleting="onDeleteStock"
                                                 CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                 EditorRenderMode="GridEditorRenderMode.Detached"
                                                 PagerPosition="GridPagerPosition.Bottom"
@@ -410,13 +410,13 @@
                                             </ToolbarTemplate>
                                             <Columns>
                                                 <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn FieldName="Source.Name" Caption="Location" SortIndex="0" />
-                                                <DxGridDataColumn FieldName="Product.Name" Caption="Product Name" />
+                                                 <DxGridDataColumn FieldName="Source.Name" Caption="Location" SortIndex="0" /> 
+                                                 <DxGridDataColumn FieldName="Product.Name" Caption="Product Name" /> 
                                                 <DxGridDataColumn FieldName="Qty" Caption="On Hand Qty" />
-                                                <DxGridDataColumn FieldName="Uom.Name" Caption="Unit Of Measure" />
+                                                 <DxGridDataColumn FieldName="Uom.Name" Caption="Unit Of Measure" /> 
                                                 <DxGridDataColumn FieldName="Expired" Caption="Expired Date" />
                                             </Columns>
-                                        </DxGrid>
+                                        </DxGrid> 
                                     </DxLoadingPanel>
                                     <DxPopup Visible="@FormStockPopUp" HeaderText="Add Stock Product" Width="70%">
                                         <EditForm Model="@FormStockProduct" Context="EditFormContext">
@@ -432,7 +432,7 @@
                                                     
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem Caption=" On Hand Qty" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                    <DxSpinEdit @bind-Value="@FormStockProduct.Qty" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
+                                                    <DxSpinEdit @bind-Value="@FormStockProduct.Qty" NullText="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem Caption="Product" CaptionCssClass="normal-caption" ColSpanMd="6">
                                                     <DxComboBox Data="Products" @bind-Value="@FormStockProduct.ProductId"
@@ -453,8 +453,7 @@
                                                                 ShowValidationIcon="true"></DxComboBox>
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                    <DxDateEdit @bind-Date="FormStockProduct.Expired"
-                                                               
+                                                    <DxDateEdit @bind-Date="FormStockProduct.Expired"                                                               
                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                 ShowValidationIcon="true"></DxDateEdit>
                                                 </DxFormLayoutItem>

@@ -43,6 +43,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool IsLoading { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataItemsStock { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         private bool? FormValidationState { get; set; }
         private string? NameProduct { get; set; }
@@ -343,7 +344,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ExportSelectedRowsOnly = true,
             });
         }
-
+        #endregion
+        #region Delete Product
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -357,7 +359,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     {
                         await Mediator.Send(new DeleteMedicamentRequest(idProduct.Id));
                     }
-                    await Mediator.Send(new DeleteProductCategoryRequest(((ProductDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteProductRequest(((ProductDto)e.DataItem).Id));
                 }
                 else
                 {
@@ -496,23 +498,58 @@ namespace McDermott.Web.Components.Pages.Inventory
         #region Stock Produk
         private async Task NewTableStock_Item()
         {
-            showForm = false;
-            StockProductView = true;
-            PanelVisible = true;
-            var products = SelectedDataItems[0].Adapt<ProductDto>();
-            StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == products.Id));
-            NameProduct = products.Name;
-            Products = Products.Where(p => p.Id == products.Id).ToList();
-            PanelVisible = false;
+            try
+            {
+                showForm = false;
+                PanelVisible = true;
+                StockProductView = true;
+                var products = SelectedDataItems[0].Adapt<ProductDto>();
+                var s = await Mediator.Send(new GetStockProductQuery());
+                StockProducts = [.. s.Where(x => x.ProductId == products.Id).ToList()];
+                NameProduct = products.Name;
+                Products = Products.Where(p => p.Id == products.Id).ToList();
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
         private async Task NewItemStock_Click()
         {
+            FormStockProduct = new();
             FormStockPopUp = true;
         }
-        private async Task EditItemStock_Click() { }
+        private async Task EditItemStock_Click()
+        {
+            FormStockPopUp = true;
+            var DataEdit = SelectedDataItemsStock[0].Adapt<StockProductDto>();
+            FormStockProduct = DataEdit;
+        }
         private void DeleteItemStock_Click()
         {
             GridStock!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        private async Task onDeleteStock(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                var stocks = (StockProductDto)e.DataItem;
+                if (SelectedDataItemsStock is null)
+                {
+                    await Mediator.Send(new DeleteStockProductRequest(((StockProductDto)e.DataItem).Id));
+                }
+                else
+                {
+                    await Mediator.Send(new DeleteStockProductRequest(ids: SelectedDataItemsStock.Adapt<List<StockProductDto>>().Select(x => x.Id).ToList()));
+                }
+                await NewTableStock_Item();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task onSaveStock()
@@ -520,7 +557,26 @@ namespace McDermott.Web.Components.Pages.Inventory
             try
             {
                 var a = FormStockProduct;
-            }catch (Exception ex)
+                if (FormStockProduct.SourceId is null)
+                {
+                    return;
+                }
+
+                if (FormStockProduct.Id == 0)
+                {
+                    await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
+                    ToastService.ShowSuccess("Success Add Data Stock..");
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateStockProductRequest(FormStockProduct));
+                    ToastService.ShowSuccess("Success Update Data Stock..");
+                }
+                FormStockPopUp = false;
+                await NewTableStock_Item();
+
+            }
+            catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }

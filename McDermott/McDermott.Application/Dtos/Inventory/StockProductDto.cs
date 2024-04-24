@@ -13,7 +13,7 @@ namespace McDermott.Application.Dtos.Inventory
         public long? ProductId { get; set; }
         public long? Qty { get; set; }
         public long? UomId { get; set; }
-        public DateTime? Expired { get; set; }
+        public DateTime? Expired { get; set; } = DateTime.Now;
         public long? SourceId { get; set; }
         public long? DestinanceId { get; set; }
         public string? Batch { get; set; }
