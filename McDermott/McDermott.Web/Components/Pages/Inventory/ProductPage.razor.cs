@@ -184,7 +184,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                     Id = group.Key,
                     Name = group.FirstOrDefault()?.Name, // Use FirstOrDefault() for safer handling
                     SalesPrice = group.FirstOrDefault()?.SalesPrice,
-                    InternalReference = group.FirstOrDefault()?.InternalReference,                    
+                    InternalReference = group.FirstOrDefault()?.InternalReference,
+                    UomId = group.FirstOrDefault()?.UomId,
+                    PurchaseUomId = group.FirstOrDefault()?.PurchaseUomId,
+                    HospitalType=group.FirstOrDefault().HospitalType,
+                    ProductType=group.FirstOrDefault()?.ProductType,
                     UomName = group.FirstOrDefault()?.Uom.Name
                 }).ToList();
 
@@ -348,7 +352,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             
         }
 
-        private async void onDiscard()
+        private async Task onDiscard()
         {
             await LoadData();
         }  
