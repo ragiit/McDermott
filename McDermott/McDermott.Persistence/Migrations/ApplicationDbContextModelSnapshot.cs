@@ -851,12 +851,18 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<float>("Days")
+                        .HasColumnType("real");
+
                     b.Property<long?>("DrugRouteId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Frequency")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("TotalQtyPerDay")
+                        .HasColumnType("real");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -3177,8 +3183,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Destinance")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long?>("DestinanceId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime?>("Expired")
                         .HasColumnType("datetime2");
@@ -3192,8 +3198,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("Referency")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Source")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long?>("SourceId")
+                        .HasColumnType("bigint");
 
                     b.Property<bool?>("StatusTransaction")
                         .HasColumnType("bit");
@@ -3206,7 +3212,11 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DestinanceId");
+
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("SourceId");
 
                     b.ToTable("StockProducts");
                 });
@@ -4408,12 +4418,26 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.StockProduct", b =>
                 {
+                    b.HasOne("McDermott.Domain.Entities.Location", "Destinance")
+                        .WithMany()
+                        .HasForeignKey("DestinanceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("McDermott.Domain.Entities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("McDermott.Domain.Entities.Location", "Source")
+                        .WithMany()
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Destinance");
+
                     b.Navigation("Product");
+
+                    b.Navigation("Source");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>
