@@ -30,6 +30,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 {
                     result = await _unitOfWork.Repository<Product>().Entities
                       .Include(x=>x.Medicaments)
+                      .Include(x=>x.StockProduct)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 

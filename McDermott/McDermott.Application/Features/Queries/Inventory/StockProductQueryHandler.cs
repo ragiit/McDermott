@@ -30,6 +30,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 {
                     result = await _unitOfWork.Repository<StockProduct>().Entities
                         .Include(x=>x.Product)
+                        .Include(x=>x.Product.Uom)
                         .Include(x=>x.Source)
                         .Include(x=>x.Destinance)
                         .Include(x=>x.Uom)

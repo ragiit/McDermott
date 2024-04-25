@@ -19,6 +19,7 @@ namespace McDermott.Application.Dtos.Inventory
         public string? Tax { get; set; }
         public string? Cost { get; set; }
         public string? InternalReference { get; set; }
+        public long? TotalQty { get; set; }
 
 
         [SetToNull]
@@ -29,6 +30,9 @@ namespace McDermott.Application.Dtos.Inventory
         public virtual ProductCategoryDto? ProductCategory { get; set; }
         [SetToNull]
         public virtual CompanyDto? Company { get; set; }
+
+        [SetToNull]
+        public StockProductDto? StockProducts { get; set; }
     }
 
     public class ProductDetailDto
