@@ -1,0 +1,88 @@
+﻿@page "/inventory/reporting -inventory"
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Reporting Inventory</PageTitle>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Reporting Inventory</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
+                    <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/inventory/reporting-inventory">Reporting Inventory</a></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h4 class="text-center"> Reporting Inventory</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row justify-content-center">
+                            <div class="col-md-7">
+                                <DxFormLayout CssClass="mt">
+                                    <DxFormLayoutItem Caption="Type Report" ColSpanMd=" 12">
+                                        <DxComboBox Data="@ListReport"
+                                                    @bind-Value="@FormReports.report"
+                                                    NullText="Select Report..."
+                                                    SelectedItemChanged="@((string reports)=> selectedReport(reports))"
+                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                    FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
+                                    </DxFormLayoutItem>
+                                </DxFormLayout>
+                            </div>
+                        </div>
+                        @if (showForm)
+                        {
+                            <hr />
+                            <div class="row justify-content-center">
+                                <div class="col-md-8">
+
+                                    @if (!FormReports.report.Equals(ListReport[8]))
+                                    {
+                                        <div class="row">
+                                            <div class="col-md">
+                                                <DxFormLayout CssClass="mt-1">
+                                                    <DxFormLayoutItem Caption="Start Date" ColSpanMd="12">
+                                                        <DxDateEdit @bind-Date="@FormReports.StartDate"
+                                                                    CssClass="cw-320"
+                                                                    InputId="deOverview" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <DxFormLayout CssClass="mt-1">
+                                                    <DxFormLayoutItem Caption="End Date" ColSpanMd="12">
+                                                        <DxDateEdit @bind-Date="@FormReports.EndDate"
+                                                                    CssClass="cw-320"
+                                                                    InputId="deOverview" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div class="row justify-content-end">
+                                        <div class=" col-md-4 ">
+                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-file-arrow-down" Text="Download" Click="Download"></DxButton>
+                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Text="Cancel"></DxButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
