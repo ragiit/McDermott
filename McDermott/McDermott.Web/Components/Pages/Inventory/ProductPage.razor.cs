@@ -184,8 +184,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     Id = group.Key,
                     Name = group.FirstOrDefault()?.Name, // Use FirstOrDefault() for safer handling
                     SalesPrice = group.FirstOrDefault()?.SalesPrice,
-                    InternalReference = group.FirstOrDefault()?.InternalReference,
-                    
+                    InternalReference = group.FirstOrDefault()?.InternalReference,                    
                     UomName = group.FirstOrDefault()?.Uom.Name
                 }).ToList();
 
@@ -202,7 +201,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 Locations = await Mediator.Send(new GetLocationQuery());
 
                 //StockProduct
-                
+                StockProducts = await Mediator.Send(new GetStockProductQuery());
                 foreach (var sp in Products)
                 {
                     var stockIN = StockProducts.Where(s => s.ProductId == sp.Id && s.StatusTransaction == "IN").ToList();
@@ -337,6 +336,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormProductDetails.Food = medicamen.Food;
                 }
             }
+
             var stockIN = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "IN").ToList();
             var stockOUT = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "OUT").ToList();
             var countStockIn = stockIN.Sum(x=>x.Qty);
