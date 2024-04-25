@@ -227,7 +227,7 @@
         {
             PanelVisible = true;
 
-            Users2 = await Mediator.Send(new GetUserPatientQuery());
+            Users2 = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
 
             PanelVisible = false;
         }
@@ -278,7 +278,8 @@
         {
             if (UserForm.Id != 0)
             {
-                InsurancePoliciesCount = await Mediator.Send(new GetInsurancePolicyCountQuery(x => x.UserId == UserForm.Id));
+                var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
+                InsurancePoliciesCount = count.Count;
             }
         }
 
@@ -553,7 +554,8 @@
                 PatientFamilyRelations = await Mediator.Send(new GetPatientFamilyByPatientQuery(x => x.PatientId == UserForm.Id));
                 AllPatientFamilyRelations = [.. PatientFamilyRelations];
                 //InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
-                InsurancePoliciesCount = await Mediator.Send(new GetInsurancePolicyCountQuery(x => x.UserId == UserForm.Id));
+                var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
+                InsurancePoliciesCount = count.Count;
                 var alergy = await Mediator.Send(new GetPatientAllergyQuery(x => x.UserId == UserForm.Id));
                 if (alergy.Count == 0)
                 {

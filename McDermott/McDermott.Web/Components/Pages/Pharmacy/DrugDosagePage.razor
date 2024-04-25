@@ -44,6 +44,7 @@
                                             FocusedRowChanged="Grid_FocusedRowChanged"
                                             ShowGroupPanel="true"
                                             AutoExpandAllGroupRows="true"
+                                            PopupEditFormHeaderText="@(IsAddForm ? "Add Drug Dosage" : "Edit Drug Dosage")"
                                             CssClass="ch-480"
                                             ShowFilterRow="true"
                                             TextWrapEnabled="false"
@@ -70,8 +71,10 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Frequency" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="DrugRoute.Route" Caption="Route" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Frequency" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="DrugRoute.Route" Caption="Route" />
+                                            <DxGridDataColumn MinWidth="100" FieldName="TotalQtyPerDay" Caption="Total Qty Per Day" />
+                                            <DxGridDataColumn MinWidth="100" FieldName="Days" Caption="Days" />
 
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
@@ -98,6 +101,22 @@
                                                                 ValueFieldName="Id">
                                                     </DxComboBox>
                                                     <ValidationMessage For="@(()=>a.DrugRouteId)" />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Total Qty Per Day" ColSpanMd="12">
+                                                    <DxSpinEdit @bind-Value="@a.TotalQtyPerDay"
+                                                                NullText="Total Qty Per Day..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                BindValueMode="BindValueMode.OnInput" />
+                                                    <ValidationMessage For="@(()=> a.TotalQtyPerDay)"   />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Days" ColSpanMd="12">
+                                                    <DxSpinEdit @bind-Value="@a.Days"
+                                                                NullText="Days..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                BindValueMode="BindValueMode.OnInput" />
+                                                    <ValidationMessage For="@(()=> a.Days)"   />
                                                 </DxFormLayoutItem>
 
                                             </DxFormLayout>

@@ -81,15 +81,15 @@
                                                 </DxToolbar>
                                             </ToolbarTemplate>
                                                     <Columns>
-                                                        <DxGridSelectionColumn Width="15px" />
+                                                        <DxGridSelectionColumn Width="15px"/>
                                                         <DxGridDataColumn MinWidth="200" FieldName="RegistrationDate" DisplayFormat="ddd, dd MMM yyyy" Caption="Registration Date"/>
                                                         <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
                                                         <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
-                                                        <DxGridDataColumn MinWidth="200" FieldName="StagingStatus" Caption="Status" />
+                                                        <DxGridDataColumn MinWidth="200" FieldName="StagingStatus" Caption="Status"/>
+                                                        <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service"/>
                                                         <DxGridDataColumn MinWidth="200" FieldName="Payment" Caption="Payment Methode" />
-                                                        <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
                                                         <DxGridDataColumn MinWidth="200" FieldName="AppoimentDate" Caption="Appoiment" />
-                                                        <DxGridDataColumn MinWidth="200" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
+                                                        <DxGridDataColumn Width="100px" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
                                                             <CellDisplayTemplate>
                                                         @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
                                                             </CellDisplayTemplate>
@@ -1460,7 +1460,6 @@ else
             </DxGrid>
         </DxLoadingPanel>
 </DxPopup>
-
 <DxPopup HeaderText="Follow Up" @bind-Visible="@PopUpAppoiment" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Closed="CloseAppoimentPopUp" Width="90%">
     <EditForm Model="@FormRegis" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
         <DataAnnotationsValidator />
@@ -1555,7 +1554,7 @@ else
                                         </DxComboBox>
                                         <ValidationMessage For="@(() => FormRegis.ServiceId)" />
                                     </DxFormLayoutItem>
-                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Physicion" ColSpanMd="12">
+                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Physicion" ColSpanMd="12">
                                         <DxComboBox ShowValidationIcon="true" Data="@IsPratition"
                                                     NullText="Select Physicion..."
                                                     @bind-Value="@FormRegis.PratitionerId"
@@ -1566,7 +1565,7 @@ else
                                         </DxComboBox>
                                         <ValidationMessage For="@(() => FormRegis.PratitionerId)" />
                                     </DxFormLayoutItem>
-                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Payment Methode" ColSpanMd="12">
+                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Payment Methode" ColSpanMd="12">
                                         <DxComboBox ShowValidationIcon="true" Data="@Payments"
                                                     NullText="Payment Method.."
                                                     SelectedItemChanged="@((string e) => SelectedItemPaymentChanged(e))"
@@ -1587,7 +1586,7 @@ else
                                                 <ValidationMessage For="@(() => FormRegis.InsurancePolicyId)" />
                                             </DxFormLayoutItem>
                                 }
-                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up Date" ColSpanMd="12">
+                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Follow Up Date" ColSpanMd="12">
                                        <DxDateEdit
                                                 DateChanged="@((DateTime e) => SelectedItemRegistrationDateChanged(e))"
                                                 Date="@FormRegis.RegistrationDate"
@@ -1596,12 +1595,12 @@ else
                                                 NullText="Select Registration Date">
                                         </DxDateEdit>
                                     </DxFormLayoutItem>
-                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Schedule Time" ColSpanMd="12">
+                                   @* <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Schedule Time" ColSpanMd="12">
                                         <DxComboBox ShowValidationIcon="true" Data="@Times"
                                                     NullText="Select Time.."
                                                     @bind-Value="@FormRegis.AppoimentDate"/>
                                             <ValidationMessage For="@(() => FormRegis.AppoimentDate)" />
-                                    </DxFormLayoutItem>
+                                    </DxFormLayoutItem> *@
                                      <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
                                        <DxDateEdit
                                                 Enabled="false"
@@ -1627,8 +1626,9 @@ else
     </EditForm>
 </DxPopup>
 
-<DxPopup HeaderText="Procedure Room" @bind-Visible="@PopUpProcedureRoom" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
-       <div class="row justify-content-end mb-3">
+<DxPopup HeaderText="Procedure Room" @bind-Visible="@PopUpProcedureRoom" HeaderCssClass="fw-bold" HorizontalAlignment="@HorizontalAlignment.Center"
+         VerticalAlignment="@VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
+      @*  <div class="row justify-content-end mb-3">
             <div class="col-auto align-self-end">
                 <DxTabs>
                     <DxTab Text="Draft" Enabled="@(GeneralConsultanMedicalSupport.Status == "Draft")"></DxTab>
@@ -1636,14 +1636,14 @@ else
                     <DxTab Text="Finish" Enabled="@(GeneralConsultanMedicalSupport.Status == "Finish")"></DxTab>
                 </DxTabs>
             </div>
-        </div>
+        </div> *@
     <EditForm Model="@GeneralConsultanMedicalSupport" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
         <DataAnnotationsValidator />
-        <DxFormLayout>
+        <DxFormLayout CssClass="w-100">
             <DxFormLayoutGroup ColSpanMd="12" Caption="Lab Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                 <Items>
 
-                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
+                    <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Practitioner" ColSpanMd="12">
                         <DxComboBox ShowValidationIcon="true" Data="@AllDoctors.Where(x => x.IsPhysicion == true)"
                                     NullText="Select Practitioner..."
                                     @bind-Value="@GeneralConsultanMedicalSupport.PractitionerLabEximinationId"
@@ -1820,13 +1820,13 @@ else
                                 ShowSearchBox="true"
                                 KeyboardNavigationEnabled="true">
                             <Columns>
-                                <DxGridDataColumn MinWidth="200" FieldName="Parameter" Caption="Parameter" SortIndex="0" />
-                                <DxGridDataColumn MinWidth="200" FieldName="NormalRange" Caption="Normal Range" />
-                                <DxGridDataColumn MinWidth="200" FieldName="LabUom.Name" Caption="UoM" />
-                                <DxGridDataColumn MinWidth="200" FieldName="Result" Caption="Result" />
-                                <DxGridDataColumn MinWidth="200" FieldName="ResultType" Caption="Result Type" />
-                                <DxGridDataColumn MinWidth="200" FieldName="Remark" Caption="Remark" />
-                                <DxGridCommandColumn MinWidth="100">
+                                <DxGridDataColumn FieldName="Parameter" Caption="Parameter" SortIndex="0" />
+                                <DxGridDataColumn FieldName="NormalRange" Caption="Normal Range" />
+                                <DxGridDataColumn FieldName="LabUom.Name" Caption="UoM" />
+                                <DxGridDataColumn FieldName="Result" Caption="Result" />
+                                <DxGridDataColumn FieldName="ResultType" Caption="Result Type" />
+                                <DxGridDataColumn FieldName="Remark" Caption="Remark" />
+                                <DxGridCommandColumn MinWidth="100" FixedPosition="GridColumnFixedPosition.Right">
                                     <HeaderTemplate>
                                         <a class="fa-solid fa-plus" @onclick="@(async () => await AddNewLabResult())" style="text-decoration: none;" href="javascript:void(0);"></a>
                                     </HeaderTemplate>
@@ -1860,10 +1860,26 @@ else
                                         <ValidationMessage For="@(()=> LabResultDetail.LabUomId)"   />
                                     </DxFormLayoutItem>
 
-                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result" ColSpanMd="12">
-                                        <DxTextBox InputDelay="1000" @oninput="OnResultTextChanged" ShowValidationIcon="true" @bind-Text="@LabResultDetail.Result" NullText="Result" InputCssClass="fw-normal" />
-                                        <ValidationMessage For="@(() => LabResultDetail.Result)" />
-                                    </DxFormLayoutItem>
+                                   @{
+                                                                                    var showResult = true;
+
+                                                                                    ResultValueTypes = ["Low", "Normal", "High"];
+
+                                                                                    if (LabResultDetail.ResultValueType is not null && LabResultDetail.ResultValueType.Equals("Qualitative"))
+                                                                                    {
+                                                                                        showResult = false;
+                                                                                        ResultValueTypes = ["Positive", "Negative"];
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        showResult = true;
+                                                                                    }
+                                                                                }
+
+                                                                                <DxFormLayoutItem Visible="showResult" CaptionCssClass="normal-caption" Caption="Result" ColSpanMd="12">
+                                                                                    <DxTextBox InputDelay="1000" @oninput="OnResultTextChanged" ShowValidationIcon="true" @bind-Text="@LabResultDetail.Result" NullText="Result" InputCssClass="fw-normal" />
+                                                                                    <ValidationMessage For="@(() => LabResultDetail.Result)" />
+                                                                                </DxFormLayoutItem>
 
                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result Type" ColSpanMd="12">
                                         <DxComboBox ShowValidationIcon="true"
@@ -1891,7 +1907,7 @@ else
 
             <DxFormLayoutGroup ColSpanMd="12" Caption="Radiology Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                 <Items>
-                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
+                    <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Practitioner" ColSpanMd="12">
                         <DxComboBox ShowValidationIcon="true" Data="@AllDoctors.Where(x => x.IsPhysicion == true)"
                                     NullText="Select Practitioner..."
                                     @bind-Value="@GeneralConsultanMedicalSupport.PractitionerRadiologyEximinationId"
@@ -1921,7 +1937,7 @@ else
 
             <DxFormLayoutGroup ColSpanMd="12" Caption="Alcohol Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                 <Items>
-                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
+                     <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Practitioner" ColSpanMd="12">
                         <DxComboBox ShowValidationIcon="true" Data="@AllDoctors.Where(x => x.IsPhysicion == true)"
                                     NullText="Select Practitioner..."
                                     @bind-Value="@GeneralConsultanMedicalSupport.PractitionerAlcoholEximinationId"

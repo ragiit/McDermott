@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240424033423_AddedTotalQtyAndDaysRegimenOfUse")]
+    partial class AddedTotalQtyAndDaysRegimenOfUse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2118,9 +2121,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("ResultType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ResultValueType")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -3201,17 +3201,11 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("Referency")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SerialNumber")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<long?>("SourceId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("StatusTransaction")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("UomId")
-                        .HasColumnType("bigint");
+                    b.Property<bool?>("StatusTransaction")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -3223,13 +3217,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("DestinanceId");
 
-                    b.HasIndex("ProductId")
-                        .IsUnique()
-                        .HasFilter("[ProductId] IS NOT NULL");
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("SourceId");
-
-                    b.HasIndex("UomId");
 
                     b.ToTable("StockProducts");
                 });
@@ -3919,9 +3909,9 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.LabTest", "LabTest")
-                        .WithMany("GeneralConsultanMedicalSupports")
+                        .WithMany()
                         .HasForeignKey("LabTestId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.User", "PractitionerAlcoholEximination")
                         .WithMany()
@@ -4319,9 +4309,9 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.PatientAllergy", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.User", "User")
-                        .WithMany("PatientAllergies")
+                        .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -4437,8 +4427,8 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.Product", "Product")
-                        .WithOne("StockProduct")
-                        .HasForeignKey("McDermott.Domain.Entities.StockProduct", "ProductId")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.Location", "Source")
@@ -4446,18 +4436,11 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("SourceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.Uom", "Uom")
-                        .WithMany()
-                        .HasForeignKey("UomId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Destinance");
 
                     b.Navigation("Product");
 
                     b.Navigation("Source");
-
-                    b.Navigation("Uom");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>
@@ -4708,8 +4691,6 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.LabTest", b =>
                 {
-                    b.Navigation("GeneralConsultanMedicalSupports");
-
                     b.Navigation("LabTestDetails");
                 });
 
@@ -4733,8 +4714,6 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.Product", b =>
                 {
                     b.Navigation("Medicaments");
-
-                    b.Navigation("StockProduct");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Province", b =>
@@ -4771,11 +4750,6 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.UomCategory", b =>
                 {
                     b.Navigation("Uoms");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.User", b =>
-                {
-                    b.Navigation("PatientAllergies");
                 });
 #pragma warning restore 612, 618
         }

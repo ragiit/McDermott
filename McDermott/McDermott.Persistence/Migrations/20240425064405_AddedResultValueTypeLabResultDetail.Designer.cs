@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240425064405_AddedResultValueTypeLabResultDetail")]
+    partial class AddedResultValueTypeLabResultDetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3223,9 +3226,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("DestinanceId");
 
-                    b.HasIndex("ProductId")
-                        .IsUnique()
-                        .HasFilter("[ProductId] IS NOT NULL");
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("SourceId");
 
@@ -3919,9 +3920,9 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.LabTest", "LabTest")
-                        .WithMany("GeneralConsultanMedicalSupports")
+                        .WithMany()
                         .HasForeignKey("LabTestId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.User", "PractitionerAlcoholEximination")
                         .WithMany()
@@ -4437,8 +4438,8 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.Product", "Product")
-                        .WithOne("StockProduct")
-                        .HasForeignKey("McDermott.Domain.Entities.StockProduct", "ProductId")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.Location", "Source")
@@ -4708,8 +4709,6 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.LabTest", b =>
                 {
-                    b.Navigation("GeneralConsultanMedicalSupports");
-
                     b.Navigation("LabTestDetails");
                 });
 
@@ -4733,8 +4732,6 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.Product", b =>
                 {
                     b.Navigation("Medicaments");
-
-                    b.Navigation("StockProduct");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Province", b =>

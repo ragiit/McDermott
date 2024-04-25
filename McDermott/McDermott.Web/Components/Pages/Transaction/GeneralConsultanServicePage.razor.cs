@@ -1,6 +1,5 @@
 ﻿using QuestPDF.Fluent;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace McDermott.Web.Components.Pages.Transaction
@@ -175,32 +174,49 @@ namespace McDermott.Web.Components.Pages.Transaction
                 return;
             }
 
-            LabResultDetails.Clear();
+            //LabResultDetails.Clear();
 
             var details = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == e.Id));
-            if (GeneralConsultanMedicalSupport.Id == 0)
+            foreach (var item in details)
             {
-                var temp = new List<LabResultDetailDto>();
-                foreach (var item in details)
+                LabResultDetails.Add(new LabResultDetailDto
                 {
-                    temp.Add(new LabResultDetailDto
-                    {
-                        IsFromDB = true,
-                        Id = Helper.RandomNumber,
-                        NormalRange = FormRegis.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
-                        Parameter = item.Name,
-                        Remark = item.Remark,
-                        LabUomId = item.LabUomId,
-                        LabUom = item.LabUom
-                    });
-                }
+                    IsFromDB = true,
+                    Id = Helper.RandomNumber,
+                    NormalRange = FormRegis.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
+                    Parameter = item.Name,
+                    Remark = item.Remark,
+                    LabUomId = item.LabUomId,
+                    LabUom = item.LabUom,
+                    ResultValueType = item.ResultValueType
+                });
+            }
 
-                LabResultDetails.AddRange(temp);
-            }
-            else
-            {
-                LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
-            }
+            //var details = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == e.Id));
+            //if (GeneralConsultanMedicalSupport.Id == 0)
+            //{
+            //    var temp = new List<LabResultDetailDto>();
+            //    foreach (var item in details)
+            //    {
+            //        temp.Add(new LabResultDetailDto
+            //        {
+            //            IsFromDB = true,
+            //            Id = Helper.RandomNumber,
+            //            NormalRange = FormRegis.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
+            //            Parameter = item.Name,
+            //            Remark = item.Remark,
+            //            LabUomId = item.LabUomId,
+            //            LabUom = item.LabUom,
+            //            ResultValueType = item.ResultValueType
+            //        });
+            //    }
+
+            //    LabResultDetails.AddRange(temp);
+            //}
+            //else
+            //{
+            //    LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
+            //}
 
             //LabResultDetail.LabTestId = e.Id;
 
@@ -650,7 +666,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             public string? Diagnosis { get; set; }
 
-            [Required]
             [DisplayName("Nurse Diagnosis")]
             public string? NursingDiagnosis { get; set; }
 
@@ -1260,7 +1275,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 if (FormRegis.Id == 0)
                 {
-                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.ServiceId == FormRegis.ServiceId && x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
 
                     if (patient.Count > 0)
                     {

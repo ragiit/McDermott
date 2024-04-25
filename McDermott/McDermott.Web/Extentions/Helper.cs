@@ -5,7 +5,10 @@ namespace McDermott.Web.Extentions
     public static class Helper
     {
         public static readonly string VERSION = "2.0.0";
-
+        public static T EnumGetValue<T>(this Enum enumValue)
+        {
+            return (T)Convert.ChangeType(enumValue, typeof(T));
+        }
         public static long RandomNumber => new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second;
 
         public static string HashMD5(string input)

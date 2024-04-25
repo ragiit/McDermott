@@ -100,6 +100,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task LoadData()
         {
             PanelVisible = true;
+            PertamaKali = true;
             ShowForm = false;
             GeneralConsultanService = new();
             GeneralConsultanMedicalSupport = new();
@@ -121,32 +122,53 @@ namespace McDermott.Web.Components.Pages.Transaction
                 return;
             }
 
-            LabResultDetails.Clear();
+            //LabResultDetails.Clear();
+
+            //if (PertamaKali)
+            //{
+            //    PertamaKali = false;
+            //    return;
+            //}
 
             var details = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == e.Id));
-            if (GeneralConsultanMedicalSupport.Id == 0)
+            foreach (var item in details)
             {
-                var temp = new List<LabResultDetailDto>();
-                foreach (var item in details)
+                LabResultDetails.Add(new LabResultDetailDto
                 {
-                    temp.Add(new LabResultDetailDto
-                    {
-                        IsFromDB = true,
-                        Id = Helper.RandomNumber,
-                        NormalRange = GeneralConsultanService.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
-                        Parameter = item.Name,
-                        Remark = item.Remark,
-                        LabUomId = item.LabUomId,
-                        LabUom = item.LabUom
-                    });
-                }
+                    IsFromDB = true,
+                    Id = Helper.RandomNumber,
+                    NormalRange = GeneralConsultanService.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
+                    Parameter = item.Name,
+                    Remark = item.Remark,
+                    LabUomId = item.LabUomId,
+                    LabUom = item.LabUom,
+                    ResultValueType = item.ResultValueType
+                });
+            }
 
-                LabResultDetails.AddRange(temp);
-            }
-            else
-            {
-                LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
-            }
+            //if (GeneralConsultanMedicalSupport.Id == 0)
+            //{
+            //    var temp = new List<LabResultDetailDto>();
+            //    foreach (var item in details)
+            //    {
+            //        temp.Add(new LabResultDetailDto
+            //        {
+            //            IsFromDB = true,
+            //            Id = Helper.RandomNumber,
+            //            NormalRange = GeneralConsultanService.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
+            //            Parameter = item.Name,
+            //            Remark = item.Remark,
+            //            LabUomId = item.LabUomId,
+            //            LabUom = item.LabUom
+            //        });
+            //    }
+
+            //    LabResultDetails.AddRange(temp);
+            //}
+            //else
+            //{
+            //    LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
+            //}
 
             //LabResultDetail.LabTestId = e.Id;
 
@@ -219,7 +241,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 else
                 {
                     var splits = LabResultDetail.NormalRange.Split("-");
-                    if (value.ToLong() <= splits[0].ToLong())
+                    if (value.ToLong() < splits[0].ToLong())
                     {
                         LabResultDetail.ResultType = "Low";
                     }
@@ -358,7 +380,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     LabResultDetails.ForEach(x => x.Id = 0);
 
-                    await Mediator.Send(new CreateListLabResultDetailRequest(LabResultDetails));
+                    LabResultDetails = await Mediator.Send(new CreateListLabResultDetailRequest(LabResultDetails));
 
                     IsAddOrUpdateOrDeleteLabResult = false;
                 }
@@ -563,6 +585,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             GridLabTest.ShowRowDeleteConfirmation(FocusedRowLabTestVisibleIndex);
         }
 
+        private bool PertamaKali { get; set; } = false;
+
         private async Task EditItem_Click()
         {
             ShowForm = true;
@@ -582,6 +606,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             DeletedLabTestIds.Clear();
 
             LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
+            PertamaKali = true;
             DeletedLabTestIds = LabResultDetails.Select(x => x.Id).ToList();
 
             //LabResultDetails.ForEach(x =>

@@ -2,114 +2,158 @@
 
 namespace McDermott.Application.Features.Queries.Medical
 {
-    public class InsuranceQueryHandler
+    public class InsuranceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetInsuranceQuery, List<InsuranceDto>>,
+        IRequestHandler<CreateInsuranceRequest, InsuranceDto>,
+        IRequestHandler<CreateListInsuranceRequest, List<InsuranceDto>>,
+        IRequestHandler<UpdateInsuranceRequest, InsuranceDto>,
+        IRequestHandler<UpdateListInsuranceRequest, List<InsuranceDto>>,
+        IRequestHandler<DeleteInsuranceRequest, bool>
     {
-        internal class GetAllInsuranceQueryHandler : IRequestHandler<GetInsuranceQuery, List<InsuranceDto>>
+        #region GET
+
+        public async Task<List<InsuranceDto>> Handle(GetInsuranceQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetAllInsuranceQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetInsuranceQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Insurance>? result))
+                {
+                    result = await _unitOfWork.Repository<Insurance>().Entities
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<InsuranceDto>>();
             }
-
-            public async Task<List<InsuranceDto>> Handle(GetInsuranceQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                return await _unitOfWork.Repository<Insurance>().Entities
-                        .Select(Insurance => Insurance.Adapt<InsuranceDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                throw;
             }
         }
 
-        internal class GetInsuranceByIdQueryHandler : IRequestHandler<GetInsuranceByIdQuery, InsuranceDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<InsuranceDto> Handle(CreateInsuranceRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetInsuranceByIdQueryHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<InsuranceDto> Handle(GetInsuranceByIdQuery request, CancellationToken cancellationToken)
-            {
-                var result = await _unitOfWork.Repository<Insurance>().GetByIdAsync(request.Id);
-
-                return result.Adapt<InsuranceDto>();
-            }
-        }
-
-        internal class CreateInsuranceHandler : IRequestHandler<CreateInsuranceRequest, InsuranceDto>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateInsuranceHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<InsuranceDto> Handle(CreateInsuranceRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<Insurance>().AddAsync(request.InsuranceDto.Adapt<Insurance>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetInsuranceQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<InsuranceDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateInsuranceHandler : IRequestHandler<UpdateInsuranceRequest, bool>
+        public async Task<List<InsuranceDto>> Handle(CreateListInsuranceRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateInsuranceHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
+                var result = await _unitOfWork.Repository<Insurance>().AddAsync(request.InsuranceDtos.Adapt<List<Insurance>>());
 
-            public async Task<bool> Handle(UpdateInsuranceRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Insurance>().UpdateAsync(request.InsuranceDto.Adapt<Insurance>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetInsuranceQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<InsuranceDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<InsuranceDto> Handle(UpdateInsuranceRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Insurance>().UpdateAsync(request.InsuranceDto.Adapt<Insurance>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetInsuranceQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<InsuranceDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<InsuranceDto>> Handle(UpdateListInsuranceRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<Insurance>().UpdateAsync(request.InsuranceDtos.Adapt<List<Insurance>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetInsuranceQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<InsuranceDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteInsuranceRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<Insurance>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<Insurance>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetInsuranceQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteInsuranceHandler : IRequestHandler<DeleteInsuranceRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteInsuranceHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteInsuranceRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Insurance>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListInsuranceHandler : IRequestHandler<DeleteListInsuranceRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListInsuranceHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListInsuranceRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<Insurance>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

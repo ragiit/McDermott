@@ -157,7 +157,7 @@
                                                             KeyFieldName="Id"
                                                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                             EditModelSaving="OnSave"
-                                                            DataItemDeleting="OnDelete"
+                                                            DataItemDeleting="OnDeleteLabTestDetail"
                                                             AllowSelectRowByClick="true"
                                                             EditMode="GridEditMode.PopupEditForm"
                                                             PopupEditFormCssClass="pw-800"
@@ -206,7 +206,10 @@
                                                         <EditFormTemplate Context="EditFormContext">
                                                             @{
                                                                 var a = (LabTestDetailDto)EditFormContext.EditModel;
-                                                                a.ResultValueType = LabTest.ResultType;
+                                                                if (string.IsNullOrWhiteSpace(a.ResultValueType))
+                                                                {
+                                                                    a.ResultValueType = LabTest.ResultType;
+                                                                }
                                                             }
                                                             <DxFormLayout CssClass="w-100">
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Parameter" ColSpanMd="12">

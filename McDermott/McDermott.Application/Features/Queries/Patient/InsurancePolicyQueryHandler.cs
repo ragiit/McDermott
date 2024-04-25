@@ -1,99 +1,149 @@
-﻿namespace McDermott.Application.Features.Queries.Patient
+﻿
+
+namespace McDermott.Application.Features.Queries.Patient
 {
-    public class InsurancePolicyQueryHandler
+    public class InsurancePolicyQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetInsurancePolicyQuery, List<InsurancePolicyDto>>,
+        IRequestHandler<CreateInsurancePolicyRequest, InsurancePolicyDto>,
+        IRequestHandler<CreateListInsurancePolicyRequest, List<InsurancePolicyDto>>,
+        IRequestHandler<UpdateInsurancePolicyRequest, InsurancePolicyDto>,
+        IRequestHandler<UpdateListInsurancePolicyRequest, List<InsurancePolicyDto>>,
+        IRequestHandler<DeleteInsurancePolicyRequest, bool>
     {
-        #region Get
+        #region GET
 
-        internal class GetInsurancePolicyQueryHandler : IRequestHandler<GetInsurancePolicyQuery, List<InsurancePolicyDto>>
+        public async Task<List<InsurancePolicyDto>> Handle(GetInsurancePolicyQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetInsurancePolicyQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                string cacheKey = $"GetInsurancePolicyQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<InsurancePolicy>? result))
+                {
+                    result = await _unitOfWork.Repository<InsurancePolicy>().Entities
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    //result = await _unitOfWork.Repository<InsurancePolicy>().GetAsync(
+                    //    null,
+                    //    x => x.Include(z => z.Country),
+                    //    cancellationToken);
+
+                    //return await _unitOfWork.Repository<Counter>().Entities
+                    //  .Include(x => x.Physician)
+                    //  .Include(x => x.Service)
+                    //  .AsNoTracking()
+                    //  .Select(Counter => Counter.Adapt<CounterDto>())
+                    //  .AsNoTracking()
+                    //  .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<InsurancePolicyDto>>();
             }
-
-            public async Task<List<InsurancePolicyDto>> Handle(GetInsurancePolicyQuery query, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                try
-                {
-                    var result = await _unitOfWork.Repository<InsurancePolicy>().GetAsync(
-                      query.Predicate,
-                          x => x
-                          .Include(z => z.Insurance)
-                          .Include(z => z.User), cancellationToken);
-
-                    return result.Adapt<List<InsurancePolicyDto>>();
-                }
-                catch (Exception)
-                {
-                    return [];
-                }
+                throw;
             }
         }
 
-        internal class GetInsurancePolicyCountQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetInsurancePolicyCountQuery, long>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<InsurancePolicyDto> Handle(CreateInsurancePolicyRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<long> Handle(GetInsurancePolicyCountQuery query, CancellationToken cancellationToken)
-            {
-                try
-                {
-                    return await _unitOfWork.Repository<InsurancePolicy>().GetCountAsync(
-                      query.Predicate, cancellationToken);
-                }
-                catch (Exception)
-                {
-                    return 0;
-                }
-            }
-        }
-
-        #endregion Get
-
-        #region Create
-
-        internal class CreateInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateInsurancePolicyRequest, InsurancePolicyDto>
-        {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<InsurancePolicyDto> Handle(CreateInsurancePolicyRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<InsurancePolicy>().AddAsync(request.InsurancePolicyDto.Adapt<InsurancePolicy>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetInsurancePolicyQuery_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<InsurancePolicyDto>();
             }
-        }
-
-        #endregion Create
-
-        #region Update
-
-        internal class UpdateInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateInsurancePolicyRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<bool> Handle(UpdateInsurancePolicyRequest request, CancellationToken cancellationToken)
+            catch (Exception)
             {
-                await _unitOfWork.Repository<InsurancePolicy>().UpdateAsync(request.InsurancePolicyDto.Adapt<InsurancePolicy>());
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        #endregion Update
-
-        #region Delete
-
-        internal class DeleteInsurancePolicyHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteInsurancePolicyRequest, bool>
+        public async Task<List<InsurancePolicyDto>> Handle(CreateListInsurancePolicyRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
+            try
+            {
+                var result = await _unitOfWork.Repository<InsurancePolicy>().AddAsync(request.InsurancePolicyDtos.Adapt<List<InsurancePolicy>>());
 
-            public async Task<bool> Handle(DeleteInsurancePolicyRequest request, CancellationToken cancellationToken)
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetInsurancePolicyQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<InsurancePolicyDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<InsurancePolicyDto> Handle(UpdateInsurancePolicyRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<InsurancePolicy>().UpdateAsync(request.InsurancePolicyDto.Adapt<InsurancePolicy>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetInsurancePolicyQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<InsurancePolicyDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<InsurancePolicyDto>> Handle(UpdateListInsurancePolicyRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<InsurancePolicy>().UpdateAsync(request.InsurancePolicyDtos.Adapt<List<InsurancePolicy>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetInsurancePolicyQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<InsurancePolicyDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteInsurancePolicyRequest request, CancellationToken cancellationToken)
+        {
+            try
             {
                 if (request.Id > 0)
                 {
@@ -107,10 +157,16 @@
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetInsurancePolicyQuery_"); // Ganti dengan key yang sesuai
+
                 return true;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-        #endregion Delete
+        #endregion DELETE
     }
 }

@@ -8,6 +8,7 @@
         public long? LabUomId { get; set; }
         public string? Result { get; set; }
         public string? ResultType { get; set; }
+        public string? ResultValueType { get; set; }
         public string? Remark { get; set; }
 
         //[SetToNull]
