@@ -12,6 +12,7 @@ namespace McDermott.Application.Dtos.Inventory
         public long? ProductCategoryId { get; set; }
         public long? CompanyId { get; set; }
         public long? PurchaseUomId { get; set; }
+        public bool? TraceAbility { get; set; }
         public string? ProductType { get; set; }
         public string? HospitalType { get; set; }
         public string? SalesPrice { get; set; }
@@ -19,7 +20,7 @@ namespace McDermott.Application.Dtos.Inventory
         public string? Cost { get; set; }
         public string? InternalReference { get; set; }
 
-        
+
         [SetToNull]
         public virtual UomDto? Uom { get; set; }
         [SetToNull]
@@ -42,6 +43,7 @@ namespace McDermott.Application.Dtos.Inventory
         public long? UomId { get; set; }
         public long? UomMId { get; set; }
         public List<long>? ActiveComponentId { get; set; }
+        public bool? TraceAbility { get; set; } = false;
         public bool? PregnancyWarning { get; set; } = false;
         public bool? Cronies { get; set; }
         public bool? Pharmacologi { get; set; } = false;

@@ -250,7 +250,6 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             showForm = true;
             textPopUp = "Add Data Kiosk";
-            await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()

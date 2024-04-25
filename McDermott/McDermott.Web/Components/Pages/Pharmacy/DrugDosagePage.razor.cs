@@ -55,6 +55,7 @@
 
         private IGrid Grid { get; set; }
         private bool PanelVisible { get; set; } = false;
+        public bool IsAddForm { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
@@ -89,6 +90,7 @@
 
         private async Task NewItem_Click()
         {
+            IsAddForm = true;
             await Grid.StartEditNewRowAsync();
         }
 
@@ -99,6 +101,7 @@
 
         private async Task EditItem_Click()
         {
+            IsAddForm = false;
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 

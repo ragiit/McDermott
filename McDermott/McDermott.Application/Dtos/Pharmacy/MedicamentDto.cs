@@ -1,13 +1,8 @@
 ﻿using McDermott.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Pharmacy
 {
-    public class MedicamentDto:IMapFrom<Medicament>
+    public class MedicamentDto : IMapFrom<Medicament>
     {
         public long Id { get; set; }
         public long? ProductId { get; set; }
@@ -36,6 +31,6 @@ namespace McDermott.Application.Dtos.Pharmacy
         public virtual UomDto? Uom { get; set; }
         [SetToNull]
         public virtual List<ActiveComponentDto>? ActiveComponent { get; set; }
-        
+
     }
 }

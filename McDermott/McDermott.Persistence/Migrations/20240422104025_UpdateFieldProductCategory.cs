@@ -51,12 +51,17 @@ namespace McDermott.Persistence.Migrations
                 name: "Uom",
                 table: "LabResultDetails",
                 type: "nvarchar(max)",
+
                 nullable: true);     
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
-        {   
+
+        {
+            
+
             migrationBuilder.DropColumn(
                 name: "Code",
                 table: "ProductCategories");
@@ -94,7 +99,9 @@ namespace McDermott.Persistence.Migrations
                 column: "LabTestId",
                 principalTable: "LabTestDetails",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict); 
+
+                onDelete: ReferentialAction.Restrict);
+           
         }
     }
 }

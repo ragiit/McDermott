@@ -12,12 +12,13 @@ namespace McDermott.Application.Dtos.Inventory
         public long Id { get; set; }
         public long? ProductId { get; set; }
         public long? Qty { get; set; }
-        public DateTime? Expired { get; set; }
+        public long? UomId { get; set; }
+        public DateTime? Expired { get; set; } = DateTime.Now;
         public long? SourceId { get; set; }
         public long? DestinanceId { get; set; }
         public string? Batch { get; set; }
         public string? Referency { get; set; }
-        public bool? StatusTransaction { get; set; }
+        public string? StatusTransaction { get; set; }
 
         [SetToNull]
         public virtual ProductDto? Product { get; set; }
@@ -25,5 +26,9 @@ namespace McDermott.Application.Dtos.Inventory
         public virtual LocationDto? Source { get; set; }
         [SetToNull]
         public virtual LocationDto? Destinance { get; set; }
+        [SetToNull]
+        public virtual UomDto? Uom { get; set; }
     }
+
+   
 }

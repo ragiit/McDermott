@@ -9,6 +9,7 @@ global using McDermott.Application.Dtos.Bpjs;
 global using McDermott.Application.Interfaces.Repositories;
 global using McDermott.Domain.Entities;
 
+
 global using Mapster;
 global using System.ComponentModel.DataAnnotations.Schema;
 global using MediatR;
@@ -17,6 +18,7 @@ global using System.ComponentModel.DataAnnotations;
 global using System.Linq.Expressions;
 global using Microsoft.Extensions.Caching.Memory;
 
+global using static McDermott.Application.Extentions.EnumHelper;
 global using static McDermott.Application.Features.Commands.Bpjs.BpjsClassificationCommand;
 global using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
 global using static McDermott.Application.Features.Commands.Medical.BuildingLocationCommand;

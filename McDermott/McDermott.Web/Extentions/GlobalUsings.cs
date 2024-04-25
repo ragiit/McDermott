@@ -32,6 +32,7 @@ global using DevExpress.Data.XtraReports.Native;
 
 global using OfficeOpenXml;
 
+global using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
 global using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanClinicalAssesmentCommand;
 global using static McDermott.Application.Features.Commands.Bpjs.BpjsClassificationCommand;

@@ -11,7 +11,21 @@
 @if (IsAccess)
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Medicamen Group" />
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Medicament Group</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
+                            <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/pharmacy/medicament-group">Medicament Group</a></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -83,42 +97,45 @@
                                                         LabelPosition="LabelPosition.Left" CssClass="w-100" />
                                         </DxFormLayoutItem>
                                     </DxFormLayout>
-                                    <DxFormLayout CssClass="mt">
+                                    <div class="row">
                                         <div class="col-md-6">
-                                            <DxFormLayoutItem Caption="Phycisian" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                <DxComboBox Data="@Phy"
-                                                            @bind-Value="@MGForm.PhycisianId"
-                                                            NullText="Select Phycisian ..."
-                                                            TextFieldName="Name"
-                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                            ShowValidationIcon="true"></DxComboBox>
-                                            </DxFormLayoutItem>
-
+                                            <DxFormLayout CssClass="mt">
+                                                <DxFormLayoutItem Caption="Phycisian" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                    <DxComboBox Data="@Phy"
+                                                                @bind-Value="@MGForm.PhycisianId"
+                                                                NullText="Select Phycisian ..."
+                                                                TextFieldName="Name"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                ShowValidationIcon="true"></DxComboBox>
+                                                </DxFormLayoutItem>
+                                            </DxFormLayout>
                                         </div>
                                         <div class="col-md-6 ">
-                                            @if (Concotions)
-                                            {
-                                                <DxFormLayoutItem Caption="Unit Of Dosage" CaptionCssClass="normal-caption mr-1" ColSpanMd="12">
-                                                    <DxComboBox Data="@UoMs"
-                                                                @bind-Value="@MGForm.RegimentOfUseId"
-                                                                NullText="Select Unit Of Dosage ..."
-                                                                TextFieldName="Name"
-                                                                ValueFieldName="Id"
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                ShowValidationIcon="true"></DxComboBox>
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Form" CaptionCssClass="normal-caption mr-5" ColSpanMd="12">
-                                                    <DxComboBox Data="@FormDrugs"
-                                                                @bind-Value="@MGForm.FormDrugId"
-                                                                NullText="Select Form ..."
-                                                                TextFieldName="Name"
-                                                                ValueFieldName="Id"
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                ShowValidationIcon="true"></DxComboBox>
-                                                </DxFormLayoutItem>
-                                            }
+                                            <DxFormLayout CssClass="mt">
+                                                @if (Concotions)
+                                                {
+                                                    <DxFormLayoutItem Caption="Unit Of Dosage" CaptionCssClass="normal-caption " ColSpanMd="12">
+                                                        <DxComboBox Data="@UoMs"
+                                                                    @bind-Value="@MGForm.RegimentOfUseId"
+                                                                    NullText="Select Unit Of Dosage ..."
+                                                                    TextFieldName="Name"
+                                                                    ValueFieldName="Id"
+                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                    ShowValidationIcon="true"></DxComboBox>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Form" CaptionCssClass="normal-caption " ColSpanMd="12">
+                                                        <DxComboBox Data="@FormDrugs"
+                                                                    @bind-Value="@MGForm.FormDrugId"
+                                                                    NullText="Select Form ..."
+                                                                    TextFieldName="Name"
+                                                                    ValueFieldName="Id"
+                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                    ShowValidationIcon="true"></DxComboBox>
+                                                    </DxFormLayoutItem>
+                                                }
+                                            </DxFormLayout>
                                         </div>
-                                    </DxFormLayout>
+                                    </div>
                                     <hr />
                                     <DxGrid @ref="GridDoctorScheduleDetail"
                                             Data="@medicamentGroupDetails"

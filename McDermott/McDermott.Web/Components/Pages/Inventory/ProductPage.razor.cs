@@ -1,4 +1,5 @@
 ﻿using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
+using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
@@ -18,17 +19,23 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<ProductCategoryDto> productCategories = [];
         private List<ActiveComponentDto> ActiveComponents = [];
         private List<SignaDto> Signas = [];
+        private List<LocationDto> Locations = [];
+        private List<StockProductDto> StockProducts = [];
         private ProductDetailDto FormProductDetails = new();
         private ProductDto FormProducts = new();
+        private StockProductDto FormStockProduct = new();
         private MedicamentDto FormMedicaments = new();
+        
 
         #endregion Relation Data
 
         #region Static
 
         private IGrid? Grid { get; set; }
+        private IGrid? GridStock { get; set; }
         private bool smartButtonShow { get; set; } = false;
         private bool showForm { get; set; } = false;
+        private bool FormStockPopUp { get; set; } = false;
         private bool StockProductView { get; set; } = false;
         private bool PanelVisible { get; set; } = false;
         private bool showTabs { get; set; } = true;
@@ -36,9 +43,13 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool Chronis { get; set; } = false;
         private bool IsLoading { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
+        private long? TotalQty { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataItemsStock { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         private bool? FormValidationState { get; set; }
+        private string? NameProduct { get; set; }
+        private DateTime? DateNow { get; set; } = DateTime.Now;
 
         private List<string> ProductTypes = new List<string>
         {
@@ -160,26 +171,35 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task LoadData()
         {
-            PanelVisible = true;
-            showForm = false;
-            SelectedDataItems = [];
-            Products = await Mediator.Send(new GetProductQuery());
+            try
+            {
+                PanelVisible = true;
+                showForm = false;
+                StockProductView = false;
+                SelectedDataItems = [];
+                Products = await Mediator.Send(new GetProductQuery());
 
-            //Data
-            FormProductDetails.ProductType = ProductTypes[2];
-            FormProductDetails.HospitalType = HospitalProducts[0];
-            BpjsClassifications = await Mediator.Send(new GetBpjsClassificationQuery());
-            Uoms = await Mediator.Send(new GetUomQuery());
-            productCategories = await Mediator.Send(new GetProductCategoryQuery());
-            DrugForms = await Mediator.Send(new GetFormDrugQuery());
-            DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
-            FormProductDetails.SalesPrice = "100";
-            Signas = await Mediator.Send(new GetSignaQuery());
-            ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
-            Medicaments = await Mediator.Send(new GetMedicamentQuery());
-            FormProductDetails.Tax = "11%";
+                //Data
 
-            PanelVisible = false;
+                BpjsClassifications = await Mediator.Send(new GetBpjsClassificationQuery());
+                Uoms = await Mediator.Send(new GetUomQuery());
+                productCategories = await Mediator.Send(new GetProductCategoryQuery());
+                DrugForms = await Mediator.Send(new GetFormDrugQuery());
+                DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
+                Signas = await Mediator.Send(new GetSignaQuery());
+                ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
+                Medicaments = await Mediator.Send(new GetMedicamentQuery());
+                Locations = await Mediator.Send(new GetLocationQuery());
+
+                //StockProduct
+                StockProducts = await Mediator.Send(new GetStockProductQuery());
+
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         #endregion Load
@@ -195,7 +215,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task HandleInvalidSubmit()
         {
-            
+
             showForm = true;
             FormValidationState = false;
         }
@@ -231,18 +251,32 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             showForm = true;
             FormProductDetails = new();
+            FormProductDetails.ProductType = ProductTypes[2];
+            FormProductDetails.HospitalType = HospitalProducts[0];
+            FormProductDetails.SalesPrice = "100";
+            FormProductDetails.Tax = "11%";
         }
+
 
         private async Task Refresh_Click()
         {
             await LoadData();
         }
 
-        private async Task EditItem_Click()
+        private async Task EditItem_Click(ProductDto? p = null)
         {
             showForm = true;
+           
             smartButtonShow = true;
-            var products = SelectedDataItems[0].Adapt<ProductDto>();
+            var products = new ProductDto();
+            if (p == null)
+            {
+               products = SelectedDataItems[0].Adapt<ProductDto>();
+            }
+            else
+            {
+                products = p;
+            }
             var medicamen = Medicaments.FirstOrDefault(z => z.ProductId == products.Id);
             FormProductDetails.Id = products.Id;
             FormProductDetails.Name = products.Name;
@@ -257,6 +291,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             FormProductDetails.Cost = products.Cost;
             FormProductDetails.ProductCategoryId = products.ProductCategoryId;
             FormProductDetails.InternalReference = products.InternalReference;
+            FormProductDetails.TraceAbility = products.TraceAbility;
             if (products.HospitalType == "Medicament")
             {
                 if (medicamen != null)
@@ -265,7 +300,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormProductDetails.FormId = medicamen.FormId;
                     FormProductDetails.RouteId = medicamen.RouteId;
                     FormProductDetails.Dosage = medicamen.Dosage;
-                    FormProductDetails.UomId = medicamen.UomId;
+                    FormProductDetails.UomMId = medicamen.UomId;
                     FormProductDetails.Cronies = medicamen.Cronies;
                     FormProductDetails.MontlyMax = medicamen.MontlyMax;
                     FormProductDetails.SignaId = medicamen.SignaId;
@@ -279,23 +314,26 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormProductDetails.Food = medicamen.Food;
                 }
             }
+            var stockIN = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "IN").ToList();
+            var stockOUT = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "OUT").ToList();
+            var countStockIn = stockIN.Sum(x=>x.Qty);
+            var countStockOUT = stockOUT.Sum(x=>x.Qty);
+            TotalQty = countStockIn - countStockOUT;
+            
         }
 
-        private async Task NewTableStock_Item()
-        {
-            //NavigationManager.NavigateTo($"/inventory/stock-product/{id}", true);
-            var products = SelectedDataItems[0].Adapt<ProductDto>();
-            StockProductView = true;
-        }
         private async void onDiscard()
         {
             await LoadData();
-        }
+        }  
+       
 
         private void DeleteItem_Click()
         {
             Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+
+
 
         private void ColumnChooserButton_Click()
         {
@@ -325,7 +363,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ExportSelectedRowsOnly = true,
             });
         }
-
+        #endregion
+        #region Delete Product
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -339,7 +378,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     {
                         await Mediator.Send(new DeleteMedicamentRequest(idProduct.Id));
                     }
-                    await Mediator.Send(new DeleteProductCategoryRequest(((ProductDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteProductRequest(((ProductDto)e.DataItem).Id));
                 }
                 else
                 {
@@ -393,6 +432,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormProducts.Cost = FormProductDetails.Cost;
                     FormProducts.ProductCategoryId = FormProductDetails.ProductCategoryId;
                     FormProducts.InternalReference = FormProductDetails.InternalReference;
+                    FormProducts.TraceAbility = FormProductDetails.TraceAbility;
 
                     //Medicament
                     FormMedicaments.Id = FormProductDetails.MedicamentId ?? 0;
@@ -458,21 +498,121 @@ namespace McDermott.Web.Components.Pages.Inventory
                         ToastService.ShowSuccess("Successfully Update Data...");
                     }
 
-                    await EditItem_Click();
+                    await EditItem_Click(getProduct);
                 }
                 else
                 {
-                  await  HandleInvalidSubmit();
+                    await HandleInvalidSubmit();
                 }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }                       
+        }
+
+        #endregion Save
+
+        #region Stock Produk
+        private async void onDiscardStock()
+        {
+            FormStockPopUp = false;
+            await NewTableStock_Item();
+        }
+        private async Task RefreshStock_Click()
+        {
+            await NewTableStock_Item();
+        }
+        private async Task NewTableStock_Item()
+        {
+            try
+            {
+                showForm = false;
+                PanelVisible = true;
+                StockProductView = true;
+                var products = SelectedDataItems[0].Adapt<ProductDto>();                
+                StockProducts = [.. StockProducts.Where(x => x.ProductId == products.Id).ToList()];               
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+        private async Task NewItemStock_Click()
+        {
+            FormStockProduct = new();
+            FormStockPopUp = true;
+            var products = SelectedDataItems[0].Adapt<ProductDto>();
+            FormStockProduct.UomId = Products.Where(p => p.Id == products.Id).Select(x => x.UomId).FirstOrDefault();
+            FormStockProduct.ProductId = Products.Where(p => p.Id == products.Id).Select(x => x.Id).FirstOrDefault();
+            NameProduct = products.Name;
+        }
+        private async Task EditItemStock_Click()
+        {
+            FormStockPopUp = true;
+            var DataEdit = SelectedDataItemsStock[0].Adapt<StockProductDto>();
+            FormStockProduct = DataEdit;
+        }
+        private void DeleteItemStock_Click()
+        {
+            GridStock!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+        private async Task Back_Click()
+        {
+            await LoadData();
+        }
+        private async Task onDeleteStock(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                var stocks = (StockProductDto)e.DataItem;
+                if (SelectedDataItemsStock is null)
+                {
+                    await Mediator.Send(new DeleteStockProductRequest(((StockProductDto)e.DataItem).Id));
+                }
+                else
+                {
+                    await Mediator.Send(new DeleteStockProductRequest(ids: SelectedDataItemsStock.Adapt<List<StockProductDto>>().Select(x => x.Id).ToList()));
+                }
+                await NewTableStock_Item();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task onSaveStock()
+        {
+            try
+            {
+                var a = FormStockProduct;
+                if (FormStockProduct.SourceId is null)
+                {
+                    return;
+                }
+                FormStockProduct.StatusTransaction = "IN";
+                if (FormStockProduct.Id == 0)
+                {
+                    await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
+                    ToastService.ShowSuccess("Success Add Data Stock..");
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateStockProductRequest(FormStockProduct));
+                    ToastService.ShowSuccess("Success Update Data Stock..");
+                }
+                FormStockPopUp = false;
+                await NewTableStock_Item();
+
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
 
-            await LoadData();
         }
-
-        #endregion Save
+        #endregion
     }
 }

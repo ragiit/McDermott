@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240424033423_AddedTotalQtyAndDaysRegimenOfUse")]
+    partial class AddedTotalQtyAndDaysRegimenOfUse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3198,17 +3201,11 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("Referency")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SerialNumber")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<long?>("SourceId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("StatusTransaction")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("UomId")
-                        .HasColumnType("bigint");
+                    b.Property<bool?>("StatusTransaction")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -3221,6 +3218,8 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("DestinanceId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("SourceId");
 
                     b.ToTable("StockProducts");
                 });
@@ -4432,7 +4431,16 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("McDermott.Domain.Entities.Location", "Source")
+                        .WithMany()
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Destinance");
+
                     b.Navigation("Product");
+
+                    b.Navigation("Source");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>

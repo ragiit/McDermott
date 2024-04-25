@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240423081212_addFieldStock")]
+    partial class addFieldStock
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -851,18 +854,12 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<float>("Days")
-                        .HasColumnType("real");
-
                     b.Property<long?>("DrugRouteId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Frequency")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("TotalQtyPerDay")
-                        .HasColumnType("real");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -3204,8 +3201,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("SourceId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("StatusTransaction")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool?>("StatusTransaction")
+                        .HasColumnType("bit");
 
                     b.Property<long?>("UomId")
                         .HasColumnType("bigint");
@@ -3221,6 +3218,10 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("DestinanceId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("SourceId");
+
+                    b.HasIndex("UomId");
 
                     b.ToTable("StockProducts");
                 });
@@ -4432,7 +4433,23 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("McDermott.Domain.Entities.Location", "Source")
+                        .WithMany()
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.Uom", "Uom")
+                        .WithMany()
+                        .HasForeignKey("UomId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Destinance");
+
                     b.Navigation("Product");
+
+                    b.Navigation("Source");
+
+                    b.Navigation("Uom");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>

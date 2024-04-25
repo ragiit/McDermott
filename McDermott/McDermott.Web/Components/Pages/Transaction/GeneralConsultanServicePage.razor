@@ -1627,8 +1627,9 @@ else
     </EditForm>
 </DxPopup>
 
-<DxPopup HeaderText="Procedure Room" @bind-Visible="@PopUpProcedureRoom" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
-       <div class="row justify-content-end mb-3">
+<DxPopup HeaderText="Procedure Room" @bind-Visible="@PopUpProcedureRoom" HeaderCssClass="fw-bold" HorizontalAlignment="@HorizontalAlignment.Center"
+         VerticalAlignment="@VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
+      @*  <div class="row justify-content-end mb-3">
             <div class="col-auto align-self-end">
                 <DxTabs>
                     <DxTab Text="Draft" Enabled="@(GeneralConsultanMedicalSupport.Status == "Draft")"></DxTab>
@@ -1636,10 +1637,10 @@ else
                     <DxTab Text="Finish" Enabled="@(GeneralConsultanMedicalSupport.Status == "Finish")"></DxTab>
                 </DxTabs>
             </div>
-        </div>
+        </div> *@
     <EditForm Model="@GeneralConsultanMedicalSupport" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
         <DataAnnotationsValidator />
-        <DxFormLayout>
+        <DxFormLayout CssClass="w-100">
             <DxFormLayoutGroup ColSpanMd="12" Caption="Lab Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                 <Items>
 
