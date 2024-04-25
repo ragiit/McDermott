@@ -2,58 +2,27 @@
 @rendermode InteractiveServer
 <PageTitle>Inventory - Product</PageTitle>
 
-<style>
-    .mr-1s, .mx-1s {
-        margin-right: .8rem !important;
-    }
 
-    .mr-2ss, .mx-2ss {
-        margin-right: 1.6rem !important;
-    }
-
-    .mr-2s, .mx-2s {
-        margin-right: 1.9rem !important;
-    }
-
-    .mr-3s, .mx-3s {
-        margin-right: 1.4rem !important;
-    }
-
-    .mr-4s, .mx-4s {
-        margin-right: 2.9rem !important;
-    }
-
-    .mr-4ss, .mx-4ss {
-        margin-right: 2.1rem !important;
-    }
-
-    .mr-5s, .mx-5s {
-        margin-right: 2.6rem !important;
-    }
-
-    .mr-6, .mx-6 {
-        margin-right: 3.5rem !important;
-    }
-
-    .mr-7, .mx-7 {
-        margin-right: 4rem !important;
-    }
-
-    .mr-8, .mx-8 {
-        margin-right: 4.5rem !important;
-    }
-
-    .mr-9, .mx-9 {
-        margin-right: 5rem !important;
-    }
-
-</style>
 
 @if (IsAccess)
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Product" />
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>General Consultation Service</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
+                            <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/inventory/product">Product</a></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <section class="content">
             <div class="container-fluid">
@@ -187,7 +156,7 @@
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                     FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
                                                                     </DxFormLayoutItem>
-                                                                    <DxFormLayoutItem Caption="Dosage" CaptionCssClass="mr-4ss normal-caption" ColSpanMd="12">
+                                                                    <DxFormLayoutItem Caption="Dosage" CaptionCssClass=" normal-caption" ColSpanMd="12">
                                                                         <Template>
                                                                             <DxGridLayout>
                                                                                 <Rows>
