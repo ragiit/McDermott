@@ -1,6 +1,5 @@
 ﻿using QuestPDF.Fluent;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace McDermott.Web.Components.Pages.Transaction
@@ -667,7 +666,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             public string? Diagnosis { get; set; }
 
-            [Required]
             [DisplayName("Nurse Diagnosis")]
             public string? NursingDiagnosis { get; set; }
 

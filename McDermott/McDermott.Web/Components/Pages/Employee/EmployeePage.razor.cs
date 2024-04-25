@@ -121,7 +121,7 @@
             ShowForm = false;
 
             SelectedDataItems = new ObservableRangeCollection<object>();
-            Users = await Mediator.Send(new GetUserEmployeeQuery());
+            Users = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true));
 
             PanelVisible = false;
         }

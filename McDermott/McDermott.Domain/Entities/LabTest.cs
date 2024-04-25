@@ -13,5 +13,8 @@ namespace McDermott.Domain.Entities
 
         [SetToNull]
         public virtual List<LabTestDetail>? LabTestDetails { get; set; }
+
+        [SetToNull]
+        public virtual List<GeneralConsultanMedicalSupport>? GeneralConsultanMedicalSupports { get; set; }
     }
 }

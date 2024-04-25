@@ -87,6 +87,27 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 if (SelectedDataItems is null || SelectedDataItems.Count == 1)
                 {
+                    await Mediator.Send(new DeleteLabTestRequest(((LabTestDto)e.DataItem).Id));
+                }
+                else
+                {
+                    await Mediator.Send(new DeleteLabTestRequest(ids: SelectedDataItems.Adapt<List<LabTestDto>>().Select(x => x.Id).ToList()));
+                }
+
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task OnDeleteLabTestDetail(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                if (SelectedDataItems is null || SelectedDataItems.Count == 1)
+                {
                     LabTestDetailForms.Remove((LabTestDetailDto)e.DataItem);
                 }
                 else
