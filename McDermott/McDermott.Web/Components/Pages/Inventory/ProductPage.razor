@@ -2,8 +2,6 @@
 @rendermode InteractiveServer
 <PageTitle>Inventory - Product</PageTitle>
 
-
-
 @if (IsAccess)
 {
     <div class="wrapper">
@@ -59,6 +57,7 @@
                                                 AutoExpandAllGroupRows="true"
                                                 CssClass="ch-480"
                                                 ShowFilterRow="true"
+                                                RowDoubleClick="OnRowDoubleClick"
                                                 TextWrapEnabled="false"
                                                 CustomizeElement="Grid_CustomizeElement"
                                                 ShowSearchBox="true"
@@ -78,8 +77,8 @@
                                                 <DxGridDataColumn FieldName="Name" Caption="Product Name" SortIndex="0" />
                                                 <DxGridDataColumn FieldName="InternalReference" Caption="Internal Reference" />
                                                 <DxGridDataColumn FieldName="SalesPrice" Caption="Sales Price" />
-                                                <DxGridDataColumn FieldName="Name" Caption="Qty On Hand" />
-                                                <DxGridDataColumn FieldName="Medicament.Uom.Name" Caption="Unit Of Measure" />
+                                                <DxGridDataColumn FieldName="Qtys" Caption="Qty On Hand" />
+                                                <DxGridDataColumn FieldName="UomName" Caption="Unit Of Measure" />
                                             </Columns>
                                         </DxGrid>
                                     </DxLoadingPanel>
@@ -224,18 +223,18 @@
                                                                 </DxFormLayout>
                                                             </div>
                                                             @* <DxFormLayout CssClass="mt-1">
-                                                                <DxFormLayoutGroup Caption="Alergy Data" CaptionCssClass="fw-bold ">
-                                                                    <DxFormLayoutItem ColSpanMd="4" Caption="Pharmacology" CaptionCssClass="normal-caption">
-                                                                        <DxCheckBox @bind-Checked="@FormProductDetails.Pharmacologi" LabelPosition="LabelPosition.Left" CssClass="w-100" />
-                                                                    </DxFormLayoutItem>
-                                                                    <DxFormLayoutItem ColSpanMd="4" Caption="Weather" CaptionCssClass="normal-caption">
-                                                                        <DxCheckBox @bind-Checked="@FormProductDetails.Weather" LabelPosition="LabelPosition.Left" CssClass="w-100" />
-                                                                    </DxFormLayoutItem>
-                                                                    <DxFormLayoutItem ColSpanMd="4" Caption="Food" CaptionCssClass="normal-caption">
-                                                                        <DxCheckBox @bind-Checked="@FormProductDetails.Food" LabelPosition="LabelPosition.Left" CssClass="w-100" />
-                                                                    </DxFormLayoutItem>
-                                                                </DxFormLayoutGroup>
-                                                            </DxFormLayout> *@
+                                                <DxFormLayoutGroup Caption="Alergy Data" CaptionCssClass="fw-bold ">
+                                                <DxFormLayoutItem ColSpanMd="4" Caption="Pharmacology" CaptionCssClass="normal-caption">
+                                                <DxCheckBox @bind-Checked="@FormProductDetails.Pharmacologi" LabelPosition="LabelPosition.Left" CssClass="w-100" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem ColSpanMd="4" Caption="Weather" CaptionCssClass="normal-caption">
+                                                <DxCheckBox @bind-Checked="@FormProductDetails.Weather" LabelPosition="LabelPosition.Left" CssClass="w-100" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem ColSpanMd="4" Caption="Food" CaptionCssClass="normal-caption">
+                                                <DxCheckBox @bind-Checked="@FormProductDetails.Food" LabelPosition="LabelPosition.Left" CssClass="w-100" />
+                                                </DxFormLayoutItem>
+                                                </DxFormLayoutGroup>
+                                                </DxFormLayout> *@
                                                         </div>
                                                     </DxTabPage>
                                                 }
@@ -321,7 +320,7 @@
                                                                             CssClass="cw-480"
                                                                             ShowValidationIcon="true" />
                                                                 </DxFormLayoutItem>
-                                                                
+
                                                             </DxFormLayout>
                                                         </div>
                                                     </div>
