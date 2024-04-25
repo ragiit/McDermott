@@ -81,15 +81,15 @@
                                                 </DxToolbar>
                                             </ToolbarTemplate>
                                                     <Columns>
-                                                        <DxGridSelectionColumn Width="15px" />
+                                                        <DxGridSelectionColumn Width="15px"/>
                                                         <DxGridDataColumn MinWidth="200" FieldName="RegistrationDate" DisplayFormat="ddd, dd MMM yyyy" Caption="Registration Date"/>
                                                         <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
                                                         <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
-                                                        <DxGridDataColumn MinWidth="200" FieldName="StagingStatus" Caption="Status" />
+                                                        <DxGridDataColumn MinWidth="200" FieldName="StagingStatus" Caption="Status"/>
+                                                        <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service"/>
                                                         <DxGridDataColumn MinWidth="200" FieldName="Payment" Caption="Payment Methode" />
-                                                        <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
                                                         <DxGridDataColumn MinWidth="200" FieldName="AppoimentDate" Caption="Appoiment" />
-                                                        <DxGridDataColumn MinWidth="200" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
+                                                        <DxGridDataColumn Width="100px" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
                                                             <CellDisplayTemplate>
                                                         @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
                                                             </CellDisplayTemplate>
