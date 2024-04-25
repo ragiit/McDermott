@@ -1821,13 +1821,13 @@ else
                                 ShowSearchBox="true"
                                 KeyboardNavigationEnabled="true">
                             <Columns>
-                                <DxGridDataColumn MinWidth="200" FieldName="Parameter" Caption="Parameter" SortIndex="0" />
-                                <DxGridDataColumn MinWidth="200" FieldName="NormalRange" Caption="Normal Range" />
-                                <DxGridDataColumn MinWidth="200" FieldName="LabUom.Name" Caption="UoM" />
-                                <DxGridDataColumn MinWidth="200" FieldName="Result" Caption="Result" />
-                                <DxGridDataColumn MinWidth="200" FieldName="ResultType" Caption="Result Type" />
-                                <DxGridDataColumn MinWidth="200" FieldName="Remark" Caption="Remark" />
-                                <DxGridCommandColumn MinWidth="100">
+                                <DxGridDataColumn FieldName="Parameter" Caption="Parameter" SortIndex="0" />
+                                <DxGridDataColumn FieldName="NormalRange" Caption="Normal Range" />
+                                <DxGridDataColumn FieldName="LabUom.Name" Caption="UoM" />
+                                <DxGridDataColumn FieldName="Result" Caption="Result" />
+                                <DxGridDataColumn FieldName="ResultType" Caption="Result Type" />
+                                <DxGridDataColumn FieldName="Remark" Caption="Remark" />
+                                <DxGridCommandColumn MinWidth="100" FixedPosition="GridColumnFixedPosition.Right">
                                     <HeaderTemplate>
                                         <a class="fa-solid fa-plus" @onclick="@(async () => await AddNewLabResult())" style="text-decoration: none;" href="javascript:void(0);"></a>
                                     </HeaderTemplate>
@@ -1861,10 +1861,26 @@ else
                                         <ValidationMessage For="@(()=> LabResultDetail.LabUomId)"   />
                                     </DxFormLayoutItem>
 
-                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result" ColSpanMd="12">
-                                        <DxTextBox InputDelay="1000" @oninput="OnResultTextChanged" ShowValidationIcon="true" @bind-Text="@LabResultDetail.Result" NullText="Result" InputCssClass="fw-normal" />
-                                        <ValidationMessage For="@(() => LabResultDetail.Result)" />
-                                    </DxFormLayoutItem>
+                                   @{
+                                                                                    var showResult = true;
+
+                                                                                    ResultValueTypes = ["Low", "Normal", "High"];
+
+                                                                                    if (LabResultDetail.ResultValueType is not null && LabResultDetail.ResultValueType.Equals("Qualitative"))
+                                                                                    {
+                                                                                        showResult = false;
+                                                                                        ResultValueTypes = ["Positive", "Negative"];
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        showResult = true;
+                                                                                    }
+                                                                                }
+
+                                                                                <DxFormLayoutItem Visible="showResult" CaptionCssClass="normal-caption" Caption="Result" ColSpanMd="12">
+                                                                                    <DxTextBox InputDelay="1000" @oninput="OnResultTextChanged" ShowValidationIcon="true" @bind-Text="@LabResultDetail.Result" NullText="Result" InputCssClass="fw-normal" />
+                                                                                    <ValidationMessage For="@(() => LabResultDetail.Result)" />
+                                                                                </DxFormLayoutItem>
 
                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result Type" ColSpanMd="12">
                                         <DxComboBox ShowValidationIcon="true"

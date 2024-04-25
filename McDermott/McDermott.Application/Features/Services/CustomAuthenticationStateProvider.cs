@@ -52,6 +52,9 @@ namespace McDermott.Application.Features.Services
 
                 var usr = JsonConvert.DeserializeObject<User>(userSession);
 
+                if (usr is null)
+                    return await Task.FromResult(new AuthenticationState(_));
+
                 var claimPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
                 [
                     new Claim(ClaimTypes.NameIdentifier, usr.Id.ToString()),
@@ -108,6 +111,9 @@ namespace McDermott.Application.Features.Services
                     IsPersistent = true, // Sesuaikan sesuai kebutuhan
                     ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1) // Sesuaikan sesuai kebutuhan
                 };
+
+                if (usr is null)
+                    return;
 
                 claims = new ClaimsPrincipal(new ClaimsIdentity(
                 [

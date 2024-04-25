@@ -71,7 +71,7 @@
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<InsuranceDto>>();
-                    await Mediator.Send(new DeleteListInsuranceRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteInsuranceRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }

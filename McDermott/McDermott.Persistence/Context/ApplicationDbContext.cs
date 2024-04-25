@@ -162,9 +162,9 @@ namespace McDermott.Persistence.Context
 
             modelBuilder.Entity<Location>()
             .HasOne(e => e.ParentLocation)
-            .WithMany() // Menggunakan WithMany karena properti ParentLocationId akan menjadi nullable
+            .WithMany()
             .HasForeignKey(e => e.ParentLocationId)
-            .OnDelete(DeleteBehavior.Restrict); // Mengizinkan ParentLocationId menjadi null saat entitas ParentLocation dihapus
+            .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Village>()
                 .HasIndex(p => p.Id)
@@ -242,6 +242,11 @@ namespace McDermott.Persistence.Context
             modelBuilder.Entity<User>()
                 .HasOne(e => e.Department)
                 .WithMany();
+
+            modelBuilder.Entity<User>()
+             .HasMany(m => m.PatientAllergies)
+             .WithOne(c => c.User)
+             .OnDelete(DeleteBehavior.Cascade);
 
             //modelBuilder.Entity<User>()
             // .HasMany(m => m.PatientFamilyRelations)

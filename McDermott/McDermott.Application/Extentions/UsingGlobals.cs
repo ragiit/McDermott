@@ -18,6 +18,7 @@ global using System.ComponentModel.DataAnnotations;
 global using System.Linq.Expressions;
 global using Microsoft.Extensions.Caching.Memory;
 
+global using static McDermott.Application.Features.Commands.Patient.PatientAllergyCommand;
 global using static McDermott.Application.Extentions.EnumHelper;
 global using static McDermott.Application.Features.Commands.Bpjs.BpjsClassificationCommand;
 global using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
@@ -40,7 +41,6 @@ global using static McDermott.Application.Features.Commands.Medical.NursingDiagn
 global using static McDermott.Application.Features.Commands.Medical.PractitionerCommand;
 global using static McDermott.Application.Features.Commands.Medical.SpecialityCommand;
 global using static McDermott.Application.Features.Commands.Patient.InsurancePolicyCommand;
-global using static McDermott.Application.Features.Commands.Patient.PatientCommand;
 global using static McDermott.Application.Features.Commands.Patient.PatientFamilyRelationCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanCPPTCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanMedicalSupportCommand;

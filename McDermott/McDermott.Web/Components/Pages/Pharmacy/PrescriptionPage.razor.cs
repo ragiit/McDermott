@@ -208,6 +208,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task NewItemPrescriptionConcoction_Click()
         {
             PopUpConcoctionDetail = true;
+            if (GridConcoctionLines is not null)
+                GridConcoctionLines.AutoFitColumnWidths();
             //await GridPrescriptionConcoction.StartEditNewRowAsync();
         }
 

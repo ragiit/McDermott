@@ -2,56 +2,52 @@
 {
     public class InsuranceCommand
     {
-        public class GetInsuranceQuery : IRequest<List<InsuranceDto>>;
+        #region GET 
 
-        public class GetInsuranceByIdQuery : IRequest<InsuranceDto>
+        public class GetInsuranceQuery(Expression<Func<Insurance, bool>>? predicate = null, bool removeCache = false) : IRequest<List<InsuranceDto>>
         {
-            public long Id { get; set; }
-
-            public GetInsuranceByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public Expression<Func<Insurance, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class CreateInsuranceRequest : IRequest<InsuranceDto>
-        {
-            public InsuranceDto InsuranceDto { get; set; }
+        #endregion  
 
-            public CreateInsuranceRequest(InsuranceDto InsuranceDto)
-            {
-                this.InsuranceDto = InsuranceDto;
-            }
+        #region CREATE
+
+        public class CreateInsuranceRequest(InsuranceDto InsuranceDto) : IRequest<InsuranceDto>
+        {
+            public InsuranceDto InsuranceDto { get; set; } = InsuranceDto;
         }
 
-        public class UpdateInsuranceRequest : IRequest<bool>
+        public class CreateListInsuranceRequest(List<InsuranceDto> InsuranceDtos) : IRequest<List<InsuranceDto>>
         {
-            public InsuranceDto InsuranceDto { get; set; }
-
-            public UpdateInsuranceRequest(InsuranceDto InsuranceDto)
-            {
-                this.InsuranceDto = InsuranceDto;
-            }
+            public List<InsuranceDto> InsuranceDtos { get; set; } = InsuranceDtos;
         }
 
-        public class DeleteInsuranceRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion CREATE
 
-            public DeleteInsuranceRequest(long id)
-            {
-                Id = id;
-            }
+        #region Update
+
+        public class UpdateInsuranceRequest(InsuranceDto InsuranceDto) : IRequest<InsuranceDto>
+        {
+            public InsuranceDto InsuranceDto { get; set; } = InsuranceDto;
         }
 
-        public class DeleteListInsuranceRequest : IRequest<bool>
+        public class UpdateListInsuranceRequest(List<InsuranceDto> InsuranceDtos) : IRequest<List<InsuranceDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListInsuranceRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<InsuranceDto> InsuranceDtos { get; set; } = InsuranceDtos;
         }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteInsuranceRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

@@ -2,39 +2,45 @@
 {
     public class InsurancePolicyCommand
     {
-        #region Get
+        #region GET 
 
-        public class GetInsurancePolicyQuery(Expression<Func<InsurancePolicy, bool>>? predicate = null) : IRequest<List<InsurancePolicyDto>>
+        public class GetInsurancePolicyQuery(Expression<Func<InsurancePolicy, bool>>? predicate = null, bool removeCache = false) : IRequest<List<InsurancePolicyDto>>
         {
-            public Expression<Func<InsurancePolicy, bool>> Predicate { get; } = predicate;
+            public Expression<Func<InsurancePolicy, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class GetInsurancePolicyCountQuery(Expression<Func<InsurancePolicy, bool>>? predicate = null) : IRequest<long>
-        {
-            public Expression<Func<InsurancePolicy, bool>> Predicate { get; } = predicate;
-        }
+        #endregion  
 
-        #endregion Get
-
-        #region Create
+        #region CREATE
 
         public class CreateInsurancePolicyRequest(InsurancePolicyDto InsurancePolicyDto) : IRequest<InsurancePolicyDto>
         {
             public InsurancePolicyDto InsurancePolicyDto { get; set; } = InsurancePolicyDto;
         }
 
-        #endregion Create
+        public class CreateListInsurancePolicyRequest(List<InsurancePolicyDto> InsurancePolicyDtos) : IRequest<List<InsurancePolicyDto>>
+        {
+            public List<InsurancePolicyDto> InsurancePolicyDtos { get; set; } = InsurancePolicyDtos;
+        }
+
+        #endregion CREATE
 
         #region Update
 
-        public class UpdateInsurancePolicyRequest(InsurancePolicyDto InsurancePolicyDto) : IRequest<bool>
+        public class UpdateInsurancePolicyRequest(InsurancePolicyDto InsurancePolicyDto) : IRequest<InsurancePolicyDto>
         {
             public InsurancePolicyDto InsurancePolicyDto { get; set; } = InsurancePolicyDto;
         }
 
+        public class UpdateListInsurancePolicyRequest(List<InsurancePolicyDto> InsurancePolicyDtos) : IRequest<List<InsurancePolicyDto>>
+        {
+            public List<InsurancePolicyDto> InsurancePolicyDtos { get; set; } = InsurancePolicyDtos;
+        }
+
         #endregion Update
 
-        #region Delete
+        #region DELETE
 
         public class DeleteInsurancePolicyRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
@@ -42,6 +48,6 @@
             public List<long> Ids { get; set; } = ids ?? [];
         }
 
-        #endregion Delete
+        #endregion DELETE
     }
 }

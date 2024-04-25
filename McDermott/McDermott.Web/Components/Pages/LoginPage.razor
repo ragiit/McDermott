@@ -184,6 +184,7 @@
         {
             // await Helper.DownloadFile(HttpContextAccessor, Http, JsRuntime);
             // Replace "api/download/file" with the actual API endpoint for downloading files
+            return;
             var response = await HttpClient.GetAsync("http://localhost:5000/Uploads/Hasil-Ronsen.jpeg");
 
             if (response.IsSuccessStatusCode)

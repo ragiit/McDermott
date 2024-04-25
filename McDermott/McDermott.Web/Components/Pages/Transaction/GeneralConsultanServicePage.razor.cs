@@ -175,32 +175,49 @@ namespace McDermott.Web.Components.Pages.Transaction
                 return;
             }
 
-            LabResultDetails.Clear();
+            //LabResultDetails.Clear();
 
             var details = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == e.Id));
-            if (GeneralConsultanMedicalSupport.Id == 0)
+            foreach (var item in details)
             {
-                var temp = new List<LabResultDetailDto>();
-                foreach (var item in details)
+                LabResultDetails.Add(new LabResultDetailDto
                 {
-                    temp.Add(new LabResultDetailDto
-                    {
-                        IsFromDB = true,
-                        Id = Helper.RandomNumber,
-                        NormalRange = FormRegis.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
-                        Parameter = item.Name,
-                        Remark = item.Remark,
-                        LabUomId = item.LabUomId,
-                        LabUom = item.LabUom
-                    });
-                }
+                    IsFromDB = true,
+                    Id = Helper.RandomNumber,
+                    NormalRange = FormRegis.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
+                    Parameter = item.Name,
+                    Remark = item.Remark,
+                    LabUomId = item.LabUomId,
+                    LabUom = item.LabUom,
+                    ResultValueType = item.ResultValueType
+                });
+            }
 
-                LabResultDetails.AddRange(temp);
-            }
-            else
-            {
-                LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
-            }
+            //var details = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == e.Id));
+            //if (GeneralConsultanMedicalSupport.Id == 0)
+            //{
+            //    var temp = new List<LabResultDetailDto>();
+            //    foreach (var item in details)
+            //    {
+            //        temp.Add(new LabResultDetailDto
+            //        {
+            //            IsFromDB = true,
+            //            Id = Helper.RandomNumber,
+            //            NormalRange = FormRegis.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
+            //            Parameter = item.Name,
+            //            Remark = item.Remark,
+            //            LabUomId = item.LabUomId,
+            //            LabUom = item.LabUom,
+            //            ResultValueType = item.ResultValueType
+            //        });
+            //    }
+
+            //    LabResultDetails.AddRange(temp);
+            //}
+            //else
+            //{
+            //    LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
+            //}
 
             //LabResultDetail.LabTestId = e.Id;
 

@@ -135,5 +135,8 @@
 
         [SetToNull]
         public virtual Degree? Degree { get; set; }
+
+        [SetToNull]
+        public virtual List<PatientAllergy>? PatientAllergies { get; set; }
     }
 }

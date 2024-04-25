@@ -70,7 +70,6 @@ global using static McDermott.Application.Features.Commands.Config.GenderCommand
 global using static McDermott.Application.Features.Commands.Config.MenuCommand;
 global using static McDermott.Application.Features.Commands.Medical.HealthCenterCommand;
 global using static McDermott.Application.Features.Commands.Medical.SpecialityCommand;
-global using static McDermott.Application.Features.Commands.Patient.PatientCommand;
 global using static McDermott.Application.Features.Commands.Config.CompanyCommand;
 global using static McDermott.Application.Features.Commands.Employee.EmployeeCommand;
 global using static McDermott.Application.Features.Commands.Patient.FamilyRelationCommand;
@@ -82,3 +81,4 @@ global using static McDermott.Application.Features.Commands.Medical.NursingDiagn
 global using static McDermott.Application.Features.Commands.Config.GroupMenuCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanCPPTCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanMedicalSupportCommand;
+global using static McDermott.Application.Features.Commands.Patient.PatientAllergyCommand;
