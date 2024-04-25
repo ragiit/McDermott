@@ -185,7 +185,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     Name = group.FirstOrDefault()?.Name, // Use FirstOrDefault() for safer handling
                     SalesPrice = group.FirstOrDefault()?.SalesPrice,
                     InternalReference = group.FirstOrDefault()?.InternalReference,
-                    Qtys = group.Where(product => product.StockProducts.StatusTransaction == "IN").Sum(product => product.StockProducts?.Qty) - group.Where(product => product.StockProducts?.StatusTransaction == "OUT").Sum(product => product.StockProducts?.Qty),
+                    Qtys = group.Where(product => product.StockProducts?.StatusTransaction == "IN").Sum(product => product.StockProducts?.Qty) ,
                     UomName = group.FirstOrDefault()?.Uom.Name
                 }).ToList();
 
