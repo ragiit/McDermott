@@ -12,5 +12,7 @@ namespace McDermott.Application.Dtos.Medical
         public string ResultType { get; set; } = "Quantitative";
 
         public virtual SampleTypeDto? SampleType { get; set; }
+
+        public virtual List<GeneralConsultanMedicalSupportDto>? GeneralConsultanMedicalSupports { get; set; }
     }
 }

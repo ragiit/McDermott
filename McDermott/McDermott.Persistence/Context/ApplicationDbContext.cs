@@ -215,6 +215,11 @@ namespace McDermott.Persistence.Context
                   .WithOne(c => c.LabTest)
                   .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<LabTest>()
+                .HasMany(m => m.GeneralConsultanMedicalSupports)
+                .WithOne(c => c.LabTest)
+                .OnDelete(DeleteBehavior.SetNull);
+
             modelBuilder.Entity<Menu>()
                   .HasMany(m => m.GroupMenus)
                   .WithOne(c => c.Menu)
