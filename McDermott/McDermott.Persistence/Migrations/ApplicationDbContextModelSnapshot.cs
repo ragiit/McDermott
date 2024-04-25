@@ -2118,6 +2118,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("ResultType")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ResultValueType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -3222,6 +3225,10 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ProductId");
 
+                    b.HasIndex("SourceId");
+
+                    b.HasIndex("UomId");
+
                     b.ToTable("StockProducts");
                 });
 
@@ -4310,9 +4317,9 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.PatientAllergy", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("PatientAllergies")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -4432,7 +4439,23 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("McDermott.Domain.Entities.Location", "Source")
+                        .WithMany()
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.Uom", "Uom")
+                        .WithMany()
+                        .HasForeignKey("UomId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Destinance");
+
                     b.Navigation("Product");
+
+                    b.Navigation("Source");
+
+                    b.Navigation("Uom");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>
@@ -4742,6 +4765,11 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.UomCategory", b =>
                 {
                     b.Navigation("Uoms");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.User", b =>
+                {
+                    b.Navigation("PatientAllergies");
                 });
 #pragma warning restore 612, 618
         }
