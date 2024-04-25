@@ -1275,7 +1275,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 if (FormRegis.Id == 0)
                 {
-                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.ServiceId == FormRegis.ServiceId && x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
 
                     if (patient.Count > 0)
                     {

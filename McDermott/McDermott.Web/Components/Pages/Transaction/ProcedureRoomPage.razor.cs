@@ -380,7 +380,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     LabResultDetails.ForEach(x => x.Id = 0);
 
-                    await Mediator.Send(new CreateListLabResultDetailRequest(LabResultDetails));
+                    LabResultDetails = await Mediator.Send(new CreateListLabResultDetailRequest(LabResultDetails));
 
                     IsAddOrUpdateOrDeleteLabResult = false;
                 }
