@@ -185,7 +185,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     Name = group.FirstOrDefault()?.Name, // Use FirstOrDefault() for safer handling
                     SalesPrice = group.FirstOrDefault()?.SalesPrice,
                     InternalReference = group.FirstOrDefault()?.InternalReference,
-                    Qtys = group.Where(product => product.StockProducts?.StatusTransaction == "IN").Sum(product => product.StockProducts?.Qty) ,
+                    
                     UomName = group.FirstOrDefault()?.Uom.Name
                 }).ToList();
 
@@ -209,7 +209,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     var stockOUT = StockProducts.Where(s => s.ProductId == sp.Id && s.StatusTransaction == "OUT").ToList();
                     var countStockIn = stockIN.Sum(x => x.Qty);
                     var countStockOUT = stockOUT.Sum(x => x.Qty);
-                    TotalQty = countStockIn - countStockOUT;
+                    sp.Qtys = countStockIn - countStockOUT;
                 }
                 PanelVisible = false;
             }
