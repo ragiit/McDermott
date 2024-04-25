@@ -165,12 +165,12 @@
                                                                                     <DxGridLayoutColumn />
                                                                                 </Columns>
                                                                                 <Items>
-                                                                                    <DxGridLayoutItem Row="0" Column="0" ColumnSpan="4">
-                                                                                        <Template>
+                                                                                    <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption " ColumnSpan="1" >
+                                                                                        <Template >
                                                                                             <DxTextBox @bind-Text="@FormProductDetails.Dosage" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="0.00" />
                                                                                         </Template>
                                                                                     </DxGridLayoutItem>
-                                                                                    <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption" ColumnSpan="6">
+                                                                                    <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="6" >
                                                                                         <Template>
                                                                                             <DxComboBox Data="@Uoms"
                                                                                                         @bind-Value="@FormProductDetails.UomMId"
