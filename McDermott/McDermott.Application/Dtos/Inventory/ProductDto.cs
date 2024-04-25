@@ -19,6 +19,8 @@ namespace McDermott.Application.Dtos.Inventory
         public string? Tax { get; set; }
         public string? Cost { get; set; }
         public string? InternalReference { get; set; }
+        public string? UomName { get; set; }
+        public long? Qtys { get; set; }
 
 
         [SetToNull]
@@ -29,6 +31,9 @@ namespace McDermott.Application.Dtos.Inventory
         public virtual ProductCategoryDto? ProductCategory { get; set; }
         [SetToNull]
         public virtual CompanyDto? Company { get; set; }
+
+        [SetToNull]
+        public virtual StockProductDto? StockProducts { get; set; }
     }
 
     public class ProductDetailDto
@@ -52,6 +57,8 @@ namespace McDermott.Application.Dtos.Inventory
         public string? MontlyMax { get; set; }
         public long? FormId { get; set; }
         public string? Dosage { get; set; }
+        public string? UomName { get; set; }
+        public long? Qtys { get; set; }
         public long? BpjsClasificationId { get; set; }
         public long? ProductCategoryId { get; set; }
         public long? CompanyId { get; set; }

@@ -23,5 +23,6 @@ namespace McDermott.Domain.Entities
         public ProductCategory? ProductCategory { get; set; }
         public Company? Company { get; set; }
         public List<Medicament>? Medicaments { get; set; }
+        public StockProduct? StockProduct { get; set; }
     }
 }

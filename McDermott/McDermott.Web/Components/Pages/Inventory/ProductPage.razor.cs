@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
+﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
@@ -11,6 +12,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         #region Relation Data
 
         private List<ProductDto> Products = [];
+        private List<StockProductDto> DataProducts = [];
         private List<MedicamentDto> Medicaments = [];
         private List<BpjsClassificationDto> BpjsClassifications = [];
         private List<UomDto> Uoms = [];
@@ -177,7 +179,15 @@ namespace McDermott.Web.Components.Pages.Inventory
                 showForm = false;
                 StockProductView = false;
                 SelectedDataItems = [];
-                Products = await Mediator.Send(new GetProductQuery());
+                var p = await Mediator.Send(new GetProductQuery());
+                Products = p.GroupBy(x => x.Id).Select(group => new ProductDto{
+                    Id = group.Key,
+                    Name = group.FirstOrDefault()?.Name, // Use FirstOrDefault() for safer handling
+                    SalesPrice = group.FirstOrDefault()?.SalesPrice,
+                    InternalReference = group.FirstOrDefault()?.InternalReference,
+                    
+                    UomName = group.FirstOrDefault()?.Uom.Name
+                }).ToList();
 
                 //Data
 
@@ -193,7 +203,14 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 //StockProduct
                 StockProducts = await Mediator.Send(new GetStockProductQuery());
-
+                foreach (var sp in Products)
+                {
+                    var stockIN = StockProducts.Where(s => s.ProductId == sp.Id && s.StatusTransaction == "IN").ToList();
+                    var stockOUT = StockProducts.Where(s => s.ProductId == sp.Id && s.StatusTransaction == "OUT").ToList();
+                    var countStockIn = stockIN.Sum(x => x.Qty);
+                    var countStockOUT = stockOUT.Sum(x => x.Qty);
+                    sp.Qtys = countStockIn - countStockOUT;
+                }
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -240,6 +257,11 @@ namespace McDermott.Web.Components.Pages.Inventory
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
+        }
+
+        private async Task OnRowDoubleClick(GridRowClickEventArgs e)
+        {
+            await EditItem_Click();
         }
 
         #endregion Grid
