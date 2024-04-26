@@ -24,6 +24,14 @@ namespace McDermott.Web.Components.Layout
             NavigationManager.NavigateTo("/login", true);
         }
 
+        private string searchQuery = "";
+
+        private void Search()
+        {
+            // No action required here since search is handled in the foreach loop
+            StateHasChanged(); // Refresh UI after search
+        }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             try

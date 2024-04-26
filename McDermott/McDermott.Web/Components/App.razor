@@ -50,7 +50,7 @@
 
     @* Blazor Bootstrap *@
 
-    <link href="McDermott.Web.styles.css" rel="stylesheet">
+    @* <link href="McDermott.Web.styles.css" rel="stylesheet"> *@
 
     @DxResourceManager.RegisterScripts()
 
@@ -140,7 +140,8 @@
     </style>
 </head>
 
-<body class="hold-transition sidebar-mini  layout-fixed hold-transition white-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+@* <body class="hold-transition sidebar-mini  layout-fixed hold-transition white-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed"> *@
+<body class="hold-transition sidebar-mini sidebar-collapse layout-navbar-fixed layout-footer-fixed layout-fixed">
     <Routes @rendermode="InteractiveServer" />
     <script src="_framework/blazor.web.js"></script>
 
