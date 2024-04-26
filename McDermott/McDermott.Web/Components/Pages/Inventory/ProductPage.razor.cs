@@ -175,26 +175,19 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
+                // Inisialisasi variabel
                 PanelVisible = true;
                 showForm = false;
                 StockProductView = false;
                 SelectedDataItems = [];
-                DataProducts = await Mediator.Send(new GetProductQuery());
-                Products = DataProducts.GroupBy(x => x.Id).Select(group => new ProductDto{
-                    Id = group.Key,
-                    Name = group.FirstOrDefault()?.Name, // Use FirstOrDefault() for safer handling
-                    SalesPrice = group.FirstOrDefault()?.SalesPrice,
-                    InternalReference = group.FirstOrDefault()?.InternalReference,
-                    UomId = group.FirstOrDefault()?.UomId,
-                    PurchaseUomId = group.FirstOrDefault()?.PurchaseUomId,
-                    HospitalType=group.FirstOrDefault()?.HospitalType,
-                    ProductType=group.FirstOrDefault()?.ProductType,
-                    ProductCategoryId=group.FirstOrDefault()?.ProductCategoryId,
-                    UomName = group.FirstOrDefault()?.Uom.Name
-                }).ToList();
 
-                //Data
+                // Mengambil data produk
+                Products = (await Mediator.Send(new GetProductQuery()))
+                    .GroupBy(x => x.Id)
+                    .Select(group => group.First())
+                    .ToList();
 
+                // Mengambil data lainnya
                 BpjsClassifications = await Mediator.Send(new GetBpjsClassificationQuery());
                 Uoms = await Mediator.Send(new GetUomQuery());
                 productCategories = await Mediator.Send(new GetProductCategoryQuery());
@@ -205,16 +198,16 @@ namespace McDermott.Web.Components.Pages.Inventory
                 Medicaments = await Mediator.Send(new GetMedicamentQuery());
                 Locations = await Mediator.Send(new GetLocationQuery());
 
-                //StockProduct
+                // Mengambil data stok produk dan menghitung jumlahnya
                 StockProducts = await Mediator.Send(new GetStockProductQuery());
-                foreach (var sp in Products)
+                foreach (var product in Products)
                 {
-                    var stockIN = StockProducts.Where(s => s.ProductId == sp.Id && s.StatusTransaction == "IN").ToList();
-                    var stockOUT = StockProducts.Where(s => s.ProductId == sp.Id && s.StatusTransaction == "OUT").ToList();
-                    var countStockIn = stockIN.Sum(x => x.Qty);
-                    var countStockOUT = stockOUT.Sum(x => x.Qty);
-                    sp.Qtys = countStockIn - countStockOUT;
+                    var stockIn = StockProducts.Where(s => s.ProductId == product.Id && s.StatusTransaction == "IN").Sum(x => x.Qty);
+                    var stockOut = StockProducts.Where(s => s.ProductId == product.Id && s.StatusTransaction == "OUT").Sum(x => x.Qty);
+                    product.Qtys = stockIn - stockOut;
                 }
+
+                // Menyembunyikan panel setelah selesai
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -276,12 +269,13 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             await LoadData();
             showForm = true;
-            smartButtonShow = false;
-            FormProductDetails = new();
-            FormProductDetails.ProductType = ProductTypes[2];
-            FormProductDetails.HospitalType = HospitalProducts[0];
-            FormProductDetails.SalesPrice = "100";
-            FormProductDetails.Tax = "11%";
+            FormProductDetails = new ProductDetailDto
+            {
+                ProductType = ProductTypes[2],
+                HospitalType = HospitalProducts[0],
+                SalesPrice = "100",
+                Tax = "11%"
+            };
         }
 
 
@@ -292,65 +286,59 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task EditItem_Click(ProductDto? p = null)
         {
-            showForm = true;
-            PanelVisible = true;
-            smartButtonShow = true;
-            var products = new ProductDto();
-            if (p == null)
+            try
             {
-               products = SelectedDataItems[0].Adapt<ProductDto>();
-            }
-            else
-            {
-                products = p;
-            }
-            var medicamen = Medicaments.FirstOrDefault(z => z.ProductId == products.Id);
-            FormProductDetails.Id = products.Id;
-            FormProductDetails.Name = products.Name;
-            FormProductDetails.ProductCategoryId = products.ProductCategoryId;
-            FormProductDetails.ProductType = products.ProductType;
-            FormProductDetails.HospitalType = products.HospitalType;
-            FormProductDetails.BpjsClasificationId = products.BpjsClasificationId;
-            FormProductDetails.UomId = products.UomId;
-            FormProductDetails.PurchaseUomId = products.PurchaseUomId;
-            FormProductDetails.SalesPrice = products.SalesPrice;
-            FormProductDetails.Tax = products.Tax;
-            FormProductDetails.Cost = products.Cost;
-            FormProductDetails.ProductCategoryId = products.ProductCategoryId;
-            FormProductDetails.InternalReference = products.InternalReference;
-            FormProductDetails.TraceAbility = products.TraceAbility;
-            if (products.HospitalType == "Medicament")
-            {
-                if (medicamen != null)
+                showForm = true;
+                PanelVisible = true;
+                smartButtonShow = true;
+
+                // Inisialisasi data produk
+                var products = p ?? SelectedDataItems[0].Adapt<ProductDto>();
+                FormProductDetails = products.Adapt<ProductDetailDto>();
+
+                // Jika produk adalah "Medicament", isi detail tambahan
+                var medicamen = Medicaments.FirstOrDefault(z => z.ProductId == products.Id);
+                if (products.HospitalType == "Medicament")
                 {
-                    FormProductDetails.MedicamentId = medicamen.Id;
-                    FormProductDetails.FormId = medicamen.FormId;
-                    FormProductDetails.RouteId = medicamen.RouteId;
-                    FormProductDetails.Dosage = medicamen.Dosage;
-                    FormProductDetails.UomMId = medicamen.UomId;
-                    FormProductDetails.Cronies = medicamen.Cronies;
-                    FormProductDetails.MontlyMax = medicamen.MontlyMax;
-                    FormProductDetails.SignaId = medicamen.SignaId;
-                    if (medicamen.ActiveComponentId != null)
+                    if (medicamen != null)
                     {
-                        selectedActiveComponents = ActiveComponents.Where(a => medicamen.ActiveComponentId.Contains(a.Id)).ToList();
+                        FormProductDetails.MedicamentId = medicamen.Id;
+                        FormProductDetails.FormId = medicamen.FormId;
+                        FormProductDetails.RouteId = medicamen.RouteId;
+                        FormProductDetails.Dosage = medicamen.Dosage;
+                        FormProductDetails.UomMId = medicamen.UomId;
+                        FormProductDetails.Cronies = medicamen.Cronies;
+                        FormProductDetails.MontlyMax = medicamen.MontlyMax;
+                        FormProductDetails.SignaId = medicamen.SignaId;
+
+                        // Ambil komponen aktif jika tersedia
+                        if (medicamen.ActiveComponentId != null)
+                        {
+                            selectedActiveComponents = ActiveComponents.Where(a => medicamen.ActiveComponentId.Contains(a.Id)).ToList();
+                        }
+
+                        FormProductDetails.PregnancyWarning = medicamen.PregnancyWarning;
+                        FormProductDetails.Pharmacologi = medicamen.Pharmacologi;
+                        FormProductDetails.Weather = medicamen.Weather;
+                        FormProductDetails.Food = medicamen.Food;
                     }
-                    FormProductDetails.PregnancyWarning = medicamen.PregnancyWarning;
-                    FormProductDetails.Pharmacologi = medicamen.Pharmacologi;
-                    FormProductDetails.Weather = medicamen.Weather;
-                    FormProductDetails.Food = medicamen.Food;
                 }
+
+                // Kelola informasi stok
+                var stockIN = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "IN").ToList();
+                var stockOUT = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "OUT").ToList();
+                var TotalQty = stockIN.Sum(x => x.Qty) - stockOUT.Sum(x => x.Qty);
+
+                // Ambil nama satuan ukur
+                var NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;
+
+                // Atur visibilitas panel
+                PanelVisible = false;
             }
-
-            var stockIN = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "IN").ToList();
-            var stockOUT = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "OUT").ToList();
-            var countStockIn = stockIN.Sum(x=>x.Qty);
-            var countStockOUT = stockOUT.Sum(x=>x.Qty);
-            TotalQty = countStockIn - countStockOUT;
-
-            NameUom =Uoms.Where(u=>u.Id == FormProductDetails.UomId).Select(x=>x.Name).FirstOrDefault();
-            PanelVisible = false;
-            
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task onDiscard()
@@ -431,6 +419,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         }
                     }
                     await Mediator.Send(new DeleteProductRequest(ids: SelectedDataItems.Adapt<List<ProductDto>>().Select(x => x.Id).ToList()));
+                    ToastService.ShowError("Success Delete Data Product..");
                 }
 
                 await LoadData();
@@ -565,23 +554,30 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
+                // Inisialisasi
                 showForm = false;
                 PanelVisible = true;
                 StockProductView = true;
+
+                // Mengambil data stok produk
                 StockProducts = await Mediator.Send(new GetStockProductQuery());
+
                 if (SelectedDataItems.Count == 0)
                 {
-
-                    StockProducts = [.. StockProducts.Where(x => x.ProductId == getProduct.Id).ToList()];
+                    // Jika tidak ada item yang dipilih, gunakan produk yang sedang dipertimbangkan
+                    StockProducts = StockProducts.Where(x => x.ProductId == getProduct.Id).ToList();
                     NameProduct = getProduct.Name;
                 }
-                else {
-
-                    StockProducts = [.. StockProducts.Where(x => x.ProductId == SelectedDataItems[0].Adapt<ProductDto>().Id).ToList()];
-
+                else
+                {
+                    // Jika ada item yang dipilih, gunakan produk yang dipilih
+                    StockProducts = StockProducts.Where(x => x.ProductId == SelectedDataItems[0].Adapt<ProductDto>().Id).ToList();
                     NameProduct = SelectedDataItems[0].Adapt<ProductDto>().Name;
-                }                 
+                }
+
+                // Menyembunyikan panel setelah selesai
                 PanelVisible = false;
+
             }
             catch (Exception ex)
             {
@@ -589,7 +585,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
         }
         private async Task NewItemStock_Click()
-        {
+            {
             FormStockProduct = new();
             FormStockPopUp = true;
             DataProducts = await Mediator.Send(new GetProductQuery());
@@ -630,10 +626,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if (SelectedDataItemsStock is null)
                 {
                     await Mediator.Send(new DeleteStockProductRequest(((StockProductDto)e.DataItem).Id));
+                    ToastService.ShowError("Success Delete Data Stock..");
                 }
                 else
                 {
                     await Mediator.Send(new DeleteStockProductRequest(ids: SelectedDataItemsStock.Adapt<List<StockProductDto>>().Select(x => x.Id).ToList()));
+                    ToastService.ShowError("Success Delete Data Stock..");
                 }
                 await NewTableStock_Item();
             }
