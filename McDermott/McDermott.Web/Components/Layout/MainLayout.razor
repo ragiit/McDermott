@@ -241,10 +241,27 @@
                             </div>
 
                             <ul class="mt-3 nav nav-pills nav-sidebar flex-column sidebar-light-info sidebar-light-bg-info" data-widget="treeview" role="menu" data-accordion="false">
-                                @foreach (var h in HeaderMenuDtos.Where(x => DetailMenuDtos.Where(z => z.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower())).Select(a => a.ParentMenu).ToList().Contains(x.Name)))
+
+                                <li class="nav-item mb-2">
+                                    <div class="input-group input-group-sm">
+                                    </div>
+                                    <NavLink href="/" class="nav-link" Match="NavLinkMatch.All">
+                                        <i class="nav-icon fa-solid fa-house"></i>
+                                        <p>
+                                            Home Page
+                                        </p>
+                                    </NavLink>
+                                </li>
+
+                                @foreach (var h in HeaderMenuDtos.Where(x => x.Name.ToLower().Trim().Contains(searchQuery.Trim().ToLower()) || DetailMenuDtos.Where(z => z.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower())).Select(a => a.ParentMenu).ToList().Contains(x.Name)))
                                 {
                                     <li class="nav-item">
-                                        <NavLink href="#" class="nav-link sidebar-light-info sidebar-light-bg-info" Match="NavLinkMatch.Prefix">
+
+                                        @{
+                                            var details = DetailMenuDtos.Where(x => x.ParentMenu == h.Name && x.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower()));
+                                        }
+
+                                        <NavLink class="nav-link sidebar-light-info sidebar-light-bg-info">
                                             @if (h.Icon != null)
                                             {
                                                 @((MarkupString)h.Icon)
@@ -259,19 +276,22 @@
                                             </p>
                                         </NavLink>
 
-                                        @foreach (var d in DetailMenuDtos.Where(x => x.ParentMenu == h.Name && x.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower())))
+                                        @if (details.Count() > 0)
                                         {
-                                            if (!d.Name.ToLower().Equals("kiosk"))
+                                            @foreach (var d in DetailMenuDtos.Where(x => x.ParentMenu == h.Name && x.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower())))
                                             {
-                                                var url = string.IsNullOrEmpty(d.Url) ? "test" : d.Url;
-                                                <ul class="nav nav-treeview sidebar-light-bg-info sidebar-light-info">
-                                                    <li class="nav-item">
-                                                        <NavLink href="@url" class="nav-link sidebar-light-info sidebar-light-bg-info">
-                                                            <i class="far fa-circle nav-icon"></i>
-                                                            <p class="ml-3">@d.Name</p>
-                                                        </NavLink>
-                                                    </li>
-                                                </ul>
+                                                if (!d.Name.ToLower().Equals("kiosk"))
+                                                {
+                                                    var url = string.IsNullOrEmpty(d.Url) ? "test" : d.Url;
+                                                    <ul class="nav nav-treeview sidebar-light-bg-info sidebar-light-info">
+                                                        <li class="nav-item">
+                                                            <NavLink href="@url" class="nav-link sidebar-light-info sidebar-light-bg-info">
+                                                                <i class="far fa-circle nav-icon"></i>
+                                                                <p class="ml-3">@d.Name</p>
+                                                            </NavLink>
+                                                        </li>
+                                                    </ul>
+                                                }
                                             }
                                         }
                                     </li>
