@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
@@ -45,6 +46,30 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #endregion UserLoginAndAccessRole
 
         #region Static Variables
+
+        [Parameter]
+        public long Id { get; set; }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            await base.OnParametersSetAsync();
+
+            if (Id == 0)
+                return;
+
+            var generalConsultantService = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id));
+            if (generalConsultantService.Count == 0 || generalConsultantService is null)
+                return;
+
+            ShowForm = true;
+            Pharmacy.PatientId = generalConsultantService.FirstOrDefault()!.PatientId;
+            Pharmacy.PractitionerId = generalConsultantService.FirstOrDefault()!.PratitionerId;
+            Pharmacy.ServiceId = generalConsultantService.FirstOrDefault()!.ServiceId;
+            Pharmacy.PaymentMethod = generalConsultantService.FirstOrDefault()!.Payment;
+            Pharmacy.IsWeather = generalConsultantService.FirstOrDefault()!.IsWeather;
+            Pharmacy.IsFarmacologi = generalConsultantService.FirstOrDefault()!.IsPharmacology;
+            Pharmacy.IsFood = generalConsultantService.FirstOrDefault()!.IsFood;
+        }
 
         private IGrid Grid { get; set; }
         private IGrid GridPrescriptionLines { get; set; }
@@ -106,7 +131,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Services = await Mediator.Send(new GetServiceQuery());
             Products = await Mediator.Send(new GetProductQuery());
             DrugDosages = await Mediator.Send(new GetDrugDosageQuery());
-            Medicaments = await Mediator.Send(new GetMedicamentQuery());
             MedicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery());
             DrugForms = await Mediator.Send(new GetFormDrugQuery());
             Signas = await Mediator.Send(new GetSignaQuery());
@@ -117,6 +141,47 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await GetUserInfo();
 
             IsLoading = false;
+        }
+
+        private async Task SelectedItemMedicalNamePresciptionLinesChanged(ProductDto e)
+        {
+            try
+            {
+                Prescription.ProductId = null;
+                Prescription.DrugFromId = null;
+                Prescription.SignaId = null;
+                Prescription.DrugDosageId = null;
+                Prescription.DrugRouteId = null;
+                Prescription.PriceUnit = 0;
+                Prescription.Stock = 0;
+
+                if (e is null)
+                    return;
+
+                Prescription.ProductId = e.Id;
+
+                var medicament = await Mediator.Send(new GetMedicamentQuery(x => x.ProductId == e.Id));
+                if (medicament.Count > 0)
+                {
+                    Prescription.DrugFromId = medicament[0].FormId;
+                    Prescription.DrugRouteId = medicament[0].RouteId;
+                    //Prescription.DrugRouteId = medicament[0].Dosage;
+                }
+
+                var stock = await Mediator.Send(new GetStockProductQuery(x => x.ProductId == e.Id));
+                if (stock.Count > 0)
+                    Prescription.Stock = (float)stock.Where(x => x.StatusTransaction == "IN").Select(x => x.Qty).Sum()! - (float)stock.Where(x => x.StatusTransaction == "OUT").Select(x => x.Qty).Sum()!;
+
+                if (Products.Count > 0)
+                {
+                    var p = Products.FirstOrDefault(x => x.Id == e.Id);
+                    Prescription.PriceUnit = p!.SalesPrice!.ToLong();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task LoadData()
@@ -150,6 +215,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task NewItem_Click()
         {
             ShowForm = true;
+            Pharmacy = new();
         }
 
         private async Task Refresh_Click()
@@ -205,11 +271,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             GridPrescriptionLines.ShowRowDeleteConfirmation(FocusedRowVisibleIndexPrescriptionLines);
         }
 
-        private async Task NewItemPrescriptionConcoction_Click()
+        private void NewItemPrescriptionConcoction_Click()
         {
             PopUpConcoctionDetail = true;
-            if (GridConcoctionLines is not null)
-                GridConcoctionLines.AutoFitColumnWidths();
             //await GridPrescriptionConcoction.StartEditNewRowAsync();
         }
 

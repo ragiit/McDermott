@@ -211,13 +211,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             if (editModel.Id == 0)
             {
-                long newId;
-                do
-                {
-                    newId = Helper.RandomNumber;
-                } while (LabResultDetails.Any(pfr => pfr.Id == newId));
-
-                editModel.Id = newId;
+                editModel.Id = Helper.RandomNumber;
                 editModel.GeneralConsultanMedicalSupportId = GeneralConsultanMedicalSupport.Id;
                 LabResultDetails.Add(editModel);
             }
