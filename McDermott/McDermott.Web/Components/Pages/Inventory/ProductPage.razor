@@ -418,11 +418,10 @@
                                                     <DxSpinEdit @bind-Value="@FormStockProduct.Qty" NullText="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem Caption="Product" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                    <DxComboBox Data="Products" @bind-Value="@FormStockProduct.ProductId"
+                                                    <DxComboBox Data="DataProducts" @bind-Value="@FormStockProduct.ProductId"
                                                                 NullText="Select Product..."
                                                                 ShowValidationIcon="true"
                                                                 TextFieldName="Name"
-                                                                ReadOnly
                                                                 ValueFieldName="Id"
                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
                                                     </DxComboBox>

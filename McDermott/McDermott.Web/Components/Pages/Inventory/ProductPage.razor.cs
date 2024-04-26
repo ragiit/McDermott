@@ -12,7 +12,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         #region Relation Data
 
         private List<ProductDto> Products = [];
-        private List<StockProductDto> DataProducts = [];
+        private List<ProductDto> DataProducts = [];
         private List<MedicamentDto> Medicaments = [];
         private List<BpjsClassificationDto> BpjsClassifications = [];
         private List<UomDto> Uoms = [];
@@ -179,16 +179,17 @@ namespace McDermott.Web.Components.Pages.Inventory
                 showForm = false;
                 StockProductView = false;
                 SelectedDataItems = [];
-                var p = await Mediator.Send(new GetProductQuery());
-                Products = p.GroupBy(x => x.Id).Select(group => new ProductDto{
+                DataProducts = await Mediator.Send(new GetProductQuery());
+                Products = DataProducts.GroupBy(x => x.Id).Select(group => new ProductDto{
                     Id = group.Key,
                     Name = group.FirstOrDefault()?.Name, // Use FirstOrDefault() for safer handling
                     SalesPrice = group.FirstOrDefault()?.SalesPrice,
                     InternalReference = group.FirstOrDefault()?.InternalReference,
                     UomId = group.FirstOrDefault()?.UomId,
                     PurchaseUomId = group.FirstOrDefault()?.PurchaseUomId,
-                    HospitalType=group.FirstOrDefault().HospitalType,
+                    HospitalType=group.FirstOrDefault()?.HospitalType,
                     ProductType=group.FirstOrDefault()?.ProductType,
+                    ProductCategoryId=group.FirstOrDefault()?.ProductCategoryId,
                     UomName = group.FirstOrDefault()?.Uom.Name
                 }).ToList();
 
@@ -362,7 +363,6 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
-
 
 
         private void ColumnChooserButton_Click()
@@ -573,10 +573,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
 
                     StockProducts = [.. StockProducts.Where(x => x.ProductId == getProduct.Id).ToList()];
+                    NameProduct = getProduct.Name;
                 }
                 else {
 
                     StockProducts = [.. StockProducts.Where(x => x.ProductId == SelectedDataItems[0].Adapt<ProductDto>().Id).ToList()];
+
+                    NameProduct = SelectedDataItems[0].Adapt<ProductDto>().Name;
                 }                 
                 PanelVisible = false;
             }
@@ -589,11 +592,12 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             FormStockProduct = new();
             FormStockPopUp = true;
+            DataProducts = await Mediator.Send(new GetProductQuery());
             if (SelectedDataItems.Count == 0)
             {
 
-                FormStockProduct.UomId = Products.Where(p => p.Id == getProduct.Id).Select(x => x.UomId).FirstOrDefault();
-                FormStockProduct.ProductId = Products.Where(p => p.Id == getProduct.Id).Select(x => x.Id).FirstOrDefault();
+                FormStockProduct.UomId = getProduct.UomId;
+                FormStockProduct.ProductId =getProduct.Id;
                 NameProduct = getProduct.Name;
             }
             else
