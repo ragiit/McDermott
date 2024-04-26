@@ -4,6 +4,7 @@
     {
         public long Id { get; set; }
         public long? PatientId { get; set; }
+        public long? MedicamentGroupId { get; set; }
         public long? PractitionerId { get; set; }
         public long? PrescriptionLocationId { get; set; }
         public long? ServiceId { get; set; }
@@ -21,6 +22,7 @@
         }
 
         public LocationDto? Location { get; set; }
+        public MedicamentGroupDto? MedicamentGroup { get; set; }
         public ServiceDto? Service { get; set; }
         public UserDto? Patient { get; set; }
         public UserDto? Practitioner { get; set; }

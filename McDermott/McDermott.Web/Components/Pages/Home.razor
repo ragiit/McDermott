@@ -322,6 +322,64 @@
             <!-- Small boxes (Stat box) -->
             <div class="row">
 
+                <div class="col">
+                    <div class="card" hidden>
+                        <div class="card-body">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="true"
+                                            Text="Fetching Data...">
+
+                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                        Data="ProductTemps"
+                                        PageSize="10"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                        KeyFieldName="Id"
+                                        EditorRenderMode="GridEditorRenderMode.Detached"
+                                        EditMode="GridEditMode.PopupEditForm"
+                                        PopupEditFormCssClass="pw-800"
+                                        PagerPosition="GridPagerPosition.Bottom"
+                                        AllowSelectRowByClick="true"
+                                        PageSizeSelectorVisible="true"
+                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                        PageSizeSelectorAllRowsItemVisible="true"
+                                        PagerSwitchToInputBoxButtonCount="10"
+                                        FocusedRowEnabled="true"
+                                        PagerVisibleNumericButtonCount="10"
+                                        ShowGroupPanel="true"
+                                        AutoExpandAllGroupRows="true"
+                                        CssClass="ch-480"
+                                        ShowFilterRow="true"
+                                        TextWrapEnabled="false"
+                                        CustomizeElement="Grid_CustomizeElement"
+                                        ShowSearchBox="true"
+                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                        KeyboardNavigationEnabled="true">
+
+                                    <Columns>
+                                        <DxGridDataColumn MinWidth="200" FieldName="Thumbnail">
+                                            <CellDisplayTemplate>
+                                                <img src="@(((ProductTemp)context.DataItem).Thumbnail)" style="width: 30px; height: 30px;" />
+                                            </CellDisplayTemplate>
+                                        </DxGridDataColumn>
+                                        <DxGridDataColumn MinWidth="200" FieldName="Id" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Title" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Description" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Price" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="DiscountPercentage" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Rating" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Stock" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Brand" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Category" />
+                                    </Columns>
+                                </DxGrid>
+                            </DxLoadingPanel>
+                        </div>
+                    </div>
+                </div>
+
                 @*   <div class="col-md-3 col-12">
             <!-- small box -->
             <div class="small-box bg-info">
@@ -545,10 +603,30 @@ else
 </BlazoredTextEditor> *@
 
 @code {
+
+    private IGrid Grid { get; set; }
+    private bool PanelVisible { get; set; } = false;
+    public bool IsAddForm { get; set; }
+    private int FocusedRowVisibleIndex { get; set; }
+    private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+
     IEnumerable<SaleInfo> SalesData2;
     BlazoredTextEditor richEditor = default!;
     string toolbar = """"...markup here..."""";
     string body = """"...markup here..."""";
+
+    private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+        {
+            e.CssClass = "alt-item";
+        }
+        if (e.ElementType == GridElementType.HeaderCell)
+        {
+            e.Style = "background-color: rgba(0, 0, 0, 0.08)";
+            e.CssClass = "header-bold";
+        }
+    }
 
     protected override void OnInitialized()
     {
@@ -704,12 +782,43 @@ else
     }
 
     private DashboardTemp Dashboard { get; set; } = new();
+    public class ProductTemp
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public decimal Price { get; set; }
+        public double DiscountPercentage { get; set; }
+        public double Rating { get; set; }
+        public int Stock { get; set; }
+        public string Brand { get; set; }
+        public string Category { get; set; }
+        public string Thumbnail { get; set; }
+        public List<string> Images { get; set; }
+    }
+    private List<ProductTemp> ProductTemps = [];
 
     protected override async Task OnInitializedAsync()
     {
         // var aa = await AuthenticationState;
         // var bb = aa.User.Identity.Name;
         // SalesData2 = await Sales.GetSalesAsync();
+
+        PanelVisible = true;
+
+        var a = await HttpClient.GetStringAsync("https://dummyjson.com/products?limit=99999999999999")!;
+
+        var jsonObject = JsonConvert.DeserializeObject<dynamic>(a);
+
+        // Mengambil nilai dari properti 'products'
+        var productsJson = jsonObject["products"].ToString();
+
+        // Mengonversi string produk menjadi List<ProductTemp>
+        var products = JsonConvert.DeserializeObject<List<ProductTemp>>(productsJson);
+
+        ProductTemps = products;
+
+        PanelVisible = false;
 
         var hour = DateTime.Now.Hour;
 
