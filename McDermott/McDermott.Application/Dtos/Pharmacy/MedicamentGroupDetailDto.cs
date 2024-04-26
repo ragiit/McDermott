@@ -32,5 +32,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public string? ActiveComponentName { get; set; }
 
         public UomDto? RegimentOfUse { get; set; }
+
+        public MedicamentGroupDto? MedicamentGroup { get; set; }
     }
 }

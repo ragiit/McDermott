@@ -15,7 +15,6 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long? RegimentOfUseId { get; set; }
         public long? FormDrugId { get; set; }
         
-
-        
+       
     }
 }

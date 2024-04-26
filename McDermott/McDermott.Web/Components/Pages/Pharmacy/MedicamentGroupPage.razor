@@ -141,8 +141,7 @@
                                             Data="@medicamentGroupDetails"
                                             @bind-SelectedDataItems="@SelectedMedicamentGroupDetailDataItems"
                                             PageSize="10"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Name"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"                                           
                                             SelectionMode="GridSelectionMode.Multiple"
                                             AllowSelectRowByClick="true"
                                             EditModelSaving="OnSaveDoctorScheduleDetail"
@@ -166,7 +165,8 @@
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                 <DxToolbarItem Text="New" Click="NewItemMedicamentGroupDetail_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Text="Delete" Click="DeleteItemMedicamentGroupDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && medicamentGroupDetails.Count > 0" />
+                                                <DxToolbarItem  Text="Edit" Click="EditItemMedicamentGroupDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedMedicamentGroupDetailDataItems.Count > 0 && medicamentGroupDetails.Count > 0" />
+                                                <DxToolbarItem Text="Delete" Click="DeleteItemMedicamentGroupDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedMedicamentGroupDetailDataItems.Count > 0 && medicamentGroupDetails.Count > 0" />
                                                 <DxToolbarItem BeginGroup="true" Text="Save" IconCssClass="fa-solid fa-floppy-disk" Click="SaveItemMedicamentGroupDetailGrid_Click" />
                                                 <DxToolbarItem Text="Cancel" IconCssClass="fa-solid fa-ban" Click="CancelItemMedicamentGroupDetailGrid_Click" />
                                                 @* <DxToolbarItem BeginGroup="true" Text="Refresh" IconCssClass="fa-solid fa-rotate-left" Click="CancelItemMedicamentGroupDetailGrid_Click" /> *@

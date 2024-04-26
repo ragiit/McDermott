@@ -21,6 +21,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<ProductDto> Products = [];
         private MedicamentGroupDto MGForm = new();
         private MedicamentGroupDetailDto FormMedicamenDetails = new();
+        MedicamentGroupDto getMedicament = new();
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
 
         #endregion Relation Data
@@ -40,7 +41,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private string? chars { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        private IReadOnlyList<object> SelectedMedicamentGroupDetailDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedMedicamentGroupDetailDataItems { get; set; } = [];
 
         private async Task SelectChangeItem(ProductDto product)
         {
@@ -151,6 +152,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
             var user = await Mediator.Send(new GetUserQuery());
             FormDrugs = await Mediator.Send(new GetFormDrugQuery());
             UoMs = await Mediator.Send(new GetUomQuery());
@@ -211,6 +213,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
+        private void GridMedicamentGroupDetail_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+        }
 
         #endregion Grid
 
@@ -239,9 +245,43 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
+        private async Task EditItemMedicamentGroupDetail_Click()
+        {
+
+        }
         private async Task SaveItemMedicamentGroupDetailGrid_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            if (MGForm.Name is null) return;
+
+            MedicamentGroupDto result = new();
+            if (MGForm.Id == 0)
+            {
+                getMedicament = await Mediator.Send(new CreateMedicamentGroupRequest(MGForm));
+
+                foreach (var a in medicamentGroupDetails)
+                {
+                    a.MedicamentGroupId = getMedicament.Id;
+                    a.MedicamentId = FormMedicamenDetails.MedicamentId;
+                    a.MedicaneDosage = FormMedicamenDetails.MedicaneDosage;
+                    a.QtyByDay = FormMedicamenDetails.QtyByDay;
+                    a.Days = FormMedicamenDetails.Days;
+                    a.Comment = FormMedicamenDetails.Comment;
+                    a.TotalQty = FormMedicamenDetails.TotalQty;
+                    a.SignaId = FormMedicamenDetails.SignaId;
+                    a.RegimentOfUseId = FormMedicamenDetails.RegimentOfUseId;
+                    a.MedicaneUnitDosage = FormMedicamenDetails.MedicaneUnitDosage;
+                    a.Dosage = FormMedicamenDetails.Dosage;
+                    if (selectedActiveComponents != null)
+                    {
+                        var listActiveComponent = selectedActiveComponents.Select(x => x.Id).ToList();
+                        FormMedicamenDetails.ActiveComponentId?.AddRange(listActiveComponent);
+                    }
+                    a.ActiveComponentId = FormMedicamenDetails.ActiveComponentId;
+                    await Mediator.Send(new CreateMedicamentGroupDetailRequest(a));
+
+                }
+
+            }
         }
 
         private async Task Back_Click()
@@ -319,24 +359,38 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             try
             {
                 var FormMedicamenGroupDetails = (MedicamentGroupDetailDto)e.EditModel;
-                MedicamentGroupDetailDto updateMedicamentGroupDetail = new();
+
+                // Jika menambahkan medicament
                 if (IsAddMedicament)
                 {
-                    if (medicamentGroupDetails.Where(x => x.MedicamentId == FormMedicamenGroupDetails.MedicamentId).Any())
+                    // Cek apakah medicament dengan MedicamentId yang sama sudah ada
+                    if (medicamentGroupDetails.Any(x => x.MedicamentId == FormMedicamenGroupDetails.MedicamentId))
                         return;
 
-                    var listActiveComponent = selectedActiveComponents.Select(x => x.Id).ToList();
-                    FormMedicamenGroupDetails.ActiveComponentId?.AddRange(listActiveComponent);
-                    medicamentGroupDetails.Add(FormMedicamenGroupDetails);
-                    medicamentGroupDetails.ForEach(x => x.ActiveComponentName = string.Join(",", ActiveComponents.Where(a => x.ActiveComponentId.Contains(a.Id)).Select(a => a.Name).ToList()));
+                    // Ambil daftar ID komponen aktif yang dipilih
+                    var listActiveComponentIds = selectedActiveComponents?.Select(x => x.Id).ToList();
 
+                    // Jika ada komponen aktif yang dipilih, tambahkan ke FormMedicamenGroupDetails
+                    if (FormMedicamenGroupDetails.ActiveComponentId != null)
+                        FormMedicamenGroupDetails.ActiveComponentId.AddRange(listActiveComponentIds);
+                    else
+                        FormMedicamenGroupDetails.ActiveComponentId = listActiveComponentIds;
+
+                    // Tambahkan FormMedicamenGroupDetails ke daftar medicamentGroupDetails
+                    medicamentGroupDetails.Add(FormMedicamenGroupDetails);
+
+                    // Update nama komponen aktif untuk setiap item dalam daftar medicamentGroupDetails
+                    foreach (var detail in medicamentGroupDetails)
+                    {
+                        detail.ActiveComponentName = string.Join(",", ActiveComponents
+                            .Where(a => detail.ActiveComponentId.Contains(a.Id))
+                            .Select(a => a.Name));
+                    }
                 }
 
-                //if (IsAddMedicament)
-                //{
-                //}
-
+                // Bersihkan koleksi SelectedMedicamentGroupDetailDataItems
                 SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
+
             }
             catch (Exception ex)
             {
