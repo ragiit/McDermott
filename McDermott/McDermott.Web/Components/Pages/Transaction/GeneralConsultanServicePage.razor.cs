@@ -1797,6 +1797,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             PopUpAppoimentPending = true;
         }
 
+        private void OnClickReferralPrescriptionConcoction()
+        {
+            NavigationManager.NavigateTo($"/pharmacy/prescription/{FormRegis.Id}");
+        }
+
         private void SelectedCountryChanged(string country)
         {
             FormRegis.TypeRegistration = country;

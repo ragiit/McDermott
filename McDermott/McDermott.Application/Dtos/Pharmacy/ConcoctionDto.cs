@@ -5,6 +5,7 @@ namespace McDermott.Application.Dtos.Pharmacy
     {
         public long Id { get; set; }
         public long PharmacyId { get; set; }
+        public long? DrugDosageId { get; set; }
         public long? PrescribingDoctorId { get; set; }
         public long? MedicamentGroupId { get; set; }
         public long? DrugFromId { get; set; }
@@ -16,6 +17,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public float TotalQty { get; set; }
 
         public UomDto? Uom { get; set; }
+        public DrugDosageDto? DrugDosage { get; set; }
         public DrugFormDto? DrugForm { get; set; }
         public PharmacyDto? Pharmacy { get; set; }
         public UserDto? PrescribingDoctor { get; set; }
