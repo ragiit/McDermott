@@ -327,10 +327,10 @@ namespace McDermott.Web.Components.Pages.Inventory
                 // Kelola informasi stok
                 var stockIN = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "IN").ToList();
                 var stockOUT = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "OUT").ToList();
-                var TotalQty = stockIN.Sum(x => x.Qty) - stockOUT.Sum(x => x.Qty);
+                TotalQty = stockIN.Sum(x => x.Qty) - stockOUT.Sum(x => x.Qty);
 
                 // Ambil nama satuan ukur
-                var NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;
+                 NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;
 
                 // Atur visibilitas panel
                 PanelVisible = false;
