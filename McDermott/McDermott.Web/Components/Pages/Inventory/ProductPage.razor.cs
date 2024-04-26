@@ -403,6 +403,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     List<long> MProductId = SelectedDataItems.Adapt<List<ProductDto>>().Select(x => x.Id).ToList();
                     foreach (var data in MProductId)
                     {
+                        // Jika ada item yang dipilih, hapus medicament dan stok produk yang sesuai dengan produk yang dipilih
                         var CheckStock = StockProducts.Where(s => s.ProductId == data).ToList();
                         foreach (var stc in CheckStock)
                         {
@@ -418,6 +419,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                             await Mediator.Send(new DeleteMedicamentRequest(checkData.Id));
                         }
                     }
+                    // Hapus produk yang dipilih
                     await Mediator.Send(new DeleteProductRequest(ids: SelectedDataItems.Adapt<List<ProductDto>>().Select(x => x.Id).ToList()));
                     ToastService.ShowError("Success Delete Data Product..");
                 }
