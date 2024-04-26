@@ -273,16 +273,16 @@
                                                                                                                                                                         BindValueMode="BindValueMode.OnInput" />
                                                                                                                                                             <ValidationMessage For="@(()=> Prescription.Stock)"   />
                                                                                                                                                         </DxFormLayoutItem>
-
+@* 
                                                                                                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Prescribed Amount" ColSpanMd="12">
                                                                                                                                                             <DxSpinEdit @bind-Value="@Prescription.PrescribedAmount"
                                                                                                                                                                         NullText="Prescribed Amount..."
                                                                                                                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                                                                                                         BindValueMode="BindValueMode.OnInput" />
                                                                                                                                                             <ValidationMessage For="@(()=> Prescription.PrescribedAmount)"   />
-                                                                                                                                                        </DxFormLayoutItem>
+                                                                                                                                                        </DxFormLayoutItem> *@
 
-                                                                                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Given Amount" ColSpanMd="12">
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Prescription quantity" ColSpanMd="12">
                                                                                                                                                             <DxSpinEdit @bind-Value="@Prescription.GivenAmount"
                                                                                                                                                                         NullText="Given Amount..."
                                                                                                                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
