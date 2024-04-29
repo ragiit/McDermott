@@ -20,7 +20,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<DrugRouteDto> DrugRoutes = [];
         private List<ProductCategoryDto> productCategories = [];
         private List<ActiveComponentDto> ActiveComponents = [];
-        private List<SignaDto> Signas = [];
+        private List<DrugDosageDto> Frequencys = [];
         private List<LocationDto> Locations = [];
         private List<StockProductDto> StockProducts = [];
         private ProductDetailDto FormProductDetails = new();
@@ -193,7 +193,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 productCategories = await Mediator.Send(new GetProductCategoryQuery());
                 DrugForms = await Mediator.Send(new GetFormDrugQuery());
                 DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
-                Signas = await Mediator.Send(new GetSignaQuery());
+                Frequencys = await Mediator.Send(new GetDrugDosageQuery());
                 ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
                 Medicaments = await Mediator.Send(new GetMedicamentQuery());
                 Locations = await Mediator.Send(new GetLocationQuery());
@@ -309,7 +309,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         FormProductDetails.UomMId = medicamen.UomId;
                         FormProductDetails.Cronies = medicamen.Cronies;
                         FormProductDetails.MontlyMax = medicamen.MontlyMax;
-                        FormProductDetails.SignaId = medicamen.SignaId;
+                        FormProductDetails.FrequencyId = medicamen.FrequencyId;
 
                         // Ambil komponen aktif jika tersedia
                         if (medicamen.ActiveComponentId != null)
@@ -472,7 +472,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormMedicaments.UomId = FormProductDetails.UomMId;
                     FormMedicaments.Cronies = FormProductDetails.Cronies;
                     FormMedicaments.MontlyMax = FormProductDetails.MontlyMax;
-                    FormMedicaments.SignaId = FormProductDetails.SignaId;
+                    FormMedicaments.FrequencyId = FormProductDetails.FrequencyId;
                     FormMedicaments.PregnancyWarning = FormProductDetails.PregnancyWarning;
                     FormMedicaments.Pharmacologi = FormProductDetails.Pharmacologi;
                     FormMedicaments.Weather = FormProductDetails.Weather;

@@ -60,9 +60,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     var totalQty = (Int64.Parse(FormMedicamenDetails?.Dosage) * Int64.Parse(FormMedicamenDetails?.Days));
                     FormMedicamenDetails.TotalQty = totalQty.ToString();
                 }
-                if (FormMedicamenDetails.SignaId != null)
+                if (FormMedicamenDetails.RegimentOfUseId != null)
                 {
-                    FormMedicamenDetails.SignaId = ChekMedicament.SignaId;
+                    FormMedicamenDetails.RegimentOfUseId = ChekMedicament.FrequencyId;
                 }
                 selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
                 FormMedicamenDetails.UnitOfDosageId = ChekMedicament.UomId;
@@ -270,7 +270,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
-                if (FormValidationState == null)
+                if (FormValidationState == null || MGForm.Name == null)
                 {
                     return;
                 }

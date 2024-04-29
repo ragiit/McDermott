@@ -9,5 +9,6 @@
 
         [SetToNull]
         public virtual DrugRoute? DrugRoute { get; set; }
+        public  List<Medicament>? Medicaments { get; set; }
     }
 }
