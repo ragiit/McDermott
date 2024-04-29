@@ -5,7 +5,7 @@ namespace McDermott.Domain.Entities
     public class Medicament : BaseAuditableEntity
     {
         public long? ProductId { get; set; }
-        public long? SignaId { get; set; }
+        public long? FrequencyId { get; set; }
         public long? RouteId { get; set; }
         public long? FormId { get; set; }
         public long? UomId { get; set; }
@@ -21,7 +21,7 @@ namespace McDermott.Domain.Entities
 
         public Uom? Uom { get; set; }
         public DrugForm? Form { get; set; }
-        public Signa? Signa { get; set; }
+        public DrugDosage? Frequency { get; set; }
         public Product? Product { get; set; }
         public DrugRoute? Route { get; set; }
         public List<ActiveComponent>? ActiveComponent { get; set; }

@@ -43,7 +43,7 @@ namespace McDermott.Application.Dtos.Inventory
         [Required(ErrorMessage = "Name Must Be Filled In!")]
         public string? Name { get; set; }
         public long? ProductId { get; set; }
-        public long? SignaId { get; set; }
+        public long? FrequencyId { get; set; }
         public long? RouteId { get; set; }
         public long? UomId { get; set; }
         public long? UomMId { get; set; }

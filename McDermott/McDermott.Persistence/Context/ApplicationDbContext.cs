@@ -146,7 +146,7 @@ namespace McDermott.Persistence.Context
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Medicament>()
-                .HasOne(e => e.Signa)
+                .HasOne(e => e.Frequency)
                 .WithMany(m => m.Medicaments)
                 .OnDelete(DeleteBehavior.SetNull);
 

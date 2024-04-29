@@ -37,6 +37,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private bool Concotions { get; set; } = false;
         public bool KeyboardNavigationEnabled { get; set; }
         private bool IsAddMedicament { get; set; } = false;
+        private bool? FormValidationState { get; set; }
+        private bool IsLoading { get; set; } = false;
         private double Dosages { get; set; }
         private string? chars { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
@@ -58,12 +60,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     var totalQty = (Int64.Parse(FormMedicamenDetails?.Dosage) * Int64.Parse(FormMedicamenDetails?.Days));
                     FormMedicamenDetails.TotalQty = totalQty.ToString();
                 }
-                if (FormMedicamenDetails.SignaId != null)
+                if (FormMedicamenDetails.RegimentOfUseId != null)
                 {
-                    FormMedicamenDetails.SignaId = ChekMedicament.SignaId;
+                    FormMedicamenDetails.RegimentOfUseId = ChekMedicament.FrequencyId;
                 }
                 selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
-                FormMedicamenDetails.RegimentOfUseId = ChekMedicament.UomId;
+                FormMedicamenDetails.UnitOfDosageId = ChekMedicament.UomId;
                 FormMedicamenDetails.MedicaneName = product.Name;
             }
             catch (Exception ex)
@@ -153,6 +155,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
+            medicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery());
             var user = await Mediator.Send(new GetUserQuery());
             FormDrugs = await Mediator.Send(new GetFormDrugQuery());
             UoMs = await Mediator.Send(new GetUomQuery());
@@ -161,6 +164,20 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Phy = [.. user.Where(x => x.IsPhysicion == true)];
             Products = await Mediator.Send(new GetProductQuery());
             PanelVisible = false;
+        }
+        private async Task HandleValidSubmit()
+        {
+            IsLoading = true;
+            FormValidationState = true;
+            await OnSave();
+            IsLoading = false;
+        }
+
+        private async Task HandleInvalidSubmit()
+        {
+
+            showForm = true;
+            FormValidationState = false;
         }
 
         private void onChangeTotalQty(string numDosage)
@@ -249,38 +266,48 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
 
         }
-        private async Task SaveItemMedicamentGroupDetailGrid_Click()
+        private async Task OnSave()
         {
-            if (MGForm.Name is null) return;
-
-            MedicamentGroupDto result = new();
-            if (MGForm.Id == 0)
+            try
             {
-                getMedicament = await Mediator.Send(new CreateMedicamentGroupRequest(MGForm));
-
-                foreach (var a in medicamentGroupDetails)
+                if (FormValidationState == null || MGForm.Name == null)
                 {
-                    a.MedicamentGroupId = getMedicament.Id;
-                    a.MedicamentId = FormMedicamenDetails.MedicamentId;
-                    a.MedicaneDosage = FormMedicamenDetails.MedicaneDosage;
-                    a.QtyByDay = FormMedicamenDetails.QtyByDay;
-                    a.Days = FormMedicamenDetails.Days;
-                    a.Comment = FormMedicamenDetails.Comment;
-                    a.TotalQty = FormMedicamenDetails.TotalQty;
-                    a.SignaId = FormMedicamenDetails.SignaId;
-                    a.RegimentOfUseId = FormMedicamenDetails.RegimentOfUseId;
-                    a.MedicaneUnitDosage = FormMedicamenDetails.MedicaneUnitDosage;
-                    a.Dosage = FormMedicamenDetails.Dosage;
-                    if (selectedActiveComponents != null)
-                    {
-                        var listActiveComponent = selectedActiveComponents.Select(x => x.Id).ToList();
-                        FormMedicamenDetails.ActiveComponentId?.AddRange(listActiveComponent);
-                    }
-                    a.ActiveComponentId = FormMedicamenDetails.ActiveComponentId;
-                    await Mediator.Send(new CreateMedicamentGroupDetailRequest(a));
-
+                    return;
                 }
+                var aa = MGForm;
 
+                MedicamentGroupDto result = new();
+                if (MGForm.Id == 0)
+                {
+                    getMedicament = await Mediator.Send(new CreateMedicamentGroupRequest(MGForm));
+
+                    foreach (var a in medicamentGroupDetails)
+                    {
+                        a.MedicamentGroupId = getMedicament.Id;
+                        a.MedicamentId = FormMedicamenDetails.MedicamentId;
+                        a.MedicaneDosage = FormMedicamenDetails.MedicaneDosage;
+                        a.QtyByDay = FormMedicamenDetails.QtyByDay;
+                        a.Days = FormMedicamenDetails.Days;
+                        a.Comment = FormMedicamenDetails.Comment;
+                        a.TotalQty = FormMedicamenDetails.TotalQty;
+                        a.SignaId = FormMedicamenDetails.SignaId;
+                        a.RegimentOfUseId = FormMedicamenDetails.RegimentOfUseId;
+                        a.MedicaneUnitDosage = FormMedicamenDetails.MedicaneUnitDosage;
+                        a.Dosage = FormMedicamenDetails.Dosage;
+                        if (selectedActiveComponents != null)
+                        {
+                            var listActiveComponent = selectedActiveComponents.Select(x => x.Id).ToList();
+                            FormMedicamenDetails.ActiveComponentId?.AddRange(listActiveComponent);
+                        }
+                        a.ActiveComponentId = FormMedicamenDetails.ActiveComponentId;
+                        await Mediator.Send(new CreateMedicamentGroupDetailRequest(a));
+                    }
+                }
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
             }
         }
 
@@ -329,7 +356,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        private async Task OnDeleteDoctorScheduleDetail(GridDataItemDeletingEventArgs e)
+        private async Task OnDeleteMedicamentGroupDetail(GridDataItemDeletingEventArgs e)
         {
             try
             {
@@ -354,7 +381,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         #region Function Save
 
-        private async Task OnSaveDoctorScheduleDetail(GridEditModelSavingEventArgs e)
+        private async Task OnSaveMedicamentGroupDetail(GridEditModelSavingEventArgs e)
         {
             try
             {

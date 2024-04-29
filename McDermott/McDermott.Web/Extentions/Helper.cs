@@ -4,6 +4,12 @@ namespace McDermott.Web.Extentions
 {
     public static class Helper
     {
+        public static string EncodeToBase64(this string input)
+        {
+            byte[] bytesToEncode = Encoding.UTF8.GetBytes(input);
+            string base64Encoded = Convert.ToBase64String(bytesToEncode);
+            return base64Encoded;
+        }
         public static readonly string VERSION = "2.0.0";
         public static T EnumGetValue<T>(this Enum enumValue)
         {

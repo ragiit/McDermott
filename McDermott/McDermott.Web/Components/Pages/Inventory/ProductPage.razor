@@ -91,17 +91,18 @@
                             {
                                 <div class="card-body">
                                     <div class="card">
-                                        <div class="row justify-content-between my-3 mx-3">
+                                        <div class="row justify-content-between mt-2 mx-2">
                                             <div class="col-md-3 col-sm-5 col-12 align-self-center">
                                                 <h5 class="fw-bolder ">Action: </h5>
                                             </div>
 
-                                            <div class="col-md-3 col-sm-5 col-12 ">
+                                            <div class="col-md-4 col-sm-6 col-12 ">
                                                 <div class="info-box shadow border">
                                                     <DxButton class="info-box-icon bg-info" style="border:none" Click="NewTableStock_Item"><i class="fa-solid fa-boxes-stacked"></i></DxButton>
 
                                                     <div class="info-box-content">
-                                                        <h3 class="info-box-number"> @TotalQty <span>@NameUom</span> </h3>
+                                                        <h3 class="info-box-number"> @TotalQty </h3>
+                                                        <h4 class="info-box-text"> @NameUom</h4>
                                                         <span class="info-box-text">On Hand</span>
                                                     </div>
                                                     <!-- /.info-box-content -->
@@ -121,7 +122,8 @@
                                             <DxFormLayoutItem Caption="Name" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@FormProductDetails.Name"
                                                            NullText="Name Product"
-                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxTextBox>
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           ShowValidationIcon="true"></DxTextBox>
                                                 <ValidationMessage For="@(()=>FormProductDetails.Name)" />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
@@ -200,9 +202,9 @@
                                                             <div class="col-md-6">
                                                                 <DxFormLayout class="mt w-100">
                                                                     <DxFormLayoutItem Caption="Frequency" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                        <DxComboBox Data="@Signas"
-                                                                                    @bind-Value="@FormProductDetails.SignaId"
-                                                                                    TextFieldName="Name"
+                                                                        <DxComboBox Data="@Frequencys"
+                                                                                    @bind-Value="@FormProductDetails.FrequencyId"
+                                                                                    TextFieldName="Frequency"
                                                                                     NullText="Select Frequency.."
                                                                                     ValueFieldName="Id"
                                                                                     ShowValidationIcon="true"

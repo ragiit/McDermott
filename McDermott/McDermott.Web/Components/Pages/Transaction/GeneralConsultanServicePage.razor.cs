@@ -1799,7 +1799,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private void OnClickReferralPrescriptionConcoction()
         {
-            NavigationManager.NavigateTo($"/pharmacy/prescription/{FormRegis.Id}");
+            NavigationManager.NavigateTo($"/pharmacy/prescription/");
         }
 
         private void SelectedCountryChanged(string country)

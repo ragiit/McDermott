@@ -16,15 +16,15 @@
         }
         else
         {
-            <section class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1>Insurance Policy</h1>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            @* <section class="content-header">
+    <div class="container-fluid">
+    <div class="row mb-2">
+    <div class="col-sm-6">
+    <h1>Insurance Policy</h1>
+    </div>
+    </div>
+    </div>
+    </section> *@
         }
 
         @if (!ShowForm)
@@ -115,12 +115,6 @@
                                     <DxFormLayout CssClass="mt">
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Patient" ColSpanMd="12">
-                                                @* <DxComboBox Data="@Users"
-                                        NullText="Select Patient..."
-                                        @bind-Value="@InsurancePoliciyForm.UserId"
-                                        TextFieldName="Name"
-                                        ValueFieldName="Id">
-                                        </DxComboBox> *@
                                                 <p>@User.Name</p>
                                             </DxFormLayoutItem>
 
@@ -133,8 +127,19 @@
                                                             TextFieldName="Name"
                                                             SelectedItemChanged="@((InsuranceDto e) => SelectedItemInsuranceChanged(e))"
                                                             ValueFieldName="Id">
+                                                    @*  <Buttons>
+                                            <DxEditorButton Visible="IsBPJS"
+                                            Text="Get BPJS"
+                                            Tooltip="Get BPJS" />
+                                            </Buttons> *@
                                                 </DxComboBox>
                                                 <ValidationMessage For="@(()=>InsurancePoliciyForm.InsuranceId)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem Visible="IsBPJS" Caption=" " ColSpanMd="12">
+                                                <DxButton Text="Get BPJS"
+                                                          Click="OnClickGetBPJS"
+                                                          RenderStyle="ButtonRenderStyle.Primary" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Policy Number" ColSpanMd="12">
@@ -149,7 +154,7 @@
                                                 <DxCheckBox @bind-Checked="@InsurancePoliciyForm.Active" />
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutGroup Caption="BPJS Integration" ColSpanMd="12" CssClass="mt-3" Visible="IsBPJS">
+                                            <DxFormLayoutGroup Caption="BPJS Integration" ColSpanMd="12" CssClass="mt-3" Visible="IsBPJS" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                                                 <Items>
 
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Prolanis">

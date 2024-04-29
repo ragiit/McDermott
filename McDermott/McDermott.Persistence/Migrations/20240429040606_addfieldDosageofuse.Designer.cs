@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240429040606_addfieldDosageofuse")]
+    partial class addfieldDosageofuse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2344,9 +2347,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("FormId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("FrequencyId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("MontlyMax")
                         .HasColumnType("nvarchar(max)");
 
@@ -2380,8 +2380,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FormId");
-
-                    b.HasIndex("FrequencyId");
 
                     b.HasIndex("ProductId");
 
@@ -4228,11 +4226,6 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("FormId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.DrugDosage", "Frequency")
-                        .WithMany("Medicaments")
-                        .HasForeignKey("FrequencyId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("McDermott.Domain.Entities.Product", "Product")
                         .WithMany("Medicaments")
                         .HasForeignKey("ProductId")
@@ -4243,10 +4236,10 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("RouteId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("McDermott.Domain.Entities.Signa", null)
+                    b.HasOne("McDermott.Domain.Entities.Signa", "Signa")
                         .WithMany("Medicaments")
                         .HasForeignKey("SignaId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("McDermott.Domain.Entities.Uom", "Uom")
                         .WithMany("Medicaments")
@@ -4255,11 +4248,11 @@ namespace McDermott.Persistence.Migrations
 
                     b.Navigation("Form");
 
-                    b.Navigation("Frequency");
-
                     b.Navigation("Product");
 
                     b.Navigation("Route");
+
+                    b.Navigation("Signa");
 
                     b.Navigation("Uom");
                 });
@@ -4666,11 +4659,6 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.Degree", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.DrugDosage", b =>
-                {
-                    b.Navigation("Medicaments");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.DrugRoute", b =>

@@ -1,0 +1,59 @@
+﻿@page "/inventory/internal-transfer"
+@rendermode InteractiveServer
+<h3>Internal Transfer</h3>
+
+<div class="form-group">
+    <label for="location">Search Location:</label>
+</div>
+<div class="form-group">
+    <label for="location">Search Location:</label>
+</div>
+<div class="form-group">
+    <label for="location">Description:</label>
+    <input id="location" type="text" class="form-control" @bind="@location" />
+</div>
+
+@code {
+    private string Description;
+}
+
+@code {
+    private string location;
+}
+
+
+
+<h4>Product List</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Qty</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in productList)
+        {
+            <tr>
+                <td><input type="text" class="form-control" @bind="@item.Product" /></td>
+                <td><input type="text" class="form-control" @bind="@item.Quantity" /></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<button class="btn btn-primary">Add Product</button>
+
+@code {
+    private string searchLocation;
+    private string destinationLocation;
+    private string description;
+
+    private List<ProductItem> productList = new List<ProductItem>();
+
+    public class ProductItem
+    {
+        public string Product { get; set; }
+        public string Quantity { get; set; }
+    }
+}

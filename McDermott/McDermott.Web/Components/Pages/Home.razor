@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System.Drawing
+@using LZStringCSharp
 @using McDermott.Application.Features.Services
 @using Microsoft.AspNetCore.Components.Authorization
 
@@ -798,11 +799,171 @@ else
     }
     private List<ProductTemp> ProductTemps = [];
 
+    static string Signature(string timestamp)
+    {
+        var data = "15793&" + timestamp;
+        var secretKey = "8nDF24C2AD";
+
+        // Initialize the keyed hash object using the secret key as the key
+        HMACSHA256 hashObject = new HMACSHA256(Encoding.UTF8.GetBytes(secretKey));
+
+        // Computes the signature by hashing the salt with the secret key as the key
+        var signature = hashObject.ComputeHash(Encoding.UTF8.GetBytes(data));
+
+        // Base 64 Encode
+        var encodedSignature = Convert.ToBase64String(signature);
+
+        // URLEncode
+        // encodedSignature = System.Web.HttpUtility.UrlEncode(encodedSignature);
+
+        return encodedSignature;
+
+    }
+
+    private async Task Send()
+    {
+        try
+        {
+            DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            TimeSpan timeSpan = DateTime.UtcNow - epochStart;
+            string t = Convert.ToInt64(timeSpan.TotalSeconds).ToString();
+            string sign = Signature(t);
+            string ee = $"dermott:BPJSKes2024**:095".EncodeToBase64();
+
+            var url = "https://apijkn-dev.bpjs-kesehatan.go.id/pcare-rest-dev/peserta/0001462337886";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("X-cons-id", "15793");
+            request.Headers.Add("X-timestamp", t);
+            request.Headers.Add("X-signature", sign);
+            request.Headers.Add("X-authorization", $"Basic {ee}");
+            request.Headers.Add("user_key", "6825c31715d8d748d5944f13b39ac431");
+            // request.Content = new StringContent("", Encoding.ASCII, "text/plain");
+
+            var response = await HttpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Ambil data dari respon
+                var responseData = await response.Content.ReadAsStringAsync();
+
+                string aa = "15793";
+                string a1 = "8nDF24C2AD";
+                string a2 = t;
+                string a3 = aa + a1 + a2;
+
+                dynamic responseJson = JsonConvert.DeserializeObject(responseData);
+
+                string r = responseJson.response;
+                dynamic metaData = responseJson.metaData;
+
+                string LZDecrypted = Decrypt2(a3, r);
+                string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
+
+                // Sekarang variabel "anis" berisi data respons dari permintaan
+            }
+            else
+            {
+                // Tangani kesalahan jika diperlukan
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error: {errorResponse}");
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+    }
+
+    public string Decrypt2(string key, string data)
+    {
+        string decData = null;
+        byte[][] keys = GetHashKeys2(key);
+
+        try
+        {
+            decData = DecryptStringFromBytes_Aes2(data, keys[0], keys[1]);
+        }
+        catch (CryptographicException) { }
+        catch (ArgumentNullException) { }
+
+        return decData;
+    }
+    private byte[][] GetHashKeys2(string key)
+    //public byte[][] GetHashKeys(string key)
+    {
+        byte[][] result = new byte[2][];
+        Encoding enc = Encoding.UTF8;
+
+        SHA256 sha2 = new SHA256CryptoServiceProvider();
+
+        byte[] rawKey = enc.GetBytes(key);
+        byte[] rawIV = enc.GetBytes(key);
+
+        byte[] hashKey = sha2.ComputeHash(rawKey);
+        byte[] hashIV = sha2.ComputeHash(rawIV);
+
+        Array.Resize(ref hashIV, 16);
+
+        result[0] = hashKey;
+        result[1] = hashIV;
+
+        return result;
+    }
+    private static string DecryptStringFromBytes_Aes2(string cipherTextString, byte[] Key, byte[] IV)
+    {
+        byte[] cipherText = Convert.FromBase64String(cipherTextString);
+
+        if (cipherText == null || cipherText.Length <= 0)
+            throw new ArgumentNullException("cipherText");
+        if (Key == null || Key.Length <= 0)
+            throw new ArgumentNullException("Key");
+        if (IV == null || IV.Length <= 0)
+            throw new ArgumentNullException("IV");
+
+        string plaintext = null;
+
+        using (Aes aesAlg = Aes.Create())
+        {
+            aesAlg.Key = Key;
+            aesAlg.IV = IV;
+
+            ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+            using (MemoryStream msDecrypt = new MemoryStream(cipherText))
+            {
+                using (CryptoStream csDecrypt =
+                        new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                {
+                    using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                    {
+                        plaintext = srDecrypt.ReadToEnd();
+                    }
+                }
+            }
+        }
+        return plaintext;
+    }
+
     protected override async Task OnInitializedAsync()
     {
+        await Send();
         // var aa = await AuthenticationState;
         // var bb = aa.User.Identity.Name;
         // SalesData2 = await Sales.GetSalesAsync();
+
+        ///Decrypted
+        DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        TimeSpan timeSpan = DateTime.UtcNow - epoch;
+        long tStamp = (long)timeSpan.TotalSeconds;
+        ///
+        // string r = "Wcem5CYDCbnmR5fcoBtip3UDpHUxcq1N7hUfK4uMm3xs3L+vPboELhK6PMjvxX1QP0o9DpVcEsLBjmswszbku3pFH2HR3S+iLcSP65JFYJlGwXUDtd9TF+PFQuPo3YaqRGhLQ3YBLCkPifnTcuGqAQdIw5cNT5RhF8tKcmOWB6tTc29heTSp5mTf4S81FDl9jY55n1OkQsirSzYGgGzXdolW4K6mMc6loYstTR1GVQXaTEsl7z4HhzXtEVB7W2IYaTcrUetUW6Tad0EGaaAznwOs8ek8YDd+4CQcbFCq/K30RZg9uiKyLeFtfsQCyA9ZDOS7sKhTUdGiGqIyW6uLsBSEq4ysZJpMcIZc/8D0aps56auvLmJY+HNWKklfbl88+DJmpxud7hFuYZo9jTlkrIA/gnIJZcKTa6gMUpzEH1RyHdzOTNogRxvpwGb3dRkcHfjvOHo0kI9DM2236XWfjIypa2RkhF8KsKtBjoSnVnMNDZNTXX6Sp/k/vmaJcU+8RJbh1ah1E1tgLnyGQY7+nu8CjCBqv0ODOChG7JKKz6dU6KZC/VWX7cXH8+/SGXOSKiijsJJEAiOX2Okqv87m9rmhHL6VcoCNFhQXtOYo1U2RCQVXhcpxOsl6gsQWqAMYFc95zMSjkBCot6975LQVhETzt2AAd67L6Abd+ylRBzlpfX2PZrIab0i8rjwdstNE3xg+r/tTayvSRzMHyoX/PYTr6FKtky4u2sjx/3wH+WLqMFvKzbiNSgbT/lRrGaS1FMxVR75/7qYchVCJieauSg==";
+        // string aa = "15793";
+        // string a1 = "8nDF24C2AD";
+        // // string a2 = "1714373200";
+        // string a2 = tStamp.ToString();
+        // string a3 = aa + a1 + a2;
+        // string LZDecrypted = Decrypt(a3, r);
+        // string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
 
         PanelVisible = true;
 

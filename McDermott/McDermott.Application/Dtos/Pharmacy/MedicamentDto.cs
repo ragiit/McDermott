@@ -6,7 +6,7 @@ namespace McDermott.Application.Dtos.Pharmacy
     {
         public long Id { get; set; }
         public long? ProductId { get; set; }
-        public long? SignaId { get; set; }
+        public long? FrequencyId { get; set; }
         public long? RouteId { get; set; }
         public long? FormId { get; set; }
         public long? UomId { get; set; } = null;
@@ -22,7 +22,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         [SetToNull]
         public virtual ProductDto? Product { get; set; }
         [SetToNull]
-        public virtual SignaDto? Signa { get; set; }
+        public virtual DrugDosageDto? Frequency { get; set; }
         [SetToNull]
         public virtual DrugFormDto? Form { get; set; }
         [SetToNull]
