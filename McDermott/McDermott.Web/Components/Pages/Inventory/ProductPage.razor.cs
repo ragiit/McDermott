@@ -44,6 +44,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool Checkins { get; set; } = false;
         private bool Chronis { get; set; } = false;
         private bool IsLoading { get; set; } = false;
+        private bool? FieldHideStock { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private long? TotalQty { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
@@ -568,6 +569,14 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     // Jika tidak ada item yang dipilih, gunakan produk yang sedang dipertimbangkan
                     StockProducts = StockProducts.Where(x => x.ProductId == getProduct.Id).ToList();
+                    if(getProduct.TraceAbility == true)
+                    {
+                        FieldHideStock = true;
+                    }
+                    else
+                    {
+                        FieldHideStock = false;
+                    }
                     NameProduct = getProduct.Name;
                 }
                 else
@@ -575,6 +584,14 @@ namespace McDermott.Web.Components.Pages.Inventory
                     // Jika ada item yang dipilih, gunakan produk yang dipilih
                     StockProducts = StockProducts.Where(x => x.ProductId == SelectedDataItems[0].Adapt<ProductDto>().Id).ToList();
                     NameProduct = SelectedDataItems[0].Adapt<ProductDto>().Name;
+                    if (SelectedDataItems[0].Adapt<ProductDto>().TraceAbility == true)
+                    {
+                        FieldHideStock = true;
+                    }
+                    else
+                    {
+                        FieldHideStock = false;
+                    }
                 }
 
                 // Menyembunyikan panel setelah selesai
@@ -597,12 +614,28 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormStockProduct.UomId = getProduct.UomId;
                 FormStockProduct.ProductId =getProduct.Id;
                 NameProduct = getProduct.Name;
+                if (getProduct.TraceAbility == true)
+                {
+                    FieldHideStock = true;
+                }
+                else
+                {
+                    FieldHideStock = false;
+                }
             }
             else
             {
                 FormStockProduct.UomId = Products.Where(p => p.Id == SelectedDataItems[0].Adapt<ProductDto>().Id).Select(x => x.UomId).FirstOrDefault();
                 FormStockProduct.ProductId = Products.Where(p => p.Id == SelectedDataItems[0].Adapt<ProductDto>().Id).Select(x => x.Id).FirstOrDefault();
                 NameProduct = SelectedDataItems[0].Adapt<ProductDto>().Name;
+                if (SelectedDataItems[0].Adapt<ProductDto>().TraceAbility == true)
+                {
+                    FieldHideStock = true;
+                }
+                else
+                {
+                    FieldHideStock = false;
+                }
             }                
            
         }
@@ -651,6 +684,10 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if (FormStockProduct.SourceId is null)
                 {
                     return;
+                }
+                if(FieldHideStock == false){
+                    FormStockProduct.Batch = null;
+                    FormStockProduct.Expired = null;
                 }
                 FormStockProduct.StatusTransaction = "IN";
                 if (FormStockProduct.Id == 0)

@@ -167,12 +167,12 @@
                                                                                     <DxGridLayoutColumn />
                                                                                 </Columns>
                                                                                 <Items>
-                                                                                    <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption " ColumnSpan="1" >
-                                                                                        <Template >
+                                                                                    <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption " ColumnSpan="1">
+                                                                                        <Template>
                                                                                             <DxTextBox @bind-Text="@FormProductDetails.Dosage" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="0.00" />
                                                                                         </Template>
                                                                                     </DxGridLayoutItem>
-                                                                                    <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="6" >
+                                                                                    <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="6">
                                                                                         <Template>
                                                                                             <DxComboBox Data="@Uoms"
                                                                                                         @bind-Value="@FormProductDetails.UomMId"
@@ -200,7 +200,7 @@
                                                                 </DxFormLayout>
                                                             </div>
                                                             <div class="col-md-6">
-                                                                <DxFormLayout class="mt w-100">
+                                                                <DxFormLayout CssClass="mt w-100">
                                                                     <DxFormLayoutItem Caption="Frequency" CaptionCssClass=" normal-caption" ColSpanMd="12">
                                                                         <DxComboBox Data="@Frequencys"
                                                                                     @bind-Value="@FormProductDetails.FrequencyId"
@@ -220,7 +220,7 @@
                                                                                   TextFieldName="Name" />
                                                                     </DxFormLayoutItem>
                                                                     <DxFormLayoutItem Caption="Pregnancy Warning" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                        <DxCheckBox @bind-Checked="@FormProductDetails.PregnancyWarning" LabelPosition="LabelPosition.Left" CssClass="w-100" />
+                                                                        <DxCheckBox @bind-Checked="@FormProductDetails.PregnancyWarning" />
                                                                     </DxFormLayoutItem>
                                                                 </DxFormLayout>
                                                             </div>
@@ -244,7 +244,7 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <DxFormLayout CssClass="mt w-100">
-                                                                <DxFormLayoutItem Caption="Product Type" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                <DxFormLayoutItem Caption="Product Type" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                     <DxComboBox Data="@ProductTypes"
                                                                                 @bind-Value="@FormProductDetails.ProductType"
                                                                                 ShowValidationIcon="true"
@@ -393,11 +393,17 @@
                                             <Columns>
                                                 <DxGridSelectionColumn Width="15px" />
                                                 <DxGridDataColumn FieldName="Source.Name" Caption="Location" SortIndex="0" />
-                                                <DxGridDataColumn FieldName="Batch" Caption="Batch" />
+                                                @if (FieldHideStock == true)
+                                                {
+                                                    <DxGridDataColumn FieldName="Batch" Caption="Batch" />
+                                                }
                                                 <DxGridDataColumn FieldName="Product.Name" Caption="Product Name" />
                                                 <DxGridDataColumn FieldName="Qty" Caption="On Hand Qty" />
                                                 <DxGridDataColumn FieldName="Uom.Name" Caption="Unit Of Measure" />
-                                                <DxGridDataColumn FieldName="Expired" Caption="Expired Date" />
+                                                @if (FieldHideStock ==true)
+                                                {
+                                                    <DxGridDataColumn FieldName="Expired" Caption="Expired Date" />
+                                                }
                                             </Columns>
                                         </DxGrid>
                                     </DxLoadingPanel>
@@ -412,10 +418,13 @@
                                                                 ValueFieldName="Id"
                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
                                                     </DxComboBox>
-
-                                                </DxFormLayoutItem><DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                    <DxTextBox @bind-Text="@FormStockProduct.Batch" NullText="Batch.." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxTextBox>
                                                 </DxFormLayoutItem>
+                                                @if (FieldHideStock == true)
+                                                {
+                                                    <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                        <DxTextBox @bind-Text="@FormStockProduct.Batch" NullText="Batch.." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxTextBox>
+                                                    </DxFormLayoutItem>
+                                                }
                                                 <DxFormLayoutItem Caption=" On Hand Qty" CaptionCssClass="normal-caption" ColSpanMd="6">
                                                     <DxSpinEdit @bind-Value="@FormStockProduct.Qty" NullText="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
                                                 </DxFormLayoutItem>
@@ -438,17 +447,20 @@
                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                 ShowValidationIcon="true"></DxComboBox>
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                    <DxDateEdit @bind-Date="FormStockProduct.Expired"
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                ShowValidationIcon="true"></DxDateEdit>
-                                                </DxFormLayoutItem>
-                                            @*     <DxFormLayoutItem Caption="Reference" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                    <DxMemo @bind-Text="@FormStockProduct.Referency"
-                                                            NullText="Reference.."
-                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                            ShowValidationIcon="true"></DxMemo>
-                                                </DxFormLayoutItem> *@
+                                                @if (FieldHideStock == true)
+                                                {
+                                                    <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                        <DxDateEdit @bind-Date="FormStockProduct.Expired"
+                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                    ShowValidationIcon="true"></DxDateEdit>
+                                                    </DxFormLayoutItem>
+                                                }
+                                                @*     <DxFormLayoutItem Caption="Reference" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                        <DxMemo @bind-Text="@FormStockProduct.Referency"
+                                        NullText="Reference.."
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        ShowValidationIcon="true"></DxMemo>
+                                        </DxFormLayoutItem> *@
                                             </DxFormLayout>
                                             <hr />
                                             <DxFormLayout CssClass="mt">
