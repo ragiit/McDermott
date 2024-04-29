@@ -9,11 +9,16 @@ namespace McDermott.Application.Dtos.Pharmacy
     public class MedicamentGroupDto :IMapFrom<MedicamentGroup>
     {
         public long Id { get; set; }
+        [Required(ErrorMessage = "Name Must Be Filled In!")]
         public string? Name { get; set; }
         public bool IsConcoction { get; set; } = false;
         public long? PhycisianId { get; set; }
-        public long? RegimentOfUseId { get; set; }
+        public long? UnitOfMeasureId { get; set; }
         public long? FormDrugId { get; set; }
+
+        public virtual UserDto? Phycisian { get; set; }
+        public virtual Uom? UnitOfMeasure { get; set; }
+        public virtual DrugFormDto? FromDrug { get; set; }
         
        
     }
