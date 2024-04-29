@@ -7,6 +7,7 @@
         public List<long>? ActiveComponentId { get; set; }
         public long? SignaId { get; set; }
         public long? RegimentOfUseId { get; set; }
+        public long? UnitOfDosageId { get; set; }
         public bool? AllowSubtitation { get; set; }
         public string? MedicaneUnitDosage { get; set; }
         public string? MedicaneDosage { get; set; }
@@ -17,17 +18,17 @@
         public string? MedicaneName { get; set; }
         public string? Comment { get; set; }
 
+
         [SetToNull]
         public Product? Medicament { get; set; }
-
         [SetToNull]
         public  List<ActiveComponent>? ActiveComponent { get; set; }
         [SetToNull]
-        public  MedicamentGroup? MedicamentGroup { get; set; }
+        public  MedicamentGroup? MedicamentGroup { get; set; }        
         [SetToNull]
-        public  Uom? UoM { get; set; }
+        public  Uom? UnitOfDosage { get; set; }
         [SetToNull]
-        public  DrugDosage? RegimentOfUse { get; set; }
+        public DrugDosage? RegimentOfUse { get; set; }
         [SetToNull]
         public Signa? Signa { get; set; }
     }

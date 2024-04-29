@@ -35,6 +35,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 if (!_cache.TryGetValue(cacheKey, out List<MedicamentGroup>? result))
                 {
                     result = await _unitOfWork.Repository<MedicamentGroup>().Entities
+                      .Include(x => x.Phycisian)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 
@@ -66,6 +67,11 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 if (!_cache.TryGetValue(cacheKey, out List<MedicamentGroupDetail>? result))
                 {
                     result = await _unitOfWork.Repository<MedicamentGroupDetail>().Entities
+                        .Include(x=>x.ActiveComponent)
+                        .Include(x=>x.Medicament)
+                        .Include(x=>x.MedicamentGroup)
+                        .Include(x=>x.RegimentOfUse)
+                        .Include(x=>x.Signa)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 
