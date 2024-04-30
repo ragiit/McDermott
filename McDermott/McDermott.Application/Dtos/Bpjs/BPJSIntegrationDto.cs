@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace McDermott.Application.Dtos.Bpjs
 {
@@ -17,13 +18,16 @@ namespace McDermott.Application.Dtos.Bpjs
         public string? Sex { get; set; }
 
         [JsonPropertyName("tglLahir")]
-        public string? TglLahir { get; set; }
+        [JsonConverter(typeof(JsonDateConverter))]
+        public DateTime? TglLahir { get; set; }
 
         [JsonPropertyName("tglMulaiAktif")]
-        public string? TglMulaiAktif { get; set; }
+        [JsonConverter(typeof(JsonDateConverter))]
+        public DateTime? TglMulaiAktif { get; set; }
 
         [JsonPropertyName("tglAkhirBerlaku")]
-        public string? TglAkhirBerlaku { get; set; }
+        [JsonConverter(typeof(JsonDateConverter))]
+        public DateTime? TglAkhirBerlaku { get; set; }
 
         [JsonPropertyName("kdProviderPst")]
         public KdProviderPst KdProviderPstt { get; set; } = new();
@@ -113,6 +117,45 @@ namespace McDermott.Application.Dtos.Bpjs
 
             [JsonPropertyName("nmProvider")]
             public string? NmProvider { get; set; }
+        }
+    }
+
+    public class JsonDateConverter : JsonConverter<DateTime?>
+    {
+        public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType == JsonTokenType.Null)
+            {
+                return null;
+            }
+
+            if (reader.TokenType != JsonTokenType.String)
+            {
+                throw new JsonException();
+            }
+
+            string dateString = reader.GetString();
+
+            if (DateTime.TryParseExact(dateString, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime date))
+            {
+                return date;
+            }
+            else
+            {
+                throw new JsonException($"The JSON value '{dateString}' is not in the expected format.");
+            }
+        }
+
+        public override void Write(Utf8JsonWriter writer, DateTime? value, JsonSerializerOptions options)
+        {
+            if (value.HasValue)
+            {
+                writer.WriteStringValue(value.Value.ToString("dd-MM-yyyy"));
+            }
+            else
+            {
+                writer.WriteNullValue();
+            }
         }
     }
 }

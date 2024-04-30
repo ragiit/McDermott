@@ -200,21 +200,15 @@
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date of Birth" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.TglLahir"
-                                                                               NullText="Date of Birth"
-                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                    <DxDateEdit NullText="Date of Birth" @bind-Date="@BPJSIntegration.TglLahir" Mask="@DateTimeMask.ShortDate" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Start Active Date" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.TglMulaiAktif"
-                                                                               NullText="Start Active Date"
-                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                    <DxDateEdit NullText="Date of Birth" @bind-Date="@BPJSIntegration.TglMulaiAktif" Mask="@DateTimeMask.ShortDate" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Start End Date" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.TglAkhirBerlaku"
-                                                                               NullText="Start End Date"
-                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                    <DxDateEdit NullText="Date of Birth" @bind-Date="@BPJSIntegration.TglAkhirBerlaku" Mask="@DateTimeMask.ShortDate" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Blood Type" ColSpanMd="12">
