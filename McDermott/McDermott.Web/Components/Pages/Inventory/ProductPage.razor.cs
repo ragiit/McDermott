@@ -274,7 +274,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 ProductType = ProductTypes[2],
                 HospitalType = HospitalProducts[0],
-                SalesPrice = "100",
+                SalesPrice = "Rp 1.00",
                 Tax = "11%"
             };
         }
