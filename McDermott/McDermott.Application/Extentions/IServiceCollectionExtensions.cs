@@ -13,6 +13,7 @@ namespace McDermott.Application.Extentions
             services.AddMediator();
 
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IPCareService, PCareService>();
 
             services.AddScoped<ProtectedSessionStorage>();
             services.AddScoped<CustomAuthenticationStateProvider>();
