@@ -53,6 +53,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool? FormValidationState { get; set; }
         private string? NameProduct { get; set; }
         private string? NameUom { get; set; }
+        CultureInfo Culture = CultureInfo.GetCultureInfo("id-ID");
 
         private List<string> ProductTypes = new List<string>
         {
@@ -178,6 +179,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 // Inisialisasi variabel
                 PanelVisible = true;
+                smartButtonShow = false;
                 showForm = false;
                 StockProductView = false;
                 SelectedDataItems = [];
@@ -274,7 +276,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 ProductType = ProductTypes[2],
                 HospitalType = HospitalProducts[0],
-                SalesPrice = "100",
+                SalesPrice = 100,
                 Tax = "11%"
             };
         }
@@ -526,8 +528,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                             }
                         }
                         ToastService.ShowSuccess("Successfully Update Data...");
-                    }
 
+                    }
+                    
                     await EditItem_Click(getProduct);
                 }
                 else

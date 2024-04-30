@@ -13,28 +13,29 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long? MedicamentId { get; set; }
         public List<long>? ActiveComponentId { get; set; } = [];
         public long? SignaId { get; set; }
-        public long? RegimentOfUseId { get; set; }
+        public long? FrequencyId { get; set; }
+        public string FrequencyName { get; set; }
         public long? UnitOfDosageId { get; set; }
         public bool? AllowSubtitation { get; set; } = false;
         public string? MedicaneUnitDosage { get; set; }
         [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
-        public string? MedicaneDosage { get; set; }
-        
+        public long? MedicaneDosage { get; set; }
+
         [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
-        public string? Dosage { get; set; }
+        public long Dosage { get; set; } = 0;
         [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
-        public string? QtyByDay { get; set; }
+        public long QtyByDay { get; set; } = 0;
         [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
-        public string? Days { get; set; }
+        public long? Days { get; set; }
         [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
-        public string? TotalQty { get; set; }
+        public long? TotalQty { get; set; }
         public string? MedicaneName { get; set; }
         public string? Comment { get; set; }
         public string? ActiveComponentName { get; set; }
 
 
         public virtual ProductDto? Medicament { get; set; }
-        public virtual DrugDosageDto? RegimentOfUse { get; set; }
+        public virtual DrugDosageDto? Frequency { get; set; }
         public virtual MedicamentGroupDto? MedicamentGroup { get; set; }
         public virtual UomDto? UnitOfDosage { get; set; }
         public virtual SignaDto? Signa { get; set; }

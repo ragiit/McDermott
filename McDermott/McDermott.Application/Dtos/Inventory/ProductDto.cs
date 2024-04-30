@@ -15,9 +15,9 @@ namespace McDermott.Application.Dtos.Inventory
         public bool? TraceAbility { get; set; }
         public string? ProductType { get; set; }
         public string? HospitalType { get; set; }
-        public string? SalesPrice { get; set; }
+        public long? SalesPrice { get; set; }
         public string? Tax { get; set; }
-        public string? Cost { get; set; }
+        public long? Cost { get; set; }
         public string? InternalReference { get; set; }
         public string? UomName { get; set; }
         public long? Qtys { get; set; }
@@ -56,7 +56,7 @@ namespace McDermott.Application.Dtos.Inventory
         public bool? Food { get; set; } = false;
         public string? MontlyMax { get; set; }
         public long? FormId { get; set; }
-        public string? Dosage { get; set; }
+        public long Dosage { get; set; } = 0;
         public string? UomName { get; set; }
         public long? Qtys { get; set; }
         public long? BpjsClasificationId { get; set; }
@@ -65,9 +65,9 @@ namespace McDermott.Application.Dtos.Inventory
         public long? PurchaseUomId { get; set; }
         public string? ProductType { get; set; }
         public string? HospitalType { get; set; }
-        public string? SalesPrice { get; set; }
+        public long? SalesPrice { get; set; }
         public string? Tax { get; set; }
-        public string? Cost { get; set; }
+        public long? Cost { get; set; }
         public string? InternalReference { get; set; }
     }
 }

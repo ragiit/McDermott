@@ -10,7 +10,7 @@ namespace McDermott.Application.Dtos.Pharmacy
     {
         public long Id { get; set; }
         [Required(ErrorMessage = "Name Must Be Filled In!")]
-        public string? Name { get; set; }
+        public string? Name { get; set; } = string.Empty;
         public bool IsConcoction { get; set; } = false;
         public long? PhycisianId { get; set; }
         public long? UnitOfMeasureId { get; set; }

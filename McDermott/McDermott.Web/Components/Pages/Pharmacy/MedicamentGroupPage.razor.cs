@@ -15,7 +15,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<MedicamentGroupDetailDto> medicamentGroupDetails = [];
         private List<UserDto> Phy = new();
         private List<UomDto> UoMs = new();
-        private List<SignaDto> Signas = new();
+        private List<DrugDosageDto> Frequencys = new();
         private List<ActiveComponentDto> ActiveComponents = [];
         private List<DrugFormDto> FormDrugs = new();
         private List<ProductDto> Products = [];
@@ -53,16 +53,26 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
                 var checkUom = UoMs.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
                 FormMedicamenDetails.MedicaneUnitDosage = checkUom?.Name;
-                FormMedicamenDetails.Dosage = ChekMedicament?.Dosage;
+                FormMedicamenDetails.FrequencyId = ChekMedicament?.FrequencyId;
+                FormMedicamenDetails.FrequencyName = ChekMedicament.Frequency.Frequency;
+                FormMedicamenDetails.Dosage = ChekMedicament.Dosage;
                 FormMedicamenDetails.MedicaneDosage = ChekMedicament?.Dosage;
-                if (FormMedicamenDetails.Dosage != null && FormMedicamenDetails.Days != null)
+                FormMedicamenDetails.Days = ChekMedicament.Frequency.Days.ToLong();
+                FormMedicamenDetails.QtyByDay = ChekMedicament.Frequency.TotalQtyPerDay.ToLong();
+
+
+                if (Concotions == true)
                 {
-                    var totalQty = (Int64.Parse(FormMedicamenDetails?.Dosage) * Int64.Parse(FormMedicamenDetails?.Days));
-                    FormMedicamenDetails.TotalQty = totalQty.ToString();
+                    FormMedicamenDetails.TotalQty = FormMedicamenDetails.Dosage;
                 }
-                if (FormMedicamenDetails.RegimentOfUseId != null)
+                else
                 {
-                    FormMedicamenDetails.RegimentOfUseId = ChekMedicament.FrequencyId;
+                    if (FormMedicamenDetails.Dosage != null && FormMedicamenDetails.QtyByDay != null)
+                    {
+
+                        FormMedicamenDetails.TotalQty = FormMedicamenDetails?.Dosage * FormMedicamenDetails?.QtyByDay;
+                    }
+                    FormMedicamenDetails.FrequencyId = ChekMedicament.FrequencyId;
                 }
                 selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
                 FormMedicamenDetails.UnitOfDosageId = ChekMedicament.UomId;
@@ -160,7 +170,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             FormDrugs = await Mediator.Send(new GetFormDrugQuery());
             UoMs = await Mediator.Send(new GetUomQuery());
             ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
-            Signas = await Mediator.Send(new GetSignaQuery());
+            Frequencys = await Mediator.Send(new GetDrugDosageQuery());
             Phy = [.. user.Where(x => x.IsPhysicion == true)];
             Products = await Mediator.Send(new GetProductQuery());
             PanelVisible = false;
@@ -180,22 +190,19 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             FormValidationState = false;
         }
 
-        private void onChangeTotalQty(string numDosage)
+        private void OnValueChangedTotalQty(long numDosage)
         {
-            var a = Int64.Parse(numDosage);
-            var b = Int64.Parse(FormMedicamenDetails.Days);
-            FormMedicamenDetails.Dosage = numDosage;
-            var tempt = a * b;
-            FormMedicamenDetails.TotalQty = tempt.ToString();
+            if (numDosage != null)
+            {
+                FormMedicamenDetails.Dosage = numDosage;
+            }
+            FormMedicamenDetails.TotalQty = numDosage * FormMedicamenDetails.QtyByDay;
         }
 
-        private void onChangeTotalQtyDays(string numDays)
+        private void OnValueChangedTotalQtyDays(long? numDays)
         {
-            var a = Int64.Parse(numDays);
-            var b = Int64.Parse(FormMedicamenDetails.Dosage);
-            FormMedicamenDetails.Days = numDays;
-            var tempt = a * b;
-            FormMedicamenDetails.TotalQty = tempt.ToString();
+
+            FormMedicamenDetails.TotalQty = numDays * FormMedicamenDetails.Dosage;
         }
 
         #endregion async Data
@@ -247,7 +254,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task NewItemMedicamentGroupDetail_Click()
         {
-            FormMedicamenDetails = new();
+            FormMedicamenDetails = new(); 
+            selectedActiveComponents = [];
             IsAddMedicament = true;
             await GridDoctorScheduleDetail.StartEditNewRowAsync();
         }
@@ -270,7 +278,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
-                if (FormValidationState == null || MGForm.Name == null)
+                if (MGForm.Name == "")
                 {
                     return;
                 }
@@ -286,12 +294,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         a.MedicamentGroupId = getMedicament.Id;
                         a.MedicamentId = FormMedicamenDetails.MedicamentId;
                         a.MedicaneDosage = FormMedicamenDetails.MedicaneDosage;
+                        a.MedicaneUnitDosage = FormMedicamenDetails.MedicaneUnitDosage;
                         a.QtyByDay = FormMedicamenDetails.QtyByDay;
                         a.Days = FormMedicamenDetails.Days;
                         a.Comment = FormMedicamenDetails.Comment;
                         a.TotalQty = FormMedicamenDetails.TotalQty;
-                        a.SignaId = FormMedicamenDetails.SignaId;
-                        a.RegimentOfUseId = FormMedicamenDetails.RegimentOfUseId;
+                        a.FrequencyId = FormMedicamenDetails.FrequencyId;
                         a.MedicaneUnitDosage = FormMedicamenDetails.MedicaneUnitDosage;
                         a.Dosage = FormMedicamenDetails.Dosage;
                         if (selectedActiveComponents != null)

@@ -169,7 +169,7 @@
                                                                                 <Items>
                                                                                     <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption " ColumnSpan="1">
                                                                                         <Template>
-                                                                                            <DxTextBox @bind-Text="@FormProductDetails.Dosage" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="0.00" />
+                                                                                            <DxSpinEdit @bind-Value="@FormProductDetails.Dosage" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
                                                                                         </Template>
                                                                                     </DxGridLayoutItem>
                                                                                     <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="6">
@@ -298,13 +298,17 @@
                                                         <div class="col-md-6">
                                                             <DxFormLayout CssClass="mt">
                                                                 <DxFormLayoutItem Caption="Sale Price" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@FormProductDetails.SalesPrice" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
+                                                                    <DxMaskedInput @bind-Value="@FormProductDetails.SalesPrice" Mask="@NumericMask.Currency" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true">
+                                                                        <DxNumericMaskProperties Culture="Culture"></DxNumericMaskProperties>
+                                                                    </DxMaskedInput>
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem Caption="Customer Tax" CaptionCssClass=" normal-caption" ColSpanMd="12">
                                                                     <DxTextBox @bind-Text="@FormProductDetails.Tax" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem Caption="Cost" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@FormProductDetails.Cost" NullText="Cost.." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
+                                                                   <DxMaskedInput @bind-Value="@FormProductDetails.SalesPrice" Mask="@NumericMask.Currency" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true">
+                                                                        <DxNumericMaskProperties Culture="Culture"></DxNumericMaskProperties>
+                                                                    </DxMaskedInput>
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem Caption="Category Product" CaptionCssClass=" normal-caption" ColSpanMd="12">
                                                                     <DxComboBox Data="@productCategories"
@@ -400,7 +404,7 @@
                                                 <DxGridDataColumn FieldName="Product.Name" Caption="Product Name" />
                                                 <DxGridDataColumn FieldName="Qty" Caption="On Hand Qty" />
                                                 <DxGridDataColumn FieldName="Uom.Name" Caption="Unit Of Measure" />
-                                                @if (FieldHideStock ==true)
+                                                @if (FieldHideStock == true)
                                                 {
                                                     <DxGridDataColumn FieldName="Expired" Caption="Expired Date" />
                                                 }

@@ -17,7 +17,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public bool? Weather { get; set; }
         public bool? Food { get; set; }
         public string? MontlyMax { get; set; }
-        public string? Dosage { get; set; }
+        public long Dosage { get; set; } = 0;
 
         [SetToNull]
         public virtual ProductDto? Product { get; set; }
