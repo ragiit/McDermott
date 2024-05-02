@@ -82,7 +82,8 @@
                                     </Columns>
                                 </DxGrid>
                                 <DxPopup Visible="showForm" Width="70%" MinWidth="40%" HeaderText="@header">
-                                    <EditForm Model="@FormInternalTransfer" Context="EditFormContext">
+                                    <EditForm Model="@FormInternalTransfer" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
+                                        <DataAnnotationsValidator/>
                                         <DxFormLayout CssClass="mt">
                                             <DxFormLayoutItem Caption="Source Location" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxComboBox Data="@Locations"
@@ -148,7 +149,7 @@
                                         <DxFormLayout class="mt">
                                             <div class="col d-flex justify-content-end">
                                                 <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="onDiscard"></DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="onDiscard"></DxButton>
                                             </div>
                                         </DxFormLayout>
                                     </EditForm>
