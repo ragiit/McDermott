@@ -4,17 +4,21 @@ namespace McDermott.Web.Extentions
 {
     public static class Helper
     {
+        public static readonly string VERSION = "2.0.0";
+
+        public static void ShowInfoSubmittingForm(this IToastService toastService, string message = "Please ensure that all fields marked in red are filled in before submitting the form.") => toastService.ShowInfo(message);
+
         public static string EncodeToBase64(this string input)
         {
             byte[] bytesToEncode = Encoding.UTF8.GetBytes(input);
             string base64Encoded = Convert.ToBase64String(bytesToEncode);
             return base64Encoded;
         }
-        public static readonly string VERSION = "2.0.0";
         public static T EnumGetValue<T>(this Enum enumValue)
         {
             return (T)Convert.ChangeType(enumValue, typeof(T));
         }
+
         public static long RandomNumber => new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second;
 
         public static string HashMD5(string input)

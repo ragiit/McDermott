@@ -18,6 +18,8 @@ global using System.ComponentModel.DataAnnotations;
 global using System.Linq.Expressions;
 global using Microsoft.Extensions.Caching.Memory;
 
+global using static McDermott.Application.Features.Commands.Bpjs.SystemParameterCommand;
+global using static McDermott.Application.Features.Commands.Bpjs.BPJSIntegrationCommand;
 global using static McDermott.Application.Features.Commands.Patient.PatientAllergyCommand;
 global using static McDermott.Application.Extentions.EnumHelper;
 global using static McDermott.Application.Features.Commands.Bpjs.BpjsClassificationCommand;

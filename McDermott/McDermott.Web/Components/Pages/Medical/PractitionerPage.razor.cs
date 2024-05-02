@@ -187,6 +187,12 @@
             if (!FormValidationState)
                 return;
 
+            if (UserForm.IsPhysicion && string.IsNullOrWhiteSpace(UserForm.PhysicanCode))
+            {
+                ToastService.ShowInfoSubmittingForm();
+                return;
+            }
+
             UserForm.IsDoctor = true;
 
             if (UserForm.Id == 0)

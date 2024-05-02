@@ -1,9 +1,8 @@
-﻿using McDermott.Domain.Common;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace McDermott.Application.Dtos.Bpjs
+namespace McDermott.Domain.Entities
 {
-    public class BPJSIntegrationDto : IMapFrom<BPJSIntegration>
+    public class BPJSIntegration : BaseAuditableEntity
     {
         public long? InsurancePolicyId { get; set; }
         [JsonPropertyName("noKartu")]
@@ -65,6 +64,6 @@ namespace McDermott.Application.Dtos.Bpjs
         public bool AsuransiCob { get; set; }
 
         [SetToNull]
-        public InsurancePolicyDto? InsurancePolicy { get; set; }
+        public InsurancePolicy? InsurancePolicy { get; set; }
     }
 }
