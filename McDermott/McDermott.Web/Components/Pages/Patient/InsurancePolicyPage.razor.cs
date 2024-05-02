@@ -1,6 +1,4 @@
-﻿using LZStringCSharp;
-
-namespace McDermott.Web.Components.Pages.Patient
+﻿namespace McDermott.Web.Components.Pages.Patient
 {
     public partial class InsurancePolicyPage
     {
@@ -309,28 +307,46 @@ namespace McDermott.Web.Components.Pages.Patient
             await OnSave();
         }
 
+        private bool IsLoadingGetBPJS { get; set; } = false;
+        private BPJSIntegrationDto BPJSIntegration { get; set; } = new();
+
         private async Task OnClickGetBPJS()
         {
             if (string.IsNullOrWhiteSpace(InsurancePoliciyForm.PolicyNumber))
             {
-                //ToastService.ShowInfo("Please insert the Policy Number!");
-                //return;
+                ToastService.ShowInfo("Please insert the Policy Number!");
+                return;
             }
 
-            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            TimeSpan timeSpan = DateTime.UtcNow - epoch;
-            long tStamp = (long)timeSpan.TotalSeconds;
+            IsLoadingGetBPJS = true;
 
-            string r = "Wcem5CYDCbnmR5fcoBtip3UDpHUxcq1N7hUfK4uMm3xs3L+vPboELhK6PMjvxX1QP0o9DpVcEsLBjmswszbku3pFH2HR3S+iLcSP65JFYJlGwXUDtd9TF+PFQuPo3YaqRGhLQ3YBLCkPifnTcuGqAQdIw5cNT5RhF8tKcmOWB6tTc29heTSp5mTf4S81FDl9jY55n1OkQsirSzYGgGzXdolW4K6mMc6loYstTR1GVQXaTEsl7z4HhzXtEVB7W2IYaTcrUetUW6Tad0EGaaAznwOs8ek8YDd+4CQcbFCq/K30RZg9uiKyLeFtfsQCyA9ZDOS7sKhTUdGiGqIyW6uLsBSEq4ysZJpMcIZc/8D0aps56auvLmJY+HNWKklfbl88+DJmpxud7hFuYZo9jTlkrIA/gnIJZcKTa6gMUpzEH1RyHdzOTNogRxvpwGb3dRkcHfjvOHo0kI9DM2236XWfjIypa2RkhF8KsKtBjoSnVnMNDZNTXX6Sp/k/vmaJcU+8RJbh1ah1E1tgLnyGQY7+nu8CjCBqv0ODOChG7JKKz6dU6KZC/VWX7cXH8+/SGXOSKiijsJJEAiOX2Okqv87m9rmhHL6VcoCNFhQXtOYo1U2RCQVXhcpxOsl6gsQWqAMYFc95zMSjkBCot6975LQVhETzt2AAd67L6Abd+ylRBzlpfX2PZrIab0i8rjwdstNE3xg+r/tTayvSRzMHyoX/PYTr6FKtky4u2sjx/3wH+WLqMFvKzbiNSgbT/lRrGaS1FMxVR75/7qYchVCJieauSg==";
-            string aa = "15793";
-            string a1 = "8nDF24C2AD";
-            // string a2 = "1714373200";
-            string a2 = tStamp.ToString();
-            string a3 = aa + a1 + a2;
-            string LZDecrypted = Decrypt(a3, r);
-            string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
+            var result = await PcareService.SendPCareService($"peserta/{InsurancePoliciyForm.PolicyNumber}", HttpMethod.Get);
+            if (result.Item2 == 200)
+            {
+                BPJSIntegration = System.Text.Json.JsonSerializer.Deserialize<BPJSIntegrationDto>(result.Item1) ?? new();
+            }
+            else
+            {
+                BPJSIntegration = new();
+                ToastService.ShowError(result.Item1);
+            }
 
-            Console.WriteLine("==========================================================================================");
+            IsLoadingGetBPJS = false;
+
+            //DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            //TimeSpan timeSpan = DateTime.UtcNow - epoch;
+            //long tStamp = (long)timeSpan.TotalSeconds;
+
+            //string r = "Wcem5CYDCbnmR5fcoBtip3UDpHUxcq1N7hUfK4uMm3xs3L+vPboELhK6PMjvxX1QP0o9DpVcEsLBjmswszbku3pFH2HR3S+iLcSP65JFYJlGwXUDtd9TF+PFQuPo3YaqRGhLQ3YBLCkPifnTcuGqAQdIw5cNT5RhF8tKcmOWB6tTc29heTSp5mTf4S81FDl9jY55n1OkQsirSzYGgGzXdolW4K6mMc6loYstTR1GVQXaTEsl7z4HhzXtEVB7W2IYaTcrUetUW6Tad0EGaaAznwOs8ek8YDd+4CQcbFCq/K30RZg9uiKyLeFtfsQCyA9ZDOS7sKhTUdGiGqIyW6uLsBSEq4ysZJpMcIZc/8D0aps56auvLmJY+HNWKklfbl88+DJmpxud7hFuYZo9jTlkrIA/gnIJZcKTa6gMUpzEH1RyHdzOTNogRxvpwGb3dRkcHfjvOHo0kI9DM2236XWfjIypa2RkhF8KsKtBjoSnVnMNDZNTXX6Sp/k/vmaJcU+8RJbh1ah1E1tgLnyGQY7+nu8CjCBqv0ODOChG7JKKz6dU6KZC/VWX7cXH8+/SGXOSKiijsJJEAiOX2Okqv87m9rmhHL6VcoCNFhQXtOYo1U2RCQVXhcpxOsl6gsQWqAMYFc95zMSjkBCot6975LQVhETzt2AAd67L6Abd+ylRBzlpfX2PZrIab0i8rjwdstNE3xg+r/tTayvSRzMHyoX/PYTr6FKtky4u2sjx/3wH+WLqMFvKzbiNSgbT/lRrGaS1FMxVR75/7qYchVCJieauSg==";
+            //string aa = "15793";
+            //string a1 = "8nDF24C2AD";
+            //// string a2 = "1714373200";
+            //string a2 = tStamp.ToString();
+            //string a3 = aa + a1 + a2;
+            //string LZDecrypted = Decrypt(a3, r);
+            //string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
+
+            //Console.WriteLine("==========================================================================================");
         }
 
         public string Decrypt(string key, string data)

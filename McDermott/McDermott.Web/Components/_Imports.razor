@@ -1,5 +1,6 @@
 ﻿@using System.Net.Http
 @using System.Net.Http.Json
+@using McDermott.Application.Features.Services
 @using MediatR
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
@@ -16,6 +17,7 @@
 @using System.Numerics
 @using Blazored.Toast.Services
 
+@inject IPCareService PcareService
 @inject IFileUploadService FileUploadService
 @inject IHttpContextAccessor HttpContextAccessor
 @inject IToastService ToastService

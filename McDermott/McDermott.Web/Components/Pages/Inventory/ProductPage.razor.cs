@@ -27,7 +27,6 @@ namespace McDermott.Web.Components.Pages.Inventory
         private ProductDto FormProducts = new();
         private StockProductDto FormStockProduct = new();
         private MedicamentDto FormMedicaments = new();
-        
 
         #endregion Relation Data
 
@@ -222,6 +221,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         #endregion Load
 
         #region Grid
+
         private async Task HandleValidSubmit()
         {
             IsLoading = true;
@@ -232,7 +232,6 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task HandleInvalidSubmit()
         {
-
             showForm = true;
             FormValidationState = false;
         }
@@ -280,7 +279,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                 Tax = "11%"
             };
         }
-
 
         private async Task Refresh_Click()
         {
@@ -347,14 +345,12 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task onDiscard()
         {
             await LoadData();
-        }  
-       
+        }
 
         private void DeleteItem_Click()
         {
             Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
-
 
         private void ColumnChooserButton_Click()
         {
@@ -384,8 +380,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ExportSelectedRowsOnly = true,
             });
         }
-        #endregion
+
+        #endregion Click
+
         #region Delete Product
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -435,8 +434,10 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
         }
 
-        #endregion Click
+        #endregion Delete Product
+
         ProductDto getProduct = new();
+
         #region Save
 
         private async Task OnSave()
@@ -447,7 +448,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     return;
                 }
-               
+
                 var a = FormProductDetails;
                 if (a.Name != null)
                 {
@@ -495,7 +496,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                             getProduct = await Mediator.Send(new CreateProductRequest(FormProducts));
                         }
 
-
                         // Medicament
                         if (FormProductDetails.HospitalType == "Medicament")
                         {
@@ -528,9 +528,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                             }
                         }
                         ToastService.ShowSuccess("Successfully Update Data...");
-
                     }
-                    
+
                     await EditItem_Click(getProduct);
                 }
                 else
@@ -541,12 +540,13 @@ namespace McDermott.Web.Components.Pages.Inventory
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
-            }                       
+            }
         }
 
         #endregion Save
 
         #region Stock Produk
+
         private async void onDiscardStock()
         {
             FormStockPopUp = false;
@@ -599,7 +599,6 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 // Menyembunyikan panel setelah selesai
                 PanelVisible = false;
-
             }
             catch (Exception ex)
             {
@@ -613,7 +612,6 @@ namespace McDermott.Web.Components.Pages.Inventory
             DataProducts = await Mediator.Send(new GetProductQuery());
             if (SelectedDataItems.Count == 0)
             {
-
                 FormStockProduct.UomId = getProduct.UomId;
                 FormStockProduct.ProductId =getProduct.Id;
                 NameProduct = getProduct.Name;
@@ -639,8 +637,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     FieldHideStock = false;
                 }
-            }                
-           
+            }
         }
         private async Task EditItemStock_Click()
         {
@@ -705,14 +702,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 FormStockPopUp = false;
                 await NewTableStock_Item();
-
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-
         }
-        #endregion
+
+        #endregion Stock Produk
     }
 }
