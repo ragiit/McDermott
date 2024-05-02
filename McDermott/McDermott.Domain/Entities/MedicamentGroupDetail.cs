@@ -7,14 +7,14 @@
         public List<long>? ActiveComponentId { get; set; }
         public long? SignaId { get; set; }
         public long? FrequencyId { get; set; }
-        public long? UnitOfDosageId { get; set; }
-        public bool? AllowSubtitation { get; set; }
-        public string? MedicaneUnitDosage { get; set; }
-        public string? MedicaneDosage { get; set; }
+        public long? UnitOfDosageId { get; set; }        
         public long? Dosage { get; set; }
         public long? QtyByDay { get; set; }
         public long? Days { get; set; }
         public long? TotalQty { get; set; }
+        public bool? AllowSubtitation { get; set; }
+        public string? MedicaneUnitDosage { get; set; }
+        public string? MedicaneDosage { get; set; }
         public string? MedicaneName { get; set; }
         public string? Comment { get; set; }
 

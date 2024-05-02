@@ -11,6 +11,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private List<MedicamentGroupDto> medicamentGroups = [];
         private List<MedicamentGroupDetailDto> medicamentGroupDetails = [];
+        private List<MedicamentGroupDetailDto> TempMedicamentGroupDetails = [];
         private List<UserDto> Phy = new();
         private List<UomDto> UoMs = new();
         private List<DrugDosageDto> Frequencys = new();
@@ -18,7 +19,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<DrugFormDto> FormDrugs = new();
         private List<ProductDto> Products = [];
         private MedicamentGroupDto MGForm = new();
-        private MedicamentGroupDetailDto FormMedicamenDetails = new();
+        private MedicamentGroupDetailDto FormMedicamenDetails { get; set; } = new();
         private MedicamentGroupDto getMedicament = new();
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
 
@@ -37,12 +38,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private bool IsAddMedicament { get; set; } = false;
         private bool FormValidationState { get; set; } = true;
         private bool IsLoading { get; set; } = false;
-        private double Dosages { get; set; }
+        private MedicamentGroupDetailDto iMedicamentGroups { get; set; } = new();
         private string? chars { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private int FocusedRowVisibleIndexMedicamentGroup { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        private IReadOnlyList<object> SelectedMedicamentGroupDetailDataItems { get; set; } = [];
+        private IReadOnlyList<object> SelectedMedicamentGroupDetailDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         private async Task SelectChangeItem(ProductDto product)
         {
@@ -163,6 +164,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             SelectedDataItems = new ObservableRangeCollection<object>();
             SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
             medicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery());
+            medicamentGroupDetails = await Mediator.Send(new GetMedicamentGroupDetailQuery());
             var user = await Mediator.Send(new GetUserQuery());
             FormDrugs = await Mediator.Send(new GetFormDrugQuery());
             UoMs = await Mediator.Send(new GetUomQuery());
@@ -250,6 +252,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task NewItem_Click()
         {
             medicamentGroupDetails.Clear();
+            MGForm = new();
             showForm = true;
         }
 
@@ -268,12 +271,126 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            try
+            {
+                MGForm = SelectedDataItems[0].Adapt<MedicamentGroupDto>();
+                showForm = true;
+
+                TempMedicamentGroupDetails = await Mediator.Send(new GetMedicamentGroupDetailQuery(x => x.MedicamentGroupId == MGForm.Id));
+                medicamentGroupDetails = TempMedicamentGroupDetails.Select(x => x).ToList();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
-        private async Task EditItemMedicamentGroupDetail_Click()
+        private async Task EditItemMedicamentGroupDetail_Click(IGrid context)
         {
+            try
+            {
+                FormMedicamenDetails = (MedicamentGroupDetailDto)context.SelectedDataItem;
+                // Buat salinan objek yang akan diedit menggunakan Mapster
+                var editedGroupDetail = FormMedicamenDetails.Adapt<MedicamentGroupDetailDto>(); // MedicamentGroupDetail adalah objek yang sedang diedit
+
+                IsAddMedicament = false;
+
+                await GridMedicamenGroupDetail.StartEditRowAsync(FocusedRowVisibleIndexMedicamentGroup);
+
+                var detail = medicamentGroupDetails.FirstOrDefault(x => x.Id == editedGroupDetail.Id);
+                if (detail.ActiveComponentId != null)
+                {
+                    selectedActiveComponents = ActiveComponents.Where(a => detail.ActiveComponentId.Contains(a.Id)).ToList();
+                }
+
+                if (detail is not null)
+                    // Gunakan salinan objek yang diedit
+                    this.FormMedicamenDetails = editedGroupDetail;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
+
+        private async Task Back_Click()
+        {
+            showForm = false;
+        }
+
+        private async Task CancelItemMedicamentGroupDetailGrid_Click()
+        {
+            showForm = false;
+        }
+
+        private void DeleteItem_Click()
+        {
+            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        private void DeleteItemMedicamentGroupDetail_Click()
+        {
+            GridMedicamenGroupDetail.ShowRowDeleteConfirmation(FocusedRowVisibleIndexMedicamentGroup);
+        }
+
+        #endregion Click
+
+        #region function Delete
+
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                List<MedicamentGroupDto> a = SelectedDataItems.Adapt<List<MedicamentGroupDto>>();
+                List<long> ids = a.Select(x => x.Id).ToList();
+                List<long> detailIdsToDelete = new();
+
+                foreach (var Uid in ids)
+                {
+                    detailIdsToDelete = medicamentGroupDetails
+                           .Where(x => x.MedicamentGroupId == Uid)
+                           .Select(x => x.Id)
+                           .ToList();
+                }
+                if (SelectedDataItems.Count == 1)
+                {
+                    await Mediator.Send(new DeleteMedicamentGroupDetailRequest(ids: detailIdsToDelete));
+
+                    await Mediator.Send(new DeleteMedicamentGroupRequest(SelectedDataItems[0].Adapt<MedicamentGroupDto>().Id));
+                }
+                else
+                {
+                    await Mediator.Send(new DeleteMedicamentGroupDetailRequest(ids: detailIdsToDelete));
+                    await Mediator.Send(new DeleteMedicamentGroupRequest(ids: ids));
+                }
+
+                ToastService.ShowError("Data Deleting success..");
+                await LoadData();
+            }
+            catch (Exception ee)
+            {
+                ee.HandleException(ToastService);
+            }
+        }
+
+        private async Task OnDeleteMedicamentGroupDetail(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                StateHasChanged();
+                var aaa = SelectedMedicamentGroupDetailDataItems.Adapt<List<MedicamentGroupDetailDto>>();
+                medicamentGroupDetails.RemoveAll(x => aaa.Select(z => z.MedicamentId).Contains(x.MedicamentId));
+                SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
+            }
+            catch (Exception ee)
+            {
+                ee.HandleException(ToastService);
+            }
+        }
+
+        #endregion function Delete
+
+        #region Function Save
 
         private async Task OnSave()
         {
@@ -320,70 +437,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 ex.HandleException(ToastService);
             }
         }
-
-        private async Task Back_Click()
-        {
-            showForm = false;
-        }
-
-        private async Task CancelItemMedicamentGroupDetailGrid_Click()
-        {
-            showForm = false;
-        }
-
-        private void DeleteItem_Click()
-        {
-            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
-        }
-
-        private void DeleteItemMedicamentGroupDetail_Click()
-        {
-            GridMedicamenGroupDetail.ShowRowDeleteConfirmation(FocusedRowVisibleIndexMedicamentGroup);
-        }
-
-        #endregion Click
-
-        #region function Delete
-
-        private async Task OnDelete(GridDataItemDeletingEventArgs e)
-        {
-            try
-            {
-                if (SelectedDataItems.Count == 1)
-                {
-                    await Mediator.Send(new DeleteMedicamentGroupRequest(SelectedDataItems[0].Adapt<MedicamentGroupDto>().Id));
-                }
-                else
-                {
-                    var a = SelectedDataItems.Adapt<List<MedicamentGroupDto>>();
-                    await Mediator.Send(new DeleteMedicamentGroupRequest(ids: a.Select(x => x.Id).ToList()));
-                }
-                await LoadData();
-            }
-            catch (Exception ee)
-            {
-                ee.HandleException(ToastService);
-            }
-        }
-
-        private async Task OnDeleteMedicamentGroupDetail(GridDataItemDeletingEventArgs e)
-        {
-            try
-            {
-                StateHasChanged();
-                var aaa = SelectedMedicamentGroupDetailDataItems.Adapt<List<MedicamentGroupDetailDto>>();
-                medicamentGroupDetails.RemoveAll(x => aaa.Select(z => z.MedicamentId).Contains(x.MedicamentId));
-                SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
-            }
-            catch (Exception ee)
-            {
-                ee.HandleException(ToastService);
-            }
-        }
-
-        #endregion function Delete
-
-        #region Function Save
 
         private async Task OnSaveMedicamentGroupDetail(GridEditModelSavingEventArgs e)
         {
