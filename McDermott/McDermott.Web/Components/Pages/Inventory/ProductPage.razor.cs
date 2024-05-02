@@ -49,7 +49,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool? FormValidationState { get; set; }
         private string? NameProduct { get; set; }
         private string? NameUom { get; set; }
-        CultureInfo Culture = CultureInfo.GetCultureInfo("id-ID");
+        private CultureInfo Culture = CultureInfo.GetCultureInfo("id-ID");
 
         private List<string> ProductTypes = new List<string>
         {
@@ -434,7 +434,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         #endregion Delete Product
 
-        ProductDto getProduct = new();
+        private ProductDto getProduct = new();
 
         #region Save
 
@@ -545,7 +545,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         #region Stock Produk
 
-        private async void onDiscardStock()
+        private async Task onDiscardStock()
         {
             FormStockPopUp = false;
             await NewTableStock_Item();
@@ -638,9 +638,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     FieldHideStock = false;
                 }
-            }                
-           
+            }
         }
+
         private async Task EditItemStock_Click()
         {
             FormStockPopUp = true;

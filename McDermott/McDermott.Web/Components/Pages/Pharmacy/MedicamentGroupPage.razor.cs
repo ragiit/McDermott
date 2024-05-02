@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 
@@ -262,6 +263,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await EditItem_Click();
         }
 
+        private async Task OnRowDoubleClickDetail(GridRowClickEventArgs e)
+        {
+            await EditItemMedicamentGroupDetail_Click(e.Grid);
+        }
+
         #endregion Grid
 
         #region Click
@@ -486,26 +492,27 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
-                var FormMedicamenGroupDetails = (MedicamentGroupDetailDto)e.EditModel;
+                var FormMedicamenGroupDetailss = (MedicamentGroupDetailDto)e.EditModel;
+                MedicamentGroupDetailDto updates = new();
 
                 // Jika menambahkan medicament
                 if (IsAddMedicament)
                 {
                     // Cek apakah medicament dengan MedicamentId yang sama sudah ada
-                    if (medicamentGroupDetails.Any(x => x.MedicamentId == FormMedicamenGroupDetails.MedicamentId))
+                    if (medicamentGroupDetails.Any(x => x.MedicamentId == FormMedicamenGroupDetailss.MedicamentId))
                         return;
 
                     // Ambil daftar ID komponen aktif yang dipilih
                     var listActiveComponentIds = selectedActiveComponents?.Select(x => x.Id).ToList();
 
                     // Jika ada komponen aktif yang dipilih, tambahkan ke FormMedicamenGroupDetails
-                    if (FormMedicamenGroupDetails.ActiveComponentId != null)
-                        FormMedicamenGroupDetails.ActiveComponentId.AddRange(listActiveComponentIds);
+                    if (FormMedicamenGroupDetailss.ActiveComponentId != null)
+                        FormMedicamenGroupDetailss.ActiveComponentId.AddRange(listActiveComponentIds);
                     else
-                        FormMedicamenGroupDetails.ActiveComponentId = listActiveComponentIds;
+                        FormMedicamenGroupDetailss.ActiveComponentId = listActiveComponentIds;
 
                     // Tambahkan FormMedicamenGroupDetails ke daftar medicamentGroupDetails
-                    medicamentGroupDetails.Add(FormMedicamenGroupDetails);
+                    medicamentGroupDetails.Add(FormMedicamenGroupDetailss);
 
                     // Update nama komponen aktif untuk setiap item dalam daftar medicamentGroupDetails
                     foreach (var detail in medicamentGroupDetails)
@@ -514,6 +521,18 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                             .Where(a => detail.ActiveComponentId.Contains(a.Id))
                             .Select(a => a.Name));
                     }
+                }
+                else
+                {
+                    var d = SelectedMedicamentGroupDetailDataItems[0].Adapt<MedicamentGroupDetailDto>();
+                    var cek = medicamentGroupDetails.FirstOrDefault(x => x.MedicamentId == FormMedicamenGroupDetailss.MedicamentId);
+                    if (cek is not null && d.MedicamentId != FormMedicamenGroupDetailss.MedicamentId)
+                        return;
+                    updates = medicamentGroupDetails.FirstOrDefault(x => x.MedicamentId == d.MedicamentId)!;
+
+                    var index = medicamentGroupDetails.IndexOf(updates!);
+
+                    medicamentGroupDetails[index] = FormMedicamenGroupDetailss;
                 }
 
                 // Bersihkan koleksi SelectedMedicamentGroupDetailDataItems
