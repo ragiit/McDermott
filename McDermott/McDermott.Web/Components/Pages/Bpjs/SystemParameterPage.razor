@@ -72,7 +72,7 @@
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Key" SortIndex="0" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Value" Caption="Route" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Value" />
 
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
@@ -88,7 +88,7 @@
                                                     <ValidationMessage For="@(()=> a.Key)"   />
                                                 </DxFormLayoutItem>
 
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Value" ColSpanMd="12">
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Value" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@a.Value"
                                                                ShowValidationIcon="true"
                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
