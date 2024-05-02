@@ -1,6 +1,169 @@
-﻿namespace McDermott.Web.Components.Pages.Inventory
+﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
+
+namespace McDermott.Web.Components.Pages.Inventory
 {
     public partial class InternalTransfer
     {
+        #region relation Data
+
+        private List<StockProductDto> StockProducts = [];
+        private List<LocationDto> Locations = [];
+        private StockProductDto FromInternalTransfer = new();
+
+        #endregion relation Data
+
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                try
+                {
+                    await GetUserInfo();
+                }
+                catch { }
+            }
+        }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo();
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
+        #region static Variable
+
+        private IGrid? Grid { get; set; }
+        private bool PanelVisible { get; set; } = false;
+        private bool showForm { get; set; } = false;
+        private string? header { get; set; } = string.Empty;
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private int FocusedRowVisibleIndex { get; set; }
+
+        #endregion static Variable
+
+        #region Load
+
+        protected override async Task OnInitializedAsync()
+        {
+            await GetUserInfo();
+            await LoadData();
+        }
+
+        private async Task LoadData()
+        {
+            try
+            {
+                PanelVisible = true;
+                StockProducts = await Mediator.Send(new GetStockProductQuery());
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        #endregion Load
+
+        #region Grid
+
+        private async Task HandleValidSubmit()
+        {
+            //IsLoading = true;
+            //FormValidationState = true;
+            //await OnSave();
+            //IsLoading = false;
+        }
+
+        private async Task HandleInvalidSubmit()
+        {
+            //showForm = true;
+            //FormValidationState = false;
+        }
+
+        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        {
+            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+            {
+                e.CssClass = "alt-item";
+            }
+            if (e.ElementType == GridElementType.HeaderCell)
+            {
+                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
+                e.CssClass = "header-bold";
+            }
+        }
+
+        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        {
+            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+        }
+
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+        }
+
+        private async Task OnRowDoubleClick(GridRowClickEventArgs e)
+        {
+            //    await EditItem_Click();
+        }
+
+        #endregion Grid
+
+        #region Click
+
+        private async Task NewItem_Click()
+        {
+            showForm = true;
+            FromInternalTransfer = new();
+            header = "Add Transfer Internal";
+        }
+
+        private async Task EditItem_Click()
+        {
+        }
+
+        private void DeleteItem_Click()
+        {
+            Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        private async Task Refresh_Click()
+        {
+            await LoadData();
+        }
+
+        #endregion Click
+
+        #region function Delete
+
+        private async Task OnDelete()
+        {
+        }
+
+        #endregion function Delete
     }
 }

@@ -1,57 +1,106 @@
 ﻿@page "/inventory/internal-transfer"
 @rendermode InteractiveServer
-<h3>Internal Transfer</h3>
 
-<div class="form-group">
-    <label for="location">Search Location:</label>
+<PageTitle> Internal Transfer</PageTitle>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Internal Transfer</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
+                        <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/inventory/internal-transfer">Internal Transfer</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="true"
+                                            Text="Fetching Data...">
+                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                        Data="StockProducts"
+                                        PageSize="10"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                        KeyFieldName="Id"
+                                        DataItemDeleting="OnDelete"
+                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                        EditorRenderMode="GridEditorRenderMode.Detached"
+                                        PagerPosition="GridPagerPosition.Bottom"
+                                        AllowSelectRowByClick="true"
+                                        PageSizeSelectorVisible="true"
+                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                        PageSizeSelectorAllRowsItemVisible="true"
+                                        PagerSwitchToInputBoxButtonCount="10"
+                                        FocusedRowEnabled="true"
+                                        PagerVisibleNumericButtonCount="10"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        ShowGroupPanel="true"
+                                        AutoExpandAllGroupRows="true"
+                                        CssClass="ch-480"
+                                        ShowFilterRow="true"
+                                        RowDoubleClick="OnRowDoubleClick"
+                                        TextWrapEnabled="false"
+                                        CustomizeElement="Grid_CustomizeElement"
+                                        ShowSearchBox="true"
+                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                        KeyboardNavigationEnabled="true">
+                                    <ToolbarTemplate>
+                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && StockProducts.Count > 0" />
+                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && StockProducts.Count > 0" />
+                                            <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                        </DxToolbar>
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Source.Name" Caption="Location" SortIndex="0" />
+                                        @* @if (FieldHideStock == true)
+                                        { *@
+                                        <DxGridDataColumn FieldName="Batch" Caption="Batch" />
+                                        @* } *@
+                                        <DxGridDataColumn FieldName="Product.Name" Caption="Product Name" />
+                                        <DxGridDataColumn FieldName="Qty" Caption="On Hand Qty" />
+                                        <DxGridDataColumn FieldName="Uom.Name" Caption="Unit Of Measure" />
+                                        @* @if (FieldHideStock == true)
+                                        { *@
+                                        <DxGridDataColumn FieldName="Expired" Caption="Expired Date" />
+                                        @* } *@
+                                    </Columns>
+                                </DxGrid>
+                                <DxPopup Visible="showForm" Width="auto" HeaderText="@header">
+                                    <EditForm Model="@FromInternalTransfer" Context="EditFormContext">
+                                        <DxFormLayout CssClass="mt">
+                                            <DxFormLayoutItem Caption="Source Location" ColSpanMd="12">
+                                                <DxComboBox Data="@Locations"
+                                                            @bind-Value="@FromInternalTransfer.SourceId"
+                                                            NullText=" Select Location Source..."
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"                                                            
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                            ShowValidationIcon="true"></DxComboBox>
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditForm>
+                                </DxPopup>
+                            </DxLoadingPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
-<div class="form-group">
-    <label for="location">Destination Location:</label>
-</div>
-<div class="form-group">
-    <label for="location">Description:</label>
-    <input id="location" type="text" class="form-control" @bind="@location" />
-</div>
-
-@code {
-    private string Description;
-}
-
-@code {
-    private string location;
-}
-
-<h4>Product List</h4>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Qty</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in productList)
-        {
-            <tr>
-                <td><input type="text" class="form-control" @bind="@item.Product" /></td>
-                <td><input type="text" class="form-control" @bind="@item.Quantity" /></td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<button class="btn btn-primary">Add Product</button>
-
-@code {
-    private string searchLocation;
-    private string destinationLocation;
-    private string description;
-
-    private List<ProductItem> productList = new List<ProductItem>();
-
-    public class ProductItem
-    {
-        public string Product { get; set; }
-        public string Quantity { get; set; }
-    }
-}

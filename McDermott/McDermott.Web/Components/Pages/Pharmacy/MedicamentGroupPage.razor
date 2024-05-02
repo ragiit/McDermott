@@ -250,9 +250,11 @@
                                                                                 <DxFormLayoutItem Caption="Frequency" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                     <DxComboBox Data="@Frequencys"
                                                                                                 @bind-Value="@FormMedicamenDetails.FrequencyId"
+                                                                                                FilteringMode="@DataGridFilteringMode.Contains"
                                                                                                 NullText="Select Dosage signa ..."
                                                                                                 TextFieldName="Frequency"
                                                                                                 ValueFieldName="Id"
+                                                                                                SelectedItemChanged="@((DrugDosageDto freq)=>SelectChangeFrequency(freq))"
                                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                                 ShowValidationIcon="true"></DxComboBox>
                                                                                 </DxFormLayoutItem>
