@@ -255,6 +255,8 @@
         private void NewItem_Click()
         {
             InsurancePoliciyForm = new();
+            BPJSIntegration = new();
+            IsBPJS = false;
             ShowForm = true;
         }
 
@@ -262,6 +264,8 @@
         {
             try
             {
+                InsurancePoliciyForm = new();
+                BPJSIntegration = new();
                 InsurancePoliciyForm = SelectedDataItems[0].Adapt<InsurancePolicyDto>();
                 IsBPJS = Insurances.Any(x => x.IsBPJS == true && x.Id == InsurancePoliciyForm.InsuranceId);
                 if (IsBPJS)
