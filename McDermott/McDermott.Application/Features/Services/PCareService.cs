@@ -131,7 +131,7 @@ namespace McDermott.Application.Features.Services
 
         }
 
-        public async Task<(string, int)> SendPCareService(string requestURL, HttpMethod method)
+        public async Task<(dynamic, int)> SendPCareService(string requestURL, HttpMethod method)
         {
             try
             {

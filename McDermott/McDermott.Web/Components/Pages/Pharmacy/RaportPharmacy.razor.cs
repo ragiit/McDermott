@@ -504,5 +504,3 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #endregion Report
     }
 }
-    
-

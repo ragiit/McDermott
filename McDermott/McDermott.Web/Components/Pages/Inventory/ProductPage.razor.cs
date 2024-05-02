@@ -1,9 +1,6 @@
-﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
-using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
 {
@@ -235,6 +232,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             showForm = true;
             FormValidationState = false;
         }
+
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -331,7 +329,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 TotalQty = stockIN.Sum(x => x.Qty) - stockOUT.Sum(x => x.Qty);
 
                 // Ambil nama satuan ukur
-                 NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;
+                NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;
 
                 // Atur visibilitas panel
                 PanelVisible = false;
@@ -552,10 +550,12 @@ namespace McDermott.Web.Components.Pages.Inventory
             FormStockPopUp = false;
             await NewTableStock_Item();
         }
+
         private async Task RefreshStock_Click()
         {
             await NewTableStock_Item();
         }
+
         private async Task NewTableStock_Item()
         {
             try
@@ -572,7 +572,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     // Jika tidak ada item yang dipilih, gunakan produk yang sedang dipertimbangkan
                     StockProducts = StockProducts.Where(x => x.ProductId == getProduct.Id).ToList();
-                    if(getProduct.TraceAbility == true)
+                    if (getProduct.TraceAbility == true)
                     {
                         FieldHideStock = true;
                     }
@@ -605,15 +605,16 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
+
         private async Task NewItemStock_Click()
-            {
+        {
             FormStockProduct = new();
             FormStockPopUp = true;
             DataProducts = await Mediator.Send(new GetProductQuery());
             if (SelectedDataItems.Count == 0)
             {
                 FormStockProduct.UomId = getProduct.UomId;
-                FormStockProduct.ProductId =getProduct.Id;
+                FormStockProduct.ProductId = getProduct.Id;
                 NameProduct = getProduct.Name;
                 if (getProduct.TraceAbility == true)
                 {
@@ -637,7 +638,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     FieldHideStock = false;
                 }
-            }
+            }                
+           
         }
         private async Task EditItemStock_Click()
         {
@@ -645,14 +647,17 @@ namespace McDermott.Web.Components.Pages.Inventory
             var DataEdit = SelectedDataItemsStock[0].Adapt<StockProductDto>();
             FormStockProduct = DataEdit;
         }
+
         private void DeleteItemStock_Click()
         {
             GridStock!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+
         private async Task Back_Click()
         {
             await LoadData();
         }
+
         private async Task onDeleteStock(GridDataItemDeletingEventArgs e)
         {
             try
@@ -685,7 +690,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     return;
                 }
-                if(FieldHideStock == false){
+                if (FieldHideStock == false)
+                {
                     FormStockProduct.Batch = null;
                     FormStockProduct.Expired = null;
                 }

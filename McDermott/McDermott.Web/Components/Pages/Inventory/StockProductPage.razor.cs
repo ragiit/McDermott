@@ -5,7 +5,6 @@
         #region UserLoginAndAccessRole
 
         [Parameter]
-
         public long Id { get; set; }
 
         [Inject]

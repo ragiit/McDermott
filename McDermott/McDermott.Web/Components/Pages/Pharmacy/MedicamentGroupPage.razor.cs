@@ -1,5 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+﻿using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 

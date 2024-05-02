@@ -969,6 +969,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         }
 
         private bool IsLoading { get; set; } = false;
+        private bool IsSending { get; set; } = false;
 
         private async Task Send()
         {
@@ -978,11 +979,23 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsLoading = false;
         }
 
+        private int NumericValue = 0;
+        private bool IsEnabled = true;
+
+        private void OnValueChanged2(int newValue)
+        {
+            NumericValue = newValue;
+            if (newValue != 0)
+                IsEnabled = false;
+            else IsEnabled = true;
+        }
+
         private async Task OnClickConfirm()
         {
             try
             {
                 IsLoading = true;
+                ToastService.ClearInfoToasts();
                 if (FormRegis.PatientId == null || FormRegis.TypeRegistration == null || FormRegis.ServiceId is null || (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null)))
                 {
                     IsLoading = false;
