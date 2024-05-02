@@ -1,6 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+﻿using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
@@ -21,7 +19,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<ProductDto> Products = [];
         private MedicamentGroupDto MGForm = new();
         private MedicamentGroupDetailDto FormMedicamenDetails = new();
-        MedicamentGroupDto getMedicament = new();
+        private MedicamentGroupDto getMedicament = new();
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
 
         #endregion Relation Data
@@ -165,6 +163,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Products = await Mediator.Send(new GetProductQuery());
             PanelVisible = false;
         }
+
         private async Task HandleValidSubmit()
         {
             IsLoading = true;
@@ -175,7 +174,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task HandleInvalidSubmit()
         {
-
             showForm = true;
             FormValidationState = false;
         }
@@ -230,6 +228,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
+
         private void GridMedicamentGroupDetail_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
@@ -264,8 +263,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItemMedicamentGroupDetail_Click()
         {
-
         }
+
         private async Task OnSave()
         {
             try
@@ -417,7 +416,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 // Bersihkan koleksi SelectedMedicamentGroupDetailDataItems
                 SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
-
             }
             catch (Exception ex)
             {
