@@ -13,11 +13,11 @@ namespace McDermott.Application.Dtos.Pharmacy
         public string? Name { get; set; } = string.Empty;
         public bool IsConcoction { get; set; } = false;
         public long? PhycisianId { get; set; }
-        public long? UnitOfMeasureId { get; set; }
+        public long? UoMId { get; set; }
         public long? FormDrugId { get; set; }
 
         public virtual UserDto? Phycisian { get; set; }
-        public virtual Uom? UnitOfMeasure { get; set; }
+        public virtual Uom? UoM { get; set; }
         public virtual DrugFormDto? FromDrug { get; set; }
         
        

@@ -11,7 +11,9 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private List<StockProductDto> StockProducts = [];
         private List<LocationDto> Locations = [];
-        private StockProductDto FromInternalTransfer = new();
+        private List<ProductDto> Products = [];
+        private List<UomDto> Uoms = [];
+        private StockProductDto FormInternalTransfer = new();
 
         #endregion relation Data
 
@@ -57,6 +59,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private IGrid? Grid { get; set; }
         private bool PanelVisible { get; set; } = false;
         private bool showForm { get; set; } = false;
+        private bool FormValidationState { get; set; } = false;
         private string? header { get; set; } = string.Empty;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
@@ -76,13 +79,23 @@ namespace McDermott.Web.Components.Pages.Inventory
             try
             {
                 PanelVisible = true;
+                showForm = false;
                 StockProducts = await Mediator.Send(new GetStockProductQuery());
+                Locations = await Mediator.Send(new GetLocationQuery());
+                Products = await Mediator.Send(new GetProductQuery());
+                Uoms = await Mediator.Send(new GetUomQuery());
                 PanelVisible = false;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
+        }
+
+        private void SelectedItemProduct(ProductDto product)
+        {
+            var data = Products.Where(p => p.Id == product.Id).FirstOrDefault();
+            FormInternalTransfer.UomId = data.UomId;
         }
 
         #endregion Load
@@ -92,15 +105,15 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task HandleValidSubmit()
         {
             //IsLoading = true;
-            //FormValidationState = true;
-            //await OnSave();
+            FormValidationState = true;
+            await OnSave();
             //IsLoading = false;
         }
 
         private async Task HandleInvalidSubmit()
         {
-            //showForm = true;
-            //FormValidationState = false;
+            showForm = true;
+            FormValidationState = false;
         }
 
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
@@ -138,12 +151,17 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task NewItem_Click()
         {
             showForm = true;
-            FromInternalTransfer = new();
+            FormInternalTransfer = new();
             header = "Add Transfer Internal";
         }
 
         private async Task EditItem_Click()
         {
+        }
+
+        private async Task onDiscard()
+        {
+            await LoadData();
         }
 
         private void DeleteItem_Click()
@@ -165,5 +183,24 @@ namespace McDermott.Web.Components.Pages.Inventory
         }
 
         #endregion function Delete
+
+        #region Function Save
+
+        private async Task OnSave()
+        {
+            try
+            {
+                if (FormValidationState == false)
+                {
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        #endregion Function Save
     }
 }

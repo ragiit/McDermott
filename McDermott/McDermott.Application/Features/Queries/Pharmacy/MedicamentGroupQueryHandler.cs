@@ -36,6 +36,8 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 {
                     result = await _unitOfWork.Repository<MedicamentGroup>().Entities
                       .Include(x => x.Phycisian)
+                      .Include(x=>x.UoM)
+                      .Include(x=>x.FormDrug)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 

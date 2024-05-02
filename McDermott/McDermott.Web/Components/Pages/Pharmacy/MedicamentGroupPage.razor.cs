@@ -172,6 +172,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task LoadData()
         {
             PanelVisible = true;
+            showForm = false;
             SelectedDataItems = new ObservableRangeCollection<object>();
             SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
             medicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery());
@@ -254,6 +255,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private void GridMedicamentGroupDetail_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
+        }
+
+        private async Task OnRowDoubleClick(GridRowClickEventArgs e)
+        {
+            await EditItem_Click();
         }
 
         #endregion Grid
@@ -353,10 +359,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             try
             {
                 List<MedicamentGroupDto> a = SelectedDataItems.Adapt<List<MedicamentGroupDto>>();
-                List<long> ids = a.Select(x => x.Id).ToList();
+                List<long> id = a.Select(x => x.Id).ToList();
                 List<long> detailIdsToDelete = new();
 
-                foreach (var Uid in ids)
+                foreach (var Uid in id)
                 {
                     detailIdsToDelete = medicamentGroupDetails
                            .Where(x => x.MedicamentGroupId == Uid)
@@ -372,7 +378,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 else
                 {
                     await Mediator.Send(new DeleteMedicamentGroupDetailRequest(ids: detailIdsToDelete));
-                    await Mediator.Send(new DeleteMedicamentGroupRequest(ids: ids));
+                    await Mediator.Send(new DeleteMedicamentGroupRequest(ids: id));
                 }
 
                 ToastService.ShowError("Data Deleting success..");
@@ -413,7 +419,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
                 var aa = MGForm;
 
-                MedicamentGroupDto result = new();
+                //MedicamentGroupDto result = new();
                 if (MGForm.Id == 0)
                 {
                     getMedicament = await Mediator.Send(new CreateMedicamentGroupRequest(MGForm));
@@ -439,6 +445,33 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         a.ActiveComponentId = FormMedicamenDetails.ActiveComponentId;
                         await Mediator.Send(new CreateMedicamentGroupDetailRequest(a));
                     }
+                    ToastService.ShowSuccess("Add Data Success...");
+                }
+                else
+                {
+                    getMedicament = await Mediator.Send(new UpdateMedicamentGroupRequest(MGForm));
+                    foreach (var a in medicamentGroupDetails)
+                    {
+                        a.MedicamentGroupId = getMedicament.Id;
+                        a.MedicamentId = FormMedicamenDetails.MedicamentId;
+                        a.MedicaneDosage = FormMedicamenDetails.MedicaneDosage;
+                        a.MedicaneUnitDosage = FormMedicamenDetails.MedicaneUnitDosage;
+                        a.QtyByDay = FormMedicamenDetails.QtyByDay;
+                        a.Days = FormMedicamenDetails.Days;
+                        a.Comment = FormMedicamenDetails.Comment;
+                        a.TotalQty = FormMedicamenDetails.TotalQty;
+                        a.FrequencyId = FormMedicamenDetails.FrequencyId;
+                        a.MedicaneUnitDosage = FormMedicamenDetails.MedicaneUnitDosage;
+                        a.Dosage = FormMedicamenDetails.Dosage;
+                        if (selectedActiveComponents != null)
+                        {
+                            var listActiveComponent = selectedActiveComponents.Select(x => x.Id).ToList();
+                            FormMedicamenDetails.ActiveComponentId?.AddRange(listActiveComponent);
+                        }
+                        a.ActiveComponentId = FormMedicamenDetails.ActiveComponentId;
+                        await Mediator.Send(new CreateMedicamentGroupDetailRequest(a));
+                    }
+                    ToastService.ShowSuccess("Update Data Success...");
                 }
                 showForm = false;
                 await LoadData();

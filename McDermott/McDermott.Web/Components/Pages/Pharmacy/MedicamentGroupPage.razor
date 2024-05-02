@@ -64,6 +64,7 @@
                                                 AutoExpandAllGroupRows="true"
                                                 ShowFilterRow="true"
                                                 CustomizeElement="Grid_CustomizeElement"
+                                                RowDoubleClick="OnRowDoubleClick"
                                                 ShowSearchBox="true"
                                                 SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                                 KeyboardNavigationEnabled="true">
@@ -119,7 +120,7 @@
                                                     {
                                                         <DxFormLayoutItem Caption="Unit Of Dosage" CaptionCssClass="normal-caption " ColSpanMd="12">
                                                             <DxComboBox Data="@UoMs"
-                                                                        @bind-Value="@MGForm.UnitOfMeasureId"
+                                                                        @bind-Value="@MGForm.UoMId"
                                                                         NullText="Select Unit Of Measure ..."
                                                                         TextFieldName="Name"
                                                                         ValueFieldName="Id"
