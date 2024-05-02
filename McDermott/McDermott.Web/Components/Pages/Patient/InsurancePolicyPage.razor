@@ -52,6 +52,7 @@
                                                 CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                 EditModelSaving="OnSave"
                                                 DataItemDeleting="OnDelete"
+                                                RowDoubleClick="EditItem_Click"
                                                 AllowSelectRowByClick="true"
                                                 EditMode="GridEditMode.PopupEditForm"
                                                 PopupEditFormCssClass="pw-800"
@@ -115,7 +116,7 @@
                                     <DxFormLayout CssClass="mt">
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Patient" ColSpanMd="12">
-                                                <p>@User.Name</p>
+                                                <label>@User.Name</label>
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Company" ColSpanMd="12">
@@ -256,73 +257,73 @@
                                                         <div class="col-md-6">
                                                             <DxFormLayout>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PST Kd Provider" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.KdProviderPstt.KdProvider"
+                                                                    <DxTextBox @bind-Text="@BPJSIntegration.KdProviderPstKdProvider"
                                                                                NullText="PST Kd Provider"
                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PST Nm Provider" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.KdProviderPstt.NmProvider"
+                                                                    <DxTextBox @bind-Text="@BPJSIntegration.KdProviderPstNmProvider"
                                                                                NullText="PST Nm Provider"
                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Dental Kd Provider" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.KdProviderGigii.KdProvider"
+                                                                    <DxTextBox @bind-Text="@BPJSIntegration.KdProviderGigiKdProvider"
                                                                                NullText="Dental Kd Provider"
                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Dental Nm Provider" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.KdProviderGigii.NmProvider"
+                                                                    <DxTextBox @bind-Text="@BPJSIntegration.KdProviderGigiNmProvider"
                                                                                NullText="Dental Nm Provider"
                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Jns Class Name" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.JnsKelass.Nama"
+                                                                    <DxTextBox @bind-Text="@BPJSIntegration.JnsKelasNama"
                                                                                NullText="Jns Class"
                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Jns Class Code" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.JnsKelass.Kode"
+                                                                    <DxTextBox @bind-Text="@BPJSIntegration.JnsKelasKode"
                                                                                NullText="Jns Class Code"
                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Jns Participant Name" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.JnsPesertaa.Nama"
+                                                                    <DxTextBox @bind-Text="@BPJSIntegration.JnsPesertaNama"
                                                                                NullText="Jns Participant Name"
                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Jns Participant Code" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.JnsPesertaa.Kode"
+                                                                    <DxTextBox @bind-Text="@BPJSIntegration.JnsPesertaKode"
                                                                                NullText="Jns Participant Code"
                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Kd Insurance" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.Asuransii.KdAsuransi"
+                                                                    <DxTextBox @bind-Text="@BPJSIntegration.AsuransiKdAsuransi"
                                                                                NullText="Kd Insurance"
                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Nm Insurance" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.Asuransii.NmAsuransi"
+                                                                    <DxTextBox @bind-Text="@BPJSIntegration.AsuransiNmAsuransi"
                                                                                NullText="Nm Insurance"
                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="No Insurance" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@BPJSIntegration.Asuransii.NoAsuransi"
+                                                                    <DxTextBox @bind-Text="@BPJSIntegration.AsuransiNoAsuransi"
                                                                                NullText="No Insurance"
                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Cob Insurance" ColSpanMd="12">
-                                                                    <DxCheckBox @bind-Checked="@BPJSIntegration.Asuransii.Cob" />
+                                                                    <DxCheckBox @bind-Checked="@BPJSIntegration.AsuransiCob" />
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Arrears" ColSpanMd="12">

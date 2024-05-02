@@ -176,9 +176,22 @@
                 InsurancePoliciyForm.UserId = User.Id;
 
                 if (InsurancePoliciyForm.Id == 0)
-                    await Mediator.Send(new CreateInsurancePolicyRequest(InsurancePoliciyForm));
+                {
+                    InsurancePoliciyForm = await Mediator.Send(new CreateInsurancePolicyRequest(InsurancePoliciyForm));
+
+                    var insurance = Insurances.FirstOrDefault(x => x.Name.Contains("BPJS Kesehatan"));
+
+                    if (insurance is not null && InsurancePoliciyForm.InsuranceId == insurance.Id)
+                    {
+                        BPJSIntegration.InsurancePolicyId = InsurancePoliciyForm.Id;
+                        await Mediator.Send(new CreateBPJSIntegrationRequest(BPJSIntegration));
+                    }
+                }
                 else
+                {
                     await Mediator.Send(new UpdateInsurancePolicyRequest(InsurancePoliciyForm));
+                    await Mediator.Send(new UpdateBPJSIntegrationRequest(BPJSIntegration));
+                }
 
                 await LoadData();
             }
@@ -245,11 +258,19 @@
             ShowForm = true;
         }
 
-        private void EditItem_Click()
+        private async Task EditItem_Click()
         {
             try
             {
                 InsurancePoliciyForm = SelectedDataItems[0].Adapt<InsurancePolicyDto>();
+                IsBPJS = Insurances.Any(x => x.IsBPJS == true && x.Id == InsurancePoliciyForm.InsuranceId);
+                if (IsBPJS)
+                {
+                    var BPJSIntegration = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == InsurancePoliciyForm.Id));
+                    if (BPJSIntegration.Count > 0)
+                        this.BPJSIntegration = BPJSIntegration[0];
+                }
+                User = InsurancePoliciyForm.User.Adapt<UserDto>();
                 ShowForm = true;
             }
             catch { }
@@ -308,35 +329,61 @@
         }
 
         private bool IsLoadingGetBPJS { get; set; } = false;
+        private ResponseAPIBPJSIntegrationGetPeserta ResponseAPIBPJSIntegrationGetPeserta { get; set; } = new();
         private BPJSIntegrationDto BPJSIntegration { get; set; } = new();
 
         private async Task OnClickGetBPJS()
         {
-            if (string.IsNullOrWhiteSpace(InsurancePoliciyForm.PolicyNumber))
+            try
             {
-                ToastService.ShowInfo("Please insert the Policy Number!");
-                return;
+                if (string.IsNullOrWhiteSpace(InsurancePoliciyForm.PolicyNumber))
+                {
+                    ToastService.ShowInfo("Please insert the Policy Number!");
+                    return;
+                }
+
+                IsLoadingGetBPJS = true;
+
+                var result = await PcareService.SendPCareService($"peserta/{InsurancePoliciyForm.PolicyNumber}", HttpMethod.Get);
+                if (result.Item2 == 200)
+                {
+                    ResponseAPIBPJSIntegrationGetPeserta = System.Text.Json.JsonSerializer.Deserialize<ResponseAPIBPJSIntegrationGetPeserta>(result.Item1);
+                    BPJSIntegration = ResponseAPIBPJSIntegrationGetPeserta.Adapt<BPJSIntegrationDto>();
+
+                    BPJSIntegration.AsuransiNoAsuransi = ResponseAPIBPJSIntegrationGetPeserta.Asuransii.NoAsuransi;
+                    BPJSIntegration.AsuransiNmAsuransi = ResponseAPIBPJSIntegrationGetPeserta.Asuransii.NmAsuransi;
+                    BPJSIntegration.AsuransiCob = ResponseAPIBPJSIntegrationGetPeserta.Asuransii.Cob;
+                    BPJSIntegration.AsuransiKdAsuransi = ResponseAPIBPJSIntegrationGetPeserta.Asuransii.KdAsuransi;
+
+                    BPJSIntegration.JnsKelasNama = ResponseAPIBPJSIntegrationGetPeserta.JnsKelass.Nama;
+                    BPJSIntegration.JnsKelasKode = ResponseAPIBPJSIntegrationGetPeserta.JnsKelass.Kode;
+
+                    BPJSIntegration.JnsPesertaNama = ResponseAPIBPJSIntegrationGetPeserta.JnsPesertaa.Nama;
+                    BPJSIntegration.JnsPesertaKode = ResponseAPIBPJSIntegrationGetPeserta.JnsPesertaa.Kode;
+
+                    BPJSIntegration.KdProviderGigiKdProvider = ResponseAPIBPJSIntegrationGetPeserta.KdProviderGigii.KdProvider;
+                    BPJSIntegration.KdProviderGigiNmProvider = ResponseAPIBPJSIntegrationGetPeserta.KdProviderGigii.NmProvider;
+
+                    BPJSIntegration.KdProviderPstKdProvider = ResponseAPIBPJSIntegrationGetPeserta.KdProviderPstt.KdProvider;
+                    BPJSIntegration.KdProviderPstNmProvider = ResponseAPIBPJSIntegrationGetPeserta.KdProviderPstt.NmProvider;
+                }
+                else
+                {
+                    ResponseAPIBPJSIntegrationGetPeserta = new();
+                    BPJSIntegration = new();
+
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                }
+
+                IsLoadingGetBPJS = false;
             }
-
-            IsLoadingGetBPJS = true;
-
-            var result = await PcareService.SendPCareService($"peserta/{InsurancePoliciyForm.PolicyNumber}", HttpMethod.Get);
-            if (result.Item2 == 200)
+            catch (Exception ex)
             {
-                BPJSIntegration = System.Text.Json.JsonSerializer.Deserialize<BPJSIntegrationDto>(result.Item1);
+                IsLoadingGetBPJS = false;
+                ex.HandleException(ToastService);
             }
-            else
-            {
-                BPJSIntegration = new();
-                dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
-
-                string message = data.metaData.message;
-                int code = data.metaData.code;
-
-                ToastService.ShowError($"{message}\n Code: {code}");
-            }
-
-            IsLoadingGetBPJS = false;
 
             //DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             //TimeSpan timeSpan = DateTime.UtcNow - epoch;

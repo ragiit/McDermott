@@ -1,13 +1,13 @@
-﻿@page "/pharmacy/drug-dosage"
+﻿@page "/pharmacy/system-parameter"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Regimen of Use</PageTitle>
+<PageTitle>McHealthCare - System Parameter</PageTitle>
 
 @if (IsAccess)
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Medicine Dosage" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="System Parameter" />
 
         <section class="content">
             <div class="container-fluid">
@@ -22,7 +22,7 @@
                                                 Text="Fetching Data...">
 
                                     <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="DrugDosages"
+                                            Data="SystemParameters"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -44,7 +44,7 @@
                                             FocusedRowChanged="Grid_FocusedRowChanged"
                                             ShowGroupPanel="true"
                                             AutoExpandAllGroupRows="true"
-                                            PopupEditFormHeaderText="@(IsAddForm ? "Add Drug Dosage" : "Edit Drug Dosage")"
+                                            PopupEditFormHeaderText="@(IsAddForm ? "Add System Parameter" : "Edit System Parameter")"
                                             CssClass="ch-480"
                                             ShowFilterRow="true"
                                             TextWrapEnabled="false"
@@ -55,8 +55,8 @@
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && DrugDosages.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && DrugDosages.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && SystemParameters.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && SystemParameters.Count > 0" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                 <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                 <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
@@ -71,54 +71,30 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Frequency" SortIndex="0" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="DrugRoute.Route" Caption="Route" />
-                                            <DxGridDataColumn MinWidth="100" FieldName="TotalQtyPerDay" Caption="Total Qty Per Day" />
-                                            <DxGridDataColumn MinWidth="100" FieldName="Days" Caption="Days" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Key" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Value" Caption="Route" />
 
                                         </Columns>
                                         <EditFormTemplate Context="EditFormContext">
                                             @{
-                                                var a = (DrugDosageDto)EditFormContext.EditModel;
+                                                var a = (SystemParameterDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
-
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Frequency" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Frequency"
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Key" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.Key"
                                                                ShowValidationIcon="true"
                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="Frequency" />
-                                                    <ValidationMessage For="@(()=> a.Frequency)"   />
+                                                               NullText="Key" />
+                                                    <ValidationMessage For="@(()=> a.Key)"   />
                                                 </DxFormLayoutItem>
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Route" ColSpanMd="12">
-                                                    <DxComboBox ShowValidationIcon="true"
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                                Data="@DrugRoutes"
-                                                                NullText="Select Route..."
-                                                                @bind-Value="@a.DrugRouteId"
-                                                                TextFieldName="Route"
-                                                                ValueFieldName="Id">
-                                                    </DxComboBox>
-                                                    <ValidationMessage For="@(()=>a.DrugRouteId)" />
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Value" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.Value"
+                                                               ShowValidationIcon="true"
+                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                               NullText="Value" />
+                                                    <ValidationMessage For="@(()=> a.Value)"   />
                                                 </DxFormLayoutItem>
-
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Total Qty Per Day" ColSpanMd="12">
-                                                    <DxSpinEdit @bind-Value="@a.TotalQtyPerDay"
-                                                                NullText="Total Qty Per Day..."
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                BindValueMode="BindValueMode.OnInput" />
-                                                    <ValidationMessage For="@(()=> a.TotalQtyPerDay)"   />
-                                                </DxFormLayoutItem>
-
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Days" ColSpanMd="12">
-                                                    <DxSpinEdit @bind-Value="@a.Days"
-                                                                NullText="Days..."
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                BindValueMode="BindValueMode.OnInput" />
-                                                    <ValidationMessage For="@(()=> a.Days)"   />
-                                                </DxFormLayoutItem>
-
                                             </DxFormLayout>
                                         </EditFormTemplate>
                                     </DxGrid>

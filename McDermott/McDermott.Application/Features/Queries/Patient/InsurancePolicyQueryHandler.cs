@@ -24,6 +24,8 @@ namespace McDermott.Application.Features.Queries.Patient
                 if (!_cache.TryGetValue(cacheKey, out List<InsurancePolicy>? result))
                 {
                     result = await _unitOfWork.Repository<InsurancePolicy>().Entities
+                       .Include(x => x.User)
+                       .Include(x => x.Insurance)
                        .AsNoTracking()
                        .ToListAsync(cancellationToken);
 
