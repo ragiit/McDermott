@@ -502,20 +502,45 @@
                                                                 ShowValidationIcon="true"
                                                                 Rows="1" />
                                                     </DxFormLayoutItem>
+                                                       <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Code" ColSpanMd="6">
+                                                <DxTextBox @bind-Text="@UserForm.FarmacologiCode"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Name" />
+                                                        <ValidationMessage For="@(() => UserForm.FarmacologiCode)"   />
+                                            </DxFormLayoutItem>
+
                                                     <DxFormLayoutItem CaptionCssClass=" normal-caption" ColSpanMd="12" Caption="Weather">
                                                         <DxMemo @bind-Text="@UserForm.PatientAllergy.Weather"
                                                                 ShowValidationIcon="true"
                                                                 NullText="Weather"
                                                                 Rows="1" />
                                                     </DxFormLayoutItem>
+                                                       <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Code" ColSpanMd="6">
+                                                <DxTextBox @bind-Text="@UserForm.WeatherCode"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Name" />
+                                                        <ValidationMessage For="@(() => UserForm.WeatherCode)"   />
+                                            </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass=" normal-caption" ColSpanMd="12" Caption="Food">
                                                         <DxMemo @bind-Text="@UserForm.PatientAllergy.Food"
                                                                 ShowValidationIcon="true"
                                                                 NullText="Food"
                                                                 Rows="1" />
                                                     </DxFormLayoutItem>
+                                                    <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Code" ColSpanMd="6">
+                                                        <DxTextBox @bind-Text="@UserForm.FoodCode"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Name" />
+                                                        <ValidationMessage For="@(() => UserForm.FoodCode)"   />
+                                                    </DxFormLayoutItem>
+
+                                                    
                                                 </Items>
                                             </DxFormLayoutGroup>
+                                         
 
                                             <DxFormLayoutGroup Caption="Family Relation" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                                                 <Items>

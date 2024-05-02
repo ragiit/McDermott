@@ -394,8 +394,15 @@
                                                     </DxGridLayoutItem>
                                                 </Items>
                                             </DxGridLayout>
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Physician Code" ColSpanMd="6">
+                                                <DxTextBox @bind-Text="@UserForm.PhysicanCode"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Name" />
+                                                <ValidationMessage For="@(() => UserForm.PhysicanCode)"   />
+                                            </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Sip Number">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Sip Number">
                                                 <DxMaskedInput @bind-Value="@UserForm.SipNo"
                                                                NullText="Sip Number"
                                                                ShowValidationIcon="true"

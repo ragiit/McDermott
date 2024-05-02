@@ -9,6 +9,10 @@ namespace McDermott.Application.Dtos.Config
 
         [Required]
         public string Name { get; set; } = string.Empty;
+        public string PhysicanCode { get; set; } = string.Empty;
+        public string WeatherCode { get; set; } = string.Empty;
+        public string FoodCode { get; set; } = string.Empty;
+        public string FarmacologiCode { get; set; } = string.Empty;
 
         //[Required]
         public string UserName { get; set; } = string.Empty;

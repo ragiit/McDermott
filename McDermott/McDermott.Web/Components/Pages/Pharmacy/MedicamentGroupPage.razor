@@ -170,7 +170,7 @@
                                                         <ToolbarTemplate>
                                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                                 <DxToolbarItem Text="New" Click="NewItemMedicamentGroupDetail_Click" IconCssClass="fa-solid fa-plus" />
-                                                                <DxToolbarItem Text="Edit" Click="EditItemMedicamentGroupDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedMedicamentGroupDetailDataItems.Count > 0 && medicamentGroupDetails.Count > 0" />
+                                                                <DxToolbarItem Text="Edit" Click="()=>EditItemMedicamentGroupDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedMedicamentGroupDetailDataItems.Count > 0 && medicamentGroupDetails.Count > 0" />
                                                                 <DxToolbarItem Text="Delete" Click="DeleteItemMedicamentGroupDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedMedicamentGroupDetailDataItems.Count > 0 && medicamentGroupDetails.Count > 0" />
                                                                 @*<DxToolbarItem BeginGroup="true" Text="Save" IconCssClass="fa-solid fa-floppy-disk" Click="OnSave" />
                                                                 <DxToolbarItem Text="Cancel" IconCssClass="fa-solid fa-ban" Click="CancelItemMedicamentGroupDetailGrid_Click" />

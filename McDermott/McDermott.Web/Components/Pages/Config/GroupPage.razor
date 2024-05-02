@@ -139,7 +139,7 @@
                                                             ShowFilterRow="true"
                                                             SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed">
                                                         <ToolbarTemplate>
-                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                                 <DxToolbarItem Text="New" Click="NewItemGroup_Click" IconCssClass="fa-solid fa-plus" />
                                                                 <DxToolbarItem Text="Edit" Click="() => EditItemGroup_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsGroupMenu.Count > 0 && GroupMenus.Count > 0" />
                                                                 <DxToolbarItem Text="Delete" Click="DeleteItemGrid_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsGroupMenu.Count > 0 && GroupMenus.Count > 0" />

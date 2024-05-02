@@ -67,11 +67,11 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 if (!_cache.TryGetValue(cacheKey, out List<MedicamentGroupDetail>? result))
                 {
                     result = await _unitOfWork.Repository<MedicamentGroupDetail>().Entities
-                        .Include(x=>x.ActiveComponent)
-                        .Include(x=>x.Medicament)
-                        .Include(x=>x.MedicamentGroup)
-                        .Include(x=>x.Frequency)
-                        .Include(x=>x.Signa)
+                        .Include(x => x.ActiveComponent)
+                        .Include(x => x.Medicament)
+                        .Include(x => x.MedicamentGroup)
+                        .Include(x => x.Frequency)
+                        .Include(x => x.UnitOfDosage)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 
@@ -166,6 +166,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 throw;
             }
         }
+
         #endregion CREATE
 
         #region UPDATE
@@ -205,7 +206,6 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 throw;
             }
         }
-
 
         public async Task<MedicamentGroupDetailDto> Handle(UpdateMedicamentGroupDetailRequest request, CancellationToken cancellationToken)
         {
