@@ -53,11 +53,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var checkUom = UoMs.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
                 FormMedicamenDetails.MedicaneUnitDosage = checkUom?.Name;
                 FormMedicamenDetails.FrequencyId = ChekMedicament?.FrequencyId;
-                FormMedicamenDetails.FrequencyName = ChekMedicament.Frequency.Frequency;
+                if (ChekMedicament.FrequencyId != null)
+                {
+                    FormMedicamenDetails.FrequencyName = ChekMedicament.Frequency.Frequency;
+                    FormMedicamenDetails.Days = ChekMedicament.Frequency.Days.ToLong();
+                    FormMedicamenDetails.QtyByDay = ChekMedicament.Frequency.TotalQtyPerDay.ToLong();
+                }
                 FormMedicamenDetails.Dosage = ChekMedicament.Dosage;
                 FormMedicamenDetails.MedicaneDosage = ChekMedicament?.Dosage;
-                FormMedicamenDetails.Days = ChekMedicament.Frequency.Days.ToLong();
-                FormMedicamenDetails.QtyByDay = ChekMedicament.Frequency.TotalQtyPerDay.ToLong();
 
                 if (Concotions == true)
                 {
@@ -79,6 +82,15 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 ex.HandleException(ToastService);
             }
+        }
+
+        private async Task SelectChangeFrequency(DrugDosageDto datas)
+        {
+            var data = Frequencys.Where(f => f.Id == datas.Id).FirstOrDefault();
+
+            FormMedicamenDetails.QtyByDay = data.TotalQtyPerDay.ToLong();
+            FormMedicamenDetails.Days = data.Days.ToLong();
+            FormMedicamenDetails.TotalQty = FormMedicamenDetails?.Dosage * FormMedicamenDetails?.QtyByDay;
         }
 
         private bool Checkin
