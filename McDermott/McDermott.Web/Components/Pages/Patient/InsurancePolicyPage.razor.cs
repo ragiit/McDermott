@@ -323,12 +323,17 @@
             var result = await PcareService.SendPCareService($"peserta/{InsurancePoliciyForm.PolicyNumber}", HttpMethod.Get);
             if (result.Item2 == 200)
             {
-                BPJSIntegration = System.Text.Json.JsonSerializer.Deserialize<BPJSIntegrationDto>(result.Item1) ?? new();
+                BPJSIntegration = System.Text.Json.JsonSerializer.Deserialize<BPJSIntegrationDto>(result.Item1);
             }
             else
             {
                 BPJSIntegration = new();
-                ToastService.ShowError(result.Item1);
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                string message = data.metaData.message;
+                int code = data.metaData.code;
+
+                ToastService.ShowError($"{message}\n Code: {code}");
             }
 
             IsLoadingGetBPJS = false;

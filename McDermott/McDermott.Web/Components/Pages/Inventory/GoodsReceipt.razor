@@ -18,8 +18,6 @@
     private string location;
 }
 
-
-
 <DxGrid Data="Cities">
     <Columns>
         <DxGridSelectionColumn Width = "15px" />
@@ -35,17 +33,5 @@
     {
         Cities = await Mediator.Send(new GetCityQuery());
     }
-    
+
 }
-
-        
-
-
-
-
-
-
-
-
-
-

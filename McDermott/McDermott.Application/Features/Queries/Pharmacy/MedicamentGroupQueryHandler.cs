@@ -70,7 +70,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                         .Include(x=>x.ActiveComponent)
                         .Include(x=>x.Medicament)
                         .Include(x=>x.MedicamentGroup)
-                        .Include(x=>x.RegimentOfUse)
+                        .Include(x=>x.Frequency)
                         .Include(x=>x.Signa)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);

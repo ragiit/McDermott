@@ -26,7 +26,6 @@ namespace McDermott.Web.Components.Pages.Inventory
             "Minimum Stock Report",
             "Stock Op-name Report",
             "Expiry Report",
-         
         };
 
         private void selectedReport(string reports)
@@ -503,7 +502,3 @@ namespace McDermott.Web.Components.Pages.Inventory
         #endregion Report
     }
 }
-    
-
-
- 

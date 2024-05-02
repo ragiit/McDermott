@@ -2,6 +2,6 @@
 {
     public interface IPCareService
     {
-        Task<(string, int)> SendPCareService(string requestURL, HttpMethod method);
+        Task<(dynamic, int)> SendPCareService(string requestURL, HttpMethod method);
     }
 }
