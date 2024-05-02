@@ -174,9 +174,9 @@
                                                 </ToolbarTemplate>
                                                 <Columns>
                                                     <DxGridSelectionColumn Width="15px" />
-                                                    <DxGridDataColumn FieldName="NoRm" Caption="Medical Record" SortOrder="GridColumnSortOrder.Descending" />
-                                                    <DxGridDataColumn FieldName="Name" />
-                                                    <DxGridDataColumn FieldName="DateOfBirth" Caption="Date of Birth" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="NoRm" Caption="Medical Record" SortOrder="GridColumnSortOrder.Descending" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="Name" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="DateOfBirth" Caption="Date of Birth" />
                                                 </Columns>
                                             </DxGrid>
                                         </DxLoadingPanel>
@@ -642,6 +642,6 @@ else
     </div>
 }
 
-<DxPopup HeaderText="Insurance Policy" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%" Closed="OnClickCloseInsurancePolicyPopUp">
+<DxPopup HeaderText="Insurance Policy" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="auto" Closed="OnClickCloseInsurancePolicyPopUp">
     <InsurancePolicyPage User="UserForm" IsPopUpForm="true"></InsurancePolicyPage>
 </DxPopup>

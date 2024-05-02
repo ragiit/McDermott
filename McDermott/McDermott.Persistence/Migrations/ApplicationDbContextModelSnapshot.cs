@@ -80,6 +80,133 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("ActiveComponents");
                 });
 
+            modelBuilder.Entity("McDermott.Domain.Entities.BPJSIntegration", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Aktif")
+                        .HasColumnType("bit")
+                        .HasAnnotation("Relational:JsonPropertyName", "aktif");
+
+                    b.Property<bool>("AsuransiCob")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("AsuransiKdAsuransi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AsuransiNmAsuransi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AsuransiNoAsuransi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GolDarah")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "golDarah");
+
+                    b.Property<string>("HubunganKeluarga")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "hubunganKeluarga");
+
+                    b.Property<long?>("InsurancePolicyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("JnsKelasKode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JnsKelasNama")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JnsPesertaKode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JnsPesertaNama")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("KdProviderGigiKdProvider")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("KdProviderGigiNmProvider")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("KdProviderPstKdProvider")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("KdProviderPstNmProvider")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("KetAktif")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "ketAktif");
+
+                    b.Property<string>("Nama")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "nama");
+
+                    b.Property<string>("NoHP")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "noHP");
+
+                    b.Property<string>("NoKTP")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "noKTP");
+
+                    b.Property<string>("NoKartu")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "noKartu");
+
+                    b.Property<string>("PstPrb")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "pstPrb");
+
+                    b.Property<string>("PstProl")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "pstProl");
+
+                    b.Property<string>("Sex")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "sex");
+
+                    b.Property<DateTime?>("TglAkhirBerlaku")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "tglAkhirBerlaku");
+
+                    b.Property<DateTime?>("TglLahir")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "tglLahir");
+
+                    b.Property<DateTime?>("TglMulaiAktif")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "tglMulaiAktif");
+
+                    b.Property<int>("Tunggakan")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "tunggakan");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InsurancePolicyId");
+
+                    b.ToTable("BPJSIntegrations");
+                });
+
             modelBuilder.Entity("McDermott.Domain.Entities.BpjsClassification", b =>
                 {
                     b.Property<long>("Id")
@@ -2465,11 +2592,11 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Days")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long?>("Days")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("Dosage")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long?>("Dosage")
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("FrequencyId")
                         .HasColumnType("bigint");
@@ -2489,14 +2616,14 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("MedicaneUnitDosage")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("QtyByDay")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long?>("QtyByDay")
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("SignaId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("TotalQty")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long?>("TotalQty")
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("UnitOfDosageId")
                         .HasColumnType("bigint");
@@ -3685,6 +3812,16 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Uom");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.BPJSIntegration", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.InsurancePolicy", "InsurancePolicy")
+                        .WithMany()
+                        .HasForeignKey("InsurancePolicyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("InsurancePolicy");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Building", b =>

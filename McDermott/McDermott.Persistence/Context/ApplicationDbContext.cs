@@ -16,6 +16,7 @@ namespace McDermott.Persistence.Context
 
         #region BPJS
         public DbSet<BpjsClassification> BpjsClassifications { get; set; }
+        public DbSet<BPJSIntegration> BPJSIntegrations { get; set; }
         #endregion
 
         #region Config
