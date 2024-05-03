@@ -221,7 +221,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
                 FormMedicamenDetails.TotalQty = numDosage * FormMedicamenDetails.QtyByDay;
             }
-
         }
 
         private void OnValueChangedTotalQtyDays(long? numDays)
@@ -383,23 +382,29 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 List<MedicamentGroupDto> a = SelectedDataItems.Adapt<List<MedicamentGroupDto>>();
                 List<long> id = a.Select(x => x.Id).ToList();
                 List<long> detailIdsToDelete = new();
+                TempMedicamentGroupDetails = await Mediator.Send(new GetMedicamentGroupDetailQuery());
 
-                foreach (var Uid in id)
-                {
-                    detailIdsToDelete = medicamentGroupDetails
-                           .Where(x => x.MedicamentGroupId == Uid)
-                           .Select(x => x.Id)
-                           .ToList();
-                }
                 if (SelectedDataItems.Count == 1)
                 {
+                    detailIdsToDelete = TempMedicamentGroupDetails
+                           .Where(x => x.MedicamentGroupId == SelectedDataItems[0].Adapt<MedicamentGroupDto>().Id)
+                           .Select(x => x.Id)
+                           .ToList();
                     await Mediator.Send(new DeleteMedicamentGroupDetailRequest(ids: detailIdsToDelete));
 
                     await Mediator.Send(new DeleteMedicamentGroupRequest(SelectedDataItems[0].Adapt<MedicamentGroupDto>().Id));
                 }
                 else
                 {
-                    await Mediator.Send(new DeleteMedicamentGroupDetailRequest(ids: detailIdsToDelete));
+                    foreach (var Uid in id)
+                    {
+                        detailIdsToDelete = TempMedicamentGroupDetails
+                               .Where(x => x.MedicamentGroupId == Uid)
+                               .Select(x => x.Id)
+                               .ToList();
+
+                        await Mediator.Send(new DeleteMedicamentGroupDetailRequest(ids: detailIdsToDelete));
+                    }
                     await Mediator.Send(new DeleteMedicamentGroupRequest(ids: id));
                 }
 
