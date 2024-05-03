@@ -208,11 +208,20 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private void OnValueChangedTotalQty(long numDosage)
         {
-            if (numDosage != null)
+            if (Concotions == true)
             {
                 FormMedicamenDetails.Dosage = numDosage;
+                FormMedicamenDetails.TotalQty = numDosage;
             }
-            FormMedicamenDetails.TotalQty = numDosage * FormMedicamenDetails.QtyByDay;
+            else
+            {
+                if (numDosage != null)
+                {
+                    FormMedicamenDetails.Dosage = numDosage;
+                }
+                FormMedicamenDetails.TotalQty = numDosage * FormMedicamenDetails.QtyByDay;
+            }
+
         }
 
         private void OnValueChangedTotalQtyDays(long? numDays)
@@ -487,9 +496,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                             MedicamentGroupId = medicament_group[0].Id,
                         });
                     }
-                                        
+
                     await Mediator.Send(new CreateListMedicamentGroupDetailRequest(medicamentGroupDetails));
-                    
+
                     ToastService.ShowSuccess("Update Data Success...");
                 }
                 showForm = false;
