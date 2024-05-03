@@ -128,19 +128,8 @@
                                                             TextFieldName="Name"
                                                             SelectedItemChanged="@((InsuranceDto e) => SelectedItemInsuranceChanged(e))"
                                                             ValueFieldName="Id">
-                                                    @*  <Buttons>
-                                            <DxEditorButton Visible="IsBPJS"
-                                            Text="Get BPJS"
-                                            Tooltip="Get BPJS" />
-                                            </Buttons> *@
                                                 </DxComboBox>
                                                 <ValidationMessage For="@(()=>InsurancePoliciyForm.InsuranceId)"   />
-                                            </DxFormLayoutItem>
-
-                                            <DxFormLayoutItem Visible="IsBPJS" Caption=" " ColSpanMd="12">
-                                                <DxButton Text="Get BPJS"
-                                                          Click="OnClickGetBPJS"
-                                                          RenderStyle="ButtonRenderStyle.Primary" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Policy Number" ColSpanMd="12">
@@ -149,6 +138,12 @@
                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                            NullText="Policy Number" />
                                                 <ValidationMessage For="@(()=>InsurancePoliciyForm.PolicyNumber)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem Visible="IsBPJS" Caption=" " ColSpanMd="12">
+                                                <DxButton Text="Get BPJS"
+                                                          Click="OnClickGetBPJS"
+                                                          RenderStyle="ButtonRenderStyle.Primary" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Active" ColSpanMd="12">

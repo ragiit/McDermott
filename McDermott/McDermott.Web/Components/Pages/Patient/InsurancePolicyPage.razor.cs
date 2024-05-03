@@ -83,7 +83,7 @@
         private bool FormValidationState = true;
 
         public IGrid Grid { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         #endregion Grid Properties
 
@@ -101,7 +101,7 @@
         {
             PanelVisible = true;
             ShowForm = false;
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
             Countries = await Mediator.Send(new GetCountryQuery());
 
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
@@ -181,6 +181,8 @@
 
                     var insurance = Insurances.FirstOrDefault(x => x.Name.Contains("BPJS Kesehatan"));
 
+                    await Mediator.Send(new DeleteBPJSIntegrationRequest(DeletedBPJSID));
+
                     if (insurance is not null && InsurancePoliciyForm.InsuranceId == insurance.Id)
                     {
                         BPJSIntegration.InsurancePolicyId = InsurancePoliciyForm.Id;
@@ -190,9 +192,29 @@
                 else
                 {
                     await Mediator.Send(new UpdateInsurancePolicyRequest(InsurancePoliciyForm));
-                    await Mediator.Send(new UpdateBPJSIntegrationRequest(BPJSIntegration));
+
+                    var insurance = Insurances.FirstOrDefault(x => x.Name.Contains("BPJS Kesehatan"));
+
+                    if (DeletedBPJSID != 0 && !IsBPJS)
+                    {
+                        await Mediator.Send(new DeleteBPJSIntegrationRequest(DeletedBPJSID));
+                    }
+                    else
+                    {
+                        if (insurance is not null && InsurancePoliciyForm.InsuranceId == insurance.Id)
+                        {
+                            if (IsBPJS && BPJSIntegration.Id == 0)
+                            {
+                                BPJSIntegration.InsurancePolicyId = InsurancePoliciyForm.Id;
+                                await Mediator.Send(new CreateBPJSIntegrationRequest(BPJSIntegration));
+                            }
+                            else
+                                await Mediator.Send(new UpdateBPJSIntegrationRequest(BPJSIntegration));
+                        }
+                    }
                 }
 
+                DeletedBPJSID = 0;
                 await LoadData();
             }
             catch { }
@@ -257,8 +279,11 @@
             InsurancePoliciyForm = new();
             BPJSIntegration = new();
             IsBPJS = false;
+            DeletedBPJSID = 0;
             ShowForm = true;
         }
+
+        private long DeletedBPJSID { get; set; } = 0;
 
         private async Task EditItem_Click()
         {
@@ -266,13 +291,17 @@
             {
                 InsurancePoliciyForm = new();
                 BPJSIntegration = new();
+                DeletedBPJSID = 0;
                 InsurancePoliciyForm = SelectedDataItems[0].Adapt<InsurancePolicyDto>();
                 IsBPJS = Insurances.Any(x => x.IsBPJS == true && x.Id == InsurancePoliciyForm.InsuranceId);
                 if (IsBPJS)
                 {
                     var BPJSIntegration = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == InsurancePoliciyForm.Id));
                     if (BPJSIntegration.Count > 0)
+                    {
                         this.BPJSIntegration = BPJSIntegration[0];
+                        DeletedBPJSID = BPJSIntegration[0].Id;
+                    }
                 }
                 User = InsurancePoliciyForm.User.Adapt<UserDto>();
                 ShowForm = true;

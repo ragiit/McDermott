@@ -5,6 +5,7 @@ namespace McDermott.Application.Dtos.Bpjs
 {
     public class BPJSIntegrationDto : IMapFrom<BPJSIntegration>
     {
+        public long Id { get; set; }
         public long? InsurancePolicyId { get; set; }
         [JsonPropertyName("noKartu")]
         public string? NoKartu { get; set; }
