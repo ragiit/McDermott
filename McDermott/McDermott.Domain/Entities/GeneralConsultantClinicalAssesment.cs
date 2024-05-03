@@ -34,6 +34,7 @@ namespace McDermott.Domain.Entities
         public string BMIIndexString { get; set; } = "0";
 
         public string BMIState { get; set; } = "-";
+        public string? ClinicVisitTypes { get; set; }
 
         public long E { get; set; }
         public long V { get; set; }

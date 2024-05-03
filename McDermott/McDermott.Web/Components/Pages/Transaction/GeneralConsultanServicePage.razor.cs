@@ -506,6 +506,12 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Gas And Oil"
         };
 
+        private List<string> ClinicVisitTypes = new List<string>
+        {
+            "Healthy",
+            "Sick"
+        };
+
         private long PatientsId = 0;
 
         private long PractitionerId = 0;
