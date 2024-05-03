@@ -323,7 +323,7 @@
             <!-- Small boxes (Stat box) -->
             <div class="row">
 
-                <div class="col">
+              @*   <div class="col">
                     <div class="card" hidden>
                         <div class="card-body">
                             <DxLoadingPanel @bind-Visible="PanelVisible"
@@ -379,7 +379,7 @@
                             </DxLoadingPanel>
                         </div>
                     </div>
-                </div>
+                </div> *@
 
                 @*   <div class="col-md-3 col-12">
             <!-- small box -->
@@ -631,6 +631,7 @@ else
 
     protected override void OnInitialized()
     {
+        return;
         toolbar = """"
             <select class="ql-header">
                 <option selected=""></option>
@@ -876,15 +877,15 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await Send();
+        // await Send();
         // var aa = await AuthenticationState;
         // var bb = aa.User.Identity.Name;
         // SalesData2 = await Sales.GetSalesAsync();
 
         ///Decrypted
-        DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        TimeSpan timeSpan = DateTime.UtcNow - epoch;
-        long tStamp = (long)timeSpan.TotalSeconds;
+        // DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        // TimeSpan timeSpan = DateTime.UtcNow - epoch;
+        // long tStamp = (long)timeSpan.TotalSeconds;
         ///
         // string r = "Wcem5CYDCbnmR5fcoBtip3UDpHUxcq1N7hUfK4uMm3xs3L+vPboELhK6PMjvxX1QP0o9DpVcEsLBjmswszbku3pFH2HR3S+iLcSP65JFYJlGwXUDtd9TF+PFQuPo3YaqRGhLQ3YBLCkPifnTcuGqAQdIw5cNT5RhF8tKcmOWB6tTc29heTSp5mTf4S81FDl9jY55n1OkQsirSzYGgGzXdolW4K6mMc6loYstTR1GVQXaTEsl7z4HhzXtEVB7W2IYaTcrUetUW6Tad0EGaaAznwOs8ek8YDd+4CQcbFCq/K30RZg9uiKyLeFtfsQCyA9ZDOS7sKhTUdGiGqIyW6uLsBSEq4ysZJpMcIZc/8D0aps56auvLmJY+HNWKklfbl88+DJmpxud7hFuYZo9jTlkrIA/gnIJZcKTa6gMUpzEH1RyHdzOTNogRxvpwGb3dRkcHfjvOHo0kI9DM2236XWfjIypa2RkhF8KsKtBjoSnVnMNDZNTXX6Sp/k/vmaJcU+8RJbh1ah1E1tgLnyGQY7+nu8CjCBqv0ODOChG7JKKz6dU6KZC/VWX7cXH8+/SGXOSKiijsJJEAiOX2Okqv87m9rmhHL6VcoCNFhQXtOYo1U2RCQVXhcpxOsl6gsQWqAMYFc95zMSjkBCot6975LQVhETzt2AAd67L6Abd+ylRBzlpfX2PZrIab0i8rjwdstNE3xg+r/tTayvSRzMHyoX/PYTr6FKtky4u2sjx/3wH+WLqMFvKzbiNSgbT/lRrGaS1FMxVR75/7qYchVCJieauSg==";
         // string aa = "15793";
@@ -897,19 +898,17 @@ else
 
         PanelVisible = true;
 
-        var a = await HttpClient.GetStringAsync("https://dummyjson.com/products?limit=99999999999999")!;
+        // var a = await HttpClient.GetStringAsync("https://dummyjson.com/products?limit=99999999999999")!;
 
-        var jsonObject = JsonConvert.DeserializeObject<dynamic>(a);
+        // var jsonObject = JsonConvert.DeserializeObject<dynamic>(a);
 
-        // Mengambil nilai dari properti 'products'
-        var productsJson = jsonObject["products"].ToString();
+        // // Mengambil nilai dari properti 'products'
+        // var productsJson = jsonObject["products"].ToString();
 
-        // Mengonversi string produk menjadi List<ProductTemp>
-        var products = JsonConvert.DeserializeObject<List<ProductTemp>>(productsJson);
+        // // Mengonversi string produk menjadi List<ProductTemp>
+        // var products = JsonConvert.DeserializeObject<List<ProductTemp>>(productsJson);
 
-        ProductTemps = products;
-
-        PanelVisible = false;
+        // ProductTemps = products;
 
         var hour = DateTime.Now.Hour;
 
@@ -920,16 +919,17 @@ else
         else
             Greeting = "Good Evening!";
 
-        var users = await Mediator.Send(new GetUserQuery());
-        // Dashboard.UserCount = users.Where(x => x.IsUser == true).Count();
-        Dashboard.UserCount = users.Count();
-        Dashboard.PatientCount = users.Where(x => x.IsUser == true).Count();
-        Dashboard.PhysicianCount = users.Where(x => x.IsPhysicion == true).Count();
-        Dashboard.NurseCount = users.Where(x => x.IsNurse == true).Count();
-        Dashboard.EmployeeCount = users.Where(x => x.IsEmployee == true).Count();
+        // var users = await Mediator.Send(new GetUserQuery());
+        // // Dashboard.UserCount = users.Where(x => x.IsUser == true).Count();
+        // Dashboard.UserCount = users.Count();
+        // Dashboard.PatientCount = users.Where(x => x.IsUser == true).Count();
+        // Dashboard.PhysicianCount = users.Where(x => x.IsPhysicion == true).Count();
+        // Dashboard.NurseCount = users.Where(x => x.IsNurse == true).Count();
+        // Dashboard.EmployeeCount = users.Where(x => x.IsEmployee == true).Count();
 
         await GetUserInfo();
 
+        PanelVisible = false;
         // try
         // {
         //     var result = await NavigationManager.CheckAccessUser(oLocal);
