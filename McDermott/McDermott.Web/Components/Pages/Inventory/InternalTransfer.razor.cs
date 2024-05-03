@@ -13,7 +13,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<LocationDto> Locations = [];
         private List<ProductDto> Products = [];
         private List<UomDto> Uoms = [];
-        private StockProductDto FormInternalTransfer = new();
+        private TransactionStockDto FormInternalTransfer = new();
 
         #endregion relation Data
 

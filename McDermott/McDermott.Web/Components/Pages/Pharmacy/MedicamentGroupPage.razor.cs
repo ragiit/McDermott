@@ -63,7 +63,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 FormMedicamenDetails.Dosage = ChekMedicament.Dosage;
                 FormMedicamenDetails.MedicaneDosage = ChekMedicament?.Dosage;
 
-                if (Concotions == true)
+                if (MGForm.IsConcoction == true)
                 {
                     FormMedicamenDetails.TotalQty = FormMedicamenDetails.Dosage;
                 }

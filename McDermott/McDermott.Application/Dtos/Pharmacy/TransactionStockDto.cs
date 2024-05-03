@@ -13,6 +13,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
         public long? QtyStock { get; set; }
+        public long? UomId { get; set; }
         public DateTime? SchenduleDate { get; set; } = DateTime.Now;
         public string? KodeTransaksi { get; set; }
         public string? StatusStock { get; set; }

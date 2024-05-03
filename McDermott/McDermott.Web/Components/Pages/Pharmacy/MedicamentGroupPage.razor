@@ -233,7 +233,7 @@
                                                                                 <ValidationMessage For="@(()=> FormMedicamenDetails.MedicaneDosage)" ) />
                                                                             </DxFormLayoutItem>
                                                                             <DxFormLayoutItem Caption="Medicines Unit Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                                <DxTextBox @bind-Text="@FormMedicamenDetails.MedicaneUnitDosage"></DxTextBox>
+                                                                                <DxTextBox @bind-Text="@FormMedicamenDetails.MedicaneUnitDosage" ReadOnly></DxTextBox>
                                                                             </DxFormLayoutItem>
                                                                             @* <DxFormLayoutItem Caption="Allow Subtitutions" ColSpanMd="12">
                                                                     <DxCheckBox @bind-Checked="@FormMedicamenDetails.AllowSubtitation"

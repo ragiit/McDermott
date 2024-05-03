@@ -87,7 +87,7 @@
                                         <DxFormLayout CssClass="mt">
                                             <DxFormLayoutItem Caption="Source Location" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxComboBox Data="@Locations"
-                                                            @bind-Value="@FormInternalTransfer.SourceId"
+                                                            @bind-Value="@FormInternalTransfer.Source"
                                                             NullText=" Select Location Source..."
                                                             TextFieldName="Name"
                                                             ValueFieldName="Id"
@@ -98,16 +98,19 @@
 
                                             <DxFormLayoutItem Caption="Destination Location" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxComboBox Data="@Locations"
-                                                            @bind-Value="@FormInternalTransfer.DestinanceId"
+                                                            @bind-Value="@FormInternalTransfer.DestinationId"
                                                             NullText=" Select Location Destinance..."
                                                             TextFieldName="Name"
                                                             ValueFieldName="Id"
                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                             ShowValidationIcon="true"></DxComboBox>
-                                                <ValidationMessage For="@(()=>FormInternalTransfer.DestinanceId)"></ValidationMessage>
+                                                <ValidationMessage For="@(()=>FormInternalTransfer.DestinationId)"></ValidationMessage>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Schendule Date" CaptionCssClass="norma-caption" ColSpanMd="12">
-                                                
+                                                <DxDateEdit @bind-Date="@FormInternalTransfer.SchenduleDate" ShowValidationIcon="true" ></DxDateEdit>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Reference" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@FormInternalTransfer.Reference" NullText="Input Reference.." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxTextBox>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutGroup Caption="Tranfer Lines">
                                                 <div class="row">
@@ -126,23 +129,20 @@
                                                     </div>
                                                     <div class="col-md-4">
                                                         <DxFormLayoutItem Caption="Quantity Stock" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                            <DxSpinEdit @bind-Value="@FormInternalTransfer.Qty"
+                                                            <DxSpinEdit @bind-Value="@FormInternalTransfer.QtyStock"
                                                                         NullText="Input Quantity Stock..."
                                                                         MinValue="0"
                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                         ShowValidationIcon="true"></DxSpinEdit>
-                                                            <ValidationMessage For="@(()=>FormInternalTransfer.Qty)"></ValidationMessage>
+                                                            <ValidationMessage For="@(()=>FormInternalTransfer.QtyStock)"></ValidationMessage>
                                                         </DxFormLayoutItem>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                            <DxComboBox Data="@Uoms"
-                                                                        @bind-Value="@FormInternalTransfer.UomId"
-                                                                        TextFieldName="Name"
-                                                                        ValueFieldName="Id"
+                                                           @*  <DxTextBox @bind-Text="@FormInternalTransfer.UomId"                                                                       
                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                         ReadOnly
-                                                                        ShowValidationIcon="true"></DxComboBox>
+                                                                        ShowValidationIcon="true"></DxTextBox> *@
                                                         </DxFormLayoutItem>
                                                     </div>
                                                 </div>
