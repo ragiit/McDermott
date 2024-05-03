@@ -94,24 +94,38 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             FormMedicamenDetails.TotalQty = FormMedicamenDetails?.Dosage * FormMedicamenDetails?.QtyByDay;
         }
 
-        private bool Checkin
-        {
-            get => Checkins;
-            set
-            {
-                bool Checkins = value;
-                this.Checkins = value;
-                if (Checkins)
-                {
-                    Concotions = true;
-                    MGForm.IsConcoction = true;
-                }
-                else
-                {
-                    Concotions = false;
-                }
-            }
-        }
+        //private void Checkin(bool value)
+        //{
+        //    if (value == true)
+        //    {
+        //        Concotions = true;
+        //        MGForm.IsConcoction = true;
+        //    }
+        //    else
+        //    {
+        //        Concotions = false;
+        //        MGForm.IsConcoction = false;
+        //    }
+        //}
+
+        //private bool Checkin
+        //{
+        //    get => Checkins;
+        //    set
+        //    {
+        //        bool Checkins = value;
+        //        this.Checkins = value;
+        //        if (Checkins)
+        //        {
+        //            Concotions = true;
+        //            MGForm.IsConcoction = true;
+        //        }
+        //        else
+        //        {
+        //            Concotions = false;
+        //        }
+        //    }
+        //}
 
         private bool IsNumeric(string value)
         {
@@ -479,6 +493,15 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
                 else
                 {
+                    var cekIsConcoction = medicamentGroups.Where(x => x.Id == MGForm.Id).FirstOrDefault();
+                    if (MGForm.IsConcoction != cekIsConcoction.IsConcoction)
+                    {
+                        if (cekIsConcoction.IsConcoction == true && MGForm.IsConcoction == false)
+                        {
+                            MGForm.UoMId = null;
+                            MGForm.FormDrugId = null;
+                        }
+                    }
                     getMedicament = await Mediator.Send(new UpdateMedicamentGroupRequest(MGForm));
 
                     var medicament_group = await Mediator.Send(new GetMedicamentGroupQuery(x => x.Id == MGForm.Id));
@@ -487,23 +510,31 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                     var request = new List<GroupMenuDto>();
 
-                    medicamentGroupDetails.ForEach(x =>
-                    {
-                        x.Id = 0;
-                        x.MedicamentGroupId = medicament_group[0].Id;
-                    });
+                    var r = medicamentGroupDetails;
 
-                    for (var i = 0; 1 < medicamentGroups.Count; i++)
+                    if (medicamentGroupDetails.Count > 0)
                     {
-                        medicamentGroupDetails.Add(new MedicamentGroupDetailDto
+                        medicamentGroupDetails.ForEach(x =>
                         {
-                            Id = 0,
-                            MedicamentGroupId = medicament_group[0].Id,
+                            x.Id = 0;
+                            x.MedicamentGroupId = medicament_group[0].Id;
                         });
+
+                        for (int i = 0; i < medicamentGroupDetails.Count; i++)
+                        {
+                            var cekLagi = medicamentGroupDetails.FirstOrDefault(x => x.MedicamentGroupId == medicamentGroupDetails[i].MedicamentGroupId);
+                            if (cekLagi is null)
+                            {
+                                medicamentGroupDetails.Add(new MedicamentGroupDetailDto
+                                {
+                                    Id = 0,
+                                    MedicamentGroupId = medicament_group[0].Id
+                                });
+                            }
+                        }
+
+                        await Mediator.Send(new CreateListMedicamentGroupDetailRequest(medicamentGroupDetails));
                     }
-
-                    await Mediator.Send(new CreateListMedicamentGroupDetailRequest(medicamentGroupDetails));
-
                     ToastService.ShowSuccess("Update Data Success...");
                 }
                 showForm = false;
