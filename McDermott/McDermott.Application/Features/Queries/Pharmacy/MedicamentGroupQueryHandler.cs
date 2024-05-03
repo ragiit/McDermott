@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
+﻿using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacy
 {
@@ -36,8 +31,8 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 {
                     result = await _unitOfWork.Repository<MedicamentGroup>().Entities
                       .Include(x => x.Phycisian)
-                      .Include(x=>x.UoM)
-                      .Include(x=>x.FormDrug)
+                      .Include(x => x.UoM)
+                      .Include(x => x.FormDrug)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 
@@ -74,8 +69,8 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                         .Include(x => x.MedicamentGroup)
                         .Include(x => x.Frequency)
                         .Include(x => x.UnitOfDosage)
-                      .AsNoTracking()
-                      .ToListAsync(cancellationToken);
+                          .AsNoTracking()
+                          .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }

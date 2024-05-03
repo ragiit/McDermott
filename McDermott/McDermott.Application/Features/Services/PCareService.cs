@@ -23,7 +23,7 @@ namespace McDermott.Application.Features.Services
             var secretKey = _configuration["PCareCreds:secret-key"];
 
             // Initialize the keyed hash object using the secret key as the key
-            HMACSHA256 hashObject = new HMACSHA256(Encoding.UTF8.GetBytes(secretKey));
+            HMACSHA256 hashObject = new(Encoding.UTF8.GetBytes(secretKey));
 
             // Computes the signature by hashing the salt with the secret key as the key
             var signature = hashObject.ComputeHash(Encoding.UTF8.GetBytes(data));
@@ -82,9 +82,9 @@ namespace McDermott.Application.Features.Services
             if (cipherText == null || cipherText.Length <= 0)
                 throw new ArgumentNullException("cipherText");
             if (Key == null || Key.Length <= 0)
-                throw new ArgumentNullException("Key");
+                throw new ArgumentNullException(nameof(Key));
             if (IV == null || IV.Length <= 0)
-                throw new ArgumentNullException("IV");
+                throw new ArgumentNullException(nameof(IV));
 
             string plaintext = null;
 
@@ -95,17 +95,11 @@ namespace McDermott.Application.Features.Services
 
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
-                using (MemoryStream msDecrypt = new MemoryStream(cipherText))
-                {
-                    using (CryptoStream csDecrypt =
-                            new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                        {
-                            plaintext = srDecrypt.ReadToEnd();
-                        }
-                    }
-                }
+                using MemoryStream msDecrypt = new(cipherText);
+                using CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read);
+                using StreamReader srDecrypt = new(csDecrypt);
+
+                plaintext = srDecrypt.ReadToEnd();
             }
             return plaintext;
         }

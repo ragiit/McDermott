@@ -1905,6 +1905,28 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
+        private async Task SelectedItemInsurancePolicyChanged(InsuranceTemp result)
+        {
+            ToastService.ClearInfoToasts();
+
+            var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.InsurancePolicyId));
+            if (bpjs.Count > 0)
+            {
+                if (!string.IsNullOrWhiteSpace(bpjs[0].KdProviderPstKdProvider))
+                {
+                    var parameter = await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")));
+                    if (parameter.Count > 0)
+                    {
+                        if (!parameter[0].Value.Equals(bpjs[0].KdProviderPstKdProvider))
+                        {
+                            var count = GeneralConsultanServices.Where(x => x.PatientId == FormRegis.PatientId && x.StagingStatus == "Planned").Count();
+                            ToastService.ShowInfo($"Peserta tidak terdaftar sebagai Peserta Anda.\r\nPeserta telah berkunjung ke FKTP Anda sebanyak {count} kali kunjungan.");
+                        }
+                    }
+                }
+            }
+        }
+
         private void SelectedItemPatientChanged(UserDto e)
         {
             if (e is null)
