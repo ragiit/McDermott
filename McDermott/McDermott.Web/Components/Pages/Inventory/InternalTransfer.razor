@@ -114,7 +114,10 @@
                                                 <ValidationMessage For="@(()=>FormInternalTransfer.DestinationId)"></ValidationMessage>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Schendule Date" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                <DxDateEdit @bind-Date="@FormInternalTransfer.SchenduleDate" ShowValidationIcon="true"></DxDateEdit>
+                                                <DxDateEdit @bind-Date="@FormInternalTransfer.SchenduleDate"
+                                                            ShowValidationIcon="true"
+                                                            DisplayFormat="dd MMMM yyyy">
+                                                </DxDateEdit>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Reference" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxMemo @bind-Text="@FormInternalTransfer.Reference" NullText="Input Reference.." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxMemo>

@@ -222,7 +222,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private void OnValueChangedTotalQty(long numDosage)
         {
-            if (Concotions == true)
+            if (MGForm.IsConcoction == true)
             {
                 FormMedicamenDetails.Dosage = numDosage;
                 FormMedicamenDetails.TotalQty = numDosage;
