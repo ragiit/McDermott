@@ -282,11 +282,11 @@
                                                                                 <ValidationMessage For="@(() => FormRegis.PatientId)" />
                                                                         </DxFormLayoutItem>
                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
-                                                                         <DxTextBox @bind-Text="@(FormRegis.Patient.NoRm)" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
+                                                                         <DxTextBox @bind-Text="(FormRegis.Patient.NoRm)" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
 
                                                                         </DxFormLayoutItem>
                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
-                                                                            <DxTextBox @bind-Text="@(FormRegis.Patient.NoId)" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
+                                                                            <DxTextBox @bind-Text="(FormRegis.Patient.NoId)" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
                                                                         </DxFormLayoutItem>
                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
                                                                             <Template>
@@ -363,9 +363,9 @@ NullText="Select Registration..."
                                                                             <DxComboBox ShowValidationIcon="true" Data="@Services"
                                                                                         NullText="Select Service.."
                                                                                         ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
-                                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                            FilteringMode="@DataGridFilteringMode.Contains"
-                                                                                            SelectedItemChanged="@((ServiceDto e) => SelectedItemServiceChanged(e))"
+                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                        SelectedItemChanged="@((ServiceDto e) => SelectedItemServiceChanged(e))"
                                                                                         @bind-Value="@FormRegis.ServiceId" TextFieldName="Name" ValueFieldName="Id">
                                                                             </DxComboBox>
                                                                             <ValidationMessage For="@(() => FormRegis.ServiceId)" />
@@ -768,7 +768,7 @@ NullText="Select Registration..."
                                                                                                                 PopupEditFormCssClass="pw-800"
                                                                                                                 PagerPosition="GridPagerPosition.Bottom"
                                                                                                                 PageSizeSelectorVisible="true"
-                                                                                                                CustomizeElement="GridCPPT_CustomizeElement"
+                                                                                                                CustomizeElement="Grid_CustomizeElementCPPT"
                                                                                                                 PageSizeSelectorItems="@(new int[] { 12, 24, 68, 100 })"
                                                                                                                 PageSizeSelectorAllRowsItemVisible="true"
                                                                                                                 PagerSwitchToInputBoxButtonCount="10"

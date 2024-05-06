@@ -323,63 +323,63 @@
             <!-- Small boxes (Stat box) -->
             <div class="row">
 
-              @*   <div class="col">
-                    <div class="card" hidden>
-                        <div class="card-body">
-                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                            IsContentBlocked="true"
-                                            ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="true"
-                                            Text="Fetching Data...">
+                @*   <div class="col">
+            <div class="card" hidden>
+            <div class="card-body">
+            <DxLoadingPanel @bind-Visible="PanelVisible"
+            IsContentBlocked="true"
+            ApplyBackgroundShading="true"
+            IndicatorAreaVisible="true"
+            Text="Fetching Data...">
 
-                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                        Data="ProductTemps"
-                                        PageSize="10"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                        KeyFieldName="Id"
-                                        EditorRenderMode="GridEditorRenderMode.Detached"
-                                        EditMode="GridEditMode.PopupEditForm"
-                                        PopupEditFormCssClass="pw-800"
-                                        PagerPosition="GridPagerPosition.Bottom"
-                                        AllowSelectRowByClick="true"
-                                        PageSizeSelectorVisible="true"
-                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        PageSizeSelectorAllRowsItemVisible="true"
-                                        PagerSwitchToInputBoxButtonCount="10"
-                                        FocusedRowEnabled="true"
-                                        PagerVisibleNumericButtonCount="10"
-                                        ShowGroupPanel="true"
-                                        AutoExpandAllGroupRows="true"
-                                        CssClass="ch-480"
-                                        ShowFilterRow="true"
-                                        TextWrapEnabled="false"
-                                        CustomizeElement="Grid_CustomizeElement"
-                                        ShowSearchBox="true"
-                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                        KeyboardNavigationEnabled="true">
+            <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+            Data="ProductTemps"
+            PageSize="10"
+            @bind-SelectedDataItems="@SelectedDataItems"
+            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+            KeyFieldName="Id"
+            EditorRenderMode="GridEditorRenderMode.Detached"
+            EditMode="GridEditMode.PopupEditForm"
+            PopupEditFormCssClass="pw-800"
+            PagerPosition="GridPagerPosition.Bottom"
+            AllowSelectRowByClick="true"
+            PageSizeSelectorVisible="true"
+            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+            PageSizeSelectorAllRowsItemVisible="true"
+            PagerSwitchToInputBoxButtonCount="10"
+            FocusedRowEnabled="true"
+            PagerVisibleNumericButtonCount="10"
+            ShowGroupPanel="true"
+            AutoExpandAllGroupRows="true"
+            CssClass="ch-480"
+            ShowFilterRow="true"
+            TextWrapEnabled="false"
+            CustomizeElement="Grid_CustomizeElement"
+            ShowSearchBox="true"
+            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+            KeyboardNavigationEnabled="true">
 
-                                    <Columns>
-                                        <DxGridDataColumn MinWidth="200" FieldName="Thumbnail">
-                                            <CellDisplayTemplate>
-                                                <img src="@(((ProductTemp)context.DataItem).Thumbnail)" style="width: 30px; height: 30px;" />
-                                            </CellDisplayTemplate>
-                                        </DxGridDataColumn>
-                                        <DxGridDataColumn MinWidth="200" FieldName="Id" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Title" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Description" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Price" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="DiscountPercentage" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Rating" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Stock" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Brand" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Category" />
-                                    </Columns>
-                                </DxGrid>
-                            </DxLoadingPanel>
-                        </div>
-                    </div>
-                </div> *@
+            <Columns>
+            <DxGridDataColumn MinWidth="200" FieldName="Thumbnail">
+            <CellDisplayTemplate>
+            <img src="@(((ProductTemp)context.DataItem).Thumbnail)" style="width: 30px; height: 30px;" />
+            </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn MinWidth="200" FieldName="Id" SortIndex="0" />
+            <DxGridDataColumn MinWidth="200" FieldName="Title" />
+            <DxGridDataColumn MinWidth="200" FieldName="Description" />
+            <DxGridDataColumn MinWidth="200" FieldName="Price" />
+            <DxGridDataColumn MinWidth="200" FieldName="DiscountPercentage" />
+            <DxGridDataColumn MinWidth="200" FieldName="Rating" />
+            <DxGridDataColumn MinWidth="200" FieldName="Stock" />
+            <DxGridDataColumn MinWidth="200" FieldName="Brand" />
+            <DxGridDataColumn MinWidth="200" FieldName="Category" />
+            </Columns>
+            </DxGrid>
+            </DxLoadingPanel>
+            </div>
+            </div>
+            </div> *@
 
                 @*   <div class="col-md-3 col-12">
             <!-- small box -->
@@ -877,6 +877,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        // var result = await PcareService.SendPCareService($"poli/fktp/1/1000", HttpMethod.Get);
+
         // await Send();
         // var aa = await AuthenticationState;
         // var bb = aa.User.Identity.Name;

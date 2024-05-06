@@ -75,6 +75,7 @@
         public bool? IsDoctor { get; set; }
         public bool? IsPhysicion { get; set; }
         public bool? IsNurse { get; set; }
+        public string PhysicanCode { get; set; } = string.Empty;
         public bool? IsEmployeeRelation { get; set; }
         public string? EmployeeType { get; set; }
         public string? EmployeeStatus { get; set; }
