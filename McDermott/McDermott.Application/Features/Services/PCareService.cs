@@ -125,7 +125,7 @@ namespace McDermott.Application.Features.Services
 
         }
 
-        public async Task<(dynamic, int)> SendPCareService(string requestURL, HttpMethod method)
+        public async Task<(dynamic, int)> SendPCareService(string requestURL, HttpMethod method, object? requestBody = null)
         {
             try
             {
@@ -152,7 +152,12 @@ namespace McDermott.Application.Features.Services
                 request.Headers.Add("X-signature", sign);
                 request.Headers.Add("X-authorization", $"Basic {auth}");
                 request.Headers.Add("user_key", userKey);
-                // request.Content = new StringContent("", Encoding.ASCII, "text/plain");
+
+                if (method == HttpMethod.Post || method == HttpMethod.Put)
+                {
+                    string requestBodyJson = JsonConvert.SerializeObject(requestBody);
+                    request.Content = new StringContent(requestBodyJson, Encoding.UTF8, "application/json");
+                }
 
                 var response = await httpClient.SendAsync(request);
 

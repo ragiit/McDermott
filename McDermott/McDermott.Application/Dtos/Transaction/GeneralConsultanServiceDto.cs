@@ -75,10 +75,11 @@
         public bool IsWeather { get; set; } = false;
         public bool IsPharmacology { get; set; } = false;
         public bool IsFood { get; set; } = false;
+        public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
 
         public virtual KioskQueue? KioskQueue { get; set; }
         public virtual ClassTypeDto? ClassType { get; set; }
-        public virtual UserDto? Patient { get; set; } = new();
+        public virtual UserDto Patient { get; set; } = new();
         public virtual UserDto? Pratitioner { get; set; }
         public virtual InsuranceDto? Insurance { get; set; }
         public virtual ServiceDto? Service { get; set; }
