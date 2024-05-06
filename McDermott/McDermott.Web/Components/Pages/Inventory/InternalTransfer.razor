@@ -30,7 +30,7 @@
                                             IndicatorAreaVisible="true"
                                             Text="Fetching Data...">
                                 <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                        Data="StockProducts"
+                                        Data="TransactionStocks"
                                         PageSize="10"
                                         @bind-SelectedDataItems="@SelectedDataItems"
                                         FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -67,13 +67,14 @@
                                     </ToolbarTemplate>
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="KodeTransaksi" Caption="No Transaksi" SortIndex="0" />
                                         <DxGridDataColumn FieldName="Source.Name" Caption="Source Location" SortIndex="0" />
                                         @* @if (FieldHideStock == true)
                                         { *@
                                         <DxGridDataColumn FieldName="Destinance.Name" Caption="Destination Location" />
                                         @* } *@
                                         <DxGridDataColumn FieldName="Product.Name" Caption="Product Name" />
-                                        <DxGridDataColumn FieldName="Qty" Caption=" Qty" />
+                                        <DxGridDataColumn FieldName="Qty" Caption=" Qty" MinWidth="130" />
                                         <DxGridDataColumn FieldName="Uom.Name" Caption="Unit Of Measure" />
                                         @* @if (FieldHideStock == true)
                                         {
@@ -83,8 +84,14 @@
                                 </DxGrid>
                                 <DxPopup Visible="showForm" Width="70%" MinWidth="40%" HeaderText="@header">
                                     <EditForm Model="@FormInternalTransfer" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
-                                        <DataAnnotationsValidator/>
+                                        <DataAnnotationsValidator />
                                         <DxFormLayout CssClass="mt">
+                                            @if (FormInternalTransfer.Id != null)
+                                            {
+                                                <DxFormLayoutItem ColSpanMd="12">
+                                                    <h2>@FormInternalTransfer.KodeTransaksi</h2>
+                                                </DxFormLayoutItem>
+                                            }
                                             <DxFormLayoutItem Caption="Source Location" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxComboBox Data="@Locations"
                                                             @bind-Value="@FormInternalTransfer.Source"
@@ -106,46 +113,47 @@
                                                             ShowValidationIcon="true"></DxComboBox>
                                                 <ValidationMessage For="@(()=>FormInternalTransfer.DestinationId)"></ValidationMessage>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Schendule Date" CaptionCssClass="norma-caption" ColSpanMd="12">
-                                                <DxDateEdit @bind-Date="@FormInternalTransfer.SchenduleDate" ShowValidationIcon="true" ></DxDateEdit>
+                                            <DxFormLayoutItem Caption="Schendule Date" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                <DxDateEdit @bind-Date="@FormInternalTransfer.SchenduleDate" ShowValidationIcon="true"></DxDateEdit>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Reference" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@FormInternalTransfer.Reference" NullText="Input Reference.." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxTextBox>
+                                                <DxMemo @bind-Text="@FormInternalTransfer.Reference" NullText="Input Reference.." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxMemo>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutGroup Caption="Tranfer Lines">
-                                                <div class="row">
-                                                    <div class="col-md-4">
-                                                        <DxFormLayoutItem Caption="Product Name" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                            <DxComboBox Data="@Products"
-                                                                        @bind-Value="@FormInternalTransfer.ProductId"
-                                                                        NullText="Select Product.."
-                                                                        TextFieldName="Name"
-                                                                        ValueFieldName="Id"
-                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                        SelectedItemChanged="@((ProductDto product)=> SelectedItemProduct(product))"
-                                                                        ShowValidationIcon="true"></DxComboBox>
-                                                            <ValidationMessage For="@(()=>FormInternalTransfer.ProductId)"></ValidationMessage>
-                                                        </DxFormLayoutItem>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <DxFormLayoutItem Caption="Quantity Stock" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                            <DxSpinEdit @bind-Value="@FormInternalTransfer.QtyStock"
-                                                                        NullText="Input Quantity Stock..."
-                                                                        MinValue="0"
-                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                        ShowValidationIcon="true"></DxSpinEdit>
-                                                            <ValidationMessage For="@(()=>FormInternalTransfer.QtyStock)"></ValidationMessage>
-                                                        </DxFormLayoutItem>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                           @*  <DxTextBox @bind-Text="@FormInternalTransfer.UomId"                                                                       
-                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                        ReadOnly
-                                                                        ShowValidationIcon="true"></DxTextBox> *@
-                                                        </DxFormLayoutItem>
-                                                    </div>
+
+                                                <div class="col-md-4">
+                                                    <DxFormLayoutItem Caption="Product Name" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                        <DxComboBox Data="@Products"
+                                                                    @bind-Value="@FormInternalTransfer.ProductId"
+                                                                    NullText="Select Product.."
+                                                                    TextFieldName="Name"
+                                                                    ValueFieldName="Id"
+                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                    SelectedItemChanged="@((ProductDto product)=> SelectedItemProduct(product))"
+                                                                    ShowValidationIcon="true"></DxComboBox>
+                                                        <ValidationMessage For="@(()=>FormInternalTransfer.ProductId)"></ValidationMessage>
+                                                    </DxFormLayoutItem>
                                                 </div>
+                                                <div class="col-md-4">
+                                                    <DxFormLayoutItem Caption="Quantity Stock" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                        <DxSpinEdit @bind-Value="@FormInternalTransfer.QtyStock"
+                                                                    NullText="Input Quantity Stock..."
+                                                                    MinValue="0"
+                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                    ShowValidationIcon="true"></DxSpinEdit>
+                                                        <ValidationMessage For="@(()=>FormInternalTransfer.QtyStock)"></ValidationMessage>
+                                                    </DxFormLayoutItem>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                        <DxTextBox @bind-Text="@FormInternalTransfer.UomName"
+                                                                   NullText="Unit Of Measure"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   ReadOnly
+                                                                   ShowValidationIcon="true"></DxTextBox>
+                                                    </DxFormLayoutItem>
+                                                </div>
+
                                             </DxFormLayoutGroup>
                                         </DxFormLayout>
                                         <hr />

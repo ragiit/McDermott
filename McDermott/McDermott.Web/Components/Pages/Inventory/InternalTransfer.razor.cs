@@ -1,7 +1,9 @@
-﻿using McDermott.Domain.Entities;
+﻿using DevExpress.ClipboardSource.SpreadsheetML;
+using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace McDermott.Web.Components.Pages.Inventory
 {
@@ -9,6 +11,7 @@ namespace McDermott.Web.Components.Pages.Inventory
     {
         #region relation Data
 
+        private List<TransactionStockDto> TransactionStocks = [];
         private List<StockProductDto> StockProducts = [];
         private List<LocationDto> Locations = [];
         private List<ProductDto> Products = [];
@@ -61,6 +64,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool showForm { get; set; } = false;
         private bool FormValidationState { get; set; } = false;
         private string? header { get; set; } = string.Empty;
+        private string? UomName { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
 
@@ -80,10 +84,12 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 PanelVisible = true;
                 showForm = false;
+                //TransactionStocks = a
                 StockProducts = await Mediator.Send(new GetStockProductQuery());
                 Locations = await Mediator.Send(new GetLocationQuery());
                 Products = await Mediator.Send(new GetProductQuery());
                 Uoms = await Mediator.Send(new GetUomQuery());
+                UomName = Uoms.Select(x => x.Name).FirstOrDefault();
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -95,7 +101,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         private void SelectedItemProduct(ProductDto product)
         {
             var data = Products.Where(p => p.Id == product.Id).FirstOrDefault();
-            FormInternalTransfer.UomId = data.UomId;
+            var uomName = Uoms.Where(u => u.Id == data.UomId).Select(x => x.Name).FirstOrDefault();
+            FormInternalTransfer.UomName = uomName;
         }
 
         #endregion Load

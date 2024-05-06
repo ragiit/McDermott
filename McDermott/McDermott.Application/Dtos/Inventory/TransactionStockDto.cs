@@ -4,16 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace McDermott.Application.Dtos.Pharmacy
+namespace McDermott.Application.Dtos.Inventory
 {
     public class TransactionStockDto : IMapFrom<TransactionStock>
     {
+        public long Id { get; set; }
         public long? StockId { get; set; }
         public long? ProductId { get; set; }
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
         public long? QtyStock { get; set; }
-        public long? UomId { get; set; }
+        public string? UomName { get; set; }
         public DateTime? SchenduleDate { get; set; } = DateTime.Now;
         public string? KodeTransaksi { get; set; }
         public string? StatusStock { get; set; }
