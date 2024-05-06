@@ -63,7 +63,11 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool PanelVisible { get; set; } = false;
         private bool showForm { get; set; } = false;
         private bool FormValidationState { get; set; } = false;
+
+        private bool showButton { get; set; } = false;
+        private bool showMatching { get; set; } = false;
         private string? header { get; set; } = string.Empty;
+
         private string? UomName { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
@@ -166,6 +170,10 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
         }
 
+        private async Task ToDoCheck()
+        {
+        }
+
         private async Task onDiscard()
         {
             await LoadData();
@@ -201,6 +209,25 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     return;
                 }
+
+                var getKodeTransaksi = TransactionStocks.Where(t => t.SourceId == FormInternalTransfer.SourceId && t.ProductId == FormInternalTransfer.ProductId).Select(x => x.KodeTransaksi).FirstOrDefault();
+
+                if (getKodeTransaksi == null)
+                {
+                    var nextTransactionNumber = 1;
+                    FormInternalTransfer.KodeTransaksi = $"INT/{nextTransactionNumber.ToString("00000")}";
+                }
+                else
+                {
+                    // Jika kode transaksi sudah ada, kita perlu mengekstrak nomor urutnya, menambahkannya, dan membuat kode transaksi baru
+                    var lastTransactionNumber = int.Parse(getKodeTransaksi.Split('/')[1]);
+                    var nextTransactionNumber = lastTransactionNumber + 1;
+                    FormInternalTransfer.KodeTransaksi = $"INT/{nextTransactionNumber.ToString("00000")}";
+                }
+
+                FormInternalTransfer.StatusTranfer = "DRAFT";
+                FormInternalTransfer.StatusStock = "OUT";
+                var a = FormInternalTransfer;
             }
             catch (Exception ex)
             {
