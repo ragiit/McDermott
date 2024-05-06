@@ -140,9 +140,9 @@ namespace McDermott.Persistence.Context
             // Contoh: Aturan cascade delete untuk hubungan many-to-many
 
             // Menentukan indeks menggunakan Fluent API
-            modelBuilder.Entity<TransactionStock>()
-                .HasOne(h => h.Stock)
-                .WithMany(x => x.TransactionStocks)
+            modelBuilder.Entity<TransactionStockDetail>()
+                .HasOne(h => h.TransactionStock)
+                .WithMany(x => x.TransactionStockDetail)
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Medicament>()

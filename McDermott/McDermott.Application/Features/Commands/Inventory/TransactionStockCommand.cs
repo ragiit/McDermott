@@ -18,6 +18,16 @@ namespace McDermott.Application.Features.Commands.Inventory
 
         #endregion GET
 
+        #region GET Detail
+
+        public class GetTransactionStockDetailQuery(Expression<Func<TransactionStockDetail, bool>>? predicate = null, bool removeCache = false) : IRequest<List<TransactionStockDetailDto>>
+        {
+            public Expression<Func<TransactionStockDetail, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
+        }
+
+        #endregion GET Detail
+
         #region CREATE
 
         public class CreateTransactionStockRequest(TransactionStockDto TransactionStockDto) : IRequest<TransactionStockDto>
@@ -31,6 +41,20 @@ namespace McDermott.Application.Features.Commands.Inventory
         }
 
         #endregion CREATE
+
+        #region CREATE Detail
+
+        public class CreateTransactionStockDetailRequest(TransactionStockDetailDto TransactionStockDetailDto) : IRequest<TransactionStockDetailDto>
+        {
+            public TransactionStockDetailDto TransactionStockDetailDto { get; set; } = TransactionStockDetailDto;
+        }
+
+        public class CreateListTransactionStockDetailRequest(List<TransactionStockDetailDto> TransactionStockDetailDtos) : IRequest<List<TransactionStockDetailDto>>
+        {
+            public List<TransactionStockDetailDto> TransactionStockDetailDtos { get; set; } = TransactionStockDetailDtos;
+        }
+
+        #endregion CREATE Detail
 
         #region Update
 
@@ -46,6 +70,20 @@ namespace McDermott.Application.Features.Commands.Inventory
 
         #endregion Update
 
+        #region Update Detail
+
+        public class UpdateTransactionStockDetailRequest(TransactionStockDetailDto TransactionStockDetailDto) : IRequest<TransactionStockDetailDto>
+        {
+            public TransactionStockDetailDto TransactionStockDetailDto { get; set; } = TransactionStockDetailDto;
+        }
+
+        public class UpdateListTransactionStockDetailRequest(List<TransactionStockDetailDto> TransactionStockDetailDtos) : IRequest<List<TransactionStockDetailDto>>
+        {
+            public List<TransactionStockDetailDto> TransactionStockDetailDtos { get; set; } = TransactionStockDetailDtos;
+        }
+
+        #endregion Update Detail
+
         #region DELETE
 
         public class DeleteTransactionStockRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
@@ -55,5 +93,15 @@ namespace McDermott.Application.Features.Commands.Inventory
         }
 
         #endregion DELETE
+
+        #region DELETE Detail
+
+        public class DeleteTransactionStockDetailRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE Detail
     }
 }

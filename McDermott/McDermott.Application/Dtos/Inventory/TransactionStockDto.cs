@@ -11,22 +11,14 @@ namespace McDermott.Application.Dtos.Inventory
         public long Id { get; set; }
         public long? StockId { get; set; }
 
-        [Required(ErrorMessage = "Please Select Product Name... ")]
-        public long? ProductId { get; set; }
-
         [Required(ErrorMessage = "Please Select Source Location... ")]
         public long? SourceId { get; set; }
 
         [Required(ErrorMessage = "Please Select Source Location... ")]
         public long? DestinationId { get; set; }
 
-        [Required(ErrorMessage = "Please Input Quantity Stock... ")]
-        public long? QtyStock { get; set; }
-
-        public string? UomName { get; set; }
         public DateTime? SchenduleDate { get; set; } = DateTime.Now;
         public string? KodeTransaksi { get; set; }
-        public string? StatusStock { get; set; }
         public string? StatusTranfer { get; set; }
         public string? Reference { get; set; }
 
