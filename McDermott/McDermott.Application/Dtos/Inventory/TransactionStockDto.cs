@@ -1,4 +1,5 @@
-﻿using System;
+﻿using McDermott.Domain.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,12 +20,16 @@ namespace McDermott.Application.Dtos.Inventory
 
         public DateTime? SchenduleDate { get; set; } = DateTime.Now;
         public string? KodeTransaksi { get; set; }
-        public string? StatusTranfer { get; set; }
+        public string? StatusTransfer { get; set; }
         public string? Reference { get; set; }
 
+        [SetToNull]
         public virtual StockProductDto? Stock { get; set; }
+        [SetToNull]
         public virtual ProductDto? Product { get; set; }
+        [SetToNull]
         public virtual LocationDto? Source { get; set; }
+        [SetToNull]
         public virtual LocationDto? Destination { get; set; }
     }
 }

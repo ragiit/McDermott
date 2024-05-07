@@ -14,8 +14,11 @@ namespace McDermott.Domain.Entities
         public long? QtyStock { get; set; }
         public string? StatusStock { get; set; }
 
+        [SetToNull]
         public TransactionStock? TransactionStock { get; set; }
+        [SetToNull]
         public StockProduct? Stock { get; set; }
+        [SetToNull]
         public Product? Product { get; set; }
     }
 }

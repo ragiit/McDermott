@@ -16,13 +16,20 @@ namespace McDermott.Domain.Entities
         public string? Tax { get; set; }
         public string? Cost { get; set; }
         public string? InternalReference { get; set; }
-      
+
+        [SetToNull]
         public BpjsClassification? BpjsClassification { get; set; }
+        [SetToNull]
         public Uom? Uom { get; set; }
+        [SetToNull]
         public Uom? PurchaseUom { get; set; }
+        [SetToNull]
         public ProductCategory? ProductCategory { get; set; }
+        [SetToNull]
         public Company? Company { get; set; }
+        [SetToNull]
         public List<Medicament>? Medicaments { get; set; }
+        [SetToNull]
         public StockProduct? StockProduct { get; set; }
     }
 }

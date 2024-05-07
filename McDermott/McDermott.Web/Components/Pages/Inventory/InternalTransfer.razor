@@ -1,6 +1,12 @@
 ﻿@page "/inventory/internal-transfer"
 @rendermode InteractiveServer
 
+<style>
+    .my-style{
+        min-width:800px;
+    }
+</style>
+
 <PageTitle> Internal Transfer</PageTitle>
 <div class="wrapper">
     <section class="content-header">
@@ -62,8 +68,8 @@
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && TransactionStocks.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && TransactionStocks.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && TransactionStocks.Count > 0 " />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && TransactionStocks.Count > 0 && isActiveButton" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
@@ -73,7 +79,11 @@
                                             <DxGridDataColumn FieldName="Source.Name" Caption="Source Location" />
                                             <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Location" />
                                             <DxGridDataColumn FieldName="SchenduleDate" Caption="Schendule Date" />
-                                            <DxGridDataColumn FieldName="StatusTranfer" Caption="Status" />
+                                            <DxGridDataColumn FieldName="StatusTransfer" Caption="Status">
+                                                <CellDisplayTemplate>
+                                                    @GetIssueStatusIconHtml((context.DataItem as TransactionStockDto).StatusTransfer)
+                                                </CellDisplayTemplate>
+                                            </DxGridDataColumn>
                                         </Columns>
                                     </DxGrid>
                                 </DxLoadingPanel>
@@ -86,7 +96,7 @@
                         {
                             <div class="row justify-content-between mb-3">
                                 <div class="col-auto align-self-start">
-                                    @if (showButton == false)
+                                    @if (FormInternalTransfer.StatusTransfer == "Draft")
                                     {
                                         <DxButton Text="To do Check" RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-clipboard-check" Click="ToDoCheck"></DxButton>
                                         <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check"></DxButton>
@@ -94,12 +104,12 @@
                                     }
                                     else
                                     {
-                                        @if (showMatching == true)
+                                        @if (FormInternalTransfer.StatusTransfer == "Ready")
                                         {
                                             <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check"></DxButton>
                                             <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark"></DxButton>
                                         }
-                                        else
+                                        else if(FormInternalTransfer.StatusTransfer =="Waiting")
                                         {
                                             <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check"></DxButton>
                                             <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check"></DxButton>
@@ -109,10 +119,10 @@
                                 </div>
                                 <div class="col-auto align-self-end">
                                     <DxTabs>
-                                        <DxTab Text="Draft" Enabled="@(FormInternalTransfer.StatusTranfer == "Draft")"></DxTab>
-                                        <DxTab Text="Waiting" Enabled="@(FormInternalTransfer.StatusTranfer == "Waiting")"></DxTab>
-                                        <DxTab Text="Ready" Enabled="@(FormInternalTransfer.StatusTranfer == "Ready")"></DxTab>
-                                        <DxTab Text="Done" Enabled="@(FormInternalTransfer.StatusTranfer == "Done")"></DxTab>
+                                        <DxTab Text="Draft" Enabled="@(FormInternalTransfer.StatusTransfer == "Draft")"></DxTab>
+                                        <DxTab Text="Waiting" Enabled="@(FormInternalTransfer.StatusTransfer == "Waiting")"></DxTab>
+                                        <DxTab Text="Ready" Enabled="@(FormInternalTransfer.StatusTransfer == "Ready")"></DxTab>
+                                        <DxTab Text="Done" Enabled="@(FormInternalTransfer.StatusTransfer == "Done")"></DxTab>
                                     </DxTabs>
                                 </div>
                             </div>
@@ -138,6 +148,7 @@
                                                         NullText=" Select Location Source..."
                                                         TextFieldName="Name"
                                                         ValueFieldName="Id"
+                                                        Enabled="@isActiveButton"
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                         ShowValidationIcon="true"></DxComboBox>
                                             <ValidationMessage For="@(()=>FormInternalTransfer.SourceId)"></ValidationMessage>
@@ -149,18 +160,23 @@
                                                         NullText=" Select Location Destinance..."
                                                         TextFieldName="Name"
                                                         ValueFieldName="Id"
+                                                        Enabled="@isActiveButton"
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                         ShowValidationIcon="true"></DxComboBox>
                                             <ValidationMessage For="@(()=>FormInternalTransfer.DestinationId)"></ValidationMessage>
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem Caption="Schendule Date" CaptionCssClass="normal-caption" ColSpanMd="12">
                                             <DxDateEdit @bind-Date="@FormInternalTransfer.SchenduleDate"
+                                                        Enabled="@isActiveButton"
                                                         ShowValidationIcon="true"
                                                         DisplayFormat="dd MMMM yyyy">
                                             </DxDateEdit>
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem Caption="Reference" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                            <DxMemo @bind-Text="@FormInternalTransfer.Reference" NullText="Input Reference.." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxMemo>
+                                            <DxMemo @bind-Text="@FormInternalTransfer.Reference" NullText="Input Reference.."
+                                                    Enabled="@isActiveButton"
+                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                    ShowValidationIcon="true"></DxMemo>
                                         </DxFormLayoutItem>
                                         <DxFormLayoutGroup ColSpanMd="12">
                                             <CaptionTemplate>
@@ -190,7 +206,7 @@
                                                         PagerSwitchToInputBoxButtonCount="10"
                                                         FocusedRowEnabled="true"
                                                         PagerVisibleNumericButtonCount="10"
-                                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                                        FocusedRowChanged="Grid_FocusedRowChangedDetail"
                                                         ShowGroupPanel="true"
                                                         AutoExpandAllGroupRows="true"
                                                         CssClass="ch-480"
@@ -203,19 +219,19 @@
                                                         KeyboardNavigationEnabled="true">
                                                     <ToolbarTemplate>
                                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
-                                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0" />
-                                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0" />
-                                                            <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="isActiveButton"/>
+                                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0 && isActiveButton" />
+                                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0 && isActiveButton" />
+                                                           
                                                         </DxToolbar>
                                                     </ToolbarTemplate>
                                                     <Columns>
                                                         <DxGridSelectionColumn Width="15px" />
                                                         <DxGridDataColumn FieldName="ProductName" Caption="Product Name" SortIndex="0" />
-                                                        <DxGridDataColumn FieldName="QtyStock" Caption="Stock" MinWidth="90" Width="190"/>
+                                                        <DxGridDataColumn FieldName="QtyStock" Caption="Stock" MinWidth="90" Width="190" />
                                                         <DxGridDataColumn FieldName="UomName" Caption="Unit Of Measure" />
                                                     </Columns>
-                                                    <EditFormTemplate Context="EditFormContextt">
+                                                    <EditFormTemplate Context="EditFormContextt" >
                                                         @{
                                                             TempFormInternalTransfer = (TransactionStockDetailDto)EditFormContextt.EditModel;
                                                         }
@@ -253,19 +269,22 @@
                                                                 </DxFormLayoutItem>
                                                             </div>
                                                         </DxFormLayout>
-                                                        
+
                                                     </EditFormTemplate>
                                                 </DxGrid>
                                             </Items>
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>
                                     <hr />
-                                    <DxFormLayout class="mt">
-                                        <div class="col d-flex justify-content-end">
-                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="onDiscard"></DxButton>
-                                        </div>
-                                    </DxFormLayout>
+                                    @if (isActiveButton)
+                                    {
+                                        <DxFormLayout class="mt">
+                                            <div class="col d-flex justify-content-end">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="onDiscard"></DxButton>
+                                            </div>
+                                        </DxFormLayout>
+                                    }
                                 </EditForm>
                             </div>
                         </div>

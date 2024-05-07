@@ -1,4 +1,5 @@
-﻿using System;
+﻿using McDermott.Domain.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,8 +24,11 @@ namespace McDermott.Application.Dtos.Inventory
         public string? ProductName { get; set; }
         public string? UomName { get; set; }
 
+        [SetToNull]
         public virtual TransactionStockDto? TransactionStock { get; set; }
+        [SetToNull]
         public virtual StockProductDto? Stock { get; set; }
+        [SetToNull]
         public virtual ProductDto? Product { get; set; }
     }
 }

@@ -510,8 +510,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                     var request = new List<GroupMenuDto>();
 
-                    var r = medicamentGroupDetails;
-
                     if (medicamentGroupDetails.Count > 0)
                     {
                         medicamentGroupDetails.ForEach(x =>

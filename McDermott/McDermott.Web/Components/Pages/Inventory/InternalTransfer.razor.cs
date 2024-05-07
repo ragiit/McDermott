@@ -5,6 +5,7 @@ using static McDermott.Application.Features.Commands.Inventory.StockProductComma
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -75,9 +76,11 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool IsAddTransfer { get; set; } = false;
         private bool showButton { get; set; } = false;
         private bool showMatching { get; set; } = false;
+        private long? transactionId { get; set; }
         private string? header { get; set; } = string.Empty;
         private string? headerDetail { get; set; } = string.Empty;
 
+        private bool isActiveButton = false;
         private string? UomName { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsDetail { get; set; } = new ObservableRangeCollection<object>();
@@ -122,6 +125,43 @@ namespace McDermott.Web.Components.Pages.Inventory
             TempFormInternalTransfer.UomName = uomName;
         }
 
+        public MarkupString GetIssueStatusIconHtml(string status)
+        {
+            string priorityClass;
+            string title;
+
+            switch (status)
+            {
+                case "Draft":
+                    priorityClass = "info";
+                    title = "Draft";
+                    break;
+
+                case "Waiting":
+                    priorityClass = "warning";
+                    title = "Waiting";
+                    break;
+
+                case "Ready":
+                    priorityClass = "primary";
+                    title = "Ready";
+                    break;
+
+                case "Done":
+                    priorityClass = "success";
+                    title = "Done";
+                    break;
+
+                default:
+                    return new MarkupString("");
+            }
+
+            string html = $"<div class='row '><div class='col-3'>" +
+                          $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+
+            return new MarkupString(html);
+        }
+
         #endregion Load
 
         #region Grid
@@ -161,6 +201,23 @@ namespace McDermott.Web.Components.Pages.Inventory
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
+
+            try
+            {
+                if ((TransactionStockDto)args.DataItem is null)
+                    return;
+
+                isActiveButton = ((TransactionStockDto)args.DataItem)!.StatusTransfer!.Equals("Draft");
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private void Grid_FocusedRowChangedDetail(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)
@@ -181,6 +238,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             showForm = true;
             FormInternalTransfer = new();
+            TempTransactionStocks.Clear();
+            isActiveButton = true;
             header = "Add Transfer Internal";
         }
 
@@ -199,6 +258,8 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 showForm = true;
                 FormInternalTransfer = SelectedDataItems[0].Adapt<TransactionStockDto>();
+
+                transactionId = FormInternalTransfer.Id;
 
                 TransactionStockDetails = await Mediator.Send(new GetTransactionStockDetailQuery(x => x.TransactionStockId == FormInternalTransfer.Id));
                 TempTransactionStocks = TransactionStockDetails.Select(x => x).ToList();
@@ -222,6 +283,11 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task ToDoCheck()
         {
+            var asyncData = await Mediator.Send(new GetTransactionStockDetailQuery(x => x.TransactionStockId == transactionId));
+            foreach (var item in asyncData)
+            {
+                var StockSent = asyncData.Where(t => t.TransactionStock.SourceId == FormInternalTransfer.SourceId && t.ProductId == item.ProductId).FirstOrDefault();
+            }
         }
 
         private async Task onDiscard()
@@ -302,24 +368,31 @@ namespace McDermott.Web.Components.Pages.Inventory
                     return;
                 }
 
-                var getKodeTransaksi = TransactionStocks.Where(t => t.SourceId == FormInternalTransfer.SourceId).Select(x => x.KodeTransaksi).FirstOrDefault();
-
-                if (getKodeTransaksi == null)
-                {
-                    var nextTransactionNumber = 1;
-                    FormInternalTransfer.KodeTransaksi = $"INT/{nextTransactionNumber.ToString("00000")}";
-                }
-                else
-                {
-                    // Jika kode transaksi sudah ada, kita perlu mengekstrak nomor urutnya, menambahkannya, dan membuat kode transaksi baru
-                    var lastTransactionNumber = int.Parse(getKodeTransaksi.Split('/')[1]);
-                    var nextTransactionNumber = lastTransactionNumber + 1;
-                    FormInternalTransfer.KodeTransaksi = $"INT/{nextTransactionNumber.ToString("00000")}";
-                }
-
-                FormInternalTransfer.StatusTranfer = "Draft";
                 if (FormInternalTransfer.Id == 0)
                 {
+                    var sourcname = Locations.Where(x => x.Id == FormInternalTransfer.SourceId).Select(x => x.Name).FirstOrDefault();
+                    var getKodeTransaksi = TransactionStocks.Where(t => t.SourceId == FormInternalTransfer.SourceId).OrderByDescending(x => x.KodeTransaksi).Select(x => x.KodeTransaksi).FirstOrDefault();
+
+                    if (getKodeTransaksi == null)
+                    {
+                        var nextTransactionNumber = 1;
+                        FormInternalTransfer.KodeTransaksi = $"{sourcname}/INT/{nextTransactionNumber.ToString("00000")}";
+                    }
+                    else
+                    {
+                        var lastTransactionNumber = 0;
+                        if (getKodeTransaksi.Contains("/INT/"))
+                        {
+                            var lastTransactionNumberStr = getKodeTransaksi.Split('/')[2];
+                            int.TryParse(lastTransactionNumberStr, out lastTransactionNumber);
+                        }
+
+                        var nextTransactionNumber = lastTransactionNumber + 1;
+                        FormInternalTransfer.KodeTransaksi = $"{sourcname}/INT/{nextTransactionNumber.ToString("00000")}";
+                    }
+
+                    FormInternalTransfer.StatusTransfer = "Draft";
+
                     getInternalTransfer = await Mediator.Send(new CreateTransactionStockRequest(FormInternalTransfer));
                     if (TempTransactionStocks.Count > 0)
                     {
@@ -333,8 +406,45 @@ namespace McDermott.Web.Components.Pages.Inventory
                             await Mediator.Send(new CreateTransactionStockDetailRequest(item));
                         }
                     }
+                    ToastService.ShowSuccess("Add Data Success...");
                 }
-                ToastService.ShowSuccess("Add Data Success...");
+                else
+                {
+                    var bb = FormInternalTransfer;
+                    getInternalTransfer = await Mediator.Send(new UpdateTransactionStockRequest(FormInternalTransfer));
+
+                    var stock_detail = await Mediator.Send(new GetTransactionStockQuery(x => x.Id == FormInternalTransfer.Id));
+                    var aa = TransactionStockDetails;
+                    await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: TransactionStockDetails.Select(x => x.Id).ToList()));
+
+                    var request = new List<TransactionStockDetailDto>();
+                    var ss = TransactionStockDetails;
+                    if (TempTransactionStocks.Count > 0)
+                    {
+                        TempTransactionStocks.ForEach(x =>
+                        {
+                            x.Id = 0;
+                            x.TransactionStockId = stock_detail[0].Id;
+                        });
+
+                        for (int i = 0; i < TempTransactionStocks.Count; i++)
+                        {
+                            var cekLagi = TempTransactionStocks.FirstOrDefault(x => x.TransactionStockId == TempTransactionStocks[i].TransactionStockId);
+                            if (cekLagi is null)
+                            {
+                                TempTransactionStocks.Add(new TransactionStockDetailDto
+                                {
+                                    Id = 0,
+                                    TransactionStockId = stock_detail[0].Id
+                                });
+                            }
+                        }
+
+                        await Mediator.Send(new CreateListTransactionStockDetailRequest(TempTransactionStocks));
+                    }
+
+                    ToastService.ShowSuccess("Update Data Success...");
+                }
             }
             catch (Exception ex)
             {
