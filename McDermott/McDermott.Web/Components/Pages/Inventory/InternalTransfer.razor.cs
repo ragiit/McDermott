@@ -16,6 +16,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private List<TransactionStockDto> TransactionStocks = [];
         private List<TransactionStockDetailDto> TempTransactionStocks = [];
+        private List<TransactionStockDetailDto> TransactionStockDetails = [];
         private List<StockProductDto> StockProducts = [];
         private List<LocationDto> Locations = [];
         private List<ProductDto> Products = [];
@@ -194,7 +195,23 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task EditItem_Click()
         {
-            showForm = true;
+            try
+            {
+                showForm = true;
+                FormInternalTransfer = SelectedDataItems[0].Adapt<TransactionStockDto>();
+
+                TransactionStockDetails = await Mediator.Send(new GetTransactionStockDetailQuery(x => x.TransactionStockId == FormInternalTransfer.Id));
+                TempTransactionStocks = TransactionStockDetails.Select(x => x).ToList();
+                foreach (var item in TempTransactionStocks)
+                {
+                    var d = Products.Where(x => x.Id == item.ProductId).FirstOrDefault();
+                    item.UomName = Uoms.Where(u => u.Id == d.UomId).Select(x => x.Name).FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task EditItemDetail_Click()
