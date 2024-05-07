@@ -20,6 +20,35 @@ namespace McDermott.Web.Components.Pages.Transaction
         private LabUomDto LabUom = new();
         private bool IsAddOrUpdateOrDeleteLabResult = false;
 
+        private class HomeStatusTemp
+        {
+            public string Code { get; set; } = string.Empty;
+            public string Name { get; set; } = string.Empty;
+        }
+
+        private List<HomeStatusTemp> _homeStatusTemps = [
+                new()
+                {
+                    Code = "1",
+                    Name = "Meninggal",
+                },
+                new()
+                {
+                    Code = "3",
+                    Name = "Berobat Jalan",
+                },
+                new()
+                {
+                    Code = "4",
+                    Name = "Rujuk Vertikal",
+                },
+                new()
+                {
+                    Code = "6",
+                    Name = "Rujuk Horizontal",
+                },
+            ];
+
         private List<string> ResultValueTypes =
           [
               "Low",

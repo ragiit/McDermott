@@ -564,8 +564,9 @@ NullText="Select Registration..."
                                                     {
                                                                                 <DxTab Text="Clinical Assesment"></DxTab>
                                                                                 <DxTab Text="CPPT"></DxTab>
+                                                                                <DxTab Visible="@(FormRegis.StagingStatus.Equals("Physician") || FormRegis.StagingStatus.Equals("Procedure Room") || FormRegis.StagingStatus.Equals("Finished"))" Text="Other Information"></DxTab>
                                                     }
-                                                                    <DxTab Visible="@(PaymentMethod == "BPJS")" Text="BPJS"></DxTab>
+                                                                    @* <DxTab Visible="@(PaymentMethod == "BPJS")" Text="BPJS"></DxTab> *@
                                                                 </DxTabs>
 
                                                 @if (FormRegis!.StagingStatus!.Equals("Physician")! || FormRegis.StagingStatus.Equals("Finished"))
@@ -788,6 +789,28 @@ NullText="Select Registration..."
                                                                                                 </Items>
                                                                                             </DxFormLayoutGroup>
                                                                                         </DxFormLayout>
+                                                    }
+                                                    else if (ActiveTabIndex == 2 && (FormRegis.StagingStatus.Equals("Physician") || FormRegis.StagingStatus.Equals("Procedure Room") || FormRegis.StagingStatus.Equals("Finished")))
+                                                    {
+                                                        <div class="w-100">
+                                                            <div class="col-md-6">
+                                                                <DxFormLayout CssClass="w-100">
+                                                                    <DxFormLayoutItem Caption="Home Status" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                          <DxComboBox ShowValidationIcon="true" Data="@_homeStatusTemps"
+                                                                                      NullText="Home Status..."
+                                                                                      @bind-Value="@FormRegis.HomeStatus"
+                                                                                      TextFieldName="Name"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                      FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                      ValueFieldName="Code">
+                                                                          </DxComboBox>
+                                                                    </DxFormLayoutItem>
+                                                                </DxFormLayout>
+                                                            </div>
+                                                            <div class="col-md-6">
+
+                                                            </div>
+                                                        </div>
                                                     }
                                                     else
                                                     {

@@ -17,6 +17,7 @@
         public string? IdentityNumber { get; set; }
         public DateTime? BirthDay { get; set; }
         public string? TypeRegistration { get; set; }
+        public string? HomeStatus { get; set; }
         public string? TypeMedical { get; set; }
         public string? ScheduleTime { get; set; }
         public bool IsAlertInformationSpecialCase { get; set; } = false;
