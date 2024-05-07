@@ -156,7 +156,7 @@ namespace McDermott.Application.Features.Services
                 if (method == HttpMethod.Post || method == HttpMethod.Put)
                 {
                     string requestBodyJson = JsonConvert.SerializeObject(requestBody);
-                    request.Content = new StringContent(requestBodyJson, Encoding.UTF8, "application/json");
+                    request.Content = new StringContent(requestBodyJson, Encoding.UTF8);
                 }
 
                 var response = await httpClient.SendAsync(request);
@@ -181,10 +181,37 @@ namespace McDermott.Application.Features.Services
                 else
                 {
                     // Tangani kesalahan jika diperlukan
-                    var errorResponse = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Error: {errorResponse}");
+                    dynamic errorResponse = await response.Content.ReadAsStringAsync();
 
-                    return (errorResponse, Convert.ToInt32(response.StatusCode));
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(errorResponse);
+
+                    if (data.response is not null)
+                    {
+                        string a = cons + secretKey + t;
+                        string r = data.response;
+                        dynamic metaData = data.metaData;
+
+                        if (r is null)
+                        {
+                            return (metaData.message, Convert.ToInt32(response.StatusCode));
+                        }
+
+                        string LZDecrypted = PCareWebServiceDecrypt(a, r);
+                        string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
+
+                        Console.WriteLine($"Response: {JsonConvert.DeserializeObject(result)}");
+                        return (result, Convert.ToInt32(response.StatusCode));
+                    }
+                    else
+                    {
+
+                        Console.WriteLine($"Response: {data}");
+
+                        return (data, Convert.ToInt32(response.StatusCode));
+                    }
+
+
+
                 }
             }
             catch (Exception ex)

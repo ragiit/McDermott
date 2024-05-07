@@ -1,0 +1,94 @@
+﻿@page "/bpjs-integration/tindakan"
+
+<PageTitle>McHealthCare - Tindakan</PageTitle>
+
+@if (!IsLoading)
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Tindakan" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <DxFormLayout CssClass="w-100">
+                                    <DxFormLayoutItem Caption="KdTkp" CaptionCssClass="normal-caption required-caption" ColSpanMd="6">
+                                        <DxComboBox Data="@_KdTkpList"
+                                                    NullText="Select KdTkp..."
+                                                    ShowValidationIcon="true"
+                                                    FilteringMode="@DataGridFilteringMode.Contains"
+                                                    SelectedItemChanged="@((KdTkp req)=> SelectChangeKdTkp(req))"
+                                                    @bind-Value="@SelectedCodeKdTkp"
+                                                    TextFieldName="Name"
+                                                    ValueFieldName="Code">
+                                        </DxComboBox>
+                                    </DxFormLayoutItem>
+
+                                    <DxFormLayoutItem Context="ItemContexxt" ColSpanMd="12">
+                                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                        IsContentBlocked="true"
+                                                        ApplyBackgroundShading="true"
+                                                        IndicatorAreaVisible="false"
+                                                        Text="Fetching Data...">
+                                            <DxGrid @ref="Grid"
+                                                    Data="@_tindakanBPJSIntegrationTemp"
+                                                    PagerVisible="true"
+                                                    KeyFieldName="Code"
+                                                    PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                    TextWrapEnabled="false"
+                                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                    PageSizeSelectorVisible="true"
+                                                    PagerPosition="GridPagerPosition.Bottom"
+                                                    PageIndex="@parameter1"
+                                                    PageSize="@parameter2"
+                                                    ShowGroupPanel="true"
+                                                    CustomizeElement="GridExtention.Grid_CustomizeElement"
+                                                    AutoExpandAllGroupRows="true"
+                                                    ShowFilterRow="true"
+                                                    KeyboardNavigationEnabled="true"
+                                                    ShowSearchBox="true"
+                                                    PageIndexChanged="HandlePageIndexChanged"
+                                                    PageSizeChanged="HandlePageSizeChanged">
+                                                <ToolbarTemplate>
+                                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                        <DxToolbarItem BeginGroup="true" Text="Refresh" Click="LoadData" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                        <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                            <Items>
+                                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                            </Items>
+                                                        </DxToolbarItem>
+                                                    </DxToolbar>
+                                                </ToolbarTemplate>
+                                                <Columns>
+                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(TindakanBPJSIntegrationTemp.KdTindakan)" Caption="Code" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(TindakanBPJSIntegrationTemp.NmTindakan)" Caption="Tindakan" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(TindakanBPJSIntegrationTemp.MaxTarif)" Caption="Max Tarif" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(TindakanBPJSIntegrationTemp.WithValue)" Caption="With Value" />
+                                                </Columns>
+                                            </DxGrid>
+                                        </DxLoadingPanel>
+                                    </DxFormLayoutItem>
+                                </DxFormLayout>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Tindakan" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    </div>
+}

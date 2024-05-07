@@ -34,6 +34,7 @@
 
         [Required]
         public string? TypeRegistration { get; set; }
+        public string? HomeStatus { get; set; }
 
         public string? TypeMedical { get; set; }
 
