@@ -1,11 +1,12 @@
-﻿@page "/bpjs-integration/tindakan"
+﻿@page "/bpjs-integration/obat"
+@rendermode InteractiveAuto
 
-<PageTitle>McHealthCare - Tindakan</PageTitle>
+<PageTitle>McHealthCare - Obat</PageTitle>
 
 @if (!IsLoading)
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Tindakan" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Drug" />
 
         <section class="content">
             <div class="container-fluid">
@@ -14,16 +15,21 @@
                         <div class="card">
                             <div class="card-body">
                                 <DxFormLayout CssClass="w-100">
-                                    <DxFormLayoutItem Caption="KdTkp" CaptionCssClass="normal-caption required-caption" ColSpanMd="6">
-                                        <DxComboBox Data="@_KdTkpList"
-                                                    NullText="Select KdTkp..."
-                                                    ShowValidationIcon="true"
-                                                    FilteringMode="@DataGridFilteringMode.Contains"
-                                                    SelectedItemChanged="@((KdTkp req)=> SelectChangeKdTkp(req))"
-                                                    @bind-Value="@SelectedCodeKdTkp"
-                                                    TextFieldName="Name"
-                                                    ValueFieldName="Code">
+                                    <DxFormLayoutItem Caption="Drug" CaptionCssClass="normal-caption required-caption" ColSpanMd="6">
+                                        <DxComboBox Data="@Products"
+                                                    NullText="Select Drug..."
+                                                    @bind-Value="@SelectedProduct"
+                                                    SelectedItemChanged="@((ProductDto req)=> SelectChangeProduct(req))"
+                                                    FilteringMode="DataGridFilteringMode.Contains"
+                                                    EditFormat="{0} {1}">
+                                            <Columns>
+                                                <DxListEditorColumn FieldName="@nameof(ProductDto.Name)"
+                                                                    Caption="Name" />
+                                                <DxListEditorColumn FieldName="@nameof(ProductDto.InternalReference)"
+                                                                    Caption="Internal Reference" />
+                                            </Columns>
                                         </DxComboBox>
+
                                     </DxFormLayoutItem>
 
                                     <DxFormLayoutItem Context="ItemContexxt" ColSpanMd="12">
@@ -34,15 +40,15 @@
                                                         IndicatorAreaVisible="false"
                                                         Text="Fetching Data...">
                                             <DxGrid @ref="Grid"
-                                                    Data="@_tindakanBPJSIntegrationTemp"
+                                                    Data="@_ObatBPJSIntegrationTemp"
                                                     PagerVisible="true"
                                                     KeyFieldName="Code"
                                                     PagerNavigationMode="PagerNavigationMode.InputBox"
                                                     TextWrapEnabled="false"
-                                                    EditorRenderMode="GridEditorRenderMode.Detached"
                                                     FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                                     PageSizeSelectorVisible="true"
                                                     PagerPosition="GridPagerPosition.Bottom"
+                                                    EditorRenderMode="GridEditorRenderMode.Detached"
                                                     PageIndex="@parameter1"
                                                     PageSize="@parameter2"
                                                     ShowGroupPanel="true"
@@ -67,10 +73,9 @@
                                                     </DxToolbar>
                                                 </ToolbarTemplate>
                                                 <Columns>
-                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(TindakanBPJSIntegrationTemp.KdTindakan)" Caption="Code" />
-                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(TindakanBPJSIntegrationTemp.NmTindakan)" Caption="Tindakan" />
-                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(TindakanBPJSIntegrationTemp.MaxTarif)" Caption="Max Tarif" />
-                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(TindakanBPJSIntegrationTemp.WithValue)" Caption="With Value" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(ObatBPJSIntegrationTemp.KdObat)" Caption="Code" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(ObatBPJSIntegrationTemp.NmObat)" Caption="Drug" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(ObatBPJSIntegrationTemp.Sedia)" Caption="Sedia" />
                                                 </Columns>
                                             </DxGrid>
                                         </DxLoadingPanel>
@@ -88,7 +93,7 @@
 else
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Tindakan" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Diagnosis" />
 
         <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>

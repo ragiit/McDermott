@@ -1,12 +1,12 @@
-﻿@page "/bpjs-integration/doctor"
+﻿@page "/bpjs-integration/provider"
 @rendermode InteractiveAuto
 
-<PageTitle>McHealthCare - Doctor</PageTitle>
+<PageTitle>McHealthCare - Provider</PageTitle>
 
 @if (!IsLoading)
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Doctor" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Provider" />
 
         <section class="content">
             <div class="container-fluid">
@@ -21,23 +21,26 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
                                     <DxGrid @ref="Grid"
-                                            Data="@_doctorBPJSIntegrationTemp"
+                                            Data="@_ProviderBPJSIntegrationTemp"
                                             PagerVisible="true"
                                             KeyFieldName="Code"
                                             EditorRenderMode="GridEditorRenderMode.Detached"
                                             PagerNavigationMode="PagerNavigationMode.InputBox"
                                             TextWrapEnabled="false"
                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            PageSizeSelectorVisible="true"
                                             PagerPosition="GridPagerPosition.Bottom"
                                             PageIndex="@parameter1"
                                             PageSize="@parameter2"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
                                             ShowGroupPanel="true"
                                             CustomizeElement="GridExtention.Grid_CustomizeElement"
                                             AutoExpandAllGroupRows="true"
                                             ShowFilterRow="true"
                                             KeyboardNavigationEnabled="true"
                                             ShowSearchBox="true"
+                                            ShowAllRowsChanged="HandlePageShowAllSizeChanged"
                                             PageIndexChanged="HandlePageIndexChanged"
                                             PageSizeChanged="HandlePageSizeChanged">
                                         <ToolbarTemplate>
@@ -54,8 +57,8 @@
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
-                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(DoctorBPJSIntegrationTemp.KdDokter)" Caption="Code" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(DoctorBPJSIntegrationTemp.NmDokter)" Caption="Doctor" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(ProviderBPJSIntegrationTemp.KdProvider)" Caption="Code" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(ProviderBPJSIntegrationTemp.NmProvider)" Caption="Provider" />
                                         </Columns>
                                     </DxGrid>
                                 </DxLoadingPanel>
@@ -70,7 +73,7 @@
 else
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Doctor" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Provider" />
 
         <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>

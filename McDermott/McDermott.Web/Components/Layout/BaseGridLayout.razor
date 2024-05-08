@@ -1,0 +1,161 @@
+﻿<DxLoadingPanel @bind-Visible="PanelVisible"
+                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                IsContentBlocked="true"
+                ApplyBackgroundShading="true"
+                IndicatorAreaVisible="false"
+                Text="Fetching Data...">
+    <DxGrid @ref="Grid"
+            PagerNavigationMode="PagerNavigationMode.InputBox"
+            Data="Data"
+
+            PageSize="10"
+            @bind-SelectedDataItems="@SelectedDataItems"
+            AllowSelectRowByClick="true"
+            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+            KeyFieldName="Id"
+            EditorRenderMode="GridEditorRenderMode.Detached"
+            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+            EditModelSaving="OnSave"
+            DataItemDeleting="OnDelete"
+            TextWrapEnabled="false"
+            RowDoubleClick="OnRowDoubleClick"
+            FocusedRowEnabled="true"
+            PopupEditFormCssClass="pw-800"
+            PagerPosition="GridPagerPosition.Bottom"
+            PageSizeSelectorVisible="true"
+            EditMode="@GridEditMode"
+            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+            PageSizeSelectorAllRowsItemVisible="true"
+            PagerSwitchToInputBoxButtonCount="10"
+            PagerVisibleNumericButtonCount="10"
+            CustomizeElement="Grid_CustomizeElement"
+            FocusedRowChanged="Grid_FocusedRowChanged"
+            ShowGroupPanel="true"
+            AutoExpandAllGroupRows="true"
+            ShowFilterRow="true"
+            ShowSearchBox="true"
+            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+            KeyboardNavigationEnabled="true">
+        <ToolbarTemplate>
+            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Grid.GetVisibleRowCount() > 0" />
+                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Grid.GetVisibleRowCount() > 0 && !IsDeleted" />
+                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                <DxToolbarItem Text="Column Chooser" Click="ColumnChooser_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                    <Items>
+                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                    </Items>
+                </DxToolbarItem>
+            </DxToolbar>
+        </ToolbarTemplate>
+        <Columns>
+            <DxGridSelectionColumn Width="15px" />
+            @foreach (var column in GridColumns)
+            {
+                <DxGridDataColumn FieldName="@column.FieldName" MinWidth="200" Caption="@column.Caption" />
+            }
+        </Columns>
+        <EditFormTemplate></EditFormTemplate>
+    </DxGrid>
+</DxLoadingPanel>
+
+@code {
+    [Parameter] public RenderFragment EditFormTemplate2 { get; set; }
+
+    [Parameter] public IGrid Grid { get; set; }
+    [Parameter] public object Data { get; set; } = new();
+
+    [Parameter] public IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+
+    [Parameter] public GroupMenuDto UserAccessCRUID { get; set; } = new();
+    [Parameter] public bool PanelVisible { get; set; }
+    [Parameter] public bool IsDeleted { get; set; }
+    [Parameter] public GridEditMode GridEditMode { get; set; } = GridEditMode.PopupEditForm;
+
+    [Parameter] public List<CustomDxGridDataColumn> GridColumns { get; set; } = [];
+    [Parameter] public EventCallback<GridEditModelSavingEventArgs> OnSave { get; set; }
+    [Parameter] public EventCallback<GridDataItemDeletingEventArgs> OnDelete { get; set; }
+    [Parameter] public EventCallback<GridRowClickEventArgs> OnRowDoubleClick { get; set; }
+    [Parameter] public EventCallback<GridFocusedRowChangedEventArgs> Grid_FocusedRowChanged { get; set; }
+
+    [Parameter] public EventCallback<ToolbarItemClickEventArgs> NewItem_Click { get; set; }
+    [Parameter] public EventCallback<ToolbarItemClickEventArgs> EditItem_Click { get; set; }
+    [Parameter] public EventCallback<ToolbarItemClickEventArgs> DeleteItem_Click { get; set; }
+    [Parameter] public EventCallback<ToolbarItemClickEventArgs> Refresh_Click { get; set; }
+    [Parameter] public EventCallback<ToolbarItemClickEventArgs> ColumnChooser_Click { get; set; }
+    [Parameter] public EventCallback<IGrid> GridInitialized { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GridInitialized.InvokeAsync(Grid);
+
+        }
+    }
+
+    public class CustomDxGridDataColumn
+    {
+        private string _fieldName = string.Empty;
+
+        public string FieldName
+        {
+            get => _fieldName;
+            set
+            {
+                _fieldName = value;
+                if (string.IsNullOrEmpty(Caption))
+                {
+                    Caption = value;
+                }
+            }
+        }
+
+        public string? Caption { get; set; }
+    }
+
+    private async Task ExportXlsxItem_Click()
+    {
+        await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+    }
+
+    private async Task ExportXlsItem_Click()
+    {
+        await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+    }
+
+    private async Task ExportCsvItem_Click()
+    {
+        await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
+            {
+                ExportSelectedRowsOnly = true,
+            });
+    }
+    private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+        {
+            e.CssClass = "alt-item";
+        }
+        if (e.ElementType == GridElementType.HeaderCell)
+        {
+            e.Style = "background-color: rgba(0, 0, 0, 0.08)";
+            e.CssClass = "header-bold";
+        }
+    }
+
+    private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+    {
+        ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+    }
+}

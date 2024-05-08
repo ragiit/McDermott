@@ -110,7 +110,7 @@
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Context="ItemContext" CaptionPosition="CaptionPosition.Vertical" Caption="Menu" ColSpanMd="12">
                                                 <Template>
                                                     <DxGrid @ref="GridGropMenu"
-                                                            Data="GroupMenus"
+                                                            Data="GroupMenus.Where(x => x.Menu is not null && !string.IsNullOrWhiteSpace(x.Menu.ParentMenu))"
                                                             @bind-SelectedDataItems="@SelectedDataItemsGroupMenu"
                                                             PageSize="10"
                                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -167,16 +167,36 @@
                                                         </Columns>
                                                         <EditFormTemplate Context="EditFormContext">
                                                             <DxFormLayout CssClass="w-100">
+                                                                @*  <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Menu:" ColSpanMd="12">
+                                                        <DxComboBox Data="@(Menus.Where(x => !string.IsNullOrWhiteSpace(x.ParentMenu) || (string.IsNullOrEmpty(x.ParentMenu) && x.Name.Equals("All"))))"
+                                                        NullText="Select Menu..."
+                                                        ShowValidationIcon="true"
+                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                        @bind-Value="@GroupMenu.MenuId"
+                                                        TextFieldName="Name"
+                                                        ValueFieldName="Id">
+                                                        </DxComboBox>
+                                                        <ValidationMessage For="@(() => GroupMenu.MenuId)"   />
+                                                        </DxFormLayoutItem> *@
                                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Menu:" ColSpanMd="12">
                                                                     <DxComboBox Data="@(Menus.Where(x => !string.IsNullOrWhiteSpace(x.ParentMenu) || (string.IsNullOrEmpty(x.ParentMenu) && x.Name.Equals("All"))))"
-                                                                                NullText="Select Menu..."
-                                                                                ShowValidationIcon="true"
-                                                                                FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 @bind-Value="@GroupMenu.MenuId"
-                                                                                TextFieldName="Name"
-                                                                                ValueFieldName="Id">
+                                                                                ValueFieldName="Id"
+                                                                                FilteringMode="DataGridFilteringMode.Contains"
+                                                                                EditFormat="{0}">
+                                                                        <Columns>
+                                                                            <DxListEditorColumn Visible="false" FieldName="@nameof(MenuDto.Id)"
+                                                                                                Caption="Id" />
+                                                                            <DxListEditorColumn FieldName="@nameof(MenuDto.Name)"
+                                                                                                Caption="Name" />
+                                                                            <DxListEditorColumn FieldName="@nameof(MenuDto.ParentMenu)"
+                                                                                                Caption="Parent Menu" />
+                                                                            <DxListEditorColumn FieldName="@nameof(MenuDto.Sequence)"
+                                                                                                Caption="Sequence" />
+                                                                            <DxListEditorColumn FieldName="@nameof(MenuDto.Url)"
+                                                                                                Caption="Url" />
+                                                                        </Columns>
                                                                     </DxComboBox>
-                                                                    <ValidationMessage For="@(() => GroupMenu.MenuId)"   />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Create" ColSpanMd="3">
                                                                     <DxCheckBox @bind-Checked="@GroupMenu.Create" />

@@ -798,6 +798,7 @@ NullText="Select Registration..."
                                                                     <DxFormLayoutItem Caption="Home Status" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                           <DxComboBox ShowValidationIcon="true" Data="@_homeStatusTemps"
                                                                                       NullText="Home Status..."
+                                                                                       ReadOnly="@(FormRegis.StagingStatus.Equals("Finished"))"
                                                                                       @bind-Value="@FormRegis.HomeStatus"
                                                                                       TextFieldName="Name"
                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"

@@ -1,12 +1,12 @@
-﻿@page "/bpjs-integration/doctor"
+﻿@page "/bpjs-integration/Kesadaran"
 @rendermode InteractiveAuto
 
-<PageTitle>McHealthCare - Doctor</PageTitle>
+<PageTitle>McHealthCare - Kesadaran</PageTitle>
 
 @if (!IsLoading)
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Doctor" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Kesadaran" />
 
         <section class="content">
             <div class="container-fluid">
@@ -21,7 +21,7 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
                                     <DxGrid @ref="Grid"
-                                            Data="@_doctorBPJSIntegrationTemp"
+                                            Data="@_kesadaranBPJSIntegrationTemp"
                                             PagerVisible="true"
                                             KeyFieldName="Code"
                                             EditorRenderMode="GridEditorRenderMode.Detached"
@@ -54,8 +54,8 @@
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
-                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(DoctorBPJSIntegrationTemp.KdDokter)" Caption="Code" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(DoctorBPJSIntegrationTemp.NmDokter)" Caption="Doctor" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(KesadaranBPJSIntegrationTemp.KdSadar)" Caption="Code" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(KesadaranBPJSIntegrationTemp.NmSadar)" Caption="Kesadaran" />
                                         </Columns>
                                     </DxGrid>
                                 </DxLoadingPanel>
@@ -70,7 +70,7 @@
 else
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Doctor" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Kesadaran" />
 
         <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>
