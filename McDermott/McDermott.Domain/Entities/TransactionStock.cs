@@ -17,9 +17,13 @@ namespace McDermott.Domain.Entities
 
         [SetToNull]
         public Location? Source { get; set; }
+
         [SetToNull]
         public Location? Destination { get; set; }
+
         [SetToNull]
+        public List<TransactionStockProduct>? TransactionStockProduct { get; set; }
+
         public List<TransactionStockDetail>? TransactionStockDetail { get; set; }
     }
 }

@@ -9,6 +9,12 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<UpdateTransactionStockRequest, TransactionStockDto>,
         IRequestHandler<UpdateListTransactionStockRequest, List<TransactionStockDto>>,
         IRequestHandler<DeleteTransactionStockRequest, bool>,
+        IRequestHandler<GetTransactionStockProductQuery, List<TransactionStockProductDto>>,
+        IRequestHandler<CreateTransactionStockProductRequest, TransactionStockProductDto>,
+        IRequestHandler<CreateListTransactionStockProductRequest, List<TransactionStockProductDto>>,
+        IRequestHandler<UpdateTransactionStockProductRequest, TransactionStockProductDto>,
+        IRequestHandler<UpdateListTransactionStockProductRequest, List<TransactionStockProductDto>>,
+        IRequestHandler<DeleteTransactionStockProductRequest, bool>,
         IRequestHandler<GetTransactionStockDetailQuery, List<TransactionStockDetailDto>>,
         IRequestHandler<CreateTransactionStockDetailRequest, TransactionStockDetailDto>,
         IRequestHandler<CreateListTransactionStockDetailRequest, List<TransactionStockDetailDto>>,
@@ -53,6 +59,44 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #endregion GET
 
+        #region GET Product
+
+        public async Task<List<TransactionStockProductDto>> Handle(GetTransactionStockProductQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                string cacheKey = $"GetTransactionStockProductQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<TransactionStockProduct>? result))
+                {
+                    result = await _unitOfWork.Repository<TransactionStockProduct>().Entities
+                      .Include(x => x.Stock)
+                      .Include(x => x.Product)
+                      .Include(x => x.TransactionStock)
+                      .AsNoTracking()
+                      .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<TransactionStockProductDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion GET Product
+
         #region GET Detail
 
         public async Task<List<TransactionStockDetailDto>> Handle(GetTransactionStockDetailQuery request, CancellationToken cancellationToken)
@@ -67,9 +111,9 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (!_cache.TryGetValue(cacheKey, out List<TransactionStockDetail>? result))
                 {
                     result = await _unitOfWork.Repository<TransactionStockDetail>().Entities
-                      .Include(x => x.Stock)
-                      .Include(x => x.Product)
-                      .Include(x=>x.TransactionStock)
+                      .Include(x => x.TransactionStock)
+                      .Include(x => x.Source)
+                      .Include(x => x.Destination)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 
@@ -130,6 +174,46 @@ namespace McDermott.Application.Features.Queries.Inventory
         }
 
         #endregion CREATE
+
+        #region CREATE Product
+
+        public async Task<TransactionStockProductDto> Handle(CreateTransactionStockProductRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<TransactionStockProduct>().AddAsync(request.TransactionStockProductDto.Adapt<TransactionStockProduct>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetTransactionStockProductQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<TransactionStockProductDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<TransactionStockProductDto>> Handle(CreateListTransactionStockProductRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<TransactionStockProduct>().AddAsync(request.TransactionStockProductDtos.Adapt<List<TransactionStockProduct>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetTransactionStockProductQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<TransactionStockProductDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE Product
 
         #region CREATE Detail
 
@@ -211,6 +295,46 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #endregion UPDATE
 
+        #region UPDATE Product
+
+        public async Task<TransactionStockProductDto> Handle(UpdateTransactionStockProductRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<TransactionStockProduct>().UpdateAsync(request.TransactionStockProductDto.Adapt<TransactionStockProduct>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetTransactionStockProductQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<TransactionStockProductDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<TransactionStockProductDto>> Handle(UpdateListTransactionStockProductRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<TransactionStockProduct>().UpdateAsync(request.TransactionStockProductDtos.Adapt<List<TransactionStockProduct>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetTransactionStockProductQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<TransactionStockProductDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE Product
+
         #region UPDATE Detail
 
         public async Task<TransactionStockDetailDto> Handle(UpdateTransactionStockDetailRequest request, CancellationToken cancellationToken)
@@ -280,6 +404,36 @@ namespace McDermott.Application.Features.Queries.Inventory
         }
 
         #endregion DELETE
+
+        #region DELETE Product
+
+        public async Task<bool> Handle(DeleteTransactionStockProductRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<TransactionStockProduct>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<TransactionStockProduct>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetTransactionStockProductQuery_"); // Ganti dengan key yang sesuai
+
+                return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion DELETE Product
 
         #region DELETE Detail
 

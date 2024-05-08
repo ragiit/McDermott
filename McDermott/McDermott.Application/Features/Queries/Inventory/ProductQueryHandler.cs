@@ -29,9 +29,9 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (!_cache.TryGetValue(cacheKey, out List<Product>? result))
                 {
                     result = await _unitOfWork.Repository<Product>().Entities
-                      .Include(x=>x.Medicaments)
-                      .Include(x=>x.Uom)
-                      .Include(x => x.StockProduct)
+                      .Include(x => x.Medicaments)
+                      .Include(x => x.Uom)
+                      //.Include(x => x.StockProduct)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 
@@ -152,7 +152,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetProductQuery_"); // Ganti dengan key yang sesuai
-
 
                 return true;
             }

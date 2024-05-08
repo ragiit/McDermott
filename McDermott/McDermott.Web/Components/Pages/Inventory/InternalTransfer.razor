@@ -69,7 +69,7 @@
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && TransactionStocks.Count > 0 " />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItem_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && TransactionStocks.Count > 0 " />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && TransactionStocks.Count > 0 && isActiveButton" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                             </DxToolbar>
@@ -79,7 +79,7 @@
                                             <DxGridDataColumn FieldName="KodeTransaksi" Caption="No Transaksi" SortIndex="0" />
                                             <DxGridDataColumn FieldName="Source.Name" Caption="Source Location" />
                                             <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Location" />
-                                            <DxGridDataColumn FieldName="SchenduleDate" Caption="Schendule Date" />
+                                            <DxGridDataColumn FieldName="SchenduleDate" DisplayFormat="d" Caption="Schendule Date" />
                                             <DxGridDataColumn FieldName="StatusTransfer" Caption="Status">
                                                 <CellDisplayTemplate>
                                                     @GetIssueStatusIconHtml((context.DataItem as TransactionStockDto).StatusTransfer)
@@ -101,20 +101,20 @@
                                     {
                                         <DxButton Text="To do Check" RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-clipboard-check" Click="ToDoCheck"></DxButton>
                                         <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check"></DxButton>
-                                        <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark"></DxButton>
+                                        <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
                                     }
                                     else
                                     {
                                         @if (FormInternalTransfer.StatusTransfer == "Ready")
                                         {
-                                            <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check"></DxButton>
-                                            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark"></DxButton>
+                                            <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
+                                            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
                                         }
                                         else if (FormInternalTransfer.StatusTransfer == "Waiting")
                                         {
                                             <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check" Click="ToDoCheck"></DxButton>
-                                            <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check"></DxButton>
-                                            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark"></DxButton>
+                                            <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
+                                            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
                                         }
                                     }
                                 </div>
@@ -234,7 +234,7 @@
                                                     </Columns>
                                                     <EditFormTemplate Context="EditFormContextt">
                                                         @{
-                                                            TempFormInternalTransfer = (TransactionStockDetailDto)EditFormContextt.EditModel;
+                                                            TempFormInternalTransfer = (TransactionStockProductDto)EditFormContextt.EditModel;
                                                         }
                                                         <DxFormLayout CssClass="mt w-100">
                                                             <div class="col-md-4">

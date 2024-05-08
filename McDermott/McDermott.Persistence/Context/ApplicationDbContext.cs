@@ -117,6 +117,7 @@ namespace McDermott.Persistence.Context
         public DbSet<Medicament> Medicaments { get; set; }
         public DbSet<StockProduct> StockProducts { get; set; }
         public DbSet<TransactionStock> TransactionStocks { get; set; }
+        public DbSet<TransactionStockDetail> TransactionStockDetails { get; set; }
 
         #endregion Pharmacy
 
@@ -140,8 +141,18 @@ namespace McDermott.Persistence.Context
             // Contoh: Aturan cascade delete untuk hubungan many-to-many
 
             // Menentukan indeks menggunakan Fluent API
+            modelBuilder.Entity<TransactionStockProduct>()
+                .HasOne(h => h.TransactionStock)
+                .WithMany(x => x.TransactionStockProduct)
+                .OnDelete(DeleteBehavior.SetNull);
+
             modelBuilder.Entity<TransactionStockDetail>()
                 .HasOne(h => h.TransactionStock)
+                .WithMany(x => x.TransactionStockDetail)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<TransactionStockDetail>()
+                .HasOne(h => h.Source)
                 .WithMany(x => x.TransactionStockDetail)
                 .OnDelete(DeleteBehavior.SetNull);
 
