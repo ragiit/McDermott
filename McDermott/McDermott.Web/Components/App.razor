@@ -150,10 +150,15 @@
             z-index: 1000; /* Ensure the section appears above the navbar */
         }
 
-        .dxbl-active {
+        .dxbl-tabs{
+             display:inline !important;
+        }
+
+        .dxbl-tabs > .dxbl-tabs-tablist > .dxbl-scroll-viewer > .dxbl-scroll-viewer-content > ul > li > .dxbl-tabs-item:not(.dxbl-tabs-tmpl):not(.dxbl-disabled):not(:disabled).dxbl-active {
             background-color: rgb(100, 172, 200 ) !important;
             color: white !important;
             font-weight: bolder;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
         }
 
         .dxbl-tabs-item {
@@ -162,6 +167,10 @@
 
         .dxbl-tabs > .dxbl-tabs-tablist {
             border-radius: 20px !important;
+        }
+
+        .dxbl-scroll-viewer > .dxbl-scroll-viewer-content{
+            padding:3px 0 !important; 
         }
     </style>
 </head>

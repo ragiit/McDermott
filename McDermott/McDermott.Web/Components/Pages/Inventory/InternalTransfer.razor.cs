@@ -76,7 +76,10 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool IsAddTransfer { get; set; } = false;
         private bool showButton { get; set; } = false;
         private bool showMatching { get; set; } = false;
+
+        //private bool HasValueFalse { get; set; }
         private long? transactionId { get; set; }
+
         private string? header { get; set; } = string.Empty;
         private string? headerDetail { get; set; } = string.Empty;
 
@@ -257,6 +260,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             try
             {
                 showForm = true;
+                header = "Edit Data";
                 FormInternalTransfer = SelectedDataItems[0].Adapt<TransactionStockDto>();
 
                 transactionId = FormInternalTransfer.Id;
@@ -283,26 +287,46 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task ToDoCheck()
         {
+            List<bool> allMatched = new List<bool>();
+
             var asyncData = await Mediator.Send(new GetTransactionStockDetailQuery(x => x.TransactionStockId == transactionId));
             if (asyncData.Count > 0)
             {
                 foreach (var item in asyncData)
                 {
-                    var StockSent = asyncData.Where(t => t.TransactionStock.SourceId == item.TransactionStock.SourceId && t.ProductId == item.ProductId).FirstOrDefault();
+                    var StockSent = asyncData.Where(t => t.TransactionStock is not null && t.TransactionStock.SourceId == item.TransactionStock!.SourceId && t.ProductId == item.ProductId).FirstOrDefault();
                     var warehouse_stock = StockProducts.Where(sp => sp.SourceId == item.TransactionStock.SourceId && sp.ProductId == item.ProductId).FirstOrDefault();
-
-                    if (warehouse_stock != null)
+                    if (warehouse_stock is not null && StockSent is not null)
                     {
                         if (StockSent.QtyStock <= warehouse_stock.Qty)
                         {
-                            ToastService.ShowSuccess("Stock Tersedia");
+                            allMatched.Add(true);
                         }
                         else
                         {
-                            ToastService.ShowError("Stock Tidak Mencukupi");
+                            allMatched.Add(false);
                         }
                     }
+                    else
+                    {
+                        allMatched.Add(false);
+                    }
                 }
+
+                bool HasValueFalse = allMatched.Any(x => x == false);
+                FormInternalTransfer = TransactionStocks.Where(x => x.Id == transactionId).FirstOrDefault();
+                if (HasValueFalse)
+                {
+                    FormInternalTransfer.StatusTransfer = "Waiting";
+                    ToastService.ShowError("Pastikan Stock Disemua Produk Terpenuhi!..");
+                }
+                else
+                {
+                    FormInternalTransfer.StatusTransfer = "Ready";
+                    ToastService.ShowSuccess(" Stock Disemua Produk Terpenuhi..");
+                }
+                var asds = FormInternalTransfer;
+                await Mediator.Send(new UpdateTransactionStockRequest(FormInternalTransfer));
             }
             else
             {

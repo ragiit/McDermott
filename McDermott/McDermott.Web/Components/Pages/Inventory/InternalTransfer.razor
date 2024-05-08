@@ -6,7 +6,6 @@
         min-width: 800px;
     }
 
-    
 </style>
 
 <PageTitle> Internal Transfer</PageTitle>
@@ -113,7 +112,7 @@
                                         }
                                         else if (FormInternalTransfer.StatusTransfer == "Waiting")
                                         {
-                                            <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check"></DxButton>
+                                            <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check" Click="ToDoCheck"></DxButton>
                                             <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check"></DxButton>
                                             <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark"></DxButton>
                                         }
