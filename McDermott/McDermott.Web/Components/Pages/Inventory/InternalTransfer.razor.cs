@@ -284,9 +284,29 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task ToDoCheck()
         {
             var asyncData = await Mediator.Send(new GetTransactionStockDetailQuery(x => x.TransactionStockId == transactionId));
-            foreach (var item in asyncData)
+            if (asyncData.Count > 0)
             {
-                var StockSent = asyncData.Where(t => t.TransactionStock.SourceId == FormInternalTransfer.SourceId && t.ProductId == item.ProductId).FirstOrDefault();
+                foreach (var item in asyncData)
+                {
+                    var StockSent = asyncData.Where(t => t.TransactionStock.SourceId == item.TransactionStock.SourceId && t.ProductId == item.ProductId).FirstOrDefault();
+                    var warehouse_stock = StockProducts.Where(sp => sp.SourceId == item.TransactionStock.SourceId && sp.ProductId == item.ProductId).FirstOrDefault();
+
+                    if (warehouse_stock != null)
+                    {
+                        if (StockSent.QtyStock <= warehouse_stock.Qty)
+                        {
+                            ToastService.ShowSuccess("Stock Tersedia");
+                        }
+                        else
+                        {
+                            ToastService.ShowError("Stock Tidak Mencukupi");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                ToastService.ShowError("Data Produk Tidak Ditemukan!!..");
             }
         }
 

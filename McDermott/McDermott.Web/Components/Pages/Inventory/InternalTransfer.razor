@@ -2,9 +2,11 @@
 @rendermode InteractiveServer
 
 <style>
-    .my-style{
-        min-width:800px;
+    .my-style {
+        min-width: 800px;
     }
+
+    
 </style>
 
 <PageTitle> Internal Transfer</PageTitle>
@@ -109,7 +111,7 @@
                                             <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check"></DxButton>
                                             <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark"></DxButton>
                                         }
-                                        else if(FormInternalTransfer.StatusTransfer =="Waiting")
+                                        else if (FormInternalTransfer.StatusTransfer == "Waiting")
                                         {
                                             <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check"></DxButton>
                                             <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check"></DxButton>
@@ -118,7 +120,7 @@
                                     }
                                 </div>
                                 <div class="col-auto align-self-end">
-                                    <DxTabs>
+                                    <DxTabs RenderMode="TabsRenderMode.AllTabs">
                                         <DxTab Text="Draft" Enabled="@(FormInternalTransfer.StatusTransfer == "Draft")"></DxTab>
                                         <DxTab Text="Waiting" Enabled="@(FormInternalTransfer.StatusTransfer == "Waiting")"></DxTab>
                                         <DxTab Text="Ready" Enabled="@(FormInternalTransfer.StatusTransfer == "Ready")"></DxTab>
@@ -219,10 +221,10 @@
                                                         KeyboardNavigationEnabled="true">
                                                     <ToolbarTemplate>
                                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="isActiveButton"/>
+                                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="isActiveButton" />
                                                             <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0 && isActiveButton" />
                                                             <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0 && isActiveButton" />
-                                                           
+
                                                         </DxToolbar>
                                                     </ToolbarTemplate>
                                                     <Columns>
@@ -231,7 +233,7 @@
                                                         <DxGridDataColumn FieldName="QtyStock" Caption="Stock" MinWidth="90" Width="190" />
                                                         <DxGridDataColumn FieldName="UomName" Caption="Unit Of Measure" />
                                                     </Columns>
-                                                    <EditFormTemplate Context="EditFormContextt" >
+                                                    <EditFormTemplate Context="EditFormContextt">
                                                         @{
                                                             TempFormInternalTransfer = (TransactionStockDetailDto)EditFormContextt.EditModel;
                                                         }

@@ -69,6 +69,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                     result = await _unitOfWork.Repository<TransactionStockDetail>().Entities
                       .Include(x => x.Stock)
                       .Include(x => x.Product)
+                      .Include(x=>x.TransactionStock)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 
