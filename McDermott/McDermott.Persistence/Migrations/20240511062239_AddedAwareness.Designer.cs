@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240511062239_AddedAwareness")]
+    partial class AddedAwareness
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1650,9 +1653,6 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("AwarenessId")
-                        .HasColumnType("bigint");
-
                     b.Property<double>("BMIIndex")
                         .HasColumnType("float");
 
@@ -1719,8 +1719,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AwarenessId");
 
                     b.HasIndex("GeneralConsultanServiceId");
 
@@ -4057,9 +4055,9 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.BPJSIntegration", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.InsurancePolicy", "InsurancePolicy")
-                        .WithMany("BPJSIntegrations")
+                        .WithMany()
                         .HasForeignKey("InsurancePolicyId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("InsurancePolicy");
                 });
@@ -4401,17 +4399,10 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultantClinicalAssesment", b =>
                 {
-                    b.HasOne("McDermott.Domain.Entities.Awareness", "Awareness")
-                        .WithMany("GeneralConsultantClinicalAssesments")
-                        .HasForeignKey("AwarenessId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
                         .WithMany("GeneralConsultantClinicalAssesments")
                         .HasForeignKey("GeneralConsultanServiceId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Awareness");
 
                     b.Navigation("GeneralConsultanService");
                 });
@@ -5086,11 +5077,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Province");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.Awareness", b =>
-                {
-                    b.Navigation("GeneralConsultantClinicalAssesments");
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.Building", b =>
                 {
                     b.Navigation("BuildingLocations");
@@ -5172,11 +5158,6 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.HealthCenter", b =>
                 {
                     b.Navigation("Buildings");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.InsurancePolicy", b =>
-                {
-                    b.Navigation("BPJSIntegrations");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.JobPosition", b =>

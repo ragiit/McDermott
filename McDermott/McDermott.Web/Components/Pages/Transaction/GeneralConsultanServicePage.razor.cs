@@ -541,6 +541,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Sick"
         };
 
+        public List<AwarenessDto> Awareness { get; set; } = [];
+
         private long PatientsId = 0;
 
         private long PractitionerId = 0;
@@ -934,6 +936,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             PanelVisible = true;
 
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
+            Awareness = await Mediator.Send(new GetAwarenessQuery());
 
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
             NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());

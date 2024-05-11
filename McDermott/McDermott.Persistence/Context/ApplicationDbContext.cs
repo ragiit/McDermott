@@ -14,6 +14,12 @@ namespace McDermott.Persistence.Context
 
         #region DbSet
 
+        #region BPJS Integration (Kalo ada relasi di buat Set To Null)
+
+        public DbSet<Awareness> Awarenesses { get; set; }
+
+        #endregion BPJS Integration (Kalo ada relasi di buat Set To Null)
+
         #region BPJS
 
         public DbSet<BpjsClassification> BpjsClassifications { get; set; }
@@ -146,6 +152,11 @@ namespace McDermott.Persistence.Context
                 .WithMany(x => x.TransactionStockProduct)
                 .OnDelete(DeleteBehavior.SetNull);
 
+            modelBuilder.Entity<GeneralConsultantClinicalAssesment>()
+               .HasOne(h => h.Awareness)
+               .WithMany(x => x.GeneralConsultantClinicalAssesments)
+               .OnDelete(DeleteBehavior.SetNull);
+
             modelBuilder.Entity<TransactionStockDetail>()
                 .HasOne(h => h.TransactionStock)
                 .WithMany(x => x.TransactionStockDetail)
@@ -225,6 +236,11 @@ namespace McDermott.Persistence.Context
                   .HasMany(m => m.GeneralConsultanCPPTs)
                   .WithOne(c => c.GeneralConsultanService)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<InsurancePolicy>()
+                .HasMany(m => m.BPJSIntegrations)
+                .WithOne(c => c.InsurancePolicy)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Group>()
                   .HasMany(m => m.GroupMenus)

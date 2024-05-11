@@ -27,11 +27,13 @@ global using McDermott.Application.Dtos.Employee;
 global using McDermott.Application.Dtos.Patient;
 global using McDermott.Application.Dtos.Pharmacy;
 global using McDermott.Application.Dtos.Inventory;
+global using McDermott.Application.Dtos.BpjsIntegration;
 
 global using DevExpress.Data.XtraReports.Native;
 
 global using OfficeOpenXml;
 
+global using static McDermott.Application.Features.Commands.BpjsIntegration.AwarenessCommand;
 global using static McDermott.Application.Features.Commands.Bpjs.SystemParameterCommand;
 global using static McDermott.Application.Features.Commands.Bpjs.BPJSIntegrationCommand;
 global using static McDermott.Application.Features.Commands.Inventory.ProductCommand;

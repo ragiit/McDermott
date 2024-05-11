@@ -102,6 +102,7 @@
             PanelVisible = true;
             ShowForm = false;
             SelectedDataItems = [];
+
             Countries = await Mediator.Send(new GetCountryQuery());
 
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
@@ -514,6 +515,7 @@
         private void OnCancel()
         {
             InsurancePoliciyForm = new();
+            User = new();
             ShowForm = false;
         }
 

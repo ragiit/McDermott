@@ -1,12 +1,12 @@
-﻿@page "/bpjs-integration/Kesadaran"
+﻿@page "/bpjs-integration/awarness"
 @rendermode InteractiveAuto
 
-<PageTitle>McHealthCare - Kesadaran</PageTitle>
+<PageTitle>McHealthCare - Awarness</PageTitle>
 
 @if (!IsLoading)
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Kesadaran" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Awarness" />
 
         <section class="content">
             <div class="container-fluid">
@@ -21,7 +21,7 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
                                     <DxGrid @ref="Grid"
-                                            Data="@_kesadaranBPJSIntegrationTemp"
+                                            Data="@_awarnessDto"
                                             PagerVisible="true"
                                             KeyFieldName="Code"
                                             EditorRenderMode="GridEditorRenderMode.Detached"
@@ -43,6 +43,7 @@
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="LoadData" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                <DxToolbarItem BeginGroup="true" Text="Update Data" Click="RefreshToDb" IconCssClass="fa-solid fa-database" />
                                                 <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                 <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
                                                     <Items>
@@ -54,8 +55,8 @@
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
-                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(KesadaranBPJSIntegrationTemp.KdSadar)" Caption="Code" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(KesadaranBPJSIntegrationTemp.NmSadar)" Caption="Kesadaran" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(AwarenessDto.KdSadar)" Caption="Code" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(AwarenessDto.NmSadar)" Caption="Awarness" />
                                         </Columns>
                                     </DxGrid>
                                 </DxLoadingPanel>
@@ -70,7 +71,7 @@
 else
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Kesadaran" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Awarness" />
 
         <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>

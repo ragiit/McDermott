@@ -26,6 +26,8 @@ namespace McDermott.Application.Interfaces.Repositories
 
         Task DeleteAsync(long id);
 
+        Task DeleteAsync(bool deleteAll);
+
         Task DeleteAsync(Expression<Func<T, bool>> predicate);
 
         Task DeleteAsync(List<long> id);

@@ -77,11 +77,13 @@
 
         public string BMIState { get; set; } = "-";
         public string? ClinicVisitTypes { get; set; }
+        public long? AwarenessId { get; set; }
 
         public long E { get; set; } = 4;
         public long V { get; set; } = 5;
         public long M { get; set; } = 6;
 
+        public virtual AwarenessDto? AwarenessDto { get; set; }
         public virtual GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
     }
 }

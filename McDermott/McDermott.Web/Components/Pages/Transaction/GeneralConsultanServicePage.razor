@@ -583,8 +583,14 @@ NullText="Select Registration..."
                                                                                                                     @bind-Value="@GeneralConsultantClinical.ClinicVisitTypes">
                                                                                                         </DxComboBox>
                                                                                                     </DxFormLayoutItem>
-                                                                                                    <DxFormLayoutItem>
-
+                                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Awareness">
+                                                                                                         <DxComboBox ReadOnly="@(FormRegis.StagingStatus.Equals("Finished"))"   ShowValidationIcon="true" Data="@Awareness"
+                                                                                                                    NullText="Select Awareness..."
+                                                                                                                    TextFieldName="NmSadar"
+                                                                                                                    ValueFieldName="Id"
+                                                                                                                    FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                                                    @bind-Value="@GeneralConsultantClinical.AwarenessId">
+                                                                                                        </DxComboBox>
                                                                                                     </DxFormLayoutItem>
                                                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weight">
                                                                                                         <DxSpinEdit ReadOnly="@(FormRegis.StagingStatus.Equals("Finished"))" ShowValidationIcon="true"MinValue="0" @bind-Value="@GeneralConsultantClinical.Weight" NullText="Weight" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
@@ -976,8 +982,14 @@ NullText="Select Registration..."
                                                                                                                                                                                                                                         </DxComboBox>
                                                                                                                                                                                                                                     </DxFormLayoutItem>
 
-                                                                                                    <DxFormLayoutItem>
-
+                                                                                                   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Awareness">
+                                                                                                         <DxComboBox ReadOnly="@(FormRegis.StagingStatus.Equals("Finished"))"   ShowValidationIcon="true" Data="@Awareness"
+                                                                                                                    NullText="Select Awareness..."
+                                                                                                                    TextFieldName="NmSadar"
+                                                                                                                    ValueFieldName="Id"
+                                                                                                                    FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                                                    @bind-Value="@GeneralConsultantClinical.AwarenessId">
+                                                                                                        </DxComboBox>
                                                                                                     </DxFormLayoutItem>
 
                                                                                                                                                                                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weight">

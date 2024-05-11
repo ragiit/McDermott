@@ -1,19 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using static McDermott.Application.Features.Commands.BpjsIntegration.AwarenessCommand;
 
 namespace McDermott.Web.Components.Pages.BpjsIntegration
 {
-    public partial class KesadaranBpjsIntegrationPage
+    public partial class AwarnessBpjsIntegrationPage
     {
-        public class KesadaranBPJSIntegrationTemp
-        {
-            [JsonPropertyName("kdSadar")]
-            public string KdSadar { get; set; } = string.Empty;
-
-            [JsonPropertyName("nmSadar")]
-            public string NmSadar { get; set; } = string.Empty;
-        }
-
-        private List<KesadaranBPJSIntegrationTemp> _kesadaranBPJSIntegrationTemp { get; set; } = new();
+        private List<AwarenessDto> _awarnessDto { get; set; } = new();
         private int parameter1 = 1; // Row data awal yang akan ditampilkan
         private int parameter2 = 10; // Limit jumlah data yang akan ditampilkan
         private IGrid Grid { get; set; }
@@ -59,6 +50,19 @@ namespace McDermott.Web.Components.Pages.BpjsIntegration
         private async Task LoadData()
         {
             PanelVisible = true;
+            _awarnessDto = await Mediator.Send(new GetAwarenessQuery());
+
+            if (_awarnessDto.Count == 0)
+                await RefreshToDb();
+
+            PanelVisible = false;
+        }
+
+        private async Task RefreshToDb()
+        {
+            PanelVisible = true;
+
+            Console.WriteLine("Getting API awarness");
 
             var response = await PcareService.SendPCareService($"kesadaran", HttpMethod.Get);
 
@@ -74,13 +78,16 @@ namespace McDermott.Web.Components.Pages.BpjsIntegration
 
             var dynamicList = (IEnumerable<dynamic>)data.list;
 
-            var KesadaranList = dynamicList.Select(item => new KesadaranBPJSIntegrationTemp
+            var AwarnessList = dynamicList.Select(item => new AwarenessDto
             {
                 KdSadar = item.kdSadar,
                 NmSadar = item.nmSadar
             }).ToList();
 
-            _kesadaranBPJSIntegrationTemp = KesadaranList;
+            Console.WriteLine("Success Getting API awarness");
+
+            _awarnessDto = await Mediator.Send(new UpdateToDbAwarenessRequest(AwarnessList));
+
             PanelVisible = false;
         }
 
