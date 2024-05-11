@@ -79,7 +79,7 @@
                                             <DxGridDataColumn FieldName="KodeTransaksi" Caption="No Transaksi" SortIndex="0" />
                                             <DxGridDataColumn FieldName="Source.Name" Caption="Source Location" />
                                             <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Location" />
-                                            <DxGridDataColumn FieldName="SchenduleDate" DisplayFormat="d" Caption="Schendule Date" />
+                                            <DxGridDataColumn FieldName="SchenduleDate" DisplayFormat="dd-MMMM-yyyy" Caption="Schendule Date" />
                                             <DxGridDataColumn FieldName="StatusTransfer" Caption="Status">
                                                 <CellDisplayTemplate>
                                                     @GetIssueStatusIconHtml((context.DataItem as TransactionStockDto).StatusTransfer)
