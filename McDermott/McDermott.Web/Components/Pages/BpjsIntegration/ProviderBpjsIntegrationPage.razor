@@ -1,0 +1,80 @@
+﻿@page "/bpjs-integration/provider"
+@rendermode InteractiveAuto
+
+<PageTitle>McHealthCare - Provider</PageTitle>
+
+@if (!IsLoading)
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Provider" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <DxGrid @ref="Grid"
+                                            Data="@_ProviderBPJSIntegrationTemp"
+                                            PagerVisible="true"
+                                            KeyFieldName="Code"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
+                                            PagerNavigationMode="PagerNavigationMode.InputBox"
+                                            TextWrapEnabled="false"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageIndex="@parameter1"
+                                            PageSize="@parameter2"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            ShowGroupPanel="true"
+                                            CustomizeElement="GridExtention.Grid_CustomizeElement"
+                                            AutoExpandAllGroupRows="true"
+                                            ShowFilterRow="true"
+                                            KeyboardNavigationEnabled="true"
+                                            ShowSearchBox="true"
+                                            ShowAllRowsChanged="HandlePageShowAllSizeChanged"
+                                            PageIndexChanged="HandlePageIndexChanged"
+                                            PageSizeChanged="HandlePageSizeChanged">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="LoadData" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(ProviderBPJSIntegrationTemp.KdProvider)" Caption="Code" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(ProviderBPJSIntegrationTemp.NmProvider)" Caption="Provider" />
+                                        </Columns>
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Provider" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    </div>
+}

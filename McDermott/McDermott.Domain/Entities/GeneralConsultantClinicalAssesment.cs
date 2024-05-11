@@ -35,6 +35,7 @@ namespace McDermott.Domain.Entities
 
         public string BMIState { get; set; } = "-";
         public string? ClinicVisitTypes { get; set; }
+        public long? AwarenessId { get; set; }
 
         public long E { get; set; }
         public long V { get; set; }
@@ -75,5 +76,8 @@ namespace McDermott.Domain.Entities
 
         [SetToNull] // Tandai properti yang harus diatur ke null
         public virtual GeneralConsultanService? GeneralConsultanService { get; set; }
+
+        [SetToNull]
+        public virtual Awareness? Awareness { get; set; }
     }
 }

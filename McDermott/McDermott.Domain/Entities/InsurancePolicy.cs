@@ -89,5 +89,8 @@
 
         [SetToNull]
         public virtual User? User { get; set; }
+
+        [SetToNull]
+        public virtual List<BPJSIntegration>? BPJSIntegrations { get; set; }
     }
 }

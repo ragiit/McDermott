@@ -9,7 +9,6 @@ global using McDermott.Application.Dtos.Bpjs;
 global using McDermott.Application.Interfaces.Repositories;
 global using McDermott.Domain.Entities;
 
-
 global using Mapster;
 global using System.ComponentModel.DataAnnotations.Schema;
 global using MediatR;
@@ -17,7 +16,9 @@ global using Microsoft.EntityFrameworkCore;
 global using System.ComponentModel.DataAnnotations;
 global using System.Linq.Expressions;
 global using Microsoft.Extensions.Caching.Memory;
+global using McDermott.Application.Dtos.BpjsIntegration;
 
+global using static McDermott.Application.Features.Commands.BpjsIntegration.AwarenessCommand;
 global using static McDermott.Application.Features.Commands.Bpjs.SystemParameterCommand;
 global using static McDermott.Application.Features.Commands.Bpjs.BPJSIntegrationCommand;
 global using static McDermott.Application.Features.Commands.Patient.PatientAllergyCommand;

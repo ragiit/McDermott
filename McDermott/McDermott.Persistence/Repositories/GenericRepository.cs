@@ -4,6 +4,7 @@ using McDermott.Domain.Common;
 using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -170,6 +171,24 @@ namespace McDermott.Persistence.Repositories
                 _dbContext.Set<T>().Remove(entity!);
             }
             catch (Exception ex)
+            {
+                LogError(nameof(DeleteAsync), ex.Message, ex);
+            }
+        }
+
+        public async Task DeleteAsync(bool deleteAll = false)
+        {
+            try
+            {
+                if (deleteAll)
+                {
+                    var entity = await _dbContext.Set<T>().ToListAsync();
+
+                    if (entity is not null && entity.Count > 0)
+                        _dbContext.Set<T>().RemoveRange(entity);
+                }
+            }
+            catch (InvalidOperationException ex)
             {
                 LogError(nameof(DeleteAsync), ex.Message, ex);
             }
