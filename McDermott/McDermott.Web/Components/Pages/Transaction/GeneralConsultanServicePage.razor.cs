@@ -1611,6 +1611,30 @@ namespace McDermott.Web.Components.Pages.Transaction
                 showForm = true;
 
                 FormRegis = SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>();
+
+                if (FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS"))
+                {
+                    var all = InsurancePolicies.Where(x => x.UserId == FormRegis.PatientId && x.Insurance is not null && x.Insurance.IsBPJS == true && x.Active == true).ToList();
+                    Temps = all.Select(x => new InsuranceTemp
+                    {
+                        InsurancePolicyId = x.Id,
+                        InsuranceId = x.InsuranceId,
+                        InsuranceName = x.Insurance.Name,
+                        PolicyNumber = x.PolicyNumber
+                    }).ToList();
+                }
+                else
+                {
+                    var all = InsurancePolicies.Where(x => x.UserId == FormRegis.PatientId && x.Insurance is not null && x.Insurance.IsBPJS != true && x.Active == true).ToList();
+                    Temps = all.Select(x => new InsuranceTemp
+                    {
+                        InsurancePolicyId = x.Id,
+                        InsuranceId = x.InsuranceId,
+                        InsuranceName = x.Insurance.Name,
+                        PolicyNumber = x.PolicyNumber
+                    }).ToList();
+                }
+
                 if (FormRegis.StagingStatus != "Finished")
                 {
                     var text = FormRegis.StagingStatus == "Physician" ? "In Consultation" : FormRegis.StagingStatus;
