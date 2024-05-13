@@ -1459,7 +1459,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                                 await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: FormRegis.Id));
 
-                                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
+                                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = null; x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
                                 await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
                                 break;
 
@@ -1479,7 +1479,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                                 await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: FormRegis.Id));
 
-                                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
+                                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = null; x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
                                 await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
 
                                 BrowserFiles.Distinct();

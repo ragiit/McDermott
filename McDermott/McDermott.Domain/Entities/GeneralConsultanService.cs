@@ -32,28 +32,28 @@
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }
 
-        [SetToNull] // Tandai properti yang harus diatur ke null
+        [SetToNull]
         public virtual User? Patient { get; set; }
 
-        [SetToNull] // Tandai properti yang harus diatur ke null
+        [SetToNull]
         public virtual User? Pratitioner { get; set; }
 
-        [SetToNull] // Tandai properti yang harus diatur ke null
+        [SetToNull]
         public virtual Insurance? Insurance { get; set; }
 
-        [SetToNull] // Tandai properti yang harus diatur ke null
+        [SetToNull]
         public virtual Service? Service { get; set; }
 
-        [SetToNull] // Tandai properti yang harus diatur ke null
+        [SetToNull]
         public virtual InsurancePolicy? InsurancePolicy { get; set; }
 
         [SetToNull]
         public virtual List<GeneralConsultanCPPT>? GeneralConsultanCPPTs { get; set; }
 
-        [SetToNull] // Tandai properti yang harus diatur ke null
+        [SetToNull]
         public virtual List<GeneralConsultanMedicalSupport>? GeneralConsultanMedicalSupports { get; set; }
 
-        [SetToNull] // Tandai properti yang harus diatur ke null
+        [SetToNull]
         public virtual List<GeneralConsultantClinicalAssesment>? GeneralConsultantClinicalAssesments { get; set; }
 
         [SetToNull]

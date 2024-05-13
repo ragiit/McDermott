@@ -44,12 +44,13 @@
         {
             get
             {
-                if (Patient is not null && Patient.DateOfBirth is null)
+                if (Patient is null || Patient.DateOfBirth is null)
                     return null;
 
-                var awikwok = DateTime.Now.Year - Patient.DateOfBirth.GetValueOrDefault().Year;
+                if (Patient.DateOfBirth is null)
+                    return null;
 
-                return awikwok;
+                return DateTime.Now.Year - Patient.DateOfBirth.GetValueOrDefault().Year;
             }
             set
             { }
