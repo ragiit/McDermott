@@ -1288,6 +1288,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                     await FileUploadService.UploadFileAsync(item, 0, []);
                 }
 
+                FormRegis.StagingStatus = "Procedure Room";
+                await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+
                 if (GeneralConsultanMedicalSupport.Id == 0)
                 {
                     GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
@@ -2028,7 +2031,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     {
                         if (!parameter[0].Value.Equals(bpjs[0].KdProviderPstKdProvider))
                         {
-                            ToastService.ShowInfo($"Peserta tidak terdaftar sebagai Peserta Anda.\r\nPeserta telah berkunjung ke FKTP Anda sebanyak {count} kali kunjungan.");
+                            ToastService.ShowInfo($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
                         }
                         else
                         {
@@ -2038,7 +2041,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                 {
-                    ToastService.ShowInfo($"Peserta tidak terdaftar sebagai Peserta Anda.\r\nPeserta telah berkunjung ke FKTP Anda sebanyak {count} kali kunjungan.");
+                    ToastService.ShowInfo($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
                 }
             }
         }
