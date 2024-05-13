@@ -1288,6 +1288,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                     await FileUploadService.UploadFileAsync(item, 0, []);
                 }
 
+                FormRegis.StagingStatus = "Procedure Room";
+                await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+
                 if (GeneralConsultanMedicalSupport.Id == 0)
                 {
                     GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
@@ -1456,7 +1459,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                                 await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: FormRegis.Id));
 
-                                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
+                                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = null; x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
                                 await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
                                 break;
 
@@ -1476,7 +1479,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                                 await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: FormRegis.Id));
 
-                                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
+                                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = null; x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
                                 await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
 
                                 BrowserFiles.Distinct();
@@ -2013,6 +2016,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             ToastService.ClearInfoToasts();
 
             SelectedBPJSIntegration = new();
+
+            if (result is null)
+                return;
+
             var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.InsurancePolicyId));
             if (bpjs.Count > 0)
             {
@@ -2024,7 +2031,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     {
                         if (!parameter[0].Value.Equals(bpjs[0].KdProviderPstKdProvider))
                         {
-                            ToastService.ShowInfo($"Peserta tidak terdaftar sebagai Peserta Anda.\r\nPeserta telah berkunjung ke FKTP Anda sebanyak {count} kali kunjungan.");
+                            ToastService.ShowInfo($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
                         }
                         else
                         {
@@ -2034,7 +2041,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                 {
-                    ToastService.ShowInfo($"Peserta tidak terdaftar sebagai Peserta Anda.\r\nPeserta telah berkunjung ke FKTP Anda sebanyak {count} kali kunjungan.");
+                    ToastService.ShowInfo($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
                 }
             }
         }

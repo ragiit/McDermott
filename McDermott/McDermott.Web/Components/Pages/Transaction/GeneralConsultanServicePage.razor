@@ -125,7 +125,7 @@
                                                                 <DxTab Text="Confirmed" Enabled="@(FormRegis.StagingStatus == "Confirmed")"></DxTab>
                                                                 <DxTab Text="Nurse Station" Enabled="@(FormRegis.StagingStatus == "Nurse Station")"></DxTab>
                                                                 <DxTab Text="Waiting" Enabled="@(FormRegis.StagingStatus == "Waiting")"></DxTab>
-                                                                <DxTab Text="@(GeneralConsultanMedicalSupport != null && GeneralConsultanMedicalSupport.Id != 0 && GeneralConsultanMedicalSupport.Status != "Finish" ? "Procedure Room" : "Physician")" Enabled="@(FormRegis.StagingStatus == "Physician")"></DxTab>
+                                                                <DxTab Text="@(GeneralConsultanMedicalSupport != null && GeneralConsultanMedicalSupport.Id != 0 && GeneralConsultanMedicalSupport.Status != "Finish" ? "Procedure Room" : "Physician")" Enabled="@(FormRegis.StagingStatus == "Physician" || FormRegis.StagingStatus == "Procedure Room")"></DxTab>
                                                                 <DxTab Text="Finished" Enabled="@(FormRegis.StagingStatus == "Finished")"></DxTab>
                                                                 <DxTab Text="Canceled" Enabled="@(FormRegis.StagingStatus == "Canceled")"></DxTab>
                                                             </DxTabs>
