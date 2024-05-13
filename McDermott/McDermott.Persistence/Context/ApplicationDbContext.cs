@@ -122,6 +122,7 @@ namespace McDermott.Persistence.Context
         public DbSet<Product> Products { get; set; }
         public DbSet<Medicament> Medicaments { get; set; }
         public DbSet<StockProduct> StockProducts { get; set; }
+        public DbSet<ReceivingStockDetail> ReceivingStockDetails { get; set; }
         public DbSet<TransactionStock> TransactionStocks { get; set; }
         public DbSet<TransactionStockDetail> TransactionStockDetails { get; set; }
 
@@ -140,9 +141,14 @@ namespace McDermott.Persistence.Context
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
 
-            //modelBuilder.Entity<EmailTemplate>()
-            //  .HasMany(m => m.ToPartner)
-            //  .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ReceivingStockDetail>()
+              .HasOne(h => h.Product)
+              .WithMany(m => m.ReceivingStockDetail)
+              .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<ReceivingStockDetail>()
+              .HasOne(h => h.Stock)
+              .WithMany(m => m.ReceivingStockDetail)
+              .OnDelete(DeleteBehavior.SetNull);
 
             // Contoh: Aturan cascade delete untuk hubungan many-to-many
 

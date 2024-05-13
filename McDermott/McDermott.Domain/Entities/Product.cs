@@ -1,7 +1,6 @@
-﻿
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
-    public class Product :BaseAuditableEntity
+    public class Product : BaseAuditableEntity
     {
         public string? Name { get; set; }
         public long? BpjsClassificationId { get; set; }
@@ -19,17 +18,26 @@ namespace McDermott.Domain.Entities
 
         [SetToNull]
         public BpjsClassification? BpjsClassification { get; set; }
+
         [SetToNull]
         public Uom? Uom { get; set; }
+
         [SetToNull]
         public Uom? PurchaseUom { get; set; }
+
         [SetToNull]
         public ProductCategory? ProductCategory { get; set; }
+
         [SetToNull]
         public Company? Company { get; set; }
+
         [SetToNull]
         public List<Medicament>? Medicaments { get; set; }
+
         [SetToNull]
         public StockProduct? StockProduct { get; set; }
+
+        [SetToNull]
+        public List<ReceivingStockDetail>? ReceivingStockDetail { get; set; }
     }
 }

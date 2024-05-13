@@ -19,6 +19,16 @@ namespace McDermott.Application.Features.Commands.Inventory
 
         #endregion GET
 
+        #region GET Receiving Stock Detail
+
+        public class GetReceivingStockDetailQuery(Expression<Func<ReceivingStockDetail, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ReceivingStockDetailDto>>
+        {
+            public Expression<Func<ReceivingStockDetail, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
+        }
+
+        #endregion GET Receiving Stock Detail
+
         #region GET Product
 
         public class GetTransactionStockProductQuery(Expression<Func<TransactionStockProduct, bool>>? predicate = null, bool removeCache = false) : IRequest<List<TransactionStockProductDto>>
@@ -52,6 +62,20 @@ namespace McDermott.Application.Features.Commands.Inventory
         }
 
         #endregion CREATE
+
+        #region CREATE Receiving Stock Detail
+
+        public class CreateReceivingStockDetailRequest(ReceivingStockDetailDto ReceivingStockDetailDto) : IRequest<ReceivingStockDetailDto>
+        {
+            public ReceivingStockDetailDto ReceivingStockDetailDto { get; set; } = ReceivingStockDetailDto;
+        }
+
+        public class CreateListReceivingStockDetailRequest(List<ReceivingStockDetailDto> ReceivingStockDetailDtos) : IRequest<List<ReceivingStockDetailDto>>
+        {
+            public List<ReceivingStockDetailDto> ReceivingStockDetailDtos { get; set; } = ReceivingStockDetailDtos;
+        }
+
+        #endregion CREATE Receiving Stock Detail
 
         #region CREATE Product
 
@@ -95,6 +119,20 @@ namespace McDermott.Application.Features.Commands.Inventory
 
         #endregion Update
 
+        #region Update Receiving Stock Detail
+
+        public class UpdateReceivingStockDetailRequest(ReceivingStockDetailDto ReceivingStockDetailDto) : IRequest<ReceivingStockDetailDto>
+        {
+            public ReceivingStockDetailDto ReceivingStockDetailDto { get; set; } = ReceivingStockDetailDto;
+        }
+
+        public class UpdateListReceivingStockDetailRequest(List<ReceivingStockDetailDto> ReceivingStockDetailDtos) : IRequest<List<ReceivingStockDetailDto>>
+        {
+            public List<ReceivingStockDetailDto> ReceivingStockDetailDtos { get; set; } = ReceivingStockDetailDtos;
+        }
+
+        #endregion Update Receiving Stock Detail
+
         #region Update Product
 
         public class UpdateTransactionStockProductRequest(TransactionStockProductDto TransactionStockProductDto) : IRequest<TransactionStockProductDto>
@@ -109,7 +147,7 @@ namespace McDermott.Application.Features.Commands.Inventory
 
         #endregion Update Product
 
-        #region Update Product
+        #region Update Detail
 
         public class UpdateTransactionStockDetailRequest(TransactionStockDetailDto TransactionStockDetailDto) : IRequest<TransactionStockDetailDto>
         {
@@ -121,7 +159,7 @@ namespace McDermott.Application.Features.Commands.Inventory
             public List<TransactionStockDetailDto> TransactionStockDetailDtos { get; set; } = TransactionStockDetailDtos;
         }
 
-        #endregion Update Product
+        #endregion Update Detail
 
         #region DELETE
 
@@ -132,6 +170,16 @@ namespace McDermott.Application.Features.Commands.Inventory
         }
 
         #endregion DELETE
+
+        #region DELETE Receiving Stock Detail
+
+        public class DeleteReceivingStockDetailRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE Receiving Stock Detail
 
         #region DELETE Product
 
