@@ -27,6 +27,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private TransactionStockDto getInternalTransfer = new();
         private TransactionStockProductDto TempFormInternalTransfer = new();
         private TransactionStockDetailDto FormInternalTransferDetail = new();
+        private StockProductDto FormStock = new();
 
         #endregion relation Data
 
@@ -158,6 +159,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                     title = "Done";
                     break;
 
+                case "Cancel":
+                    priorityClass = "danger";
+                    title = "Cancel";
+                    break;
+
                 default:
                     return new MarkupString("");
             }
@@ -264,10 +270,14 @@ namespace McDermott.Web.Components.Pages.Inventory
             try
             {
                 showForm = true;
+                var ase = p;
                 PanelVisible = true;
                 header = "Edit Data";
                 FormInternalTransfer = p ?? SelectedDataItems[0].Adapt<TransactionStockDto>();
-
+                if (FormInternalTransfer.StatusTransfer != "Draft")
+                {
+                    isActiveButton = false;
+                }
                 transactionId = FormInternalTransfer.Id;
 
                 TransactionStockProducts = await Mediator.Send(new GetTransactionStockProductQuery(x => x.TransactionStockId == FormInternalTransfer.Id));
@@ -320,7 +330,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 bool HasValueFalse = allMatched.Any(x => x == false);
-                FormInternalTransfer = TransactionStocks.Where(x => x.Id == transactionId).FirstOrDefault();
+                var datas = await Mediator.Send(new GetTransactionStockQuery());
+                FormInternalTransfer = datas.Where(x => x.Id == transactionId).FirstOrDefault();
                 if (HasValueFalse)
                 {
                     FormInternalTransfer.StatusTransfer = "Waiting";
@@ -339,10 +350,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormInternalTransferDetail.StatusTransfer = getInternalTransfer.StatusTransfer;
 
                 await Mediator.Send(new CreateTransactionStockDetailRequest(FormInternalTransferDetail));
+
+                await EditItem_Click(getInternalTransfer);
             }
             else
             {
-                ToastService.ShowError("Data Produk Tidak Ditemukan!!..");
+                ToastService.ShowError("Product Data Not Found!!..");
             }
         }
 
@@ -355,11 +368,39 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
+                var Stock = await Mediator.Send(new GetStockProductQuery());
+                var transactionProductStock = await Mediator.Send(new GetTransactionStockProductQuery());
+                TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                 FormInternalTransfer = TransactionStocks.Where(x => x.Id == transactionId).FirstOrDefault();
                 if (FormInternalTransfer is not null)
                 {
                     FormInternalTransfer.StatusTransfer = "Done";
                     getInternalTransfer = await Mediator.Send(new UpdateTransactionStockRequest(FormInternalTransfer));
+
+                    var checkTransactionProduct = transactionProductStock.Where(x => x.TransactionStockId == getInternalTransfer.Id).ToList();
+                    foreach (var a in checkTransactionProduct)
+                    {
+                        //check product stock OUT availability
+                        var checkedStockOut = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.SourceId).FirstOrDefault();
+                        checkedStockOut!.Qty = checkedStockOut.Qty - a.QtyStock;
+                        await Mediator.Send(new UpdateStockProductRequest(checkedStockOut));
+
+                        //check product stock IN availability
+                        var checkStockIn = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.DestinationId).FirstOrDefault();
+                        if (checkStockIn is null)
+                        {
+                            FormStock.ProductId = a.ProductId;
+                            FormStock.SourceId = getInternalTransfer.DestinationId;
+                            FormStock.UomId = a.Product.UomId;
+                            FormStock.Qty = a.QtyStock;
+                            await Mediator.Send(new CreateStockProductRequest(FormStock));
+                        }
+                        else
+                        {
+                            checkStockIn!.Qty = checkStockIn.Qty + a.QtyStock;
+                            await Mediator.Send(new UpdateStockProductRequest(checkStockIn));
+                        }
+                    }
 
                     //Save Log
                     FormInternalTransferDetail.TransactionStockId = getInternalTransfer.Id;
@@ -384,25 +425,22 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
-                //delete data Transaction Stock Product
-                var ProductIdsToDelete = TransactionStockProducts
-                            .Where(x => x.TransactionStockId == transactionId)
-                            .Select(x => x.Id)
-                            .ToList();
-                await Mediator.Send(new DeleteTransactionStockProductRequest(ids: ProductIdsToDelete));
+                var transactionProductStock = await Mediator.Send(new GetTransactionStockProductQuery());
+                TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+                FormInternalTransfer = TransactionStocks.Where(x => x.Id == transactionId).FirstOrDefault();
+                if (FormInternalTransfer is not null)
+                {
+                    FormInternalTransfer.StatusTransfer = "Cancel";
+                    getInternalTransfer = await Mediator.Send(new UpdateTransactionStockRequest(FormInternalTransfer));
+                }
 
-                //Delete data transaction Detal transfer (Log)
+                //Save Log
+                FormInternalTransferDetail.TransactionStockId = getInternalTransfer.Id;
+                FormInternalTransferDetail.SourceId = getInternalTransfer.SourceId;
+                FormInternalTransferDetail.DestinationId = getInternalTransfer.DestinationId;
+                FormInternalTransferDetail.StatusTransfer = getInternalTransfer.StatusTransfer;
 
-                var DetailsIdsToDelete = TransactionStockDetails
-                    .Where(x => x.TransactionStockId == transactionId)
-                    .Select(x => x.Id)
-                    .ToList();
-                await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: DetailsIdsToDelete));
-
-                //Delete Transaction
-
-                await Mediator.Send(new DeleteTransactionStockRequest(transactionId));
-                await LoadData();
+                await Mediator.Send(new CreateTransactionStockDetailRequest(FormInternalTransferDetail));
             }
             catch (Exception ex)
             {
@@ -429,8 +467,57 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         #region function Delete
 
-        private async Task OnDelete()
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
+            List<TransactionStockDto> transactions = SelectedDataItems.Adapt<List<TransactionStockDto>>();
+            List<long> id = transactions.Select(x => x.Id).ToList();
+            List<long> ProductIdsToDelete = new();
+            List<long> DetailsIdsToDelete = new();
+
+            if (SelectedDataItems.Count == 1)
+            {
+                //delete data Transaction Stock Product
+                ProductIdsToDelete = TransactionStockProducts
+                           .Where(x => x.TransactionStockId == transactionId)
+                           .Select(x => x.Id)
+                           .ToList();
+                await Mediator.Send(new DeleteTransactionStockProductRequest(ids: ProductIdsToDelete));
+
+                //Delete data transaction Detal transfer (Log)
+
+                DetailsIdsToDelete = TransactionStockDetails
+                   .Where(x => x.TransactionStockId == transactionId)
+                   .Select(x => x.Id)
+                   .ToList();
+                await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: DetailsIdsToDelete));
+
+                //Delete Transaction
+
+                await Mediator.Send(new DeleteTransactionStockRequest(SelectedDataItems[0].Adapt<TransactionStockDto>().Id));
+            }
+            else
+            {
+                foreach (var uid in id)
+                {
+                    //delete data Transaction Stock Product
+                    ProductIdsToDelete = TransactionStockProducts
+                               .Where(x => x.TransactionStockId == transactionId)
+                               .Select(x => x.Id)
+                               .ToList();
+                    await Mediator.Send(new DeleteTransactionStockProductRequest(ids: ProductIdsToDelete));
+
+                    //Delete data transaction Detal transfer (Log)
+
+                    DetailsIdsToDelete = TransactionStockDetails
+                       .Where(x => x.TransactionStockId == transactionId)
+                       .Select(x => x.Id)
+                       .ToList();
+                    await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: DetailsIdsToDelete));
+                }
+                await Mediator.Send(new DeleteTransactionStockRequest(ids: id));
+            }
+            ToastService.ShowError("Data Deleting success..");
+            await LoadData();
         }
 
         #endregion function Delete
