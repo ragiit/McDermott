@@ -2013,6 +2013,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             ToastService.ClearInfoToasts();
 
             SelectedBPJSIntegration = new();
+
+            if (result is null)
+                return;
+
             var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.InsurancePolicyId));
             if (bpjs.Count > 0)
             {
