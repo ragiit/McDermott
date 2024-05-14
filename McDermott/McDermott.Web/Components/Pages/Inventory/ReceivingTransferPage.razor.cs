@@ -101,12 +101,13 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task SelectedChangeProduct(ProductDto product)
         {
-            var productName = Products.Where(p => p.Id == product.Id).Select(x => x.Name).FirstOrDefault();
+            var productName = Products.Where(p => p.Id == product.Id).FirstOrDefault();
             var uomName = Uoms.Where(u => u.Id == product.UomId).Select(x => x.Name).FirstOrDefault();
             var purchaseName = Uoms.Where(u => u.Id == product.PurchaseUomId).Select(x => x.Name).FirstOrDefault();
             TempFormReceivingStock.PurchaseName = purchaseName;
             TempFormReceivingStock.UomName = uomName;
-            TempFormReceivingStock.ProductName = productName;
+            TempFormReceivingStock.ProductName = productName.Name;
+            //TempFormReceivingStock.TraceAbility = productName.TraceAbility;
         }
 
         private async Task HandleValidSubmit()
@@ -216,6 +217,8 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task EditItemDetail_Click()
         {
+            await GridProduct.StartEditRowAsync(FocusedRowVisibleIndex);
+            IsAddReceived = false;
         }
 
         private async Task DeleteItemDetail_Click()
@@ -240,13 +243,27 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task OnSave()
         {
+            try
+            {
+                if (FormValidationState == false)
+                {
+                    return;
+                }
+                if (FormReceivingStock.Id == 0)
+                {
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task OnSave_Detail(GridEditModelSavingEventArgs e)
         {
             try
             {
-                var tempReceiving = (ReceivingStockDetailDto)e.DataItem;
+                var tempReceiving = (ReceivingStockDetailDto)e.EditModel;
                 ReceivingStockDetailDto updates = new();
 
                 if (IsAddReceived)
@@ -260,11 +277,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                 else
                 {
                     var d = SelectedDataItemsDetail[0].Adapt<ReceivingStockDetailDto>();
-                    var checkData = TempReceivingStockDetails.FirstOrDefault(x => x.ProductId == tempReceiving.ProductId);
-                    if (checkData is not null && d.ProductId != tempReceiving.ProductId)
+                    var checkData = TempReceivingStockDetails.FirstOrDefault(x => x.ProductId == d.ProductId);
+                    if (checkData is not null && d.ProductId == tempReceiving.ProductId)
                         return;
 
-                    updates = TempReceivingStockDetails.FirstOrDefault(x => x.ProductId == tempReceiving.ProductId);
+                    updates = TempReceivingStockDetails.FirstOrDefault(x => x.ProductId == d.ProductId);
 
                     var index = TempReceivingStockDetails.IndexOf(updates!);
 
