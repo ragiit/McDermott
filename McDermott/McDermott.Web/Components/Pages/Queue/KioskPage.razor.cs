@@ -339,7 +339,7 @@ namespace McDermott.Web.Components.Pages.Queue
             var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId);
             var types = FormKios.Type;
             var InputSearch = FormKios.NumberType;
-            Patients = await Mediator.Send(new GetDataUserForKioskQuery(types, InputSearch));
+            Patients = await Mediator.Send(new GetDataUserForKioskQuery(InputSearch));
 
             if (Patients != null)
             {

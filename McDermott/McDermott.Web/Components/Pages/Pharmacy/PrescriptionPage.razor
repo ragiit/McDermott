@@ -133,7 +133,7 @@
                                                                         Data="@PreciptionLocations"
                                                                         NullText="Select Preciption Location..."
                                                                         @bind-Value="@Pharmacy.PrescriptionLocationId"
-                                                                        TextFieldName="Name"
+                                                                        TextFieldName="NameAndParent"
                                                                         ValueFieldName="Id">
                                                             </DxComboBox>
                                                             <ValidationMessage For="@(()=> Pharmacy.PrescriptionLocationId)" />

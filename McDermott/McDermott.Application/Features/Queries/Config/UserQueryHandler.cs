@@ -71,31 +71,36 @@ namespace McDermott.Application.Features.Queries.Config
             try
             {
                 List<UserDto> data = new List<UserDto>();
-                if (request.Types == "Legacy")
+
+                var result = await _unitOfWork.Repository<User>().GetAllAsync(
+                    x => x.Legacy!.Equals(request.Number) ||
+                         x.NIP!.Equals(request.Number) ||
+                         x.Oracle!.Equals(request.Number) ||
+                         x.SAP!.Equals(request.Number));
+
+                if (result != null)
                 {
-                    var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Legacy!.Equals(request.Number));
-                    data = result.Adapt<List<UserDto>>().ToList();
+                    var idUser = result.Select(x => x.Id).FirstOrDefault();
+                    if (idUser != null)
+                    {
+                        var asiop = await _unitOfWork.Repository<PatientFamilyRelation>().GetAllAsync(x => x.PatientId.Equals(idUser));
+
+                        List<UserDto> familyMembersData = new List<UserDto>();
+
+                        foreach (var i in asiop)
+                        {
+                            var familyMembers = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Id.Equals(i.FamilyMemberId));
+                            var familyMemberDtos = familyMembers.Adapt<List<UserDto>>();
+                            familyMembersData.AddRange(familyMemberDtos);
+                        }
+
+                        data = familyMembersData; // Assign the accumulated data to the final list
+                    }
                 }
-                else if (request.Types == "Oracle")
+                else
                 {
-                    var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Oracle!.Equals(request.Number));
-                    data = result.Adapt<List<UserDto>>().ToList();
                 }
-                else if (request.Types == "SAP")
-                {
-                    var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.SAP!.Equals(request.Number));
-                    data = result.Adapt<List<UserDto>>().ToList();
-                }
-                else if (request.Types == "NIP")
-                {
-                    var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.NIP!.Equals(request.Number));
-                    data = result.Adapt<List<UserDto>>().ToList();
-                }
-                else if (request.Types == "NIK")
-                {
-                    var result = await _unitOfWork.Repository<User>().GetAllAsync(x => x.NoId!.Equals(request.Number));
-                    data = result.Adapt<List<UserDto>>().ToList();
-                }
+
                 return data;
             }
             catch (Exception)

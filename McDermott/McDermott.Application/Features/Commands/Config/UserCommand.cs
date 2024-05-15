@@ -17,12 +17,10 @@
         public class GetDataUserForKioskQuery : IRequest<List<UserDto>>
         {
             public UserDto userDto { get; set; }
-            public string Types { get; set; }
             public string Number { get; set; }
 
-            public GetDataUserForKioskQuery(string Types, string Number)
+            public GetDataUserForKioskQuery(string Number)
             {
-                this.Types = Types;
                 this.Number = Number;
             }
         }

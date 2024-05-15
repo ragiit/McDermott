@@ -20,7 +20,7 @@
                     <section class="content">
                         <div class="container-fluid">
                             <div class="row justify-content-center">
-                                <div class="col-md-8">
+                                <div class="col-md-10">
                                     <div class="card mt-5">
                                         <div class="card-header bg-primary">
                                             <div class="row justify-content-start">
@@ -37,39 +37,39 @@
                                         <div class="card-body">
                                             <EditForm Model="@FormKios" Context="EditFormContext">
                                                 <DxFormLayout CssClass="mt w-100">
-                                                   
-                                                        <DxFormLayoutItem Caption="@captions" ColSpanMd="12">
-                                                            <Template>
-                                                                <DxGridLayout>
-                                                                    <Rows>
-                                                                        <DxGridLayoutRow />
-                                                                    </Rows>
-                                                                    <Columns>
-                                                                        <DxGridLayoutColumn Width="25fr" />
-                                                                        <DxGridLayoutColumn Width="5fr" />
-                                                                    </Columns>
-                                                                    <Items>
-                                                                        <DxGridLayoutItem Row="0" Column="0" CssClass="mt ">
-                                                                            <Template>
-                                                                                <DxTextBox @bind-Text="@FormKios.NumberType" NullText="Number Type..." CssClass="" ShowValidationIcon="true"></DxTextBox>
-                                                                            </Template>
-                                                                        </DxGridLayoutItem>
-                                                                        <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
-                                                                            <Template>
-                                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search" SubmitFormOnClick="true" Click="OnSearch" CssClass="w-100 me-1"></DxButton>
-                                                                            </Template>
-                                                                        </DxGridLayoutItem>
-                                                                    </Items>
-                                                                </DxGridLayout>
-                                                            </Template>
-                                                        </DxFormLayoutItem>
 
+                                                    <DxFormLayoutItem Caption="@captions" ColSpanMd="12">
+                                                        <Template>
+                                                            <DxGridLayout>
+                                                                <Rows>
+                                                                    <DxGridLayoutRow />
+                                                                </Rows>
+                                                                <Columns>
+                                                                    <DxGridLayoutColumn Width="25fr" />
+                                                                    <DxGridLayoutColumn Width="5fr" />
+                                                                </Columns>
+                                                                <Items>
+                                                                    <DxGridLayoutItem Row="0" Column="0" CssClass="mt ">
+                                                                        <Template>
+                                                                            <DxTextBox @bind-Text="@FormKios.NumberType" NullText="Number Type..." CssClass="" ShowValidationIcon="true"></DxTextBox>
+                                                                        </Template>
+                                                                    </DxGridLayoutItem>
+                                                                    <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                                        <Template>
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search" SubmitFormOnClick="true" Click="OnSearch" CssClass="w-100 me-1"></DxButton>
+                                                                        </Template>
+                                                                    </DxGridLayoutItem>
+                                                                </Items>
+                                                            </DxGridLayout>
+                                                        </Template>
+                                                    </DxFormLayoutItem>
                                                     @if (showForm)
                                                     {
+                                                        <hr />
                                                         @if (NamePatient != null)
                                                         {
                                                             <DxFormLayoutItem Caption="Patient Name" ColSpanMd="12">
-                                                                <DxTextBox @bind-Text="@NamePatient" NullText="Patient..." ReadOnly style="background-color:#949494" ShowValidationIcon="true" />
+                                                                <DxComboBox Data="@Patients" @bind-Value="FormKios.PatientId" TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
                                                             </DxFormLayoutItem>
                                                             @if (Bpjs != null)
                                                             {
