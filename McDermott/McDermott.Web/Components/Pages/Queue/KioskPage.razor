@@ -37,12 +37,7 @@
                                         <div class="card-body">
                                             <EditForm Model="@FormKios" Context="EditFormContext">
                                                 <DxFormLayout CssClass="mt w-100">
-                                                    <DxFormLayoutItem Caption="Search type" ColSpanMd="12">
-                                                        <DxComboBox Data="@type" NullText="Search type .."
-                                                                    @bind-Value="@FormKios.Type"
-                                                                    SelectedItemChanged="@((string city) => SelectedItemChanged(city))"></DxComboBox>
-                                                    </DxFormLayoutItem>
-
+                                                   
                                                         <DxFormLayoutItem Caption="@captions" ColSpanMd="12">
                                                             <Template>
                                                                 <DxGridLayout>
