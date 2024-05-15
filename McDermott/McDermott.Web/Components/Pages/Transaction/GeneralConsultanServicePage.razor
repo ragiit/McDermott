@@ -22,12 +22,12 @@
                     </div>
                 </section>
 
-                <section class="content">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col">
-                        @if (!showForm)
-                        {
+                        <section class="content">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col">
+                                @if (!showForm)
+                                {
                                             <div class="card">
                                                 <div class="card-body">
                                                     <DxLoadingPanel @bind-Visible="PanelVisible"
@@ -261,7 +261,12 @@
                                                         </div>
 
                                                     <div class="card">
-                                                            <div class="w-100">
+
+                                                        <DxLoadingPanel @bind-Visible="IsLoading"
+                        IsContentBlocked="true"
+                        CssClass="w-100"
+                        ApplyBackgroundShading="true">
+             <div class="w-100">
                                                                     <DxFormLayout>
                                                                 <DxFormLayoutGroup Caption="General" ColSpanMd="12">
                                                                     <div class="row">
@@ -1204,6 +1209,7 @@ NullText="Select Registration..."
                                                 }
                                                                                                             </div>
                                                             </div>
+        </DxLoadingPanel>
 
                                         @if (!FormRegis.StagingStatus.Equals("Waiting") && !FormRegis.StagingStatus.Equals("Confirmed") && !FormRegis.StagingStatus.Equals("Finished") && !FormRegis.StagingStatus.Equals("Canceled"))
                                         {

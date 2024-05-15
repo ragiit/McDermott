@@ -31,6 +31,9 @@
         public DateTime? AppoimentDate { get; set; }
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }
+        public string? SerialNo { get; set; } // NoUrut
+
+
 
         [SetToNull]
         public virtual User? Patient { get; set; }

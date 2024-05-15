@@ -16,7 +16,6 @@
         [Required(ErrorMessage = "The Service field is required.")]
         public long? ServiceId { get; set; }
 
-        //[Required(ErrorMessage = "The Physicion field is required.")]
         public long? PratitionerId { get; set; }
 
         public long? ClassTypeId { get; set; }
@@ -40,6 +39,7 @@
 
         public string? ScheduleTime { get; set; }
 
+        [NotMapped]
         public long? Age
         {
             get
@@ -55,6 +55,7 @@
             set
             { }
         }
+
         public DateTime? CreateDate { get; set; }
 
         [Required]
@@ -78,6 +79,7 @@
         public bool IsPharmacology { get; set; } = false;
         public bool IsFood { get; set; } = false;
         public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
+        public string? SerialNo { get; set; } // NoUrut
 
         public virtual KioskQueue? KioskQueue { get; set; }
         public virtual ClassTypeDto? ClassType { get; set; }
