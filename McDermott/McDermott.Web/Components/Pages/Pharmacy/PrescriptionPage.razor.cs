@@ -109,6 +109,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<MedicamentGroupDto> MedicamentGroups { get; set; } = [];
         private List<DrugFormDto> DrugForms { get; set; } = [];
         private List<DrugRouteDto> DrugRoutes { get; set; } = [];
+        private List<StockProductDto> StockProducts { get; set; } = [];
         private List<ActiveComponentDto> ActiveComponents { get; set; } = [];
 
         private List<string> Payments = new List<string>
@@ -117,6 +118,61 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             "Insurance",
             "BPJS"
         };
+
+        private async Task SelectedChangePractition(UserDto? user)
+        {
+            MedicamentGroups = MedicamentGroups.Where(x => x.IsConcoction == false && x.PhycisianId == user.Id).ToList();
+        }
+
+        private async Task SelectedMedicament(MedicamentGroupDto medicament)
+        {
+            var a = await Mediator.Send(new GetMedicamentGroupDetailQuery());
+            var details = a.Where(x => x.MedicamentGroupId == medicament.Id).ToList();
+            List<PrescriptionDto> prescriptionsList = new();
+
+            foreach (var item in details)
+            {
+                var checkProduct = Products.FirstOrDefault(p => p.Id == item.MedicamentId);
+                if (checkProduct == null)
+                {
+                    continue; // Skip if product is not found
+                }
+
+                var stock = StockProducts
+                    .Where(s => s.ProductId == checkProduct.Id && s.SourceId == Pharmacy.PrescriptionLocationId)
+                    .Select(x => x.Qty)
+                    .FirstOrDefault();
+
+                var medicamentDetails = Medicaments.FirstOrDefault(s => s.ProductId == checkProduct.Id);
+                if (medicamentDetails == null)
+                {
+                    continue; // Skip if medicament details are not found
+                }
+
+                var newPrescription = new PrescriptionDto
+                {
+                    ProductId = checkProduct.Id,
+                    ProductName = checkProduct.Name,
+                    Stock = stock
+                };
+
+                if (medicamentDetails.Dosage != 0 && medicamentDetails.UomId.HasValue)
+                {
+                    newPrescription.UomId = medicamentDetails.UomId;
+                    newPrescription.DosageFrequency = $"{medicamentDetails.Dosage}/{medicamentDetails.Uom.Name}";
+                }
+
+                newPrescription.DrugRouteId = medicamentDetails.RouteId;
+                newPrescription.PriceUnit = checkProduct.SalesPrice;
+                newPrescription.DrugDosageId = medicamentDetails.FrequencyId;
+                newPrescription.DrugDosageName = medicamentDetails.Frequency?.Frequency;
+                newPrescription.DrugRoutName = medicamentDetails.Route?.Route;
+
+                prescriptionsList.Add(newPrescription);
+            }
+
+            Prescriptions = prescriptionsList;
+        }
 
         #endregion Static Variables
 
@@ -136,6 +192,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Signas = await Mediator.Send(new GetSignaQuery());
             DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
             Uoms = await Mediator.Send(new GetUomQuery());
+            StockProducts = await Mediator.Send(new GetStockProductQuery());
+            Medicaments = await Mediator.Send(new GetMedicamentQuery());
             ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
 
             await GetUserInfo();
@@ -149,7 +207,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 Prescription.ProductId = null;
                 Prescription.DrugFromId = null;
-                Prescription.SignaId = null;
                 Prescription.DrugDosageId = null;
                 Prescription.DrugRouteId = null;
                 Prescription.PriceUnit = 0;
@@ -170,7 +227,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 var stock = await Mediator.Send(new GetStockProductQuery(x => x.ProductId == e.Id));
                 if (stock.Count > 0)
-                    Prescription.Stock = (float)stock.Where(x => x.StatusTransaction == "IN").Select(x => x.Qty).Sum()! - (float)stock.Where(x => x.StatusTransaction == "OUT").Select(x => x.Qty).Sum()!;
+                    Prescription.Stock = stock.Where(x => x.StatusTransaction == "IN").Select(x => x.Qty).Sum();
 
                 if (Products.Count > 0)
                 {

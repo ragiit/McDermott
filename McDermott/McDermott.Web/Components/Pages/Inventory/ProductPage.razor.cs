@@ -201,9 +201,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 StockProducts = await Mediator.Send(new GetStockProductQuery());
                 foreach (var product in Products)
                 {
-                    var stockIn = StockProducts.Where(s => s.ProductId == product.Id && s.StatusTransaction == "IN").Sum(x => x.Qty);
+                    var stockIn = StockProducts.Where(s => s.ProductId == product.Id).Sum(x => x.Qty);
                     var stockOut = StockProducts.Where(s => s.ProductId == product.Id && s.StatusTransaction == "OUT").Sum(x => x.Qty);
-                    product.Qtys = stockIn - stockOut;
+                    product.Qtys = stockIn;
                 }
 
                 // Menyembunyikan panel setelah selesai
@@ -324,9 +324,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 // Kelola informasi stok
-                var stockIN = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "IN").ToList();
+                var stockIN = StockProducts.Where(s => s.ProductId == products.Id).ToList();
                 var stockOUT = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "OUT").ToList();
-                TotalQty = stockIN.Sum(x => x.Qty) - stockOUT.Sum(x => x.Qty);
+                TotalQty = stockIN.Sum(x => x.Qty);
 
                 // Ambil nama satuan ukur
                 NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;

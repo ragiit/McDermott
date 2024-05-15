@@ -159,7 +159,7 @@
                                                     <Columns>
                                                         <DxGridSelectionColumn Width="15px" />
                                                         <DxGridDataColumn FieldName="ProductName" Caption="Product Name" SortIndex="0" />
-                                                        <DxGridDataColumn FieldName="QtyStock" Caption="Stock" MinWidth="90" Width="190" />
+                                                        <DxGridDataColumn FieldName="Qty" Caption="Stock" MinWidth="90" Width="190" />
                                                         <DxGridDataColumn FieldName="PurchaseName" Caption="Purchase Of Measure" MinWidth="90" Width="190" />
                                                         <DxGridDataColumn FieldName="UomName" Caption="Unit Of Measure" />
                                                     </Columns>
@@ -198,6 +198,19 @@
                                                             <div class="col-md-6">
                                                                 <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                     <DxTextBox @bind-Text="@TempFormReceivingStock.UomName" ReadOnly></DxTextBox>
+                                                                </DxFormLayoutItem>
+                                                            </div>
+                                                        </DxFormLayout>
+                                                        <DxFormLayout CssClass="w-100 mt">
+                                                            <div class="col-md-6">
+                                                                <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@TempFormReceivingStock.Batch" NullText="Select Serial Number/LoT" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                               ShowValidationIcon="true"></DxTextBox>
+                                                                </DxFormLayoutItem>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12" >
+                                                                    <DxDateEdit @bind-Date="@TempFormReceivingStock.ExpiredDate" DisplayFormat="dd MMMM yyyy" Format="d"></DxDateEdit>
                                                                 </DxFormLayoutItem>
                                                             </div>
                                                         </DxFormLayout>
