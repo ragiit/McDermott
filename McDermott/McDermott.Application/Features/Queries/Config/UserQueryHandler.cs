@@ -72,33 +72,49 @@ namespace McDermott.Application.Features.Queries.Config
             {
                 List<UserDto> data = new List<UserDto>();
 
+                // Fetch users based on the request number
                 var result = await _unitOfWork.Repository<User>().GetAllAsync(
                     x => x.Legacy!.Equals(request.Number) ||
                          x.NIP!.Equals(request.Number) ||
                          x.Oracle!.Equals(request.Number) ||
                          x.SAP!.Equals(request.Number));
 
-                if (result != null)
+                if (result.Count > 0)
                 {
+                    // Convert the result to UserDto and add to the data list
+                    var userDtos = result.Adapt<List<UserDto>>();
+                    data.AddRange(userDtos);
+
+                    // Get the first user's ID
                     var idUser = result.Select(x => x.Id).FirstOrDefault();
                     if (idUser != null)
                     {
+                        // Fetch patient-family relations for the user
                         var asiop = await _unitOfWork.Repository<PatientFamilyRelation>().GetAllAsync(x => x.PatientId.Equals(idUser));
 
+                        // Create a list to accumulate family members' data
                         List<UserDto> familyMembersData = new List<UserDto>();
 
-                        foreach (var i in asiop)
+                        foreach (var relation in asiop)
                         {
-                            var familyMembers = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Id.Equals(i.FamilyMemberId));
+                            // Fetch family members based on the relation's FamilyMemberId
+                            var familyMembers = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Id.Equals(relation.FamilyMemberId));
+
+                            // Convert the family members to UserDto and add to the family members' data list
                             var familyMemberDtos = familyMembers.Adapt<List<UserDto>>();
                             familyMembersData.AddRange(familyMemberDtos);
                         }
 
-                        data = familyMembersData; // Assign the accumulated data to the final list
+                        // Add the accumulated family members' data to the main data list
+                        data.AddRange(familyMembersData);
                     }
                 }
                 else
                 {
+                    var dataBPJS = await _unitOfWork.Repository<InsurancePolicy>().GetAllAsync(x => x.PolicyNumber!.Equals(request.Number));
+                    var bpjsId = dataBPJS.Select(x => x.UserId).FirstOrDefault();
+                    var cekUser = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Id!.Equals(bpjsId));
+                    data = cekUser.Adapt<List<UserDto>>().ToList();
                 }
 
                 return data;
