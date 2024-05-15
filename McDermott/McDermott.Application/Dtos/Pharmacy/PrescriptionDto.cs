@@ -15,6 +15,7 @@
         public string? DrugRoutName { get; set; }
         public string? DrugDosageName { get; set; }
         public long? Stock { get; set; } // product stock
+        public long? Dosage { get; set; }
         public long? PrescribedAmount { get; set; } // jumlah yg diresepkan
         public long? GivenAmount { get; set; } // jumlah yg diberikan
         public long? PriceUnit { get; set; }

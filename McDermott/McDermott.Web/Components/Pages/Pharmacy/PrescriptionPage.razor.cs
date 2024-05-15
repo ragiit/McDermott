@@ -156,16 +156,16 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     Stock = stock
                 };
 
-                if (medicamentDetails.Dosage != 0 && medicamentDetails.UomId.HasValue)
+                if (medicamentDetails.Dosage != 0 && medicamentDetails.FrequencyId.HasValue)
                 {
-                    newPrescription.UomId = medicamentDetails.UomId;
-                    newPrescription.DosageFrequency = $"{medicamentDetails.Dosage}/{medicamentDetails.Uom.Name}";
+                    newPrescription.DrugDosageId = medicamentDetails.FrequencyId;
+                    newPrescription.Dosage = medicamentDetails.Dosage;
+                    newPrescription.DosageFrequency = $"{medicamentDetails.Dosage}/{medicamentDetails.Frequency?.Frequency}";
                 }
 
+                newPrescription.UomId = medicamentDetails.UomId;
                 newPrescription.DrugRouteId = medicamentDetails.RouteId;
                 newPrescription.PriceUnit = checkProduct.SalesPrice;
-                newPrescription.DrugDosageId = medicamentDetails.FrequencyId;
-                newPrescription.DrugDosageName = medicamentDetails.Frequency?.Frequency;
                 newPrescription.DrugRoutName = medicamentDetails.Route?.Route;
 
                 prescriptionsList.Add(newPrescription);
