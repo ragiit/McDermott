@@ -1592,6 +1592,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("ScheduleTime")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("SerialNo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long?>("ServiceId")
                         .HasColumnType("bigint");
 
