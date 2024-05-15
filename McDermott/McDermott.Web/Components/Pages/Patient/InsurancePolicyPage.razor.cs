@@ -97,7 +97,7 @@
             await LoadData();
         }
 
-        private async Task LoadData()
+        private async Task LoadData(bool v = false)
         {
             PanelVisible = true;
             ShowForm = false;
@@ -111,6 +111,9 @@
             {
                 InsurancePolicies = InsurancePolicies.Where(x => x.UserId == User.Id).ToList();
             }
+
+            if (v)
+                User = new() { Name = "-" };
 
             PanelVisible = false;
         }

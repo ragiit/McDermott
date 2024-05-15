@@ -1,6 +1,7 @@
 ﻿using LZStringCSharp;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -187,16 +188,33 @@ namespace McDermott.Application.Features.Services
 
                     if (data.response is not null)
                     {
+                        if (Convert.ToInt32(response.StatusCode) == 412 && data.response is null)
+                            return (await response.Content.ReadAsStringAsync(), Convert.ToInt32(response.StatusCode));
+
                         string a = cons + secretKey + t;
-                        string r = data.response;
+                        dynamic r = data.response;
                         dynamic metaData = data.metaData;
+
+                        if (r is JArray responseArray)
+                        {
+                            // Iterate over each item in the response array
+                            var rr = string.Empty;
+                            foreach (dynamic item in responseArray)
+                            {
+                                string field = item.field;
+                                string message = item.message;
+
+                                rr += $"{field} {message} ";
+                            }
+                            return (rr, Convert.ToInt32(response.StatusCode));
+                        }
 
                         if (r is null)
                         {
                             return (metaData.message, Convert.ToInt32(response.StatusCode));
                         }
 
-                        string LZDecrypted = PCareWebServiceDecrypt(a, r);
+                        string LZDecrypted = PCareWebServiceDecrypt(a, Convert.ToString(r));
                         string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
 
                         Console.WriteLine($"Response: {JsonConvert.DeserializeObject(result)}");
