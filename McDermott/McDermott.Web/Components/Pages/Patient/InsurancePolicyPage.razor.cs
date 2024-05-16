@@ -157,7 +157,10 @@
 
                 await LoadData();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task OnSave()

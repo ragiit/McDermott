@@ -1,34 +1,24 @@
-﻿<style>
+﻿<section class="content-wrapper">
+    <DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                    CssClass="loading-panel"
+                    IndicatorVisible="true"
+                    IndicatorAreaVisible="true"
+                    Visible="true"
+                    Text="Processing..."
+                    TextAlignment="LoadingPanelTextAlignment.Right">
+        <div style="min-height: 50px;"></div>
+    </DxLoadingPanel>
+</section> 
 
+<style>
+    .tengah {
+        -ms-flex-align: center;
+        align-items: center; 
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-direction: column;
+        flex-direction: column; 
+        -ms-flex-pack: center;
+        justify-content: center;
+    }
 </style>
-
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="loading-panel-container">
-                            <DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                            CssClass="loading-panel"
-                                            IndicatorVisible="indicatorVisible"
-                                            IndicatorAreaVisible="indicatorAreaVisible"
-                                            Visible="true"
-                                            Text="Processing..."
-                                            TextAlignment="textAlignment">
-                                <div style="min-height: 50px;"></div>
-                            </DxLoadingPanel>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-@code {
-    bool indicatorVisible = true;
-    bool indicatorAreaVisible = true;
-
-    LoadingPanelTextAlignment textAlignment = LoadingPanelTextAlignment.Right;
-}

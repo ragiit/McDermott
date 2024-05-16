@@ -44,7 +44,23 @@ namespace McDermott.Persistence.Repositories
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
-            return await _dbContext.SaveChangesAsync(cancellationToken);
+            try
+            {
+
+                return await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(
+                  "\n\n" +
+                  "==================== START SAVE ASYNC ERROR ====================" + "\n" +
+                  "Message =====> " + ex.Message + "\n" +
+                  "Inner Message =====> " + ex.InnerException?.Message + "\n" +
+                  "Stack Trace =====> " + ex.StackTrace?.Trim() + "\n" +
+                  "==================== END SAVE ASYNC ERROR ====================" + "\n"
+                  );
+                throw;
+            }
         }
 
         public Task<int> SaveAndRemoveCache(CancellationToken cancellationToken, params string[] cacheKeys)

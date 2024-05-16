@@ -141,6 +141,26 @@ namespace McDermott.Persistence.Context
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
 
+            modelBuilder.Entity<User>()
+                   .HasIndex(e => e.NIP)
+                   .IsUnique();
+
+            modelBuilder.Entity<User>()
+                  .HasIndex(e => e.Oracle)
+                  .IsUnique();
+
+            modelBuilder.Entity<User>()
+                  .HasIndex(e => e.SAP)
+                  .IsUnique();
+
+            modelBuilder.Entity<User>()
+                  .HasIndex(e => e.Legacy)
+                  .IsUnique();
+
+            modelBuilder.Entity<InsurancePolicy>()
+                  .HasIndex(e => e.NoCard)
+                  .IsUnique();
+
             modelBuilder.Entity<ReceivingStockDetail>()
               .HasOne(h => h.Product)
               .WithMany(m => m.ReceivingStockDetail)

@@ -101,7 +101,7 @@ namespace McDermott.Web.Components.Pages.BpjsIntegration
         {
             PanelVisible = true;
 
-            var response = await PcareService.SendPCareService($"diagnosa/{SelectedDiagnosis.Code}/{parameter1}/{parameter2}", HttpMethod.Get);
+            var response = await PcareService.SendPCareService($"diagnosa/{SelectedDiagnosis.Name}/{parameter1}/{parameter2}", HttpMethod.Get);
 
             if (response.Item2 != 200)
             {
