@@ -141,6 +141,8 @@ namespace McDermott.Application.Dtos.Config
         public string? setNameFamily => $"{Name}({FamilyRelation})";
         public DateTime? JoinDate { get; set; }
         public List<long>? DoctorServiceIds { get; set; } = [];
+        public List<long> PatientAllergyIds { get; set; } = new List<long>();
+
 
         [SetToNull]
         public virtual SpecialityDto? Speciality { get; set; }

@@ -744,61 +744,7 @@
                                                                         ShowValidationIcon="true"
                                                                         Rows="1" />
                                                             }
-                                                        </DxFormLayoutItem>
-                                                        @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Other Examination" ColSpanMd="12">
-                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsOtherExaminationECG" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem ColSpanMd="12">
-                                                <Template>
-                                                <DxGridLayout>
-                                                <Rows>
-                                                <DxGridLayoutRow />
-                                                <DxGridLayoutRow />
-                                                </Rows>
-                                                <Columns>
-                                                <DxGridLayoutColumn />
-                                                </Columns>
-                                                <Items>
-                                                <DxGridLayoutItem Row="0" Column="0">
-                                                <Template>
-                                                @if (Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherExaminationECG))
-                                                {
-                                                <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherExaminationTypeECG"
-                                                NullText="Examination Type..."
-                                                ShowValidationIcon="true"
-                                                Rows="1" />
-                                                }
-                                                </Template>
-                                                </DxGridLayoutItem>
-                                                <DxGridLayoutItem Row="1" Column="0" CssClass="mt-1">
-                                                <Template>
-                                                @if (Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherExaminationECG))
-                                                {
-                                                <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherExaminationRemarkECG"
-                                                NullText="Remark..."
-                                                ShowValidationIcon="true"
-                                                Rows="1" />
-                                                }
-                                                </Template>
-                                                </DxGridLayoutItem>
-                                                </Items>
-                                                </DxGridLayout>
-
-                                                </Template>
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
-                                                <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.DrugEximinationAttachment"
-                                                ShowValidationIcon="true"
-                                                ReadOnly="true"
-                                                MaskMode="MaskMode.RegEx">
-                                                <Buttons>
-                                                <InputFile id="drugFile" OnChange="@SelectFilesDrug" multiple="false" style="display:none" />
-                                                <DxEditorButton Click="SelectFileDrug" IconCssClass="fa-solid fa-upload" />
-                                                <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.DrugEximinationAttachment)" IconCssClass="fa-solid fa-download" />
-                                                <DxEditorButton Click="RemoveSelectedFileDrug" IconCssClass="fa-solid fa-trash" />
-                                                </Buttons>
-                                                </DxMaskedInput>
-                                                </DxFormLayoutItem> *@
+                                                        </DxFormLayoutItem> 
                                                     </Items>
                                                 </DxFormLayoutGroup>
 

@@ -33,6 +33,7 @@ global using DevExpress.Data.XtraReports.Native;
 
 global using OfficeOpenXml;
 
+global using static McDermott.Application.Features.Commands.BpjsIntegration.AllergyCommand;
 global using static McDermott.Application.Features.Commands.BpjsIntegration.AwarenessCommand;
 global using static McDermott.Application.Features.Commands.Bpjs.SystemParameterCommand;
 global using static McDermott.Application.Features.Commands.Bpjs.BPJSIntegrationCommand;

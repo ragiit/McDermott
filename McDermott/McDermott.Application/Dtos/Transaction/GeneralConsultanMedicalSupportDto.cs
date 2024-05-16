@@ -80,7 +80,7 @@
             }
         }
 
-        private bool _AmphetaminesNegative = false;
+        private bool _AmphetaminesNegative = true;
         private bool _AmphetaminesPositive = false;
 
         public bool AmphetaminesNegative
@@ -110,7 +110,7 @@
         }
 
 
-        private bool _BenzodiazepinesNegative = false;
+        private bool _BenzodiazepinesNegative { get; set; } = true;
         private bool _BenzodiazepinesPositive = false;
 
         public bool BenzodiazepinesNegative
@@ -141,7 +141,7 @@
 
         // Lanjutkan dengan pola yang sama untuk properti-properti lainnya
 
-        private bool _CocaineMetabolitesNegative = false;
+        private bool _CocaineMetabolitesNegative { get; set; } = true;
         private bool _CocaineMetabolitesPositive = false;
 
         public bool CocaineMetabolitesNegative
@@ -170,7 +170,7 @@
             }
         }
 
-        private bool _OpiatesNegative = false;
+        private bool _OpiatesNegative = true;
         private bool _OpiatesPositive = false;
 
         public bool OpiatesNegative
@@ -199,7 +199,7 @@
             }
         }
 
-        private bool _MethamphetaminesNegative = false;
+        private bool _MethamphetaminesNegative = true;
         private bool _MethamphetaminesPositive = false;
 
         public bool MethamphetaminesNegative
@@ -228,7 +228,7 @@
             }
         }
 
-        private bool _THCCannabinoidMarijuanaNegative = false;
+        private bool _THCCannabinoidMarijuanaNegative = true;
         private bool _THCCannabinoidMarijuanaPositive = false;
 
         public bool THCCannabinoidMarijuanaNegative
