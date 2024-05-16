@@ -44,26 +44,27 @@ namespace McDermott.Web.Extentions
                 switch (sqlException.Number)
                 {
                     case 547:
-                        errorMessage = "Data cannot be deleted because it is associated with another entity. \n" + sqlException.Message;
+                        errorMessage = "Data cannot be deleted because it is associated with another entity.";
                         break;
                     // Add more cases as needed for specific SQL error numbers
                     default:
-                        errorMessage = "An error occurred in the database: " + sqlException.Message;
+                        errorMessage = "An error occurred in the database, Code: " + sqlException.ErrorCode;
                         break;
                 }
             }
             else
             {
-                errorMessage = "An error occurred: " + ex.Message;
+                errorMessage = "An error occurred";
             }
 
             Log.Error(
-                  "\n" +
+                  "\n\n" +
                   "==================== START ERROR ====================" + "\n" +
-                  "Message: " + ex.Message + "\n" +
-                  "Inner Message: " + ex.InnerException?.Message + "\n" +
-                  "Stack Trace: " + ex.StackTrace + "\n" +
-                  "==================== END ERROR ====================" + "\n");
+                  "Message =====> " + ex.Message + "\n" +
+                  "Inner Message =====> " + ex.InnerException?.Message + "\n" +
+                  "Stack Trace =====> " + ex.StackTrace?.Trim() + "\n" +
+                  "==================== END ERROR ====================" + "\n"
+                  );
 
             toastService.ClearErrorToasts();
             toastService.ShowError(errorMessage);
