@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Employee
+﻿using System.Linq.Expressions;
+
+namespace McDermott.Web.Components.Pages.Employee
 {
     public partial class EmployeePage
     {
@@ -152,12 +154,115 @@
             ShowForm = false;
         }
 
+        private async Task<bool> CheckExistingNumber(Expression<Func<User, bool>> predicate, string numberType)
+        {
+            var users = await Mediator.Send(new GetUserQuery(predicate));
+            var isOkOk = false;
+            if (users.Count > 0 && (UserForm.Id == 0 || users[0].Id != UserForm.Id))
+            {
+                ToastService.ShowInfo($"{numberType} Number already exists");
+                isOkOk = true;
+            }
+            return isOkOk;
+        }
+
+        public async Task<bool> CheckUserFormAsync()
+        {
+            var checks = new List<Func<Task<bool>>>
+            {
+                () => CheckExistingNumber(x => UserForm.NIP != null && x.IsEmployee == true && x.NIP != null && x.NIP.ToLower().Trim().Contains(UserForm.NIP.ToLower().Trim()), "NIP"),
+                () => CheckExistingNumber(x => UserForm.Oracle != null && x.IsEmployee == true && x.Oracle != null && x.Oracle.ToLower().Trim().Contains(UserForm.Oracle.ToLower().Trim()), "Oracle"),
+                () => CheckExistingNumber(x => UserForm.Legacy != null && x.IsEmployee == true && x.Legacy != null && x.Legacy.ToLower().Trim().Contains(UserForm.Legacy.ToLower().Trim()), "Legacy"),
+                () => CheckExistingNumber(x => UserForm.SAP != null && x.IsEmployee == true && x.SAP != null && x.SAP.ToLower().Trim().Contains(UserForm.SAP.ToLower().Trim()), "SAP")
+            };
+
+            var isOkOk = true;
+
+            foreach (var check in checks)
+            {
+                if (await check())
+                {
+                    isOkOk = false;
+                }
+            }
+
+            return isOkOk;
+
+        }
+
+
         private async Task OnSave()
         {
             if (!FormValidationState)
                 return;
 
             UserForm.IsEmployee = true;
+
+            ToastService.ClearInfoToasts();
+
+            var isOk = await CheckUserFormAsync();
+            if (!isOk)
+                return;
+
+            //var checkNipNumber = await Mediator.Send(new GetUserQuery(x => UserForm.NIP != null && x.IsEmployee == true && x.NIP != null && x.NIP.ToLower().Trim().Contains(UserForm.NIP.ToLower().Trim())));
+            //var checkOracleumber = await Mediator.Send(new GetUserQuery(x => UserForm.Oracle != null && x.IsEmployee == true && x.Oracle != null && x.Oracle.ToLower().Trim().Contains(UserForm.Oracle.ToLower().Trim())));
+            //var checkLegacyNumber = await Mediator.Send(new GetUserQuery(x => UserForm.Legacy != null && x.IsEmployee == true && x.Legacy != null && x.Legacy.ToLower().Trim().Contains(UserForm.Legacy.ToLower().Trim())));
+            //var checkSapNumber = await Mediator.Send(new GetUserQuery(x => UserForm.SAP != null && x.IsEmployee == true && x.SAP != null && x.SAP.ToLower().Trim().Contains(UserForm.SAP.ToLower().Trim())));
+
+            //if (UserForm.Id == 0)
+            //{
+            //    bool b = false;
+            //    if (checkNipNumber.Count > 0)
+            //    {
+            //        b = true;
+            //        ToastService.ShowInfo("NIP Number already exist");
+            //    }
+            //    if (checkOracleumber.Count > 0)
+            //    {
+            //        b = true;
+            //        ToastService.ShowInfo("Oracle Number already exist");
+            //    }
+            //    if (checkLegacyNumber.Count > 0)
+            //    {
+            //        b = true;
+            //        ToastService.ShowInfo("Legacy Number already exist");
+            //    }
+            //    if (checkSapNumber.Count > 0)
+            //    {
+            //        b = true;
+            //        ToastService.ShowInfo("SAP Number already exist");
+            //    }
+
+            //    if (b)
+            //        return;
+            //}
+            //else
+            //{
+            //    bool b = false;
+            //    if (checkNipNumber.Count > 0 && checkNipNumber[0].Id != UserForm.Id)
+            //    {
+            //        b = true;
+            //        ToastService.ShowInfo("NIP Number already exist");
+            //    }
+            //    if (checkOracleumber.Count > 0 && checkOracleumber[0].Id != UserForm.Id)
+            //    {
+            //        b = true;
+            //        ToastService.ShowInfo("Oracle Number already exist");
+            //    }
+            //    if (checkLegacyNumber.Count > 0 && checkLegacyNumber[0].Id != UserForm.Id)
+            //    {
+            //        b = true;
+            //        ToastService.ShowInfo("Legacy Number already exist");
+            //    }
+            //    if (checkSapNumber.Count > 0 && checkSapNumber[0].Id != UserForm.Id)
+            //    {
+            //        b = true;
+            //        ToastService.ShowInfo("SAP Number already exist");
+            //    }
+
+            //    if (b)
+            //        return;
+            //}
 
             if (UserForm.IsSameDomicileAddress)
             {

@@ -1230,7 +1230,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
 
-                if (responseApi.Item2 != 200)
+                if (responseApi.Item2 != 201)
                 {
                     if (responseApi.Item2 == 412)
                         ToastService.ShowError($"{data.message}\n Code: {responseApi.Item2}");
@@ -1241,7 +1241,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     return false;
                 }
                 else
-                    FormRegis.SerialNo = data.response.message;
+                    FormRegis.SerialNo = data.message;
             }
             return true;
         }

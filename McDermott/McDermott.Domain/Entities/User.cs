@@ -80,6 +80,7 @@
         public string? EmployeeType { get; set; }
         public string? EmployeeStatus { get; set; }
         public DateTime? JoinDate { get; set; }
+
         public string? NIP { get; set; }
         public string? Legacy { get; set; }
         public string? SAP { get; set; }
