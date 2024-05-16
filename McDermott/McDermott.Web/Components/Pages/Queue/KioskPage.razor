@@ -4,6 +4,15 @@
 @inject NavigationManager NavigationManager
 
 <PageTitle>McHealthCare - Queue Kiosk</PageTitle>
+
+<style>
+    .centered-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+</style>
 @if (IsAccess)
 {
     @if (Id != 0)
@@ -18,8 +27,8 @@
                             Text="Fetching Data...">
                 <div class="wrapper">
                     <section class="content">
-                        <div class="container-fluid">
-                            <div class="row justify-content-center">
+                        <div class="container-fluid ">
+                            <div class="row centered-container">
                                 <div class="col-md-10">
                                     <div class="card mt-5">
                                         <div class="card-header bg-primary">
@@ -69,7 +78,7 @@
                                                         @if (NamePatient != null)
                                                         {
                                                             <DxFormLayoutItem Caption="Patient Name" ColSpanMd="12">
-                                                                <DxComboBox Data="@Patients" @bind-Value="FormKios.PatientId" TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
+                                                                <DxComboBox Data="@Patients" @bind-Value="FormKios.PatientId" TextFieldName="setNameFamily" ValueFieldName="Id"></DxComboBox>
                                                             </DxFormLayoutItem>
                                                             @if (Bpjs != null)
                                                             {
@@ -170,57 +179,50 @@
         }
         else
         {
-            <div class="content">
-                <div class="container-fluid">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8">
-                            <div class="card custom-card custom-card-image">
-
-                                <div class="card-body">
-                                    <div class="row justify-content-center">
-                                        <div class="col-md">
-                                            <div class="card shadow-sm mb-5 bg-white rounded ">
-                                                <div class="card-body py-0">
-                                                    <p class="fs-3 my-0 text-center text-success">Your Number Queue is Generated Succcesfully!!</p>
-                                                </div>
-                                            </div>
-                                        </div>
+            <div class="centered-container">
+                <div class="card custom-card custom-card-image">
+                    <div class="card-body">
+                        <div class="row justify-content-center">
+                            <div class="col-md">
+                                <div class="card shadow-sm mb-5 bg-white rounded ">
+                                    <div class="card-body py-0">
+                                        <p class="fs-3 my-0 text-center text-success">Your Number Queue is Generated Succcesfully!!</p>
                                     </div>
-                                    <div class="row justify-content-center">
-                                        <div class="col-md-6 align-self-center">
-                                            <div class="card rounded-3">
-                                                <div class="card-body">
-                                                    <h4 class="mt fw-bold text-center">Number Queue</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="col-md-6 align-self-center">
+                                <div class="card rounded-3">
+                                    <div class="card-body">
+                                        <h4 class="mt fw-bold text-center">Number Queue</h4>
 
-                                                    <h1 class="mt-1 fw-bolder display-1 text-center"> @string.Format("{0:D3}", ViewQueue is not null ? ViewQueue.QueueNumber : string.Empty)</h1>
+                                        <h1 class="mt-1 fw-bolder display-1 text-center"> @string.Format("{0:D3}", ViewQueue is not null ? ViewQueue.QueueNumber : string.Empty)</h1>
 
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
 
-                                    <div class="row mt-3 border-start-0 border-end-0 justify-content-center">
-                                        <div class="col-md-10 align-self-center" ml-5>
-                                            <div class="row justify-content-between">
-                                                <div class="col-md-4">
-                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-trash" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Canceled" Click="@(() => OnCanceled(ViewQueue.Id))"></DxButton>
-                                                </div>
-                                                @* <div class="col-md-4">
-                                    <DxButton RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-print" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Print"></DxButton>
-                                    </div> *@
-                                                <div class="col-md-4">
-                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Closed" Click="OnCancel"></DxButton>
-                                                </div>
-                                            </div>
-                                        </div>
+                        <div class="row mt-3 border-start-0 border-end-0 justify-content-center">
+                            <div class="col-md-10 align-self-center" ml-5>
+                                <div class="row justify-content-between">
+                                    <div class="col-md-4">
+                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-trash" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Canceled" Click="@(() => OnCanceled(ViewQueue.Id))"></DxButton>
+                                    </div>
+                                    @* <div class="col-md-4">
+                        <DxButton RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-print" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Print"></DxButton>
+                        </div> *@
+                                    <div class="col-md-4">
+                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Closed" Click="OnCancel"></DxButton>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
-
         }
     }
 

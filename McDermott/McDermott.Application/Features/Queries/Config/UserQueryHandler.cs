@@ -83,6 +83,11 @@ namespace McDermott.Application.Features.Queries.Config
                 {
                     // Convert the result to UserDto and add to the data list
                     var userDtos = result.Adapt<List<UserDto>>();
+                    foreach (var userDto in userDtos)
+                    {
+                        // Set RelationshipType to "Employee" for userDtos
+                        userDto.FamilyRelation = "Employee";
+                    }
                     data.AddRange(userDtos);
 
                     // Get the first user's ID
@@ -99,9 +104,15 @@ namespace McDermott.Application.Features.Queries.Config
                         {
                             // Fetch family members based on the relation's FamilyMemberId
                             var familyMembers = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Id.Equals(relation.FamilyMemberId));
+                            var FamilyId = await _unitOfWork.Repository<Family>().GetAllAsync(x => x.Id.Equals(relation.FamilyId));
+                            var nameFamily = FamilyId.Select(x => x.Name).FirstOrDefault();
 
                             // Convert the family members to UserDto and add to the family members' data list
                             var familyMemberDtos = familyMembers.Adapt<List<UserDto>>();
+                            foreach (var familyMemberDto in familyMemberDtos)
+                            {
+                                familyMemberDto.FamilyRelation = nameFamily;  // Assuming the relation entity has a RelationshipType property
+                            }
                             familyMembersData.AddRange(familyMemberDtos);
                         }
 

@@ -9,6 +9,7 @@ namespace McDermott.Application.Dtos.Config
 
         [Required]
         public string Name { get; set; } = string.Empty;
+
         public string PhysicanCode { get; set; } = string.Empty;
 
         //[Required]
@@ -136,11 +137,14 @@ namespace McDermott.Application.Dtos.Config
         }
 
         public string? EmployeeStatus { get; set; }
+        public string? FamilyRelation { get; set; }
+        public string? setNameFamily => $"{Name}({FamilyRelation})";
         public DateTime? JoinDate { get; set; }
         public List<long>? DoctorServiceIds { get; set; } = [];
 
         [SetToNull]
         public virtual SpecialityDto? Speciality { get; set; }
+
         [SetToNull]
         public virtual GenderDto? Gender { get; set; }
 
