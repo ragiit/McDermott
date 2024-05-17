@@ -1,4 +1,5 @@
 ﻿using McDermott.Application.Dtos.Queue;
+using System.Drawing;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 
@@ -164,7 +165,7 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 ActiveBack = false;
             }
-            else if (NameGroup.Name == "Nurse" || NameGroup.Name == "Perawat")
+            else if (NameGroup.Name == "Nurse" || NameGroup.Name == "Perawat" || NameGroup.Name == "Nursing")
             {
                 ActiveBack = true;
             }
@@ -388,6 +389,74 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 showForm = false;
             }
+        }
+
+        private async Task onPrint()
+        {
+            var aas = ViewQueue.QueueNumber.ToString();
+            string queueNumber = aas.PadLeft(3, '0');
+
+            // HTML untuk dokumen cetak
+            string contentToPrint = $@"
+            <!DOCTYPE html>
+            <html lang='en'>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <title>Cetak Antrian</title>
+                <style>
+                    @page {{
+                        size: 8cm 8cm; /* Ukuran kertas 8x8 cm */
+                        margin: 0; /* Hilangkan margin default */
+                    }}
+                    body {{
+                        font-family: Arial, sans-serif;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        padding: 0;
+                    }}
+                    .print-container {{
+                        text-align: center;
+                        width: 8cm;
+                        height: 8cm;
+                        padding: 20px;
+                        box-sizing: border-box;
+                    }}
+                    .company-logo img {{
+                        width: 50px;
+                        height: auto;
+                        margin-bottom: 10px;
+                    }}
+                    .company-name {{
+                        font-size: 18px;
+                        font-weight: bold;
+                        margin-bottom: 10px;
+                    }}
+                    .queue-label {{
+                        font-size: 14px;
+                        margin-bottom: 5px;
+                    }}
+                    .queue-number {{
+                        font-size: 48px;
+                        font-weight: bold;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='print-container'>
+                    <div class='company-logo'><img src='/image/bgCounter.jpg' alt='Logo Perusahaan'></div>
+                    <div class='company-name'>McHealthCare</div>
+                    <div class='queue-label'>Your Number :</div>
+                    <div class='queue-number'>{queueNumber}</div>
+                </div>
+            </body>
+            </html>";
+
+            // Panggil JavaScript Interop untuk memicu pencetakan
+            await JsRuntime.InvokeVoidAsync("printJS", contentToPrint);
         }
 
         #endregion Button Function

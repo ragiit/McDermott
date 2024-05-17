@@ -138,7 +138,7 @@ namespace McDermott.Application.Dtos.Config
 
         public string? EmployeeStatus { get; set; }
         public string? FamilyRelation { get; set; }
-        public string? setNameFamily => $"{Name}({FamilyRelation})";
+        public string? setNameFamily => $"{Name} ({FamilyRelation})";
         public DateTime? JoinDate { get; set; }
         public List<long>? DoctorServiceIds { get; set; } = [];
 

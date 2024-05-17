@@ -26,145 +26,144 @@
                             IndicatorAreaVisible="false"
                             Text="Fetching Data...">
                 <div class="wrapper">
-                    <section class="content">
-                        <div class="container-fluid ">
-                            <div class="row centered-container">
-                                <div class="col-md-10">
-                                    <div class="card mt-5">
-                                        <div class="card-header bg-primary">
-                                            <div class="row justify-content-start">
-                                                <div class="col-md-3">
-                                                    <DxButton Text="back" Visible="@ActiveBack"></DxButton>
-                                                </div>
-                                            </div>
-                                            <div class="row justify-content-center">
-                                                <div class="col-auto align-self-center">
-                                                    <h4 class="fw-bold">@HeaderName.ToUpper()</h4>
-                                                </div>
+
+                    <div class="container-fluid ">
+                        <div class="row centered-container">
+                            <div class="col-md-10">
+                                <div class="card mt-5">
+                                    <div class="card-header bg-primary">
+                                        <div class="row justify-content-start">
+                                            <div class="col-md-3">
+                                                <DxButton Text="back" Visible="@ActiveBack"></DxButton>
                                             </div>
                                         </div>
-                                        <div class="card-body">
-                                            <EditForm Model="@FormKios" Context="EditFormContext">
-                                                <DxFormLayout CssClass="mt w-100">
+                                        <div class="row justify-content-center">
+                                            <div class="col-auto align-self-center">
+                                                <h4 class="fw-bold">@HeaderName.ToUpper()</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <EditForm Model="@FormKios" Context="EditFormContext">
+                                            <DxFormLayout CssClass="mt w-100">
 
-                                                    <DxFormLayoutItem Caption="@captions" ColSpanMd="12">
-                                                        <Template>
-                                                            <DxGridLayout>
-                                                                <Rows>
-                                                                    <DxGridLayoutRow />
-                                                                </Rows>
-                                                                <Columns>
-                                                                    <DxGridLayoutColumn Width="25fr" />
-                                                                    <DxGridLayoutColumn Width="5fr" />
-                                                                </Columns>
-                                                                <Items>
-                                                                    <DxGridLayoutItem Row="0" Column="0" CssClass="mt ">
-                                                                        <Template>
-                                                                            <DxTextBox @bind-Text="@FormKios.NumberType" NullText="Number Type..." CssClass="" ShowValidationIcon="true"></DxTextBox>
-                                                                        </Template>
-                                                                    </DxGridLayoutItem>
-                                                                    <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
-                                                                        <Template>
-                                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search" SubmitFormOnClick="true" Click="OnSearch" CssClass="w-100 me-1"></DxButton>
-                                                                        </Template>
-                                                                    </DxGridLayoutItem>
-                                                                </Items>
-                                                            </DxGridLayout>
-                                                        </Template>
-                                                    </DxFormLayoutItem>
-                                                    @if (showForm)
+                                                <DxFormLayoutItem Caption="@captions" ColSpanMd="12">
+                                                    <Template>
+                                                        <DxGridLayout>
+                                                            <Rows>
+                                                                <DxGridLayoutRow />
+                                                            </Rows>
+                                                            <Columns>
+                                                                <DxGridLayoutColumn Width="25fr" />
+                                                                <DxGridLayoutColumn Width="5fr" />
+                                                            </Columns>
+                                                            <Items>
+                                                                <DxGridLayoutItem Row="0" Column="0" CssClass="mt ">
+                                                                    <Template>
+                                                                        <DxTextBox @bind-Text="@FormKios.NumberType" NullText="Number Type..." CssClass="" ShowValidationIcon="true"></DxTextBox>
+                                                                    </Template>
+                                                                </DxGridLayoutItem>
+                                                                <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                                    <Template>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search" SubmitFormOnClick="true" Click="OnSearch" CssClass="w-100 me-1"></DxButton>
+                                                                    </Template>
+                                                                </DxGridLayoutItem>
+                                                            </Items>
+                                                        </DxGridLayout>
+                                                    </Template>
+                                                </DxFormLayoutItem>
+                                                @if (showForm)
+                                                {
+                                                    <hr />
+                                                    @if (NamePatient != null)
                                                     {
-                                                        <hr />
-                                                        @if (NamePatient != null)
-                                                        {
-                                                            <DxFormLayoutItem Caption="Patient Name" ColSpanMd="12">
-                                                                <DxComboBox Data="@Patients" @bind-Value="FormKios.PatientId" TextFieldName="setNameFamily" ValueFieldName="Id"></DxComboBox>
-                                                            </DxFormLayoutItem>
-                                                            @if (Bpjs != null)
-                                                            {
-                                                                <DxFormLayoutItem Caption="BPJS" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@FormKios.BPJS" ReadOnly style="background-color:#949494" />
-                                                                </DxFormLayoutItem>
-                                                                <DxFormLayoutItem Caption=" BPJS Status" ColSpanMd="12">
-                                                                    @if (FormKios.BPJS != null)
-                                                                    {
-                                                                        <h6 class="text-success">
-                                                                            <i class="fa-solid fa-circle" style="color: #05e401;"></i>
-                                                                            @statBPJS
-                                                                        </h6>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <h6 class="text-danger">
-                                                                            <i class="fa-solid fa-circle" style="color: #d20404;"></i>
-                                                                            @statBPJS
-                                                                        </h6>
-                                                                    }
-                                                                </DxFormLayoutItem>
-                                                            }
-                                                            @if (showClass)
-                                                            {
-                                                                <DxFormLayoutItem Caption="Patient Class" ColSpanMd="12">
-                                                                    <DxComboBox Data="@classTypes"
-                                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                                NullText="Select Service.."
-                                                                                @bind-Value="@FormKios.ClassTypeId"
-                                                                                TextFieldName="Name"
-                                                                                ValueFieldName="Id" ShowValidationIcon="true"></DxComboBox>
-                                                                </DxFormLayoutItem>
-                                                            }
-                                                            @if (CountServiceId > 1)
-                                                            {
-                                                                <DxFormLayoutItem Caption="Service" ColSpanMd="12">
-                                                                    <DxComboBox Data="@serv"
-                                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                                NullText="Select Service.."
-                                                                                @bind-Value="@ServiceId"
-                                                                                TextFieldName="Name"
-                                                                                ValueFieldName="Id" ShowValidationIcon="true"></DxComboBox>
-                                                                </DxFormLayoutItem>
-                                                            }
-                                                            else
-                                                            {
-                                                                <DxFormLayoutItem Caption="Service" ColSpanMd="12">
-                                                                    <DxComboBox Data="@Services"
-                                                                                @bind-Value="@FormKios.ServiceId"
-                                                                                TextFieldName="Name"
-                                                                                ValueFieldName="Id"
-                                                                                ReadOnly="true"
-                                                                                ShowValidationIcon="true" />
+                                                        <DxFormLayoutItem Caption="Patient Name" ColSpanMd="12">
+                                                            <DxComboBox Data="@Patients" @bind-Value="FormKios.PatientId" FilteringMode="@DataGridFilteringMode.Contains" TextFieldName="setNameFamily" ValueFieldName="Id">
 
-                                                                </DxFormLayoutItem>
-                                                            }
-                                                            @if (showPhysician)
-                                                            {
-                                                                <DxFormLayoutItem Caption="Physician" ColSpanMd="12">
-                                                                    <DxComboBox Data="@Phys" @bind-Value="@FormKios.PhysicianId" NullText="Select Physician.." ValueFieldName="Id" TextFieldName="Name"
-                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
-                                                                </DxFormLayoutItem>
-                                                            }
+                                                            </DxComboBox>
+                                                        </DxFormLayoutItem>
+                                                        @if (Bpjs != null)
+                                                        {
+                                                            <DxFormLayoutItem Caption="BPJS" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="@FormKios.BPJS" ReadOnly style="background-color:#949494" />
+                                                            </DxFormLayoutItem>
+                                                            <DxFormLayoutItem Caption=" BPJS Status" ColSpanMd="12">
+                                                                @if (FormKios.BPJS != null)
+                                                                {
+                                                                    <h6 class="text-success">
+                                                                        <i class="fa-solid fa-circle" style="color: #05e401;"></i>
+                                                                        @statBPJS
+                                                                    </h6>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <h6 class="text-danger">
+                                                                        <i class="fa-solid fa-circle" style="color: #d20404;"></i>
+                                                                        @statBPJS
+                                                                    </h6>
+                                                                }
+                                                            </DxFormLayoutItem>
+                                                        }
+                                                        @if (showClass)
+                                                        {
+                                                            <DxFormLayoutItem Caption="Patient Class" ColSpanMd="12">
+                                                                <DxComboBox Data="@classTypes"
+                                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                                            NullText="Select Service.."
+                                                                            @bind-Value="@FormKios.ClassTypeId"
+                                                                            TextFieldName="Name"
+                                                                            ValueFieldName="Id" ShowValidationIcon="true"></DxComboBox>
+                                                            </DxFormLayoutItem>
+                                                        }
+                                                        @if (CountServiceId > 1)
+                                                        {
+                                                            <DxFormLayoutItem Caption="Service" ColSpanMd="12">
+                                                                <DxComboBox Data="@serv"
+                                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                                            NullText="Select Service.."
+                                                                            @bind-Value="@ServiceId"
+                                                                            TextFieldName="Name"
+                                                                            ValueFieldName="Id" ShowValidationIcon="true"></DxComboBox>
+                                                            </DxFormLayoutItem>
                                                         }
                                                         else
                                                         {
-                                                            <DxFormLayoutItem ColSpanMd="12">
-                                                                <p class="text-center"> Data Not Found...</p>
-                                                                <h5 class="text-center fw-bold">Please Register Through The Nurse!</h5>
+                                                            <DxFormLayoutItem Caption="Service" ColSpanMd="12">
+                                                                <DxComboBox Data="@Services"
+                                                                            @bind-Value="@FormKios.ServiceId"
+                                                                            TextFieldName="Name"
+                                                                            ValueFieldName="Id"
+                                                                            ReadOnly="true"
+                                                                            ShowValidationIcon="true" />
+
+                                                            </DxFormLayoutItem>
+                                                        }
+                                                        @if (showPhysician)
+                                                        {
+                                                            <DxFormLayoutItem Caption="Physician" ColSpanMd="12">
+                                                                <DxComboBox Data="@Phys" @bind-Value="@FormKios.PhysicianId" NullText="Select Physician.." ValueFieldName="Id" TextFieldName="Name"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
                                                             </DxFormLayoutItem>
                                                         }
                                                     }
-                                                </DxFormLayout>
-                                            </EditForm>
-                                        </div>
+                                                    else
+                                                    {
+                                                        <DxFormLayoutItem ColSpanMd="12">
+                                                            <p class="text-center"> Data Not Found...</p>
+                                                            <h5 class="text-center fw-bold">Please Register Through The Nurse!</h5>
+                                                        </DxFormLayoutItem>
+                                                    }
+                                                }
+                                            </DxFormLayout>
+                                        </EditForm>
                                         @if (showForm)
                                         {
                                             @if (NamePatient != null)
                                             {
-                                                <div class="card-footer">
-                                                    <div class="row  justify-content-end">
-                                                        <div class="col-auto align-self-end">
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true" Click="OnSave"></DxButton>
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
-                                                        </div>
+                                                <div class="row justify-content-end">
+                                                    <div class="col-auto align-self-end">
+                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
                                                     </div>
                                                 </div>
                                             }
@@ -173,7 +172,7 @@
                                 </div>
                             </div>
                         </div>
-                    </section>
+                    </div>
                 </div>
             </DxLoadingPanel>
         }
@@ -204,21 +203,19 @@
                             </div>
                         </div>
 
-                        <div class="row mt-3 border-start-0 border-end-0 justify-content-center">
-                            <div class="col-md-10 align-self-center" ml-5>
-                                <div class="row justify-content-between">
-                                    <div class="col-md-4">
-                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-trash" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Canceled" Click="@(() => OnCanceled(ViewQueue.Id))"></DxButton>
-                                    </div>
-                                    @* <div class="col-md-4">
-                        <DxButton RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-print" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Print"></DxButton>
-                        </div> *@
-                                    <div class="col-md-4">
-                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Closed" Click="OnCancel"></DxButton>
-                                    </div>
-                                </div>
+                        
+                        <div class="row justify-content-between">
+                            <div class="col-auto">
+                                <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-trash"  Text="Canceled" Click="@(() => OnCanceled(ViewQueue.Id))"></DxButton>
+                            </div>
+                            <div class="col-auto">
+                                <DxButton RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-print" Click="onPrint" Text="Print"></DxButton>
+                            </div>
+                            <div class="col-auto">
+                                <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Closed" Click="OnCancel"></DxButton>
                             </div>
                         </div>
+                       
                     </div>
 
                 </div>
