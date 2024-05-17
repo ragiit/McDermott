@@ -24,7 +24,7 @@
         public string? AdmissionQueue { get; set; }
 
         [Required]
-        public string? Payment { get; set; }
+        public string? Payment { get; set; } = "BPJS";
 
         public string? NoRM { get; set; }
 

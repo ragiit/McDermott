@@ -86,6 +86,11 @@
         public string? SAP { get; set; }
         public string? Oracle { get; set; }
         public List<long>? DoctorServiceIds { get; set; }
+        public List<long>? PatientAllergyIds { get; set; }
+
+
+        #region Relation
+
 
         [SetToNull]
         public virtual Group? Group { get; set; }
@@ -140,5 +145,7 @@
 
         [SetToNull]
         public virtual List<PatientAllergy>? PatientAllergies { get; set; }
+
+        #endregion
     }
 }

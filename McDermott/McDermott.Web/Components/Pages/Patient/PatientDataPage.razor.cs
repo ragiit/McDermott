@@ -1,9 +1,12 @@
-﻿namespace McDermott.Web.Components.Pages.Patient
+﻿
+
+namespace McDermott.Web.Components.Pages.Patient
 {
     public partial class PatientDataPage
     {
         #region Relation Data
 
+        private List<AllergyDto> Allergies = [];
         private List<UserDto> Users = [];
         private List<UserDto> Patiens = [];
         private List<UserDto> AllPatiens = [];
@@ -77,6 +80,7 @@
 
         public IGrid Grid { get; set; }
         public IGrid GridFamilyRelation { get; set; }
+        private IEnumerable<AllergyDto> SelectedAllergies { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private IReadOnlyList<object> SelectedDataFamilyRelationItems { get; set; } = new ObservableRangeCollection<object>();
 
@@ -119,6 +123,15 @@
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+
+            Allergies = await Mediator.Send(new GetAllergyQuery());
+
+            Allergies.ForEach(x =>
+            {
+                var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+                if (a is not null)
+                    x.TypeString = a.Name;
+            });
 
             Countries = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
@@ -175,13 +188,13 @@
         private async Task LoadData()
         {
             PanelVisible = true;
-
+            SelectedAllergies = [];
             ShowForm = false;
             AllPatientFamilyRelations.Clear();
             PatientFamilyRelations.Clear();
             TabIndex = -1;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            SelectedDataFamilyRelationItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
+            SelectedDataFamilyRelationItems = [];
             UserForm = new();
 
             try
@@ -330,6 +343,7 @@
                     return;
 
                 UserForm.IsPatient = true;
+                UserForm.PatientAllergyIds = new List<long>();
 
                 if (UserForm.IsSameDomicileAddress)
                 {
@@ -345,6 +359,9 @@
 
                 if (!string.IsNullOrWhiteSpace(UserForm.Password))
                     UserForm.Password = Helper.HashMD5(UserForm.Password);
+
+                if (SelectedAllergies is not null && SelectedAllergies.Count() > 0)
+                    UserForm.PatientAllergyIds.AddRange(SelectedAllergies.Select(x => x.Id).ToList());
 
                 if (UserForm.Id == 0)
                 {
@@ -555,6 +572,7 @@
                 AllPatientFamilyRelations = [.. PatientFamilyRelations];
                 //InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
                 var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
+                SelectedAllergies = Allergies.Where(x => UserForm.PatientAllergyIds.Contains(x.Id)).ToList();
                 InsurancePoliciesCount = count.Count;
                 var alergy = await Mediator.Send(new GetPatientAllergyQuery(x => x.UserId == UserForm.Id));
                 if (alergy.Count == 0)

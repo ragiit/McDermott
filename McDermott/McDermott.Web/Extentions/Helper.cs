@@ -4,6 +4,30 @@ namespace McDermott.Web.Extentions
 {
     public static class Helper
     {
+        public class AllergyType
+        {
+            public string Code { get; set; } = string.Empty;
+            public string Name { get; set; } = string.Empty;
+        }
+
+        public static List<AllergyType> _allergyTypes = [
+            new()
+            {
+                Code = "01",
+                Name = "Makanan"
+            },
+            new()
+            {
+                Code = "02",
+                Name = "Udara"
+            },
+            new()
+            {
+                Code = "03",
+                Name = "Obat"
+            },
+        ];
+
         public static readonly string VERSION = "2.0.0";
 
         public static void ShowInfoSubmittingForm(this IToastService toastService, string message = "Please ensure that all fields marked in red are filled in before submitting the form.") => toastService.ShowInfo(message);

@@ -496,8 +496,24 @@
 
                                             <DxFormLayoutGroup Caption="Allergy Data" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                                                 <Items>
+                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Allergies">
+                                                        <DxTagBox Data="@Allergies"
+                                                                  NullText="Select Allergy..."
+                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                  @bind-Values="@SelectedAllergies" 
+                                                                  EditFormat="{1}"
+                                                                  InputId="tbMultiColumn">
+                                                            <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                                                                                Caption="Code"
+                                                                                Width="100px" />
+                                                            <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                Caption="Name" /> 
+                                                                                 <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                                                                                Caption="Type" /> 
+                                                        </DxTagBox>
+                                                    </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Farmacologi" ColSpanMd="3">
+                                                   @*  <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Farmacologi" ColSpanMd="3">
                                                         <DxTextBox @bind-Text="@UserForm.PatientAllergy.FarmacologiCode"
                                                                    ShowValidationIcon="true"
                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -540,7 +556,7 @@
                                                                 ShowValidationIcon="true"
                                                                 NullText="Food"
                                                                 Rows="1" />
-                                                    </DxFormLayoutItem>
+                                                    </DxFormLayoutItem> *@
                                                 </Items>
                                             </DxFormLayoutGroup>
 

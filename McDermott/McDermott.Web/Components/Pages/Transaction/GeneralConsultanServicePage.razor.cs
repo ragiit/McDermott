@@ -1059,11 +1059,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                     return;
                 }
 
-                var isSuccess = await SendPcareRequestRegistration();
-                var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
+                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0)
+                {
+                    var isSuccess = await SendPcareRequestRegistration();
+                    var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
 
-                if (!isSuccess || !isSuccessAddKunjungan)
-                    return;
+                    if (!isSuccess || !isSuccessAddKunjungan)
+                        return;
+                }
 
                 if (FormRegis.Id == 0)
                 {
@@ -1883,8 +1886,15 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (FormRegis.StagingStatus != "Finished")
                 {
                     var text = FormRegis.StagingStatus == "Physician" ? "In Consultation" : FormRegis.StagingStatus;
-                    var index = Stagings.FindIndex(x => x == text);
-                    StagingText = Stagings[index + 1];
+                    if (!string.IsNullOrWhiteSpace(text) && text.Equals("Procedure Room"))
+                    {
+                        StagingText = "Procedure Room";
+                    }
+                    else
+                    {
+                        var index = Stagings.FindIndex(x => x == text);
+                        StagingText = Stagings[index + 1];
+                    }
                 }
 
                 var patientAllergy = PatientAllergies.FirstOrDefault(x => x.UserId == FormRegis!.PatientId);
@@ -1916,6 +1926,12 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                         if (clinical.Count > 0)
                             GeneralConsultantClinical = clinical[0];
+                        break;
+
+                    case "Procedure Room":
+                        var supportP = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                        if (supportP.Count > 0)
+                            GeneralConsultanMedicalSupport = supportP[0];
                         break;
 
                     case "Physician":
@@ -2295,7 +2311,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
             {
                 FormRegis.InsurancePolicyId = null;
-                //FormRegis.Age = null;
                 FormRegis.NoRM = null;
                 FormRegis.IdentityNumber = null;
                 PatientAllergy.Food = null;
@@ -2317,50 +2332,39 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                if (item is not null && item.DateOfBirth != null)
-                {
-                    //FormRegis.Age = DateTime.Now.Year - item.DateOfBirth.GetValueOrDefault().Year;
-                }
-
                 FormRegis.NoRM = item.NoRm ?? null;
                 FormRegis.IdentityNumber = item.NoId ?? null;
                 FormRegis.PatientId = item.Id;
             }
             catch { }
 
-            if (PaymentMethod is not null)
+            if (FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS"))
             {
-                if (PaymentMethod.Equals("BPJS"))
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS == true).ToList();
+                Temps = all.Select(x => new InsuranceTemp
                 {
-                    var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS == true).ToList();
-                    Temps = all.Select(x => new InsuranceTemp
-                    {
-                        InsurancePolicyId = x.Id,
-                        InsuranceId = x.InsuranceId,
-                        InsuranceName = x.Insurance.Name,
-                        PolicyNumber = x.PolicyNumber
-                    }).ToList();
-                }
-                else
+                    InsurancePolicyId = x.Id,
+                    InsuranceId = x.InsuranceId,
+                    InsuranceName = x.Insurance.Name,
+                    PolicyNumber = x.PolicyNumber
+                }).ToList();
+            }
+            else
+            {
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS != true).ToList();
+                Temps = all.Select(x => new InsuranceTemp
                 {
-                    var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS != true).ToList();
-                    Temps = all.Select(x => new InsuranceTemp
-                    {
-                        InsurancePolicyId = x.Id,
-                        InsuranceId = x.InsuranceId,
-                        InsuranceName = x.Insurance.Name,
-                        PolicyNumber = x.PolicyNumber
-                    }).ToList();
-                }
+                    InsurancePolicyId = x.Id,
+                    InsuranceId = x.InsuranceId,
+                    InsuranceName = x.Insurance.Name,
+                    PolicyNumber = x.PolicyNumber
+                }).ToList();
             }
 
             var patientAlergy = PatientAllergies.Where(x => x.UserId == item!.Id).FirstOrDefault();
 
             if (patientAlergy is not null)
             {
-                //FormRegis.IsWeather = patientAlergy.Any(x => !string.IsNullOrWhiteSpace(x.Weather));
-                //FormRegis.IsPharmacology = patientAlergy.Any(x => !string.IsNullOrWhiteSpace(x.Farmacology));
-                //FormRegis.IsFood = patientAlergy.Any(x => !string.IsNullOrWhiteSpace(x.Food));
                 PatientAllergy = patientAlergy;
                 PatientAllergy.Food = patientAlergy.Food;
                 PatientAllergy.Weather = patientAlergy.Weather;

@@ -18,6 +18,7 @@ global using System.Linq.Expressions;
 global using Microsoft.Extensions.Caching.Memory;
 global using McDermott.Application.Dtos.BpjsIntegration;
 
+global using static McDermott.Application.Features.Commands.BpjsIntegration.AllergyCommand;
 global using static McDermott.Application.Features.Commands.BpjsIntegration.AwarenessCommand;
 global using static McDermott.Application.Features.Commands.Bpjs.SystemParameterCommand;
 global using static McDermott.Application.Features.Commands.Bpjs.BPJSIntegrationCommand;

@@ -17,6 +17,7 @@ namespace McDermott.Persistence.Context
         #region BPJS Integration (Kalo ada relasi di buat Set To Null)
 
         public DbSet<Awareness> Awarenesses { get; set; }
+        public DbSet<Allergy> Allergies { get; set; }
 
         #endregion BPJS Integration (Kalo ada relasi di buat Set To Null)
 
@@ -509,10 +510,7 @@ namespace McDermott.Persistence.Context
         {
             try
             {
-                var bb = _httpContextAccessor;
-                var a = _httpContextAccessor.HttpContext.User;
-
-                var currentUser = _httpContextAccessor is null ? string.Empty : _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name); ;
+                var currentUser = _httpContextAccessor is null ? string.Empty : _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name);
 
                 var entries = ChangeTracker.Entries<BaseAuditableEntity>();
 
@@ -536,13 +534,16 @@ namespace McDermott.Persistence.Context
 
                 return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 Log.Error(
-                    "Message: An error occurred while saving data: " + e.Message + "\n" +
-                    "Inner Message: An error occurred while saving data: " + e.InnerException?.Message + "\n" +
-                    "Stack Trace: " + e.StackTrace);
-                //Log.Error(e, "Unhandled Exception occurred Halo");
+                 "\n\n" +
+                 "==================== START SAVE ASYNC ERROR ====================" + "\n" +
+                 "Message =====> An error occurred while saving data: " + ex.Message + "\n" +
+                 "Inner Message =====> An error occurred while saving data: " + ex.InnerException?.Message + "\n" +
+                 "Stack Trace =====> " + ex.StackTrace?.Trim() + "\n" +
+                 "==================== END SAVE ASYNC ERROR ====================" + "\n"
+                 );
                 throw;
             }
         }
