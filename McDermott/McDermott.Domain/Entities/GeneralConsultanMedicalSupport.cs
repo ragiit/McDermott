@@ -34,6 +34,7 @@
         public bool? THCCannabinoidMarijuanaNegative { get; set; }
         public bool? THCCannabinoidMarijuanaPositive { get; set; }
         public string? OtherExaminationAttachment { get; set; }
+        public string? ECGAttachment { get; set; }
         public bool IsOtherExaminationECG { get; set; } = false;
         public string? OtherExaminationTypeECG { get; set; }
         public string? OtherExaminationRemarkECG { get; set; }

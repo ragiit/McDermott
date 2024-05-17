@@ -4,7 +4,7 @@
 
 @if (IsAccess)
 {
-            <div class="wrapper">
+        <div class="wrapper">
 
                 <section class="content-header">
                     <div class="container-fluid">
@@ -43,6 +43,7 @@
                                                                 FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                                                 KeyFieldName="Id"
                                                                 TextWrapEnabled="false"
+                                                EditorRenderMode="GridEditorRenderMode.Detached"
                                                                 CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                                 DataItemDeleting="OnDelete"
                                                                 EditMode="GridEditMode.PopupEditForm"
@@ -85,15 +86,16 @@
                                                                 <DxGridDataColumn MinWidth="200" FieldName="RegistrationDate" DisplayFormat="ddd, dd MMM yyyy" Caption="Registration Date"/>
                                                                 <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
-                                                                <DxGridDataColumn MinWidth="200" FieldName="StagingStatus" Caption="Status"/>
                                                                 <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service"/>
                                                                 <DxGridDataColumn MinWidth="200" FieldName="Payment" Caption="Payment Method" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="AppoimentDate" Caption="Appoiment" />
-                                                                <DxGridDataColumn Width="100px" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
+                                                                <DxGridDataColumn MinWidth="200" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
                                                                     <CellDisplayTemplate>
-                                                        @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
+                                                                        @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
                                                                     </CellDisplayTemplate>
                                                                 </DxGridDataColumn>
+                                                                
+                                                                <DxGridDataColumn MinWidth="200" FieldName="StagingStatus" Caption="Status"/>
                                                             </Columns>
                                                             <GroupSummary>
                                                                 <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="StagingStatus"/>
@@ -1513,13 +1515,7 @@ else
                                                     Mask="@DateTimeMask.ShortDate"
                                                     NullText="Select Registration Date">
                                             </DxDateEdit>
-                                        </DxFormLayoutItem>
-                                    @* <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Schedule Time" ColSpanMd="12">
-                                            <DxComboBox ShowValidationIcon="true" Data="@Times"
-                                                        NullText="Select Time.."
-                                                        @bind-Value="@FormRegis.AppoimentDate"/>
-                                                <ValidationMessage For="@(() => FormRegis.AppoimentDate)" />
-                                        </DxFormLayoutItem> *@
+                                        </DxFormLayoutItem> 
                                          <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
                                            <DxDateEdit
                                                     Enabled="false"
@@ -2135,25 +2131,22 @@ else
                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Other" ColSpanMd="12">
                         <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsOtherECG" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem ColSpanMd="12" Caption=" ">
-                        @if (Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherECG))
-                        {
-                                    <DxMemo
+                    <DxFormLayoutItem ColSpanMd="12" Caption=" " Visible="@Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherECG)">
+                        <DxMemo
                                         @bind-Text="GeneralConsultanMedicalSupport.OtherDesc"
                                         NullText="Other Description..."
                                         ShowValidationIcon="true"
                                         Rows="1" />
-                        }
                     </DxFormLayoutItem>
                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
-                        <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.RadiologyEximinationAttachment"
+                        <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.ECGAttachment"
                             ShowValidationIcon="true"
                             ReadOnly="true"
                             MaskMode="MaskMode.RegEx">
                             <Buttons>
                                 <InputFile id="radiologyFile" OnChange="@SelectFilesRadiology" multiple="false" style="display:none" />
                                 <DxEditorButton Click="SelectFileRadiology" IconCssClass="fa-solid fa-upload" />
-                                <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.RadiologyEximinationAttachment)" IconCssClass="fa-solid fa-download" />
+                                <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.ECGAttachment)" IconCssClass="fa-solid fa-download" />
                                 <DxEditorButton Click="RemoveSelectedFileRadiology" IconCssClass="fa-solid fa-trash" />
                             </Buttons>
                         </DxMaskedInput>

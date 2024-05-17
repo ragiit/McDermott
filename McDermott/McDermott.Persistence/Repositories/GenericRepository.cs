@@ -4,7 +4,6 @@ using McDermott.Domain.Common;
 using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System;
 using System.Linq.Expressions;
 using System.Reflection;
 

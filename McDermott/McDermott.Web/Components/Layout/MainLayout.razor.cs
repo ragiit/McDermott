@@ -14,6 +14,16 @@ namespace McDermott.Web.Components.Layout
 
         private bool showPreloader = true;
 
+        private async Task Top()
+        {
+            await JsRuntime.InvokeVoidAsync("scrollToTop");
+        }
+
+        private async Task ScrollToTop()
+        {
+            await JsRuntime.InvokeVoidAsync("scrollToTop");
+        }
+
         private async Task OnClickLogout()
         {
             await JsRuntime.InvokeVoidAsync("deleteCookie", CookieHelper.USER_INFO);
@@ -38,6 +48,7 @@ namespace McDermott.Web.Components.Layout
             {
                 if (firstRender)
                 {
+                    await JsRuntime.InvokeVoidAsync("scrollFunction");
                     await LoadUser();
                     StateHasChanged();
                 }

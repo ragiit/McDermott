@@ -45,6 +45,7 @@
                                                 KeyFieldName="Id"
                                                 CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                 EditModelSaving="OnSave"
+                                                EditorRenderMode="GridEditorRenderMode.Detached"
                                                 DataItemDeleting="OnDelete"
                                                 AllowSelectRowByClick="true"
                                                 EditMode="GridEditMode.PopupEditForm"
@@ -701,12 +702,6 @@
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sinus Tachycardia" ColSpanMd="12">
                                                             <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusTachycardia" />
                                                         </DxFormLayoutItem>
-                                                        @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Ventriculat Extra Systole" ColSpanMd="12">
-                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsVentriculatExtraSystole" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Supraventricular Extra Systole" ColSpanMd="12">
-                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSupraventricularExtraSystole" />
-                                                </DxFormLayoutItem> *@
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="HR" ColSpanMd="12">
                                                             <Template>
                                                                 <DxGridLayout>
@@ -736,15 +731,25 @@
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Other" ColSpanMd="12">
                                                             <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsOtherECG" />
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem ColSpanMd="12">
-                                                            @if (Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherECG))
-                                                            {
-                                                                <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherDesc"
-                                                                        NullText="Other Description..."
-                                                                        ShowValidationIcon="true"
-                                                                        Rows="1" />
-                                                            }
+                                                        <DxFormLayoutItem ColSpanMd="12" Visible="@Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherECG)">
+                                                            <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherDesc"
+                                                                    NullText="Other Description..."
+                                                                    ShowValidationIcon="true"
+                                                                    Rows="1" />
                                                         </DxFormLayoutItem> 
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
+                                                            <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.ECGAttachment"
+                                                                           ShowValidationIcon="true"
+                                                                           ReadOnly="true"
+                                                                           MaskMode="MaskMode.RegEx">
+                                                                <Buttons>
+                                                                    <InputFile id="radiologyFile" OnChange="@SelectFilesRadiology" multiple="false" style="display:none" />
+                                                                    <DxEditorButton Click="SelectFileRadiology" IconCssClass="fa-solid fa-upload" />
+                                                                    <DxEditorButton Click="() => DownloadFile(GeneralConsultanMedicalSupport.ECGAttachment)" IconCssClass="fa-solid fa-download" />
+                                                                    <DxEditorButton Click="RemoveSelectedFileRadiology" IconCssClass="fa-solid fa-trash" />
+                                                                </Buttons>
+                                                            </DxMaskedInput>
+                                                        </DxFormLayoutItem>
                                                     </Items>
                                                 </DxFormLayoutGroup>
 

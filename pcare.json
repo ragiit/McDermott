@@ -1,0 +1,286 @@
+{
+  "kdProviderPeserta": "00010001",
+  "tglDaftar": "17-05-2024",
+  "noKartu": "0001113569638",
+  "kdPoli": "001",
+  "keluhan": null,
+  "kunjSakit": true,
+  "sistole": 0,
+  "diastole": 0,
+  "beratBadan": 0,
+  "tinggiBadan": 0,
+  "respRate": 0,
+  "lingkarPerut": 0,
+  "heartRate": 0,
+  "rujukBalik": 0,
+  "kdTkp": "10"
+}
+
+
+{"kdProviderPeserta":"00010001","tglDaftar":"01-05-2024","noKartu":"0001113569638","kdPoli":"001","keluhan":null,"kunjSakit":true,"sistole":0,"diastole":0,"beratBadan":0,"tinggiBadan":0,"respRate":0,"lingkarPerut":0,"heartRate":0,"rujukBalik":0,"kdTkp":"10"}
+
+Response:
+{
+  "field": "noUrut",
+  "message": "A1"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+URL: pendaftaran
+Request Body: {
+  "kdProviderPeserta": "00010001",
+  "tglDaftar": "17-05-2024",
+  "noKartu": "0001113569638",
+  "kdPoli": "001",
+  "keluhan": null,
+  "kunjSakit": true,
+  "sistole": 0,
+  "diastole": 0,
+  "beratBadan": 0,
+  "tinggiBadan": 0,
+  "respRate": 0,
+  "lingkarPerut": 0,
+  "heartRate": 0,
+  "rujukBalik": 0,
+  "kdTkp": "10"
+}
+
+Response: {
+  "field": "noUrut",
+  "message": "A1"
+}
+
+{
+  "noKunjungan": "A1",
+  "noKartu": "0001113569638",
+  "tglDaftar": "17-05-2024",
+  "kdPoli": "001",
+  "keluhan": "keluhan",
+  "kdSadar": "04",
+  "sistole": 80,
+  "diastole": 80,
+  "beratBadan": 50,
+  "tinggiBadan": 170,
+  "respRate": 80,
+  "heartRate": 80,
+  "lingkarPerut": 36,
+  "kdStatusPulang": "4",
+  "tglPulang": "17-05-2024",
+  "kdDokter": "440939",
+  "kdDiag1": "O82",
+  "kdDiag2": null,
+  "kdDiag3": null,
+  "kdPoliRujukInternal": null,
+  "rujukLanjut": null,
+  "kdTacc": 4,
+  "alasanTacc": "< 3 Hari",
+  "anamnesa": "test anamnesa",
+  "alergiMakan": "00",
+  "alergiUdara": "00",
+  "alergiObat": "00",
+  "kdPrognosa": "01",
+  "terapiObat": "test terapi obat",
+  "terapiNonObat": "test terapi nonobat",
+  "bmhp": "bmhp",
+  "suhu": "36.4"
+}
+
+
+{
+  "noKunjungan": "A1",
+  "noKartu": "0001113569638",
+  "tglDaftar": "17-05-2024",
+  "kdPoli": "001",
+  "keluhan": "keluhan",
+  "kdSadar": "01",
+  "sistole": 10,
+  "diastole": 10,
+  "beratBadan": 10,
+  "tinggiBadan": 10,
+  "respRate": 10,
+  "heartRate": 10,
+  "terapi": "catatan",
+  "kdStatusPulang": "4",
+  "tglPulang": "17-05-2024",
+  "kdDokter": "440939",
+  "kdDiag1": "A01.0",
+  "kdDiag2": null,
+  "kdDiag3": null,
+  "kdPoliRujukInternal": null,
+  "rujukLanjut": {
+    "tglEstRujuk": "02-10-2018",
+    "kdppk": "0116R028",
+    "subSpesialis": null,
+    "khusus": {
+      "kdKhusus": "HDL",
+      "kdSubSpesialis": null,
+      "catatan": "peserta sudah biasa hemodialisa"
+    }
+  },
+  "kdTacc": 0,
+  "alasanTacc": null
+}
+
+
+URL: kunjungan
+Request Body: {
+  "noKunjungan": "A1",
+  "noKartu": "0001113569638",
+  "tglDaftar": "17-05-2024",
+  "kdPoli": "001",
+  "keluhan": "keluhan",
+  "kdSadar": "04",
+  "sistole": 80,
+  "diastole": 80,
+  "beratBadan": 50,
+  "tinggiBadan": 170,
+  "respRate": 80,
+  "heartRate": 80,
+  "lingkarPerut": 36,
+  "kdStatusPulang": "4",
+  "tglPulang": "17-05-2024",
+  "kdDokter": "440939",
+  "kdDiag1": "O82",
+  "kdDiag2": null,
+  "kdDiag3": null,
+  "kdPoliRujukInternal": null,
+  "rujukLanjut": null,
+  "kdTacc": 4,
+  "alasanTacc": "< 3 Hari",
+  "anamnesa": "test anamnesa",
+  "alergiMakan": "00",
+  "alergiUdara": "00",
+  "alergiObat": "00",
+  "kdPrognosa": "01",
+  "terapiObat": "test terapi obat",
+  "terapiNonObat": "test terapi nonobat",
+  "bmhp": "bmhp",
+  "suhu": "36.4"
+}
+
+Response: {
+  "response": [],
+  "metaData": {
+    "message": "Cannot access child value on Newtonsoft.Json.Linq.JValue.",
+    "code": 500
+  }
+}
+
+URL: kunjungan
+Request Body: {
+  "noKunjungan": "A1",
+  "noKartu": "0001113569638",
+  "tglDaftar": "16-05-2024",
+  "kdPoli": "001",
+  "keluhan": "keluhan",
+  "kdSadar": "01",
+  "sistole": 10,
+  "diastole": 10,
+  "beratBadan": 10,
+  "tinggiBadan": 10,
+  "respRate": 10,
+  "heartRate": 10,
+  "terapi": "catatan",
+  "kdStatusPulang": "4",
+  "tglPulang": "17-05-2024",
+  "kdDokter": "440939",
+  "kdDiag1": "A01.0",
+  "kdDiag2": null,
+  "kdDiag3": null,
+  "kdPoliRujukInternal": null,
+  "rujukLanjut": {
+    "tglEstRujuk": "02-10-2018",
+    "kdppk": "0116R028",
+    "subSpesialis": null,
+    "khusus": {
+      "kdKhusus": "HDL",
+      "kdSubSpesialis": null,
+      "catatan": "peserta sudah biasa hemodialisa"
+    }
+  },
+  "kdTacc": 0,
+  "alasanTacc": null
+}
+
+Response: {
+  "response": [],
+  "metaData": {
+    "message": "Value cannot be null.\r\nParameter name: value",
+    "code": 500
+  }
+}
+
+
+{
+  "noKunjungan": "A1",
+  "noKartu": "0001113569638",
+  "tglDaftar": "16-05-2024",
+  "kdPoli": "001",
+  "keluhan": "keluhan",
+  "kdSadar": "04",
+  "sistole": 80,
+  "diastole": 80,
+  "beratBadan": 50,
+  "tinggiBadan":170,
+  "respRate": 80,
+  "heartRate": 80,
+  "lingkarPerut": 36,
+  "kdStatusPulang": "4",
+  "tglPulang": "16-05-2024",
+  "kdDokter": "440939",
+  "kdDiagi": "082",
+  "kdDiag2": null,
+  "kdDiag3": null,
+  "kdPoLiRujukInternal": "he",
+  "rujukLanjut": {
+    "kdppk": "0112R016",
+    "tglEstRujuk"："27-03-2022",
+    "subSpesialis": {
+      "kdSubSpesialis1": "16",
+      "kdSarana"："he"
+    },
+    "khusus": "he"
+  },
+  "kdTacc": -1,
+  "alasa nTacc": "he",
+  "anamnesa": "test anamnesa",
+  "alergiMakan": "00",
+  "alergiUdara": "00",
+  "alergiObat": "00",
+  "kdPrognosa": "01",
+  "terapiObat": "test terapi obat",
+  "terapiNonObat": "test terapi nonobat",
+  "bmhp": "bmhp",
+  "suhu": "36.4"
+}

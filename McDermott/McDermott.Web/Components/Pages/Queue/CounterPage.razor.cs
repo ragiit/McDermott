@@ -29,6 +29,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private List<string> NameCard = new();
         private string textPopUp = "";
         private bool PanelVisible { get; set; } = true;
+        private bool IsLoading { get; set; } = true;
         private bool PopUpVisible { get; set; } = false;
         private bool ArchiveCard { get; set; } = false;
         private bool EditItemsEnabled { get; set; }
@@ -176,7 +177,9 @@ namespace McDermott.Web.Components.Pages.Queue
             PanelVisible = true;
             countersActive.Clear();
             counterForm = new();
+            IsLoading = true;
             counters = await Mediator.Send(new GetCounterQuery());
+            IsLoading = false;
             Services = await Mediator.Send(new GetServiceQuery());
             ServiceK = [.. Services.Where(x => x.IsKiosk == true)];
             var Physician = await Mediator.Send(new GetUserQuery());
@@ -424,6 +427,9 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(counterForm.Name))
+                    return;
+
                 counterForm.IsActive = true;
                 counterForm.Status = "open";
                 var edit = counterForm;
