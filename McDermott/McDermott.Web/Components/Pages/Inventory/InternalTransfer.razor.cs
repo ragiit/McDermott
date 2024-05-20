@@ -126,10 +126,13 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private void SelectedItemProduct(ProductDto product)
         {
-            var data = Products.Where(p => p.Id == product.Id).FirstOrDefault();
-            TempFormInternalTransfer.ProductName = data.Name;
-            var uomName = Uoms.Where(u => u.Id == data.UomId).Select(x => x.Name).FirstOrDefault();
-            TempFormInternalTransfer.UomName = uomName;
+            if (product is not null)
+            {
+                var data = Products.Where(p => p.Id == product.Id).FirstOrDefault();
+                TempFormInternalTransfer.ProductName = data.Name;
+                var uomName = Uoms.Where(u => u.Id == data.UomId).Select(x => x.Name).FirstOrDefault();
+                TempFormInternalTransfer.UomName = uomName;
+            }
         }
 
         public MarkupString GetIssueStatusIconHtml(string status)
@@ -603,7 +606,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                             item.TransactionStockId = getInternalTransfer.Id;
                             item.ProductId = TempFormInternalTransfer.ProductId;
                             item.QtyStock = TempFormInternalTransfer.QtyStock;
-                            item.StatusStock = "IN";
 
                             await Mediator.Send(new CreateTransactionStockProductRequest(item));
                         }
@@ -612,7 +614,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 else
                 {
-                    var bb = FormInternalTransfer;
                     getInternalTransfer = await Mediator.Send(new UpdateTransactionStockRequest(FormInternalTransfer));
 
                     var stock_detail = await Mediator.Send(new GetTransactionStockQuery(x => x.Id == FormInternalTransfer.Id));
@@ -652,6 +653,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormInternalTransferDetail.SourceId = getInternalTransfer.SourceId;
                 FormInternalTransferDetail.DestinationId = getInternalTransfer.DestinationId;
                 FormInternalTransferDetail.StatusTransfer = getInternalTransfer.StatusTransfer;
+                FormInternalTransferDetail.TypeTransaction = "Internal";
 
                 await Mediator.Send(new CreateTransactionStockDetailRequest(FormInternalTransferDetail));
                 await EditItem_Click(getInternalTransfer);

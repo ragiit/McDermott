@@ -24,6 +24,6 @@ namespace McDermott.Domain.Entities
         public Location? Destinance { get; set; }
         public Uom? Uom { get; set; }
         public List<TransactionStock>? TransactionStocks { get; set; }
-        public List<ReceivingStockDetail>? ReceivingStockDetail { get; set; }
+        public List<ReceivingStockProduct>? ReceivingStockProduct { get; set; }
     }
 }

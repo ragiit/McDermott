@@ -24,6 +24,7 @@ namespace McDermott.Domain.Entities
         [SetToNull]
         public List<TransactionStockProduct>? TransactionStockProduct { get; set; }
 
+        [SetToNull]
         public List<TransactionStockDetail>? TransactionStockDetail { get; set; }
     }
 }

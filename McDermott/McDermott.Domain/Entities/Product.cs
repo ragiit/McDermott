@@ -38,6 +38,6 @@
         public StockProduct? StockProduct { get; set; }
 
         [SetToNull]
-        public List<ReceivingStockDetail>? ReceivingStockDetail { get; set; }
+        public List<ReceivingStockProduct>? ReceivingStockProduct { get; set; }
     }
 }

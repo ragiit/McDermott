@@ -3139,7 +3139,7 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("QueueDisplays");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingStockDetail", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingStockProduct", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -4844,15 +4844,15 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Country");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingStockDetail", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingStockProduct", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.Product", "Product")
-                        .WithMany("ReceivingStockDetail")
+                        .WithMany("ReceivingStockProduct")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("McDermott.Domain.Entities.StockProduct", "Stock")
-                        .WithMany("ReceivingStockDetail")
+                        .WithMany("ReceivingStockProduct")
                         .HasForeignKey("StockId")
                         .OnDelete(DeleteBehavior.SetNull);
 
@@ -5279,7 +5279,7 @@ namespace McDermott.Persistence.Migrations
                 {
                     b.Navigation("Medicaments");
 
-                    b.Navigation("ReceivingStockDetail");
+                    b.Navigation("ReceivingStockProduct");
 
                     b.Navigation("StockProduct");
                 });
@@ -5310,7 +5310,7 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.StockProduct", b =>
                 {
-                    b.Navigation("ReceivingStockDetail");
+                    b.Navigation("ReceivingStockProduct");
 
                     b.Navigation("TransactionStocks");
                 });

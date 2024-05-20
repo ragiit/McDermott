@@ -11,14 +11,17 @@ namespace McDermott.Web.Components.Pages.Inventory
     {
         #region Relation Data
 
-        private List<StockProductDto> stockProducts = [];
-        private List<ReceivingStockDetailDto> receivingStockDetails = [];
-        private List<ReceivingStockDetailDto> TempReceivingStockDetails = [];
+        private List<ReceivingStockDto> ReceivingStocks = [];
+        private List<ReceivingStockProductDto> receivingStockDetails = [];
+        private List<ReceivingStockProductDto> TempReceivingStockDetails = [];
         private List<LocationDto> Locations = [];
         private List<ProductDto> Products = [];
         private List<UomDto> Uoms = [];
-        private ReceivingStockDetailDto FormReceivingStock = new();
-        private ReceivingStockDetailDto TempFormReceivingStock = new();
+        private ReceivingStockProductDto FormReceivingDetailStock = new();
+        private ReceivingStockProductDto TempFormReceivingStockDetail = new();
+        private ReceivingStockDto GetReceivingStock = new();
+        private ReceivingStockDto FormReceivingStocks = new();
+        private TransactionStockDetailDto FormTransactionDetail = new();
 
         #endregion Relation Data
 
@@ -91,7 +94,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             PanelVisible = true;
             showForm = false;
-            stockProducts = await Mediator.Send(new GetStockProductQuery());
+            ReceivingStocks = await Mediator.Send(new GetReceivingStockQuery());
             receivingStockDetails = await Mediator.Send(new GetReceivingStockDetailQuery());
             Locations = await Mediator.Send(new GetLocationQuery());
             Products = await Mediator.Send(new GetProductQuery());
@@ -99,15 +102,18 @@ namespace McDermott.Web.Components.Pages.Inventory
             PanelVisible = false;
         }
 
-        private async Task SelectedChangeProduct(ProductDto product)
+        private void SelectedChangeProduct(ProductDto product)
         {
-            var productName = Products.Where(p => p.Id == product.Id).FirstOrDefault();
-            var uomName = Uoms.Where(u => u.Id == product.UomId).Select(x => x.Name).FirstOrDefault();
-            var purchaseName = Uoms.Where(u => u.Id == product.PurchaseUomId).Select(x => x.Name).FirstOrDefault();
-            TempFormReceivingStock.PurchaseName = purchaseName;
-            TempFormReceivingStock.UomName = uomName;
-            TempFormReceivingStock.ProductName = productName.Name;
-            //TempFormReceivingStock.TraceAbility = productName.TraceAbility;
+            if (product is not null)
+            {
+                var productName = Products.Where(p => p.Id == product.Id).FirstOrDefault();
+                var uomName = Uoms.Where(u => u.Id == product.UomId).Select(x => x.Name).FirstOrDefault();
+                var purchaseName = Uoms.Where(u => u.Id == product.PurchaseUomId).Select(x => x.Name).FirstOrDefault();
+                TempFormReceivingStockDetail.PurchaseName = purchaseName;
+                TempFormReceivingStockDetail.UomName = uomName;
+                TempFormReceivingStockDetail.ProductName = productName.Name;
+                TempFormReceivingStockDetail.TraceAbility = productName.TraceAbility;
+            }
         }
 
         private async Task HandleValidSubmit()
@@ -211,21 +217,30 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task NewItemDetail_Click()
         {
             IsAddReceived = true;
-            TempFormReceivingStock = new();
-            await GridProduct.StartEditNewRowAsync();
+            TempFormReceivingStockDetail = new();
+            await GridProduct!.StartEditNewRowAsync();
         }
 
         private async Task EditItemDetail_Click()
         {
-            await GridProduct.StartEditRowAsync(FocusedRowVisibleIndex);
+            await GridProduct!.StartEditRowAsync(FocusedRowVisibleIndex);
             IsAddReceived = false;
         }
 
         private async Task DeleteItemDetail_Click()
         {
+            GridProduct!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
         #endregion Click Button
+
+        #region Validation
+
+        private async Task onValidaion()
+        {
+        }
+
+        #endregion Validation
 
         #region Function Delete
 
@@ -249,9 +264,68 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     return;
                 }
-                if (FormReceivingStock.Id == 0)
+                if (FormReceivingStocks.Id == 0)
                 {
+                    FormReceivingStocks.StatusReceived = "Draft";
+
+                    GetReceivingStock = await Mediator.Send(new CreateReceivingStockRequest(FormReceivingStocks));
+                    if (TempReceivingStockDetails.Count > 0)
+                    {
+                        foreach (var item in TempReceivingStockDetails)
+                        {
+                            item.ReceivingStockId = GetReceivingStock.Id;
+                            item.ProductId = TempFormReceivingStockDetail.ProductId;
+                            item.Qty = TempFormReceivingStockDetail.Qty;
+                            item.ExpiredDate = TempFormReceivingStockDetail.ExpiredDate;
+                            item.Batch = TempFormReceivingStockDetail.Batch;
+
+                            await Mediator.Send(new CreateReceivingStockDetailRequest(item));
+                        }
+                    }
+                    ToastService.ShowSuccess("Add Data Success...");
                 }
+                else
+                {
+                    GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
+
+                    var check_Detail = await Mediator.Send(new GetReceivingStockQuery(x => x.Id == GetReceivingStock.Id));
+
+                    await Mediator.Send(new DeleteReceivingStockPoductRequest(ids: receivingStockDetails.Select(x => x.Id).ToList()));
+
+                    var request = new List<ReceivingStockProductDto>();
+                    if (TempReceivingStockDetails.Count > 0)
+                    {
+                        TempReceivingStockDetails.ForEach(x =>
+                        {
+                            x.Id = 0;
+                            x.ReceivingStockId = check_Detail[0].Id;
+                        });
+
+                        for (int i = 0; i < TempReceivingStockDetails.Count; i++)
+                        {
+                            var cekLagi = TempReceivingStockDetails.FirstOrDefault(x => x.ReceivingStockId == TempReceivingStockDetails[i].ReceivingStockId);
+                            if (cekLagi is null)
+                            {
+                                TempReceivingStockDetails.Add(new ReceivingStockProductDto
+                                {
+                                    Id = 0,
+                                    ReceivingStockId = check_Detail[0].Id
+                                });
+                            }
+                        }
+                        await Mediator.Send(new CreateListReceivingStockDetailRequest(TempReceivingStockDetails));
+                    }
+                    ToastService.ShowSuccess("Update Data Success...");
+                }
+                FormTransactionDetail.DestinationId = GetReceivingStock.DestinationId;
+                FormTransactionDetail.TransactionStockId = GetReceivingStock.Id;
+                FormTransactionDetail.StatusTransfer = GetReceivingStock.StatusReceived;
+                FormTransactionDetail.TypeTransaction = "Received";
+
+                await Mediator.Send(new CreateTransactionStockDetailRequest(FormTransactionDetail));
+
+                ToastService.ShowSuccess("Add Data Success!..");
+                ToastService.ClearSuccessToasts();
             }
             catch (Exception ex)
             {
@@ -263,8 +337,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
-                var tempReceiving = (ReceivingStockDetailDto)e.EditModel;
-                ReceivingStockDetailDto updates = new();
+                var tempReceiving = (ReceivingStockProductDto)e.EditModel;
+                ReceivingStockProductDto updates = new();
 
                 if (IsAddReceived)
                 {
@@ -272,11 +346,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                     if (TempReceivingStockDetails.Any(x => x.ProductId == tempReceiving.ProductId))
                         return;
 
-                    TempReceivingStockDetails.Add(TempFormReceivingStock);
+                    TempFormReceivingStockDetail.Id = Helper.RandomNumber;
+                    TempReceivingStockDetails.Add(TempFormReceivingStockDetail);
                 }
                 else
                 {
-                    var d = SelectedDataItemsDetail[0].Adapt<ReceivingStockDetailDto>();
+                    var d = SelectedDataItemsDetail[0].Adapt<ReceivingStockProductDto>();
                     var checkData = TempReceivingStockDetails.FirstOrDefault(x => x.ProductId == d.ProductId);
                     if (checkData is not null && d.ProductId == tempReceiving.ProductId)
                         return;

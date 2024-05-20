@@ -10,7 +10,6 @@ namespace McDermott.Application.Dtos.Inventory
     public class TransactionStockDto : IMapFrom<TransactionStock>
     {
         public long Id { get; set; }
-        public long? StockId { get; set; }
 
         [Required(ErrorMessage = "Please Select Source Location... ")]
         public long? SourceId { get; set; }
@@ -24,11 +23,11 @@ namespace McDermott.Application.Dtos.Inventory
         public string? Reference { get; set; }
 
         [SetToNull]
-        public virtual StockProductDto? Stock { get; set; }
-        [SetToNull]
         public virtual ProductDto? Product { get; set; }
+
         [SetToNull]
         public virtual LocationDto? Source { get; set; }
+
         [SetToNull]
         public virtual LocationDto? Destination { get; set; }
     }

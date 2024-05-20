@@ -14,6 +14,7 @@ namespace McDermott.Application.Dtos.Inventory
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
         public string? StatusTransfer { get; set; }
+        public string? TypeTransaction { get; set; }
 
         [SetToNull]
         public virtual TransactionStockDto? TransactionStock { get; set; }

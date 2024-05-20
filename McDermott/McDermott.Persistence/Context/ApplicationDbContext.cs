@@ -123,7 +123,7 @@ namespace McDermott.Persistence.Context
         public DbSet<Product> Products { get; set; }
         public DbSet<Medicament> Medicaments { get; set; }
         public DbSet<StockProduct> StockProducts { get; set; }
-        public DbSet<ReceivingStockDetail> ReceivingStockDetails { get; set; }
+        public DbSet<ReceivingStockProduct> ReceivingStockDetails { get; set; }
         public DbSet<TransactionStock> TransactionStocks { get; set; }
         public DbSet<TransactionStockDetail> TransactionStockDetails { get; set; }
 
@@ -162,13 +162,13 @@ namespace McDermott.Persistence.Context
                   .HasIndex(e => e.NoCard)
                   .IsUnique();
 
-            modelBuilder.Entity<ReceivingStockDetail>()
+            modelBuilder.Entity<ReceivingStockProduct>()
               .HasOne(h => h.Product)
-              .WithMany(m => m.ReceivingStockDetail)
+              .WithMany(m => m.ReceivingStockProduct)
               .OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<ReceivingStockDetail>()
+            modelBuilder.Entity<ReceivingStockProduct>()
               .HasOne(h => h.Stock)
-              .WithMany(m => m.ReceivingStockDetail)
+              .WithMany(m => m.ReceivingStockProduct)
               .OnDelete(DeleteBehavior.SetNull);
 
             // Contoh: Aturan cascade delete untuk hubungan many-to-many

@@ -21,6 +21,7 @@ namespace McDermott.Web.Components.Pages.Queue
         public List<UserDto> Physician = new();
         public List<ClassTypeDto> classTypes = new();
         public List<GroupDto> groups = new();
+        public List<InsurancePolicyDto> InsurancePolices = [];
 
         #endregion Relation Data
 
@@ -347,18 +348,22 @@ namespace McDermott.Web.Components.Pages.Queue
                 showForm = true;
                 NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
                 FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
-                FormKios.BPJS = Patients.Select(x => x.NoBpjsKs).FirstOrDefault();
-                if (FormKios.BPJS != null)
+                var BPJS = InsurancePolices.Where(x => x.UserId == FormKios.PatientId).FirstOrDefault();
+                if (BPJS is not null)
                 {
-                    FormKios.StageBpjs = true;
-                    statBPJS = "Active";
+                    FormKios.BPJS = BPJS.PolicyNumber;
+                    if (BPJS.Active)
+                    {
+                        FormKios.StageBpjs = true;
+                        statBPJS = "Active";
+                    }
+                    else
+                    {
+                        FormKios.StageBpjs = false;
+                        statBPJS = "InActive";
+                    }
                 }
-                else
-                {
-                    FormKios.StageBpjs = false;
-                    statBPJS = "InActive";
-                }
-                if (NameGroup.Name == "Nurse" || NameGroup.Name == "Perawat")
+                if (NameGroup.Name == "Nurse" || NameGroup.Name == "Perawat" || NameGroup.Name == "Nursing")
                 {
                     showClass = true;
                 }
@@ -412,8 +417,6 @@ namespace McDermott.Web.Components.Pages.Queue
                     body {{
                         font-family: Arial, sans-serif;
                         display: flex;
-                        justify-content: center;
-                        align-items: center;
                         height: 100vh;
                         margin: 0;
                         padding: 0;
@@ -427,11 +430,15 @@ namespace McDermott.Web.Components.Pages.Queue
                     }}
                     .company-logo img {{
                         width: 50px;
+                        justify-content: center;
+                        align-items: center;
                         height: auto;
                         margin-bottom: 10px;
                     }}
                     .company-name {{
-                        font-size: 18px;
+                        justify-content: center;
+                        align-items: center;
+                        font-size: 38px;
                         font-weight: bold;
                         margin-bottom: 10px;
                     }}
@@ -440,14 +447,16 @@ namespace McDermott.Web.Components.Pages.Queue
                         margin-bottom: 5px;
                     }}
                     .queue-number {{
-                        font-size: 48px;
+                        justify-content: center;
+                        align-items: center;
+                        font-size: 88px;
                         font-weight: bold;
                     }}
                 </style>
             </head>
             <body>
                 <div class='print-container'>
-                    <div class='company-logo'><img src='/image/bgCounter.jpg' alt='Logo Perusahaan'></div>
+                    <div class='company-logo'><img src='/image/ses.jpg' alt='Logo Perusahaan'></div>
                     <div class='company-name'>McHealthCare</div>
                     <div class='queue-label'>Your Number :</div>
                     <div class='queue-number'>{queueNumber}</div>
