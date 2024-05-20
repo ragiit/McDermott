@@ -570,9 +570,8 @@ namespace McDermott.Web.Components.Pages.Patient
 
                 PatientFamilyRelations = await Mediator.Send(new GetPatientFamilyByPatientQuery(x => x.PatientId == UserForm.Id));
                 AllPatientFamilyRelations = [.. PatientFamilyRelations];
-                //InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
                 var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
-                SelectedAllergies = Allergies.Where(x => UserForm.PatientAllergyIds.Contains(x.Id)).ToList();
+                SelectedAllergies = Allergies.Where(x => UserForm.PatientAllergyIds is not null && UserForm.PatientAllergyIds.Contains(x.Id)).ToList();
                 InsurancePoliciesCount = count.Count;
                 var alergy = await Mediator.Send(new GetPatientAllergyQuery(x => x.UserId == UserForm.Id));
                 if (alergy.Count == 0)

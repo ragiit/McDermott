@@ -1068,18 +1068,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                         return;
                 }
 
-                if (FormRegis.Id == 0)
-                {
-                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
-
-                    if (patient.Count > 0)
-                    {
-                        IsLoading = false;
-                        ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
-                        return;
-                    }
-                }
-
                 if (FormRegis.Id != 0)
                 {
                     var text = FormRegis.StagingStatus == "Physician" ? "Consultation Done" : FormRegis.StagingStatus;
@@ -1109,6 +1097,15 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                 {
+                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+
+                    if (patient.Count > 0)
+                    {
+                        IsLoading = false;
+                        ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
+                        return;
+                    }
+
                     FormRegis.StagingStatus = "Confirmed";
                     StagingText = "Nurse Station";
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
@@ -1757,7 +1754,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             showForm = false;
             PanelVisible = true;
             PatientAllergy = new();
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
             PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
             await SelectData();

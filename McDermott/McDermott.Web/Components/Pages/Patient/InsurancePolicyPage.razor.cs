@@ -174,13 +174,27 @@
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(User.Name))
+                if (User is null || User.Id == 0)
                 {
                     ToastService.ShowInfo("Please select the Patient first.");
                     return;
                 }
 
                 InsurancePoliciyForm.UserId = User.Id;
+
+                if (IsBPJS)
+                {
+                    var query = BPJSIntegration.Id == 0
+                                ? new GetBPJSIntegrationQuery(x => !string.IsNullOrWhiteSpace(x.NoKartu) && x.NoKartu.ToLower().Trim().Equals(BPJSIntegration.NoKartu))
+                                : new GetBPJSIntegrationQuery(x => x.Id != BPJSIntegration.Id && !string.IsNullOrWhiteSpace(x.NoKartu) && x.NoKartu.ToLower().Trim().Equals(BPJSIntegration.NoKartu));
+
+                    var bpjs = await Mediator.Send(query);
+                    if (bpjs.Count > 0)
+                    {
+                        ToastService.ShowInfo("Card Number already exist");
+                        return;
+                    }
+                }
 
                 if (InsurancePoliciyForm.Id == 0)
                 {

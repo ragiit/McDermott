@@ -263,6 +263,7 @@
         public bool IsSinusBradycardia { get; set; } = false;
         public long HR { get; set; }
         public bool IsSinusTachycardia { get; set; } = false;
+        public string? ECGAttachment { get; set; }
         //public bool IsVentriculatExtraSystole { get; set; } = false;
         //public bool IsSupraventricularExtraSystole { get; set; } = false;
         public bool IsOtherECG { get; set; } = false;
