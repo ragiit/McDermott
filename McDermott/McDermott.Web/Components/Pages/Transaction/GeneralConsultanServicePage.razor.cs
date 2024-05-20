@@ -320,6 +320,17 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Form Regis
 
+        public MarkupString GetStatusIconHtml(GeneralConsultanServiceDto priority)
+        {
+            if (priority is not null)
+            {
+                string html = $"<span class='badge bg-dark py-1 px-2' title='{priority.StagingStatus} Priority'>{priority.StagingStatus}</span>";
+
+                return new MarkupString(html);
+            }
+            return new MarkupString("");
+        }
+
         public MarkupString GetIssuePriorityIconHtml(GeneralConsultanServiceDto priority)
         {
             if (priority is not null)

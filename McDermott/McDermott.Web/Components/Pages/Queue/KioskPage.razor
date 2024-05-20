@@ -45,9 +45,8 @@
                                     </div>
                                     <div class="card-body">
                                         <EditForm Model="@FormKios" Context="EditFormContext">
-                                            <DxFormLayout CssClass="mt w-100">
-
-                                                <DxFormLayoutItem Caption="@captions" ColSpanMd="12">
+                                            <DxFormLayout CssClass="w-100">
+                                                <DxFormLayoutItem Caption="@captions" CaptionCssClass="normal-caption required-caption" ColSpanMd="12">
                                                     <Template>
                                                         <DxGridLayout>
                                                             <Rows>
@@ -178,57 +177,71 @@
         }
         else
         {
-            <div class="centered-container">
-                <div class="card custom-card custom-card-image">
-                    <div class="card-body">
-                        <div class="row justify-content-center">
-                            <div class="col-md">
-                                <div class="card shadow-sm mb-5 bg-white rounded ">
-                                    <div class="card-body py-0">
-                                        <p class="fs-3 my-0 text-center text-success">Your Number Queue is Generated Succcesfully!!</p>
+            <div class="wrapper">
+                @if (IsLoading)
+                {
+                    <LoadingIndicatorLayout />
+                }
+                else
+                { 
+                    <div class="container">
+                        <div class="container-fluid">
+                            <div class="centered-container">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <!-- Card with Queue Number -->
+                                        <div class="card custom-card custom-card-image mb-3 shadow">
+                                            <div class="card-body">
+                                                <div class="row justify-content-center">
+                                                    <div class="col-md">
+                                                        <div class="card shadow-sm bg-white rounded">
+                                                            <div class="card-body py-0">
+                                                                <p class="fs-3 p-2 my-0 text-center text-success"><b>Your Queue Number is Generated Successfully!!</b></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row justify-content-center mt-2">
+                                                    <div class="col-md-6 align-self-center">
+                                                        <div class="card rounded-3 shadow">
+                                                            <div class="card-body">
+                                                                <h4 class="mt fw-bold text-center">Queue Number</h4>
+                                                                <h1 class="mt-1 fw-bolder display-1 text-center">@string.Format("{0:D3}", ViewQueue is not null ? ViewQueue.QueueNumber : string.Empty)</h1>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Buttons row -->
+                                        <div class="row w-100 mt-5">
+                                            <div class="col-md-12">
+                                                <div class="row justify-content-center">
+                                                    <div class="col-auto">
+                                                        <DxButton CssClass="w-100" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-trash" Text="Cancel" Click="@(() => OnCanceled(ViewQueue.Id))"></DxButton>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <DxButton CssClass="w-100" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-print" Click="onPrint" Text="Print"></DxButton>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <DxButton CssClass="w-100" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" RenderStyleMode="@ButtonRenderStyleMode.Contained" Text="Close" Click="OnCancel"></DxButton>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row justify-content-center">
-                            <div class="col-md-6 align-self-center">
-                                <div class="card rounded-3">
-                                    <div class="card-body">
-                                        <h4 class="mt fw-bold text-center">Number Queue</h4>
-
-                                        <h1 class="mt-1 fw-bolder display-1 text-center"> @string.Format("{0:D3}", ViewQueue is not null ? ViewQueue.QueueNumber : string.Empty)</h1>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        
-                        <div class="row justify-content-between">
-                            <div class="col-auto">
-                                <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-trash"  Text="Canceled" Click="@(() => OnCanceled(ViewQueue.Id))"></DxButton>
-                            </div>
-                            <div class="col-auto">
-                                <DxButton RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-print" Click="onPrint" Text="Print"></DxButton>
-                            </div>
-                            <div class="col-auto">
-                                <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Closed" Click="OnCancel"></DxButton>
-                            </div>
-                        </div>
-                       
                     </div>
-
-                </div>
+                }
             </div>
         }
-    }
-
+    } 
 }
 else
 {
-    <div class="wrapper">
-        @* <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Kiosk" /> *@
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    <div class="wrapper"> 
+        <LoadingIndicatorLayout />
     </div>
 }

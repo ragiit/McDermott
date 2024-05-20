@@ -1,5 +1,4 @@
 ﻿using McDermott.Application.Dtos.Queue;
-using System.Drawing;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 
@@ -199,7 +198,7 @@ namespace McDermott.Web.Components.Pages.Queue
             FormKios = new();
             Physician = await Mediator.Send(new GetUserQuery());
             KioskQueues = await Mediator.Send(new GetKioskQueueQuery());
-            ViewQueue = KioskQueues.OrderByDescending(x => x.CreatedDate).FirstOrDefault();
+            ViewQueue = KioskQueues.OrderByDescending(x => x.CreatedDate).FirstOrDefault() ?? new();
             SelectedDataItems = new ObservableRangeCollection<object>();
             Kiosks = await Mediator.Send(new GetKioskQuery());
             Services = await Mediator.Send(new GetServiceQuery());
@@ -338,9 +337,9 @@ namespace McDermott.Web.Components.Pages.Queue
         private async Task OnSearch()
         {
             var group = await Mediator.Send(new GetGroupQuery());
-            var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId);
+            var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
             var types = FormKios.Type;
-            var InputSearch = FormKios.NumberType;
+            var InputSearch = FormKios.NumberType ?? string.Empty;
             Patients = await Mediator.Send(new GetDataUserForKioskQuery(InputSearch));
 
             if (Patients != null)
@@ -370,7 +369,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
                 foreach (var kiosk in KioskConf)
                 {
-                    var serviceIds = kiosk.ServiceIds;
+                    var serviceIds = kiosk.ServiceIds ?? [];
                     CountServiceId = KioskConf.SelectMany(k => k.ServiceIds).Count();
 
                     if (CountServiceId > 1)
@@ -383,7 +382,7 @@ namespace McDermott.Web.Components.Pages.Queue
                         var serviceId = FormKios.ServiceId;
                         if (serviceId.HasValue)
                         {
-                            LoadPhysicians(serviceId.Value);
+                            await LoadPhysicians(serviceId.Value);
                         }
 
                         showPhysician = true;
@@ -398,7 +397,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task onPrint()
         {
-            var aas = ViewQueue.QueueNumber.ToString();
+            var aas = ViewQueue.QueueNumber.ToString() ?? string.Empty;
             string queueNumber = aas.PadLeft(3, '0');
 
             // HTML untuk dokumen cetak
@@ -493,13 +492,26 @@ namespace McDermott.Web.Components.Pages.Queue
         #endregion Methode Delete
 
         #region Methode Save And Update
-
+        private bool IsLoading { get; set; } = false;
         private async Task OnSave()
         {
             try
             {
                 var edit = FormKios;
                 showQueue = true;
+                IsLoading = true;
+
+                FormGeneral.Method = null;
+                FormGeneral.InsurancePolicyId = null;
+
+                // Save BPJS Insurance Policy
+                var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => FormKios != null && FormKios.NumberType != null && x.NoKartu != null && x.NoKartu.ToLower().Trim().Equals(FormKios.NumberType.ToLower().Trim())));
+                if (bpjs is not null && bpjs.Count > 0)
+                {
+                    FormGeneral.Method = "BPJS";
+                    FormGeneral.InsurancePolicyId = bpjs[0].InsurancePolicyId;
+                }
+
                 if (FormKios.Id == 0)
                 {
                     // Mendapatkan ID dari hasil CreateKioskRequest
@@ -514,14 +526,15 @@ namespace McDermott.Web.Components.Pages.Queue
                         }
                         else
                         {
-                            var GetNoQueue = TodayQueu.OrderByDescending(x => x.QueueNumber).FirstOrDefault();
+                            var GetNoQueue = TodayQueu.OrderByDescending(x => x.QueueNumber).FirstOrDefault() ?? new();
                             if (GetNoQueue.QueueNumber < 9)
                             {
                                 FormQueue.QueueNumber = 1 * (long)GetNoQueue.QueueNumber + 2;
                             }
                             else
                             {
-                                ToastService.ShowError("Penuh Eyy!!");
+                                IsLoading = false;
+                                ToastService.ShowError("Full!!");
                                 return;
                             }
                         }
@@ -529,7 +542,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     else
                     {
                         //Mendapatkan data berdasarkan Counter, service dan tanggal hari ini
-                        var TodayQueu = KioskQueues.Where(x => x.ServiceId == checkId.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date).ToList();
+                        var TodayQueu = KioskQueues.Where(x => x.ServiceId == checkId.ServiceId && x.CreatedDate.GetValueOrDefault().Date == DateTime.Now.Date).ToList();
 
                         if (TodayQueu.Count == 0)
                         {
@@ -537,14 +550,14 @@ namespace McDermott.Web.Components.Pages.Queue
                         }
                         else
                         {
-                            var GetNoQueue = TodayQueu.OrderByDescending(x => x.QueueNumber).FirstOrDefault();
+                            var GetNoQueue = TodayQueu.OrderByDescending(x => x.QueueNumber).FirstOrDefault() ?? new();
                             if (GetNoQueue.QueueNumber < 10)
                             {
                                 FormQueue.QueueNumber = 1 * ((long)GetNoQueue.QueueNumber + 2);
                             }
                             else
                             {
-                                FormQueue.QueueNumber = 1 * ((long)GetNoQueue.QueueNumber + 1);
+                                FormQueue.QueueNumber = 1 * ((long)GetNoQueue.QueueNumber.GetValueOrDefault() + 1);
                             }
                         }
                     }
@@ -560,8 +573,6 @@ namespace McDermott.Web.Components.Pages.Queue
 
                     // Membuat KioskQueue baru
                     var QueueKioskId = await Mediator.Send(new CreateKioskQueueRequest(FormQueue));
-
-                    ToastService.ShowSuccess("Number Queue is Generated Succces!!");
 
                     FormGeneral.PatientId = FormKios.PatientId;
                     FormGeneral.ServiceId = FormKios.ServiceId;
@@ -580,9 +591,11 @@ namespace McDermott.Web.Components.Pages.Queue
                 }
 
                 FormKios = new();
+                ToastService.ShowSuccess("Number Queue is Generated Succces!!");
                 await LoadData();
             }
             catch { }
+            IsLoading = false;
         }
 
         #endregion Methode Save And Update
