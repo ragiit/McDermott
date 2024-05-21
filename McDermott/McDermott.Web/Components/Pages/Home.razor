@@ -11,36 +11,36 @@
 
 @if (IsAccess)
 {
-        <div class="content-header">
-            <div class="container-fluid">
+    <div class="content-header">
+        <div class="container-fluid">
 
-                <h1><label>Home</label></h1>
+            <h1><label>Home</label></h1>
 
-                <p>Welcome, @UserLogin.Name. @Greeting</p>
-            </div>
+            <p>Welcome, @UserLogin.Name. @Greeting</p>
         </div>
+    </div>
 }
 else
 {
-        <section class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col">
-                        <div class="loading-panel-container">
-                            <DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                            CssClass="loading-panel"
-                                            IndicatorVisible="true"
-                                            IndicatorAreaVisible="true"
-                                            Visible="true"
-                                            Text="Processing..."
-                                            TextAlignment="LoadingPanelTextAlignment.Right">
-                                <div style="min-height: 50px;"></div>
-                            </DxLoadingPanel>
-                        </div>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="loading-panel-container">
+                        <DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                        CssClass="loading-panel"
+                                        IndicatorVisible="true"
+                                        IndicatorAreaVisible="true"
+                                        Visible="true"
+                                        Text="Processing..."
+                                        TextAlignment="LoadingPanelTextAlignment.Right">
+                            <div style="min-height: 50px;"></div>
+                        </DxLoadingPanel>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 }
 
 @code {
@@ -268,7 +268,11 @@ else
         // Dashboard.NurseCount = users.Where(x => x.IsNurse == true).Count();
         // Dashboard.EmployeeCount = users.Where(x => x.IsEmployee == true).Count();
 
-        await GetUserInfo();
+        try
+        {
+            await GetUserInfo();
+        }
+        catch { }
 
         PanelVisible = false;
         // try
@@ -298,8 +302,12 @@ else
             try
             {
                 await GetUserInfo();
+                StateHasChanged();
             }
-            catch { }
+            catch
+            {
+                await GetUserInfo();
+            }
         }
     }
 
@@ -317,7 +325,7 @@ else
             var encrypt = Helper.Encrypt(serialize);
             await a.UpdateAuthState(encrypt);
         }
-        catch { }
+        catch {   }
     }
 
     #endregion UserLoginAndAccessRole
