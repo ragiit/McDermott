@@ -95,29 +95,7 @@
                     {
                         @if (FormInternalTransfer.Id != 0)
                         {
-                            <div class="row justify-content-between mb-3">
-                                <div class="col-auto align-self-start">
-                                    @if (FormInternalTransfer.StatusTransfer == "Draft")
-                                    {
-                                        <DxButton Text="To do Check" RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-clipboard-check" Click="ToDoCheck"></DxButton>
-                                        <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check"></DxButton>
-                                        <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
-                                    }
-                                    else
-                                    {
-                                        @if (FormInternalTransfer.StatusTransfer == "Ready")
-                                        {
-                                            <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
-                                            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
-                                        }
-                                        else if (FormInternalTransfer.StatusTransfer == "Waiting")
-                                        {
-                                            <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check" Click="ToDoCheck"></DxButton>
-                                            <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
-                                            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
-                                        }
-                                    }
-                                </div>
+                            <div class="row justify-content-end mb-3">
                                 <div class="col-auto align-self-end">
                                     <DxTabs RenderMode="TabsRenderMode.AllTabs">
                                         <DxTab Text="Draft" Enabled="@(FormInternalTransfer.StatusTransfer == "Draft")"></DxTab>
@@ -126,6 +104,36 @@
                                         <DxTab Text="Done" Enabled="@(FormInternalTransfer.StatusTransfer == "Done")"></DxTab>
                                     </DxTabs>
                                 </div>
+                            </div>
+                            <div class="row justify-content-start mb-3">
+
+                                <div class="col-auto align-self-start">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            @if (FormInternalTransfer.StatusTransfer == "Draft")
+                                            {
+                                                <DxButton Text="To do Check" RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-clipboard-check" Click="ToDoCheck"></DxButton>
+                                                <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check"></DxButton>
+                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
+                                            }
+                                            else
+                                            {
+                                                @if (FormInternalTransfer.StatusTransfer == "Ready")
+                                                {
+                                                    <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
+                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
+                                                }
+                                                else if (FormInternalTransfer.StatusTransfer == "Waiting")
+                                                {
+                                                    <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check" Click="ToDoCheck"></DxButton>
+                                                    <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
+                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         }
                         <div class="card">

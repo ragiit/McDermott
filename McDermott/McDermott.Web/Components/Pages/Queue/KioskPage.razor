@@ -77,7 +77,12 @@
                                                     @if (NamePatient != null)
                                                     {
                                                         <DxFormLayoutItem Caption="Patient Name" ColSpanMd="12">
-                                                            <DxComboBox Data="@Patients" @bind-Value="FormKios.PatientId" FilteringMode="@DataGridFilteringMode.Contains" TextFieldName="setNameFamily" ValueFieldName="Id">
+                                                            <DxComboBox Data="@Patients"
+                                                                        @bind-Value="FormKios.PatientId"
+                                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        TextFieldName="setNameFamily"
+                                                                        ValueFieldName="Id"
+                                                                        SelectedItemChanged="@((UserDto user)=>UserSelected(user))">
 
                                                             </DxComboBox>
                                                         </DxFormLayoutItem>
@@ -183,7 +188,7 @@
                     <LoadingIndicatorLayout />
                 }
                 else
-                { 
+                {
                     <div class="container">
                         <div class="container-fluid">
                             <div class="centered-container">
@@ -237,11 +242,11 @@
                 }
             </div>
         }
-    } 
+    }
 }
 else
 {
-    <div class="wrapper"> 
+    <div class="wrapper">
         <LoadingIndicatorLayout />
     </div>
 }

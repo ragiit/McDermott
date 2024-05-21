@@ -124,6 +124,7 @@ namespace McDermott.Persistence.Context
         public DbSet<Medicament> Medicaments { get; set; }
         public DbSet<StockProduct> StockProducts { get; set; }
         public DbSet<ReceivingStockProduct> ReceivingStockDetails { get; set; }
+        public DbSet<ReceivingStock> ReceivingStocks { get; set; }
         public DbSet<TransactionStock> TransactionStocks { get; set; }
         public DbSet<TransactionStockDetail> TransactionStockDetails { get; set; }
 

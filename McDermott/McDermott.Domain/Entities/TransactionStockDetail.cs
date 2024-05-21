@@ -9,6 +9,7 @@ namespace McDermott.Domain.Entities
     public class TransactionStockDetail : BaseAuditableEntity
     {
         public long? TransactionStockId { get; set; }
+        public long? ReceivingStockId { get; set; }
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
         public string? StatusTransfer { get; set; }

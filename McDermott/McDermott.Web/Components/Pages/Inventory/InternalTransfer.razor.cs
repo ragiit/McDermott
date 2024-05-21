@@ -410,6 +410,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormInternalTransferDetail.SourceId = getInternalTransfer.SourceId;
                     FormInternalTransferDetail.DestinationId = getInternalTransfer.DestinationId;
                     FormInternalTransferDetail.StatusTransfer = getInternalTransfer.StatusTransfer;
+                    FormInternalTransferDetail.TypeTransaction = "Transfer"
 
                     await Mediator.Send(new CreateTransactionStockDetailRequest(FormInternalTransferDetail));
                 }
@@ -442,6 +443,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormInternalTransferDetail.SourceId = getInternalTransfer.SourceId;
                 FormInternalTransferDetail.DestinationId = getInternalTransfer.DestinationId;
                 FormInternalTransferDetail.StatusTransfer = getInternalTransfer.StatusTransfer;
+                FormInternalTransferDetail.TypeTransaction = "Transfer";
 
                 await Mediator.Send(new CreateTransactionStockDetailRequest(FormInternalTransferDetail));
             }
@@ -653,7 +655,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormInternalTransferDetail.SourceId = getInternalTransfer.SourceId;
                 FormInternalTransferDetail.DestinationId = getInternalTransfer.DestinationId;
                 FormInternalTransferDetail.StatusTransfer = getInternalTransfer.StatusTransfer;
-                FormInternalTransferDetail.TypeTransaction = "Internal";
+                FormInternalTransferDetail.TypeTransaction = "Transfer";
 
                 await Mediator.Send(new CreateTransactionStockDetailRequest(FormInternalTransferDetail));
                 await EditItem_Click(getInternalTransfer);

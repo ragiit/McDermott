@@ -11,6 +11,7 @@ namespace McDermott.Application.Dtos.Inventory
     {
         public long Id { get; set; }
         public long? TransactionStockId { get; set; }
+        public long? ReceivingStockId { get; set; }
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
         public string? StatusTransfer { get; set; }

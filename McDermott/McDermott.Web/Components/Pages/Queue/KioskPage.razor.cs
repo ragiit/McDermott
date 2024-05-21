@@ -86,6 +86,26 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
+        private void UserSelected(UserDto user)
+        {
+          
+            var BPJS = InsurancePolices.Where(x => x.UserId == user.Id).FirstOrDefault();
+            if (BPJS is not null)
+            {
+                FormKios.BPJS = BPJS.PolicyNumber;
+                if (BPJS.Active)
+                {
+                    FormKios.StageBpjs = true;
+                    statBPJS = "Active";
+                }
+                else
+                {
+                    FormKios.StageBpjs = false;
+                    statBPJS = "InActive";
+                }
+            }
+        }
+
         public void SelectedItemChanged(string kiosk)
         {
             if (kiosk == "Family Relation")
@@ -199,6 +219,7 @@ namespace McDermott.Web.Components.Pages.Queue
             Physician = await Mediator.Send(new GetUserQuery());
             KioskQueues = await Mediator.Send(new GetKioskQueueQuery());
             ViewQueue = KioskQueues.OrderByDescending(x => x.CreatedDate).FirstOrDefault() ?? new();
+            InsurancePolices = await Mediator.Send(new GetInsurancePolicyQuery());
             SelectedDataItems = new ObservableRangeCollection<object>();
             Kiosks = await Mediator.Send(new GetKioskQuery());
             Services = await Mediator.Send(new GetServiceQuery());
@@ -409,57 +430,60 @@ namespace McDermott.Web.Components.Pages.Queue
                 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
                 <title>Cetak Antrian</title>
                 <style>
-                    @page {{
-                        size: 8cm 8cm; /* Ukuran kertas 8x8 cm */
+                   @page {{size: 8cm 8cm; /* Ukuran kertas 8x8 cm */
                         margin: 0; /* Hilangkan margin default */
                     }}
-                    body {{
-                        font-family: Arial, sans-serif;
+                    body {{font - family: Arial, sans-serif;
                         display: flex;
+                        justify-content: center;
+                        align-items: center;
                         height: 100vh;
                         margin: 0;
                         padding: 0;
                     }}
-                    .print-container {{
-                        text-align: center;
-                        width: 8cm;
+                    .print-container {{width: 8cm;
                         height: 8cm;
                         padding: 20px;
                         box-sizing: border-box;
-                    }}
-                    .company-logo img {{
-                        width: 50px;
+                        flex-direction: column;
                         justify-content: center;
                         align-items: center;
+                        border: 1px solid black;
+                    }}
+                    .company{{align - items: center;
+                      justify-content: center;
+
+                        text-align:center;
+                    }}
+                    .company-logo img {{width: 50px;
                         height: auto;
                         margin-bottom: 10px;
                     }}
-                    .company-name {{
-                        justify-content: center;
-                        align-items: center;
-                        font-size: 38px;
+                    .company-name {{text - align: center;
+                        font-size: 18px;
                         font-weight: bold;
                         margin-bottom: 10px;
                     }}
-                    .queue-label {{
-                        font-size: 14px;
+                    .queue-label {{font - size: 14px;
                         margin-bottom: 5px;
                     }}
-                    .queue-number {{
-                        justify-content: center;
-                        align-items: center;
-                        font-size: 88px;
+                    .queue-number {{text - align: center;
+                        font-size: 48px;
                         font-weight: bold;
                     }}
                 </style>
             </head>
             <body>
-                <div class='print-container'>
-                    <div class='company-logo'><img src='/image/ses.jpg' alt='Logo Perusahaan'></div>
-                    <div class='company-name'>McHealthCare</div>
-                    <div class='queue-label'>Your Number :</div>
-                    <div class='queue-number'>{queueNumber}</div>
-                </div>
+                <page>
+                    <div class='print-container'>
+                        <div class=""company"">
+                          <div class='company-logo'><img src='https://th.bing.com/th/id/R.11c17a8cffdce4bc047102db49a94a51?rik=YMKOe232a1ee3w&riu=http%3a%2f%2flogos-download.com%2fwp-content%2fuploads%2f2016%2f02%2fBMW_logo_big_transparent_png.png&ehk=AhLghiJcc6OJgtYYdNOiiM061S%2fa11BCNRbBYQtUBjI%3d&risl=&pid=ImgRaw&r=0' alt='Logo Perusahaan'></div>
+                        </div>
+                        <div class='company-name'>McHealthCare</div>
+                        <div class='queue-label'>Your Number :</div>
+                        <div class='queue-number'>{queueNumber}</div>
+                    </div>
+                </page>
             </body>
             </html>";
 
@@ -492,7 +516,9 @@ namespace McDermott.Web.Components.Pages.Queue
         #endregion Methode Delete
 
         #region Methode Save And Update
+
         private bool IsLoading { get; set; } = false;
+
         private async Task OnSave()
         {
             try

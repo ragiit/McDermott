@@ -21,7 +21,7 @@ namespace McDermott.Application.Features.Commands.Inventory
 
         #region GET Receiving Stock Detail
 
-        public class GetReceivingStockDetailQuery(Expression<Func<ReceivingStockProduct, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ReceivingStockProductDto>>
+        public class GetReceivingStockProductQuery(Expression<Func<ReceivingStockProduct, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ReceivingStockProductDto>>
         {
             public Expression<Func<ReceivingStockProduct, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
@@ -75,14 +75,14 @@ namespace McDermott.Application.Features.Commands.Inventory
 
         #region CREATE Receiving Stock Detail
 
-        public class CreateReceivingStockDetailRequest(ReceivingStockProductDto ReceivingStockDetailDto) : IRequest<ReceivingStockProductDto>
+        public class CreateReceivingStockProductRequest(ReceivingStockProductDto ReceivingStockProductDto) : IRequest<ReceivingStockProductDto>
         {
-            public ReceivingStockProductDto ReceivingStockDetailDto { get; set; } = ReceivingStockDetailDto;
+            public ReceivingStockProductDto ReceivingStockProductDto { get; set; } = ReceivingStockProductDto;
         }
 
-        public class CreateListReceivingStockDetailRequest(List<ReceivingStockProductDto> ReceivingStockDetailDtos) : IRequest<List<ReceivingStockProductDto>>
+        public class CreateListReceivingStockProductRequest(List<ReceivingStockProductDto> ReceivingStockProductDtos) : IRequest<List<ReceivingStockProductDto>>
         {
-            public List<ReceivingStockProductDto> ReceivingStockDetailDtos { get; set; } = ReceivingStockDetailDtos;
+            public List<ReceivingStockProductDto> ReceivingStockProductDtos { get; set; } = ReceivingStockProductDtos;
         }
 
         #endregion CREATE Receiving Stock Detail

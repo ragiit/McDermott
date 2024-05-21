@@ -27,9 +27,9 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<UpdateReceivingStockRequest, ReceivingStockDto>,
         IRequestHandler<UpdateListReceivingStockRequest, List<ReceivingStockDto>>,
         IRequestHandler<DeleteReceivingStockRequest, bool>,
-        IRequestHandler<GetReceivingStockDetailQuery, List<ReceivingStockProductDto>>,
-        IRequestHandler<CreateReceivingStockDetailRequest, ReceivingStockProductDto>,
-        IRequestHandler<CreateListReceivingStockDetailRequest, List<ReceivingStockProductDto>>,
+        IRequestHandler<GetReceivingStockProductQuery, List<ReceivingStockProductDto>>,
+        IRequestHandler<CreateReceivingStockProductRequest, ReceivingStockProductDto>,
+        IRequestHandler<CreateListReceivingStockProductRequest, List<ReceivingStockProductDto>>,
         IRequestHandler<UpdateReceivingStockProductRequest, ReceivingStockProductDto>,
         IRequestHandler<UpdateListReceivingStockProductRequest, List<ReceivingStockProductDto>>,
         IRequestHandler<DeleteReceivingStockPoductRequest, bool>
@@ -71,13 +71,13 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #endregion GET
 
-        #region GET Receiving Stock Detail
+        #region GET Receiving Stock Product
 
-        public async Task<List<ReceivingStockProductDto>> Handle(GetReceivingStockDetailQuery request, CancellationToken cancellationToken)
+        public async Task<List<ReceivingStockProductDto>> Handle(GetReceivingStockProductQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetReceivingStockDetailQuery_";
+                string cacheKey = $"GetReceivingStockProductQuery_";
 
                 if (request.RemoveCache)
                     _cache.Remove(cacheKey);
@@ -110,7 +110,7 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        #endregion GET Receiving Stock Detail
+        #endregion GET Receiving Stock Product
 
         #region GET Receiving Stock
 
@@ -264,17 +264,17 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #endregion CREATE
 
-        #region CREATE Receiving Stock Detail
+        #region CREATE Receiving Stock Product
 
-        public async Task<ReceivingStockProductDto> Handle(CreateReceivingStockDetailRequest request, CancellationToken cancellationToken)
+        public async Task<ReceivingStockProductDto> Handle(CreateReceivingStockProductRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<ReceivingStockProduct>().AddAsync(request.ReceivingStockDetailDto.Adapt<ReceivingStockProduct>());
+                var result = await _unitOfWork.Repository<ReceivingStockProduct>().AddAsync(request.ReceivingStockProductDto.Adapt<ReceivingStockProduct>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetReceivingStockDetailQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetReceivingStockProductQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<ReceivingStockProductDto>();
             }
@@ -284,15 +284,15 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        public async Task<List<ReceivingStockProductDto>> Handle(CreateListReceivingStockDetailRequest request, CancellationToken cancellationToken)
+        public async Task<List<ReceivingStockProductDto>> Handle(CreateListReceivingStockProductRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<ReceivingStockProduct>().AddAsync(request.ReceivingStockDetailDtos.Adapt<List<ReceivingStockProduct>>());
+                var result = await _unitOfWork.Repository<ReceivingStockProduct>().AddAsync(request.ReceivingStockProductDtos.Adapt<List<ReceivingStockProduct>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetReceivingStockDetailQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetReceivingStockProductQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<List<ReceivingStockProductDto>>();
             }
@@ -302,7 +302,7 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        #endregion CREATE Receiving Stock Detail
+        #endregion CREATE Receiving Stock Product
 
         #region CREATE Receiving Stock
 

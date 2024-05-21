@@ -16,10 +16,12 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<ReceivingStockProductDto> TempReceivingStockDetails = [];
         private List<LocationDto> Locations = [];
         private List<ProductDto> Products = [];
+        private List<StockProductDto> Stocks = [];
         private List<UomDto> Uoms = [];
         private ReceivingStockProductDto FormReceivingDetailStock = new();
         private ReceivingStockProductDto TempFormReceivingStockDetail = new();
         private ReceivingStockDto GetReceivingStock = new();
+        private StockProductDto FormStockProduct = new();
         private ReceivingStockDto FormReceivingStocks = new();
         private TransactionStockDetailDto FormTransactionDetail = new();
 
@@ -31,9 +33,11 @@ namespace McDermott.Web.Components.Pages.Inventory
         private IGrid? GridProduct { get; set; }
         private bool PanelVisible { get; set; } = false;
         private bool showForm { get; set; } = false;
+        private bool isActiveButton { get; set; } = false;
         private bool IsAddReceived { get; set; } = false;
         private bool FormValidationState { get; set; } = false;
         private string? header { get; set; }
+        private long? receivingId { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsDetail { get; set; } = new ObservableRangeCollection<object>();
@@ -95,10 +99,11 @@ namespace McDermott.Web.Components.Pages.Inventory
             PanelVisible = true;
             showForm = false;
             ReceivingStocks = await Mediator.Send(new GetReceivingStockQuery());
-            receivingStockDetails = await Mediator.Send(new GetReceivingStockDetailQuery());
+            receivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery());
             Locations = await Mediator.Send(new GetLocationQuery());
             Products = await Mediator.Send(new GetProductQuery());
             Uoms = await Mediator.Send(new GetUomQuery());
+            Stocks = await Mediator.Send(new GetStockProductQuery());
             PanelVisible = false;
         }
 
@@ -197,11 +202,31 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             showForm = true;
             header = "Add Data";
+            isActiveButton = true;
         }
 
-        private async Task EditItem_Click()
+        private async Task EditItem_Click(ReceivingStockDto? p = null)
         {
             showForm = true;
+            PanelVisible = true;
+            header = "Edit Data";
+            FormReceivingStocks = p ?? SelectedDataItems[0].Adapt<ReceivingStockDto>();
+
+            if (FormReceivingStocks.StatusReceived != "Draft")
+            {
+                isActiveButton = false;
+            }
+
+            receivingId = FormReceivingStocks.Id;
+
+            receivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery(x => x.ReceivingStockId == FormReceivingStocks.Id));
+            TempReceivingStockDetails = receivingStockDetails.Select(x => x).ToList();
+            foreach (var item in TempReceivingStockDetails)
+            {
+                var d = Products.Where(x => x.Id == item.ProductId).FirstOrDefault();
+                item.UomName = Uoms.Where(u => u.Id == d.UomId).Select(x => x.Name).FirstOrDefault();
+                item.PurchaseName = Uoms.Where(p => p.Id == d.PurchaseUomId).Select(x => x.Name).FirstOrDefault();
+            }
         }
 
         private async Task DeleteItem_Click()
@@ -232,12 +257,80 @@ namespace McDermott.Web.Components.Pages.Inventory
             GridProduct!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
+        private async Task onDiscard()
+        {
+            await LoadData();
+        }
+
         #endregion Click Button
 
         #region Validation
 
-        private async Task onValidaion()
+        private async Task onValidation()
         {
+            var Stock = await Mediator.Send(new GetStockProductQuery());
+            var receivedStock = await Mediator.Send(new GetReceivingStockQuery());
+            var receivedProductStock = await Mediator.Send(new GetReceivingStockProductQuery());
+            FormReceivingStocks = receivedStock.Where(x => x.Id == receivingId).FirstOrDefault();
+
+            if (FormReceivingStocks is not null)
+            {
+                FormReceivingStocks.StatusReceived = "Done";
+                GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
+
+                var CheckReceivedProduct = receivedProductStock.Where(x => x.ReceivingStockId == GetReceivingStock.Id).ToList();
+                foreach (var a in CheckReceivedProduct)
+                {
+                    var checkStok = Stocks.Where(x => x.ProductId == a.ProductId && x.SourceId == GetReceivingStock.DestinationId).FirstOrDefault();
+                    if (checkStok is not null)
+                    {
+                        FormStockProduct.SourceId = GetReceivingStock.DestinationId;
+                        FormStockProduct.ProductId = a.ProductId;
+                        if (TempFormReceivingStockDetail.TraceAbility == true)
+                        {
+                            FormStockProduct.Expired = a.ExpiredDate;
+                            FormStockProduct.Batch = a.Batch;
+                        }
+                        FormStockProduct.Qty = a.Qty;
+                        await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
+                    }
+                    else
+                    {
+                        checkStok!.Qty = checkStok.Qty + a.Qty;
+                        await Mediator.Send(new UpdateStockProductRequest(checkStok));
+                    }
+                }
+
+                //Save Log..
+
+                FormTransactionDetail.DestinationId = GetReceivingStock.DestinationId;
+                FormTransactionDetail.ReceivingStockId = GetReceivingStock.Id;
+                FormTransactionDetail.StatusTransfer = GetReceivingStock.StatusReceived;
+                FormTransactionDetail.TypeTransaction = "Received";
+
+                await Mediator.Send(new CreateTransactionStockDetailRequest(FormTransactionDetail));
+            }
+        }
+
+        private async Task onCancel()
+        {
+            var receivedStock = await Mediator.Send(new GetReceivingStockQuery());
+            var receivedProductStock = await Mediator.Send(new GetReceivingStockProductQuery());
+            FormReceivingStocks = receivedStock.Where(x => x.Id == receivingId).FirstOrDefault();
+
+            if (FormReceivingStocks is not null)
+            {
+                FormReceivingStocks.StatusReceived = " Cancel";
+                GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
+            }
+
+            //Save Log
+            FormTransactionDetail.DestinationId = GetReceivingStock.DestinationId;
+            FormTransactionDetail.ReceivingStockId = GetReceivingStock.Id;
+            FormTransactionDetail.StatusTransfer = GetReceivingStock.StatusReceived;
+            FormTransactionDetail.TypeTransaction = "Received";
+
+            await Mediator.Send(new CreateTransactionStockDetailRequest(FormTransactionDetail));
         }
 
         #endregion Validation
@@ -273,13 +366,16 @@ namespace McDermott.Web.Components.Pages.Inventory
                     {
                         foreach (var item in TempReceivingStockDetails)
                         {
+                            item.Id = 0;
                             item.ReceivingStockId = GetReceivingStock.Id;
                             item.ProductId = TempFormReceivingStockDetail.ProductId;
                             item.Qty = TempFormReceivingStockDetail.Qty;
-                            item.ExpiredDate = TempFormReceivingStockDetail.ExpiredDate;
-                            item.Batch = TempFormReceivingStockDetail.Batch;
-
-                            await Mediator.Send(new CreateReceivingStockDetailRequest(item));
+                            if (TempFormReceivingStockDetail.TraceAbility == true)
+                            {
+                                item.ExpiredDate = TempFormReceivingStockDetail.ExpiredDate;
+                                item.Batch = TempFormReceivingStockDetail.Batch;
+                            }
+                            await Mediator.Send(new CreateReceivingStockProductRequest(item));
                         }
                     }
                     ToastService.ShowSuccess("Add Data Success...");
@@ -313,19 +409,20 @@ namespace McDermott.Web.Components.Pages.Inventory
                                 });
                             }
                         }
-                        await Mediator.Send(new CreateListReceivingStockDetailRequest(TempReceivingStockDetails));
+                        await Mediator.Send(new CreateListReceivingStockProductRequest(TempReceivingStockDetails));
                     }
                     ToastService.ShowSuccess("Update Data Success...");
                 }
                 FormTransactionDetail.DestinationId = GetReceivingStock.DestinationId;
-                FormTransactionDetail.TransactionStockId = GetReceivingStock.Id;
+                FormTransactionDetail.ReceivingStockId = GetReceivingStock.Id;
                 FormTransactionDetail.StatusTransfer = GetReceivingStock.StatusReceived;
                 FormTransactionDetail.TypeTransaction = "Received";
 
                 await Mediator.Send(new CreateTransactionStockDetailRequest(FormTransactionDetail));
 
-                ToastService.ShowSuccess("Add Data Success!..");
                 ToastService.ClearSuccessToasts();
+
+                await EditItem_Click(GetReceivingStock);
             }
             catch (Exception ex)
             {
