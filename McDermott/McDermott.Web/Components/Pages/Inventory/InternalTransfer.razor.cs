@@ -410,7 +410,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormInternalTransferDetail.SourceId = getInternalTransfer.SourceId;
                     FormInternalTransferDetail.DestinationId = getInternalTransfer.DestinationId;
                     FormInternalTransferDetail.StatusTransfer = getInternalTransfer.StatusTransfer;
-                    FormInternalTransferDetail.TypeTransaction = "Transfer"
+                    FormInternalTransferDetail.TypeTransaction = "Transfer";
 
                     await Mediator.Send(new CreateTransactionStockDetailRequest(FormInternalTransferDetail));
                 }

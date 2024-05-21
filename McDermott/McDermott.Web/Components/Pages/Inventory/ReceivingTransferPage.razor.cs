@@ -1,9 +1,5 @@
-﻿using McDermott.Domain.Entities;
-using MediatR;
-using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
 {
@@ -137,6 +133,38 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             showForm = true;
             FormValidationState = false;
+        }
+
+        public MarkupString GetIssueStatusIconHtml(string status)
+        {
+            string priorityClass;
+            string title;
+
+            switch (status)
+            {
+                case "Draft":
+                    priorityClass = "info";
+                    title = "Draft";
+                    break;
+
+                case "Done":
+                    priorityClass = "success";
+                    title = "Done";
+                    break;
+
+                case "Cancel":
+                    priorityClass = "danger";
+                    title = "Cancel";
+                    break;
+
+                default:
+                    return new MarkupString("");
+            }
+
+            string html = $"<div class='row '><div class='col-3'>" +
+                          $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+
+            return new MarkupString(html);
         }
 
         #endregion async Data
@@ -282,7 +310,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 foreach (var a in CheckReceivedProduct)
                 {
                     var checkStok = Stocks.Where(x => x.ProductId == a.ProductId && x.SourceId == GetReceivingStock.DestinationId).FirstOrDefault();
-                    if (checkStok is not null)
+                    if (checkStok is null)
                     {
                         FormStockProduct.SourceId = GetReceivingStock.DestinationId;
                         FormStockProduct.ProductId = a.ProductId;
