@@ -1,0 +1,552 @@
+﻿@page "/snippet"
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Snippet</PageTitle>
+
+<div class="wrapper">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row w-100">
+                <EditForm Model="@LabTest" @onkeypress="@KeyPressHandler" Context="EditFormContext22" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                    <DataAnnotationsValidator />
+                    <DxFormLayout CssClass="w-100">
+
+                        <DxFormLayoutItem Caption="Name" CaptionCssClass="normal-caption required-caption" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@LabTest.Name"
+                                       ShowValidationIcon="true"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                       NullText="Name" />
+                            <ValidationMessage For="@(() => LabTest.Name)"   />
+                        </DxFormLayoutItem>
+
+                        <DxFormLayoutItem Caption="Code" CaptionCssClass="normal-caption" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@LabTest.Code"
+                                       ShowValidationIcon="true"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                       NullText="Code" />
+                            <ValidationMessage For="@(() => LabTest.Code)"   />
+                        </DxFormLayoutItem>
+
+                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sample Type" ColSpanMd="12">
+                            <DxComboBox ShowValidationIcon="true"
+                                        Data="@SampleTypes"
+                                        NullText="Select Sample Type..."
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                        @bind-Value="@LabTest.SampleTypeId"
+                                        TextFieldName="Name"
+                                        ValueFieldName="Id">
+                            </DxComboBox>
+                            <ValidationMessage For="@(()=> LabTest.SampleTypeId)"   />
+                        </DxFormLayoutItem>
+
+                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result Type" ColSpanMd="12">
+                            <DxComboBox ShowValidationIcon="true"
+                                        Data="@ResultValueTypes"
+                                        NullText="Select Result Type..."
+                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                        @bind-Value="@LabTest.ResultType">
+                            </DxComboBox>
+                            <ValidationMessage For="@(()=> LabTest.ResultType)"   />
+                        </DxFormLayoutItem>
+                    </DxFormLayout>
+
+                    <hr />
+
+                    <DxFormLayout CssClass="w-100">
+                        <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Context="ItemContext" CaptionPosition="CaptionPosition.Vertical" Caption="Diagnosis" ColSpanMd="12">
+                            <Template>
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <DxGrid @ref="GridDetail" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                            Data="LabTestDetailForms"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDetailDataItems"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            EditModelSaving="OnSaveLabTestDetail"
+                                            DataItemDeleting="OnDeleteLabTestDetail"
+                                            AllowSelectRowByClick="true"
+                                            EditMode="GridEditMode.PopupEditForm"
+                                            PopupEditFormCssClass="pw-800"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            FocusedRowEnabled="true"
+                                            PagerVisibleNumericButtonCount="10"
+                                            TextWrapEnabled="false"
+                                            FocusedRowChanged="GridDetail_FocusedRowChanged"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            ShowFilterRow="true"
+                                            CustomizeElement="@GridExtention.Grid_CustomizeElement"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDetailDataItems.Count > 0 && LabTestDetailForms.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDetailDataItems.Count > 0 && LabTestDetailForms.Count > 0" />
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" Caption="Parameter" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="LabUom.Name" Caption="UoM" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="NormalRangeMale" Caption="Normal Range (Male)" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="NormalRangeFemale" Caption="Normal Range (Female)" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="ResultValueType" Caption="Result Value Type" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Remark" Caption="Remark" />
+                                        </Columns>
+                                        <EditFormTemplate Context="EditFormContext">
+                                            @{
+                                                var a = (LabTestDetailDto)EditFormContext.EditModel;
+                                                if (string.IsNullOrWhiteSpace(a.ResultValueType))
+                                                {
+                                                    a.ResultValueType = LabTest.ResultType;
+                                                }
+                                            }
+                                            <DxFormLayout CssClass="w-100">
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Parameter" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.Name" NullText="Parameter" InputCssClass="fw-normal" ShowValidationIcon="true" />
+                                                    <ValidationMessage For="@(() => a.Name)" />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Range (Male)" ColSpanMd="12">
+                                                    <DxTextBox ShowValidationIcon="true" @bind-Text="@a.NormalRangeMale" NullText="Normal Range (Male)" InputCssClass="fw-normal" />
+                                                    <ValidationMessage For="@(() => a.NormalRangeMale)" />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Range (Female)" ColSpanMd="12">
+                                                    <DxTextBox ShowValidationIcon="true" @bind-Text="@a.NormalRangeFemale" NullText="Normal Range (Female)" InputCssClass="fw-normal" />
+                                                    <ValidationMessage For="@(() => a.NormalRangeFemale)" />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="UoM" ColSpanMd="12">
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                Data="@LabUoms"
+                                                                NullText="Select UoM..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
+                                                                @bind-Value="@a.LabUomId"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id">
+                                                    </DxComboBox>
+                                                    <ValidationMessage For="@(()=> a.LabUomId)"   />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result Value Type" ColSpanMd="12">
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                Data="@ResultValueTypes"
+                                                                NullText="Select Result Value Type..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
+                                                                @bind-Value="@a.ResultValueType">
+                                                    </DxComboBox>
+                                                    <ValidationMessage For="@(()=> a.ResultValueType)"   />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Remark" ColSpanMd="12">
+                                                    <DxTextBox ShowValidationIcon="true" @bind-Text="@a.Remark" NullText="Remark" InputCssClass="fw-normal" />
+                                                    <ValidationMessage For="@(() => a.Remark)" />
+                                                </DxFormLayoutItem>
+                                            </DxFormLayout>
+                                        </EditFormTemplate>
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                            </Template>
+                        </DxFormLayoutItem>
+
+                    </DxFormLayout>
+
+                    <div class="w-100 row justify-content-end mb-2">
+                        <div class="col-auto align-self-end p-0 m-0">
+                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                            </DxButton>
+                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Click="C" Text="Cancel"></DxButton>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+            <div class="row w-100 mt-5">
+                <div class="card-body">
+                    <DxLoadingPanel @bind-Visible="PanelVisible"
+                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                    IsContentBlocked="true"
+                                    ApplyBackgroundShading="true"
+                                    IndicatorAreaVisible="false"
+                                    Text="Fetching Data...">
+                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                Data="LabTests"
+                                PageSize="10"
+                                @bind-SelectedDataItems="@SelectedDataItems"
+                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                KeyFieldName="Id"
+                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                AllowSelectRowByClick="true"
+                                EditMode="GridEditMode.PopupEditForm"
+                                PopupEditFormCssClass="pw-800"
+                                DataItemDeleting="OnDelete"
+                                PagerPosition="GridPagerPosition.Bottom"
+                                PageSizeSelectorVisible="true"
+                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                PageSizeSelectorAllRowsItemVisible="true"
+                                EditorRenderMode="GridEditorRenderMode.Detached"
+                                PagerSwitchToInputBoxButtonCount="10"
+                                FocusedRowEnabled="true"
+                                PagerVisibleNumericButtonCount="10"
+                                TextWrapEnabled="false"
+                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                ShowGroupPanel="true"
+                                AutoExpandAllGroupRows="true"
+                                ShowFilterRow="true"
+                                RowDoubleClick="EditItem_Click"
+                                CustomizeElement="@GridExtention.Grid_CustomizeElement"
+                                ShowSearchBox="true"
+                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                KeyboardNavigationEnabled="true">
+                            <ToolbarTemplate>
+                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && LabTests.Count > 0" />
+                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && LabTests.Count > 0" />
+
+                                </DxToolbar>
+                            </ToolbarTemplate>
+                            <Columns>
+                                <DxGridSelectionColumn Width="15px" />
+                                <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                <DxGridDataColumn MinWidth="200" FieldName="Code" SortIndex="0" />
+                                <DxGridDataColumn MinWidth="200" FieldName="SampleType.Name" Caption="Sample Type" SortIndex="0" />
+                            </Columns>
+                        </DxGrid>
+                    </DxLoadingPanel>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    #region UserLoginAndAccessRole
+
+    [Inject]
+    public UserInfoService UserInfoService { get; set; }
+
+    private GroupMenuDto UserAccessCRUID = new();
+    private User UserLogin { get; set; } = new();
+    private bool IsAccess = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            try
+            {
+                //await GetUserInfo();
+            }
+            catch { }
+        }
+    }
+
+    private async Task GetUserInfo()
+    {
+        try
+        {
+            var user = await UserInfoService.GetUserInfo();
+            IsAccess = user.Item1;
+            UserAccessCRUID = user.Item2;
+            UserLogin = user.Item3;
+        }
+        catch { }
+    }
+
+    #endregion UserLoginAndAccessRole
+    private void NewItem_Click()
+    {
+        ShowForm = true;
+        LabTest = new();
+        LabTestDetailForms = [];
+    }
+    private async Task C()
+    {
+        await LoadData(); 
+    }
+    private void DeleteItem_Click()
+    {
+        Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+    }
+    private async Task EditItem_Click()
+    {
+        ShowForm = true;
+        var labTest = await Mediator.Send(new GetLabTestQuery(x => x.Id == SelectedDataItems[0].Adapt<GroupDto>().Id));
+
+        if (labTest.Count > 0)
+        {
+            LabTest = labTest[0];
+            LabTestDetailForms = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id));
+        }
+    }
+    private async Task OnDelete(GridDataItemDeletingEventArgs e)
+    {
+        try
+        {
+            if (SelectedDataItems is null || SelectedDataItems.Count == 1)
+            {
+                await Mediator.Send(new DeleteLabTestRequest(((LabTestDto)e.DataItem).Id));
+            }
+            else
+            {
+                await Mediator.Send(new DeleteLabTestRequest(ids: SelectedDataItems.Adapt<List<LabTestDto>>().Select(x => x.Id).ToList()));
+            }
+
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+    }
+    private bool ShowForm { get; set; } = false;
+    private bool FormValidationState { get; set; } = true;
+    private bool PanelVisible { get; set; } = true;
+    private int FocusedRowDetailVisibleIndex { get; set; }
+    private int FocusedRowVisibleIndex { get; set; }
+
+
+    public IGrid Grid { get; set; }
+    public IGrid GridDetail { get; set; }
+    private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+
+    private IReadOnlyList<object> SelectedDetailDataItems { get; set; } = [];
+    private List<SampleTypeDto> SampleTypes = [];
+    private List<LabTestDto> LabTests = [];
+    private List<LabTestDetailDto> LabTestDetailForms = [];
+    private List<LabUomDto> LabUoms = [];
+    private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+    {
+        ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+    }
+    private List<string> ResultValueTypes =
+    [
+        "Quantitative",
+    "Qualitative"
+    ];
+    private LabTestDto LabTest = new();
+
+    private void KeyPressHandler(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            FormValidationState = false;
+            return;
+        }
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+        FormValidationState = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (FormValidationState)
+            await SaveItemLabTest();
+        else
+            FormValidationState = true;
+    }
+
+    private async Task LoadData()
+    {
+        PanelVisible = true;
+        ShowForm = false;
+        SelectedDataItems = [];
+        LabTests = await Mediator.Send(new GetLabTestQuery());
+        PanelVisible = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    { 
+    LabUoms = await Mediator.Send(new GetLabUomQuery());
+        await LoadData();
+    }
+
+    private void GridDetail_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+    {
+        FocusedRowDetailVisibleIndex = args.VisibleIndex;
+    }
+
+    private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+    {
+        FocusedRowVisibleIndex = args.VisibleIndex;
+    }
+    private async Task NewItemDetail_Click()
+    {
+        await GridDetail.StartEditNewRowAsync();
+    }
+
+    private async Task EditItemDetail_Click(IGrid context)
+    {
+        var selected = (LabTestDetailDto)context.SelectedDataItem;
+        var copy = selected.Adapt<LabTestDetailDto>();
+        await GridDetail.StartEditRowAsync(FocusedRowDetailVisibleIndex);
+        var w = LabTestDetailForms.FirstOrDefault(x => x.Id == copy.Id);
+    }
+
+    private void DeleteItemDetail_Click()
+    {
+        GridDetail.ShowRowDeleteConfirmation(FocusedRowDetailVisibleIndex);
+    }
+
+    private async Task OnDeleteLabTestDetail(GridDataItemDeletingEventArgs e)
+    {
+        if (LabTest.Id == 0)
+        {
+            try
+            {
+                if (SelectedDetailDataItems is null || SelectedDetailDataItems.Count == 1)
+                {
+                    LabTestDetailForms.Remove((LabTestDetailDto)e.DataItem);
+                }
+                else
+                {
+                    SelectedDetailDataItems.Adapt<List<LabTestDetailDto>>().Select(x => x.Id).ToList().ForEach(x =>
+                    {
+                        LabTestDetailForms.Remove(LabTestDetailForms.FirstOrDefault(z => z.Id == x));
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+        else
+        {
+            try
+            {
+                if (SelectedDetailDataItems is null || SelectedDataItems.Count == 1)
+                {
+                    await Mediator.Send(new DeleteLabTestDetailRequest(((LabTestDetailDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDetailDataItems.Adapt<List<LabTestDetailDto>>();
+                    await Mediator.Send(new DeleteLabTestDetailRequest(ids: a.Select(x => x.Id).ToList()));
+                }
+                SelectedDetailDataItems = [];
+                await LoadLabTestDetails();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+    }
+
+    private async Task OnSaveLabTestDetail(GridEditModelSavingEventArgs e)
+    {
+        if (e is null)
+            return;
+
+        var labTest = (LabTestDetailDto)e.EditModel;
+
+        if (LabTest.Id == 0)
+        {
+            try
+            {
+
+
+                LabTestDetailDto update = new();
+
+                if (labTest.Id == 0)
+                {
+                    labTest.Id = Helper.RandomNumber;
+                    labTest.LabUom = LabUoms.FirstOrDefault(x => x.Id == labTest.LabUomId);
+
+                    LabTestDetailForms.Add(labTest);
+                }
+                else
+                {
+                    var q = SelectedDetailDataItems[0].Adapt<LabTestDetailDto>();
+
+                    update = LabTestDetailForms.FirstOrDefault(x => x.Id == q.Id)!;
+                    labTest.LabUom = LabUoms.FirstOrDefault(x => x.Id == labTest.LabUomId);
+
+                    var index = LabTestDetailForms.IndexOf(update!);
+                    LabTestDetailForms[index] = labTest;
+                }
+
+                SelectedDetailDataItems = [];
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+        else
+        {
+            labTest.LabTestId = LabTest.Id;
+            if (labTest.Id == 0)
+                await Mediator.Send(new CreateLabTestDetailRequest(labTest));
+            else
+                await Mediator.Send(new UpdateLabTestDetailRequest(labTest));
+
+            await LoadLabTestDetails();
+        }
+    }
+
+    private async Task LoadLabTestDetails()
+    {
+        SelectedDetailDataItems = [];
+        LabTestDetailForms = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id));
+    }
+
+    private async Task SaveItemLabTest()
+    {
+        try
+        {
+            if (!FormValidationState && LabTestDetailForms.Count == 0)
+            {
+                ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+                return;
+            }
+
+            if (LabTest.Id == 0)
+            {
+                var result = await Mediator.Send(new CreateLabTestRequest(LabTest));
+                LabTestDetailForms.ForEach(x =>
+                {
+                    x.Id = 0;
+                    x.LabTestId = result.Id;
+                });
+                await Mediator.Send(new CreateListLabTestDetailRequest(LabTestDetailForms));
+            }
+            else
+            {
+                await Mediator.Send(new UpdateLabTestRequest(LabTest));
+            }
+
+            ShowForm = false;
+            LabTest = new();
+            LabTestDetailForms = [];
+            SelectedDetailDataItems = [];
+        }
+        catch (Exception e)
+        {
+            e.HandleException(ToastService);
+        }
+    }
+}

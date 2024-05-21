@@ -204,6 +204,11 @@ namespace McDermott.Web.Components.Pages.Medical
             FocusedRowDetailVisibleIndex = args.VisibleIndex;
         }
 
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+        }
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
