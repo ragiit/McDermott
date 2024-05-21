@@ -1,8 +1,7 @@
-﻿namespace McDermott.Application.Dtos.Pharmacy
+﻿namespace McDermott.Domain.Entities
 {
-    public class PrescriptionDto
+    public class Prescription : BaseAuditableEntity
     {
-        public long Id { get; set; }
         public long PharmacyId { get; set; }
         public long? DrugFromId { get; set; }
         public long? DrugRouteId { get; set; }
@@ -13,7 +12,7 @@
         public string? ProductName { get; set; }
         public string? DosageFrequency { get; set; }
         public string? DrugRoutName { get; set; }
-        public string? DrugDosageName { get; set; }
+        //public string? DrugDosageName { get; set; }
         public long? Stock { get; set; } // product stock
         public long? Dosage { get; set; }
         //public long? PrescribedAmount { get; set; } // jumlah yg diresepkan
@@ -23,12 +22,19 @@
         //public long? PreTaxConcoction { get; set; }
         //public long? Total { get; set; }
 
-        public DrugFormDto? DrugForm { get; set; }
-        public PharmacyDto? Pharmacy { get; set; }
-        public ProductDto? Product { get; set; } = new();
-        public SignaDto? Signa { get; set; }
-        public DrugRouteDto? DrugRoute { get; set; } = new();
-        public DrugDosageDto? DrugDosage { get; set; } = new();
-        public MedicamentGroupDto? MedicamentGroup { get; set; }
+        [SetToNull]
+        public DrugForm? DrugForm { get; set; }
+        [SetToNull]
+        public Pharmacy? Pharmacy { get; set; }
+        [SetToNull]
+        public Product? Product { get; set; }
+        [SetToNull]
+        public Signa? Signa { get; set; }
+        [SetToNull]
+        public DrugRoute? DrugRoute { get; set; }
+        [SetToNull]
+        public DrugDosage? DrugDosage { get; set; }
+        [SetToNull]
+        public MedicamentGroup? MedicamentGroup { get; set; }
     }
 }
