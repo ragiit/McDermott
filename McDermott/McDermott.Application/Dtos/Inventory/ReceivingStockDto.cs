@@ -11,7 +11,7 @@ namespace McDermott.Application.Dtos.Inventory
     {
         public long Id { get; set; }
         public long? DestinationId { get; set; }
-        public DateTime? SchenduleDate { get; set; }
+        public DateTime? SchenduleDate { get; set; } = DateTime.Now;
         public string? Reference { get; set; }
         public string? StatusReceived { get; set; }
 
