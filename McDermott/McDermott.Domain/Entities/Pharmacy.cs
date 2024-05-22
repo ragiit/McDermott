@@ -26,7 +26,7 @@
         public User? Practitioner { get; set; }
 
         [SetToNull]
-        public List<Prescription>? Prescriptions { get; set; }
+        public virtual List<Prescription>? Prescriptions { get; set; }
     }
 
     public enum EnumStatusPharmacy

@@ -167,6 +167,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     newPrescription.DosageFrequency = $"{medicamentDetails.Dosage}/{medicamentDetails.Frequency?.Frequency}";
                 }
 
+                newPrescription.Id = Helper.RandomNumber;
                 newPrescription.Product = medicamentDetails.Product;
                 newPrescription.DrugRoute = medicamentDetails.Route;
                 newPrescription.UomId = medicamentDetails.UomId;
@@ -201,6 +202,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             StockProducts = await Mediator.Send(new GetStockProductQuery());
             Medicaments = await Mediator.Send(new GetMedicamentQuery());
             ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
+            Pharmacies = await Mediator.Send(new GetPharmacyQuery());
 
             await GetUserInfo();
 
@@ -266,7 +268,27 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             IsLoading = false;
         }
 
-        private async Task OnDelete(GridDataItemDeletingEventArgs e)
+        private async Task OnDeletePharmacy(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                if (SelectedDataItems is null || SelectedDataItems.Count == 1)
+                {
+                    await Mediator.Send(new DeletePharmacyRequest(((PharmacyDto)e.DataItem).Id));
+                }
+                else
+                {
+                    await Mediator.Send(new DeletePharmacyRequest(ids: SelectedDataItems.Adapt<List<PharmacyDto>>().Select(x => x.Id).ToList()));
+                }
+                await LoadDataPharmacy();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task OnDeletePrescriptionLines(GridDataItemDeletingEventArgs e)
         {
             if (Pharmacy.Id == 0)
             {
@@ -280,7 +302,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     {
                         SelectedDataItemsPrescriptionLines.Adapt<List<LabTestDetailDto>>().Select(x => x.Id).ToList().ForEach(x =>
                         {
-                            Prescriptions.Remove(Prescriptions.FirstOrDefault(z => z.Id == x));
+                            Prescriptions.Remove(Prescriptions.FirstOrDefault(z => z.Id == x) ?? new());
                         });
                     }
                 }
@@ -293,15 +315,15 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 try
                 {
-                    if (SelectedDataItems is null || SelectedDataItems.Count == 1)
+                    if (SelectedDataItemsPrescriptionLines is null || SelectedDataItemsPrescriptionLines.Count == 1)
                     {
-                        await Mediator.Send(new DeletePharmacyRequest(((PharmacyDto)e.DataItem).Id));
+                        await Mediator.Send(new DeletePrescriptionRequest(((PrescriptionDto)e.DataItem).Id));
                     }
                     else
                     {
-                        await Mediator.Send(new DeletePharmacyRequest(ids: SelectedDataItems.Adapt<List<PharmacyDto>>().Select(x => x.Id).ToList()));
+                        await Mediator.Send(new DeletePrescriptionRequest(ids: SelectedDataItemsPrescriptionLines.Adapt<List<PrescriptionDto>>().Select(x => x.Id).ToList()));
                     }
-                    await LoadDataPharmacy();
+                    await LoadDataPresciptions();
                 }
                 catch (Exception ex)
                 {
@@ -333,17 +355,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             IsLoading = false;
         }
 
-        private async Task OnDeletePrescriptionLines(GridDataItemDeletingEventArgs e)
-        {
-            try
-            {
-            }
-            catch (Exception ee)
-            {
-                ee.HandleException(ToastService);
-            }
-        }
-
         private async Task NewItem_Click()
         {
             ShowForm = true;
@@ -358,6 +369,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task EditItem_Click()
         {
             ShowForm = true;
+            Pharmacy = new();
+            SelectedDataItemsPrescriptionLines = [];
+            Prescriptions = [];
         }
 
         private async Task Back_Click()
@@ -393,16 +407,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
 
                     var medicamentDetails = Medicaments.FirstOrDefault(s => s.ProductId == t.ProductId);
-                    if (medicamentDetails == null)
+                    if (medicamentDetails != null)
                     {
-                        return;
+                        if (medicamentDetails.Dosage != 0 && medicamentDetails.FrequencyId.HasValue)
+                        {
+                            t.DosageFrequency = $"{medicamentDetails.Dosage}/{medicamentDetails.Frequency?.Frequency}";
+                        }
                     }
-
-                    if (medicamentDetails.Dosage != 0 && medicamentDetails.FrequencyId.HasValue)
-                    {
-                        t.DosageFrequency = $"{medicamentDetails.Dosage}/{medicamentDetails.Frequency?.Frequency}";
-                    }
-
 
                     if (t.Id == 0)
                     {
@@ -446,18 +457,29 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task OnSavePharmacy()
         {
-            if (Pharmacy.Id == 0)
+            try
             {
-                Pharmacy = await Mediator.Send(new CreatePharmacyRequest(Pharmacy));
-                Prescriptions.ForEach(x => x.PharmacyId = Pharmacy.Id);
-                await Mediator.Send(new CreateListPrescriptionRequest(Prescriptions));
-            }
-            else
-            {
-                await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
-            }
+                if (Pharmacy.Id == 0)
+                {
+                    Pharmacy = await Mediator.Send(new CreatePharmacyRequest(Pharmacy));
+                    Prescriptions.ForEach(x =>
+                    {
+                        x.PharmacyId = Pharmacy.Id;
+                        x.Id = 0;
+                    });
+                    await Mediator.Send(new CreateListPrescriptionRequest(Prescriptions));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+                }
 
-            await LoadDataPharmacy();
+                await LoadDataPharmacy();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task HandleInvalidSubmit()

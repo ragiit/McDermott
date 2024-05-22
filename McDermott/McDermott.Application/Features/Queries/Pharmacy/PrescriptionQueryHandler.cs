@@ -16,7 +16,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
         {
             try
             {
-                string cacheKey = $"GetPrescriptionQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                string cacheKey = $"GetPrescriptionQuery_";
 
                 if (request.RemoveCache)
                     _cache.Remove(cacheKey);
@@ -24,28 +24,21 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 if (!_cache.TryGetValue(cacheKey, out List<Prescription>? result))
                 {
                     result = await _unitOfWork.Repository<Prescription>().Entities
+                       .Include(x => x.Product)
+                       .Include(x => x.DrugForm)
+                       .Include(x => x.Pharmacy)
+                       .Include(x => x.Signa)
+                       .Include(x => x.DrugRoute)
+                       .Include(x => x.MedicamentGroup)
+                       .Include(x => x.DrugDosage)
                        .AsNoTracking()
                        .ToListAsync(cancellationToken);
 
-                    //result = await _unitOfWork.Repository<Prescription>().GetAsync(
-                    //    null,
-                    //    x => x.Include(z => z.Country),
-                    //    cancellationToken);
-
-                    //return await _unitOfWork.Repository<Counter>().Entities
-                    //  .Include(x => x.Physician)
-                    //  .Include(x => x.Service)
-                    //  .AsNoTracking()
-                    //  .Select(Counter => Counter.Adapt<CounterDto>())
-                    //  .AsNoTracking()
-                    //  .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
 
                 result ??= [];
 
-                // Filter result based on request.Predicate if it's not null
                 if (request.Predicate is not null)
                     result = [.. result.AsQueryable().Where(request.Predicate)];
 

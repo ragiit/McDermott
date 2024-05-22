@@ -1,6 +1,6 @@
 ﻿namespace McDermott.Application.Dtos.Pharmacy
 {
-    public class PharmacyDto
+    public class PharmacyDto : IMapFrom<McDermott.Domain.Entities.Pharmacy>
     {
         public long Id { get; set; }
         [Required]
@@ -31,6 +31,5 @@
         public UserDto? Patient { get; set; }
         public UserDto? Practitioner { get; set; }
 
-        public List<PrescriptionDto>? Prescriptions { get; set; }
     }
 }

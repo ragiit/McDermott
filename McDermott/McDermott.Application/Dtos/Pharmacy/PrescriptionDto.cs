@@ -25,10 +25,10 @@
 
         public DrugFormDto? DrugForm { get; set; }
         public PharmacyDto? Pharmacy { get; set; }
-        public ProductDto? Product { get; set; } = new();
+        public ProductDto? Product { get; set; }
         public SignaDto? Signa { get; set; }
-        public DrugRouteDto? DrugRoute { get; set; } = new();
-        public DrugDosageDto? DrugDosage { get; set; } = new();
+        public DrugRouteDto? DrugRoute { get; set; }
+        public DrugDosageDto? DrugDosage { get; set; }
         public MedicamentGroupDto? MedicamentGroup { get; set; }
     }
 }

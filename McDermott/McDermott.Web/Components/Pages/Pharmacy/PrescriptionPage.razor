@@ -52,7 +52,7 @@
                                                     KeyFieldName="Id"
                                                     CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                     EditorRenderMode="GridEditorRenderMode.Detached"
-                                                    DataItemDeleting="OnDelete"
+                                                    DataItemDeleting="OnDeletePharmacy"
                                                     AllowSelectRowByClick="true"
                                                     PagerPosition="GridPagerPosition.Bottom"
                                                     PageSizeSelectorVisible="true"
@@ -73,8 +73,8 @@
                                                 <ToolbarTemplate>
                                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                         <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                        <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Prescriptions.Count > 0" />
-                                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Prescriptions.Count > 0" />
+                                                        <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItemPharmacy_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0" />
+                                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0" />
                                                         <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                         <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                         <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
@@ -229,7 +229,7 @@
                                                                         KeyFieldName="Id"
                                                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                                         EditorRenderMode="GridEditorRenderMode.Detached"
-                                                                        DataItemDeleting="OnDelete"
+                                                                        DataItemDeleting="OnDeletePrescriptionLines"
                                                                         EditModelSaving="OnSavePrescription"
                                                                         AllowSelectRowByClick="true"
                                                                         PagerPosition="GridPagerPosition.Bottom"
@@ -322,21 +322,21 @@
 
                                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Dosage/Frequency" ColSpanMd="6">
                                                                                 <Template>
-                                                                                    <DxGridLayout>
+                                                                                    <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
                                                                                         <Rows>
                                                                                             <DxGridLayoutRow />
                                                                                         </Rows>
                                                                                         <Columns>
-                                                                                            <DxGridLayoutColumn Width="30%" />
+                                                                                            <DxGridLayoutColumn />
                                                                                             <DxGridLayoutColumn />
                                                                                         </Columns>
                                                                                         <Items>
-                                                                                            <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption mr-2" ColumnSpan="1">
+                                                                                            <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption">
                                                                                                 <Template>
                                                                                                     <DxSpinEdit @bind-Value="@a.Dosage" NullText="Input Dosage..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
                                                                                                 </Template>
                                                                                             </DxGridLayoutItem>
-                                                                                            <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="6">
+                                                                                            <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption">
                                                                                                 <Template>
                                                                                                     <DxComboBox Data="@DrugDosages"
                                                                                                                 @bind-Value="@a.DrugDosageId"
@@ -382,7 +382,7 @@
                                                                         KeyFieldName="Id"
                                                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                                         EditorRenderMode="GridEditorRenderMode.Detached"
-                                                                        DataItemDeleting="OnDelete"
+                                                                        DataItemDeleting="OnDeletePrescriptionLines"
                                                                         AllowSelectRowByClick="true"
                                                                         PagerPosition="GridPagerPosition.Bottom"
                                                                         PageSizeSelectorVisible="true"
@@ -996,7 +996,7 @@ else
                             KeyFieldName="Id"
                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                             EditorRenderMode="GridEditorRenderMode.Detached"
-                            DataItemDeleting="OnDelete"
+                            DataItemDeleting="OnDeletePrescriptionLines"
                             AllowSelectRowByClick="true"
                             PagerPosition="GridPagerPosition.Bottom"
                             PageSizeSelectorVisible="true"
