@@ -436,8 +436,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             try
             {
                 StateHasChanged();
-                var aaa = SelectedMedicamentGroupDetailDataItems.Adapt<List<MedicamentGroupDetailDto>>();
-                medicamentGroupDetails.RemoveAll(x => aaa.Select(z => z.MedicamentId).Contains(x.MedicamentId));
+                var data = SelectedMedicamentGroupDetailDataItems.Adapt<List<MedicamentGroupDetailDto>>();
+                medicamentGroupDetails.RemoveAll(x => data.Select(z => z.MedicamentId).Contains(x.MedicamentId));
                 SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
             }
             catch (Exception ee)

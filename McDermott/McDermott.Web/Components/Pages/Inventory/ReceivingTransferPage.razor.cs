@@ -10,6 +10,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<ReceivingStockDto> ReceivingStocks = [];
         private List<ReceivingStockProductDto> receivingStockDetails = [];
         private List<ReceivingStockProductDto> TempReceivingStockDetails = [];
+        private List<TransactionStockDetailDto> TransactionStockDetails = [];
         private List<LocationDto> Locations = [];
         private List<ProductDto> Products = [];
         private List<StockProductDto> Stocks = [];
@@ -193,17 +194,17 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
 
-            //try
-            //{
-            //    if ((TransactionStockDto)args.DataItem is null)
-            //        return;
+            try
+            {
+                if ((ReceivingStockDto)args.DataItem is null)
+                    return;
 
-            //    isActiveButton = ((TransactionStockDto)args.DataItem)!.StatusTransfer!.Equals("Draft");
-            //}
-            //catch (Exception ex)
-            //{
-            //    ex.HandleException(ToastService);
-            //}
+                isActiveButton = ((ReceivingStockDto)args.DataItem)!.StatusReceived!.Equals("Draft");
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private void Grid_FocusedRowChangedDetail(GridFocusedRowChangedEventArgs args)
@@ -365,12 +366,81 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         #region Function Delete
 
-        private async Task OnDelete()
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
+            try
+            {
+                List<ReceivingStockDto> receivings = SelectedDataItems.Adapt<List<ReceivingStockDto>>();
+                List<long> id = receivings.Select(x => x.Id).ToList();
+                List<long> ProductIdsToDelete = new();
+                List<long> DetailsIdsToDelete = new();
+
+                if (SelectedDataItems.Count == 1)
+                {
+                    //Delete Data Receiving stock Product
+
+                    ProductIdsToDelete = receivingStockDetails
+                        .Where(x => x.ReceivingStockId == receivingId)
+                        .Select(x => x.Id)
+                        .ToList();
+                    await Mediator.Send(new DeleteReceivingStockPoductRequest(ids: ProductIdsToDelete));
+
+                    //Delete Data Transaction Detail (log)
+
+                    DetailsIdsToDelete = TransactionStockDetails
+                        .Where(x => x.ReceivingStockId == receivingId)
+                        .Select(x => x.Id)
+                        .ToList();
+                    await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: DetailsIdsToDelete));
+
+                    //Delete Receiving Stock
+
+                    await Mediator.Send(new DeleteReceivingStockRequest(SelectedDataItems[0].Adapt<ReceivingStockDto>().Id));
+                }
+                else
+                {
+                    foreach (var Uid in id)
+                    {
+                        //Delete Data Receiving Stock Product
+                        ProductIdsToDelete = receivingStockDetails
+                       .Where(x => x.ReceivingStockId == Uid)
+                       .Select(x => x.Id)
+                       .ToList();
+                        await Mediator.Send(new DeleteReceivingStockPoductRequest(ids: ProductIdsToDelete));
+
+                        //Delete Data Transaction Detail (log)
+
+                        DetailsIdsToDelete = TransactionStockDetails
+                            .Where(x => x.ReceivingStockId == Uid)
+                            .Select(x => x.Id)
+                            .ToList();
+                        await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: DetailsIdsToDelete));
+                    }
+                    //Delete list Id ReceivingStock
+                    await Mediator.Send(new DeleteReceivingStockRequest(ids: id));
+                }
+                ToastService.ShowSuccess("Data Deleting Success!..");
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
-        private async Task OnDelete_Detail()
+        private async Task OnDelete_Detail(GridDataItemDeletingEventArgs e)
         {
+            try
+            {
+                StateHasChanged();
+                var data = SelectedDataItemsDetail.Adapt<List<ReceivingStockProductDto>>();
+                TempReceivingStockDetails.RemoveAll(x => data.Select(z => z.ReceivingStockId).Contains(x.ReceivingStockId));
+                SelectedDataItemsDetail = new ObservableRangeCollection<object>();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         #endregion Function Delete
