@@ -310,6 +310,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 var CheckReceivedProduct = receivedProductStock.Where(x => x.ReceivingStockId == GetReceivingStock.Id).ToList();
                 foreach (var a in CheckReceivedProduct)
                 {
+                    var x = Uoms.Where(x => x.Id == a.Product.PurchaseUomId).FirstOrDefault();
                     var checkStok = Stocks.Where(x => x.ProductId == a.ProductId && x.SourceId == GetReceivingStock.DestinationId).FirstOrDefault();
                     if (checkStok is null)
                     {
@@ -320,11 +321,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                             FormStockProduct.Expired = a.ExpiredDate;
                             FormStockProduct.Batch = a.Batch;
                         }
-                        FormStockProduct.Qty = a.Qty;
+                        
+                        FormStockProduct.Qty = a.Qty * x.BiggerRatio.ToLong();
                         await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
                     }
                     else
                     {
+                        var totalQty = a.Qty * x.BiggerRatio.ToLong();
                         checkStok!.Qty = checkStok.Qty + a.Qty;
                         await Mediator.Send(new UpdateStockProductRequest(checkStok));
                     }
