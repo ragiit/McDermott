@@ -3,17 +3,21 @@
     public class PharmacyDto
     {
         public long Id { get; set; }
+        [Required]
         public long? PatientId { get; set; }
-        public long? MedicamentGroupId { get; set; }
+        [Required]
         public long? PractitionerId { get; set; }
+        [Required]
         public long? PrescriptionLocationId { get; set; }
+        [Required]
+        public long? MedicamentGroupId { get; set; }
         public long? ServiceId { get; set; }
         public string? PaymentMethod { get; set; }
+        public DateTime? ReceiptDate { get; set; } = DateTime.Now;
         public bool IsWeather { get; set; } = false;
         public bool IsFarmacologi { get; set; } = false;
         public bool IsFood { get; set; } = false;
-        public DateTime? ReceiptDate { get; set; } = DateTime.Now;
-        public EnumStatusPharmacy Status { get; set; }
+        public Domain.Entities.EnumStatusPharmacy Status { get; set; }
 
         [NotMapped]
         public string StatusText
@@ -26,5 +30,7 @@
         public ServiceDto? Service { get; set; }
         public UserDto? Patient { get; set; }
         public UserDto? Practitioner { get; set; }
+
+        public List<PrescriptionDto>? Prescriptions { get; set; }
     }
 }

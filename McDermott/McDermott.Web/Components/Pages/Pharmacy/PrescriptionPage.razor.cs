@@ -2,6 +2,8 @@
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.PrescriptionCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
@@ -87,7 +89,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private int FocusedRowVisibleIndexPrescriptionLines { get; set; }
         private int FocusedRowVisibleIndexPrescriptionConcoction { get; set; }
         private int FocusedRowVisibleIndexConcoctionLines { get; set; }
-        private int ActiveSelectedTabIndex { get; set; } = 0;
 
         private PharmacyDto Pharmacy { get; set; } = new();
         private PrescriptionDto Prescription { get; set; } = new();
@@ -126,6 +127,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task SelectedMedicament(MedicamentGroupDto medicament)
         {
+            if (medicament is null)
+                return;
+
             var a = await Mediator.Send(new GetMedicamentGroupDetailQuery());
             var details = a.Where(x => x.MedicamentGroupId == medicament.Id).ToList();
             List<PrescriptionDto> prescriptionsList = new();
@@ -163,6 +167,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     newPrescription.DosageFrequency = $"{medicamentDetails.Dosage}/{medicamentDetails.Frequency?.Frequency}";
                 }
 
+                newPrescription.Product = medicamentDetails.Product;
+                newPrescription.DrugRoute = medicamentDetails.Route;
                 newPrescription.UomId = medicamentDetails.UomId;
                 newPrescription.DrugRouteId = medicamentDetails.RouteId;
                 newPrescription.PriceUnit = checkProduct.SalesPrice;
@@ -241,21 +247,90 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        private async Task LoadData()
+        private async Task LoadDataPharmacy()
         {
             ShowForm = false;
+            IsLoading = true;
+            SelectedDataItems = [];
+            SelectedDataItemsPrescriptionConcoction = [];
+            SelectedDataItemsPrescriptionLines = [];
+            Pharmacies = await Mediator.Send(new GetPharmacyQuery());
+            IsLoading = false;
+        }
+
+        private async Task LoadDataPresciptions()
+        {
+            IsLoading = true;
+            SelectedDataItems = [];
+            Prescriptions = await Mediator.Send(new GetPrescriptionQuery());
+            IsLoading = false;
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
+            if (Pharmacy.Id == 0)
+            {
+                try
+                {
+                    if (SelectedDataItemsPrescriptionLines is null || SelectedDataItemsPrescriptionLines.Count == 1)
+                    {
+                        Prescriptions.Remove((PrescriptionDto)e.DataItem);
+                    }
+                    else
+                    {
+                        SelectedDataItemsPrescriptionLines.Adapt<List<LabTestDetailDto>>().Select(x => x.Id).ToList().ForEach(x =>
+                        {
+                            Prescriptions.Remove(Prescriptions.FirstOrDefault(z => z.Id == x));
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+            }
+            else
+            {
+                try
+                {
+                    if (SelectedDataItems is null || SelectedDataItems.Count == 1)
+                    {
+                        await Mediator.Send(new DeletePharmacyRequest(((PharmacyDto)e.DataItem).Id));
+                    }
+                    else
+                    {
+                        await Mediator.Send(new DeletePharmacyRequest(ids: SelectedDataItems.Adapt<List<PharmacyDto>>().Select(x => x.Id).ToList()));
+                    }
+                    await LoadDataPharmacy();
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+            }
+        }
+
+        private async Task EditItemPharmacy_Click()
+        {
+            ShowForm = true;
+            IsLoading = true;
+
             try
             {
-                await LoadData();
+                var p = await Mediator.Send(new GetPharmacyQuery(x => x.Id == SelectedDataItems[0].Adapt<PharmacyDto>().Id));
+
+                if (p.Count > 0)
+                {
+                    Pharmacy = p[0];
+                    Prescriptions = await Mediator.Send(new GetPrescriptionQuery(x => x.PharmacyId == Pharmacy.Id));
+                }
             }
-            catch (Exception ee)
+            catch (Exception e)
             {
-                ee.HandleException(ToastService);
+                e.HandleException(ToastService);
             }
+
+            IsLoading = false;
         }
 
         private async Task OnDeletePrescriptionLines(GridDataItemDeletingEventArgs e)
@@ -277,7 +352,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task Refresh_Click()
         {
-            await LoadData();
+            await LoadDataPharmacy();
         }
 
         private async Task EditItem_Click()
@@ -294,12 +369,101 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
+        private bool FormValidationState = true;
         private async Task HandleValidSubmit()
         {
+            FormValidationState = true;
+
+            if (FormValidationState)
+                await OnSavePharmacy();
+        }
+
+        private async Task OnSavePrescription(GridEditModelSavingEventArgs e)
+        {
+            if (e is null)
+                return;
+
+            var t = (PrescriptionDto)e.EditModel;
+
+            if (Pharmacy.Id == 0)
+            {
+                try
+                {
+                    PrescriptionDto update = new();
+
+
+                    var medicamentDetails = Medicaments.FirstOrDefault(s => s.ProductId == t.ProductId);
+                    if (medicamentDetails == null)
+                    {
+                        return;
+                    }
+
+                    if (medicamentDetails.Dosage != 0 && medicamentDetails.FrequencyId.HasValue)
+                    {
+                        t.DosageFrequency = $"{medicamentDetails.Dosage}/{medicamentDetails.Frequency?.Frequency}";
+                    }
+
+
+                    if (t.Id == 0)
+                    {
+                        t.Id = Helper.RandomNumber;
+                        t.Product = Products.FirstOrDefault(x => x.Id == t.ProductId);
+                        t.DrugRoute = DrugRoutes.FirstOrDefault(x => x.Id == t.DrugRouteId);
+                        t.DrugDosage = DrugDosages.FirstOrDefault(x => x.Id == t.DrugDosageId);
+                        Prescriptions.Add(t);
+                    }
+                    else
+                    {
+                        var q = SelectedDataItemsPrescriptionLines[0].Adapt<PrescriptionDto>();
+
+                        update = Prescriptions.FirstOrDefault(x => x.Id == q.Id)!;
+                        t.Product = Products.FirstOrDefault(x => x.Id == t.ProductId);
+                        t.DrugRoute = DrugRoutes.FirstOrDefault(x => x.Id == t.DrugRouteId);
+                        t.DrugDosage = DrugDosages.FirstOrDefault(x => x.Id == t.DrugDosageId);
+
+                        var index = Prescriptions.IndexOf(update!);
+                        Prescriptions[index] = t;
+                    }
+
+                    SelectedDataItemsPrescriptionLines = [];
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+            }
+            else
+            {
+                t.PharmacyId = Pharmacy.Id;
+                if (t.Id == 0)
+                    await Mediator.Send(new CreatePrescriptionRequest(t));
+                else
+                    await Mediator.Send(new UpdatePrescriptionRequest(t));
+
+                await LoadDataPresciptions();
+            }
+        }
+
+        private async Task OnSavePharmacy()
+        {
+            if (Pharmacy.Id == 0)
+            {
+                Pharmacy = await Mediator.Send(new CreatePharmacyRequest(Pharmacy));
+                Prescriptions.ForEach(x => x.PharmacyId = Pharmacy.Id);
+                await Mediator.Send(new CreateListPrescriptionRequest(Prescriptions));
+            }
+            else
+            {
+                await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+            }
+
+            await LoadDataPharmacy();
         }
 
         private async Task HandleInvalidSubmit()
         {
+            FormValidationState = true;
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
         }
 
         private async Task HandleValidConcoctionSubmit()
@@ -319,8 +483,17 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
         }
 
-        private async Task EditItemPrescriptionLines_Click()
+        private async Task OnDiscard()
         {
+            await LoadDataPharmacy();
+        }
+
+        private async Task EditItemPrescriptionLines_Click(IGrid context)
+        {
+            var selected = (PrescriptionDto)context.SelectedDataItem;
+            var copy = selected.Adapt<LabTestDetailDto>();
+            await GridPrescriptionLines.StartEditRowAsync(FocusedRowVisibleIndexPrescriptionLines);
+            var w = Prescriptions.FirstOrDefault(x => x.Id == copy.Id);
         }
 
         private void DeleteItemPrescriptionLines_Click()

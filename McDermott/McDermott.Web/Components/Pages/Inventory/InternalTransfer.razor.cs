@@ -1,13 +1,5 @@
-﻿using DevExpress.ClipboardSource.SpreadsheetML;
-using McDermott.Domain.Entities;
-using System.Runtime.ConstrainedExecution;
-using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace McDermott.Web.Components.Pages.Inventory
 {

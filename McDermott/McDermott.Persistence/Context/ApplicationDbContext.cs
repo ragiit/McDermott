@@ -109,6 +109,8 @@ namespace McDermott.Persistence.Context
 
         #region Pharmacy
 
+        public DbSet<Prescription> Prescriptions { get; set; }
+        public DbSet<Pharmacy> Pharmacies { get; set; }
         public DbSet<DrugRoute> DrugRoutes { get; set; }
         public DbSet<DrugDosage> DrugDosages { get; set; }
         public DbSet<Signa> Signas { get; set; }
@@ -274,6 +276,11 @@ namespace McDermott.Persistence.Context
                   .HasMany(m => m.GroupMenus)
                   .WithOne(c => c.Group)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Pharmacy>()
+                 .HasMany(m => m.Prescriptions)
+                 .WithOne(c => c.Pharmacy)
+                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<LabTest>()
                   .HasMany(m => m.LabTestDetails)
