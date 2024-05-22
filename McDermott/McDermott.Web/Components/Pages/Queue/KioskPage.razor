@@ -76,7 +76,7 @@
                                                     <hr />
                                                     @if (NamePatient != null)
                                                     {
-                                                        <DxFormLayoutItem Caption="Patient Name" ColSpanMd="12">
+                                                        <DxFormLayoutItem Caption="Patient Name" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                             <DxComboBox Data="@Patients"
                                                                         @bind-Value="FormKios.PatientId"
                                                                         FilteringMode="@DataGridFilteringMode.Contains"
@@ -86,13 +86,14 @@
 
                                                             </DxComboBox>
                                                         </DxFormLayoutItem>
-                                                        @if (Bpjs != null)
-                                                        {
-                                                            <DxFormLayoutItem Caption="BPJS" ColSpanMd="12">
-                                                                <DxTextBox @bind-Text="@FormKios.BPJS" ReadOnly style="background-color:#949494" />
-                                                            </DxFormLayoutItem>
-                                                            <DxFormLayoutItem Caption=" BPJS Status" ColSpanMd="12">
-                                                                @if (FormKios.BPJS != null)
+
+                                                        <DxFormLayoutItem Caption="BPJS" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                            <DxTextBox @bind-Text="@FormKios.BPJS" ReadOnly style="background-color:#949494" />
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem Caption=" BPJS Status" ColSpanMd="12">
+                                                            @if (BPJS != null)
+                                                            {
+                                                                @if (statBPJS == "Active")
                                                                 {
                                                                     <h6 class="text-success">
                                                                         <i class="fa-solid fa-circle" style="color: #05e401;"></i>
@@ -106,11 +107,19 @@
                                                                         @statBPJS
                                                                     </h6>
                                                                 }
-                                                            </DxFormLayoutItem>
-                                                        }
+                                                            }
+                                                            else
+                                                            {
+                                                                <h6 class="text-dark">
+                                                                    <i class="fa-solid fa-circle" style="color: #000;"></i>
+                                                                    @statBPJS
+                                                                </h6>
+                                                            }
+                                                        </DxFormLayoutItem>
+
                                                         @if (showClass)
                                                         {
-                                                            <DxFormLayoutItem Caption="Patient Class" ColSpanMd="12">
+                                                            <DxFormLayoutItem Caption="Patient Class" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                 <DxComboBox Data="@classTypes"
                                                                             FilteringMode="@DataGridFilteringMode.Contains"
                                                                             NullText="Select Service.."
@@ -121,7 +130,7 @@
                                                         }
                                                         @if (CountServiceId > 1)
                                                         {
-                                                            <DxFormLayoutItem Caption="Service" ColSpanMd="12">
+                                                            <DxFormLayoutItem Caption="Service" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                 <DxComboBox Data="@serv"
                                                                             FilteringMode="@DataGridFilteringMode.Contains"
                                                                             NullText="Select Service.."
@@ -132,7 +141,7 @@
                                                         }
                                                         else
                                                         {
-                                                            <DxFormLayoutItem Caption="Service" ColSpanMd="12">
+                                                            <DxFormLayoutItem Caption="Service" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                 <DxComboBox Data="@Services"
                                                                             @bind-Value="@FormKios.ServiceId"
                                                                             TextFieldName="Name"
@@ -144,7 +153,7 @@
                                                         }
                                                         @if (showPhysician)
                                                         {
-                                                            <DxFormLayoutItem Caption="Physician" ColSpanMd="12">
+                                                            <DxFormLayoutItem Caption="Physician" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                 <DxComboBox Data="@Phys" @bind-Value="@FormKios.PhysicianId" NullText="Select Physician.." ValueFieldName="Id" TextFieldName="Name"
                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
                                                             </DxFormLayoutItem>

@@ -21,6 +21,7 @@ namespace McDermott.Web.Components.Pages.Queue
         public List<ClassTypeDto> classTypes = new();
         public List<GroupDto> groups = new();
         public List<InsurancePolicyDto> InsurancePolices = [];
+        public InsurancePolicyDto BPJS = new();
 
         #endregion Relation Data
 
@@ -62,7 +63,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private GeneralConsultanServiceDto FormGeneral = new();
         private string? NamePatient { get; set; } = string.Empty;
         private string? statBPJS { get; set; } = string.Empty;
-        private string Bpjs { get; set; } = string.Empty;
+
         private string captions { get; set; } = "Number";
         private long? CountServiceId { get; set; }
         private long _ServiceId { get; set; }
@@ -88,8 +89,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private void UserSelected(UserDto user)
         {
-          
-            var BPJS = InsurancePolices.Where(x => x.UserId == user.Id).FirstOrDefault();
+            BPJS = InsurancePolices.Where(x => x.UserId == user.Id).FirstOrDefault();
             if (BPJS is not null)
             {
                 FormKios.BPJS = BPJS.PolicyNumber;
@@ -103,6 +103,10 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormKios.StageBpjs = false;
                     statBPJS = "InActive";
                 }
+            }
+            else
+            {
+                statBPJS = "no BPJS number";
             }
         }
 
@@ -368,7 +372,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 showForm = true;
                 NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
                 FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
-                var BPJS = InsurancePolices.Where(x => x.UserId == FormKios.PatientId).FirstOrDefault();
+                BPJS = InsurancePolices.Where(x => x.UserId == FormKios.PatientId).FirstOrDefault();
                 if (BPJS is not null)
                 {
                     FormKios.BPJS = BPJS.PolicyNumber;
@@ -382,6 +386,10 @@ namespace McDermott.Web.Components.Pages.Queue
                         FormKios.StageBpjs = false;
                         statBPJS = "InActive";
                     }
+                }
+                else
+                {
+                    statBPJS = "no BPJS number";
                 }
                 if (NameGroup.Name == "Nurse" || NameGroup.Name == "Perawat" || NameGroup.Name == "Nursing")
                 {
