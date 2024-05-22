@@ -86,13 +86,14 @@
 
                                                             </DxComboBox>
                                                         </DxFormLayoutItem>
-                                                        @if (Bpjs != null)
-                                                        {
-                                                            <DxFormLayoutItem Caption="BPJS" ColSpanMd="12">
-                                                                <DxTextBox @bind-Text="@FormKios.BPJS" ReadOnly style="background-color:#949494" />
-                                                            </DxFormLayoutItem>
-                                                            <DxFormLayoutItem Caption=" BPJS Status" ColSpanMd="12">
-                                                                @if (FormKios.BPJS != null)
+
+                                                        <DxFormLayoutItem Caption="BPJS" ColSpanMd="12">
+                                                            <DxTextBox @bind-Text="@FormKios.BPJS" ReadOnly style="background-color:#949494" />
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem Caption=" BPJS Status" ColSpanMd="12">
+                                                            @if (BPJS != null)
+                                                            {
+                                                                @if (statBPJS == "Active")
                                                                 {
                                                                     <h6 class="text-success">
                                                                         <i class="fa-solid fa-circle" style="color: #05e401;"></i>
@@ -106,8 +107,16 @@
                                                                         @statBPJS
                                                                     </h6>
                                                                 }
-                                                            </DxFormLayoutItem>
-                                                        }
+                                                            }
+                                                            else
+                                                            {
+                                                                <h6 class="text-dark">
+                                                                    <i class="fa-solid fa-circle" style="color: #000;"></i>
+                                                                    @statBPJS
+                                                                </h6>
+                                                            }
+                                                        </DxFormLayoutItem>
+
                                                         @if (showClass)
                                                         {
                                                             <DxFormLayoutItem Caption="Patient Class" ColSpanMd="12">
