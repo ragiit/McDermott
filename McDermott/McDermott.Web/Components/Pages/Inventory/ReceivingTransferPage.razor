@@ -137,6 +137,7 @@
                                                         NullText="Select Destination Location......"
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                         ShowValidationIcon="true"
+                                                        FilteringMode="@DataGridFilteringMode.Contains"
                                                         TextFieldName="NameAndParent"
                                                         ValueFieldName="Id"></DxComboBox>
                                         </DxFormLayoutItem>
@@ -203,6 +204,7 @@
                                                                                 NullText="Select Product Name.."
                                                                                 TextFieldName="Name"
                                                                                 ValueFieldName="Id"
+                                                                                FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 SelectedItemChanged="@((ProductDto product)=> SelectedChangeProduct(product))"
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                 ShowValidationIcon="true"></DxComboBox>

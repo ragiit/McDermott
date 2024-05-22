@@ -158,6 +158,7 @@
                                                         TextFieldName="NameAndParent"
                                                         ValueFieldName="Id"
                                                         Enabled="@isActiveButton"
+                                                        FilteringMode="@DataGridFilteringMode.Contains"
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                         ShowValidationIcon="true"></DxComboBox>
                                             <ValidationMessage For="@(()=>FormInternalTransfer.SourceId)"></ValidationMessage>
@@ -170,6 +171,7 @@
                                                         TextFieldName="NameAndParent"
                                                         ValueFieldName="Id"
                                                         Enabled="@isActiveButton"
+                                                        FilteringMode="@DataGridFilteringMode.Contains"
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                         ShowValidationIcon="true"></DxComboBox>
                                             <ValidationMessage For="@(()=>FormInternalTransfer.DestinationId)"></ValidationMessage>
@@ -252,6 +254,7 @@
                                                                                 NullText="Select Product.."
                                                                                 TextFieldName="Name"
                                                                                 ValueFieldName="Id"
+                                                                                FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                 SelectedItemChanged="@((ProductDto product)=> SelectedItemProduct(product))"
                                                                                 ShowValidationIcon="true"></DxComboBox>

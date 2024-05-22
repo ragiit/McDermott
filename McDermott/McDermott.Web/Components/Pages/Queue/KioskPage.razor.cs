@@ -438,65 +438,65 @@ namespace McDermott.Web.Components.Pages.Queue
                 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
                 <title>Cetak Antrian</title>
                 <style>
-                   @page {{size: 8cm 8cm; /* Ukuran kertas 8x8 cm */
-                        margin: 0; /* Hilangkan margin default */
-                    }}
-                    body {{font - family: Arial, sans-serif;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        height: 100vh;
-                        margin: 0;
-                        padding: 0;
-                    }}
-                    .print-container {{width: 8cm;
-                        height: 8cm;
-                        padding: 20px;
-                        box-sizing: border-box;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-                        border: 1px solid black;
-                    }}
-                    .company{{align - items: center;
-                      justify-content: center;
+                   @page {{size: 80mm 80mm;
+    margin: 0;
+}}
 
-                        text-align:center;
-                    }}
-                    .company-logo img {{width: 50px;
-                        height: auto;
-                        margin-bottom: 10px;
-                    }}
-                    .company-name {{text - align: center;
-                        font-size: 18px;
-                        font-weight: bold;
-                        margin-bottom: 10px;
-                    }}
-                    .queue-label {{font - size: 14px;
-                        margin-bottom: 5px;
-                    }}
-                    .queue-number {{text - align: center;
-                        font-size: 48px;
-                        font-weight: bold;
-                    }}
+.ticket {{width: 80mm;
+    height: 80mm;
+    padding: 5mm;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}}
+
+.header {{text - align: center;
+}}
+
+.logo {{width: 40mm;
+    height: auto;
+}}
+
+.ticket-number {{text - align: center;
+    font-size: 24pt;
+    margin: 10mm 0;
+}}
+
+.details p {{margin: 2mm 0;
+    font-size: 12pt;
+}}
+
+.details p strong {{font - weight: bold;
+}}
                 </style>
             </head>
             <body>
-                <page>
-                    <div class='print-container'>
-                        <div class=""company"">
-                          <div class='company-logo'><img src='https://th.bing.com/th/id/R.11c17a8cffdce4bc047102db49a94a51?rik=YMKOe232a1ee3w&riu=http%3a%2f%2flogos-download.com%2fwp-content%2fuploads%2f2016%2f02%2fBMW_logo_big_transparent_png.png&ehk=AhLghiJcc6OJgtYYdNOiiM061S%2fa11BCNRbBYQtUBjI%3d&risl=&pid=ImgRaw&r=0' alt='Logo Perusahaan'></div>
-                        </div>
-                        <div class='company-name'>McHealthCare</div>
-                        <div class='queue-label'>Your Number :</div>
-                        <div class='queue-number'>{queueNumber}</div>
-                    </div>
-                </page>
+                <div class='ticket'>
+    <div class='header'>
+        <img src='logo.png' alt='Logo' class='logo' />
+        <h1>Klinik McDermott</h1>
+    </div>
+    <h2 class='ticket-number'>A001</h2>
+    <div class='details'>
+        <p><strong>Tanggal Daftar:</strong> 21 Mei 2024 15:51</p>
+        <p><strong>Nama:</strong> Dwiluky</p>
+        <p><strong>Poliklinik:</strong> Poli Umum</p>
+        <p><strong>Jaminan:</strong> BPJS Kesehatan</p>
+        <p><strong>Nomor Jaminan:</strong> 0219887728</p>
+        <p><strong>NIP:</strong> (Jika ada)</p>
+        <p><strong>Estimasi Waktu:</strong> 16:00</p>
+    </div>
+</div>
+
             </body>
             </html>";
 
             // Panggil JavaScript Interop untuk memicu pencetakan
             await JsRuntime.InvokeVoidAsync("printJS", contentToPrint);
+        }
+
+        private void PrintTicket()
+        {
+            NavigationManager.NavigateTo("/print-ticket", true);
         }
 
         #endregion Button Function
