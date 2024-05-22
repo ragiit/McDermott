@@ -1,5 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+﻿using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 
@@ -49,12 +48,19 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
+                if (product is null)
+                {
+                    FormMedicamenDetails = new();
+                    selectedActiveComponents = [];
+                    return;
+                }
+
                 var a = await Mediator.Send(new GetMedicamentQuery());
                 var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
                 var checkUom = UoMs.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
                 FormMedicamenDetails.MedicaneUnitDosage = checkUom?.Name;
                 FormMedicamenDetails.FrequencyId = ChekMedicament?.FrequencyId;
-                if (ChekMedicament.FrequencyId != null)
+                if (ChekMedicament is not null && ChekMedicament.FrequencyId != null)
                 {
                     FormMedicamenDetails.FrequencyName = ChekMedicament.Frequency.Frequency;
                     FormMedicamenDetails.Days = ChekMedicament.Frequency.Days.ToLong();

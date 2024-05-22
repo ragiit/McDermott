@@ -99,47 +99,46 @@
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem Caption="Is Concoction?" ColSpanMd="12">
-                                                <DxCheckBox @bind-Checked="@MGForm.IsConcoction"                                                           
+                                                <DxCheckBox @bind-Checked="@MGForm.IsConcoction"
                                                             LabelPosition="LabelPosition.Left" CssClass="w-100" />
                                             </DxFormLayoutItem>
 
-                                            <div class="col-md-6">
-                                                <DxFormLayoutItem Caption="Phycisian" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                    <DxComboBox Data="@Phy"
-                                                                @bind-Value="@MGForm.PhycisianId"
-                                                                NullText="Select Phycisian ..."
+                                            <DxFormLayoutItem Caption="Phycisian" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                <DxComboBox Data="@Phy"
+                                                            @bind-Value="@MGForm.PhycisianId"
+                                                            NullText="Select Phycisian ..."
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                            ShowValidationIcon="true"></DxComboBox>
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem Caption=" " ColSpanMd="6">
+                                            </DxFormLayoutItem>
+
+                                            @if (MGForm.IsConcoction == true)
+                                            {
+                                                <DxFormLayoutItem Caption="Unit Of Dosage" CaptionCssClass="normal-caption " ColSpanMd="6">
+                                                    <DxComboBox Data="@UoMs"
+                                                                @bind-Value="@MGForm.UoMId"
+                                                                NullText="Select Unit Of Measure ..."
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                ShowValidationIcon="true">
+                                                    </DxComboBox>
+
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Form" CaptionCssClass="normal-caption " ColSpanMd="6">
+                                                    <DxComboBox Data="@FormDrugs"
+                                                                @bind-Value="@MGForm.FormDrugId"
+                                                                NullText="Select Form ..."
                                                                 TextFieldName="Name"
                                                                 ValueFieldName="Id"
                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                 ShowValidationIcon="true"></DxComboBox>
                                                 </DxFormLayoutItem>
-                                            </div>
-                                            <div class="col-md-6 ">
-                                                <DxFormLayout CssClass="mt">
-                                                    @if (MGForm.IsConcoction == true)
-                                                    {
-                                                        <DxFormLayoutItem Caption="Unit Of Dosage" CaptionCssClass="normal-caption " ColSpanMd="12">
-                                                            <DxComboBox Data="@UoMs"
-                                                                        @bind-Value="@MGForm.UoMId"
-                                                                        NullText="Select Unit Of Measure ..."
-                                                                        TextFieldName="Name"
-                                                                        ValueFieldName="Id"
-                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                        ShowValidationIcon="true"></DxComboBox>
-
-                                                        </DxFormLayoutItem>
-                                                        <DxFormLayoutItem Caption="Form" CaptionCssClass="normal-caption " ColSpanMd="12">
-                                                            <DxComboBox Data="@FormDrugs"
-                                                                        @bind-Value="@MGForm.FormDrugId"
-                                                                        NullText="Select Form ..."
-                                                                        TextFieldName="Name"
-                                                                        ValueFieldName="Id"
-                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                        ShowValidationIcon="true"></DxComboBox>
-                                                        </DxFormLayoutItem>
-                                                    }
-                                                </DxFormLayout>
-                                            </div>
+                                            }
 
                                             <DxFormLayoutItem Context="ItemContext" ColSpanMd="12" CssClass="mt-4">
                                                 <Template>
