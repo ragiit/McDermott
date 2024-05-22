@@ -6,6 +6,457 @@ namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class GeneralConsultanServicePage
     {
+        #region OnSave and Staging
+
+        private async Task OnClickConfirm()
+        {
+            try
+            {
+                IsLoading = true;
+                var currentStatus = FormRegis.StagingStatus;
+                ToastService.ClearInfoToasts();
+                if (FormRegis.PatientId == null || FormRegis.TypeRegistration == null || FormRegis.ServiceId is null || (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null)))
+                {
+                    IsLoading = false;
+                    ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+                    return;
+                }
+
+                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0)
+                {
+                    var isSuccess = await SendPcareRequestRegistration();
+                    var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
+
+                    if (!isSuccess || !isSuccessAddKunjungan)
+                        return;
+                }
+
+                if (FormRegis.Id != 0)
+                {
+                    var text = FormRegis.StagingStatus == "Physician" ? "Consultation Done" : FormRegis.StagingStatus;
+                    var index = Stagings.FindIndex(x => x == text);
+                    if (text != "Consultation Done")
+                    {
+                        FormRegis.StagingStatus = Stagings[index + 1];
+                        if (index + 1 == 4)
+                        {
+                            FormRegis.StagingStatus = "Physician";
+                        }
+                        else if (index + 1 == 5)
+                        {
+                            FormRegis.StagingStatus = "Finished";
+                        }
+                        try
+                        {
+                            StagingText = FormRegis.StagingStatus == "In Consultant" ? "Finished" : Stagings[index + 2];
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        FormRegis.StagingStatus = "Finished";
+                    }
+                    await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+                }
+                else
+                {
+                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+
+                    if (patient.Count > 0)
+                    {
+                        IsLoading = false;
+                        ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
+                        return;
+                    }
+
+                    FormRegis.StagingStatus = "Confirmed";
+                    StagingText = "Nurse Station";
+                    FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+
+                    PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
+
+                    if (PatientAllergy.Id == 0)
+                        PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
+                    else
+                        PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
+                }
+
+                var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
+                FormRegis = result[0];
+
+                FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
+                FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
+                FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
+
+                if (FormRegis.StagingStatus.Equals("Physician"))
+                {
+                    if (Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
+                    {
+                        IsPratition = [.. AllDoctors.Where(x => x.Id == UserLogin.Id).ToList()];
+                        FormRegis.PratitionerId = IsPratition.Count > 0 ? IsPratition[0].Id : null;
+                    }
+                    else
+                        IsPratition = [.. AllDoctors.Where(x => x.IsDoctor == true && x.IsPhysicion == true).ToList()];
+                }
+
+                await ReadHeightWeightPatient();
+
+                IsLoading = false;
+            }
+            catch (Exception ex)
+            {
+                IsLoading = false;
+                ToastService.ShowError(ex.Message);
+            }
+        }
+
+        private async Task<bool> SendPcareRequestKunjungan()
+        {
+            if (FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Nurse Station") && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
+            {
+                var ll = GeneralConsultanCPPTs.Where(x => x.Title == "Diagnosis").Select(x => x.Body).ToList();
+
+                string diag1 = null;
+                string diag2 = null;
+                string diag3 = null;
+
+                if (FormRegis.StagingStatus.Equals("Nurse Station"))
+                {
+                    //diag1 = GeneralConsultanCPPTs.Count >= 1 ? NursingDiagnoses.FirstOrDefault(x => x.Problem.ToLower().Trim().Contains(ll[0].ToLower().Trim())).Code : null;
+                    //diag2 = GeneralConsultanCPPTs.Count >= 2 ? NursingDiagnoses.FirstOrDefault(x => x.Problem.ToLower().Trim().Contains(ll[1].ToLower().Trim())).Code : null;
+                    //diag3 = GeneralConsultanCPPTs.Count >= 3 ? NursingDiagnoses.FirstOrDefault(x => x.Problem.ToLower().Trim().Contains(ll[2].ToLower().Trim())).Code : null;
+                }
+                else
+                {
+                }
+
+                var kunj = new KunjunganRequest
+                {
+                    NoKunjungan = FormRegis.SerialNo ?? string.Empty,
+                    NoKartu = SelectedBPJSIntegration.NoKartu ?? "",
+                    TglDaftar = FormRegis.RegistrationDate.ToString("dd-MM-yyyy"),
+                    KdPoli = Services.FirstOrDefault(x => x.Id == FormRegis.ServiceId)!.Code,
+                    KdSadar = Awareness.FirstOrDefault(x => x.Id == GeneralConsultantClinical.AwarenessId)!.KdSadar,
+                    Sistole = 10,
+                    Diastole = 10,
+                    BeratBadan = GeneralConsultantClinical.Weight.ToInt32(),
+                    TinggiBadan = GeneralConsultantClinical.Height.ToInt32(),
+                    RespRate = GeneralConsultantClinical.RR.ToInt32(),
+                    HeartRate = GeneralConsultantClinical.HR.ToInt32(),
+                    LingkarPerut = 10,
+                    KdStatusPulang = "4",
+                    TglPulang = "14-05-2024",
+                    KdDokter = IsPratition.FirstOrDefault(x => x.Id == FormRegis.PratitionerId).PhysicanCode,
+                    KdDiag1 = "A00.0",
+                    KdDiag2 = diag2,
+                    KdDiag3 = diag3,
+                    Suhu = GeneralConsultantClinical.Temp.ToString(),
+                };
+
+                var aa = System.Text.Json.JsonSerializer.Serialize(kunj);
+
+                var responseApi = await PcareService.SendPCareService($"kunjungan", HttpMethod.Post, kunj);
+
+                if (responseApi.Item2 != 200)
+                {
+                    ToastService.ShowError($"{responseApi.Item1}");
+
+                    IsLoading = false;
+                    return false;
+                }
+                else
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                    FormRegis.SerialNo = data.response.message;
+                }
+            }
+
+            return true;
+        }
+
+        private async Task<bool> SendPcareRequestRegistration()
+        {
+            if (FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Planned") && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
+            {
+                var regis = new PendaftaranRequest
+                {
+                    kdProviderPeserta = SelectedBPJSIntegration.KdProviderPstKdProvider ?? "",
+                    tglDaftar = FormRegis.RegistrationDate.ToString("dd-MM-yyyy"),
+                    noKartu = SelectedBPJSIntegration.NoKartu ?? "",
+                    kdPoli = Services.FirstOrDefault(x => x.Id == FormRegis.ServiceId)!.Code,
+                    keluhan = null,
+                    kunjSakit = true,
+                    kdTkp = "10"
+                };
+
+                var responseApi = await PcareService.SendPCareService($"pendaftaran", HttpMethod.Post, regis);
+
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+
+                if (responseApi.Item2 != 201)
+                {
+                    if (responseApi.Item2 == 412)
+                        ToastService.ShowError($"{data.message}\n Code: {responseApi.Item2}");
+                    else
+                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+
+                    IsLoading = false;
+                    return false;
+                }
+                else
+                    FormRegis.SerialNo = data.message;
+            }
+            return true;
+        }
+
+        private async Task HandleValidSubmit()
+        {
+            IsLoading = true;
+            FormValidationState = true;
+
+            if (PopUpProcedureRoom)
+                await OnSaveProcedureRoom();
+            else
+                await OnSave();
+            IsLoading = false;
+        }
+
+        private async Task OnSave()
+        {
+            try
+            {
+                IsLoading = true;
+                ToastService.ClearInfoToasts();
+
+                if (!FormValidationState)
+                    return;
+
+                if (!FormRegis.IsWeather)
+                    PatientAllergy.Weather = null;
+                if (!FormRegis.IsPharmacology)
+                    PatientAllergy.Farmacology = null;
+                if (!FormRegis.IsFood)
+                    PatientAllergy.Food = null;
+
+                GeneralConsultanMedicalSupport.LabResulLabExaminationtIds = SelectedLabTests.Select(x => x.Id).ToList();
+
+                if (FormRegis.Id == 0)
+                {
+                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.ServiceId == FormRegis.ServiceId && x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+
+                    if (patient.Count > 0)
+                    {
+                        ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
+                        return;
+                    }
+                }
+
+                if (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null))
+                {
+                    ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+                    return;
+                }
+
+                if (IsReferTo)
+                {
+                    FormRegis.Id = 0;
+                    FormRegis.StagingStatus = "Planned";
+                    StagingText = "Confirmed";
+                    PopUpVisible = false;
+                    FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                }
+                else if (IsAppoiment)
+                {
+                    if (FormRegis.AppoimentDate is null)
+                    {
+                        ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+                        return;
+                    }
+
+                    FormRegis.Id = 0;
+                    FormRegis.StagingStatus = "Planned";
+                    StagingText = "Confirmed";
+                    PopUpAppoiment = false;
+                    FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                    await LoadData();
+                }
+                else
+                {
+                    // Ketika Kondisi New
+                    if (FormRegis.Id == 0)
+                    {
+                        switch (FormRegis.StagingStatus)
+                        {
+                            case "Planned":
+                                FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+
+                                PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
+
+                                if (PatientAllergy.Id == 0)
+                                    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
+                                else
+                                    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
+
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (FormRegis.StagingStatus)
+                        {
+                            case "Planned":
+                                FormRegis = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+
+                                PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
+
+                                if (PatientAllergy.Id == 0)
+                                    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
+                                else
+                                    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
+
+                                break;
+
+                            case "Nurse Station":
+
+                                if (GeneralConsultantClinical.Id == 0)
+                                {
+                                    GeneralConsultantClinical.GeneralConsultanServiceId = FormRegis.Id;
+                                    GeneralConsultantClinical = await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                                }
+                                else
+                                {
+                                    GeneralConsultantClinical = await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                                }
+
+                                await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: FormRegis.Id));
+
+                                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = null; x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
+                                await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
+                                break;
+
+                            case "Physician":
+
+                                if (GeneralConsultantClinical.Id == 0)
+                                {
+                                    GeneralConsultantClinical.GeneralConsultanServiceId = FormRegis.Id;
+                                    GeneralConsultantClinical = await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                                }
+                                else
+                                {
+                                    GeneralConsultantClinical = await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
+                                }
+
+                                FormRegis = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+
+                                await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: FormRegis.Id));
+
+                                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = null; x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
+                                await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
+
+                                BrowserFiles.Distinct();
+
+                                foreach (var item in BrowserFiles)
+                                {
+                                    await FileUploadService.UploadFileAsync(item, 0, []);
+                                }
+
+                                //if (GeneralConsultanMedicalSupport.Id == 0)
+                                //{
+                                //    GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
+                                //    GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                                //}
+                                //else
+                                //{
+                                //    GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                                //}
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+                var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
+                FormRegis = result[0];
+
+                FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
+                FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
+                FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
+
+                ToastService.ShowSuccess("Saved Successfully");
+                IsLoading = false;
+            }
+            catch (Exception exx)
+            {
+                IsLoading = false;
+                exx.HandleException(ToastService);
+            }
+        }
+
+        private async Task OnSaveProcedureRoom()
+        {
+            try
+            {
+                if (GeneralConsultanMedicalSupport.IsOtherECG && string.IsNullOrWhiteSpace(GeneralConsultanMedicalSupport.OtherDesc))
+                {
+                    ToastService.ShowInfo("Other Description can't be empty!");
+                    return;
+                }
+
+                PopUpProcedureRoom = false;
+
+                if (FormRegis.Id == 0)
+                    return;
+
+                BrowserFiles.Distinct();
+
+                foreach (var item in BrowserFiles)
+                {
+                    await FileUploadService.UploadFileAsync(item, 0, []);
+                }
+
+                FormRegis.StagingStatus = "Procedure Room";
+                await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+
+                if (GeneralConsultanMedicalSupport.Id == 0)
+                {
+                    GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
+                    GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                }
+                else
+                    GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+
+                if (GeneralConsultanMedicalSupport.LabTestId is not null && GeneralConsultanMedicalSupport.LabTestId != 0)
+                {
+                    await Mediator.Send(new DeleteLabResultDetailRequest(ids: DeletedLabTestIds));
+
+                    LabResultDetails.ForEach(x => x.Id = 0);
+
+                    LabResultDetails.ForEach(x =>
+                    {
+                        x.Id = 0;
+                        x.GeneralConsultanMedicalSupportId = GeneralConsultanMedicalSupport.Id;
+                    });
+
+                    await Mediator.Send(new CreateListLabResultDetailRequest(LabResultDetails));
+
+                    IsAddOrUpdateOrDeleteLabResult = false;
+                }
+
+                ToastService.ShowSuccess("Saved Successfully");
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        #endregion OnSave and Staging
+
         #region Grid Lab Test
 
         private IGrid GridLabTest { get; set; }
@@ -1056,207 +1507,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private async Task OnClickConfirm()
-        {
-            try
-            {
-                IsLoading = true;
-                var currentStatus = FormRegis.StagingStatus;
-                ToastService.ClearInfoToasts();
-                if (FormRegis.PatientId == null || FormRegis.TypeRegistration == null || FormRegis.ServiceId is null || (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null)))
-                {
-                    IsLoading = false;
-                    ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
-                    return;
-                }
-
-                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0)
-                {
-                    var isSuccess = await SendPcareRequestRegistration();
-                    var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
-
-                    if (!isSuccess || !isSuccessAddKunjungan)
-                        return;
-                }
-
-                if (FormRegis.Id != 0)
-                {
-                    var text = FormRegis.StagingStatus == "Physician" ? "Consultation Done" : FormRegis.StagingStatus;
-                    var index = Stagings.FindIndex(x => x == text);
-                    if (text != "Consultation Done")
-                    {
-                        FormRegis.StagingStatus = Stagings[index + 1];
-                        if (index + 1 == 4)
-                        {
-                            FormRegis.StagingStatus = "Physician";
-                        }
-                        else if (index + 1 == 5)
-                        {
-                            FormRegis.StagingStatus = "Finished";
-                        }
-                        try
-                        {
-                            StagingText = FormRegis.StagingStatus == "In Consultant" ? "Finished" : Stagings[index + 2];
-                        }
-                        catch { }
-                    }
-                    else
-                    {
-                        FormRegis.StagingStatus = "Finished";
-                    }
-                    await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
-                }
-                else
-                {
-                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
-
-                    if (patient.Count > 0)
-                    {
-                        IsLoading = false;
-                        ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
-                        return;
-                    }
-
-                    FormRegis.StagingStatus = "Confirmed";
-                    StagingText = "Nurse Station";
-                    FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
-
-                    PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
-
-                    if (PatientAllergy.Id == 0)
-                        PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
-                    else
-                        PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
-                }
-
-                var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
-                FormRegis = result[0];
-
-                FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
-                FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
-                FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
-
-                if (FormRegis.StagingStatus.Equals("Physician"))
-                {
-                    if (Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
-                    {
-                        IsPratition = [.. AllDoctors.Where(x => x.Id == UserLogin.Id).ToList()];
-                        FormRegis.PratitionerId = IsPratition.Count > 0 ? IsPratition[0].Id : null;
-                    }
-                    else
-                        IsPratition = [.. AllDoctors.Where(x => x.IsDoctor == true && x.IsPhysicion == true).ToList()];
-                }
-
-                await ReadHeightWeightPatient();
-
-                IsLoading = false;
-            }
-            catch (Exception ex)
-            {
-                IsLoading = false;
-                ToastService.ShowError(ex.Message);
-            }
-        }
-
-        private async Task<bool> SendPcareRequestKunjungan()
-        {
-            if (FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Nurse Station") && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
-            {
-                var ll = GeneralConsultanCPPTs.Where(x => x.Title == "Diagnosis").Select(x => x.Body).ToList();
-
-                string diag1 = null;
-                string diag2 = null;
-                string diag3 = null;
-
-                if (FormRegis.StagingStatus.Equals("Nurse Station"))
-                {
-                    //diag1 = GeneralConsultanCPPTs.Count >= 1 ? NursingDiagnoses.FirstOrDefault(x => x.Problem.ToLower().Trim().Contains(ll[0].ToLower().Trim())).Code : null;
-                    //diag2 = GeneralConsultanCPPTs.Count >= 2 ? NursingDiagnoses.FirstOrDefault(x => x.Problem.ToLower().Trim().Contains(ll[1].ToLower().Trim())).Code : null;
-                    //diag3 = GeneralConsultanCPPTs.Count >= 3 ? NursingDiagnoses.FirstOrDefault(x => x.Problem.ToLower().Trim().Contains(ll[2].ToLower().Trim())).Code : null;
-                }
-                else
-                {
-                }
-
-                var kunj = new KunjunganRequest
-                {
-                    NoKunjungan = FormRegis.SerialNo ?? string.Empty,
-                    NoKartu = SelectedBPJSIntegration.NoKartu ?? "",
-                    TglDaftar = FormRegis.RegistrationDate.ToString("dd-MM-yyyy"),
-                    KdPoli = Services.FirstOrDefault(x => x.Id == FormRegis.ServiceId)!.Code,
-                    KdSadar = Awareness.FirstOrDefault(x => x.Id == GeneralConsultantClinical.AwarenessId)!.KdSadar,
-                    Sistole = 10,
-                    Diastole = 10,
-                    BeratBadan = GeneralConsultantClinical.Weight.ToInt32(),
-                    TinggiBadan = GeneralConsultantClinical.Height.ToInt32(),
-                    RespRate = GeneralConsultantClinical.RR.ToInt32(),
-                    HeartRate = GeneralConsultantClinical.HR.ToInt32(),
-                    LingkarPerut = 10,
-                    KdStatusPulang = "4",
-                    TglPulang = "14-05-2024",
-                    KdDokter = IsPratition.FirstOrDefault(x => x.Id == FormRegis.PratitionerId).PhysicanCode,
-                    KdDiag1 = "A00.0",
-                    KdDiag2 = diag2,
-                    KdDiag3 = diag3,
-                    Suhu = GeneralConsultantClinical.Temp.ToString(),
-                };
-
-                var aa = System.Text.Json.JsonSerializer.Serialize(kunj);
-
-                var responseApi = await PcareService.SendPCareService($"kunjungan", HttpMethod.Post, kunj);
-
-                if (responseApi.Item2 != 200)
-                {
-                    ToastService.ShowError($"{responseApi.Item1}");
-
-                    IsLoading = false;
-                    return false;
-                }
-                else
-                {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
-                    FormRegis.SerialNo = data.response.message;
-                }
-            }
-
-            return true;
-        }
-
-        private async Task<bool> SendPcareRequestRegistration()
-        {
-            if (FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Planned") && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
-            {
-                var regis = new PendaftaranRequest
-                {
-                    kdProviderPeserta = SelectedBPJSIntegration.KdProviderPstKdProvider ?? "",
-                    tglDaftar = FormRegis.RegistrationDate.ToString("dd-MM-yyyy"),
-                    noKartu = SelectedBPJSIntegration.NoKartu ?? "",
-                    kdPoli = Services.FirstOrDefault(x => x.Id == FormRegis.ServiceId)!.Code,
-                    keluhan = null,
-                    kunjSakit = true,
-                    kdTkp = "10"
-                };
-
-                var responseApi = await PcareService.SendPCareService($"pendaftaran", HttpMethod.Post, regis);
-
-                dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
-
-                if (responseApi.Item2 != 201)
-                {
-                    if (responseApi.Item2 == 412)
-                        ToastService.ShowError($"{data.message}\n Code: {responseApi.Item2}");
-                    else
-                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
-
-                    IsLoading = false;
-                    return false;
-                }
-                else
-                    FormRegis.SerialNo = data.message;
-            }
-            return true;
-        }
-
         public class Khusus
         {
             [JsonProperty("kdKhusus")]
@@ -1478,81 +1728,11 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private bool FormValidationState = true;
 
-        private async Task HandleValidSubmit()
-        {
-            IsLoading = true;
-            FormValidationState = true;
-
-            if (PopUpProcedureRoom)
-                await OnSaveProcedureRoom();
-            else
-                await OnSave();
-            IsLoading = false;
-        }
-
         private bool IsPopUpPainScale { get; set; } = false;
 
         private void OnClickPainScalePopUp()
         {
             IsPopUpPainScale = true;
-        }
-
-        private async Task OnSaveProcedureRoom()
-        {
-            try
-            {
-                if (GeneralConsultanMedicalSupport.IsOtherECG && string.IsNullOrWhiteSpace(GeneralConsultanMedicalSupport.OtherDesc))
-                {
-                    ToastService.ShowInfo("Other Description can't be empty!");
-                    return;
-                }
-
-                PopUpProcedureRoom = false;
-
-                if (FormRegis.Id == 0)
-                    return;
-
-                BrowserFiles.Distinct();
-
-                foreach (var item in BrowserFiles)
-                {
-                    await FileUploadService.UploadFileAsync(item, 0, []);
-                }
-
-                FormRegis.StagingStatus = "Procedure Room";
-                await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
-
-                if (GeneralConsultanMedicalSupport.Id == 0)
-                {
-                    GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
-                    GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
-                }
-                else
-                    GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
-
-                if (GeneralConsultanMedicalSupport.LabTestId is not null && GeneralConsultanMedicalSupport.LabTestId != 0)
-                {
-                    await Mediator.Send(new DeleteLabResultDetailRequest(ids: DeletedLabTestIds));
-
-                    LabResultDetails.ForEach(x => x.Id = 0);
-
-                    LabResultDetails.ForEach(x =>
-                    {
-                        x.Id = 0;
-                        x.GeneralConsultanMedicalSupportId = GeneralConsultanMedicalSupport.Id;
-                    });
-
-                    await Mediator.Send(new CreateListLabResultDetailRequest(LabResultDetails));
-
-                    IsAddOrUpdateOrDeleteLabResult = false;
-                }
-
-                ToastService.ShowSuccess("Saved Successfully");
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
         }
 
         private void GridCPPT_CustomizeElement(GridCustomizeElementEventArgs e)
@@ -1576,182 +1756,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
             FormValidationStateCPPT = false;
-        }
-
-        private async Task OnSave()
-        {
-            try
-            {
-                IsLoading = true;
-                ToastService.ClearInfoToasts();
-
-                if (!FormValidationState)
-                    return;
-
-                if (!FormRegis.IsWeather)
-                    PatientAllergy.Weather = null;
-                if (!FormRegis.IsPharmacology)
-                    PatientAllergy.Farmacology = null;
-                if (!FormRegis.IsFood)
-                    PatientAllergy.Food = null;
-
-                GeneralConsultanMedicalSupport.LabResulLabExaminationtIds = SelectedLabTests.Select(x => x.Id).ToList();
-
-                if (FormRegis.Id == 0)
-                {
-                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.ServiceId == FormRegis.ServiceId && x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
-
-                    if (patient.Count > 0)
-                    {
-                        ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
-                        return;
-                    }
-                }
-
-                if (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null))
-                {
-                    ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
-                    return;
-                }
-
-                if (IsReferTo)
-                {
-                    FormRegis.Id = 0;
-                    FormRegis.StagingStatus = "Planned";
-                    StagingText = "Confirmed";
-                    PopUpVisible = false;
-                    FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
-                }
-                else if (IsAppoiment)
-                {
-                    if (FormRegis.AppoimentDate is null)
-                    {
-                        ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
-                        return;
-                    }
-
-                    FormRegis.Id = 0;
-                    FormRegis.StagingStatus = "Planned";
-                    StagingText = "Confirmed";
-                    PopUpAppoiment = false;
-                    FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
-                    await LoadData();
-                }
-                else
-                {
-                    // Ketika Kondisi New
-                    if (FormRegis.Id == 0)
-                    {
-                        switch (FormRegis.StagingStatus)
-                        {
-                            case "Planned":
-                                FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
-
-                                PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
-
-                                if (PatientAllergy.Id == 0)
-                                    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
-                                else
-                                    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
-
-                                break;
-
-                            default:
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        switch (FormRegis.StagingStatus)
-                        {
-                            case "Planned":
-                                FormRegis = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
-
-                                PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
-
-                                if (PatientAllergy.Id == 0)
-                                    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
-                                else
-                                    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
-
-                                break;
-
-                            case "Nurse Station":
-
-                                if (GeneralConsultantClinical.Id == 0)
-                                {
-                                    GeneralConsultantClinical.GeneralConsultanServiceId = FormRegis.Id;
-                                    GeneralConsultantClinical = await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
-                                }
-                                else
-                                {
-                                    GeneralConsultantClinical = await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
-                                }
-
-                                await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: FormRegis.Id));
-
-                                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = null; x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
-                                await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
-                                break;
-
-                            case "Physician":
-
-                                if (GeneralConsultantClinical.Id == 0)
-                                {
-                                    GeneralConsultantClinical.GeneralConsultanServiceId = FormRegis.Id;
-                                    GeneralConsultantClinical = await Mediator.Send(new CreateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
-                                }
-                                else
-                                {
-                                    GeneralConsultantClinical = await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
-                                }
-
-                                FormRegis = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
-
-                                await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: FormRegis.Id));
-
-                                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = null; x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
-                                await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
-
-                                BrowserFiles.Distinct();
-
-                                foreach (var item in BrowserFiles)
-                                {
-                                    await FileUploadService.UploadFileAsync(item, 0, []);
-                                }
-
-                                //if (GeneralConsultanMedicalSupport.Id == 0)
-                                //{
-                                //    GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
-                                //    GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
-                                //}
-                                //else
-                                //{
-                                //    GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
-                                //}
-                                break;
-
-                            default:
-                                break;
-                        }
-                    }
-                }
-
-                var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
-                FormRegis = result[0];
-
-                FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
-                FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
-                FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
-
-                ToastService.ShowSuccess("Saved Successfully");
-                IsLoading = false;
-            }
-            catch (Exception exx)
-            {
-                IsLoading = false;
-                exx.HandleException(ToastService);
-            }
         }
 
         private void HandleInvalidSubmit()
