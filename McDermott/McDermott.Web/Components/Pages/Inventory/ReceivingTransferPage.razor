@@ -72,7 +72,7 @@
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItem_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 " />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 && isActiveButton" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
@@ -80,7 +80,11 @@
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Name" />
                                             <DxGridDataColumn FieldName="SchenduleDate" Caption="Schendule Date" />
-                                            <DxGridDataColumn FieldName="StatusReceived" Caption="Status" />
+                                            <DxGridDataColumn FieldName="StatusReceived" Caption="Status" >
+                                                <CellDisplayTemplate>
+                                                    @GetIssueStatusIconHtml((context.DataItem as ReceivingStockDto).StatusReceived)
+                                                </CellDisplayTemplate>
+                                            </DxGridDataColumn>
                                         </Columns>
                                     </DxGrid>
                                 </DxLoadingPanel>
@@ -96,8 +100,7 @@
                             <div class="row justify-content-end mb-3">
                                 <div class="col-auto align-self-end">
                                     <DxTabs RenderMode="TabsRenderMode.AllTabs">
-                                        <DxTab Text="Draft" Enabled="@(FormReceivingStocks.StatusReceived == "Draft")"></DxTab>
-                                        <DxTab Text="Received" Enabled="@(FormReceivingStocks.StatusReceived == "Received")"></DxTab>
+                                        <DxTab Text="Draft" Enabled="@(FormReceivingStocks.StatusReceived == "Draft")"></DxTab>                                        
                                         <DxTab Text="Done" Enabled="@(FormReceivingStocks.StatusReceived == "Done")"></DxTab>
                                         <DxTab Text="Cancel" Enabled="@(FormReceivingStocks.StatusReceived == "Cancel")"></DxTab>
                                     </DxTabs>
@@ -105,16 +108,15 @@
                             </div>
                             <div class="row justify-content-start mb-3">
                                 <div class="col-auto align-self-start">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            @if (FormReceivingStocks.StatusReceived == "Draft")
-                                            {
-                                                <DxButton Text="Receiving" RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-clipboard-check"></DxButton>
-                                                <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check" Click="onValidation"></DxButton>
+                                    @if (FormReceivingStocks.StatusReceived == "Draft")
+                                    {
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <DxButton Text="Receiving" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check" Click="onValidation"></DxButton>
                                                 <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
-                                            }
+                                            </div>
                                         </div>
-                                    </div>
+                                    }
                                 </div>
                             </div>
                         }
@@ -174,9 +176,9 @@
                                                         KeyboardNavigationEnabled="true">
                                                     <ToolbarTemplate>
                                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
-                                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempReceivingStockDetails.Count > 0 " />
-                                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempReceivingStockDetails.Count > 0 " />
+                                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="isActiveButton"/>
+                                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempReceivingStockDetails.Count > 0 && isActiveButton" />
+                                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempReceivingStockDetails.Count > 0 && isActiveButton" />
 
                                                         </DxToolbar>
                                                     </ToolbarTemplate>

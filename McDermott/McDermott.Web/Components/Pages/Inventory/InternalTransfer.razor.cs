@@ -466,35 +466,14 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-            List<TransactionStockDto> transactions = SelectedDataItems.Adapt<List<TransactionStockDto>>();
-            List<long> id = transactions.Select(x => x.Id).ToList();
-            List<long> ProductIdsToDelete = new();
-            List<long> DetailsIdsToDelete = new();
-
-            if (SelectedDataItems.Count == 1)
+            try
             {
-                //delete data Transaction Stock Product
-                ProductIdsToDelete = TransactionStockProducts
-                           .Where(x => x.TransactionStockId == transactionId)
-                           .Select(x => x.Id)
-                           .ToList();
-                await Mediator.Send(new DeleteTransactionStockProductRequest(ids: ProductIdsToDelete));
+                List<TransactionStockDto> transactions = SelectedDataItems.Adapt<List<TransactionStockDto>>();
+                List<long> id = transactions.Select(x => x.Id).ToList();
+                List<long> ProductIdsToDelete = new();
+                List<long> DetailsIdsToDelete = new();
 
-                //Delete data transaction Detal transfer (Log)
-
-                DetailsIdsToDelete = TransactionStockDetails
-                   .Where(x => x.TransactionStockId == transactionId)
-                   .Select(x => x.Id)
-                   .ToList();
-                await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: DetailsIdsToDelete));
-
-                //Delete Transaction
-
-                await Mediator.Send(new DeleteTransactionStockRequest(SelectedDataItems[0].Adapt<TransactionStockDto>().Id));
-            }
-            else
-            {
-                foreach (var uid in id)
+                if (SelectedDataItems.Count == 1)
                 {
                     //delete data Transaction Stock Product
                     ProductIdsToDelete = TransactionStockProducts
@@ -510,11 +489,54 @@ namespace McDermott.Web.Components.Pages.Inventory
                        .Select(x => x.Id)
                        .ToList();
                     await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: DetailsIdsToDelete));
+
+                    //Delete Transaction
+
+                    await Mediator.Send(new DeleteTransactionStockRequest(SelectedDataItems[0].Adapt<TransactionStockDto>().Id));
                 }
-                await Mediator.Send(new DeleteTransactionStockRequest(ids: id));
+                else
+                {
+                    foreach (var uid in id)
+                    {
+                        //delete data Transaction Stock Product
+                        ProductIdsToDelete = TransactionStockProducts
+                                   .Where(x => x.TransactionStockId == transactionId)
+                                   .Select(x => x.Id)
+                                   .ToList();
+                        await Mediator.Send(new DeleteTransactionStockProductRequest(ids: ProductIdsToDelete));
+
+                        //Delete data transaction Detal transfer (Log)
+
+                        DetailsIdsToDelete = TransactionStockDetails
+                           .Where(x => x.TransactionStockId == transactionId)
+                           .Select(x => x.Id)
+                           .ToList();
+                        await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: DetailsIdsToDelete));
+                    }
+                    await Mediator.Send(new DeleteTransactionStockRequest(ids: id));
+                }
+                ToastService.ShowSuccess("Data Deleting success..");
+                await LoadData();
             }
-            ToastService.ShowError("Data Deleting success..");
-            await LoadData();
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task onDelete_Detail(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                StateHasChanged();
+                var data = SelectedDataItemsDetail.Adapt<List<TransactionStockProductDto>>();
+                TempTransactionStocks.RemoveAll(x => data.Select(z => z.TransactionStockId).Contains(x.TransactionStockId));
+                SelectedDataItemsDetail = new ObservableRangeCollection<object>();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         #endregion function Delete
