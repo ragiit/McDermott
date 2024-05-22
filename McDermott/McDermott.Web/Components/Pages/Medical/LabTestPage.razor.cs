@@ -104,53 +104,106 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task OnDeleteLabTestDetail(GridDataItemDeletingEventArgs e)
         {
-            try
+            if (LabTest.Id == 0)
             {
-                if (SelectedDataItems is null || SelectedDataItems.Count == 1)
+                try
                 {
-                    LabTestDetailForms.Remove((LabTestDetailDto)e.DataItem);
-                }
-                else
-                {
-                    SelectedDataItems.Adapt<List<LabTestDetailDto>>().Select(x => x.Id).ToList().ForEach(x =>
+                    if (SelectedDetailDataItems is null || SelectedDetailDataItems.Count == 1)
                     {
-                        LabTestDetailForms.Remove(LabTestDetailForms.FirstOrDefault(z => z.Id == x));
-                    });
+                        LabTestDetailForms.Remove((LabTestDetailDto)e.DataItem);
+                    }
+                    else
+                    {
+                        SelectedDetailDataItems.Adapt<List<LabTestDetailDto>>().Select(x => x.Id).ToList().ForEach(x =>
+                        {
+                            LabTestDetailForms.Remove(LabTestDetailForms.FirstOrDefault(z => z.Id == x));
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
                 }
             }
-            catch (Exception ex)
+            else
             {
-                ex.HandleException(ToastService);
+                try
+                {
+                    if (SelectedDetailDataItems is null || SelectedDetailDataItems.Count == 1)
+                    {
+                        await Mediator.Send(new DeleteLabTestDetailRequest(((LabTestDetailDto)e.DataItem).Id));
+                    }
+                    else
+                    {
+                        var a = SelectedDetailDataItems.Adapt<List<LabTestDetailDto>>();
+                        await Mediator.Send(new DeleteLabTestDetailRequest(ids: a.Select(x => x.Id).ToList()));
+                    }
+                    SelectedDetailDataItems = [];
+                    await LoadLabTestDetails();
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
             }
         }
+        private async Task LoadLabTestDetails()
+        {
+            SelectedDetailDataItems = [];
+            LabTestDetailForms = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id));
+        }
 
-        private void OnSave(GridEditModelSavingEventArgs e)
+        private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             try
             {
+                if (e is null)
+                    return;
+
                 var labTest = (LabTestDetailDto)e.EditModel;
 
-                LabTestDetailDto update = new();
-
-                if (labTest.Id == 0)
+                if (LabTest.Id == 0)
                 {
-                    labTest.Id = Helper.RandomNumber;
-                    labTest.LabUom = LabUoms.FirstOrDefault(x => x.Id == labTest.LabUomId);
+                    try
+                    {
 
-                    LabTestDetailForms.Add(labTest);
+                        LabTestDetailDto update = new();
+
+                        if (labTest.Id == 0)
+                        {
+                            labTest.Id = Helper.RandomNumber;
+                            labTest.LabUom = LabUoms.FirstOrDefault(x => x.Id == labTest.LabUomId);
+
+                            LabTestDetailForms.Add(labTest);
+                        }
+                        else
+                        {
+                            var q = SelectedDetailDataItems[0].Adapt<LabTestDetailDto>();
+
+                            update = LabTestDetailForms.FirstOrDefault(x => x.Id == q.Id)!;
+                            labTest.LabUom = LabUoms.FirstOrDefault(x => x.Id == labTest.LabUomId);
+
+                            var index = LabTestDetailForms.IndexOf(update!);
+                            LabTestDetailForms[index] = labTest;
+                        }
+
+                        SelectedDetailDataItems = [];
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.HandleException(ToastService);
+                    }
                 }
                 else
                 {
-                    var q = SelectedDetailDataItems[0].Adapt<LabTestDetailDto>();
+                    labTest.LabTestId = LabTest.Id;
+                    if (labTest.Id == 0)
+                        await Mediator.Send(new CreateLabTestDetailRequest(labTest));
+                    else
+                        await Mediator.Send(new UpdateLabTestDetailRequest(labTest));
 
-                    update = LabTestDetailForms.FirstOrDefault(x => x.Id == q.Id)!;
-                    labTest.LabUom = LabUoms.FirstOrDefault(x => x.Id == labTest.LabUomId);
-
-                    var index = LabTestDetailForms.IndexOf(update!);
-                    LabTestDetailForms[index] = labTest;
+                    await LoadLabTestDetails();
                 }
-
-                SelectedDetailDataItems = [];
             }
             catch (Exception ex)
             {
@@ -408,19 +461,6 @@ namespace McDermott.Web.Components.Pages.Medical
                 else
                 {
                     await Mediator.Send(new UpdateLabTestRequest(LabTest));
-                    await Mediator.Send(new DeleteLabTestDetailRequest(ids: LabTestDetailForms.Select(x => x.Id).ToList()));
-
-                    LabTestDetailForms.ForEach(x =>
-                    {
-                        x.Id = 0;
-                        x.LabTestId = LabTest.Id;
-
-                        if (!LabTest.ResultType.Equals(EditedResultType))
-                        {
-                            x.ResultValueType = LabTest.ResultType;
-                        }
-                    });
-                    await Mediator.Send(new CreateListLabTestDetailRequest(LabTestDetailForms));
                 }
 
                 ShowForm = false;
