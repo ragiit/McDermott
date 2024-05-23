@@ -43,49 +43,6 @@
             }
         }
 
-        //internal class GetDoctorScheduleSlotQueryHandler : IRequestHandler<GetDoctorScheduleSlotQuery, List<DoctorScheduleSlotDto>>
-        //{
-        //    private readonly IUnitOfWork _unitOfWork;
-
-        //    public GetDoctorScheduleSlotQueryHandler(IUnitOfWork unitOfWork)
-        //    {
-        //        _unitOfWork = unitOfWork;
-        //    }
-
-        //    public async Task<List<DoctorScheduleSlotDto>> Handle(GetDoctorScheduleSlotQuery query, CancellationToken cancellationToken)
-        //    {
-        //        return await _unitOfWork.Repository<DoctorScheduleSlot>().Entities
-        //                .Select(DoctorSchedule => DoctorSchedule.Adapt<DoctorScheduleSlotDto>())
-        //                .AsNoTracking()
-        //                .ToListAsync(cancellationToken);
-        //    }
-        //}
-
-        internal class GetDoctorScheduleSlotQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetDoctorScheduleSlotQuery, List<DoctorScheduleSlotDto>>
-        {
-            private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-            public async Task<List<DoctorScheduleSlotDto>> Handle(GetDoctorScheduleSlotQuery query, CancellationToken cancellationToken)
-            {
-                try
-                {
-                    var result = await _unitOfWork.Repository<DoctorScheduleSlot>().GetAsync(
-                        query.Predicate,
-                            x => x
-                            .Include(z => z.Physician)
-                            .Include(z => z.DoctorSchedule)
-                            .ThenInclude(z => z.Service),
-                            cancellationToken);
-
-                    return result.Adapt<List<DoctorScheduleSlotDto>>();
-                }
-                catch (Exception)
-                {
-                    return [];
-                }
-            }
-        }
-
         internal class GetDoctorScheduleSlotByDoctorScheduleIdRequestHandler : IRequestHandler<GetDoctorScheduleSlotByDoctorScheduleIdRequest, List<DoctorScheduleSlotDto>>
         {
             private readonly IUnitOfWork _unitOfWork;
@@ -207,35 +164,6 @@
                     {
                         await _unitOfWork.Repository<DoctorScheduleDetail>().AddAsync(item.Adapt<DoctorScheduleDetail>());
                     }
-
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    return true;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-            }
-        }
-
-        internal class CreateDoctorScheduleSlotRequestHandler : IRequestHandler<CreateDoctorScheduleSlotRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateDoctorScheduleSlotRequestHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(CreateDoctorScheduleSlotRequest request, CancellationToken cancellationToken)
-            {
-                try
-                {
-                    request.DoctorScheduleSlotDto.ForEach(async x =>
-                    {
-                        await _unitOfWork.Repository<DoctorScheduleSlot>().AddAsync(x.Adapt<DoctorScheduleSlot>());
-                    });
 
                     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -371,24 +299,6 @@
         }
 
         #region Delete
-
-        internal class DeleteDoctorScheduleSlotRequestHandler : IRequestHandler<DeleteDoctorScheduleSlotRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteDoctorScheduleSlotRequestHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteDoctorScheduleSlotRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<DoctorScheduleSlot>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
 
         internal class DeleteDoctorScheduleSlotByPhysicionIdRequestHandler : IRequestHandler<DeleteDoctorScheduleSlotByPhysicionIdRequest, bool>
         {

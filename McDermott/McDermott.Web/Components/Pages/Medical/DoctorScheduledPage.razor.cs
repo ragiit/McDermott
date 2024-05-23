@@ -438,7 +438,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
                 #endregion MyRegion
 
-                await Mediator.Send(new CreateDoctorScheduleSlotRequest(result));
+                await Mediator.Send(new CreateListDoctorScheduleSlotRequest(result));
 
                 ToastService.ShowSuccess("Generated Schedule Doctor Successfully");
             }

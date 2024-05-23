@@ -153,8 +153,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                     Suhu = GeneralConsultantClinical.Temp.ToString(),
                 };
 
-                var aa = System.Text.Json.JsonSerializer.Serialize(kunj);
-
                 var responseApi = await PcareService.SendPCareService($"kunjungan", HttpMethod.Post, kunj);
 
                 if (responseApi.Item2 != 200)

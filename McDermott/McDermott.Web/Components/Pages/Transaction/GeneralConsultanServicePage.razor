@@ -613,7 +613,7 @@
                                                             </DxFormLayout>
                                                         }
                                                         else if (ActiveTabIndex == 1)
-                                                        { 
+                                                        {
                                                             @if (!FormRegis.StagingStatus.Equals("Finished"))
                                                             {
                                                                 <DxFormLayout>
@@ -940,7 +940,7 @@
                                                                                             </Template>
                                                                                         </DxGridLayoutItem>
                                                                                     </Items>
-                                                                                </DxGridLayout> 
+                                                                                </DxGridLayout>
                                                                             </Template>
                                                                         </DxFormLayoutItem>
                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="RR">
@@ -1008,7 +1008,7 @@
                                                         {
                                                             <EditForm Model="@FormInputCPPTGeneralConsultan" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmitCPPT"
                                                                       OnInvalidSubmit="@HandleInvalidSubmitCPPT">
-                                                                <DataAnnotationsValidator /> 
+                                                                <DataAnnotationsValidator />
                                                                 @if (!FormRegis.StagingStatus.Equals("Finished"))
                                                                 {
                                                                     <DxFormLayout>
@@ -1217,7 +1217,7 @@ else
                                                     </Template>
                                                 </DxGridLayoutItem>
                                             </Items>
-                                        </DxGridLayout> 
+                                        </DxGridLayout>
                                     </Template>
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg Type" ColSpanMd="12">
@@ -1240,7 +1240,7 @@ else
                                                 FilteringMode="@DataGridFilteringMode.Contains"
                                                 @bind-Value="@FormRegis.TypeMedical">
                                     </DxComboBox>
-                                </DxFormLayoutItem> 
+                                </DxFormLayoutItem>
                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Alert Information Special Case" ColSpanMd="12">
                                     <DxCheckBox @bind-Checked="@FormRegis.IsAlertInformationSpecialCase" />
                                 </DxFormLayoutItem>
@@ -1519,7 +1519,7 @@ else
 </DxPopup>
 
 <DxPopup HeaderText="Procedure Room" @bind-Visible="@PopUpProcedureRoom" HeaderCssClass="fw-bold" HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
-         VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto"> 
+         VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
     <EditForm Model="@GeneralConsultanMedicalSupport" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
         <DataAnnotationsValidator />
         <DxFormLayout CssClass="w-100">

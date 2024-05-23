@@ -6,6 +6,48 @@ namespace McDermott.Web.Components.Pages.Queue
 {
     public partial class KioskPage
     {
+        public class AntreanRequestBPJS
+        {
+            [JsonProperty("nomorkartu")]
+            public string Nomorkartu { get; set; }
+
+            [JsonProperty("nik")]
+            public string Nik { get; set; }
+
+            [JsonProperty("nohp")]
+            public string Nohp { get; set; }
+
+            [JsonProperty("kodepoli")]
+            public string Kodepoli { get; set; }
+
+            [JsonProperty("namapoli")]
+            public string Namapoli { get; set; }
+
+            [JsonProperty("norm")]
+            public string Norm { get; set; }
+
+            [JsonProperty("tanggalperiksa")]
+            public string Tanggalperiksa { get; set; }
+
+            [JsonProperty("kodedokter")]
+            public string Kodedokter { get; set; }
+
+            [JsonProperty("namadokter")]
+            public string Namadokter { get; set; }
+
+            [JsonProperty("jampraktek")]
+            public string Jampraktek { get; set; }
+
+            [JsonProperty("nomorantrean")]
+            public string Nomorantrean { get; set; }
+
+            [JsonProperty("angkaantrean")]
+            public int Angkaantrean { get; set; }
+
+            [JsonProperty("keterangan")]
+            public string Keterangan { get; set; }
+        }
+
         #region Relation Data
 
         public List<KioskDto> Kiosks = new();
@@ -37,6 +79,7 @@ namespace McDermott.Web.Components.Pages.Queue
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
+        private int SelectedScheduleSlot { get; set; }
         //private GroupMenuDto UserAccessCRUID = new();
 
         #endregion setings Grid
@@ -87,7 +130,7 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        private void UserSelected(UserDto user)
+        private async Task UserSelected(UserDto user)
         {
             BPJS = InsurancePolices.Where(x => x.UserId == user.Id).FirstOrDefault();
             if (BPJS is not null)
@@ -107,6 +150,28 @@ namespace McDermott.Web.Components.Pages.Queue
             else
             {
                 statBPJS = "no BPJS number";
+            }
+        }
+
+        private List<DoctorScheduleSlotDto> DoctorScheduleSlots = [];
+
+        private async Task ChangePhysician(UserDto r)
+        {
+            FormKios.PhysicianId = null;
+            if (r is null)
+                return;
+
+            FormKios.PhysicianId = r.Id;
+
+            await SelectScheduleSlots();
+        }
+
+        private async Task SelectScheduleSlots()
+        {
+            var schedules = await Mediator.Send(new GetDoctorScheduleQuery(x => x.ServiceId == FormKios.ServiceId && x.PhysicionIds != null && x.PhysicionIds.Contains(FormKios.PhysicianId.GetValueOrDefault())));
+            if (schedules.Count > 0)
+            {
+                DoctorScheduleSlots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.DoctorScheduleId == schedules[0].Id && x.PhysicianId == FormKios.PhysicianId));
             }
         }
 
@@ -422,6 +487,8 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 showForm = false;
             }
+
+            await SelectScheduleSlots();
         }
 
         private async Task onPrint()
@@ -605,6 +672,10 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormQueue.ClassTypeId = FormKios.ClassTypeId;
                     FormQueue.QueueStatus = "waiting";
 
+                    var isSuccess = await SendPCareRequestAntrean(bpjs[0] ?? new());
+                    if (!isSuccess)
+                        return;
+
                     // Membuat KioskQueue baru
                     var QueueKioskId = await Mediator.Send(new CreateKioskQueueRequest(FormQueue));
 
@@ -630,6 +701,53 @@ namespace McDermott.Web.Components.Pages.Queue
             }
             catch { }
             IsLoading = false;
+        }
+
+        private async Task<bool> SendPCareRequestAntrean(BPJSIntegrationDto bpjs)
+        {
+            try
+            {
+                var service = Services.FirstOrDefault(x => x.Id == FormKios.ServiceId);
+                var physician = Physician.FirstOrDefault(x => x.Id == FormKios.PhysicianId);
+
+                var antreanRequest = new AntreanRequestBPJS
+                {
+                    Nomorkartu = bpjs.NoKartu ?? string.Empty,
+                    Nik = bpjs.NoKTP ?? string.Empty,
+                    Nohp = bpjs.NoHP ?? string.Empty,
+                    Kodepoli = service!.Code ?? string.Empty,
+                    Namapoli = service.Name ?? string.Empty,
+                    Norm = Patients.FirstOrDefault(x => x.Id == FormKios.PatientId)!.NoRm ?? string.Empty,
+                    Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
+                    Kodedokter = physician!.PhysicanCode,
+                    Namadokter = physician!.Name,
+                    Jampraktek = "08:00-16:00",
+                    Nomorantrean = ViewQueue!.QueueNumber!.ToString()! ?? "",
+                    Angkaantrean = ViewQueue.QueueNumber.ToInt32(),
+                    Keterangan = ""
+                };
+
+                var responseApi = await PcareService.SendPCareService($"antrean/add", HttpMethod.Post, antreanRequest);
+
+                if (responseApi.Item2 != 200)
+                {
+                    ToastService.ShowError($"{responseApi.Item1}");
+                    Console.WriteLine("ResponseAPI Antrean/Add " + Convert.ToString(responseApi.Item1));
+                    IsLoading = false;
+                    return false;
+                }
+                else
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                e.HandleException(ToastService);
+                return false;
+            }
         }
 
         #endregion Methode Save And Update

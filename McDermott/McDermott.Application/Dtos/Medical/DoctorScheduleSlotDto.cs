@@ -18,6 +18,14 @@ namespace McDermott.Application.Dtos.Medical
         public string WorkToFormatString
         { get { return WorkTo.ToString(string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator) ? @"HH\:mm" : @"hh\:mm"); } }
 
+        public string ResultWorkFormatStringKiosk
+        {
+            get
+            {
+                return $"{WorkFromFormatString}-{WorkToFormatString}";
+            }
+        }
+
         public DoctorScheduleDto? DoctorSchedule { get; set; }
         public UserDto? Physician { get; set; }
     }

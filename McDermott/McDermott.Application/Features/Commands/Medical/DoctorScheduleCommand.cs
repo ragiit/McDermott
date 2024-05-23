@@ -22,11 +22,6 @@
             }
         }
 
-        public class GetDoctorScheduleSlotQuery(Expression<Func<DoctorScheduleSlot, bool>>? predicate = null) : IRequest<List<DoctorScheduleSlotDto>>
-        {
-            public Expression<Func<DoctorScheduleSlot, bool>> Predicate { get; } = predicate;
-        }
-
         public class GetDoctorScheduleSlotByDoctorScheduleIdRequest : IRequest<List<DoctorScheduleSlotDto>>
         {
             public long DoctorScheduleId { get; set; }
@@ -73,15 +68,7 @@
             }
         }
 
-        public class CreateDoctorScheduleSlotRequest : IRequest<bool>
-        {
-            public List<DoctorScheduleSlotDto> DoctorScheduleSlotDto { get; set; }
 
-            public CreateDoctorScheduleSlotRequest(List<DoctorScheduleSlotDto> DoctorScheduleSlotDto)
-            {
-                this.DoctorScheduleSlotDto = DoctorScheduleSlotDto;
-            }
-        }
 
         public class CreateDoctorScheduleRequest : IRequest<DoctorScheduleDto>
         {
@@ -148,16 +135,6 @@
             public DeleteListDoctorScheduleRequest(List<long> id)
             {
                 this.Id = id;
-            }
-        }
-
-        public class DeleteDoctorScheduleSlotRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
-
-            public DeleteDoctorScheduleSlotRequest(long id)
-            {
-                Id = id;
             }
         }
 
