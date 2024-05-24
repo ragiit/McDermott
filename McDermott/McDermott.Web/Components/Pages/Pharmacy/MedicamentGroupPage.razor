@@ -279,7 +279,9 @@
                                                                                 <DxFormLayoutItem Caption="Qty Per Day" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                     <DxSpinEdit Value="@FormMedicamenDetails.QtyByDay"
                                                                                                 ValueExpression="@(() => FormMedicamenDetails.QtyByDay)"
-                                                                                                ValueChanged="(long value)=>OnValueChangedTotalQtyDays(value)">
+                                                                                                ValueChanged="(long value)=>OnValueChangedTotalQtyDays(value)"
+                                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                                ShowValidationIcon="true">
                                                                                     </DxSpinEdit>
 
                                                                                     <ValidationMessage For="@(()=> FormMedicamenDetails.QtyByDay)" ) />
