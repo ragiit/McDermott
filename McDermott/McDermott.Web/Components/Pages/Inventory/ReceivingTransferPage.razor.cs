@@ -231,6 +231,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             showForm = true;
             header = "Add Data";
+            TempReceivingStockDetails.Clear();
+            FormReceivingStocks = new();
             isActiveButton = true;
         }
 
@@ -321,7 +323,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                             FormStockProduct.Expired = a.ExpiredDate;
                             FormStockProduct.Batch = a.Batch;
                         }
-                        
+
                         FormStockProduct.Qty = a.Qty * x.BiggerRatio.ToLong();
                         await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
                     }

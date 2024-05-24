@@ -864,6 +864,7 @@ else
     </div>
 }
 
+@* Prescription Concoction *@
 <DxPopup HeaderText="Concoction" @bind-Visible="@PopUpConcoctionDetail" HeaderCssClass="fw-bold"
          HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
@@ -1054,8 +1055,7 @@ else
                                                 }
                                             }
 
-                                            <DxFormLayoutItem Caption="name
-" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxFormLayoutItem Caption="name" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@Concoction.MedicamentName"
                                                            ShowValidationIcon="true"
                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"

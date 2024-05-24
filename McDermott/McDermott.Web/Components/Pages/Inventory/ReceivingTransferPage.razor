@@ -130,7 +130,7 @@
                                     <DataAnnotationsValidator />
                                     <DxFormLayout CssClass="mt">
                                         <DxFormLayoutItem Caption="Schendule Date" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                            <DxDateEdit @bind-Date="@FormReceivingStocks.SchenduleDate" DisplayFormat="dd MMMM yyyy" Format="d"></DxDateEdit>
+                                            <DxDateEdit @bind-Date="@FormReceivingStocks.SchenduleDate" Enabled="@isActiveButton" DisplayFormat="dd MMMM yyyy" Format="d"></DxDateEdit>
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem Caption="Destination Location" CaptionCssClass="normal-caption" ColSpanMd="12">
                                             <DxComboBox Data="@Locations" @bind-Value="@FormReceivingStocks.DestinationId"
@@ -139,7 +139,8 @@
                                                         ShowValidationIcon="true"
                                                         FilteringMode="@DataGridFilteringMode.Contains"
                                                         TextFieldName="NameAndParent"
-                                                        ValueFieldName="Id"></DxComboBox>
+                                                        ValueFieldName="Id"
+                                                        Enabled="@isActiveButton"></DxComboBox>
                                         </DxFormLayoutItem>
                                         <DxFormLayoutGroup Caption="Product Lines" ColSpanMd="12">
                                             <Items>
