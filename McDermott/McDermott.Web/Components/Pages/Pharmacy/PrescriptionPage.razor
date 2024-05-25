@@ -262,7 +262,7 @@
                                                                         <DxGridDataColumn MinWidth="200" FieldName="Stock" Caption="Stock" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="DosageFrequency" Caption="Dosage/Frequency" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="PriceUnit" Caption="Price Unit" />
-                                                                        <DxGridDataColumn MinWidth="200" FieldName="DrugRoute.Route" Caption="Route" /> 
+                                                                        <DxGridDataColumn MinWidth="200" FieldName="DrugRoute.Route" Caption="Route" />
                                                                     </Columns>
                                                                     <EditFormTemplate Context="EditFormContextPrescriptionLines">
                                                                         @{
@@ -442,413 +442,6 @@
                             }
                         }
 
-                        @*  <div class="card">
-                    <div class="card-body">
-                    @if (IsLoading)
-                    {
-                    <LoadingIndicatorLayout></LoadingIndicatorLayout>
-                    }
-                    else
-                    {
-                    @if (!ShowForm)
-                    {
-                    <DxLoadingPanel @bind-Visible="PanelVisible"
-                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                    IsContentBlocked="true"
-                    ApplyBackgroundShading="true"
-                    IndicatorAreaVisible="false"
-                    Text="Fetching Data...">
-                    <DxGrid @ref="Grid"
-                    PagerNavigationMode="PagerNavigationMode.InputBox"
-                    Data="Pharmacies"
-                    PageSize="10"
-                    @bind-SelectedDataItems="@SelectedDataItems"
-                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                    KeyFieldName="Id"
-                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                    EditorRenderMode="GridEditorRenderMode.Detached"
-                    DataItemDeleting="OnDelete"
-                    AllowSelectRowByClick="true"
-                    PagerPosition="GridPagerPosition.Bottom"
-                    PageSizeSelectorVisible="true"
-                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                    PageSizeSelectorAllRowsItemVisible="true"
-                    PagerSwitchToInputBoxButtonCount="10"
-                    FocusedRowEnabled="true"
-                    RowDoubleClick="EditItemPharmacy_Click"
-                    PagerVisibleNumericButtonCount="10"
-                    FocusedRowChanged="Grid_FocusedRowChanged"
-                    ShowGroupPanel="true"
-                    AutoExpandAllGroupRows="true"
-                    ShowFilterRow="true"
-                    CustomizeElement="@GridExtention.Grid_CustomizeElement"
-                    ShowSearchBox="true"
-                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                    KeyboardNavigationEnabled="true">
-                    <ToolbarTemplate>
-                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Prescriptions.Count > 0" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Prescriptions.Count > 0" />
-                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                    <Items>
-                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                    </Items>
-                    </DxToolbarItem>
-                    </DxToolbar>
-                    </ToolbarTemplate>
-                    <Columns>
-                    <DxGridSelectionColumn Width="15px" />
-                    <DxGridDataColumn MinWidth="200" FieldName="ReceiptDate" Caption="Prescription Date" SortIndex="0" />
-                    <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
-                    <DxGridDataColumn MinWidth="200" FieldName="Practitioner.Name" Caption="Prescribing Doctor" />
-                    <DxGridDataColumn MinWidth="200" FieldName="StatusText" Caption="Status" />
-                    </Columns>
-                    </DxGrid>
-                    </DxLoadingPanel>
-                    }
-                    else
-                    {
-                    <DxLoadingPanel @bind-Visible="IsLoading"
-                    IsContentBlocked="true"
-                    CssClass="w-100"
-                    ApplyBackgroundShading="true">
-                    <div class="w-100">
-                    <EditForm Model="@Pharmacy" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
-                    <DataAnnotationsValidator />
-                    <div class="row w-100">
-                    <div class="col-md-6">
-                    <DxFormLayout CssClass="mt w-100">
-                    <DxFormLayoutItem Caption="Patient" CaptionCssClass="normal-caption" ColSpanMd="12">
-                    <DxComboBox ShowValidationIcon="true"
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                    Data="@Patients"
-                    NullText="Select Patient..."
-                    @bind-Value="@Pharmacy.PatientId"
-                    TextFieldName="Name"
-                    ValueFieldName="Id">
-                    </DxComboBox>
-                    <ValidationMessage For="@(()=> Pharmacy.PatientId)" />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem Caption="Practitioner" CaptionCssClass="normal-caption" ColSpanMd="12">
-                    <DxComboBox ShowValidationIcon="true"
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                    Data="@Practitioners"
-                    NullText="Select Practitioner..."
-                    @bind-Value="@Pharmacy.PractitionerId"
-                    SelectedItemChanged="@((UserDto practitioner)=>SelectedChangePractition(practitioner))"
-                    TextFieldName="Name"
-                    ValueFieldName="Id">
-                    </DxComboBox>
-                    <ValidationMessage For="@(()=> Pharmacy.PractitionerId)" />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem Caption="Preciption Location" CaptionCssClass="normal-caption" ColSpanMd="12">
-                    <DxComboBox ShowValidationIcon="true"
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                    Data="@PreciptionLocations"
-                    NullText="Select Preciption Location..."
-                    @bind-Value="@Pharmacy.PrescriptionLocationId"
-                    TextFieldName="NameAndParent"
-                    ValueFieldName="Id">
-                    </DxComboBox>
-                    <ValidationMessage For="@(()=> Pharmacy.PrescriptionLocationId)" />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem Caption=" Medicament Group" CaptionCssClass="normal-caption" ColSpanMd="12">
-                    <DxComboBox Data="@MedicamentGroups"
-                    @bind-Value="@Pharmacy.MedicamentGroupId"
-                    NullText="Select Medicament Group..."
-                    TextFieldName="Name"
-                    ValueFieldName="Id"
-                    SelectedItemChanged="@((MedicamentGroupDto medicament)=>SelectedMedicament(medicament))"
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    ShowValidationIcon="true"></DxComboBox>
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="12">
-                    <DxCheckBox @bind-Checked="@Pharmacy.IsWeather" />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Farmacologi" ColSpanMd="12">
-                    <DxCheckBox @bind-Checked="@Pharmacy.IsFarmacologi" />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="12">
-                    <DxCheckBox @bind-Checked="@Pharmacy.IsFood" />
-                    </DxFormLayoutItem>
-                    </DxFormLayout>
-                    </div>
-
-                    <div class="col-md-6">
-                    <DxFormLayout CssClass="mt w-100">
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Service" ColSpanMd="12">
-                    <DxComboBox ShowValidationIcon="true" Data="@Services"
-                    NullText="Select Service..."
-                    ReadOnly
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    FilteringMode="@DataGridFilteringMode.Contains"
-                    @bind-Value="Pharmacy.ServiceId"
-                    TextFieldName="Name"
-                    ValueFieldName="Id">
-                    </DxComboBox>
-                    <ValidationMessage For="@(() => Pharmacy.ServiceId)" />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Payment Method" ColSpanMd="12">
-                    <DxComboBox ShowValidationIcon="true" Data="@Payments"
-                    NullText="Select Payment Method..."
-                    ReadOnly
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    FilteringMode="@DataGridFilteringMode.Contains"
-                    @bind-Value="Pharmacy.PaymentMethod">
-                    </DxComboBox>
-                    <ValidationMessage For="@(() => Pharmacy.PaymentMethod)" />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem CaptionCssClass="normal-caption text-center" Caption="Prescription Date" ColSpanMd="12">
-                    <DxDateEdit @bind-Date="@Pharmacy.ReceiptDate"
-                    ReadOnly
-                    TimeSectionVisible="true" />
-                    </DxFormLayoutItem>
-
-                    </DxFormLayout>
-                    </div>
-                    </div>
-
-                    <hr />
-
-                    <DxTabs>
-                    <DxTabPage Text="Prescription Lines">
-                    <DxLoadingPanel @bind-Visible="PanelVisible"
-                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                    IsContentBlocked="true"
-                    ApplyBackgroundShading="true"
-                    IndicatorAreaVisible="false"
-                    Text="Fetching Data...">
-                    <DxGrid @ref="GridPrescriptionLines"
-                    PagerNavigationMode="PagerNavigationMode.InputBox"
-                    Data="Prescriptions"
-                    PageSize="10"
-                    @bind-SelectedDataItems="@SelectedDataItemsPrescriptionLines"
-                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                    KeyFieldName="Id"
-                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                    EditorRenderMode="GridEditorRenderMode.Detached"
-                    DataItemDeleting="OnDelete"
-                    AllowSelectRowByClick="true"
-                    PagerPosition="GridPagerPosition.Bottom"
-                    PageSizeSelectorVisible="true"
-                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                    PageSizeSelectorAllRowsItemVisible="true"
-                    PagerSwitchToInputBoxButtonCount="10"
-                    FocusedRowEnabled="true"
-                    PagerVisibleNumericButtonCount="10"
-                    FocusedRowChanged="GridFocusedRowVisibleIndexPrescriptionLines_FocusedRowChanged"
-                    ShowGroupPanel="true"
-                    AutoExpandAllGroupRows="true"
-                    ShowFilterRow="true"
-                    CustomizeElement="Grid_CustomizeElement"
-                    ShowSearchBox="true"
-                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                    KeyboardNavigationEnabled="true">
-                    <ToolbarTemplate>
-                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemPrescriptionLines_Click" IconCssClass="fa-solid fa-plus" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItemPrescriptionLines_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Prescriptions.Count > 0" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemPrescriptionLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Prescriptions.Count > 0" />
-                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshPrescriptionLines_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                    </DxToolbar>
-                    </ToolbarTemplate>
-                    <Columns>
-                    <DxGridSelectionColumn Width="15px" />
-                    <DxGridDataColumn MinWidth="200" FieldName="ProductName" Caption="Medicine Name" SortIndex="0" />
-                    <DxGridDataColumn MinWidth="200" FieldName="Stock" Caption="Stock" />
-                    <DxGridDataColumn MinWidth="200" FieldName="DosageFrequency" Caption="Dosage/Frequency" />
-                    <DxGridDataColumn MinWidth="200" FieldName="PriceUnit" Caption="Price Unit" />
-                    <DxGridDataColumn MinWidth="200" FieldName="DrugRoutName" Caption="Route" />
-                    <DxGridDataColumn MinWidth="200" FieldName="DrugDosageName" Caption="Dosage" />
-                    </Columns>
-                    <EditFormTemplate Context="EditFormContextPrescriptionLines">
-                    <DxFormLayout CssClass="w-100">
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Name" ColSpanMd="12">
-                    <DxComboBox ShowValidationIcon="true" Data="@Products"
-                    NullText="Select Medical Name..."
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    FilteringMode="@DataGridFilteringMode.Contains"
-                    @bind-Value="Prescription.ProductId"
-                    TextFieldName="Name"
-                    ValueFieldName="Id">
-                    </DxComboBox>
-                    <ValidationMessage For="@(() => Prescription.ProductId)" />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Drug From" ColSpanMd="6">
-                    <DxComboBox ShowValidationIcon="true" Data="@DrugForms"
-                    NullText="Select Drug From..."
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    FilteringMode="@DataGridFilteringMode.Contains"
-                    @bind-Value="Prescription.DrugFromId"
-                    TextFieldName="Name"
-                    ValueFieldName="Id">
-                    </DxComboBox>
-                    <ValidationMessage For="@(() => Prescription.DrugFromId)" />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Stock" ColSpanMd="6">
-                    <DxSpinEdit @bind-Value="@Prescription.Stock"
-                    NullText="Stock..."
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    BindValueMode="BindValueMode.OnInput" />
-                    <ValidationMessage For="@(()=> Prescription.Stock)"   />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Prescription Quantity" ColSpanMd="6">
-                    <DxSpinEdit @bind-Value="@Prescription.GivenAmount"
-                    NullText="Given Amount..."
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    BindValueMode="BindValueMode.OnInput" />
-                    <ValidationMessage For="@(()=> Prescription.GivenAmount)"   />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Drug Route" ColSpanMd="6">
-                    <DxComboBox ShowValidationIcon="true" Data="@DrugRoutes"
-                    NullText="Drug Route..."
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    FilteringMode="@DataGridFilteringMode.Contains"
-                    @bind-Value="Prescription.DrugRouteId"
-                    TextFieldName="Route"
-                    ValueFieldName="Id">
-                    </DxComboBox>
-                    <ValidationMessage For="@(() => Prescription.DrugRouteId)" />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Dosage/Frequency" ColSpanMd="6">
-                    <Template>
-                    <DxGridLayout>
-                    <Rows>
-                    <DxGridLayoutRow />
-                    </Rows>
-                    <Columns>
-                    <DxGridLayoutColumn Width="30%" />
-                    <DxGridLayoutColumn />
-                    </Columns>
-                    <Items>
-                    <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption mr-2" ColumnSpan="1">
-                    <Template>
-                    <DxSpinEdit @bind-Value="@Prescription.Dosage" NullText="Input Dosage..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
-                    </Template>
-                    </DxGridLayoutItem>
-                    <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="6">
-                    <Template>
-                    <DxComboBox Data="@DrugDosages"
-                    @bind-Value="@Prescription.DrugDosageId"
-                    NullText="Select Frequency.."
-                    TextFieldName="Frequency"
-                    ValueFieldName="Id"
-                    ShowValidationIcon="true"
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
-                    </Template>
-                    </DxGridLayoutItem>
-                    </Items>
-                    </DxGridLayout>
-                    </Template>
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Price Unit" ColSpanMd="6">
-                    <DxSpinEdit @bind-Value="@Prescription.PriceUnit"
-                    NullText="Price Unit..."
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    BindValueMode="BindValueMode.OnInput" />
-                    <ValidationMessage For="@(()=> Prescription.PriceUnit)"   />
-                    </DxFormLayoutItem>
-                    </DxFormLayout>
-                    </EditFormTemplate>
-                    </DxGrid>
-                    </DxLoadingPanel>
-                    </DxTabPage>
-
-                    <DxTabPage Text="Prescription Concoction">
-                    <DxLoadingPanel @bind-Visible="PanelVisible"
-                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                    IsContentBlocked="true"
-                    ApplyBackgroundShading="true"
-                    IndicatorAreaVisible="false"
-                    Text="Fetching Data...">
-                    <DxGrid @ref="GridConcoction"
-                    PagerNavigationMode="PagerNavigationMode.InputBox"
-                    Data="Concoctions"
-                    PageSize="10"
-                    @bind-SelectedDataItems="@SelectedDataItemsPrescriptionConcoction"
-                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                    KeyFieldName="Id"
-                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                    EditorRenderMode="GridEditorRenderMode.Detached"
-                    DataItemDeleting="OnDelete"
-                    AllowSelectRowByClick="true"
-                    PagerPosition="GridPagerPosition.Bottom"
-                    PageSizeSelectorVisible="true"
-                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                    PopupEditFormCssClass="custom-width-grid-popup"
-                    PageSizeSelectorAllRowsItemVisible="true"
-                    EditMode="GridEditMode.PopupEditForm"
-                    PagerSwitchToInputBoxButtonCount="10"
-                    FocusedRowEnabled="true"
-                    PagerVisibleNumericButtonCount="10"
-                    FocusedRowChanged="GridFocusedRowVisibleIndexPrescriptionConcoction_FocusedRowChanged"
-                    ShowGroupPanel="true"
-                    AutoExpandAllGroupRows="true"
-                    ShowFilterRow="true"
-                    CustomizeElement="Grid_CustomizeElement"
-                    ShowSearchBox="true"
-                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                    KeyboardNavigationEnabled="true">
-                    <ToolbarTemplate>
-                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemPrescriptionConcoction_Click" IconCssClass="fa-solid fa-plus" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItemPrescriptionConcoction_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Prescriptions.Count > 0" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemPrescriptionConcoction_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Prescriptions.Count > 0" />
-                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshPrescriptionConcoction_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                    </DxToolbar>
-                    </ToolbarTemplate>
-                    <Columns>
-                    <DxGridSelectionColumn Width="15px" />
-                    <DxGridDataColumn MinWidth="200" FieldName="MedicamentName" Caption="Name" SortIndex="0" />
-                    <DxGridDataColumn MinWidth="200" FieldName="DrugDosage.Frequency" Caption="Dosage/Frequency" />
-                    <DxGridDataColumn MinWidth="200" FieldName="QtyPerDay" Caption="Qty Per Day" />
-                    <DxGridDataColumn MinWidth="200" FieldName="Qty Dose" Caption="Qty Dose" />
-                    <DxGridDataColumn MinWidth="200" FieldName="Days" Caption="Days" />
-                    <DxGridDataColumn MinWidth="200" FieldName="TotalQty" Caption="Total Qty" />
-                    </Columns>
-                    </DxGrid>
-                    </DxLoadingPanel>
-                    </DxTabPage>
-                    </DxTabs>
-
-                    <div class="card-footer">
-                    <div class="row  justify-content-end">
-                    <div class="col-auto align-self-end">
-                    <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
-
-                    </DxButton>
-                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true"></DxButton>
-                    </div>
-                    </div>
-                    </div>
-                    </EditForm>
-                    </div>
-                    </DxLoadingPanel>
-                    }
-                    }
-                    </div>
-                    </div> *@
                     </div>
                 </div>
             </div>
@@ -873,7 +466,6 @@ else
         <div class="row w-100">
             <div class="col-md-6">
                 <DxFormLayout CssClass="mt w-100">
-
                     <DxFormLayoutItem Caption="Prescribing Doctor" CaptionCssClass="normal-caption" ColSpanMd="12">
                         <DxComboBox ShowValidationIcon="true"
                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
@@ -904,6 +496,8 @@ else
                         if (medicamentGroup is not null)
                         {
                             Concoction.MedicamentName = medicamentGroup.Name;
+                            Concoction.UomId = medicamentGroup.UoMId;
+                            Concoction.DrugFromId = medicamentGroup.FormDrugId;
                         }
                     }
 
@@ -913,14 +507,6 @@ else
                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                    NullText="Name" />
                         <ValidationMessage For="@(() => Concoction.MedicamentName)"   />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem Caption="Qty Dose" CaptionCssClass="normal-caption" ColSpanMd="12">
-                        <DxSpinEdit @bind-Value="@Concoction.QtyDose"
-                                    NullText="Qty Dose..."
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    BindValueMode="BindValueMode.OnInput" />
-                        <ValidationMessage For="@(()=> Concoction.QtyDose)"   />
                     </DxFormLayoutItem>
 
                     <DxFormLayoutItem Caption="Unit of Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
@@ -951,12 +537,37 @@ else
 
             <div class="col-md-6">
                 <DxFormLayout CssClass="mt w-100">
-                    <DxFormLayoutItem Caption="Qty Per Day" CaptionCssClass="normal-caption" ColSpanMd="12">
-                        <DxSpinEdit @bind-Value="@Concoction.QtyPerDay"
-                                    NullText="Qty Per Day..."
+                    <DxFormLayoutItem Caption="Qty Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
+                        <DxSpinEdit Value="@Concoction.Qty"
+                                    NullText="0"
+                                    MinValue="0"
+                                    ValueExpression="@(()=>Concoction.Qty)"
+                                    ValueChanged="((long value)=>OnValueChangedTotalQty(value))"
                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    BindValueMode="BindValueMode.OnInput" />
-                        <ValidationMessage For="@(()=> Concoction.QtyPerDay)"   />
+                                    ShowValidationIcon="true"/>
+                        <ValidationMessage For="@(()=> Concoction.Qty)"   />
+                    </DxFormLayoutItem>
+
+                    <DxFormLayoutItem Caption="Frequency" CaptionCssClass="normal-caption" ColSpanMd="12">
+                        <DxComboBox Data="@DrugDosages"
+                                    @bind-Value="@Concoction.DrugDosageId"
+                                    FilteringMode="@DataGridFilteringMode.Contains"
+                                    NullText="Select Dosage signa ..."
+                                    TextFieldName="Frequency"
+                                    ValueFieldName="Id"
+                                    SelectedItemChanged="@((DrugDosageDto freq)=>SelectChangeFrequency(freq))"
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    ShowValidationIcon="true"></DxComboBox>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Qty Per Day" CaptionCssClass="normal-caption" ColSpanMd="12">
+                        <DxSpinEdit Value="@Concoction.QtyByDay"
+                        NullText="0"
+                        ValueExpression="@(() =>Concoction.QtyByDay)" 
+                        ValueChanged="((long value)=>OnValueChangedTotalQtyDays(value))"
+                        MinValue="0"
+                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                        ShowValidationIcon="true"></DxSpinEdit>
+                        <ValidationMessage For="@(()=> Concoction.QtyByDay)"   />
                     </DxFormLayoutItem>
 
                     <DxFormLayoutItem Caption="Days" CaptionCssClass="normal-caption" ColSpanMd="12">
@@ -1026,11 +637,15 @@ else
                         <Columns>
                             <DxGridSelectionColumn Width="15px" />
                             <DxGridDataColumn FieldName="Product.Name" Caption="Medicine Name" SortIndex="0" />
-                            <DxGridDataColumn FieldName="DrugDosage.Frequency" Caption="Dosage/Frequency" />
-                            <DxGridDataColumn FieldName="Practitioner.Name" Caption="Prescribing Doctor" />
+                            <DxGridDataColumn FieldName="ActiveComponent.Name" Caption="Active Component" />
+                            <DxGridDataColumn FieldName="MedicineDosage" Caption="MedicineDosage" />
+                            <DxGridDataColumn FieldName="QtyDosage" Caption="Qty Dosage" />
+                            <DxGridDataColumn FieldName="Uom.Name" Caption="Unit Of Dosage" />
+                            <DxGridDataColumn FieldName="TotalQty" Caption="Total Qty" />
+                            <DxGridDataColumn FieldName="AvaliableQty" Caption="Avaliable Qty" />
                         </Columns>
                         <EditFormTemplate Context="EditFormContextPrescriptionConcoctionLines">
-                            <EditForm Model="@Concoction" Context="EditFormContextPrescriptionConcoctionLinesForm" OnInvalidSubmit="@HandleValidConcoctionSubmit" OnValidSubmit="@HandleInvalidConcoctionSubmit">
+                            <EditForm Model="@ConcoctionLine" Context="EditFormContextPrescriptionConcoctionLinesForm" OnInvalidSubmit="@HandleValidConcoctionSubmit" OnValidSubmit="@HandleInvalidConcoctionSubmit">
                                 <DataAnnotationsValidator />
                                 <div class="row w-100">
                                     <div class="col-md-6">
@@ -1038,49 +653,32 @@ else
                                             <DxFormLayoutItem Caption="Medicine Name" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxComboBox ShowValidationIcon="true"
                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                            Data="@MedicamentGroups"
+                                                            Data="@Products"
                                                             NullText="Select Medicine Name..."
                                                             @bind-Value="@ConcoctionLine.MedicamentId"
+                                                            SelectedItemChanged="@((ProductDto product)=> ChangeProduct(product))"
                                                             TextFieldName="Name"
                                                             ValueFieldName="Id">
                                                 </DxComboBox>
                                                 <ValidationMessage For="@(()=> ConcoctionLine.MedicamentId)" />
                                             </DxFormLayoutItem>
 
-                                            @{
-                                                var medicamentGroup = MedicamentGroups.FirstOrDefault(x => x.Id == Concoction.MedicamentGroupId);
-                                                if (medicamentGroup is not null)
-                                                {
-                                                    Concoction.MedicamentName = medicamentGroup.Name;
-                                                }
-                                            }
-
-                                            <DxFormLayoutItem Caption="name" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@Concoction.MedicamentName"
-                                                           ShowValidationIcon="true"
-                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                           NullText="Name" />
-                                                <ValidationMessage For="@(() => Concoction.MedicamentName)"   />
-                                            </DxFormLayoutItem>
-
                                             <DxFormLayoutItem Caption="Active Component" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                <DxComboBox ShowValidationIcon="true"
-                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                            Data="@ActiveComponents"
-                                                            NullText="Select Active Component..."
-                                                            @bind-Value="@ConcoctionLine.ActiveComponentId"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id">
-                                                </DxComboBox>
+                                                <DxTagBox Data="@ActiveComponents"
+                                                          FilteringMode="@DataGridFilteringMode.Contains"
+                                                          @bind-Values="@selectedActiveComponents"
+                                                          NullText="Select Active Component.."
+                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                          TextFieldName="Name" />
                                                 <ValidationMessage For="@(()=> ConcoctionLine.ActiveComponentId)" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem Caption="Medicine Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                <DxSpinEdit @bind-Value="@ConcoctionLine.MedicineUnitOfDosage"
+                                                <DxSpinEdit @bind-Value="@ConcoctionLine.MedicineDosage"
                                                             NullText="Medicine Unit Of Dosage..."
                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                             BindValueMode="BindValueMode.OnInput" />
-                                                <ValidationMessage For="@(()=> ConcoctionLine.MedicineUnitOfDosage)"   />
+                                                <ValidationMessage For="@(()=> ConcoctionLine.MedicineDosage)"   />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </div>
@@ -1132,5 +730,6 @@ else
                 </DxLoadingPanel>
             </DxTabPage>
         </DxTabs>
+        <DxButton Click="OnSaveConcoction" Text="save"></DxButton>
     </EditForm>
 </DxPopup>

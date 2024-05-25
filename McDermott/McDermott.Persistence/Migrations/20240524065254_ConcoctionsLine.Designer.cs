@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240524065254_ConcoctionsLine")]
+    partial class ConcoctionsLine
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1842,9 +1845,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("Diastole")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("DiastolicBP")
                         .HasColumnType("bigint");
 
@@ -1869,9 +1869,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long>("RR")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Sistole")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("SpO2")
                         .HasColumnType("bigint");
 
@@ -1888,9 +1885,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<long>("V")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("WaistCircumference")
                         .HasColumnType("bigint");
 
                     b.Property<double>("Weight")

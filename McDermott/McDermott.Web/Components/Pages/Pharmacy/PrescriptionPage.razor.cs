@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
@@ -113,12 +114,63 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<StockProductDto> StockProducts { get; set; } = [];
         private List<ActiveComponentDto> ActiveComponents { get; set; } = [];
 
+        private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
+
         private List<string> Payments = new List<string>
         {
             "Personal",
             "Insurance",
             "BPJS"
         };
+
+        private async void ChangeProduct(ProductDto product)
+        {
+            try
+            {
+                if (product is null)
+                {
+                    ConcoctionLine = new();
+                    selectedActiveComponents = [];
+                    return;
+                }
+
+                var a = await Mediator.Send(new GetMedicamentQuery());
+                var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
+                var checkUom = Uoms.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
+
+                ConcoctionLine.QtyDose = ChekMedicament.Dosage;
+                ConcoctionLine.MedicineDosage = ChekMedicament.Dosage;
+                ConcoctionLine.MedicineUnitUomId = ChekMedicament.UomId;
+                selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
+                var checkStock = StockProducts.Where(x => x.ProductId == product.Id && x.SourceId == Pharmacy.PrescriptionLocationId).FirstOrDefault();
+                ConcoctionLine.AvailableQty = checkStock.ToLong();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private void OnValueChangedTotalQtyDays(long value)
+        {
+            Concoction.QtyByDay = value;
+            Concoction.TotalQty = Concoction.Qty * value;
+        }
+
+        private void OnValueChangedTotalQty(long value)
+        {
+            Concoction.Qty = value;
+            Concoction.TotalQty = Concoction.QtyByDay * value;
+        }
+
+        private void SelectChangeFrequency(DrugDosageDto datas)
+        {
+            var data = DrugDosages.Where(f => f.Id == datas.Id).FirstOrDefault();
+
+            Concoction.QtyByDay = data.TotalQtyPerDay.ToLong();
+            Concoction.Days = data.Days.ToLong();
+            Concoction.TotalQty = Concoction?.Qty * Concoction?.QtyByDay;
+        }
 
         private async Task SelectedChangePractition(UserDto? user)
         {
@@ -384,12 +436,23 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         }
 
         private bool FormValidationState = true;
+
         private async Task HandleValidSubmit()
         {
             FormValidationState = true;
 
             if (FormValidationState)
                 await OnSavePharmacy();
+        }
+
+        private async Task HandleInvalidConcoctionSubmit()
+        {
+            await OnSaveConcoction();
+        }
+
+        private async Task OnSaveConcoction()
+        {
+            var a = Concoction;
         }
 
         private async Task OnSavePrescription(GridEditModelSavingEventArgs e)
@@ -404,7 +467,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 try
                 {
                     PrescriptionDto update = new();
-
 
                     var medicamentDetails = Medicaments.FirstOrDefault(s => s.ProductId == t.ProductId);
                     if (medicamentDetails != null)
@@ -489,10 +551,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         }
 
         private async Task HandleValidConcoctionSubmit()
-        {
-        }
-
-        private async Task HandleInvalidConcoctionSubmit()
         {
         }
 

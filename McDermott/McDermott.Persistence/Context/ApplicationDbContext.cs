@@ -110,6 +110,8 @@ namespace McDermott.Persistence.Context
         #region Pharmacy
 
         public DbSet<Prescription> Prescriptions { get; set; }
+        public DbSet<Concoction> Concoctions { get; set; }
+        public DbSet<ConcoctionLine> ConcoctionLines { get; set; }
         public DbSet<Pharmacy> Pharmacies { get; set; }
         public DbSet<DrugRoute> DrugRoutes { get; set; }
         public DbSet<DrugDosage> DrugDosages { get; set; }
