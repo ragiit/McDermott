@@ -1718,6 +1718,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<long>("Diastole")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("DiastolicBP")
                         .HasColumnType("bigint");
 
@@ -1742,6 +1745,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long>("RR")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("Sistole")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("SpO2")
                         .HasColumnType("bigint");
 
@@ -1758,6 +1764,9 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<long>("V")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("WaistCircumference")
                         .HasColumnType("bigint");
 
                     b.Property<double>("Weight")
