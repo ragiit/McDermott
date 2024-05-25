@@ -1,12 +1,19 @@
 ﻿using QuestPDF.Fluent;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
+using static McDermott.Web.Components.Pages.Queue.KioskPage;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class GeneralConsultanServicePage
     {
         #region OnSave and Staging
+
+        private bool P { get; set; } = false;
+        private string SelectedRujukanType { get; set; }
+        private string SelectedRujukanExternal { get; set; }
+        private IEnumerable<string> RujukanTypes = new[] { "Rujuk Internal", "Rujukan External" };
+        private IEnumerable<string> RujukanExtenalTypes = new[] { "Rujukan Horizontal", "Rujukan Vertical" };
 
         private async Task OnClickConfirm()
         {
@@ -22,13 +29,29 @@ namespace McDermott.Web.Components.Pages.Transaction
                     return;
                 }
 
-                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0)
+                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Planned"))
                 {
                     var isSuccess = await SendPcareRequestRegistration();
+                    if (!isSuccess)
+                    {
+                        IsLoading = false;
+                        return;
+                    }
+                    else
+                    {
+                        await SendPCareRequestUpdateStatusPanggilAntrean(1);
+                    }
+                }
+
+                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Physician"))
+                {
                     var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
 
-                    if (!isSuccess || !isSuccessAddKunjungan)
+                    if (!isSuccessAddKunjungan)
+                    {
+                        IsLoading = false;
                         return;
+                    }
                 }
 
                 if (FormRegis.Id != 0)
@@ -88,7 +111,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
                 FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
 
-                if (FormRegis.StagingStatus.Equals("Physician"))
+                if (FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Physician"))
                 {
                     if (Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
                     {
@@ -116,18 +139,30 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 var ll = GeneralConsultanCPPTs.Where(x => x.Title == "Diagnosis").Select(x => x.Body).ToList();
 
-                string diag1 = null;
-                string diag2 = null;
-                string diag3 = null;
+                string diag1 = null!;
 
                 if (FormRegis.StagingStatus.Equals("Nurse Station"))
                 {
-                    //diag1 = GeneralConsultanCPPTs.Count >= 1 ? NursingDiagnoses.FirstOrDefault(x => x.Problem.ToLower().Trim().Contains(ll[0].ToLower().Trim())).Code : null;
-                    //diag2 = GeneralConsultanCPPTs.Count >= 2 ? NursingDiagnoses.FirstOrDefault(x => x.Problem.ToLower().Trim().Contains(ll[1].ToLower().Trim())).Code : null;
-                    //diag3 = GeneralConsultanCPPTs.Count >= 3 ? NursingDiagnoses.FirstOrDefault(x => x.Problem.ToLower().Trim().Contains(ll[2].ToLower().Trim())).Code : null;
+                    if (GeneralConsultanCPPTs.Count > 0)
+                    {
+                        var g = GeneralConsultanCPPTs.LastOrDefault(x => x.Title.Equals("Diagnosis"));
+                        if (g is not null)
+                        {
+                            diag1 = NursingDiagnoses.FirstOrDefault(x => x.Problem.Equals(g.Body))!.Code ?? null!;
+                        }
+                    }
                 }
-                else
+
+                if (FormRegis.StagingStatus.Equals("Physician"))
                 {
+                    if (GeneralConsultanCPPTs.Count > 0)
+                    {
+                        var g = GeneralConsultanCPPTs.LastOrDefault(x => x.Title.Equals("Diagnosis"));
+                        if (g is not null)
+                        {
+                            diag1 = Diagnoses.FirstOrDefault(x => x.Name.Equals(g.Body))!.Code ?? null!;
+                        }
+                    }
                 }
 
                 var kunj = new KunjunganRequest
@@ -137,19 +172,19 @@ namespace McDermott.Web.Components.Pages.Transaction
                     TglDaftar = FormRegis.RegistrationDate.ToString("dd-MM-yyyy"),
                     KdPoli = Services.FirstOrDefault(x => x.Id == FormRegis.ServiceId)!.Code,
                     KdSadar = Awareness.FirstOrDefault(x => x.Id == GeneralConsultantClinical.AwarenessId)!.KdSadar,
-                    Sistole = 10,
-                    Diastole = 10,
+                    Sistole = GeneralConsultantClinical.Sistole.ToInt32(),
+                    Diastole = GeneralConsultantClinical.Diastole.ToInt32(),
                     BeratBadan = GeneralConsultantClinical.Weight.ToInt32(),
                     TinggiBadan = GeneralConsultantClinical.Height.ToInt32(),
                     RespRate = GeneralConsultantClinical.RR.ToInt32(),
                     HeartRate = GeneralConsultantClinical.HR.ToInt32(),
-                    LingkarPerut = 10,
+                    LingkarPerut = GeneralConsultantClinical.WaistCircumference.ToInt32(),
                     KdStatusPulang = "4",
-                    TglPulang = "14-05-2024",
-                    KdDokter = IsPratition.FirstOrDefault(x => x.Id == FormRegis.PratitionerId).PhysicanCode,
-                    KdDiag1 = "A00.0",
-                    KdDiag2 = diag2,
-                    KdDiag3 = diag3,
+                    TglPulang = FormRegis.RegistrationDate.ToString("dd-MM-yyyy"),
+                    KdDokter = IsPratition.FirstOrDefault(x => x.Id == FormRegis.PratitionerId)!.PhysicanCode,
+                    KdDiag1 = diag1,
+                    KdDiag2 = null,
+                    KdDiag3 = null,
                     Suhu = GeneralConsultantClinical.Temp.ToString(),
                 };
 
@@ -165,7 +200,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                 else
                 {
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
-                    FormRegis.SerialNo = data.response.message;
+                    if (!string.IsNullOrWhiteSpace(FormRegis.SerialNo)) // Check if the serial no is not getting from kiosk
+                        FormRegis.SerialNo = data.response.message;
                 }
             }
 
@@ -187,6 +223,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     kdTkp = "10"
                 };
 
+                Console.WriteLine("Sending pendaftaran...");
                 var responseApi = await PcareService.SendPCareService($"pendaftaran", HttpMethod.Post, regis);
 
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
@@ -197,6 +234,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                         ToastService.ShowError($"{data.message}\n Code: {responseApi.Item2}");
                     else
                         ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+
+                    Console.WriteLine(JsonConvert.SerializeObject(regis, Formatting.Indented));
 
                     IsLoading = false;
                     return false;
@@ -1678,6 +1717,16 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsLoading = true;
             if (FormRegis.Id != 0)
             {
+                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0)
+                {
+                    var isSuccess = await SendPCareRequestUpdateStatusPanggilAntrean(2);
+                    if (!isSuccess)
+                    {
+                        IsLoading = false;
+                        return;
+                    }
+                }
+
                 FormRegis.StagingStatus = "Canceled";
 
                 await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
@@ -1688,6 +1737,47 @@ namespace McDermott.Web.Components.Pages.Transaction
                 ToastService.ShowSuccess("Cancelled..");
             }
             IsLoading = false;
+        }
+
+        private async Task<bool> SendPCareRequestUpdateStatusPanggilAntrean(int status)
+        {
+            try
+            {
+                var service = Services.FirstOrDefault(x => x.Id == FormRegis.ServiceId);
+
+                var antreanRequest = new UpdateStatusPanggilAntreanRequestPCare
+                {
+                    Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
+                    Kodepoli = service!.Code ?? string.Empty,
+                    Nomorkartu = SelectedBPJSIntegration.NoKartu ?? string.Empty,
+                    Status = status, // 1 -> Hadir, 2 -> Tidak Hadir
+                    Waktu = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                };
+
+                Console.WriteLine("Sending antrean/panggil...");
+                var responseApi = await PcareService.SendPCareService($"antrean/panggil", HttpMethod.Post, antreanRequest);
+
+                if (responseApi.Item2 != 200)
+                {
+                    ToastService.ShowError($"{responseApi.Item1}, Code: {responseApi.Item2}");
+                    Console.WriteLine(JsonConvert.SerializeObject(antreanRequest, Formatting.Indented));
+                    Console.WriteLine("ResponseAPI antrean/panggil " + Convert.ToString(responseApi.Item1));
+                    IsLoading = false;
+                    return false;
+                }
+                else
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                    Console.WriteLine(Convert.ToString(data));
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                e.HandleException(ToastService);
+                return false;
+            }
         }
 
         private void SelectedService(DoctorScheduleDto docter)
