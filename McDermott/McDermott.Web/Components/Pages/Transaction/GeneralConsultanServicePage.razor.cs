@@ -12,8 +12,10 @@ namespace McDermott.Web.Components.Pages.Transaction
         private bool P { get; set; } = false;
         private string SelectedRujukanType { get; set; }
         private string SelectedRujukanExternal { get; set; }
+        private string SelectedRujukanVertical { get; set; }
         private IEnumerable<string> RujukanTypes = new[] { "Rujuk Internal", "Rujukan External" };
         private IEnumerable<string> RujukanExtenalTypes = new[] { "Rujukan Horizontal", "Rujukan Vertical" };
+        private IEnumerable<string> RujukanExtenalVertical = new[] { "Kondisi Khusus", "Spesialis" };
 
         private async Task OnClickConfirm()
         {
