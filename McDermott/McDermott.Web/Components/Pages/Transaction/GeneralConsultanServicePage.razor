@@ -1336,7 +1336,7 @@ else
                                         </DxFormLayoutItem>
                                         @if (FormRegis.Payment == "Insurance" || FormRegis.Payment == "BPJS")
                                         {
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption=" " ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
                                                 <DxComboBox ShowValidationIcon="true"
                                                             TextFieldName="ConcatInsurancePolicy"
                                                             ValueFieldName="InsurancePolicyId"
@@ -1383,7 +1383,7 @@ else
                 <DxFormLayoutItem Context="T" ColSpanMd="12">
                     <DxFormLayout>
                         <DxFormLayoutGroup Caption="Search for Referral Health Facilities" ColSpanMd="12">
-                            <DxFormLayout>
+                            <DxFormLayout CssClass="w-100">
                                 <DxFormLayoutItem ColSpanMd="12">
                                     <DxRadioGroup Items="@RujukanExtenalTypes"
                                                   ItemAlignment="CheckBoxContentAlignment.SpaceBetween"
@@ -1391,11 +1391,8 @@ else
                                                   Layout="@RadioGroupLayout.Horizontal" />
                                 </DxFormLayoutItem>
 
-                                <DxFormLayoutItem ColSpanMd="12" Context="C">
-                                    @if (SelectedRujukanExternal is not null && SelectedRujukanExternal.Equals(RujukanExtenalTypes.ToList()[0]))
-                                    {
-                                    }
-                                    else if (SelectedRujukanExternal is not null && SelectedRujukanExternal.Equals(RujukanExtenalTypes.ToList()[1]))
+                                <DxFormLayoutItem ColSpanMd="12" Context="C" CssClass="w-100">
+                                    @if (SelectedRujukanExternal is not null && SelectedRujukanExternal.Equals(RujukanExtenalTypes.ToList()[1]))
                                     {
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem ColSpanMd="12">
@@ -1405,42 +1402,130 @@ else
                                                               Layout="@RadioGroupLayout.Horizontal" />
                                             </DxFormLayoutItem>
                                             @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[0]))
-                                            {         
+                                            {
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Category" ColSpanMd="12">
-                                                     
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                Data="@SpesialisRefrensiKhusus"
+                                                                NullText="Select Category..."
+                                                                @bind-Value="@FormRegis.ReferVerticalKhususCategoryCode"
+                                                                TextFieldName="NmKhusus"
+                                                                ValueFieldName="KdKhusus">
+                                                    </DxComboBox>
                                                 </DxFormLayoutItem>
-
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Reason..." ColSpanMd="12"> 
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Reason..." ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@FormRegis.ReferReason" NullText="Reason..." ReadOnly InputCssClass="fw-normal" />
                                                 </DxFormLayoutItem>
                                             }
                                             else if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
                                             {
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Spesialis" ColSpanMd="6">
-                                                   
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                Data="@SpesialisPs"
+                                                                NullText="Select Spesialis..."
+                                                                @bind-Value="@FormRegis.ReferVerticalSpesialisParentSpesialisCode"
+                                                                SelectedItemChanged="(SpesialisPCare e) => SelectedItemSpesialis(e)"
+                                                                TextFieldName="NmSpesialis"
+                                                                ValueFieldName="KdSpesialis">
+                                                    </DxComboBox>
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sub Spesialis" ColSpanMd="6">
-                                                   
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                Data="@SubSpesialisPs"
+                                                                NullText="Select Sub Spesialis..."
+                                                                @bind-Value="@FormRegis.ReferVerticalSpesialisParentSubSpesialisCode"
+                                                                TextFieldName="NmSubSpesialis"
+                                                                ValueFieldName="KdSubSpesialis">
+                                                    </DxComboBox>
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sarana" ColSpanMd="12">
-                                                   
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sarana" ColSpanMd="6">
+                                                    <DxCheckBox @bind-Checked="@FormRegis.IsSarana" />
                                                 </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Select Sarana" ColSpanMd="6">
-                                                   
-                                                </DxFormLayoutItem>
+
+                                                @if (Convert.ToBoolean(FormRegis.IsSarana))
+                                                {
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sarana" ColSpanMd="6">
+                                                        <DxComboBox ShowValidationIcon="true"
+                                                                    Data="@SpesialisSaranas"
+                                                                    NullText="Select Sarana..."
+                                                                    @bind-Value="@FormRegis.ReferVerticalSpesialisSaranaCode"
+                                                                    TextFieldName="NmSarana"
+                                                                    ValueFieldName="KdSarana">
+                                                        </DxComboBox>
+                                                    </DxFormLayoutItem>
+                                                }
                                             }
                                         </DxFormLayout>
+                                        @if (SelectedRujukanVertical is not null)
+                                        {
+                                            <div class="row justify-content-end">
+                                                <div class="col-auto align-self-end">
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <DxDateEdit Date="@FormRegis.ReferDateVisit"
+                                                                        DateExpression="@(() => @FormRegis.ReferDateVisit)"
+                                                                        Mask="@DateTimeMask.ShortDate"
+                                                                        NullText="Select Visit Date">
+                                                            </DxDateEdit>
+                                                        </div>
+                                                        <div class="col">
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search Faskes" Click="OnClickSearchFaskes" SubmitFormOnClick="true"></DxButton>
+                                                        </div>
+                                                        <div class="col">
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel"></DxButton>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
                                     }
-                                    <div class="row justify-content-end">
-                                        <div class="col-auto align-self-end"> 
-                                                <DxDateEdit DateChanged="@((DateTime e) => SelectedItemRegistrationDateChanged(e))"
-                                                            Date="@FormRegis.RegistrationDate"
-                                                            DateExpression="@(() => @FormRegis.RegistrationDate)"
-                                                            Mask="@DateTimeMask.ShortDate"
-                                                            NullText="Select Registration Date">
-                                                </DxDateEdit> 
-                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Search" SubmitFormOnClick="true"></DxButton>
-                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnCancelAppoimentPopup"></DxButton>
-                                        </div>
+
+                                    <div class="row w-100 mt-3">
+                                        <DxLoadingPanel @bind-Visible="IsLoadingSearchFaskes"
+                                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                        IsContentBlocked="true"
+                                                        ApplyBackgroundShading="true"
+                                                        IndicatorAreaVisible="false"
+                                                        Text="Fetching Data...">
+                                            <DxGrid @ref="GridRujukanRefer" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                    Data="RujukanSubSpesialis"
+                                                    PageSize="10"
+                                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                    KeyFieldName="Kdppk"
+                                                    TextWrapEnabled="false"
+                                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                                    EditMode="GridEditMode.PopupEditForm"
+                                                    PagerPosition="GridPagerPosition.Bottom"
+                                                    PageSizeSelectorVisible="true"
+                                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                    PageSizeSelectorAllRowsItemVisible="true"
+                                                    PagerSwitchToInputBoxButtonCount="10"
+                                                    AllowSelectRowByClick="true"
+                                                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                                    FocusedRowEnabled="true"
+                                                    PagerVisibleNumericButtonCount="10"
+                                                    ShowGroupPanel="true"
+                                                    ShowFilterRow="true"
+                                                    CustomizeElement="Grid_CustomizeElement"
+                                                    ShowSearchBox="true"
+                                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                                    KeyboardNavigationEnabled="true">
+                                                <Columns>
+                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Nmppk))" Caption="Faskes" />
+                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kelas))" Caption="Class" />
+                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.AlamatPpk))" Caption="Address" />
+                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.TelpPpk))" Caption="Phone" />
+                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Distance))" Caption="Distance" />
+                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.JmlRujuk))" Caption="Patient" />
+                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kapasitas))" Caption="Patient" />
+                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Persentase))" Caption="%" />
+                                                    <DxGridDataColumn Caption="Action ">
+                                                        <CellDisplayTemplate>
+                                                            <DxButton RenderStyle="@ButtonRenderStyle.Success" IconCssClass="fa-solid fa-play mr-1" Text="Select"></DxButton>
+                                                        </CellDisplayTemplate>
+                                                    </DxGridDataColumn>
+                                                </Columns>
+                                            </DxGrid>
+                                        </DxLoadingPanel>
                                     </div>
                                 </DxFormLayoutItem>
                             </DxFormLayout>
