@@ -92,7 +92,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     if (i != null)
                     {
-                        Phys = Physicians.Where(x => x.DoctorServiceIds.Contains(value.GetValueOrDefault())).ToList();
+                        Phys = Physicians.Where(x => x.DoctorServiceIds != null && x.DoctorServiceIds.Contains(value.GetValueOrDefault())).ToList();
                     }
                 }
             }
