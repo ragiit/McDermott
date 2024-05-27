@@ -1,4 +1,5 @@
 ﻿@page "/patient/patient-data"
+@using McDermott.Web.Components.Pages.Pharmacy
 @inject IHttpContextAccessor _httpContextAccessor
 
 <PageTitle>McHealthCare - Master Data Patient</PageTitle>
@@ -44,6 +45,9 @@
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("Insurance Policy"))"
                                                                IconCssClass="fa-solid fa-notes-medical"
                                                                Text="@($"{InsurancePoliciesCount} Insurance Policy")" />
+                                                <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("Prescription"))"
+                                                               IconCssClass="fa-solid fa-syringe"
+                                                               Text="@($"{PrescriptionCount} History Prescription")" />
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-virus-slash"
                                                                Text="@($"Data General Examination")" />
@@ -56,9 +60,7 @@
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-syringe"
                                                                Text="@($"Data Vaction")" />
-                                                <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
-                                                               IconCssClass="fa-solid fa-syringe"
-                                                               Text="@($"Data Prescription")" />
+                                               
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-syringe"
                                                                Text="@($"Data wellness")" />
@@ -99,6 +101,9 @@
                                         {
                                             case 0:
                                                 <InsurancePolicyPageListForm User="@UserForm" />
+                                                break;
+                                            case 1:
+                                                <PrescriptionPage User="@UserForm"/>
                                                 break;
                                             default:
                                                 break;
@@ -687,4 +692,8 @@ else
 
 <DxPopup HeaderText="Insurance Policy" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="auto" Closed="OnClickCloseInsurancePolicyPopUp">
     <InsurancePolicyPage User="UserForm" IsPopUpForm="true"></InsurancePolicyPage>
+</DxPopup>
+
+<DxPopup HeaderText="History Prescription" @bind-Visible="@PrescriptionPopUp" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="auto" Closed="OnClickClosePrescriptionPopUp">
+    <PrescriptionPage User="UserForm" IsPopUpForm="true"></PrescriptionPage>
 </DxPopup>

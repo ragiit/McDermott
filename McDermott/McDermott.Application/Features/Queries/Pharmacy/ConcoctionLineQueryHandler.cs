@@ -27,7 +27,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                        .Include(x => x.Concoction)
                        .Include(x => x.ActiveComponent)
                        .Include(x => x.Uom)
-                       .Include(x => x.MedicamentGroup)
+                       .Include(x => x.Product)
                        .AsNoTracking()
                        .ToListAsync(cancellationToken);
 

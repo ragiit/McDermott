@@ -1,25 +1,33 @@
-﻿namespace McDermott.Application.Dtos.Pharmacy
+﻿using McDermott.Domain.Common;
+
+namespace McDermott.Application.Dtos.Pharmacy
 {
     public class ConcoctionLineDto : IMapFrom<ConcoctionLine>
     {
         public long Id { get; set; }
         public long? ConcoctionId { get; set; }
-        public long? MedicamentId { get; set; }
-        //public long? UomDoseId { get; set; }
-        public long? ActiveComponentId { get; set; }
-        public long? MedicineDosage { get; set; }
-        public long? QtyDose { get; set; }
-        public long? MedicineUnitUomId { get; set; }
-        public long? UnitUomId { get; set; }
+        public long? ProductId { get; set; }
+        public string? ProductName { get; set; }
+        public List<long>? ActiveComponentId { get; set; } = [];
+        public string? ActiveComponentName { get; set; }
+        public long? UomId { get; set; }
+        public string? UomName { get; set; }
+        public long? MedicamentDosage { get; set; }
+        public long? MedicamentUnitOfDosage { get; set; }
+        public long? Qty { get; set; }
         public long? TotalQty { get; set; }
-        public long? AvailableQty { get; set; }
+        public long? AvaliableQty { get; set; }
 
-        public UomDto? UomDose
-        { get; set; }
+        [SetToNull]
+        public ProductDto? Product { get; set; }
 
-        public ActiveComponentDto? ActiveComponent { get; set; }
-        public UomDto? MedicineUnitUom { get; set; }
-        public MedicamentDto? Medicament { get; set; }
+        [SetToNull]
+        public List<ActiveComponentDto>? ActiveComponent { get; set; }
+
+        [SetToNull]
         public ConcoctionDto? Concoction { get; set; }
+
+        [SetToNull]
+        public UomDto? Uom { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿
+﻿using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
 
 namespace McDermott.Web.Components.Pages.Patient
 {
@@ -77,6 +77,9 @@ namespace McDermott.Web.Components.Pages.Patient
 
         [Parameter]
         public long InsurancePoliciesCount { get; set; } = 0;
+
+        [Parameter]
+        public long PrescriptionCount { get; set; } = 0;
 
         public IGrid Grid { get; set; }
         public IGrid GridFamilyRelation { get; set; }
@@ -272,6 +275,7 @@ namespace McDermott.Web.Components.Pages.Patient
         }
 
         private bool PopUpVisible = false;
+        private bool PrescriptionPopUp = false;
 
         private void OnClickSmartButton(string text)
         {
@@ -284,6 +288,11 @@ namespace McDermott.Web.Components.Pages.Patient
                 PopUpVisible = true;
                 return;
             }
+            else if (text.Equals("Prescription"))
+            {
+                PrescriptionPopUp = true;
+                return;
+            }
             TabIndex = text.ToInt32();
         }
 
@@ -293,6 +302,15 @@ namespace McDermott.Web.Components.Pages.Patient
             {
                 var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
                 InsurancePoliciesCount = count.Count;
+            }
+        }
+
+        private async Task OnClickClosePrescriptionPopUp()
+        {
+            if (UserForm.Id != 0)
+            {
+                var count = await Mediator.Send(new GetPharmacyQuery(x => x.PatientId == UserForm.Id));
+                PrescriptionCount = count.Count;
             }
         }
 
@@ -573,6 +591,8 @@ namespace McDermott.Web.Components.Pages.Patient
                 var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
                 SelectedAllergies = Allergies.Where(x => UserForm.PatientAllergyIds is not null && UserForm.PatientAllergyIds.Contains(x.Id)).ToList();
                 InsurancePoliciesCount = count.Count;
+                var counts = await Mediator.Send(new GetPharmacyQuery(x => x.PatientId == UserForm.Id));
+                PrescriptionCount = counts.Count;
                 var alergy = await Mediator.Send(new GetPatientAllergyQuery(x => x.UserId == UserForm.Id));
                 if (alergy.Count == 0)
                 {
