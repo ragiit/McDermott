@@ -12,7 +12,7 @@
         public long? MedicineUnitUomId { get; set; }
         public long? UnitUomId { get; set; }
         public long? TotalQty { get; set; }
-        public float AvailableQty { get; set; }
+        public long? AvailableQty { get; set; }
 
         public UomDto? UomDose
         { get; set; }

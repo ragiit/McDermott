@@ -695,7 +695,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormStockProduct.Batch = null;
                     FormStockProduct.Expired = null;
                 }
-                FormStockProduct.StatusTransaction = "IN";
+                //FormStockProduct.StatusTransaction = "IN";
                 if (FormStockProduct.Id == 0)
                 {
                     await Mediator.Send(new CreateStockProductRequest(FormStockProduct));

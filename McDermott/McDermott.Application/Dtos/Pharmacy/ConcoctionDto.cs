@@ -10,6 +10,10 @@
         public long? DrugFromId { get; set; }
         public long? UomId { get; set; }
         public string? MedicamentName { get; set; }
+        public string? MedicamentGroupName { get; set; }
+        public string? UomName { get; set; }
+        public string? DrugFormName { get; set; }
+        public string? DrugDosageName { get; set; }
 
         [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
         public long Qty { get; set; } = 0;

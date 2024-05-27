@@ -1,5 +1,6 @@
 ﻿using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
@@ -109,6 +110,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<DrugDosageDto> DrugDosages { get; set; } = [];
         private List<MedicamentDto> Medicaments { get; set; } = [];
         private List<MedicamentGroupDto> MedicamentGroups { get; set; } = [];
+        private List<MedicamentGroupDto> MedicamentGroupsConcoction { get; set; } = [];
         private List<DrugFormDto> DrugForms { get; set; } = [];
         private List<DrugRouteDto> DrugRoutes { get; set; } = [];
         private List<StockProductDto> StockProducts { get; set; } = [];
@@ -138,12 +140,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
                 var checkUom = Uoms.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
 
-                ConcoctionLine.QtyDose = ChekMedicament.Dosage;
-                ConcoctionLine.MedicineDosage = ChekMedicament.Dosage;
-                ConcoctionLine.MedicineUnitUomId = ChekMedicament.UomId;
-                selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
-                var checkStock = StockProducts.Where(x => x.ProductId == product.Id && x.SourceId == Pharmacy.PrescriptionLocationId).FirstOrDefault();
-                ConcoctionLine.AvailableQty = checkStock.ToLong();
+                ConcoctionLine.QtyDose = ChekMedicament?.Dosage;
+                ConcoctionLine.MedicineDosage = ChekMedicament?.Dosage;
+                ConcoctionLine.MedicineUnitUomId = ChekMedicament?.UomId;
+                selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament.ActiveComponentId!.Contains(a.Id)).ToList();
+                var aa = Pharmacy.PrescriptionLocationId;
+                var checkStock = StockProducts.Where(x => x.ProductId == product.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
+                ConcoctionLine.AvailableQty = checkStock;
             }
             catch (Exception ex)
             {
@@ -167,7 +170,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             var data = DrugDosages.Where(f => f.Id == datas.Id).FirstOrDefault();
 
-            Concoction.QtyByDay = data.TotalQtyPerDay.ToLong();
+            Concoction.QtyByDay = data!.TotalQtyPerDay.ToLong();
             Concoction.Days = data.Days.ToLong();
             Concoction.TotalQty = Concoction?.Qty * Concoction?.QtyByDay;
         }
@@ -247,6 +250,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Products = await Mediator.Send(new GetProductQuery());
             DrugDosages = await Mediator.Send(new GetDrugDosageQuery());
             MedicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery());
+            MedicamentGroupsConcoction = await Mediator.Send(new GetMedicamentGroupQuery(x => x.IsConcoction == true));
             DrugForms = await Mediator.Send(new GetFormDrugQuery());
             Signas = await Mediator.Send(new GetSignaQuery());
             DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
@@ -317,6 +321,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             IsLoading = true;
             SelectedDataItems = [];
             Prescriptions = await Mediator.Send(new GetPrescriptionQuery());
+            IsLoading = false;
+        }
+
+        private async Task LoadDataConcoctions()
+        {
+            IsLoading = true;
+            SelectedDataItems = [];
+            Concoctions = await Mediator.Send(new GetConcoctionQuery());
             IsLoading = false;
         }
 
@@ -397,6 +409,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 {
                     Pharmacy = p[0];
                     Prescriptions = await Mediator.Send(new GetPrescriptionQuery(x => x.PharmacyId == Pharmacy.Id));
+                    Concoctions = await Mediator.Send(new GetConcoctionQuery(x => x.PharmacyId == Pharmacy.Id));
                 }
             }
             catch (Exception e)
@@ -452,7 +465,65 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task OnSaveConcoction()
         {
-            var a = Concoction;
+            if (Concoction is null)
+                return;
+
+            if (Pharmacy.Id == 0)
+            {
+                try
+                {
+                    ConcoctionDto update = new();
+
+                    var medicamentGroup = MedicamentGroups.FirstOrDefault(x => x.Id == Concoction.MedicamentGroupId);
+                    if (medicamentGroup != null)
+                    {
+                        Concoction.UomId = medicamentGroup.UoMId;
+                        Concoction.DrugFromId = medicamentGroup.FormDrugId;
+                    }
+                    Concoction.PrescribingDoctorId = Pharmacy.PractitionerId;
+
+                    if (Concoction.Id == 0)
+                    {
+                        Concoction.Id = Helper.RandomNumber;
+                        Concoction.UomName = Uoms.Where(x => x.Id == Concoction.UomId).Select(x => x.Name).FirstOrDefault();
+                        Concoction.DrugDosageName = DrugDosages.Where(x => x.Id == Concoction.DrugDosageId).Select(x => x.Frequency).FirstOrDefault();
+                        Concoctions.Add(Concoction);
+                    }
+                    else
+                    {
+                        var q = SelectedDataItemsPrescriptionConcoction[0].Adapt<ConcoctionDto>();
+                        update = Concoctions.FirstOrDefault(x => x.Id == q.Id)!;
+                        var index = Concoctions.IndexOf(update!);
+                        Concoctions[index] = Concoction;
+                    }
+
+                    SelectedDataItemsPrescriptionConcoction = [];
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+            }
+            else
+            {
+                Concoction.PharmacyId = Pharmacy.Id;
+                if (Concoction.Id != 0)
+                {
+                    await Mediator.Send(new CreateConcoctionRequest(Concoction));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateConcoctionRequest(Concoction));
+                }
+                await LoadDataConcoctions();
+            }
+            var test = Concoctions;
+            PopUpConcoctionDetail = false;
+        }
+
+        private async Task OnSaveConcoctionLines()
+        {
+            var a = ConcoctionLine;
         }
 
         private async Task OnSavePrescription(GridEditModelSavingEventArgs e)
@@ -530,6 +601,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         x.Id = 0;
                     });
                     await Mediator.Send(new CreateListPrescriptionRequest(Prescriptions));
+
+                    Concoctions.ForEach(x =>
+                    {
+                        x.PharmacyId = Pharmacy.Id;
+                        x.Id = 0;
+                    });
+                    await Mediator.Send(new CreateListConcoctionRequest(Concoctions));
                 }
                 else
                 {
@@ -589,6 +667,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task RefreshPrescriptionConcoction_Click()
         {
+            await LoadDataConcoctions();
         }
 
         private async Task EditItemPrescriptionConcoction_Click()
