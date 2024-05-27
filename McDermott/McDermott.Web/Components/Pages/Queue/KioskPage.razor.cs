@@ -806,11 +806,11 @@ namespace McDermott.Web.Components.Pages.Queue
                 var service = Services.FirstOrDefault(x => x.Id == FormKios.ServiceId);
                 var physician = Physician.FirstOrDefault(x => x.Id == FormKios.PhysicianId);
 
-                if (physician is null)
-                {
-                    ToastService.ShowInfo("Please select the Physician!");
-                    return false;
-                }
+                //if (physician is null)
+                //{
+                //    ToastService.ShowInfo("Please select the Physician!");
+                //    return false;
+                //}
 
                 var antreanRequest = new AntreanRequestBPJS
                 {
@@ -821,7 +821,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     Namapoli = service.Name ?? string.Empty,
                     Norm = Patients.FirstOrDefault(x => x.Id == FormKios.PatientId)!.NoRm ?? string.Empty,
                     Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
-                    Kodedokter = physician!.PhysicanCode,
+                    Kodedokter = physician.PhysicanCode ?? null,
                     Namadokter = physician!.Name,
                     Jampraktek = SelectedScheduleSlot?.ResultWorkFormatStringKiosk ?? "00:00:00",
                     Nomorantrean = ViewQueue!.QueueNumber!.ToString()! ?? "",
