@@ -812,17 +812,23 @@ namespace McDermott.Web.Components.Pages.Queue
                 //    return false;
                 //}
 
+                if (service is null)
+                {
+                    ToastService.ShowInfo("Please select the Service!");
+                    return false;
+                }
+
                 var antreanRequest = new AntreanRequestBPJS
                 {
                     Nomorkartu = bpjs.NoKartu ?? string.Empty,
                     Nik = bpjs.NoKTP ?? string.Empty,
                     Nohp = bpjs.NoHP ?? string.Empty,
-                    Kodepoli = service!.Code ?? string.Empty,
+                    Kodepoli = service?.Code ?? string.Empty,
                     Namapoli = service.Name ?? string.Empty,
                     Norm = Patients.FirstOrDefault(x => x.Id == FormKios.PatientId)!.NoRm ?? string.Empty,
                     Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
                     Kodedokter = physician.PhysicanCode ?? null,
-                    Namadokter = physician!.Name,
+                    Namadokter = physician.Name ?? null,
                     Jampraktek = SelectedScheduleSlot?.ResultWorkFormatStringKiosk ?? "00:00:00",
                     Nomorantrean = ViewQueue!.QueueNumber!.ToString()! ?? "",
                     Angkaantrean = ViewQueue.QueueNumber.ToInt32(),
