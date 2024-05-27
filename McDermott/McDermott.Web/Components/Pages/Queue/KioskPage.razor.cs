@@ -636,7 +636,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 FormGeneral.InsurancePolicyId = null;
 
                 // Save BPJS Insurance Policy
-                var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => FormKios != null && FormKios.NumberType != null && x.NoKartu != null && x.NoKartu.ToLower().Trim().Equals(FormKios.NumberType.ToLower().Trim())));
+                var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => FormKios != null && FormKios.BPJS != null && x.NoKartu != null && x.NoKartu.ToLower().Trim().Equals(FormKios.BPJS.ToLower().Trim())));
                 if (bpjs is not null && bpjs.Count > 0)
                 {
                     FormGeneral.Method = "BPJS";
@@ -703,7 +703,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormQueue.ClassTypeId = FormKios.ClassTypeId;
                     FormQueue.QueueStatus = "waiting";
 
-                    if (bpjs is not null && bpjs.Count > 0)
+                    if (bpjs is not null && bpjs.Count > 0 && !string.IsNullOrWhiteSpace(FormKios.BPJS))
                     {
                         var isSuccess = await SendPCareRequestAntrean(bpjs[0] ?? new());
                         if (!isSuccess)
@@ -806,6 +806,12 @@ namespace McDermott.Web.Components.Pages.Queue
                 var service = Services.FirstOrDefault(x => x.Id == FormKios.ServiceId);
                 var physician = Physician.FirstOrDefault(x => x.Id == FormKios.PhysicianId);
 
+                if (physician is null)
+                {
+                    ToastService.ShowInfo("Please select the Physician!");
+                    return false;
+                }
+
                 var antreanRequest = new AntreanRequestBPJS
                 {
                     Nomorkartu = bpjs.NoKartu ?? string.Empty,
@@ -817,7 +823,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
                     Kodedokter = physician!.PhysicanCode,
                     Namadokter = physician!.Name,
-                    Jampraktek = SelectedScheduleSlot.ResultWorkFormatStringKiosk,
+                    Jampraktek = SelectedScheduleSlot?.ResultWorkFormatStringKiosk ?? "00:00:00",
                     Nomorantrean = ViewQueue!.QueueNumber!.ToString()! ?? "",
                     Angkaantrean = ViewQueue.QueueNumber.ToInt32(),
                     Keterangan = ""
