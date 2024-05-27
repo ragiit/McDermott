@@ -48,6 +48,24 @@ namespace McDermott.Web.Components.Pages.Queue
             public string Keterangan { get; set; }
         }
 
+        public class UpdateStatusPanggilAntreanRequestPCare
+        {
+            [JsonProperty("tanggalperiksa")]
+            public string Tanggalperiksa { get; set; }
+
+            [JsonProperty("kodepoli")]
+            public string Kodepoli { get; set; }
+
+            [JsonProperty("nomorkartu")]
+            public string Nomorkartu { get; set; }
+
+            [JsonProperty("status")]
+            public int Status { get; set; }
+
+            [JsonProperty("waktu")]
+            public long Waktu { get; set; }
+        }
+
         #region Relation Data
 
         public List<KioskDto> Kiosks = new();
@@ -79,7 +97,7 @@ namespace McDermott.Web.Components.Pages.Queue
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndex { get; set; }
-        private int SelectedScheduleSlot { get; set; }
+        private DoctorScheduleSlotDto? SelectedScheduleSlot { get; set; }
         //private GroupMenuDto UserAccessCRUID = new();
 
         #endregion setings Grid
@@ -400,6 +418,17 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 if (id != 0)
                 {
+                    if (BPJSIntegration is not null)
+                    {
+                        // Cancel Antrean
+                        var isSuccess = await SendPCareRequestBatalAntrean();
+                        if (!isSuccess)
+                        {
+                            showQueue = true;
+                            return;
+                        }
+                    }
+
                     var cekId = await Mediator.Send(new GetGeneralConsultanServiceQuery()); //get Data General Consultation
                     var GId = cekId.Where(x => x.KioskQueueId == id).Select(x => x.Id).FirstOrDefault(); //Get Id in General Consultation where KioskQueueId = id
                     await Mediator.Send(new DeleteGeneralConsultanServiceRequest(GId)); //Delete Data in General Consultation where id
@@ -407,6 +436,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     await Mediator.Send(new DeleteKioskQueueRequest(id)); // delete data kioskQueue in id
                 }
                 showQueue = false;
+                BPJSIntegration = new();
                 FormKios = new();
                 ToastService.ShowError("Canceled Queue!!");
                 ReloadPage();
@@ -593,13 +623,13 @@ namespace McDermott.Web.Components.Pages.Queue
         #region Methode Save And Update
 
         private bool IsLoading { get; set; } = false;
+        private BPJSIntegrationDto BPJSIntegration { get; set; }
 
         private async Task OnSave()
         {
             try
             {
                 var edit = FormKios;
-                showQueue = true;
                 IsLoading = true;
 
                 FormGeneral.Method = null;
@@ -610,6 +640,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 if (bpjs is not null && bpjs.Count > 0)
                 {
                     FormGeneral.Method = "BPJS";
+                    BPJSIntegration = bpjs[0];
                     FormGeneral.InsurancePolicyId = bpjs[0].InsurancePolicyId;
                 }
 
@@ -672,9 +703,17 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormQueue.ClassTypeId = FormKios.ClassTypeId;
                     FormQueue.QueueStatus = "waiting";
 
-                    var isSuccess = await SendPCareRequestAntrean(bpjs[0] ?? new());
-                    if (!isSuccess)
-                        return;
+                    if (bpjs is not null && bpjs.Count > 0)
+                    {
+                        var isSuccess = await SendPCareRequestAntrean(bpjs[0] ?? new());
+                        if (!isSuccess)
+                        {
+                            BPJSIntegration = new();
+                            showQueue = false;
+                            IsLoading = false;
+                            return;
+                        }
+                    }
 
                     // Membuat KioskQueue baru
                     var QueueKioskId = await Mediator.Send(new CreateKioskQueueRequest(FormQueue));
@@ -695,12 +734,69 @@ namespace McDermott.Web.Components.Pages.Queue
                     await Mediator.Send(new UpdateKioskRequest(FormKios));
                 }
 
+                showQueue = true;
                 FormKios = new();
                 ToastService.ShowSuccess("Number Queue is Generated Succces!!");
                 await LoadData();
             }
             catch { }
             IsLoading = false;
+        }
+
+        public class BatalAntreanBPJS
+        {
+            [JsonProperty("tanggalperiksa")]
+            public string Tanggalperiksa { get; set; }
+
+            [JsonProperty("kodepoli")]
+            public string Kodepoli { get; set; }
+
+            [JsonProperty("nomorkartu")]
+            public string Nomorkartu { get; set; }
+
+            [JsonProperty("alasan")]
+            public string Alasan { get; set; }
+        }
+
+        private async Task<bool> SendPCareRequestBatalAntrean()
+        {
+            try
+            {
+                var service = Services.FirstOrDefault(x => x.Id == FormKios.ServiceId);
+                var physician = Physician.FirstOrDefault(x => x.Id == FormKios.PhysicianId);
+
+                var antreanRequest = new BatalAntreanBPJS
+                {
+                    Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
+                    Kodepoli = service!.Code ?? string.Empty,
+                    Nomorkartu = BPJSIntegration.NoKartu ?? string.Empty,
+                    Alasan = string.Empty
+                };
+
+                Console.WriteLine("Sending antrean/batal...");
+                var responseApi = await PcareService.SendPCareService($"antrean/batal", HttpMethod.Post, antreanRequest);
+
+                if (responseApi.Item2 != 200)
+                {
+                    ToastService.ShowError($"{responseApi.Item1}, Code: {responseApi.Item2}");
+                    Console.WriteLine(JsonConvert.SerializeObject(antreanRequest, Formatting.Indented));
+                    Console.WriteLine("ResponseAPI Antrean/Batal " + Convert.ToString(responseApi.Item1));
+                    IsLoading = false;
+                    return false;
+                }
+                else
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                    Console.WriteLine(Convert.ToString(data));
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                e.HandleException(ToastService);
+                return false;
+            }
         }
 
         private async Task<bool> SendPCareRequestAntrean(BPJSIntegrationDto bpjs)
@@ -721,24 +817,27 @@ namespace McDermott.Web.Components.Pages.Queue
                     Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
                     Kodedokter = physician!.PhysicanCode,
                     Namadokter = physician!.Name,
-                    Jampraktek = "08:00-16:00",
+                    Jampraktek = SelectedScheduleSlot.ResultWorkFormatStringKiosk,
                     Nomorantrean = ViewQueue!.QueueNumber!.ToString()! ?? "",
                     Angkaantrean = ViewQueue.QueueNumber.ToInt32(),
                     Keterangan = ""
                 };
 
+                Console.WriteLine("Sending antrean/add...");
                 var responseApi = await PcareService.SendPCareService($"antrean/add", HttpMethod.Post, antreanRequest);
 
                 if (responseApi.Item2 != 200)
                 {
-                    ToastService.ShowError($"{responseApi.Item1}");
-                    Console.WriteLine("ResponseAPI Antrean/Add " + Convert.ToString(responseApi.Item1));
+                    ToastService.ShowError($"{responseApi.Item1}, Code: {responseApi.Item2}");
+                    Console.WriteLine(JsonConvert.SerializeObject(antreanRequest, Formatting.Indented));
+                    Console.WriteLine("ResponseAPI Antrean/Add: " + Convert.ToString(responseApi.Item1));
                     IsLoading = false;
                     return false;
                 }
                 else
                 {
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                    Console.WriteLine(Convert.ToString(data));
                 }
 
                 return true;

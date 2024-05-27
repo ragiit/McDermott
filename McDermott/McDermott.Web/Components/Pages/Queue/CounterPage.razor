@@ -62,7 +62,7 @@
                                                 @{
                                                     var NameCounters = "Counter " + i.Name;
                                                 }
-                                                <DxToolbar Title="@NameCounters.ToUpper()"  ItemRenderStyleMode="ToolbarRenderStyleMode.Plain"
+                                                <DxToolbar Title="@NameCounters.ToUpper()" ItemRenderStyleMode="ToolbarRenderStyleMode.Plain"
                                                            CssClass="position-relative">
                                                     <Items>
                                                         <DxToolbarItem IconCssClass="fa-solid fa-ellipsis-vertical fa-lg" CssClass="position-absolute top-50 start-100 translate-middle">
@@ -91,7 +91,7 @@
                                                 </DxToolbar>
                                             </div>
                                             <div class="card-body shadow">
-                                                <div class="row"> 
+                                                <div class="row">
                                                     <div class="row">
                                                         <div class="col-md-3">
                                                             <label class="me-2">Status:</label>
@@ -118,38 +118,36 @@
                                                         </div>
                                                         <div class="col-md-9">
                                                             <span class='badge bg-dark py-1 px-2'>@z</span>
-                                                        </div> 
+                                                        </div>
                                                     </div>
 
-
-
                                                     @* <div class="col-12">
-                                                        @if (i.Status == "open")
-                                                        {
-                                                            <div class="d-flex align-items-center">
-                                                                <label class="me-2">Status: </label>
-                                                                <span class='badge bg-primary py-1 px-2' title="Open">Open</span>
-                                                            </div>
-                                                        }
-                                                        else if (i.Status == "on process")
-                                                        {
-                                                            <div class="d-flex align-items-center">
-                                                                <label class="me-2">Status: </label>
-                                                                <span class='badge bg-success py-1 px-2' title=" On Process"> On Process</span>
-                                                            </div>
-                                                        }
-                                                        else if (i.Status == "stop")
-                                                        {
-                                                            <div class="d-flex align-items-center">
-                                                                <label class="me-2">Status: </label>
-                                                                <span class='badge bg-danger py-1 px-2' title="Stopped">Stopped</span>
-                                                            </div>
-                                                        }
-                                                    </div> 
-                                                    <div class="col-12 d-flex align-items-center">
-                                                        <label class="me-2 mb-0">Service:</label>
-                                                        <span class='badge bg-dark py-1 px-2'>@z</span>
-                                                    </div> *@
+                                        @if (i.Status == "open")
+                                        {
+                                        <div class="d-flex align-items-center">
+                                        <label class="me-2">Status: </label>
+                                        <span class='badge bg-primary py-1 px-2' title="Open">Open</span>
+                                        </div>
+                                        }
+                                        else if (i.Status == "on process")
+                                        {
+                                        <div class="d-flex align-items-center">
+                                        <label class="me-2">Status: </label>
+                                        <span class='badge bg-success py-1 px-2' title=" On Process"> On Process</span>
+                                        </div>
+                                        }
+                                        else if (i.Status == "stop")
+                                        {
+                                        <div class="d-flex align-items-center">
+                                        <label class="me-2">Status: </label>
+                                        <span class='badge bg-danger py-1 px-2' title="Stopped">Stopped</span>
+                                        </div>
+                                        }
+                                        </div>
+                                        <div class="col-12 d-flex align-items-center">
+                                        <label class="me-2 mb-0">Service:</label>
+                                        <span class='badge bg-dark py-1 px-2'>@z</span>
+                                        </div> *@
                                                 </div>
 
                                                 <div class="row mt-3">
@@ -203,8 +201,6 @@ else
     </div>
 }
 
-
-
 <DxPopup HeaderText="@textPopUp" @bind-Visible="@PopUpVisible" CloseOnOutsideClick="false" HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center">
     <EditForm Model="@counterForm" Context="EditFormContext">
@@ -229,7 +225,6 @@ else
         </div>
     </EditForm>
 </DxPopup>
-
 
 <DxPopup HeaderText="@textPopUp.ToUpper()" CloseOnOutsideClick="false" HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" MinWidth="500" @bind-Visible="@showFormProcess" Width="auto">
