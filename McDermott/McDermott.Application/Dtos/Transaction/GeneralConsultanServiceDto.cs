@@ -81,6 +81,18 @@
         public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
         public string? SerialNo { get; set; } // NoUrut
 
+        /// <BPJS Rujukan>
+        public string? ReferVerticalKhususCategoryCode { get; set; }
+        public string? ReferVerticalSpesialisParentSpesialisCode { get; set; }
+        public string? ReferVerticalSpesialisParentSubSpesialisCode { get; set; }
+        public string? ReferReason { get; set; } = "-";
+        public bool? IsSarana { get; set; } = false;
+        public string? ReferVerticalSpesialisSaranaCode { get; set; }
+        public bool? PPKRujukanName { get; set; }
+        public bool? PPKRujukanCode { get; set; }
+        public DateTime? ReferDateVisit { get; set; }
+        /// </BPJS Rujukan>
+
         public virtual KioskQueue? KioskQueue { get; set; }
         public virtual ClassTypeDto? ClassType { get; set; }
         public virtual UserDto Patient { get; set; } = new();

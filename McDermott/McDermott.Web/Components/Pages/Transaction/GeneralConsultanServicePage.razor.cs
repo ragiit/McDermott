@@ -12,8 +12,93 @@ namespace McDermott.Web.Components.Pages.Transaction
         private bool P { get; set; } = false;
         private string SelectedRujukanType { get; set; }
         private string SelectedRujukanExternal { get; set; }
+        private string SelectedRujukanVertical { get; set; }
         private IEnumerable<string> RujukanTypes = new[] { "Rujuk Internal", "Rujukan External" };
         private IEnumerable<string> RujukanExtenalTypes = new[] { "Rujukan Horizontal", "Rujukan Vertical" };
+        private IEnumerable<string> RujukanExtenalVertical = new[] { "Kondisi Khusus", "Spesialis" };
+
+        public class SpesialisRefrensiKhususPCare
+        {
+            [JsonProperty("kdKhusus")]
+            public string KdKhusus { get; set; }
+
+            [JsonProperty("nmKhusus")]
+            public string NmKhusus { get; set; }
+        }
+
+        public class SpesialisPCare
+        {
+            [JsonProperty("kdSpesialis")]
+            public string KdSpesialis { get; set; }
+
+            [JsonProperty("nmSpesialis")]
+            public string NmSpesialis { get; set; }
+        }
+
+        public class SpesialisSaranaPCare
+        {
+            [JsonProperty("kdSarana")]
+            public string KdSarana { get; set; }
+
+            [JsonProperty("nmSarana")]
+            public string NmSarana { get; set; }
+        }
+
+        // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
+        public class RujukanFaskesKhususSpesialisPCare
+        {
+            [JsonProperty("kdppk")]
+            public string Kdppk { get; set; }
+
+            [JsonProperty("nmppk")]
+            public string Nmppk { get; set; }
+
+            [JsonProperty("alamatPpk")]
+            public string AlamatPpk { get; set; }
+
+            [JsonProperty("telpPpk")]
+            public string TelpPpk { get; set; }
+
+            [JsonProperty("kelas")]
+            public string Kelas { get; set; }
+
+            [JsonProperty("nmkc")]
+            public string Nmkc { get; set; }
+
+            [JsonProperty("distance")]
+            public double Distance { get; set; }
+
+            [JsonProperty("jadwal")]
+            public string Jadwal { get; set; }
+
+            [JsonProperty("jmlRujuk")]
+            public int JmlRujuk { get; set; }
+
+            [JsonProperty("kapasitas")]
+            public int Kapasitas { get; set; }
+
+            [JsonProperty("persentase")]
+            public int Persentase { get; set; }
+        }
+
+        public class SubSpesialisPCare
+        {
+            [JsonProperty("kdSubSpesialis")]
+            public string KdSubSpesialis { get; set; }
+
+            [JsonProperty("nmSubSpesialis")]
+            public string NmSubSpesialis { get; set; }
+
+            [JsonProperty("kdPoliRujuk")]
+            public string KdPoliRujuk { get; set; }
+        }
+
+        private IGrid GridRujukanRefer { get; set; }
+        private List<SpesialisRefrensiKhususPCare> SpesialisRefrensiKhusus = [];
+        private List<SpesialisPCare> SpesialisPs = [];
+        private List<RujukanFaskesKhususSpesialisPCare> RujukanSubSpesialis = [];
+        private List<SpesialisSaranaPCare> SpesialisSaranas = [];
+        private List<SubSpesialisPCare> SubSpesialisPs = [];
 
         private async Task OnClickConfirm()
         {
@@ -2200,8 +2285,278 @@ namespace McDermott.Web.Components.Pages.Transaction
             try
             {
                 IsPratition = AllDoctors.Where(x => x.DoctorServiceIds is not null && x.DoctorServiceIds.Contains(FormRegis.ServiceId.GetValueOrDefault())).ToList();
+                await SendPCareGetRefrensiKhusus();
+                await SendPcareGetSpesialis();
+                await SendPcareGetSpesialisSarana();
+                //await SetTimeSchedule();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
 
-                await SetTimeSchedule();
+        private async Task SendPcareGetFaskesRujukanKhusus()
+        {
+            if (RujukanSubSpesialis.Count > 0)
+                return;
+
+            try
+            {
+                if (FormRegis.ReferVerticalKhususCategoryCode is not null && (FormRegis.ReferVerticalKhususCategoryCode.Equals("THA") || FormRegis.ReferVerticalKhususCategoryCode.Equals("HEM")))
+                {
+                    var result = await PcareService.SendPCareService($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+                    if (result.Item2 == 200)
+                    {
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                        var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                        var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
+                        {
+                            Kdppk = item.kdppk,
+                            Nmppk = item.nmppk,
+                            AlamatPpk = item.alamatPpk,
+                            TelpPpk = item.telpPpk,
+                            Kelas = item.kelas,
+                            Nmkc = item.nmkc,
+                            Distance = item.distance,
+                            Jadwal = item.jadwal,
+                            JmlRujuk = item.jmlRujuk,
+                            Kapasitas = item.kapasitas,
+                            Persentase = item.persentase,
+                        }).ToList();
+
+                        RujukanSubSpesialis.Clear();
+                        RujukanSubSpesialis = a;
+                    }
+                    else
+                    {
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                    }
+                }
+                else
+                {
+                    var result = await PcareService.SendPCareService($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit}", HttpMethod.Get);
+                    if (result.Item2 == 200)
+                    {
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                        var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                        var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
+                        {
+                            Kdppk = item.kdppk,
+                            Nmppk = item.nmppk,
+                            AlamatPpk = item.alamatPpk,
+                            TelpPpk = item.telpPpk,
+                            Kelas = item.kelas,
+                            Nmkc = item.nmkc,
+                            Distance = item.distance,
+                            Jadwal = item.jadwal,
+                            JmlRujuk = item.jmlRujuk,
+                            Kapasitas = item.kapasitas,
+                            Persentase = item.persentase,
+                        }).ToList();
+
+                        RujukanSubSpesialis.Clear();
+                        RujukanSubSpesialis = a;
+                    }
+                    else
+                    {
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task SendPcareGetFaskesSubSpesialis()
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(FormRegis.ReferVerticalSpesialisSaranaCode) || !Convert.ToBoolean(FormRegis.IsSarana))
+                    FormRegis.ReferVerticalSpesialisSaranaCode = "0";
+
+                var result = await PcareService.SendPCareService($"spesialis/rujuk/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/sarana/{FormRegis.ReferVerticalSpesialisSaranaCode}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+
+                Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/sarana/{FormRegis.ReferVerticalSpesialisSaranaCode}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
+                if (result.Item2 == 200)
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                    var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
+                    {
+                        Kdppk = item.kdppk,
+                        Nmppk = item.nmppk,
+                        AlamatPpk = item.alamatPpk,
+                        TelpPpk = item.telpPpk,
+                        Kelas = item.kelas,
+                        Nmkc = item.nmkc,
+                        Distance = item.distance,
+                        Jadwal = item.jadwal,
+                        JmlRujuk = item.jmlRujuk,
+                        Kapasitas = item.kapasitas,
+                        Persentase = item.persentase,
+                    }).ToList();
+
+                    RujukanSubSpesialis.Clear();
+                    RujukanSubSpesialis = a;
+                }
+                else
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task SendPcareGetSubSpesialis()
+        {
+            try
+            {
+                var result = await PcareService.SendPCareService($"spesialis/{FormRegis.ReferVerticalSpesialisParentSpesialisCode}/subspesialis", HttpMethod.Get);
+                if (result.Item2 == 200)
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                    var a = dynamicList.Select(item => new SubSpesialisPCare
+                    {
+                        KdSubSpesialis = item.kdSubSpesialis,
+                        NmSubSpesialis = item.nmSubSpesialis,
+                        KdPoliRujuk = item.kdPoliRujuk,
+                    }).ToList();
+
+                    SubSpesialisPs.Clear();
+                    SubSpesialisPs = a;
+                }
+                else
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task SendPcareGetSpesialis()
+        {
+            if (SpesialisPs.Count > 0)
+                return;
+
+            try
+            {
+                var result = await PcareService.SendPCareService($"spesialis", HttpMethod.Get);
+                if (result.Item2 == 200)
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                    var a = dynamicList.Select(item => new SpesialisPCare
+                    {
+                        KdSpesialis = item.kdSpesialis,
+                        NmSpesialis = item.nmSpesialis
+                    }).ToList();
+
+                    SpesialisPs = a;
+                }
+                else
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task SendPcareGetSpesialisSarana()
+        {
+            if (SpesialisSaranas.Count > 0)
+                return;
+
+            try
+            {
+                var result = await PcareService.SendPCareService($"spesialis/sarana", HttpMethod.Get);
+                if (result.Item2 == 200)
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                    var a = dynamicList.Select(item => new SpesialisSaranaPCare
+                    {
+                        KdSarana = item.kdSarana,
+                        NmSarana = item.nmSarana
+                    }).ToList();
+
+                    SpesialisSaranas = a;
+                }
+                else
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task SendPCareGetRefrensiKhusus()
+        {
+            if (SpesialisRefrensiKhusus.Count > 0)
+                return;
+
+            try
+            {
+                var result = await PcareService.SendPCareService($"spesialis/khusus", HttpMethod.Get);
+                if (result.Item2 == 200)
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                    var a = dynamicList.Select(item => new SpesialisRefrensiKhususPCare
+                    {
+                        KdKhusus = item.kdKhusus,
+                        NmKhusus = item.nmKhusus
+                    }).ToList();
+
+                    SpesialisRefrensiKhusus = a;
+                }
+                else
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                }
             }
             catch (Exception ex)
             {
@@ -2404,6 +2759,36 @@ namespace McDermott.Web.Components.Pages.Transaction
                     ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
                 }
             }
+        }
+
+        private async Task SelectedItemSpesialis(SpesialisPCare e)
+        {
+            if (e is null)
+            {
+                FormRegis.ReferVerticalSpesialisParentSpesialisCode = null;
+                FormRegis.ReferVerticalSpesialisParentSubSpesialisCode = null;
+                return;
+            }
+
+            FormRegis.ReferVerticalSpesialisParentSpesialisCode = e.KdSpesialis;
+
+            await SendPcareGetSubSpesialis();
+        }
+
+        private bool IsLoadingSearchFaskes { get; set; } = false;
+
+        private async Task OnClickSearchFaskes()
+        {
+            IsLoadingSearchFaskes = true;
+            if (SelectedRujukanExternal.Equals(RujukanExtenalTypes.ToList()[0])) // Khusus
+            {
+                await SendPcareGetFaskesRujukanKhusus();
+            }
+            else // Spesialis
+            {
+                await SendPcareGetFaskesSubSpesialis();
+            }
+            IsLoadingSearchFaskes = false;
         }
 
         private void SelectedItemPatientChanged(UserDto e)
