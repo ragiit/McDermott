@@ -53,10 +53,10 @@ namespace McDermott.Web.Components.Pages.Medical
             set
             {
                 Users = [];
-                DoctorSchedule.ServiceId = value.ToInt32();
+                DoctorSchedule.ServiceId = value.GetValueOrDefault().ToInt32();
                 SelectedPhysicions = [];
                 _ServiceId = value;
-                Users = AllUsers.Where(x => x.DoctorServiceIds.Contains(value.ToInt32())).AsEnumerable();
+                Users = AllUsers.Where(x => x.DoctorServiceIds != null && x.DoctorServiceIds.Contains(value.GetValueOrDefault().ToInt32())).AsEnumerable();
             }
         }
 
