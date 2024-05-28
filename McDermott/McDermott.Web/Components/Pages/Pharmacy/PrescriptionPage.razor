@@ -7,6 +7,18 @@
     <PageTitle>McHealthCare - Insurance Policy</PageTitle>
 }
 
+<style>
+    .custom-popup {
+        width: 500px;
+        height: 400px;
+        max-width: 90%;
+        max-height: 90%;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+</style>
 @if (IsAccess)
 {
     <div class="wrapper">
@@ -80,7 +92,7 @@
                                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                         <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                         <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItemPharmacy_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0" />
-                                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0" />
+                                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && IsPopUpForm" />
                                                         <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                         <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                         <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
@@ -113,7 +125,7 @@
                                     <EditForm Model="@Pharmacy" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
                                         <DataAnnotationsValidator />
                                         <div class="card">
-                                            <div class="card-body">
+                                            <div class="card-body ">
                                                 <div class="w-100">
                                                     <div class="row w-100">
                                                         <div class="col-md-6">
@@ -257,7 +269,7 @@
                                                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                                             <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemPrescriptionLines_Click" IconCssClass="fa-solid fa-plus" />
                                                                             <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItemPrescriptionLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsPrescriptionLines.Count > 0 && Prescriptions.Count > 0" />
-                                                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemPrescriptionLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsPrescriptionLines.Count > 0 && Prescriptions.Count > 0" />
+                                                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemPrescriptionLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsPrescriptionLines.Count > 0 && Prescriptions.Count > 0 && !IsPopUpForm" />
                                                                             <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshPrescriptionLines_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                                             <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                                         </DxToolbar>
@@ -309,6 +321,7 @@
                                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Prescription Quantity" ColSpanMd="6">
                                                                                 <DxSpinEdit @bind-Value="@a.GivenAmount"
                                                                                             NullText="Given Amount..."
+                                                                                            MinValue="0"
                                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                             BindValueMode="BindValueMode.OnInput" />
                                                                                 <ValidationMessage For="@(()=> a.GivenAmount)"   />
@@ -339,7 +352,7 @@
                                                                                         <Items>
                                                                                             <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption">
                                                                                                 <Template>
-                                                                                                    <DxSpinEdit @bind-Value="@a.Dosage" NullText="Input Dosage..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
+                                                                                                    <DxSpinEdit @bind-Value="@a.Dosage" MinValue="0" NullText="Input Dosage..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
                                                                                                 </Template>
                                                                                             </DxGridLayoutItem>
                                                                                             <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption">
@@ -388,7 +401,7 @@
                                                                         KeyFieldName="Id"
                                                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                                         EditorRenderMode="GridEditorRenderMode.Detached"
-                                                                        DataItemDeleting="OnDeletePrescriptionLines"
+                                                                        DataItemDeleting="OnDeleteConcoction"
                                                                         AllowSelectRowByClick="true"
                                                                         PagerPosition="GridPagerPosition.Bottom"
                                                                         PageSizeSelectorVisible="true"
@@ -409,19 +422,19 @@
                                                                         KeyboardNavigationEnabled="true">
                                                                     <ToolbarTemplate>
                                                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemPrescriptionConcoction_Click" IconCssClass="fa-solid fa-plus" />
-                                                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItemPrescriptionConcoction_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsConcoction.Count > 0 && Concoctions.Count > 0" />
-                                                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemPrescriptionConcoction_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsConcoction.Count > 0 && Concoctions.Count > 0" />
+                                                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click=" NewItemConcoction_Click" IconCssClass="fa-solid fa-plus" />
+                                                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemPrescriptionConcoction_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsConcoction.Count > 0 && Concoctions.Count > 0" />
+                                                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemPrescriptionConcoction_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsConcoction.Count > 0 && Concoctions.Count > 0 && IsPopUpForm" />
                                                                             <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshPrescriptionConcoction_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButtonConcoction_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                                         </DxToolbar>
                                                                     </ToolbarTemplate>
                                                                     <Columns>
                                                                         <DxGridSelectionColumn Width="15px" />
-                                                                        <DxGridDataColumn MinWidth="200" FieldName="MedicamentName" Caption="Medicamen Name" SortIndex="0" />
+                                                                        <DxGridDataColumn MinWidth="200" FieldName="MedicamentGroupName" Caption="Medicamen Name" SortIndex="0" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="Qty" Caption="Qty Dose" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="UomName" Caption="Unit of Dosage" />
-                                                                        <DxGridDataColumn MinWidth="200" FieldName="DrugDosageName" Caption="Frequency" />
+                                                                        <DxGridDataColumn MinWidth="200" Visible="false" FieldName="DrugDosageName" Caption="Frequency" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="QtyByDay" Caption="Qty Per Day" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="Days" Caption="Days" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="TotalQty" Caption="Total Qty" />
@@ -430,7 +443,6 @@
                                                             </DxLoadingPanel>
                                                         </DxTabPage>
                                                     </DxTabs>
-
                                                 </div>
                                             </div>
                                             <div class="card-footer">
@@ -445,6 +457,7 @@
                                             </div>
                                         </div>
                                     </EditForm>
+
                                 </DxLoadingPanel>
                             }
                         }
@@ -615,7 +628,7 @@ else
                             KeyFieldName="Id"
                             CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                             EditorRenderMode="GridEditorRenderMode.Detached"
-                            DataItemDeleting="OnDeletePrescriptionLines"
+                            DataItemDeleting="OnDeleteConcoctionLine"
                             EditModelSaving="OnSaveConcoctionLines"
                             AllowSelectRowByClick="true"
                             PagerPosition="GridPagerPosition.Bottom"
@@ -636,8 +649,8 @@ else
                         <ToolbarTemplate>
                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemConcoctionLines_Click" IconCssClass="fa-solid fa-plus" />
-                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItemConcoctionLines_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsConcoctionLines.Count > 0 && ConcoctionLines.Count > 0" />
-                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemConcoctionLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsConcoctionLines.Count > 0 && ConcoctionLines.Count > 0" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemConcoctionLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsConcoctionLines.Count > 0 && ConcoctionLines.Count > 0" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemConcoctionLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsConcoctionLines.Count > 0 && ConcoctionLines.Count > 0 && IsPopUpForm" />
                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshConcoctionLines_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                 <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                             </DxToolbar>

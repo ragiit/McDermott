@@ -214,7 +214,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)
         {
-            //await EditItem_Click();
+            await EditItem_Click(null);
         }
 
         private async Task OnRowDoubleClickDetail(GridRowClickEventArgs e)

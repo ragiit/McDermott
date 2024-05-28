@@ -71,7 +71,7 @@
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItem_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 " />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItem_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 && isActiveButton" />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 && isActiveButton" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                             </DxToolbar>
@@ -152,7 +152,7 @@
                                                         FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                                         KeyFieldName="Id"
                                                         EditModelSaving="OnSave_Detail"
-                                                        DataItemDeleting="OnDelete"
+                                                        DataItemDeleting="OnDelete_Detail"
                                                         EditMode="GridEditMode.PopupEditForm"
                                                         PopupEditFormCssClass="my-style"
                                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"

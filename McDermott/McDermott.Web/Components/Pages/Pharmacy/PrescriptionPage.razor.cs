@@ -187,7 +187,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Concoction.TotalQty = Concoction?.Qty * Concoction?.QtyByDay;
         }
 
-        private async Task SelectedChangePractition(UserDto? user)
+        private void SelectedChangePractition(UserDto? user)
         {
             MedicamentGroups = MedicamentGroups.Where(x => x.IsConcoction == false && x.PhycisianId == user.Id).ToList();
         }
@@ -320,6 +320,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
+        #region Load Data
+
         private async Task LoadData(bool v = false)
         {
             IsLoading = true;
@@ -368,6 +370,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             IsLoading = false;
             SelectedDataItems = [];
         }
+
+        #endregion Load Data
+
+        #region Delete Function
 
         private async Task OnDeletePharmacy(GridDataItemDeletingEventArgs e)
         {
@@ -433,57 +439,83 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        private async Task EditItemPharmacy_Click()
+        private async Task OnDeleteConcoction(GridDataItemDeletingEventArgs e)
         {
-            ShowForm = true;
-            IsLoading = true;
-
-            try
+            if (Pharmacy.Id == 0)
             {
-                var p = await Mediator.Send(new GetPharmacyQuery(x => x.Id == SelectedDataItems[0].Adapt<PharmacyDto>().Id));
-
-                if (p.Count > 0)
+                try
                 {
-                    Pharmacy = p[0];
-                    Prescriptions = await Mediator.Send(new GetPrescriptionQuery(x => x.PharmacyId == Pharmacy.Id));
-                    Concoctions = await Mediator.Send(new GetConcoctionQuery(x => x.PharmacyId == Pharmacy.Id));
+                    if (SelectedDataItemsConcoction is null || SelectedDataItemsConcoction.Count == 1)
+                    {
+                        Concoctions.Remove((ConcoctionDto)e.DataItem);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
                 }
             }
-            catch (Exception e)
+            else
             {
-                e.HandleException(ToastService);
+                try
+                {
+                    if (SelectedDataItemsConcoction is null || SelectedDataItemsConcoction.Count == 1)
+                    {
+                        await Mediator.Send(new DeleteConcoctionRequest(((ConcoctionDto)e.DataItem).Id));
+                    }
+                    else
+                    {
+                        await Mediator.Send(new DeleteConcoctionRequest(ids: SelectedDataItemsConcoction.Adapt<List<ConcoctionDto>>().Select(x => x.Id).ToList()));
+                    }
+                    await LoadDataConcoctions();
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
             }
-
-            IsLoading = false;
         }
 
-        private async Task NewItem_Click()
+        private async Task OnDeleteConcoctionLine(GridDataItemDeletingEventArgs e)
         {
-            ShowForm = true;
-            Pharmacy = new();
+            if (Pharmacy.Id == 0)
+            {
+                try
+                {
+                    if (SelectedDataItemsConcoctionLines is null || SelectedDataItemsConcoctionLines.Count == 1)
+                    {
+                        ConcoctionLines.Remove((ConcoctionLineDto)e.DataItem);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+            }
+            else
+            {
+                try
+                {
+                    if (SelectedDataItemsConcoctionLines is null || SelectedDataItemsConcoctionLines.Count == 1)
+                    {
+                        await Mediator.Send(new DeleteConcoctionLineRequest(((ConcoctionLineDto)e.DataItem).Id));
+                    }
+                    else
+                    {
+                        await Mediator.Send(new DeleteConcoctionLineRequest(ids: SelectedDataItemsConcoctionLines.Adapt<List<ConcoctionLineDto>>().Select(x => x.Id).ToList()));
+                    }
+                    await LoadDataConcoctionLines();
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+            }
         }
 
-        private async Task Refresh_Click()
-        {
-            await LoadDataPharmacy();
-        }
+        #endregion Delete Function
 
-        private async Task EditItem_Click()
-        {
-            ShowForm = true;
-            Pharmacy = new();
-            SelectedDataItemsPrescriptionLines = [];
-            Prescriptions = [];
-        }
-
-        private async Task Back_Click()
-        {
-        }
-
-        private void DeleteItem_Click()
-        {
-            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
-        }
+        #region handleValidation
 
         private bool FormValidationState = true;
 
@@ -508,6 +540,16 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             if (FormValidationState)
                 await OnSaveConcoction();
         }
+
+        private async Task HandleInvalidSubmit()
+        {
+            FormValidationState = true;
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+        }
+
+        #endregion handleValidation
+
+        #region Fungsi Save
 
         private async Task OnSaveConcoction()
         {
@@ -721,10 +763,16 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        private async Task HandleInvalidSubmit()
+        #endregion Fungsi Save
+
+        #region NewItem Click
+
+        private async Task NewItem_Click()
         {
-            FormValidationState = true;
-            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+            ShowForm = true;
+            Pharmacy = new();
+            Concoctions.Clear();
+            Prescriptions.Clear();
         }
 
         private async Task NewItemPrescriptionLines_Click()
@@ -732,13 +780,53 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await GridPrescriptionLines.StartEditNewRowAsync();
         }
 
-        private async Task RefreshPrescriptionLines_Click()
+        private void NewItemConcoction_Click()
         {
+            PopUpConcoctionDetail = true;
+            Concoction = new();
+            ConcoctionLines.Clear();
         }
 
-        private async Task OnDiscard()
+        private async Task NewItemConcoctionLines_Click()
         {
-            await LoadDataPharmacy();
+            selectedActiveComponents = [];
+            await GridConcoctionLines.StartEditNewRowAsync();
+        }
+
+        #endregion NewItem Click
+
+        #region function Edit Click
+
+        private async Task EditItemPharmacy_Click()
+        {
+            ShowForm = true;
+            IsLoading = true;
+
+            try
+            {
+                var p = await Mediator.Send(new GetPharmacyQuery(x => x.Id == SelectedDataItems[0].Adapt<PharmacyDto>().Id));
+
+                if (p.Count > 0)
+                {
+                    Pharmacy = p[0];
+                    Prescriptions = await Mediator.Send(new GetPrescriptionQuery(x => x.PharmacyId == Pharmacy.Id));
+                    Concoctions = await Mediator.Send(new GetConcoctionQuery(x => x.PharmacyId == Pharmacy.Id));
+                }
+            }
+            catch (Exception e)
+            {
+                e.HandleException(ToastService);
+            }
+
+            IsLoading = false;
+        }
+
+        private void EditItem_Click()
+        {
+            ShowForm = true;
+            Pharmacy = new();
+            SelectedDataItemsPrescriptionLines = [];
+            Prescriptions = [];
         }
 
         private async Task EditItemPrescriptionLines_Click(IGrid context)
@@ -749,15 +837,27 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             var w = Prescriptions.FirstOrDefault(x => x.Id == copy.Id);
         }
 
-        private void DeleteItemPrescriptionLines_Click()
+        private async Task EditItemPrescriptionConcoction_Click(IGrid grid)
         {
-            GridPrescriptionLines.ShowRowDeleteConfirmation(FocusedRowVisibleIndexPrescriptionLines);
         }
 
-        private void NewItemPrescriptionConcoction_Click()
+        private async Task EditItemConcoctionLines_Click(IGrid context)
         {
-            PopUpConcoctionDetail = true;
-            //await GridPrescriptionConcoction.StartEditNewRowAsync();
+            var selected = (ConcoctionLineDto)context.SelectedDataItem;
+            await GridConcoctionLines.StartEditRowAsync(FocusedRowVisibleIndexConcoctionLines);
+        }
+
+        #endregion function Edit Click
+
+        #region Refresh fuction
+
+        private async Task Refresh_Click()
+        {
+            await LoadDataPharmacy();
+        }
+
+        private async Task RefreshPrescriptionLines_Click()
+        {
         }
 
         private async Task RefreshPrescriptionConcoction_Click()
@@ -765,8 +865,27 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await LoadDataConcoctions();
         }
 
-        private async Task EditItemPrescriptionConcoction_Click()
+        private async Task RefreshConcoctionLines_Click()
         {
+        }
+
+        #endregion Refresh fuction
+
+        #region Delete Grid Config
+
+        private void DeleteItem_Click()
+        {
+            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        private void DeleteItemConcoctionLines_Click()
+        {
+            GridConcoctionLines.ShowRowDeleteConfirmation(FocusedRowVisibleIndexConcoctionLines);
+        }
+
+        private void DeleteItemPrescriptionLines_Click()
+        {
+            GridPrescriptionLines.ShowRowDeleteConfirmation(FocusedRowVisibleIndexPrescriptionLines);
         }
 
         private void DeleteItemPrescriptionConcoction_Click()
@@ -774,22 +893,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             GridConcoction.ShowRowDeleteConfirmation(FocusedRowVisibleIndexPrescriptionConcoction);
         }
 
-        private async Task NewItemConcoctionLines_Click()
-        {
-            await GridConcoctionLines.StartEditNewRowAsync();
-        }
+        #endregion Delete Grid Config
 
-        private async Task RefreshConcoctionLines_Click()
+        private async Task OnDiscard()
         {
-        }
-
-        private async Task EditItemConcoctionLines_Click()
-        {
-        }
-
-        private void DeleteItemConcoctionLines_Click()
-        {
-            GridConcoctionLines.ShowRowDeleteConfirmation(FocusedRowVisibleIndexConcoctionLines);
+            await LoadDataPharmacy();
         }
 
         #endregion Methods
@@ -799,6 +907,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private void ColumnChooserButton_Click()
         {
             Grid.ShowColumnChooser();
+        }
+
+        private void ColumnChooserButtonConcoction_Click()
+        {
+            GridConcoction.ShowColumnChooser();
         }
 
         private async Task ExportXlsxItem_Click()
