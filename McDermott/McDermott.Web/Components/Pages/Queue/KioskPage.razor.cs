@@ -636,7 +636,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 FormGeneral.InsurancePolicyId = null;
 
                 // Save BPJS Insurance Policy
-                var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => FormKios != null && FormKios.NumberType != null && x.NoKartu != null && x.NoKartu.ToLower().Trim().Equals(FormKios.NumberType.ToLower().Trim())));
+                var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => FormKios != null && FormKios.BPJS != null && x.NoKartu != null && x.NoKartu.ToLower().Trim().Equals(FormKios.BPJS.ToLower().Trim())));
                 if (bpjs is not null && bpjs.Count > 0)
                 {
                     FormGeneral.Method = "BPJS";
@@ -703,7 +703,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormQueue.ClassTypeId = FormKios.ClassTypeId;
                     FormQueue.QueueStatus = "waiting";
 
-                    if (bpjs is not null && bpjs.Count > 0)
+                    if (bpjs is not null && bpjs.Count > 0 && !string.IsNullOrWhiteSpace(FormKios.BPJS))
                     {
                         var isSuccess = await SendPCareRequestAntrean(bpjs[0] ?? new());
                         if (!isSuccess)
@@ -806,18 +806,30 @@ namespace McDermott.Web.Components.Pages.Queue
                 var service = Services.FirstOrDefault(x => x.Id == FormKios.ServiceId);
                 var physician = Physician.FirstOrDefault(x => x.Id == FormKios.PhysicianId);
 
+                //if (physician is null)
+                //{
+                //    ToastService.ShowInfo("Please select the Physician!");
+                //    return false;
+                //}
+
+                if (service is null)
+                {
+                    ToastService.ShowInfo("Please select the Service!");
+                    return false;
+                }
+
                 var antreanRequest = new AntreanRequestBPJS
                 {
                     Nomorkartu = bpjs.NoKartu ?? string.Empty,
                     Nik = bpjs.NoKTP ?? string.Empty,
                     Nohp = bpjs.NoHP ?? string.Empty,
-                    Kodepoli = service!.Code ?? string.Empty,
+                    Kodepoli = service?.Code ?? string.Empty,
                     Namapoli = service.Name ?? string.Empty,
                     Norm = Patients.FirstOrDefault(x => x.Id == FormKios.PatientId)!.NoRm ?? string.Empty,
                     Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
-                    Kodedokter = physician!.PhysicanCode,
-                    Namadokter = physician!.Name,
-                    Jampraktek = SelectedScheduleSlot.ResultWorkFormatStringKiosk,
+                    Kodedokter = physician.PhysicanCode ?? null,
+                    Namadokter = physician.Name ?? null,
+                    Jampraktek = SelectedScheduleSlot?.ResultWorkFormatStringKiosk ?? "00:00:00",
                     Nomorantrean = ViewQueue!.QueueNumber!.ToString()! ?? "",
                     Angkaantrean = ViewQueue.QueueNumber.ToInt32(),
                     Keterangan = ""

@@ -158,6 +158,7 @@
                                                                             @bind-Value="@FormKios.PhysicianId"
                                                                             NullText="Select Physician.."
                                                                             ValueFieldName="Id"
+                                                                            FilteringMode="DataGridFilteringMode.Contains"
                                                                             SelectedItemChanged="@((UserDto req)=> ChangePhysician(req))"
                                                                             TextFieldName="Name"
                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -166,6 +167,7 @@
 
                                                             <DxFormLayoutItem Caption="Physician Schedule Slot" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                 <DxComboBox Data="@DoctorScheduleSlots"
+                                                                            FilteringMode="DataGridFilteringMode.Contains"
                                                                             @bind-Value="@SelectedScheduleSlot"
                                                                             NullText="Select Physician Slot Time.."
                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"
