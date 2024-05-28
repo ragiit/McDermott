@@ -318,6 +318,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     {
                         FormStockProduct.SourceId = GetReceivingStock.DestinationId;
                         FormStockProduct.ProductId = a.ProductId;
+                        FormStockProduct.UomId = a.Product.UomId;
                         if (TempFormReceivingStockDetail.TraceAbility == true)
                         {
                             FormStockProduct.Expired = a.ExpiredDate;

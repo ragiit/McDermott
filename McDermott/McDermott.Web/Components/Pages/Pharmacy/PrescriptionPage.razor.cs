@@ -839,6 +839,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItemPrescriptionConcoction_Click(IGrid grid)
         {
+            PopUpConcoctionDetail = true;
+            IsLoading = true;
+            Concoction = (ConcoctionDto)grid.SelectedDataItem;
+            IsLoading = false;
         }
 
         private async Task EditItemConcoctionLines_Click(IGrid context)
