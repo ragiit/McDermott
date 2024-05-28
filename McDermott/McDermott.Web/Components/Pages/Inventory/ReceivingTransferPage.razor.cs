@@ -104,6 +104,14 @@ namespace McDermott.Web.Components.Pages.Inventory
             PanelVisible = false;
         }
 
+        private async Task LoadData_Detail()
+        {
+            PanelVisible = true;
+            SelectedDataItemsDetail = [];
+            receivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery());
+            PanelVisible = false;
+        }
+
         private void SelectedChangeProduct(ProductDto product)
         {
             if (product is not null)
@@ -344,6 +352,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormTransactionDetail.TypeTransaction = "Received";
 
                 await Mediator.Send(new CreateTransactionStockDetailRequest(FormTransactionDetail));
+
+                isActiveButton = false;
             }
         }
 
@@ -458,71 +468,35 @@ namespace McDermott.Web.Components.Pages.Inventory
             try
             {
                 if (FormValidationState == false)
-                {
+
                     return;
-                }
+
                 if (FormReceivingStocks.Id == 0)
                 {
                     FormReceivingStocks.StatusReceived = "Draft";
 
                     GetReceivingStock = await Mediator.Send(new CreateReceivingStockRequest(FormReceivingStocks));
-                    if (TempReceivingStockDetails.Count > 0)
+
+                    TempReceivingStockDetails.ForEach(x =>
                     {
-                        foreach (var item in TempReceivingStockDetails)
-                        {
-                            item.Id = 0;
-                            item.ReceivingStockId = GetReceivingStock.Id;
-                            item.ProductId = TempFormReceivingStockDetail.ProductId;
-                            item.Qty = TempFormReceivingStockDetail.Qty;
-                            if (TempFormReceivingStockDetail.TraceAbility == true)
-                            {
-                                item.ExpiredDate = TempFormReceivingStockDetail.ExpiredDate;
-                                item.Batch = TempFormReceivingStockDetail.Batch;
-                            }
-                            await Mediator.Send(new CreateReceivingStockProductRequest(item));
-                        }
-                    }
+                        x.ReceivingStockId = GetReceivingStock.Id;
+                        x.Id = 0;
+                    });
+                    await Mediator.Send(new CreateListReceivingStockProductRequest(TempReceivingStockDetails));
                     ToastService.ShowSuccess("Add Data Success...");
+
+                    FormTransactionDetail.DestinationId = GetReceivingStock.DestinationId;
+                    FormTransactionDetail.ReceivingStockId = GetReceivingStock.Id;
+                    FormTransactionDetail.StatusTransfer = GetReceivingStock.StatusReceived;
+                    FormTransactionDetail.TypeTransaction = "Received";
+
+                    await Mediator.Send(new CreateTransactionStockDetailRequest(FormTransactionDetail));
                 }
                 else
                 {
                     GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
-
-                    var check_Detail = await Mediator.Send(new GetReceivingStockQuery(x => x.Id == GetReceivingStock.Id));
-
-                    await Mediator.Send(new DeleteReceivingStockPoductRequest(ids: receivingStockDetails.Select(x => x.Id).ToList()));
-
-                    var request = new List<ReceivingStockProductDto>();
-                    if (TempReceivingStockDetails.Count > 0)
-                    {
-                        TempReceivingStockDetails.ForEach(x =>
-                        {
-                            x.Id = 0;
-                            x.ReceivingStockId = check_Detail[0].Id;
-                        });
-
-                        for (int i = 0; i < TempReceivingStockDetails.Count; i++)
-                        {
-                            var cekLagi = TempReceivingStockDetails.FirstOrDefault(x => x.ReceivingStockId == TempReceivingStockDetails[i].ReceivingStockId);
-                            if (cekLagi is null)
-                            {
-                                TempReceivingStockDetails.Add(new ReceivingStockProductDto
-                                {
-                                    Id = 0,
-                                    ReceivingStockId = check_Detail[0].Id
-                                });
-                            }
-                        }
-                        await Mediator.Send(new CreateListReceivingStockProductRequest(TempReceivingStockDetails));
-                    }
                     ToastService.ShowSuccess("Update Data Success...");
                 }
-                FormTransactionDetail.DestinationId = GetReceivingStock.DestinationId;
-                FormTransactionDetail.ReceivingStockId = GetReceivingStock.Id;
-                FormTransactionDetail.StatusTransfer = GetReceivingStock.StatusReceived;
-                FormTransactionDetail.TypeTransaction = "Received";
-
-                await Mediator.Send(new CreateTransactionStockDetailRequest(FormTransactionDetail));
 
                 ToastService.ClearSuccessToasts();
 
@@ -536,38 +510,47 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task OnSave_Detail(GridEditModelSavingEventArgs e)
         {
-            try
+            if (e is null)
+                return;
+
+            var r = (ReceivingStockProductDto)e.EditModel;
+
+            if (FormReceivingStocks.Id == 0)
             {
-                var tempReceiving = (ReceivingStockProductDto)e.EditModel;
-                ReceivingStockProductDto updates = new();
-
-                if (IsAddReceived)
+                try
                 {
-                    // Cek apakah medicament dengan MedicamentId yang sama sudah ada
-                    if (TempReceivingStockDetails.Any(x => x.ProductId == tempReceiving.ProductId))
-                        return;
+                    ReceivingStockProductDto updates = new();
 
-                    TempFormReceivingStockDetail.Id = Helper.RandomNumber;
-                    TempReceivingStockDetails.Add(TempFormReceivingStockDetail);
+                    if (r.Id == 0)
+                    {
+                        r.Id = Helper.RandomNumber;
+                        TempReceivingStockDetails.Add(r);
+                    }
+                    else
+                    {
+                        var q = SelectedDataItemsDetail.Adapt<ReceivingStockProductDto>();
+
+                        updates = TempReceivingStockDetails.FirstOrDefault(x => x.Id == q.Id)!;
+
+                        var index = TempReceivingStockDetails.IndexOf(updates!);
+                        TempReceivingStockDetails[index] = r;
+                    }
+                    SelectedDataItemsDetail = [];
                 }
-                else
+                catch (Exception ex)
                 {
-                    var d = SelectedDataItemsDetail[0].Adapt<ReceivingStockProductDto>();
-                    var checkData = TempReceivingStockDetails.FirstOrDefault(x => x.ProductId == d.ProductId);
-                    if (checkData is not null && d.ProductId == tempReceiving.ProductId)
-                        return;
-
-                    updates = TempReceivingStockDetails.FirstOrDefault(x => x.ProductId == d.ProductId);
-
-                    var index = TempReceivingStockDetails.IndexOf(updates!);
-
-                    TempReceivingStockDetails[index] = tempReceiving;
+                    ex.HandleException(ToastService);
                 }
-                SelectedDataItemsDetail = new ObservableRangeCollection<object>();
             }
-            catch (Exception ex)
+            else
             {
-                ex.HandleException(ToastService);
+                r.ReceivingStockId = FormReceivingStocks.Id;
+                if (r.Id == 0)
+                    await Mediator.Send(new CreateReceivingStockProductRequest(r));
+                else
+                    await Mediator.Send(new UpdateReceivingStockProductRequest(r));
+
+                await LoadData_Detail();
             }
         }
 

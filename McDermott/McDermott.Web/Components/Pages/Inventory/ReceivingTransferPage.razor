@@ -141,6 +141,7 @@
                                                         TextFieldName="NameAndParent"
                                                         ValueFieldName="Id"
                                                         Enabled="@isActiveButton"></DxComboBox>
+                                                        <ValidationMessage For="@(()=>FormReceivingStocks.DestinationId)"></ValidationMessage>
                                         </DxFormLayoutItem>
                                         <DxFormLayoutGroup Caption="Product Lines" ColSpanMd="12">
                                             <Items>
@@ -153,7 +154,7 @@
                                                         KeyFieldName="Id"
                                                         EditModelSaving="OnSave_Detail"
                                                         DataItemDeleting="OnDelete_Detail"
-                                                        EditMode="GridEditMode.PopupEditForm"
+                                                        EditMode="GridEditMode.EditForm"
                                                         PopupEditFormCssClass="my-style"
                                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                         EditorRenderMode="GridEditorRenderMode.Detached"
