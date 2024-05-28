@@ -85,6 +85,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private IReadOnlyList<object> SelectedDataItemsConcoction { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsConcoctionLines { get; set; } = [];
 
+        private TaskCompletionSource<bool> DataLoadedTcs { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
         [Parameter]
         public bool IsPopUpForm { get; set; } = false;
 
@@ -272,7 +274,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Medicaments = await Mediator.Send(new GetMedicamentQuery());
             ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
             Pharmacies = await Mediator.Send(new GetPharmacyQuery());
-
+            Concoctions = new List<ConcoctionDto>();
             var c = Concoctions;
             await GetUserInfo();
 
@@ -360,6 +362,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             IsLoading = true;
             SelectedDataItems = [];
             Concoctions = await Mediator.Send(new GetConcoctionQuery());
+            IsLoading = false;
+        }
+
+        private async Task LoadDataConcoction()
+        {
+            IsLoading = true;
+            SelectedDataItems = [];
+            StateHasChanged();
             IsLoading = false;
         }
 
@@ -562,18 +572,19 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 {
                     ConcoctionDto update = new();
 
-                    var medicamentGroup = MedicamentGroupsConcoction.FirstOrDefault(x => x.Id == Concoction.MedicamentGroupId);
-                    if (medicamentGroup != null)
-                    {
-                        Concoction.MedicamentName = medicamentGroup.Name;
-                        Concoction.UomId = medicamentGroup.UoMId;
-                        Concoction.DrugFromId = medicamentGroup.FormDrugId;
-                    }
+                    //var medicamentGroup = MedicamentGroupsConcoction.FirstOrDefault(x => x.Id == Concoction.MedicamentGroupId);
+                    //if (medicamentGroup != null)
+                    //{
+                    //    Concoction.MedicamentName = medicamentGroup.Name;
+                    //    Concoction.UomId = medicamentGroup.UoMId;
+                    //    Concoction.DrugFromId = medicamentGroup.FormDrugId;
+                    //}
                     Concoction.PrescribingDoctorId = Pharmacy.PractitionerId;
 
                     if (Concoction.Id == 0)
                     {
                         Concoction.Id = Helper.RandomNumber;
+                        Concoction.MedicamentGroupName = MedicamentGroupsConcoction.Where(x => x.Id == Concoction.MedicamentGroupId).Select(x => x.Name).FirstOrDefault();
                         Concoction.UomName = Uoms.Where(x => x.Id == Concoction.UomId).Select(x => x.Name).FirstOrDefault();
                         Concoction.DrugDosageName = DrugDosages.Where(x => x.Id == Concoction.DrugDosageId).Select(x => x.Frequency).FirstOrDefault();
                         Concoctions.Add(Concoction);
@@ -586,6 +597,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         Concoctions[index] = Concoction;
                     }
 
+                    StateHasChanged();
                     SelectedDataItemsConcoction = [];
                 }
                 catch (Exception ex)
@@ -606,8 +618,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
                 await LoadDataConcoctions();
             }
-            var test = Concoctions;
             PopUpConcoctionDetail = false;
+            await LoadDataConcoction();
+            StateHasChanged();
         }
 
         private async Task OnSaveConcoctionLines(GridEditModelSavingEventArgs e)
@@ -866,7 +879,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task RefreshPrescriptionConcoction_Click()
         {
-            await LoadDataConcoctions();
+            await LoadDataConcoction();
         }
 
         private async Task RefreshConcoctionLines_Click()

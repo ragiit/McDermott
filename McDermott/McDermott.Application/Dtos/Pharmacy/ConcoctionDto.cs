@@ -1,4 +1,6 @@
-﻿namespace McDermott.Application.Dtos.Pharmacy
+﻿using McDermott.Domain.Common;
+
+namespace McDermott.Application.Dtos.Pharmacy
 {
     public class ConcoctionDto : IMapFrom<Concoction>
     {
@@ -24,11 +26,22 @@
         public long? Days { get; set; }
         public long? TotalQty { get; set; }
 
+        [SetToNull]
         public UomDto? Uom { get; set; }
+
+        [SetToNull]
         public DrugDosageDto? DrugDosage { get; set; }
+
+        [SetToNull]
         public DrugFormDto? DrugForm { get; set; }
+
+        [SetToNull]
         public PharmacyDto? Pharmacy { get; set; }
+
+        [SetToNull]
         public UserDto? PrescribingDoctor { get; set; }
+
+        [SetToNull]
         public MedicamentGroupDto? MedicamentGroup { get; set; }
     }
 }
