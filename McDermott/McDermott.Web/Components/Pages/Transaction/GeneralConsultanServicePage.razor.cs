@@ -690,11 +690,11 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             if (long.TryParse(value, out _))
             {
-                if (!Regex.IsMatch(LabResultDetail.NormalRange, @"^\d+-\d+$"))
+                if (LabResultDetail.NormalRange is not null && !Regex.IsMatch(LabResultDetail.NormalRange, @"^\d+-\d+$"))
                     LabResultDetail.ResultType = "Negative";
                 else
                 {
-                    var splits = LabResultDetail.NormalRange.Split("-");
+                    var splits = LabResultDetail.NormalRange?.Split("-") ?? [];
                     if (value.ToLong() <= splits[0].ToLong())
                     {
                         LabResultDetail.ResultType = "Low";
@@ -734,7 +734,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsAddOrUpdateOrDeleteLabResult = true;
             //var aaa = SelectedLabTestDataItems.Adapt<List<LabResultDetailDto>>();
 
-            LabResultDetails.Remove(LabResultDetails.FirstOrDefault(x => x.Id == SelectedLabTestDataItems[0].Adapt<LabResultDetailDto>().Id));
+            LabResultDetails.Remove(LabResultDetails.FirstOrDefault(x => x.Id == (SelectedLabTestDataItems?[0]?.Adapt<LabResultDetailDto>()?.Id)));
 
             SelectedLabTestDataItems = [];
         }
@@ -785,7 +785,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     IsFromDB = true,
                     Id = Helper.RandomNumber,
-                    NormalRange = FormRegis.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
+                    NormalRange = FormRegis.Patient.Gender is not null && FormRegis.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
                     Parameter = item.Name,
                     Remark = item.Remark,
                     LabUomId = item.LabUomId,

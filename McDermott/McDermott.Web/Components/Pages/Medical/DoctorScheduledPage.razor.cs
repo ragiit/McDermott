@@ -71,9 +71,9 @@ namespace McDermott.Web.Components.Pages.Medical
 
                 var item = Schedules.FirstOrDefault(x => x.Id == newId);
 
-                PhysicionName = item.Physicions;
+                PhysicionName = item?.Physicions ?? string.Empty;
 
-                var n = item.Physicions.Split(",");
+                var n = item?.Physicions.Split(",") ?? [];
 
                 foreach (var item1 in n)
                 {
@@ -217,7 +217,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             var aaa = SelectedDoctorScheduleDetailDataItems.Adapt<List<DoctorScheduleDetailDto>>();
             DoctorScheduleDetails.RemoveAll(x => aaa.Select(z => z.Name).Contains(x.Name));
-            SelectedDoctorScheduleDetailDataItems = new ObservableRangeCollection<object>();
+            SelectedDoctorScheduleDetailDataItems = [];
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
@@ -490,7 +490,7 @@ namespace McDermott.Web.Components.Pages.Medical
             // await JsRuntime.InvokeVoidAsync("alert", $"{a} {b} {c}"); // Alert
         }
 
-        private async Task OnSaveDoctorScheduleDetail(GridEditModelSavingEventArgs e)
+        private void OnSaveDoctorScheduleDetail(GridEditModelSavingEventArgs e)
         {
             var DoctorScheduleDetail = (DoctorScheduleDetailDto)e.EditModel;
 
@@ -609,7 +609,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             DoctorScheduleDetails = [];
             DoctorSchedule = new();
-            SelectedDoctorScheduleDetailDataItems = new ObservableRangeCollection<object>();
+            SelectedDoctorScheduleDetailDataItems = [];
             ShowForm = false;
         }
 
@@ -661,37 +661,44 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task SaveItemDoctorScheduleDetailGrid_Click()
         {
-            if (DoctorScheduleDetails is null) return;
-
-            await Mediator.Send(new DeleteDoctorScheduleDetailByScheduleIdRequest(DeletedDoctorScheduleDetails.Select(x => x.Id).ToList()));
-
-            DoctorScheduleDto result = new();
-
-            DoctorSchedule.PhysicionIds = SelectedPhysicions.Select(x => x.Id).ToList();
-
-            if (DoctorSchedule.Id == 0)
+            try
             {
-                result = await Mediator.Send(new CreateDoctorScheduleRequest(DoctorSchedule));
+                if (DoctorScheduleDetails is null) return;
+
+                await Mediator.Send(new DeleteDoctorScheduleDetailByScheduleIdRequest(DeletedDoctorScheduleDetails.Select(x => x.Id).ToList()));
+
+                DoctorScheduleDto result = new();
+
+                DoctorSchedule.PhysicionIds = SelectedPhysicions.Select(x => x.Id).ToList();
+
+                if (DoctorSchedule.Id == 0)
+                {
+                    result = await Mediator.Send(new CreateDoctorScheduleRequest(DoctorSchedule));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateDoctorScheduleRequest(DoctorSchedule));
+                }
+
+                DoctorScheduleDetails.ForEach(x =>
+                {
+                    x.Id = 0;
+                    x.DoctorSchedule = null;
+                    x.DoctorScheduleId = DoctorSchedule.Id == 0 ? result.Id : DoctorSchedule.Id;
+                });
+
+                await Mediator.Send(new DeleteDoctorScheduleSlotByPhysicionIdRequest(DoctorSchedule.PhysicionIds, DoctorSchedule.Id));
+
+                await Mediator.Send(new CreateDoctorScheduleDetailRequest(DoctorScheduleDetails));
+
+                ShowForm = false;
+
+                await LoadData();
             }
-            else
+            catch (Exception ex)
             {
-                await Mediator.Send(new UpdateDoctorScheduleRequest(DoctorSchedule));
+                ex.HandleException(ToastService);
             }
-
-            DoctorScheduleDetails.ForEach(x =>
-            {
-                x.Id = 0;
-                x.DoctorSchedule = null;
-                x.DoctorScheduleId = DoctorSchedule.Id == 0 ? result.Id : DoctorSchedule.Id;
-            });
-
-            await Mediator.Send(new DeleteDoctorScheduleSlotByPhysicionIdRequest(DoctorSchedule.PhysicionIds, DoctorSchedule.Id));
-
-            await Mediator.Send(new CreateDoctorScheduleDetailRequest(DoctorScheduleDetails));
-
-            ShowForm = false;
-
-            await LoadData();
         }
 
         private void ColumnChooserButtonDoctorScheduleDetail_Click()

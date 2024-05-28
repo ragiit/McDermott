@@ -214,11 +214,18 @@ namespace McDermott.Application.Features.Services
                             return (metaData.message, Convert.ToInt32(response.StatusCode));
                         }
 
-                        string LZDecrypted = PCareWebServiceDecrypt(a, Convert.ToString(r));
-                        string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
+                        try
+                        {
+                            string LZDecrypted = PCareWebServiceDecrypt(a, Convert.ToString(r));
+                            string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
 
-                        Console.WriteLine($"Response: {JsonConvert.DeserializeObject(result)}");
-                        return (result, Convert.ToInt32(response.StatusCode));
+                            Console.WriteLine($"Response: {JsonConvert.DeserializeObject(result)}");
+                            return (result, Convert.ToInt32(response.StatusCode));
+                        }
+                        catch (Exception)
+                        {
+                            return (await response.Content.ReadAsStringAsync(), Convert.ToInt32(response.StatusCode));
+                        }
                     }
                     else
                     {

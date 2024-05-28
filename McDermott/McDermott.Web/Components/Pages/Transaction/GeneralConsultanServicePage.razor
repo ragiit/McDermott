@@ -1477,56 +1477,55 @@ else
                                                 </div>
                                             </div>
                                         }
+                                        <div class="row w-100 mt-3">
+                                            <DxLoadingPanel @bind-Visible="IsLoadingSearchFaskes"
+                                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                            IsContentBlocked="true"
+                                                            ApplyBackgroundShading="true"
+                                                            IndicatorAreaVisible="false"
+                                                            Text="Fetching Data...">
+                                                <DxGrid @ref="GridRujukanRefer" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                        Data="RujukanSubSpesialis"
+                                                        PageSize="10"
+                                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                        KeyFieldName="Kdppk"
+                                                        TextWrapEnabled="false"
+                                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                                        EditMode="GridEditMode.PopupEditForm"
+                                                        PagerPosition="GridPagerPosition.Bottom"
+                                                        PageSizeSelectorVisible="true"
+                                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                        PageSizeSelectorAllRowsItemVisible="true"
+                                                        PagerSwitchToInputBoxButtonCount="10"
+                                                        AllowSelectRowByClick="true"
+                                                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                                        FocusedRowEnabled="true"
+                                                        PagerVisibleNumericButtonCount="10"
+                                                        ShowGroupPanel="true"
+                                                        ShowFilterRow="true"
+                                                        CustomizeElement="Grid_CustomizeElement"
+                                                        ShowSearchBox="true"
+                                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                                        KeyboardNavigationEnabled="true">
+                                                    <Columns>
+                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Nmppk))" Caption="Faskes" />
+                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kelas))" Caption="Class" />
+                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.AlamatPpk))" Caption="Address" />
+                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.TelpPpk))" Caption="Phone" />
+                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Distance))" Caption="Distance" />
+                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.JmlRujuk))" Caption="Patient" />
+                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kapasitas))" Caption="Patient" />
+                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Persentase))" Caption="%" />
+                                                        <DxGridDataColumn Caption="Action ">
+                                                            <CellDisplayTemplate>
+                                                                <DxButton RenderStyle="@ButtonRenderStyle.Success" IconCssClass="fa-solid fa-play mr-1" Text="Select"></DxButton>
+                                                            </CellDisplayTemplate>
+                                                        </DxGridDataColumn>
+                                                    </Columns>
+                                                </DxGrid>
+                                            </DxLoadingPanel>
+                                        </div>
                                     }
-
-                                    <div class="row w-100 mt-3">
-                                        <DxLoadingPanel @bind-Visible="IsLoadingSearchFaskes"
-                                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                        IsContentBlocked="true"
-                                                        ApplyBackgroundShading="true"
-                                                        IndicatorAreaVisible="false"
-                                                        Text="Fetching Data...">
-                                            <DxGrid @ref="GridRujukanRefer" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                    Data="RujukanSubSpesialis"
-                                                    PageSize="10"
-                                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                    KeyFieldName="Kdppk"
-                                                    TextWrapEnabled="false"
-                                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                                    EditMode="GridEditMode.PopupEditForm"
-                                                    PagerPosition="GridPagerPosition.Bottom"
-                                                    PageSizeSelectorVisible="true"
-                                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                    PageSizeSelectorAllRowsItemVisible="true"
-                                                    PagerSwitchToInputBoxButtonCount="10"
-                                                    AllowSelectRowByClick="true"
-                                                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                                    FocusedRowEnabled="true"
-                                                    PagerVisibleNumericButtonCount="10"
-                                                    ShowGroupPanel="true"
-                                                    ShowFilterRow="true"
-                                                    CustomizeElement="Grid_CustomizeElement"
-                                                    ShowSearchBox="true"
-                                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                                    KeyboardNavigationEnabled="true">
-                                                <Columns>
-                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Nmppk))" Caption="Faskes" />
-                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kelas))" Caption="Class" />
-                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.AlamatPpk))" Caption="Address" />
-                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.TelpPpk))" Caption="Phone" />
-                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Distance))" Caption="Distance" />
-                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.JmlRujuk))" Caption="Patient" />
-                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kapasitas))" Caption="Patient" />
-                                                    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Persentase))" Caption="%" />
-                                                    <DxGridDataColumn Caption="Action ">
-                                                        <CellDisplayTemplate>
-                                                            <DxButton RenderStyle="@ButtonRenderStyle.Success" IconCssClass="fa-solid fa-play mr-1" Text="Select"></DxButton>
-                                                        </CellDisplayTemplate>
-                                                    </DxGridDataColumn>
-                                                </Columns>
-                                            </DxGrid>
-                                        </DxLoadingPanel>
-                                    </div>
                                 </DxFormLayoutItem>
                             </DxFormLayout>
                         </DxFormLayoutGroup>
