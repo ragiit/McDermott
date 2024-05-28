@@ -83,7 +83,11 @@
                                             </ToolbarTemplate>
                                             <Columns>
                                                 <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn MinWidth="200" FieldName="RegistrationDate" DisplayFormat="ddd, dd MMM yyyy" Caption="Registration Date" />
+                                                <DxGridDataColumn MinWidth="200"
+                                                                  FieldName="RegistrationDate"
+                                                                  FilterRowOperatorType="GridFilterRowOperatorType.Contains"
+                                                                  DisplayFormat="ddd, dd MMM yyyy"
+                                                                  Caption="Registration Date" />
                                                 <DxGridDataColumn MinWidth="200" FieldName="StagingStatus" Caption="Status" />
                                                 <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
                                                 <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
@@ -138,7 +142,7 @@
                                                     <div class="card-body">
                                                         <div class="w-100">
                                                             <div class="col align-self-center">
-                                                                <DxButton Enabled="!IsLoading" IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
+                                                                <DxButton Enabled="!IsLoading" IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" Visible="@(!(FormRegis.StagingStatus == "Waiting" && Convert.ToBoolean(UserLogin.IsNurse)))" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
                                                                 <DxButton Enabled="!IsLoading" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancel2" RenderStyle="ButtonRenderStyle.Danger"></DxButton>
                                                                 <DxButton Enabled="!IsLoading" IconCssClass="fa-solid fa-print" Text="Print" Click="OnPrint" RenderStyle="ButtonRenderStyle.Success" RenderStyleMode="ButtonRenderStyleMode.Outline"></DxButton>
 
@@ -155,7 +159,7 @@
                                                     <div class="w-100">
 
                                                         <div class="col align-self-center">
-                                                            <DxButton Enabled="!IsLoading" IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
+                                                            <DxButton Enabled="!IsLoading" IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" Visible="@(!(FormRegis.StagingStatus == "Waiting" && Convert.ToBoolean(UserLogin.IsNurse)))" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
                                                             <DxButton Enabled="!IsLoading" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancel2" RenderStyle="ButtonRenderStyle.Danger"></DxButton>
                                                             <DxButton Enabled="!IsLoading" IconCssClass="fa-solid fa-print" Text="Print" Click="OnPrint" RenderStyle="ButtonRenderStyle.Success" RenderStyleMode="ButtonRenderStyleMode.Outline"></DxButton>
 
@@ -282,10 +286,10 @@
                                                                         </DxComboBox>
                                                                         <ValidationMessage For="@(() => FormRegis.TypeRegistration)" />
                                                                     </DxFormLayoutItem>
-                                                                    <DxFormLayoutItem Visible="@(FormRegis.StagingStatus.Equals("Physician"))" CaptionCssClass="required-caption normal-caption" Caption="Reg Type" ColSpanMd="12">
+                                                                    <DxFormLayoutItem Visible="@(FormRegis.StagingStatus.Equals("Physician"))" CaptionCssClass="required-caption normal-caption" Caption="Return Status" ColSpanMd="12">
                                                                         <DxComboBox ShowValidationIcon="true" Data="@_homeStatusTemps"
-                                                                                    NullText="Home Status..."
-                                                                                    ReadOnly="@(FormRegis.StagingStatus.Equals("Physician") || FormRegis.StagingStatus!.Equals("Finished"))"
+                                                                                    NullText="Return Status..."
+                                                                                    ReadOnly="@(!FormRegis.StagingStatus.Equals("Physician") || FormRegis.StagingStatus!.Equals("Finished"))"
                                                                                     @bind-Value="@FormRegis.HomeStatus"
                                                                                     TextFieldName="Name"
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -463,36 +467,36 @@
                                                     <DxFormLayoutGroup Caption="Allergy Data" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                                                         <Items>
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="2">
-                                                                <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))" @bind-Checked="@FormRegis.IsWeather" />
+                                                                <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Checked="@FormRegis.IsWeather" />
                                                             </DxFormLayoutItem>
                                                             <DxFormLayoutItem ColSpanMd="10" Caption="">
                                                                 @if (PatientAllergy.Weather is not null || FormRegis.IsWeather)
                                                                 {
-                                                                    <DxMemo ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))" @bind-Text="@PatientAllergy.Weather"
+                                                                    <DxMemo ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Text="@PatientAllergy.Weather"
                                                                             NullText="Weather"
                                                                             ShowValidationIcon="true"
                                                                             Rows="1" />
                                                                 }
                                                             </DxFormLayoutItem>
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacology" ColSpanMd="2">
-                                                                <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))" @bind-Checked="@FormRegis.IsPharmacology" />
+                                                                <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Checked="@FormRegis.IsPharmacology" />
                                                             </DxFormLayoutItem>
                                                             <DxFormLayoutItem ColSpanMd="10">
                                                                 @if (PatientAllergy.Farmacology is not null || FormRegis.IsPharmacology)
                                                                 {
-                                                                    <DxMemo ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))" @bind-Text="@PatientAllergy.Farmacology"
+                                                                    <DxMemo ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Text="@PatientAllergy.Farmacology"
                                                                             NullText="Pharmacology"
                                                                             ShowValidationIcon="true"
                                                                             Rows="1" />
                                                                 }
                                                             </DxFormLayoutItem>
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="2">
-                                                                <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))" @bind-Checked="@FormRegis.IsFood" />
+                                                                <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Checked="@FormRegis.IsFood" />
                                                             </DxFormLayoutItem>
                                                             <DxFormLayoutItem ColSpanMd="10">
                                                                 @if (PatientAllergy.Food is not null || FormRegis.IsFood)
                                                                 {
-                                                                    <DxMemo ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))" @bind-Text="@PatientAllergy.Food" NullText="Food"
+                                                                    <DxMemo ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Text="@PatientAllergy.Food" NullText="Food"
                                                                             ShowValidationIcon="true"
                                                                             Rows="1" />
                                                                 }
