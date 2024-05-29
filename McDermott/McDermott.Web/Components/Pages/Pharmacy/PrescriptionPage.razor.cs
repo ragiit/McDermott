@@ -1,5 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionLineCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
@@ -139,7 +138,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             "BPJS"
         };
 
-        private async void ChangeProduct(ProductDto product)
+        private async Task ChangeProduct(ProductDto product)
         {
             try
             {
@@ -154,10 +153,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
                 var checkUom = Uoms.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
 
-                ConcoctionLine.Qty = ChekMedicament?.Dosage;
-                ConcoctionLine.MedicamentDosage = ChekMedicament?.Dosage;
-                ConcoctionLine.UomId = ChekMedicament?.UomId;
-                selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament.ActiveComponentId!.Contains(a.Id)).ToList();
+                ConcoctionLine.Qty = ChekMedicament?.Dosage ?? 0;
+                ConcoctionLine.MedicamentDosage = ChekMedicament?.Dosage ?? 0;
+                ConcoctionLine.UomId = ChekMedicament?.UomId ?? null;
+                selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament != null && ChekMedicament.ActiveComponentId != null && ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
                 var aa = Pharmacy.PrescriptionLocationId;
                 var checkStock = StockProducts.Where(x => x.ProductId == product.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
                 ConcoctionLine.AvaliableQty = checkStock;
@@ -619,7 +618,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 await LoadDataConcoctions();
             }
             PopUpConcoctionDetail = false;
-            await LoadDataConcoction();
+            GridConcoction.Reload();
             StateHasChanged();
         }
 
@@ -629,7 +628,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 return;
 
             var Cl = (ConcoctionLineDto)e.EditModel;
-            if (Concoction.Id == 0)
+            if (Pharmacy.Id == 0)
             {
                 try
                 {
@@ -917,6 +916,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await LoadDataPharmacy();
         }
 
+        private void OnDiscardConcoctionLines()
+        {
+            PopUpConcoctionDetail = false;
+        }
+
         #endregion Methods
 
         #region Grid Properties
@@ -924,6 +928,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private void ColumnChooserButton_Click()
         {
             Grid.ShowColumnChooser();
+        }
+
+        private void ColumnChooserButtonGridPrescriptionLines_Click()
+        {
+            GridPrescriptionLines.ShowColumnChooser();
         }
 
         private void ColumnChooserButtonConcoction_Click()
