@@ -272,12 +272,13 @@
                                                                             <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItemPrescriptionLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsPrescriptionLines.Count > 0 && Prescriptions.Count > 0" />
                                                                             <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemPrescriptionLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsPrescriptionLines.Count > 0 && Prescriptions.Count > 0 && !IsPopUpForm" />
                                                                             <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshPrescriptionLines_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButtonGridPrescriptionLines_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                                         </DxToolbar>
                                                                     </ToolbarTemplate>
                                                                     <Columns>
                                                                         <DxGridSelectionColumn Width="15px" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="Product.Name" Caption="Medicine Name" SortIndex="0" />
+                                                                        <DxGridDataColumn MinWidth="200" FieldName="GivenAmount" Caption="Prescription Quantity" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="Stock" Caption="Stock" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="DosageFrequency" Caption="Dosage/Frequency" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="PriceUnit" Caption="Price Unit" />
@@ -578,7 +579,8 @@ else
                                     ValueFieldName="Id"
                                     SelectedItemChanged="@((DrugDosageDto freq)=>SelectChangeFrequency(freq))"
                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    ShowValidationIcon="true"></DxComboBox>
+                                    ShowValidationIcon="true" />
+                        <ValidationMessage For="@(()=> Concoction.DrugDosageId)"   />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Qty Per Day" CaptionCssClass="normal-caption" ColSpanMd="12">
                         <DxSpinEdit Value="@Concoction.QtyByDay"
