@@ -243,8 +243,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        private void OnValueChangedTotalQtyDays(long? numDays)
+        private void OnValueChangedTotalQtyDays(long numDays)
         {
+            FormMedicamenDetails.QtyByDay = numDays;
             FormMedicamenDetails.TotalQty = numDays * FormMedicamenDetails.Dosage;
         }
 
