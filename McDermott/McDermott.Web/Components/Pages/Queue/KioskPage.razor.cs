@@ -467,7 +467,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 showForm = true;
                 NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
                 FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
-                BPJS = InsurancePolices.Where(x => x.UserId == FormKios.PatientId).FirstOrDefault();
+                BPJS = InsurancePolices.Where(x => x.UserId == FormKios.PatientId).FirstOrDefault()!;
                 if (BPJS is not null)
                 {
                     FormKios.BPJS = BPJS.PolicyNumber;
@@ -523,7 +523,18 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task onPrint()
         {
+            var noBPJS = "";
             var aas = ViewQueue.QueueNumber.ToString() ?? string.Empty;
+            var NamePatient = ViewQueue?.Kiosk?.Patient?.Name;
+            var ServiceKiosk = ViewQueue?.Service?.Name;
+            if (ViewQueue?.Kiosk?.StageBpjs == true)
+            {
+                noBPJS = BPJS.PolicyNumber;
+            }
+            else
+            {
+                noBPJS = "-";
+            }
             string queueNumber = aas.PadLeft(3, '0');
 
             // HTML untuk dokumen cetak
@@ -540,47 +551,46 @@ namespace McDermott.Web.Components.Pages.Queue
 }}
 
 .ticket {{width: 80mm;
-    height: 80mm;
-    padding: 5mm;
+    height: 10px;
+    padding: 35px;
     box-sizing: border-box;
     font-family: Arial, sans-serif;
 }}
 
-.header {{text - align: center;
+.header {{text-align: center;
 }}
 
-.logo {{width: 40mm;
+.logo {{width: 50px;
     height: auto;
 }}
 
-.ticket-number {{text - align: center;
-    font-size: 24pt;
-    margin: 10mm 0;
+.ticket-number {{text-align: center;
+    font-size: 40pt;
+    margin: 10px 0;
 }}
 
-.details p {{margin: 2mm 0;
-    font-size: 12pt;
+.details p {{margin: 1px 0;
+    font-size: 9pt;
 }}
 
-.details p strong {{font - weight: bold;
+.details p strong {{font-weight: bold;
 }}
                 </style>
             </head>
             <body>
                 <div class='ticket'>
     <div class='header'>
-        <img src='logo.png' alt='Logo' class='logo' />
+        <img src='/image/logo.png' alt='Logo' class='logo' />
         <h1>Klinik McDermott</h1>
     </div>
-    <h2 class='ticket-number'>A001</h2>
+    <h2 class='ticket-number'>{queueNumber}</h2>
     <div class='details'>
-        <p><strong>Tanggal Daftar:</strong> 21 Mei 2024 15:51</p>
-        <p><strong>Nama:</strong> Dwiluky</p>
-        <p><strong>Poliklinik:</strong> Poli Umum</p>
+        <p><strong>Tanggal Daftar:</strong> {DateTime.Now}</p>
+        <p><strong>Nama:</strong> {NamePatient}</p>
+        <p><strong>Poliklinik:</strong> {ServiceKiosk}</p>
         <p><strong>Jaminan:</strong> BPJS Kesehatan</p>
-        <p><strong>Nomor Jaminan:</strong> 0219887728</p>
+        <p><strong>Nomor Jaminan:</strong> {noBPJS}</p>
         <p><strong>NIP:</strong> (Jika ada)</p>
-        <p><strong>Estimasi Waktu:</strong> 16:00</p>
     </div>
 </div>
 

@@ -48,42 +48,42 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
-                if (product is null)
+                if (product is not null)
                 {
-                    FormMedicamenDetails = new();
-                    selectedActiveComponents = [];
-                    return;
-                }
+                    var a = await Mediator.Send(new GetMedicamentQuery());
+                    var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
+                    var checkUom = UoMs.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
+                    FormMedicamenDetails.MedicaneUnitDosage = checkUom?.Name;
+                    FormMedicamenDetails.FrequencyId = ChekMedicament?.FrequencyId;
+                    if (ChekMedicament is not null && ChekMedicament.FrequencyId != null)
+                    {
+                        FormMedicamenDetails.FrequencyName = ChekMedicament.Frequency!.Frequency;
+                        FormMedicamenDetails.Days = ChekMedicament.Frequency.Days.ToLong();
+                        FormMedicamenDetails.QtyByDay = ChekMedicament.Frequency.TotalQtyPerDay.ToLong();
+                    }
+                    FormMedicamenDetails.Dosage = ChekMedicament!.Dosage;
+                    FormMedicamenDetails.MedicaneDosage = ChekMedicament?.Dosage;
 
-                var a = await Mediator.Send(new GetMedicamentQuery());
-                var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
-                var checkUom = UoMs.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
-                FormMedicamenDetails.MedicaneUnitDosage = checkUom?.Name;
-                FormMedicamenDetails.FrequencyId = ChekMedicament?.FrequencyId;
-                if (ChekMedicament is not null && ChekMedicament.FrequencyId != null)
-                {
-                    FormMedicamenDetails.FrequencyName = ChekMedicament.Frequency.Frequency;
-                    FormMedicamenDetails.Days = ChekMedicament.Frequency.Days.ToLong();
-                    FormMedicamenDetails.QtyByDay = ChekMedicament.Frequency.TotalQtyPerDay.ToLong();
-                }
-                FormMedicamenDetails.Dosage = ChekMedicament.Dosage;
-                FormMedicamenDetails.MedicaneDosage = ChekMedicament?.Dosage;
-
-                if (MGForm.IsConcoction == true)
-                {
-                    FormMedicamenDetails.TotalQty = FormMedicamenDetails.Dosage;
+                    if (MGForm.IsConcoction == true)
+                    {
+                        FormMedicamenDetails.TotalQty = FormMedicamenDetails.Dosage;
+                    }
+                    else
+                    {
+                        if (FormMedicamenDetails?.Dosage != null && FormMedicamenDetails?.QtyByDay != null)
+                        {
+                            FormMedicamenDetails.TotalQty = FormMedicamenDetails?.Dosage * FormMedicamenDetails?.QtyByDay;
+                        }
+                        FormMedicamenDetails!.FrequencyId = ChekMedicament?.FrequencyId ?? 0;
+                    }
+                    selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament!.ActiveComponentId!.Contains(a.Id)).ToList();
+                    FormMedicamenDetails.UnitOfDosageId = ChekMedicament?.UomId;
+                    FormMedicamenDetails.MedicaneName = ChekMedicament?.Product?.Name;
                 }
                 else
                 {
-                    if (FormMedicamenDetails.Dosage != null && FormMedicamenDetails.QtyByDay != null)
-                    {
-                        FormMedicamenDetails.TotalQty = FormMedicamenDetails?.Dosage * FormMedicamenDetails?.QtyByDay;
-                    }
-                    FormMedicamenDetails.FrequencyId = ChekMedicament.FrequencyId;
+                    selectedActiveComponents = [];
                 }
-                selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
-                FormMedicamenDetails.UnitOfDosageId = ChekMedicament.UomId;
-                FormMedicamenDetails.MedicaneName = ChekMedicament.Product.Name;
             }
             catch (Exception ex)
             {
@@ -333,7 +333,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 {
                     detail.FrequencyName = Frequencys.FirstOrDefault(f => f.Id == detail.FrequencyId)?.Frequency;
                     detail.ActiveComponentName = string.Join(",", ActiveComponents
-                        .Where(a => detail.ActiveComponentId.Contains(a.Id))
+                        .Where(a => detail!.ActiveComponentId!.Contains(a.Id))
                         .Select(a => a.Name));
                 }
             }
@@ -581,7 +581,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     {
                         detail.FrequencyName = Frequencys.FirstOrDefault(f => f.Id == detail.FrequencyId)?.Frequency;
                         detail.ActiveComponentName = string.Join(",", ActiveComponents
-                            .Where(a => detail.ActiveComponentId.Contains(a.Id))
+                            .Where(a => detail!.ActiveComponentId!.Contains(a.Id))
                             .Select(a => a.Name));
                     }
                 }
