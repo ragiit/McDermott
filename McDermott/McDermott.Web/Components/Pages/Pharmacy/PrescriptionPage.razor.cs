@@ -61,7 +61,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             if (Id == 0)
                 return;
-
+            
             var generalConsultantService = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id));
             if (generalConsultantService.Count == 0 || generalConsultantService is null)
                 return;
@@ -74,6 +74,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Pharmacy.IsWeather = generalConsultantService.FirstOrDefault()!.IsWeather;
             Pharmacy.IsFarmacologi = generalConsultantService.FirstOrDefault()!.IsPharmacology;
             Pharmacy.IsFood = generalConsultantService.FirstOrDefault()!.IsFood;
+         
+            var b = Patients.Where(x => x.Id == Pharmacy.PatientId).Select(x => x.PatientAllergyIds).FirstOrDefault();
+            //if (generalConsultanService.SelectedFoodAllergies.Count() > 0)
+            //    FormRegis.IsFood = true;
+            //if (SelectedWeatherAllergies.Count() > 0)
+            //    FormRegis.IsWeather = true;
+            //if (SelectedPharmacologyAllergies.Count() > 0)
+            //    FormRegis.IsPharmacology = true;
         }
 
         private IGrid Grid { get; set; }
@@ -113,6 +121,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<PrescriptionDto> Prescriptions { get; set; } = [];
         private List<ConcoctionDto> Concoctions { get; set; } = [];
         private List<ConcoctionLineDto> ConcoctionLines { get; set; } = [];
+        private List<AllergyDto> allergies { get; set; } = [];
         private List<UserDto> Patients { get; set; } = [];
         private List<UserDto> Practitioners { get; set; } = [];
         private List<UomDto> Uoms { get; set; } = [];
@@ -275,6 +284,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
             Pharmacies = await Mediator.Send(new GetPharmacyQuery());
             Concoctions = new List<ConcoctionDto>();
+            allergies = await Mediator.Send(new GetAllergyQuery());
             var c = Concoctions;
             await GetUserInfo();
 

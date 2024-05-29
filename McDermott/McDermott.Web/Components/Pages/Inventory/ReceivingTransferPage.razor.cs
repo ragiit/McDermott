@@ -450,7 +450,15 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 StateHasChanged();
                 var data = SelectedDataItemsDetail.Adapt<List<ReceivingStockProductDto>>();
-                TempReceivingStockDetails.RemoveAll(x => data.Select(z => z.ReceivingStockId).Contains(x.ReceivingStockId));
+                var cek = data.Select(x => x.ReceivingStockId).FirstOrDefault();
+                if (cek == null)
+                {
+                    TempReceivingStockDetails.RemoveAll(x => data.Select(z => z.Id).Contains(x.Id));
+                }
+                else
+                {
+                    TempReceivingStockDetails.RemoveAll(x => data.Select(z => z.ReceivingStockId).Contains(x.ReceivingStockId));
+                }
                 SelectedDataItemsDetail = new ObservableRangeCollection<object>();
             }
             catch (Exception ex)
