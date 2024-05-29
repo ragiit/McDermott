@@ -230,7 +230,7 @@
                                                                         PagerNavigationMode="PagerNavigationMode.InputBox"
                                                                         Data="Prescriptions"
                                                                         PageSize="10"
-                                                                        EditMode="GridEditMode.PopupEditForm"
+                                                                        EditMode="GridEditMode.EditForm"
                                                                         @bind-SelectedDataItems="@SelectedDataItemsPrescriptionLines"
                                                                         FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                                                         KeyFieldName="Id"
@@ -582,14 +582,14 @@ else
                     <DxFormLayoutItem Caption="Days" CaptionCssClass="normal-caption" ColSpanMd="12">
                         <DxSpinEdit @bind-Value="@Concoction.Days"
                                     NullText="Days..."
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"/>
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                         <ValidationMessage For="@(()=> Concoction.Days)"   />
                     </DxFormLayoutItem>
 
                     <DxFormLayoutItem Caption="Total Qty" CaptionCssClass="normal-caption" ColSpanMd="12">
                         <DxSpinEdit @bind-Value="@Concoction.TotalQty"
                                     NullText="Total Qty..."
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"/>
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                         <ValidationMessage For="@(()=> Concoction.TotalQty)"   />
                     </DxFormLayoutItem>
                 </DxFormLayout>

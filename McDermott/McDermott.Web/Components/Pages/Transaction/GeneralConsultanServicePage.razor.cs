@@ -96,6 +96,14 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IGrid GridRujukanRefer { get; set; }
         private List<SpesialisRefrensiKhususPCare> SpesialisRefrensiKhusus = [];
         private List<SpesialisPCare> SpesialisPs = [];
+
+        private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
+        private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
+        private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
+        private List<AllergyDto> WeatherAllergies = [];
+        private List<AllergyDto> FoodAllergies = [];
+        private List<AllergyDto> PharmacologyAllergies = [];
+
         private List<RujukanFaskesKhususSpesialisPCare> RujukanSubSpesialis = [];
         private List<SpesialisSaranaPCare> SpesialisSaranas = [];
         private List<SubSpesialisPCare> SubSpesialisPs = [];
@@ -192,9 +200,16 @@ namespace McDermott.Web.Components.Pages.Transaction
                 var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
                 FormRegis = result[0];
 
-                FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
-                FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
-                FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
+                //FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
+                //FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
+                //FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
+
+                if (SelectedFoodAllergies.Count() > 0)
+                    FormRegis.IsFood = true;
+                if (SelectedWeatherAllergies.Count() > 0)
+                    FormRegis.IsWeather = true;
+                if (SelectedPharmacologyAllergies.Count() > 0)
+                    FormRegis.IsPharmacology = true;
 
                 if (FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Physician"))
                 {
@@ -353,12 +368,12 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (!FormValidationState)
                     return;
 
-                if (!FormRegis.IsWeather)
-                    PatientAllergy.Weather = null;
-                if (!FormRegis.IsPharmacology)
-                    PatientAllergy.Farmacology = null;
-                if (!FormRegis.IsFood)
-                    PatientAllergy.Food = null;
+                //if (!FormRegis.IsWeather)
+                //    PatientAllergy.Weather = null;
+                //if (!FormRegis.IsPharmacology)
+                //    PatientAllergy.Farmacology = null;
+                //if (!FormRegis.IsFood)
+                //    PatientAllergy.Food = null;
 
                 GeneralConsultanMedicalSupport.LabResulLabExaminationtIds = SelectedLabTests.Select(x => x.Id).ToList();
 
@@ -410,15 +425,29 @@ namespace McDermott.Web.Components.Pages.Transaction
                         switch (FormRegis.StagingStatus)
                         {
                             case "Planned":
+                                if (FormRegis.IsPharmacology || FormRegis.IsFood || FormRegis.IsWeather)
+                                {
+                                    var ids = new List<long>();
+                                    ids.AddRange(SelectedPharmacologyAllergies.Select(x => x.Id).ToList());
+                                    ids.AddRange(SelectedWeatherAllergies.Select(x => x.Id).ToList());
+                                    ids.AddRange(SelectedFoodAllergies.Select(x => x.Id).ToList());
+
+                                    var u = patients.FirstOrDefault(x => x.Id == FormRegis.PatientId);
+                                    if (u is not null)
+                                    {
+                                        u.PatientAllergyIds = ids;
+                                        await Mediator.Send(new UpdateUserRequest(u));
+                                    }
+                                }
+
                                 FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
 
-                                PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
+                                //PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
 
-                                if (PatientAllergy.Id == 0)
-                                    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
-                                else
-                                    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
-
+                                //if (PatientAllergy.Id == 0)
+                                //    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
+                                //else
+                                //    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
                                 break;
 
                             default:
@@ -434,10 +463,20 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                                 PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
 
-                                if (PatientAllergy.Id == 0)
-                                    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
-                                else
-                                    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
+                                if (FormRegis.IsPharmacology || FormRegis.IsFood || FormRegis.IsWeather)
+                                {
+                                    var ids = new List<long>();
+                                    ids.AddRange(SelectedPharmacologyAllergies.Select(x => x.Id).ToList());
+                                    ids.AddRange(SelectedWeatherAllergies.Select(x => x.Id).ToList());
+                                    ids.AddRange(SelectedFoodAllergies.Select(x => x.Id).ToList());
+
+                                    var u = patients.FirstOrDefault(x => x.Id == FormRegis.PatientId);
+                                    if (u is not null)
+                                    {
+                                        u.PatientAllergyIds = ids;
+                                        await Mediator.Send(new UpdateUserRequest(u));
+                                    }
+                                }
 
                                 break;
 
@@ -505,11 +544,19 @@ namespace McDermott.Web.Components.Pages.Transaction
                 var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
                 FormRegis = result[0];
 
-                FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
-                FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
-                FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
+                //FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
+                //FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
+                //FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
+
+                if (SelectedFoodAllergies.Count() > 0)
+                    FormRegis.IsFood = true;
+                if (SelectedWeatherAllergies.Count() > 0)
+                    FormRegis.IsWeather = true;
+                if (SelectedPharmacologyAllergies.Count() > 0)
+                    FormRegis.IsPharmacology = true;
 
                 ToastService.ShowSuccess("Saved Successfully");
+
                 IsLoading = false;
             }
             catch (Exception exx)
@@ -1518,12 +1565,22 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #endregion Tab Medical Support
 
+        private List<AllergyDto> Allergies = [];
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
 
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
             Awareness = await Mediator.Send(new GetAwarenessQuery());
+
+            Allergies = await Mediator.Send(new GetAllergyQuery());
+            Allergies.ForEach(x =>
+            {
+                var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+                if (a is not null)
+                    x.TypeString = a.Name;
+            });
 
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
             NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
@@ -2082,25 +2139,27 @@ namespace McDermott.Web.Components.Pages.Transaction
                     }
                 }
 
-                var patientAllergy = PatientAllergies.FirstOrDefault(x => x.UserId == FormRegis!.PatientId);
+                //var patientAllergy = PatientAllergies.FirstOrDefault(x => x.UserId == FormRegis!.PatientId);
 
-                if (patientAllergy != null)
-                {
-                    PatientAllergy = patientAllergy;
-                    FormRegis.IsWeather = !string.IsNullOrWhiteSpace(patientAllergy.Weather);
-                    FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(patientAllergy.Farmacology);
-                    FormRegis.IsFood = !string.IsNullOrWhiteSpace(patientAllergy.Food);
-                }
-                else
-                {
-                    PatientAllergy = new PatientAllergyDto(); // Create a new instance if no allergy is found
-                    FormRegis.IsWeather = FormRegis.IsPharmacology = FormRegis.IsFood = false;
-                }
+                //if (patientAllergy != null)
+                //{
+                //    PatientAllergy = patientAllergy;
+                //    FormRegis.IsWeather = !string.IsNullOrWhiteSpace(patientAllergy.Weather);
+                //    FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(patientAllergy.Farmacology);
+                //    FormRegis.IsFood = !string.IsNullOrWhiteSpace(patientAllergy.Food);
+                //}
+                //else
+                //{
+                //    PatientAllergy = new PatientAllergyDto(); // Create a new instance if no allergy is found
+                //    FormRegis.IsWeather = FormRegis.IsPharmacology = FormRegis.IsFood = false;
+                //}
 
-                // Assign null to properties if patientAllergy is null or clear them if a new instance was created
-                PatientAllergy.Food ??= null;
-                PatientAllergy.Weather ??= null;
-                PatientAllergy.Farmacology ??= null;
+                //// Assign null to properties if patientAllergy is null or clear them if a new instance was created
+                //PatientAllergy.Food ??= null;
+                //PatientAllergy.Weather ??= null;
+                //PatientAllergy.Farmacology ??= null;
+
+                await GetPatientAllergy();
 
                 switch (FormRegis.StagingStatus)
                 {
@@ -2170,6 +2229,45 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 LoadingForm = false;
                 exx.HandleException(ToastService);
+            }
+        }
+
+        private async Task GetPatientAllergy()
+        {
+            FoodAllergies.Clear();
+            WeatherAllergies.Clear();
+            PharmacologyAllergies.Clear();
+            SelectedFoodAllergies = [];
+            SelectedWeatherAllergies = [];
+            SelectedPharmacologyAllergies = [];
+
+            // Filter allergies by type
+            FoodAllergies = Allergies.Where(x => x.Type == "01").ToList();
+            WeatherAllergies = Allergies.Where(x => x.Type == "02").ToList();
+            PharmacologyAllergies = Allergies.Where(x => x.Type == "03").ToList();
+
+            var p = patients.FirstOrDefault(z => z.Id == FormRegis.PatientId);
+
+            if (p is null || p.PatientAllergyIds is null)
+                return;
+
+            var allergies = await Mediator.Send(new GetAllergyQuery(x => p.PatientAllergyIds.Contains(x.Id)));
+            if (allergies.Count > 0)
+            {
+                // Assuming you have another list of selected allergies IDs
+                var selectedAllergyIds = allergies.Where(x => x.Type == "01" || x.Type == "02" || x.Type == "03").Select(x => x.Id).ToList();
+
+                // Select specific allergies by their IDs
+                SelectedFoodAllergies = FoodAllergies.Where(x => selectedAllergyIds.Contains(x.Id)).ToList();
+                SelectedWeatherAllergies = WeatherAllergies.Where(x => selectedAllergyIds.Contains(x.Id)).ToList();
+                SelectedPharmacologyAllergies = PharmacologyAllergies.Where(x => selectedAllergyIds.Contains(x.Id)).ToList();
+
+                if (SelectedFoodAllergies.Count() > 0)
+                    FormRegis.IsFood = true;
+                if (SelectedWeatherAllergies.Count() > 0)
+                    FormRegis.IsWeather = true;
+                if (SelectedPharmacologyAllergies.Count() > 0)
+                    FormRegis.IsPharmacology = true;
             }
         }
 
@@ -2791,7 +2889,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsLoadingSearchFaskes = false;
         }
 
-        private void SelectedItemPatientChanged(UserDto e)
+        private async Task SelectedItemPatientChanged(UserDto e)
         {
             if (e is null)
             {
@@ -2846,27 +2944,29 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }).ToList();
             }
 
-            var patientAlergy = PatientAllergies.Where(x => x.UserId == item!.Id).FirstOrDefault();
+            await GetPatientAllergy();
 
-            if (patientAlergy is not null)
-            {
-                PatientAllergy = patientAlergy;
-                PatientAllergy.Food = patientAlergy.Food;
-                PatientAllergy.Weather = patientAlergy.Weather;
-                PatientAllergy.Farmacology = patientAlergy.Farmacology;
-                FormRegis.IsWeather = !string.IsNullOrWhiteSpace(patientAlergy.Weather);
-                FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(patientAlergy.Farmacology);
-                FormRegis.IsFood = !string.IsNullOrWhiteSpace(patientAlergy.Food);
-            }
-            else
-            {
-                PatientAllergy.Food = null;
-                PatientAllergy.Weather = null;
-                PatientAllergy.Farmacology = null;
-                FormRegis.IsWeather = false;
-                FormRegis.IsPharmacology = false;
-                FormRegis.IsFood = false;
-            }
+            //var patientAlergy = PatientAllergies.Where(x => x.UserId == item!.Id).FirstOrDefault();
+
+            //if (patientAlergy is not null)
+            //{
+            //    PatientAllergy = patientAlergy;
+            //    PatientAllergy.Food = patientAlergy.Food;
+            //    PatientAllergy.Weather = patientAlergy.Weather;
+            //    PatientAllergy.Farmacology = patientAlergy.Farmacology;
+            //    FormRegis.IsWeather = !string.IsNullOrWhiteSpace(patientAlergy.Weather);
+            //    FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(patientAlergy.Farmacology);
+            //    FormRegis.IsFood = !string.IsNullOrWhiteSpace(patientAlergy.Food);
+            //}
+            //else
+            //{
+            //    PatientAllergy.Food = null;
+            //    PatientAllergy.Weather = null;
+            //    PatientAllergy.Farmacology = null;
+            //    FormRegis.IsWeather = false;
+            //    FormRegis.IsPharmacology = false;
+            //    FormRegis.IsFood = false;
+            //}
         }
 
         private void SelectedItemChanged(String e)
