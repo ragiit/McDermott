@@ -1,5 +1,6 @@
 ﻿@page "/clinic-service/general-consultation-service"
 @rendermode InteractiveServer
+
 <PageTitle>McHealthCare - Transaction General Consultation Service</PageTitle>
 
 @if (IsAccess)
@@ -444,7 +445,6 @@
                                                                                                             Mask="@DateTimeMask.ShortDate"
                                                                                                             NullText="Select Start Date">
                                                                                                 </DxDateEdit>
-
                                                                                             </Template>
                                                                                         </DxGridLayoutItem>
                                                                                         <DxGridLayoutItem Row="0" Column="1">
@@ -466,41 +466,109 @@
                                                 <DxFormLayout>
                                                     <DxFormLayoutGroup Caption="Allergy Data" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                                                         <Items>
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="2">
-                                                                <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Checked="@FormRegis.IsWeather" />
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="12">
+                                                                <div class="row w-100">
+                                                                    <div class="col-md-1">
+                                                                        <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Checked="@FormRegis.IsWeather" />
+                                                                    </div>
+                                                                    <div class="col-md-11">
+                                                                        @if (PatientAllergy.Weather is not null || FormRegis.IsWeather)
+                                                                        {
+                                                                            <DxTagBox Data="@WeatherAllergies"
+                                                                                      NullText="Select Allergy..."
+                                                                                      ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                      @bind-Values="@SelectedWeatherAllergies"
+                                                                                      EditFormat="{1}"
+                                                                                      InputId="tbMultiColumn">
+                                                                                <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                                                                                                    Caption="Code"
+                                                                                                    Width="100px" />
+                                                                                <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                                    Caption="Name" />
+                                                                                <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                                                                                                    Caption="Type" />
+                                                                            </DxTagBox>
+                                                                        }
+                                                                    </div>
+                                                                </div>
                                                             </DxFormLayoutItem>
-                                                            <DxFormLayoutItem ColSpanMd="10" Caption="">
-                                                                @if (PatientAllergy.Weather is not null || FormRegis.IsWeather)
-                                                                {
-                                                                    <DxMemo ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Text="@PatientAllergy.Weather"
-                                                                            NullText="Weather"
-                                                                            ShowValidationIcon="true"
-                                                                            Rows="1" />
-                                                                }
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacology" ColSpanMd="12">
+                                                                <div class="row w-100">
+                                                                    <div class="col-md-1">
+                                                                        <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Checked="@FormRegis.IsPharmacology" />
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        @if (PatientAllergy.Farmacology is not null || FormRegis.IsPharmacology)
+                                                                        {
+                                                                            <DxTagBox Data="@PharmacologyAllergies"
+                                                                                      ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))"
+                                                                                      NullText="Select Allergy..."
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                      @bind-Values="@SelectedPharmacologyAllergies"
+                                                                                      EditFormat="{1}"
+                                                                                      InputId="tbMultiColumn">
+                                                                                <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                                                                                                    Caption="Code"
+                                                                                                    Width="100px" />
+                                                                                <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                                    Caption="Name" />
+                                                                                <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                                                                                                    Caption="Type" />
+                                                                            </DxTagBox>
+                                                                        }
+                                                                    </div>
+                                                                </div>
                                                             </DxFormLayoutItem>
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacology" ColSpanMd="2">
-                                                                <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Checked="@FormRegis.IsPharmacology" />
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="12">
+                                                                <div class="row w-100">
+                                                                    <div class="col-md-1">
+                                                                        <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Checked="@FormRegis.IsFood" />
+                                                                    </div>
+                                                                    <div class="col-md-11">
+                                                                        @if (PatientAllergy.Food is not null || FormRegis.IsFood)
+                                                                        {
+                                                                            <DxTagBox Data="@FoodAllergies"
+                                                                                      NullText="Select Allergy..."
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                      @bind-Values="@SelectedFoodAllergies"
+                                                                                      EditFormat="{1}"
+                                                                                      ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))"
+                                                                                      InputId="tbMultiColumn">
+                                                                                <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                                                                                                    Caption="Code"
+                                                                                                    Width="100px" />
+                                                                                <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                                    Caption="Name" />
+                                                                                <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                                                                                                    Caption="Type" />
+                                                                            </DxTagBox>
+                                                                        }
+                                                                    </div>
+                                                                </div>
                                                             </DxFormLayoutItem>
-                                                            <DxFormLayoutItem ColSpanMd="10">
-                                                                @if (PatientAllergy.Farmacology is not null || FormRegis.IsPharmacology)
-                                                                {
-                                                                    <DxMemo ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Text="@PatientAllergy.Farmacology"
-                                                                            NullText="Pharmacology"
-                                                                            ShowValidationIcon="true"
-                                                                            Rows="1" />
-                                                                }
-                                                            </DxFormLayoutItem>
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="2">
-                                                                <DxCheckBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Checked="@FormRegis.IsFood" />
-                                                            </DxFormLayoutItem>
-                                                            <DxFormLayoutItem ColSpanMd="10">
-                                                                @if (PatientAllergy.Food is not null || FormRegis.IsFood)
-                                                                {
-                                                                    <DxMemo ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))" @bind-Text="@PatientAllergy.Food" NullText="Food"
-                                                                            ShowValidationIcon="true"
-                                                                            Rows="1" />
-                                                                }
-                                                            </DxFormLayoutItem>
+                                                            @*  <DxFormLayoutItem ColSpanMd="10">
+                                                @if (PatientAllergy.Food is not null || FormRegis.IsFood)
+                                                {
+                                                <DxTagBox Data="@FoodAllergies"
+                                                NullText="Select Allergy..."
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                @bind-Values="@SelectedFoodAllergies"
+                                                EditFormat="{1}"
+                                                ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned") && !FormRegis.StagingStatus!.Equals("Physician"))"
+                                                InputId="tbMultiColumn">
+                                                <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                                                Caption="Code"
+                                                Width="100px" />
+                                                <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                Caption="Name" />
+                                                <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                                                Caption="Type" />
+                                                </DxTagBox>
+                                                }
+                                                </DxFormLayoutItem> *@
 
                                                         </Items>
                                                     </DxFormLayoutGroup>
