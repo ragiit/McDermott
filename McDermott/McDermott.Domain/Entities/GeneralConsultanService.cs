@@ -34,6 +34,23 @@
         public string? SerialNo { get; set; } // NoUrut
 
 
+        /// <BPJS Rujukan>
+        public string? ReferVerticalKhususCategoryName { get; set; }
+        public string? ReferVerticalKhususCategoryCode { get; set; }
+        public string? ReferVerticalSpesialisParentSpesialisName { get; set; }
+        public string? ReferVerticalSpesialisParentSpesialisCode { get; set; }
+        public string? ReferVerticalSpesialisParentSubSpesialisName { get; set; }
+        public string? ReferVerticalSpesialisParentSubSpesialisCode { get; set; }
+        public string? ReferReason { get; set; } = "-"; // Catatan
+        public bool? IsSarana { get; set; } = false;
+        public string? ReferVerticalSpesialisSaranaName { get; set; }
+        public string? ReferVerticalSpesialisSaranaCode { get; set; }
+        public string? PPKRujukanName { get; set; }
+        public string? PPKRujukanCode { get; set; }
+        public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
+        /// </BPJS Rujukan>
+
+
 
         [SetToNull]
         public virtual User? Patient { get; set; }

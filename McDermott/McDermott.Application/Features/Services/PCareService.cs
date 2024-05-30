@@ -175,9 +175,16 @@ namespace McDermott.Application.Features.Services
                     dynamic metaData = responseJson.metaData;
 
                     string LZDecrypted = PCareWebServiceDecrypt(a, r);
-                    string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
+                    try
+                    {
+                        string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
+                        return (result, Convert.ToInt32(response.StatusCode));
+                    }
+                    catch
+                    {
+                        return (r, Convert.ToInt32(response.StatusCode));
+                    }
 
-                    return (result, Convert.ToInt32(response.StatusCode));
                 }
                 else
                 {
