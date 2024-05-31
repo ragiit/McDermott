@@ -326,7 +326,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                     {
                         FormStockProduct.SourceId = GetReceivingStock.DestinationId;
                         FormStockProduct.ProductId = a.ProductId;
-                        FormStockProduct.UomId = a.Product.UomId;
+                        FormStockProduct.UomId = a?.Product?.UomId;
+                        if (FormReceivingDetailStock.TraceAbility == true)
+                        {
+                            FormStockProduct.Batch = a?.Batch;
+                            FormStockProduct.Expired = a?.ExpiredDate;
+                        }
                         if (TempFormReceivingStockDetail.TraceAbility == true)
                         {
                             FormStockProduct.Expired = a.ExpiredDate;
@@ -340,6 +345,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     {
                         var totalQty = a.Qty * x.BiggerRatio.ToLong();
                         checkStok!.Qty = checkStok.Qty + a.Qty;
+
                         await Mediator.Send(new UpdateStockProductRequest(checkStok));
                     }
                 }
@@ -481,19 +487,22 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 if (FormReceivingStocks.Id == 0)
                 {
-                    var getReceiving = ReceivingStocks.Where(r=>r.DestinationId == FormReceivingStocks.DestinationId).OrderByDescending(x => x.KodeTransaksi).Select(x => x.KodeTransaksi).FirstOrDefault();
-                    if(getReceiving == null)
+                    var getReceiving = ReceivingStocks.Where(r => r.DestinationId == FormReceivingStocks.DestinationId).OrderByDescending(x => x.KodeReceiving).Select(x => x.KodeReceiving).FirstOrDefault();
+                    if (getReceiving == null)
                     {
                         var nextTransactionNumber = 1;
-                        FormReceivingStocks.KodeTransaksi = $"WH-IN/{nextTransactionNumber.ToString("0000")}";
+                        FormReceivingStocks.KodeReceiving = $"WH-IN/{nextTransactionNumber.ToString("0000")}";
                     }
                     else
                     {
                         var lastTransactionNumber = 0;
                         if (getReceiving.Contains("WH-IN/"))
                         {
-
+                            var lastTransactionNumberStr = getReceiving.Split('/')[2];
+                            int.TryParse(lastTransactionNumberStr, out lastTransactionNumber);
                         }
+                        var nextTransactionNumber = lastTransactionNumber + 1;
+                        FormReceivingStocks.KodeReceiving = $"WH-IN/{nextTransactionNumber.ToString("0000")}";
                     }
 
                     FormReceivingStocks.StatusReceived = "Draft";

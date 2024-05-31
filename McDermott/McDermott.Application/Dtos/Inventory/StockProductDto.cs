@@ -18,7 +18,7 @@ namespace McDermott.Application.Dtos.Inventory
         public long? Qty { get; set; }
 
         public long? UomId { get; set; }
-        public DateTime? Expired { get; set; } = DateTime.Now;
+        public DateTime? Expired { get; set; }
 
         [Required(ErrorMessage = "Please Select Source Location..")]
         public long? SourceId { get; set; }

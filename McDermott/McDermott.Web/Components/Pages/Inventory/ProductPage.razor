@@ -386,10 +386,7 @@
                                                 SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                                 KeyboardNavigationEnabled="true">
                                             <ToolbarTemplate>
-                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStock_Click" IconCssClass="fa-solid fa-plus" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItemStock_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && StockProducts.Count > 0" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStock_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && StockProducts.Count > 0" />
+                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">                                                    
                                                     <DxToolbarItem BeginGroup="true" Text="Back To Product" Click="Back_Click" IconCssClass="fa-solid fa-arrow-left" />
                                                     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshStock_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                 </DxToolbar>

@@ -10,8 +10,10 @@ namespace McDermott.Domain.Entities
     {
         public long? DestinationId { get; set; }
         public DateTime? SchenduleDate { get; set; }
-        public string? KodeTransaksi { get; set; }
+
+        public string? KodeReceiving { get; set; }
         public string? Reference { get; set; }
+
         public string? StatusReceived { get; set; }
 
         [SetToNull]

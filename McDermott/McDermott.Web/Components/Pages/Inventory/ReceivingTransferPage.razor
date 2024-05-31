@@ -80,7 +80,7 @@
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Name" />
                                             <DxGridDataColumn FieldName="SchenduleDate" Caption="Schendule Date" />
-                                            <DxGridDataColumn FieldName="StatusReceived" Caption="Status" >
+                                            <DxGridDataColumn FieldName="StatusReceived" Caption="Status">
                                                 <CellDisplayTemplate>
                                                     @GetIssueStatusIconHtml((context.DataItem as ReceivingStockDto).StatusReceived)
                                                 </CellDisplayTemplate>
@@ -100,7 +100,7 @@
                             <div class="row justify-content-end mb-3">
                                 <div class="col-auto align-self-end">
                                     <DxTabs RenderMode="TabsRenderMode.AllTabs">
-                                        <DxTab Text="Draft" Enabled="@(FormReceivingStocks.StatusReceived == "Draft")"></DxTab>                                        
+                                        <DxTab Text="Draft" Enabled="@(FormReceivingStocks.StatusReceived == "Draft")"></DxTab>
                                         <DxTab Text="Done" Enabled="@(FormReceivingStocks.StatusReceived == "Done")"></DxTab>
                                         <DxTab Text="Cancel" Enabled="@(FormReceivingStocks.StatusReceived == "Cancel")"></DxTab>
                                     </DxTabs>
@@ -129,6 +129,12 @@
                                 <EditForm Model="@FormReceivingStocks" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
                                     <DataAnnotationsValidator />
                                     <DxFormLayout CssClass="mt">
+                                        @if (FormReceivingStocks.Id != 0)
+                                        {
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <h3 class="fw-bolder">@FormReceivingStocks.KodeReceiving</h3>
+                                            </DxFormLayoutItem>
+                                        }
                                         <DxFormLayoutItem Caption="Schendule Date" CaptionCssClass="normal-caption" ColSpanMd="12">
                                             <DxDateEdit @bind-Date="@FormReceivingStocks.SchenduleDate" Enabled="@isActiveButton" DisplayFormat="dd MMMM yyyy" Format="d"></DxDateEdit>
                                         </DxFormLayoutItem>
@@ -141,7 +147,7 @@
                                                         TextFieldName="NameAndParent"
                                                         ValueFieldName="Id"
                                                         Enabled="@isActiveButton"></DxComboBox>
-                                                        <ValidationMessage For="@(()=>FormReceivingStocks.DestinationId)"></ValidationMessage>
+                                            <ValidationMessage For="@(()=>FormReceivingStocks.DestinationId)"></ValidationMessage>
                                         </DxFormLayoutItem>
                                         <DxFormLayoutGroup Caption="Product Lines" ColSpanMd="12">
                                             <Items>
@@ -179,7 +185,7 @@
                                                         KeyboardNavigationEnabled="true">
                                                     <ToolbarTemplate>
                                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="isActiveButton"/>
+                                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="isActiveButton" />
                                                             <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempReceivingStockDetails.Count > 0 && isActiveButton" />
                                                             <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempReceivingStockDetails.Count > 0 && isActiveButton" />
 
@@ -199,6 +205,7 @@
                                                             TempFormReceivingStockDetail = (ReceivingStockProductDto)EditFormContextt.EditModel;
                                                         }
                                                         <DxFormLayout CssClass="w-100 mt">
+
                                                             <div class="col-md-6">
                                                                 <DxFormLayoutItem Caption="Product Name" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                     <DxComboBox Data="@Products"

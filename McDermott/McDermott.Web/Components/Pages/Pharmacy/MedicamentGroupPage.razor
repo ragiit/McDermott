@@ -1,7 +1,6 @@
 ﻿@page "/pharmacy/medicament-group"
 @rendermode InteractiveServer
 
-@using Microsoft.AspNetCore.Components
 <PageTitle>Pharmacy - Medicament Group</PageTitle>
 <style>
     .my-style {
@@ -113,8 +112,7 @@
                                                             ShowValidationIcon="true"></DxComboBox>
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem Caption=" " ColSpanMd="6">
-                                            </DxFormLayoutItem>
+                                           
 
                                             @if (MGForm.IsConcoction == true)
                                             {
@@ -184,7 +182,7 @@
                                                             <DxGridDataColumn MinWidth="200" FieldName="ActiveComponentName" Caption="Active Component" />
                                                             <DxGridDataColumn MinWidth="200" FieldName="MedicaneDosage" Caption="Medicament Dosage" />
                                                             <DxGridDataColumn MinWidth="200" FieldName="MedicaneUnitDosage" Caption="Medicament Unit Of Dosage" />
-                                                            @if (MGForm.IsConcoction == true)
+                                                            @if (MGForm.IsConcoction == false)
                                                             {
                                                                 @* <DxGridDataColumn MinWidth="200" FieldName="ActiveComponent.Name" Caption="Allow Substitution" /> *@
                                                                 <DxGridDataColumn MinWidth="200" FieldName="FrequencyName" Caption="Dosage Frequency" />
@@ -231,10 +229,7 @@
                                                                             <DxFormLayoutItem Caption="Medicines Unit Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                 <DxTextBox @bind-Text="@FormMedicamenDetails.MedicaneUnitDosage" ReadOnly></DxTextBox>
                                                                             </DxFormLayoutItem>
-                                                                            @* <DxFormLayoutItem Caption="Allow Subtitutions" ColSpanMd="12">
-                                                                    <DxCheckBox @bind-Checked="@FormMedicamenDetails.AllowSubtitation"
-                                                                    LabelPosition="LabelPosition.Left" CssClass="w-100" />
-                                                                    </DxFormLayoutItem> *@
+                                                                            
                                                                             <DxFormLayoutItem Caption="Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                 <DxSpinEdit Value="@FormMedicamenDetails.Dosage"
                                                                                             ValueExpression="@(()=>FormMedicamenDetails.Dosage)"
