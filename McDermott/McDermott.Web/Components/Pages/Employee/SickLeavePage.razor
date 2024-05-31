@@ -59,25 +59,24 @@
                                         KeyboardNavigationEnabled="true">
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn FieldName="PatientId" AllowSort="false"Width="90px" MinWidth="200" TextAlignment="GridTextAlignment.Center">
+                                        <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="70px" MinWidth="200" TextAlignment="GridTextAlignment.Center">
                                             <CellDisplayTemplate>
-                                                <DxButton RenderStyle="ButtonRenderStyle.Success"
-                                                         
+                                                <DxButton RenderStyle="ButtonRenderStyle.Success"                                                         
                                                           Attributes="@(new Dictionary<string, object> {  ["title"] = "Print" })"
                                                           IconCssClass="fa-solid fa-print"
                                                           CssClass="me-1" />
-                                                <DxButton RenderStyle="ButtonRenderStyle.Primary"
-                                                          
+
+                                                <DxButton RenderStyle="ButtonRenderStyle.Primary"                                                          
                                                           Attributes="@(new Dictionary<string, object> {  ["title"] = "Send To Email" })"
                                                           IconCssClass="fa-solid fa-paper-plane"
                                                           IconPosition="ButtonIconPosition.AfterText" />
                                             </CellDisplayTemplate>
-                                            <HeaderCaptionTemplate>Details</HeaderCaptionTemplate>
+                                            <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
                                         </DxGridDataColumn>
                                         <DxGridDataColumn MinWidth="200" FieldName="PatientName" Caption="Patient Name" />
                                         <DxGridDataColumn MinWidth="200" FieldName="NoRM" Caption="NO RM" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="StartSickLeave" Caption="Start Date" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="EndSickLeave" Caption="End Date" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="StartSickLeave" Caption="Start Date" DisplayFormat="dd MMMM yyyy"/>
+                                        <DxGridDataColumn MinWidth="200" FieldName="EndSickLeave" Caption="End Date" DisplayFormat="dd MMMM yyyy" />
                                         <DxGridDataColumn MinWidth="200" FieldName="Diagnosis" Caption="Diagnosis" />
                                     </Columns>
                                 </DxGrid>

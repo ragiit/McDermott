@@ -481,6 +481,21 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 if (FormReceivingStocks.Id == 0)
                 {
+                    var getReceiving = ReceivingStocks.Where(r=>r.DestinationId == FormReceivingStocks.DestinationId).OrderByDescending(x => x.KodeTransaksi).Select(x => x.KodeTransaksi).FirstOrDefault();
+                    if(getReceiving == null)
+                    {
+                        var nextTransactionNumber = 1;
+                        FormReceivingStocks.KodeTransaksi = $"WH-IN/{nextTransactionNumber.ToString("0000")}";
+                    }
+                    else
+                    {
+                        var lastTransactionNumber = 0;
+                        if (getReceiving.Contains("WH-IN/"))
+                        {
+
+                        }
+                    }
+
                     FormReceivingStocks.StatusReceived = "Draft";
 
                     GetReceivingStock = await Mediator.Send(new CreateReceivingStockRequest(FormReceivingStocks));

@@ -5,8 +5,10 @@
         #region Relation Data
 
         private List<GeneralConsultanServiceDto> generalConsultans = [];
-        private List<UserDto> Users = [];
+        private List<GeneralConsultanCPPTDto> CPPTs = [];
+        private List<DiagnosisDto> Diagnoses = [];
         private List<SickLeaveDto> SickLeaves = [];
+        private List<UserDto> Users = [];
 
         #endregion Relation Data
 
@@ -74,11 +76,35 @@
 
         private async Task LoadData()
         {
-            IsLoading = true;
-            generalConsultans = await Mediator.Send(new GetGeneralConsultanServiceQuery());
-            Users = await Mediator.Send(new GetUserQuery());
+            try
+            {
+                IsLoading = true;
+                generalConsultans = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.IsSickLeave == true || x.IsMaternityLeave == true));
+                Users = await Mediator.Send(new GetUserQuery());
+                CPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery());
+                Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
 
-            IsLoading = false;
+                foreach (var item in generalConsultans)
+                {
+                    var BodyCPPT = CPPTs.Where(x => x.GeneralConsultanServiceId == item.Id && x.Title == "Diagnosis").Select(x => x.Body).FirstOrDefault();
+                    var diagnosis = Diagnoses.Where(x => BodyCPPT!.Contains(x.Name)).Select(x => x.Name).FirstOrDefault();
+                    var newDataGridSickLeave = new SickLeaveDto
+                    {
+                        PatientName = item.Patient.Name,
+                        NoRM = item.NoRM,
+                        StartSickLeave = item.StartDateSickLeave,
+                        EndSickLeave = item.EndDateSickLeave,
+                        Diagnosis = diagnosis
+                    };
+
+                    SickLeaves.Add(newDataGridSickLeave);
+                }
+                IsLoading = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         #endregion async Data
