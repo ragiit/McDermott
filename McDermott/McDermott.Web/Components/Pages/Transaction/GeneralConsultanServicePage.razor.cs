@@ -1,4 +1,5 @@
-﻿using QuestPDF.Fluent;
+﻿using Microsoft.Extensions.Caching.Memory;
+using QuestPDF.Fluent;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using static McDermott.Web.Components.Pages.Queue.KioskPage;
@@ -394,7 +395,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     return;
                 }
 
-                if (IsReferTo)
+                if (IsReferTo && SelectedRujukanType is not null && SelectedRujukanType == RujukanTypes.ToList()[0])
                 {
                     FormRegis.Id = 0;
                     FormRegis.StagingStatus = "Planned";
@@ -510,7 +511,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                                     GeneralConsultantClinical = await Mediator.Send(new UpdateGeneralConsultantClinicalAssesmentRequest(GeneralConsultantClinical));
                                 }
 
-                                FormRegis = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+                                await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
 
                                 await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: FormRegis.Id));
 
@@ -548,11 +549,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                 //FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
                 //FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
 
-                if (SelectedFoodAllergies.Count() > 0)
+                if (SelectedFoodAllergies.Any())
                     FormRegis.IsFood = true;
-                if (SelectedWeatherAllergies.Count() > 0)
+                if (SelectedWeatherAllergies.Any())
                     FormRegis.IsWeather = true;
-                if (SelectedPharmacologyAllergies.Count() > 0)
+                if (SelectedPharmacologyAllergies.Any())
                     FormRegis.IsPharmacology = true;
 
                 ToastService.ShowSuccess("Saved Successfully");
@@ -2386,6 +2387,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 await SendPCareGetRefrensiKhusus();
                 await SendPcareGetSpesialis();
                 await SendPcareGetSpesialisSarana();
+
                 //await SetTimeSchedule();
             }
             catch (Exception ex)
@@ -2404,29 +2406,39 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (FormRegis.ReferVerticalKhususCategoryCode is not null && (FormRegis.ReferVerticalKhususCategoryCode.Equals("THA") || FormRegis.ReferVerticalKhususCategoryCode.Equals("HEM")))
                 {
                     var result = await PcareService.SendPCareService($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+
+                    Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
+
                     if (result.Item2 == 200)
                     {
-                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
-
-                        var dynamicList = (IEnumerable<dynamic>)data.list;
-
-                        var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
+                        if (result.Item1 is null)
                         {
-                            Kdppk = item.kdppk,
-                            Nmppk = item.nmppk,
-                            AlamatPpk = item.alamatPpk,
-                            TelpPpk = item.telpPpk,
-                            Kelas = item.kelas,
-                            Nmkc = item.nmkc,
-                            Distance = item.distance,
-                            Jadwal = item.jadwal,
-                            JmlRujuk = item.jmlRujuk,
-                            Kapasitas = item.kapasitas,
-                            Persentase = item.persentase,
-                        }).ToList();
+                            RujukanSubSpesialis.Clear();
+                        }
+                        else
+                        {
+                            dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                        RujukanSubSpesialis.Clear();
-                        RujukanSubSpesialis = a;
+                            var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                            var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
+                            {
+                                Kdppk = item.kdppk,
+                                Nmppk = item.nmppk,
+                                AlamatPpk = item.alamatPpk,
+                                TelpPpk = item.telpPpk,
+                                Kelas = item.kelas,
+                                Nmkc = item.nmkc,
+                                Distance = item.distance,
+                                Jadwal = item.jadwal,
+                                JmlRujuk = item.jmlRujuk,
+                                Kapasitas = item.kapasitas,
+                                Persentase = item.persentase,
+                            }).ToList();
+
+                            RujukanSubSpesialis.Clear();
+                            RujukanSubSpesialis = a;
+                        }
                     }
                     else
                     {
@@ -2488,30 +2500,38 @@ namespace McDermott.Web.Components.Pages.Transaction
                 Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/sarana/{FormRegis.ReferVerticalSpesialisSaranaCode}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
                 if (result.Item2 == 200)
                 {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
-
-                    var dynamicList = (IEnumerable<dynamic>)data.list;
-
-                    var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
+                    if (result.Item1 is null)
                     {
-                        Kdppk = item.kdppk,
-                        Nmppk = item.nmppk,
-                        AlamatPpk = item.alamatPpk,
-                        TelpPpk = item.telpPpk,
-                        Kelas = item.kelas,
-                        Nmkc = item.nmkc,
-                        Distance = item.distance,
-                        Jadwal = item.jadwal,
-                        JmlRujuk = item.jmlRujuk,
-                        Kapasitas = item.kapasitas,
-                        Persentase = item.persentase,
-                    }).ToList();
+                        RujukanSubSpesialis.Clear();
+                    }
+                    else
+                    {
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                    RujukanSubSpesialis.Clear();
-                    RujukanSubSpesialis = a;
+                        var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                        var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
+                        {
+                            Kdppk = item.kdppk,
+                            Nmppk = item.nmppk,
+                            AlamatPpk = item.alamatPpk,
+                            TelpPpk = item.telpPpk,
+                            Kelas = item.kelas,
+                            Nmkc = item.nmkc,
+                            Distance = item.distance,
+                            Jadwal = item.jadwal,
+                            JmlRujuk = item.jmlRujuk,
+                            Kapasitas = item.kapasitas,
+                            Persentase = item.persentase,
+                        }).ToList();
+
+                        RujukanSubSpesialis.Clear();
+                        RujukanSubSpesialis = a;
+                    }
                 }
                 else
                 {
+                    RujukanSubSpesialis.Clear();
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
                     ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
@@ -2564,27 +2584,33 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                var result = await PcareService.SendPCareService($"spesialis", HttpMethod.Get);
-                if (result.Item2 == 200)
+                string cacheKey = $"spesialis";
+                if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisPCare>? r))
                 {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
-
-                    var dynamicList = (IEnumerable<dynamic>)data.list;
-
-                    var a = dynamicList.Select(item => new SpesialisPCare
+                    var result = await PcareService.SendPCareService($"spesialis", HttpMethod.Get);
+                    if (result.Item2 == 200)
                     {
-                        KdSpesialis = item.kdSpesialis,
-                        NmSpesialis = item.nmSpesialis
-                    }).ToList();
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                    SpesialisPs = a;
-                }
-                else
-                {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                        var dynamicList = (IEnumerable<dynamic>)data.list;
 
-                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                        r = dynamicList.Select(item => new SpesialisPCare
+                        {
+                            KdSpesialis = item.kdSpesialis,
+                            NmSpesialis = item.nmSpesialis
+                        }).ToList();
+
+                        MemoryCache.Set(cacheKey, r, TimeSpan.FromMinutes(15));
+                    }
+                    else
+                    {
+                        MemoryCache.Remove(cacheKey);
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                    }
                 }
+
+                SpesialisPs = r ?? [];
             }
             catch (Exception ex)
             {
@@ -2599,27 +2625,33 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                var result = await PcareService.SendPCareService($"spesialis/sarana", HttpMethod.Get);
-                if (result.Item2 == 200)
+                string cacheKey = $"spesialis/sarana";
+                if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisSaranaPCare>? r))
                 {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
-
-                    var dynamicList = (IEnumerable<dynamic>)data.list;
-
-                    var a = dynamicList.Select(item => new SpesialisSaranaPCare
+                    var result = await PcareService.SendPCareService($"spesialis/sarana", HttpMethod.Get);
+                    if (result.Item2 == 200)
                     {
-                        KdSarana = item.kdSarana,
-                        NmSarana = item.nmSarana
-                    }).ToList();
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                    SpesialisSaranas = a;
-                }
-                else
-                {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                        var dynamicList = (IEnumerable<dynamic>)data.list;
 
-                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                        r = dynamicList.Select(item => new SpesialisSaranaPCare
+                        {
+                            KdSarana = item.kdSarana,
+                            NmSarana = item.nmSarana
+                        }).ToList();
+
+                        MemoryCache.Set(cacheKey, r, TimeSpan.FromMinutes(15));
+                    }
+                    else
+                    {
+                        MemoryCache.Remove(cacheKey);
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                    }
                 }
+
+                SpesialisSaranas = r ?? [];
             }
             catch (Exception ex)
             {
@@ -2634,27 +2666,32 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                var result = await PcareService.SendPCareService($"spesialis/khusus", HttpMethod.Get);
-                if (result.Item2 == 200)
+                string cacheKey = $"spesialis/khusus";
+                if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisRefrensiKhususPCare>? r))
                 {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
-
-                    var dynamicList = (IEnumerable<dynamic>)data.list;
-
-                    var a = dynamicList.Select(item => new SpesialisRefrensiKhususPCare
+                    var result = await PcareService.SendPCareService($"spesialis/khusus", HttpMethod.Get);
+                    if (result.Item2 == 200)
                     {
-                        KdKhusus = item.kdKhusus,
-                        NmKhusus = item.nmKhusus
-                    }).ToList();
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                    SpesialisRefrensiKhusus = a;
-                }
-                else
-                {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                        var dynamicList = (IEnumerable<dynamic>)data.list;
 
-                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                        r = dynamicList.Select(item => new SpesialisRefrensiKhususPCare
+                        {
+                            KdKhusus = item.kdKhusus,
+                            NmKhusus = item.nmKhusus
+                        }).ToList();
+                        MemoryCache.Set(cacheKey, r, TimeSpan.FromMinutes(15));
+                    }
+                    else
+                    {
+                        MemoryCache.Remove(cacheKey);
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                    }
                 }
+
+                SpesialisRefrensiKhusus = r ?? [];
             }
             catch (Exception ex)
             {
@@ -2665,9 +2702,12 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task CloseReferTo()
         {
             PopUpVisible = false;
-            var value = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
-            if (value.Count > 0)
-                FormRegis = value[0];
+            if (!IsSelectedFaskes)
+            {
+                var value = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
+                if (value.Count > 0)
+                    FormRegis = value[0];
+            }
         }
 
         private async Task CloseAppoimentPopUp()
@@ -2878,15 +2918,52 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task OnClickSearchFaskes()
         {
             IsLoadingSearchFaskes = true;
-            if (SelectedRujukanExternal.Equals(RujukanExtenalTypes.ToList()[0])) // Khusus
+            try
             {
-                await SendPcareGetFaskesRujukanKhusus();
+                if (SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[0])) // Khusus
+                {
+                    await SendPcareGetFaskesRujukanKhusus();
+                }
+                else // Spesialis
+                {
+                    await SendPcareGetFaskesSubSpesialis();
+                }
             }
-            else // Spesialis
+            catch (Exception)
             {
-                await SendPcareGetFaskesSubSpesialis();
             }
             IsLoadingSearchFaskes = false;
+        }
+
+        private bool IsSelectedFaskes { get; set; } = false;
+
+        private void SelectedFaskesRujuk(RujukanFaskesKhususSpesialisPCare e)
+        {
+            try
+            {
+                IsSelectedFaskes = true;
+                if (e is null)
+                {
+                    IsSelectedFaskes = false;
+                    PopUpVisible = false;
+                    return;
+                }
+
+                var rujuk = RujukanSubSpesialis.FirstOrDefault(x => x.Kdppk == e.Kdppk);
+
+                if (rujuk is not null)
+                {
+                    FormRegis.PPKRujukanCode = rujuk.Kdppk;
+                    FormRegis.PPKRujukanName = rujuk.Nmppk ?? "-";
+                    FormRegis.ReferVerticalSpesialisParentSpesialisName = SpesialisPs.FirstOrDefault(x => x.KdSpesialis == FormRegis.ReferVerticalSpesialisParentSpesialisCode)?.NmSpesialis ?? "-";
+                    FormRegis.ReferVerticalSpesialisParentSubSpesialisName = SubSpesialisPs.FirstOrDefault(x => x.KdSubSpesialis == FormRegis.ReferVerticalSpesialisParentSubSpesialisCode)?.NmSubSpesialis ?? "-";
+                    FormRegis.ReferReason = FormRegis.ReferReason is null || SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[0]) ? "-" : FormRegis.ReferReason;
+                }
+                IsSelectedFaskes = true;
+            }
+            catch { }
+
+            PopUpVisible = false;
         }
 
         private async Task SelectedItemPatientChanged(UserDto e)
@@ -2915,15 +2992,15 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                FormRegis.NoRM = item.NoRm ?? null;
-                FormRegis.IdentityNumber = item.NoId ?? null;
+                FormRegis.NoRM = item?.NoRm ?? null;
+                FormRegis.IdentityNumber = item?.NoId ?? null;
                 FormRegis.PatientId = item.Id;
             }
             catch { }
 
             if (FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS"))
             {
-                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS == true).ToList();
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance != null && x.Insurance.IsBPJS == true).ToList();
                 Temps = all.Select(x => new InsuranceTemp
                 {
                     InsurancePolicyId = x.Id,
@@ -2934,7 +3011,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             else
             {
-                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS != true).ToList();
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance != null && x.Insurance.IsBPJS != true).ToList();
                 Temps = all.Select(x => new InsuranceTemp
                 {
                     InsurancePolicyId = x.Id,

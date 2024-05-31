@@ -7,6 +7,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.Extensions.Caching.Memory
 @using Microsoft.JSInterop
 @using McDermott.Web
 @using McDermott.Web.Components
@@ -24,6 +25,7 @@
 @inject IJSRuntime JsRuntime
 @inject IMediator Mediator
 @inject IJSRuntime oLocal
+@inject IMemoryCache MemoryCache
 
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient

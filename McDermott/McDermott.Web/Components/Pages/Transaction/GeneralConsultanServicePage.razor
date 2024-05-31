@@ -3,6 +3,14 @@
 
 <PageTitle>McHealthCare - Transaction General Consultation Service</PageTitle>
 
+<style>
+    .popup-content {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+</style>
+
 @if (IsAccess)
 {
     <div class="wrapper">
@@ -580,7 +588,7 @@
                                                         {
                                                             <DxTab Text="Clinical Assesment"></DxTab>
                                                             <DxTab Text="CPPT"></DxTab>
-                                                            <DxTab Visible="@(FormRegis.StagingStatus.Equals("Physician") || FormRegis.StagingStatus.Equals("Procedure Room") || FormRegis.StagingStatus.Equals("Finished"))" Text="BPJS Integration"></DxTab>
+                                                            <DxTab Visible="@(FormRegis.Payment.Equals("BPJS") && (FormRegis.StagingStatus.Equals("Physician") || FormRegis.StagingStatus.Equals("Procedure Room") || FormRegis.StagingStatus.Equals("Finished")))" Text="BPJS Integration"></DxTab>
                                                         }
                                                     </DxTabs>
 
@@ -827,20 +835,20 @@
                                                             <div class="w-100">
                                                                 <div class="col-md-6">
                                                                     <DxFormLayout CssClass="w-100">
-                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="No Rujukan" ColSpanMd="12">
-                                                                            <label>@UserLogin.Name</label>
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Number" ColSpanMd="12">
+                                                                            <label>-</label>
                                                                         </DxFormLayoutItem>
-                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PPK Rujukan" ColSpanMd="12">
-                                                                            <label>@UserLogin.Name</label>
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PPK Refer" ColSpanMd="12">
+                                                                            <label>@FormRegis.PPKRujukanName</label>
                                                                         </DxFormLayoutItem>
                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Spesialis/Subspesialis" ColSpanMd="12">
-                                                                            <label>@UserLogin.Name</label>
+                                                                            <label>@($"{FormRegis.ReferVerticalSpesialisParentSpesialisName}/{FormRegis.ReferVerticalSpesialisParentSubSpesialisName}")</label>
                                                                         </DxFormLayoutItem>
-                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Catatan" ColSpanMd="12">
-                                                                            <label>@UserLogin.Name</label>
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Note" ColSpanMd="12">
+                                                                            <label>@FormRegis.ReferReason</label>
                                                                         </DxFormLayoutItem>
-                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Tgl. Rencana Berkunjung" ColSpanMd="12">
-                                                                            <label>@UserLogin.Name</label>
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Date Visit" ColSpanMd="12">
+                                                                            <label>@FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")</label>
                                                                         </DxFormLayoutItem>
                                                                     </DxFormLayout>
                                                                 </div>
@@ -1285,194 +1293,209 @@ else
     </div>
 }
 
-<DxPopup HeaderText="Refer To" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Closing="CloseReferTo" Width="auto" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center">
+<DxPopup Context="P" HeaderText="Refer To" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Closing="CloseReferTo" Width="90%" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center">
+    <BodyContentTemplate>
+        <div class="popup-content">
+            <DxFormLayout CssClass="100">
+                <DxFormLayout CssClass="w-100">
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Type" ColSpanMd="6">
+                        <DxComboBox ShowValidationIcon="true" Data="@RujukanTypes"
+                                    NullText="Select Refer Type..."
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    FilteringMode="@DataGridFilteringMode.Contains"
+                                    @bind-Value="SelectedRujukanType">
+                        </DxComboBox>
+                    </DxFormLayoutItem>
 
-    <DxFormLayout CssClass="w-100">
-        <DxFormLayoutItem ColSpanMd="12" Context="LayoutA">
-            <DxRadioGroup Items="@RujukanTypes"
-                          ItemAlignment="CheckBoxContentAlignment.SpaceBetween"
-                          @bind-Value="@SelectedRujukanType"
-                          Layout="@RadioGroupLayout.Horizontal" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem ColSpanMd="12" Context="LayoutT">
-            @if (SelectedRujukanType is not null && SelectedRujukanType.Equals(RujukanTypes.ToList()[0]))
-            {
-                <EditForm Model="@FormRegis" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
-                    <DataAnnotationsValidator />
-                    <DxFormLayout>
-                        <DxFormLayoutGroup Caption="General" ColSpanMd="12">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <DxFormLayout Enabled="false" CssClass="mt ">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Patient" ColSpanMd="12">
-                                            <DxComboBox ShowValidationIcon="true"
-                                                        Data="@patients"
-                                                        NullText="Select Patient..."
-                                                        @bind-Value="@FormRegis.PatientId"
-                                                        TextFieldName="Name"
-                                                        SelectedItemChanged="@((UserDto e) => SelectedItemPatientChanged(e))"
-                                                        ValueFieldName="Id">
-                                            </DxComboBox>
-                                            <ValidationMessage For="@(() => FormRegis.PatientId)"   />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@FormRegis.NoRM" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@FormRegis.IdentityNumber" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
-                                            <Template>
-                                                <DxGridLayout>
-                                                    <Rows>
-                                                        <DxGridLayoutRow />
-                                                    </Rows>
-                                                    <Columns>
-                                                        <DxGridLayoutColumn Width="90%" />
-                                                        <DxGridLayoutColumn Width="30%" />
-                                                    </Columns>
-                                                    <Items>
-                                                        <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption=" " ColSpanMd="6">
+
+                    </DxFormLayoutItem>
+
+                    @if (SelectedRujukanType is not null && SelectedRujukanType.Equals(RujukanTypes.ToList()[1]))
+                    {
+                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer" ColSpanMd="6">
+                            <DxComboBox ShowValidationIcon="true" Data="@RujukanExtenalVertical"
+                                        NullText="Select Refer Vertical Type..."
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                        @bind-Value="SelectedRujukanVertical">
+                            </DxComboBox>
+                        </DxFormLayoutItem>
+                    }
+                </DxFormLayout>
+
+                <hr />
+
+                @if (!string.IsNullOrWhiteSpace(SelectedRujukanType) || !string.IsNullOrWhiteSpace(SelectedRujukanVertical))
+                {
+                    <DxFormLayout CssClass="w-100">
+                        @if (SelectedRujukanType is not null && SelectedRujukanType.Equals(RujukanTypes.ToList()[0]))
+                        {
+                            <EditForm Model="@FormRegis" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                                <DataAnnotationsValidator />
+
+                                <div class="card">
+                                    <DxFormLayout>
+                                        <DxFormLayoutGroup Caption="General" ColSpanMd="12">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <DxFormLayout Enabled="false" CssClass="mt ">
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Patient" ColSpanMd="12">
+                                                            <DxComboBox ShowValidationIcon="true"
+                                                                        Data="@patients"
+                                                                        NullText="Select Patient..."
+                                                                        @bind-Value="@FormRegis.PatientId"
+                                                                        TextFieldName="Name"
+                                                                        SelectedItemChanged="@((UserDto e) => SelectedItemPatientChanged(e))"
+                                                                        ValueFieldName="Id">
+                                                            </DxComboBox>
+                                                            <ValidationMessage For="@(() => FormRegis.PatientId)"   />
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
+                                                            <DxTextBox @bind-Text="@FormRegis.NoRM" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
+                                                            <DxTextBox @bind-Text="@FormRegis.IdentityNumber" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
                                                             <Template>
-                                                                <DxSpinEdit ShowValidationIcon="true" MinValue="0" @bind-Value="@FormRegis.Age" NullText="Age" ReadOnly InputCssClass="fw-normal" />
+                                                                <DxGridLayout>
+                                                                    <Rows>
+                                                                        <DxGridLayoutRow />
+                                                                    </Rows>
+                                                                    <Columns>
+                                                                        <DxGridLayoutColumn Width="90%" />
+                                                                        <DxGridLayoutColumn Width="30%" />
+                                                                    </Columns>
+                                                                    <Items>
+                                                                        <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
+                                                                            <Template>
+                                                                                <DxSpinEdit ShowValidationIcon="true" MinValue="0" @bind-Value="@FormRegis.Age" NullText="Age" ReadOnly InputCssClass="fw-normal" />
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                        <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                                            <Template>
+                                                                                <h6 class="pl-1 pt-2 normal-caption">Year</h6>
+                                                                            </Template>
+                                                                        </DxGridLayoutItem>
+                                                                    </Items>
+                                                                </DxGridLayout>
+
                                                             </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
-                                                            <Template>
-                                                                <h6 class="pl-1 pt-2 normal-caption">Year</h6>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                    </Items>
-                                                </DxGridLayout>
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg Type" ColSpanMd="12">
+                                                            <DxComboBox Data="@RegisType"
+                                                                        NullText="Select Registration..."
+                                                                        AllowUserInput="true"
+                                                                        ShowValidationIcon="true"
+                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        SelectedItemChanged="@((string city) => SelectedItemChanged(city))"
+                                                                        @bind-Value="@FormRegis.TypeRegistration">
+                                                            </DxComboBox>
+                                                            <ValidationMessage For="@(() => FormRegis.TypeRegistration)" />
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem Visible="@(!string.IsNullOrWhiteSpace(FormRegis.TypeRegistration) && !FormRegis.TypeRegistration.Equals("General Consultation"))"
+                                                                          CaptionCssClass="required-caption normal-caption"
+                                                                          Caption="Medical Type" ColSpanMd="12">
+                                                            <DxComboBox ShowValidationIcon="true" Data="@Method"
+                                                                        NullText="Select Method..."
+                                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        @bind-Value="@FormRegis.TypeMedical">
+                                                            </DxComboBox>
+                                                        </DxFormLayoutItem>
 
-                                            </Template>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg Type" ColSpanMd="12">
-                                            <DxComboBox Data="@RegisType"
-                                                        NullText="Select Registration..."
-                                                        AllowUserInput="true"
-                                                        ShowValidationIcon="true"
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                        FilteringMode="@DataGridFilteringMode.Contains"
-                                                        SelectedItemChanged="@((string city) => SelectedItemChanged(city))"
-                                                        @bind-Value="@FormRegis.TypeRegistration">
-                                            </DxComboBox>
-                                            <ValidationMessage For="@(() => FormRegis.TypeRegistration)" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Visible="@(!string.IsNullOrWhiteSpace(FormRegis.TypeRegistration) && !FormRegis.TypeRegistration.Equals("General Consultation"))"
-                                                          CaptionCssClass="required-caption normal-caption"
-                                                          Caption="Medical Type" ColSpanMd="12">
-                                            <DxComboBox ShowValidationIcon="true" Data="@Method"
-                                                        NullText="Select Method..."
-                                                        FilteringMode="@DataGridFilteringMode.Contains"
-                                                        @bind-Value="@FormRegis.TypeMedical">
-                                            </DxComboBox>
-                                        </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Alert Information Special Case" ColSpanMd="12">
-                                            <DxCheckBox @bind-Checked="@FormRegis.IsAlertInformationSpecialCase" />
-                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Alert Information Special Case" ColSpanMd="12">
+                                                            <DxCheckBox @bind-Checked="@FormRegis.IsAlertInformationSpecialCase" />
+                                                        </DxFormLayoutItem>
+                                                    </DxFormLayout>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <DxFormLayout CssClass="mt ">
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
+                                                            <DxComboBox ShowValidationIcon="true"
+                                                                        Data="@Services"
+                                                                        NullText="Select Service.."
+                                                                        SelectedItemChanged="@((ServiceDto e) => SelectedItemServiceChanged(e))"
+                                                                        @bind-Value="@FormRegis.ServiceId"
+                                                                        TextFieldName="Name"
+                                                                        ValueFieldName="Id">
+                                                            </DxComboBox>
+                                                            <ValidationMessage For="@(() => FormRegis.ServiceId)" />
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Physicion" ColSpanMd="12">
+                                                            <DxComboBox ShowValidationIcon="true" Data="@IsPratition"
+                                                                        NullText="Select Physicion..."
+                                                                        @bind-Value="@FormRegis.PratitionerId"
+                                                                        TextFieldName="Name"
+                                                                        ValueFieldName="Id"
+                                                                        SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))"
+                                                                        InputId="CbDoctoreName">
+                                                            </DxComboBox>
+                                                            <ValidationMessage For="@(() => FormRegis.PratitionerId)" />
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Payment Methode" ColSpanMd="12">
+                                                            <DxComboBox ShowValidationIcon="true" Data="@Payments"
+                                                                        NullText="Payment Method.."
+                                                                        SelectedItemChanged="@((string e) => SelectedItemPaymentChanged(e))"
+                                                                        @bind-Value="@FormRegis.Payment">
+                                                            </DxComboBox>
+                                                            <ValidationMessage For="@(() => FormRegis.Payment)" />
+                                                        </DxFormLayoutItem>
+                                                        @if (FormRegis.Payment == "Insurance" || FormRegis.Payment == "BPJS")
+                                                        {
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
+                                                                <DxComboBox ShowValidationIcon="true"
+                                                                            TextFieldName="ConcatInsurancePolicy"
+                                                                            ValueFieldName="InsurancePolicyId"
+                                                                            Data="@Temps"
+                                                                            @bind-Value="@FormRegis.InsurancePolicyId"
+                                                                            NullText="Select Insurance ..">
+                                                                </DxComboBox>
+                                                                <ValidationMessage For="@(() => FormRegis.InsurancePolicyId)" />
+                                                            </DxFormLayoutItem>
+                                                        }
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Follow Up Date" ColSpanMd="12">
+                                                            <DxDateEdit DateChanged="@((DateTime e) => SelectedItemRegistrationDateChanged(e))"
+                                                                        Date="@FormRegis.RegistrationDate"
+                                                                        DateExpression="@(() => @FormRegis.RegistrationDate)"
+                                                                        Mask="@DateTimeMask.ShortDate"
+                                                                        NullText="Select Registration Date">
+                                                            </DxDateEdit>
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
+                                                            <DxDateEdit Enabled="false"
+                                                                        ShowValidationIcon="true"
+                                                                        @bind-Date="@FormRegis.RegistrationDate"
+                                                                        Mask="@DateTimeMask.ShortDate"
+                                                                        NullText="Select Date">
+                                                            </DxDateEdit>
+                                                            <ValidationMessage For="@(() => FormRegis.RegistrationDate)" />
+                                                        </DxFormLayoutItem>
+                                                    </DxFormLayout>
+                                                </div>
+                                            </div>
+                                        </DxFormLayoutGroup>
                                     </DxFormLayout>
+                                    <div class="card-footer">
+                                        <div class="w-100 row justify-content-end">
+                                            <div class="col-auto align-self-end p-0 m-0">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true"></DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnCancelReferTo"></DxButton>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <DxFormLayout CssClass="mt ">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
-                                            <DxComboBox ShowValidationIcon="true"
-                                                        Data="@Services"
-                                                        NullText="Select Service.."
-                                                        SelectedItemChanged="@((ServiceDto e) => SelectedItemServiceChanged(e))"
-                                                        @bind-Value="@FormRegis.ServiceId"
-                                                        TextFieldName="Name"
-                                                        ValueFieldName="Id">
-                                            </DxComboBox>
-                                            <ValidationMessage For="@(() => FormRegis.ServiceId)" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Physicion" ColSpanMd="12">
-                                            <DxComboBox ShowValidationIcon="true" Data="@IsPratition"
-                                                        NullText="Select Physicion..."
-                                                        @bind-Value="@FormRegis.PratitionerId"
-                                                        TextFieldName="Name"
-                                                        ValueFieldName="Id"
-                                                        SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))"
-                                                        InputId="CbDoctoreName">
-                                            </DxComboBox>
-                                            <ValidationMessage For="@(() => FormRegis.PratitionerId)" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Payment Methode" ColSpanMd="12">
-                                            <DxComboBox ShowValidationIcon="true" Data="@Payments"
-                                                        NullText="Payment Method.."
-                                                        SelectedItemChanged="@((string e) => SelectedItemPaymentChanged(e))"
-                                                        @bind-Value="@FormRegis.Payment">
-                                            </DxComboBox>
-                                            <ValidationMessage For="@(() => FormRegis.Payment)" />
-                                        </DxFormLayoutItem>
-                                        @if (FormRegis.Payment == "Insurance" || FormRegis.Payment == "BPJS")
-                                        {
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
-                                                <DxComboBox ShowValidationIcon="true"
-                                                            TextFieldName="ConcatInsurancePolicy"
-                                                            ValueFieldName="InsurancePolicyId"
-                                                            Data="@Temps"
-                                                            @bind-Value="@FormRegis.InsurancePolicyId"
-                                                            NullText="Select Insurance ..">
-                                                </DxComboBox>
-                                                <ValidationMessage For="@(() => FormRegis.InsurancePolicyId)" />
-                                            </DxFormLayoutItem>
-                                        }
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Follow Up Date" ColSpanMd="12">
-                                            <DxDateEdit DateChanged="@((DateTime e) => SelectedItemRegistrationDateChanged(e))"
-                                                        Date="@FormRegis.RegistrationDate"
-                                                        DateExpression="@(() => @FormRegis.RegistrationDate)"
-                                                        Mask="@DateTimeMask.ShortDate"
-                                                        NullText="Select Registration Date">
-                                            </DxDateEdit>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
-                                            <DxDateEdit Enabled="false"
-                                                        ShowValidationIcon="true"
-                                                        @bind-Date="@FormRegis.RegistrationDate"
-                                                        Mask="@DateTimeMask.ShortDate"
-                                                        NullText="Select Date">
-                                            </DxDateEdit>
-                                            <ValidationMessage For="@(() => FormRegis.RegistrationDate)" />
-                                        </DxFormLayoutItem>
-                                    </DxFormLayout>
-                                </div>
-                            </div>
-                        </DxFormLayoutGroup>
-                        <div class="row justify-content-end">
-                            <div class="col-auto align-self-end">
-                                <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true"></DxButton>
-                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnCancelReferTo"></DxButton>
-                            </div>
-                        </div>
-                    </DxFormLayout>
-                </EditForm>
 
-            }
-            else if (SelectedRujukanType is not null && SelectedRujukanType.Equals(RujukanTypes.ToList()[1]))
-            {
-                <DxFormLayoutItem Context="T" ColSpanMd="12">
-                    <DxFormLayout>
-                        <DxFormLayoutGroup Caption="Search for Referral Health Facilities" ColSpanMd="12">
-                            <DxFormLayout CssClass="w-100">
-                                <DxFormLayoutItem ColSpanMd="12">
-                                    <DxRadioGroup Items="@RujukanExtenalTypes"
-                                                  ItemAlignment="CheckBoxContentAlignment.SpaceBetween"
-                                                  @bind-Value="@SelectedRujukanExternal"
-                                                  Layout="@RadioGroupLayout.Horizontal" />
-                                </DxFormLayoutItem>
+                            </EditForm>
+                        }
 
-                                <DxFormLayoutItem ColSpanMd="12" Context="C" CssClass="w-100">
-                                    @if (SelectedRujukanExternal is not null && SelectedRujukanExternal.Equals(RujukanExtenalTypes.ToList()[1]))
-                                    {
+                        @if (SelectedRujukanVertical is not null)
+                        {
+                            <DxFormLayoutGroup Caption="Search for Referral Health Facilities" ColSpanMd="12">
+                                <DxFormLayout CssClass="w-100">
+                                    <DxFormLayoutItem ColSpanMd="12" Context="C" CssClass="w-100">
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem ColSpanMd="12">
-                                                <DxRadioGroup Items="@RujukanExtenalVertical"
-                                                              ItemAlignment="CheckBoxContentAlignment.SpaceBetween"
-                                                              @bind-Value="@SelectedRujukanVertical"
-                                                              Layout="@RadioGroupLayout.Horizontal" />
-                                            </DxFormLayoutItem>
                                             @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[0]))
                                             {
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Category" ColSpanMd="12">
@@ -1485,7 +1508,7 @@ else
                                                     </DxComboBox>
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Reason..." ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@FormRegis.ReferReason" NullText="Reason..." ReadOnly InputCssClass="fw-normal" />
+                                                    <DxTextBox @bind-Text="@FormRegis.ReferReason" NullText="Reason..." InputCssClass="fw-normal" />
                                                 </DxFormLayoutItem>
                                             }
                                             else if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
@@ -1527,28 +1550,41 @@ else
                                                 }
                                             }
                                         </DxFormLayout>
+
                                         @if (SelectedRujukanVertical is not null)
                                         {
-                                            <div class="row justify-content-end">
-                                                <div class="col-auto align-self-end">
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <DxDateEdit Date="@FormRegis.ReferDateVisit"
-                                                                        DateExpression="@(() => @FormRegis.ReferDateVisit)"
-                                                                        Mask="@DateTimeMask.ShortDate"
-                                                                        NullText="Select Visit Date">
-                                                            </DxDateEdit>
-                                                        </div>
-                                                        <div class="col">
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search Faskes" Click="OnClickSearchFaskes" SubmitFormOnClick="true"></DxButton>
-                                                        </div>
-                                                        <div class="col">
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel"></DxButton>
-                                                        </div>
-                                                    </div>
+                                            <div class="w-100 row justify-content-end">
+                                                <div class="col-auto align-self-end p-0 m-0">
+                                                    <DxDateEdit
+                                                                @bind-Date="@FormRegis.ReferDateVisit"
+                                                                Mask="@DateTimeMask.ShortDate"
+                                                                NullText="Select Visit Date" />
+                                                    <DxButton CssClass="mt-2" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-magnifying-glass" Text="Search Faskes" Click="OnClickSearchFaskes" SubmitFormOnClick="true"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Text="Cancel"></DxButton>
+
                                                 </div>
                                             </div>
+
+                                            @* <div class="row justify-content-end">
+                                <div class="col-auto align-self-end">
+                                <div class="row">
+                                <div class="col-md-4">
+                                <DxDateEdit Date="@FormRegis.ReferDateVisit"
+                                DateExpression="@(() => @FormRegis.ReferDateVisit)"
+                                Mask="@DateTimeMask.ShortDate"
+                                NullText="Select Visit Date"/>
+                                </div>
+                                <div class="col-md-4">
+                                <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search Faskes" Click="OnClickSearchFaskes" SubmitFormOnClick="true"></DxButton>
+                                </div>
+                                <div class="col-md-4">
+                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel"></DxButton>
+                                </div>
+                                </div>
+                                </div>
+                                </div> *@
                                         }
+
                                         <div class="row w-100 mt-3">
                                             <DxLoadingPanel @bind-Visible="IsLoadingSearchFaskes"
                                                             IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
@@ -1590,23 +1626,343 @@ else
                                                         <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Persentase))" Caption="%" />
                                                         <DxGridDataColumn Caption="Action ">
                                                             <CellDisplayTemplate>
-                                                                <DxButton RenderStyle="@ButtonRenderStyle.Success" IconCssClass="fa-solid fa-play mr-1" Text="Select"></DxButton>
+                                                                <DxButton RenderStyle="@ButtonRenderStyle.Success" Click="(() => SelectedFaskesRujuk((RujukanFaskesKhususSpesialisPCare)context.DataItem))" IconCssClass="fa-solid fa-play mr-1" Text="Select"></DxButton>
                                                             </CellDisplayTemplate>
                                                         </DxGridDataColumn>
                                                     </Columns>
                                                 </DxGrid>
                                             </DxLoadingPanel>
                                         </div>
-                                    }
-                                </DxFormLayoutItem>
-                            </DxFormLayout>
-                        </DxFormLayoutGroup>
+                                    </DxFormLayoutItem>
+                                </DxFormLayout>
+                            </DxFormLayoutGroup>
+                        }
                     </DxFormLayout>
-                </DxFormLayoutItem>
+                }
+            </DxFormLayout>
+        </div>
+    </BodyContentTemplate>
 
-            }
-        </DxFormLayoutItem>
+    @* <DxFormLayout CssClass="w-100">
+    <DxFormLayoutItem ColSpanMd="12" Context="LayoutA">
+    <DxRadioGroup Items="@RujukanTypes"
+    ItemAlignment="CheckBoxContentAlignment.SpaceBetween"
+    @bind-Value="@SelectedRujukanType"
+    Layout="@RadioGroupLayout.Horizontal" />
+    </DxFormLayoutItem>
+    <DxFormLayoutItem ColSpanMd="12" Context="LayoutT">
+    @if (SelectedRujukanType is not null && SelectedRujukanType.Equals(RujukanTypes.ToList()[0]))
+    {
+    <EditForm Model="@FormRegis" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <DxFormLayout>
+    <DxFormLayoutGroup Caption="General" ColSpanMd="12">
+    <div class="row">
+    <div class="col-md-6">
+    <DxFormLayout Enabled="false" CssClass="mt ">
+    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Patient" ColSpanMd="12">
+    <DxComboBox ShowValidationIcon="true"
+    Data="@patients"
+    NullText="Select Patient..."
+    @bind-Value="@FormRegis.PatientId"
+    TextFieldName="Name"
+    SelectedItemChanged="@((UserDto e) => SelectedItemPatientChanged(e))"
+    ValueFieldName="Id">
+    </DxComboBox>
+    <ValidationMessage For="@(() => FormRegis.PatientId)"   />
+    </DxFormLayoutItem>
+    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
+    <DxTextBox @bind-Text="@FormRegis.NoRM" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
+    </DxFormLayoutItem>
+    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
+    <DxTextBox @bind-Text="@FormRegis.IdentityNumber" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
+    </DxFormLayoutItem>
+    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
+    <Template>
+    <DxGridLayout>
+    <Rows>
+    <DxGridLayoutRow />
+    </Rows>
+    <Columns>
+    <DxGridLayoutColumn Width="90%" />
+    <DxGridLayoutColumn Width="30%" />
+    </Columns>
+    <Items>
+    <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
+    <Template>
+    <DxSpinEdit ShowValidationIcon="true" MinValue="0" @bind-Value="@FormRegis.Age" NullText="Age" ReadOnly InputCssClass="fw-normal" />
+    </Template>
+    </DxGridLayoutItem>
+    <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+    <Template>
+    <h6 class="pl-1 pt-2 normal-caption">Year</h6>
+    </Template>
+    </DxGridLayoutItem>
+    </Items>
+    </DxGridLayout>
+
+    </Template>
+    </DxFormLayoutItem>
+    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg Type" ColSpanMd="12">
+    <DxComboBox Data="@RegisType"
+    NullText="Select Registration..."
+    AllowUserInput="true"
+    ShowValidationIcon="true"
+    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+    FilteringMode="@DataGridFilteringMode.Contains"
+    SelectedItemChanged="@((string city) => SelectedItemChanged(city))"
+    @bind-Value="@FormRegis.TypeRegistration">
+    </DxComboBox>
+    <ValidationMessage For="@(() => FormRegis.TypeRegistration)" />
+    </DxFormLayoutItem>
+    <DxFormLayoutItem Visible="@(!string.IsNullOrWhiteSpace(FormRegis.TypeRegistration) && !FormRegis.TypeRegistration.Equals("General Consultation"))"
+    CaptionCssClass="required-caption normal-caption"
+    Caption="Medical Type" ColSpanMd="12">
+    <DxComboBox ShowValidationIcon="true" Data="@Method"
+    NullText="Select Method..."
+    FilteringMode="@DataGridFilteringMode.Contains"
+    @bind-Value="@FormRegis.TypeMedical">
+    </DxComboBox>
+    </DxFormLayoutItem>
+
+    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Alert Information Special Case" ColSpanMd="12">
+    <DxCheckBox @bind-Checked="@FormRegis.IsAlertInformationSpecialCase" />
+    </DxFormLayoutItem>
     </DxFormLayout>
+    </div>
+    <div class="col-md-6">
+    <DxFormLayout CssClass="mt ">
+    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
+    <DxComboBox ShowValidationIcon="true"
+    Data="@Services"
+    NullText="Select Service.."
+    SelectedItemChanged="@((ServiceDto e) => SelectedItemServiceChanged(e))"
+    @bind-Value="@FormRegis.ServiceId"
+    TextFieldName="Name"
+    ValueFieldName="Id">
+    </DxComboBox>
+    <ValidationMessage For="@(() => FormRegis.ServiceId)" />
+    </DxFormLayoutItem>
+    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Physicion" ColSpanMd="12">
+    <DxComboBox ShowValidationIcon="true" Data="@IsPratition"
+    NullText="Select Physicion..."
+    @bind-Value="@FormRegis.PratitionerId"
+    TextFieldName="Name"
+    ValueFieldName="Id"
+    SelectedItemChanged="@((UserDto e) => SelectedItemPhysicianChanged(e))"
+    InputId="CbDoctoreName">
+    </DxComboBox>
+    <ValidationMessage For="@(() => FormRegis.PratitionerId)" />
+    </DxFormLayoutItem>
+    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Payment Methode" ColSpanMd="12">
+    <DxComboBox ShowValidationIcon="true" Data="@Payments"
+    NullText="Payment Method.."
+    SelectedItemChanged="@((string e) => SelectedItemPaymentChanged(e))"
+    @bind-Value="@FormRegis.Payment">
+    </DxComboBox>
+    <ValidationMessage For="@(() => FormRegis.Payment)" />
+    </DxFormLayoutItem>
+    @if (FormRegis.Payment == "Insurance" || FormRegis.Payment == "BPJS")
+    {
+    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
+    <DxComboBox ShowValidationIcon="true"
+    TextFieldName="ConcatInsurancePolicy"
+    ValueFieldName="InsurancePolicyId"
+    Data="@Temps"
+    @bind-Value="@FormRegis.InsurancePolicyId"
+    NullText="Select Insurance ..">
+    </DxComboBox>
+    <ValidationMessage For="@(() => FormRegis.InsurancePolicyId)" />
+    </DxFormLayoutItem>
+    }
+    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Follow Up Date" ColSpanMd="12">
+    <DxDateEdit DateChanged="@((DateTime e) => SelectedItemRegistrationDateChanged(e))"
+    Date="@FormRegis.RegistrationDate"
+    DateExpression="@(() => @FormRegis.RegistrationDate)"
+    Mask="@DateTimeMask.ShortDate"
+    NullText="Select Registration Date">
+    </DxDateEdit>
+    </DxFormLayoutItem>
+    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
+    <DxDateEdit Enabled="false"
+    ShowValidationIcon="true"
+    @bind-Date="@FormRegis.RegistrationDate"
+    Mask="@DateTimeMask.ShortDate"
+    NullText="Select Date">
+    </DxDateEdit>
+    <ValidationMessage For="@(() => FormRegis.RegistrationDate)" />
+    </DxFormLayoutItem>
+    </DxFormLayout>
+    </div>
+    </div>
+    </DxFormLayoutGroup>
+    <div class="row justify-content-end">
+    <div class="col-auto align-self-end">
+    <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true"></DxButton>
+    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnCancelReferTo"></DxButton>
+    </div>
+    </div>
+    </DxFormLayout>
+    </EditForm>
+
+    }
+    else if (SelectedRujukanType is not null && SelectedRujukanType.Equals(RujukanTypes.ToList()[1]))
+    {
+    <DxFormLayoutItem Context="T" ColSpanMd="12">
+    <DxFormLayout>
+    <DxFormLayoutGroup Caption="Search for Referral Health Facilities" ColSpanMd="12">
+    <DxFormLayout CssClass="w-100">
+    <DxFormLayoutItem ColSpanMd="12">
+    <DxRadioGroup Items="@RujukanExtenalTypes"
+    ItemAlignment="CheckBoxContentAlignment.SpaceBetween"
+    @bind-Value="@SelectedRujukanExternal"
+    Layout="@RadioGroupLayout.Horizontal" />
+    </DxFormLayoutItem>
+
+    <DxFormLayoutItem ColSpanMd="12" Context="C" CssClass="w-100">
+    @if (SelectedRujukanExternal is not null && SelectedRujukanExternal.Equals(RujukanExtenalTypes.ToList()[1]))
+    {
+    <DxFormLayout CssClass="w-100">
+    <DxFormLayoutItem ColSpanMd="12">
+    <DxRadioGroup Items="@RujukanExtenalVertical"
+    ItemAlignment="CheckBoxContentAlignment.SpaceBetween"
+    @bind-Value="@SelectedRujukanVertical"
+    Layout="@RadioGroupLayout.Horizontal" />
+    </DxFormLayoutItem>
+    @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[0]))
+    {
+    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Category" ColSpanMd="12">
+    <DxComboBox ShowValidationIcon="true"
+    Data="@SpesialisRefrensiKhusus"
+    NullText="Select Category..."
+    @bind-Value="@FormRegis.ReferVerticalKhususCategoryCode"
+    TextFieldName="NmKhusus"
+    ValueFieldName="KdKhusus">
+    </DxComboBox>
+    </DxFormLayoutItem>
+    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Reason..." ColSpanMd="12">
+    <DxTextBox @bind-Text="@FormRegis.ReferReason" NullText="Reason..." ReadOnly InputCssClass="fw-normal" />
+    </DxFormLayoutItem>
+    }
+    else if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
+    {
+    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Spesialis" ColSpanMd="6">
+    <DxComboBox ShowValidationIcon="true"
+    Data="@SpesialisPs"
+    NullText="Select Spesialis..."
+    @bind-Value="@FormRegis.ReferVerticalSpesialisParentSpesialisCode"
+    SelectedItemChanged="(SpesialisPCare e) => SelectedItemSpesialis(e)"
+    TextFieldName="NmSpesialis"
+    ValueFieldName="KdSpesialis">
+    </DxComboBox>
+    </DxFormLayoutItem>
+    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sub Spesialis" ColSpanMd="6">
+    <DxComboBox ShowValidationIcon="true"
+    Data="@SubSpesialisPs"
+    NullText="Select Sub Spesialis..."
+    @bind-Value="@FormRegis.ReferVerticalSpesialisParentSubSpesialisCode"
+    TextFieldName="NmSubSpesialis"
+    ValueFieldName="KdSubSpesialis">
+    </DxComboBox>
+    </DxFormLayoutItem>
+    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sarana" ColSpanMd="6">
+    <DxCheckBox @bind-Checked="@FormRegis.IsSarana" />
+    </DxFormLayoutItem>
+
+    @if (Convert.ToBoolean(FormRegis.IsSarana))
+    {
+    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sarana" ColSpanMd="6">
+    <DxComboBox ShowValidationIcon="true"
+    Data="@SpesialisSaranas"
+    NullText="Select Sarana..."
+    @bind-Value="@FormRegis.ReferVerticalSpesialisSaranaCode"
+    TextFieldName="NmSarana"
+    ValueFieldName="KdSarana">
+    </DxComboBox>
+    </DxFormLayoutItem>
+    }
+    }
+    </DxFormLayout>
+    @if (SelectedRujukanVertical is not null)
+    {
+    <div class="row justify-content-end">
+    <div class="col-auto align-self-end">
+    <div class="row">
+    <div class="col">
+    <DxDateEdit Date="@FormRegis.ReferDateVisit"
+    DateExpression="@(() => @FormRegis.ReferDateVisit)"
+    Mask="@DateTimeMask.ShortDate"
+    NullText="Select Visit Date">
+    </DxDateEdit>
+    </div>
+    <div class="col">
+    <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-magnifying-glass" Text="Search Faskes" Click="OnClickSearchFaskes" SubmitFormOnClick="true"></DxButton>
+    </div>
+    <div class="col">
+    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel"></DxButton>
+    </div>
+    </div>
+    </div>
+    </div>
+    }
+    <div class="row w-100 mt-3">
+    <DxLoadingPanel @bind-Visible="IsLoadingSearchFaskes"
+    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+    IsContentBlocked="true"
+    ApplyBackgroundShading="true"
+    IndicatorAreaVisible="false"
+    Text="Fetching Data...">
+    <DxGrid @ref="GridRujukanRefer" PagerNavigationMode="PagerNavigationMode.InputBox"
+    Data="RujukanSubSpesialis"
+    PageSize="10"
+    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+    KeyFieldName="Kdppk"
+    TextWrapEnabled="false"
+    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+    EditMode="GridEditMode.PopupEditForm"
+    PagerPosition="GridPagerPosition.Bottom"
+    PageSizeSelectorVisible="true"
+    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+    PageSizeSelectorAllRowsItemVisible="true"
+    PagerSwitchToInputBoxButtonCount="10"
+    AllowSelectRowByClick="true"
+    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+    FocusedRowEnabled="true"
+    PagerVisibleNumericButtonCount="10"
+    ShowGroupPanel="true"
+    ShowFilterRow="true"
+    CustomizeElement="Grid_CustomizeElement"
+    ShowSearchBox="true"
+    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+    KeyboardNavigationEnabled="true">
+    <Columns>
+    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Nmppk))" Caption="Faskes" />
+    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kelas))" Caption="Class" />
+    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.AlamatPpk))" Caption="Address" />
+    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.TelpPpk))" Caption="Phone" />
+    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Distance))" Caption="Distance" />
+    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.JmlRujuk))" Caption="Patient" />
+    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kapasitas))" Caption="Patient" />
+    <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Persentase))" Caption="%" />
+    <DxGridDataColumn Caption="Action ">
+    <CellDisplayTemplate>
+    <DxButton RenderStyle="@ButtonRenderStyle.Success" IconCssClass="fa-solid fa-play mr-1" Text="Select"></DxButton>
+    </CellDisplayTemplate>
+    </DxGridDataColumn>
+    </Columns>
+    </DxGrid>
+    </DxLoadingPanel>
+    </div>
+    }
+    </DxFormLayoutItem>
+    </DxFormLayout>
+    </DxFormLayoutGroup>
+    </DxFormLayout>
+    </DxFormLayoutItem>
+
+    }
+    </DxFormLayoutItem>
+    </DxFormLayout> *@
 </DxPopup>
 
 <DxPopup HeaderText="Historical Medical Record Patient" @bind-Visible="@PopUpHistoricalMedical" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
