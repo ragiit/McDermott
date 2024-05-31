@@ -29,6 +29,7 @@ namespace McDermott.Web.Extentions
         ];
 
         public static readonly string VERSION = "2.0.0";
+        public static readonly string APP_NAME = "McHealthCare";
 
         public static void ShowInfoSubmittingForm(this IToastService toastService, string message = "Please ensure that all fields marked in red are filled in before submitting the form.") => toastService.ShowInfo(message);
 

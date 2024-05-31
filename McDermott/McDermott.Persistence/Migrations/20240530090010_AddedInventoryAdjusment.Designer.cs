@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240530090010_AddedInventoryAdjusment")]
+    partial class AddedInventoryAdjusment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2332,9 +2335,6 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -2369,6 +2369,9 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<long>("InventoryAdjusmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("LotSerialNumber")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("ProductId")
@@ -3622,9 +3625,6 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<long?>("DestinationId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("KodeTransaksi")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");

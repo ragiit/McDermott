@@ -134,6 +134,11 @@ namespace McDermott.Persistence.Context
 
         #endregion Pharmacy
 
+        #region MyRegion
+        public DbSet<InventoryAdjusment> InventoryAdjusments { get; set; }
+        public DbSet<InventoryAdjusmentDetail> InventoryAdjusmentDetails { get; set; }
+        #endregion
+
         #endregion DbSet
 
         #region OnModelCreating
@@ -273,6 +278,11 @@ namespace McDermott.Persistence.Context
                 .HasMany(m => m.BPJSIntegrations)
                 .WithOne(c => c.InsurancePolicy)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<InventoryAdjusment>()
+              .HasMany(m => m.InventoryAdjusmentDetails)
+              .WithOne(c => c.InventoryAdjusment)
+              .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Group>()
                   .HasMany(m => m.GroupMenus)
