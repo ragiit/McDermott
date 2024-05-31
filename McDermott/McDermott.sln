@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McDermott.Web", "McDermott.
 		{BB1FC57B-326E-428E-84DD-86C2DBC02A1C} = {BB1FC57B-326E-428E-84DD-86C2DBC02A1C}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McDermott.Extentions", "McDermott.Extentions\McDermott.Extentions.csproj", "{3CA8CFB5-FDC0-4BAE-B4AF-9BF071EAB6C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,10 @@ Global
 		{9618F4E6-123D-4C5E-93EA-78EC87F4FD23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9618F4E6-123D-4C5E-93EA-78EC87F4FD23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9618F4E6-123D-4C5E-93EA-78EC87F4FD23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CA8CFB5-FDC0-4BAE-B4AF-9BF071EAB6C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CA8CFB5-FDC0-4BAE-B4AF-9BF071EAB6C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CA8CFB5-FDC0-4BAE-B4AF-9BF071EAB6C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CA8CFB5-FDC0-4BAE-B4AF-9BF071EAB6C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +57,7 @@ Global
 		{BB1FC57B-326E-428E-84DD-86C2DBC02A1C} = {496D4CA3-D424-421C-BA4D-AA04AD8C1C9F}
 		{694DA318-C73F-4DA0-9F9A-92B2CADBE5E6} = {65B45342-E40B-45AF-AD6A-B899AE34E904}
 		{9618F4E6-123D-4C5E-93EA-78EC87F4FD23} = {CDFAC7A7-BE49-42EA-8148-D28E0E265BCA}
+		{3CA8CFB5-FDC0-4BAE-B4AF-9BF071EAB6C7} = {496D4CA3-D424-421C-BA4D-AA04AD8C1C9F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5016C9D3-5072-4F17-B60A-F09BC449FD16}
