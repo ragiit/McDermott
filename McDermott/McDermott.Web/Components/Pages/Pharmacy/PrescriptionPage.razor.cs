@@ -60,7 +60,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             if (Id == 0)
                 return;
-            
+
             var generalConsultantService = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id));
             if (generalConsultantService.Count == 0 || generalConsultantService is null)
                 return;
@@ -73,7 +73,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Pharmacy.IsWeather = generalConsultantService.FirstOrDefault()!.IsWeather;
             Pharmacy.IsFarmacologi = generalConsultantService.FirstOrDefault()!.IsPharmacology;
             Pharmacy.IsFood = generalConsultantService.FirstOrDefault()!.IsFood;
-         
+
             var b = Patients.Where(x => x.Id == Pharmacy.PatientId).Select(x => x.PatientAllergyIds).FirstOrDefault();
             //if (generalConsultanService.SelectedFoodAllergies.Count() > 0)
             //    FormRegis.IsFood = true;
@@ -199,7 +199,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private void SelectedChangePractition(UserDto? user)
         {
-            MedicamentGroups = MedicamentGroups.Where(x => x.IsConcoction == false && x.PhycisianId == user.Id).ToList();
+            MedicamentGroups = MedicamentGroups.Where(x => x.IsConcoction == false && x.PhycisianId == user?.Id).ToList();
         }
 
         private async Task SelectedMedicament(MedicamentGroupDto medicament)
@@ -256,6 +256,89 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
 
             Prescriptions = prescriptionsList;
+        }
+
+        private async Task SelectedProductPrescriptions(ProductDto value)
+        {
+            if (value is not null)
+            {
+                var checkMedicament = Medicaments.Where(x => x.ProductId == value.Id).FirstOrDefault();
+                Prescription.PriceUnit = value.Cost;
+                Prescription.UomId = checkMedicament?.UomId;
+                Prescription.DrugFromId = checkMedicament?.FormId;
+                Prescription.Dosage = checkMedicament?.Dosage;
+                Prescription.DrugDosageId = checkMedicament?.FrequencyId;
+                Prescription.DrugRouteId = checkMedicament?.RouteId;
+
+                var checkStock = StockProducts.Where(x => x.ProductId == value.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
+                if (checkStock == null)
+                    Prescription.Stock = 0;
+                else
+                    Prescription.Stock = checkStock;
+            }
+        }
+
+        private async Task SelectedMedicamentGroupConcoction(MedicamentGroupDto value)
+        {
+            try
+            {
+                if (value is null)
+                    return;
+
+                var medicamentGroup = MedicamentGroups.Where(x => x.Id == value.Id).FirstOrDefault();
+                Concoction.MedicamentName = medicamentGroup?.Name;
+                Concoction.UomId = medicamentGroup?.UoMId;
+                Concoction.DrugFromId = medicamentGroup?.FormDrugId;
+
+                var a = await Mediator.Send(new GetMedicamentGroupDetailQuery());
+                var data = a.Where(x => x.MedicamentGroupId == value?.Id).ToList();
+                List<ConcoctionLineDto> concoctionLinesList = new();
+
+                foreach(var item in data)
+                {
+                    var checkProduct = Products.FirstOrDefault(x => x.Id == item.MedicamentId);
+                    if (checkProduct == null)
+                        return;
+
+                    var stockProduct = StockProducts
+                                    .Where(x => x.ProductId == checkProduct.Id && x.SourceId is not null && x.SourceId == Pharmacy.PrescriptionLocationId)
+                                    .Select(x => x.Qty)
+                                    .FirstOrDefault();
+
+                    var medicamentData = Medicaments.FirstOrDefault(x => x.ProductId == checkProduct.Id);
+                    if (medicamentData is null)
+                        return;
+
+                    var newConcoctionLine = new ConcoctionLineDto
+                    {
+                        ProductId = checkProduct.Id,
+                        ProductName = checkProduct.Name,
+                    };
+
+                    newConcoctionLine.Id = Helper.RandomNumber;
+                    newConcoctionLine.MedicamentDosage = medicamentData.Dosage;
+                    newConcoctionLine.ActiveComponentId = medicamentData.ActiveComponentId;
+                    newConcoctionLine.Qty = medicamentData.Dosage;
+                    newConcoctionLine.UomId = medicamentData.UomId;
+                    newConcoctionLine.UomName = medicamentData?.Uom?.Name;
+                    if (stockProduct == null)
+                    {
+                        newConcoctionLine.AvaliableQty = 0;
+                    }
+                    else
+                    {
+                        newConcoctionLine.AvaliableQty = stockProduct;
+                    }
+                    newConcoctionLine.ActiveComponentName = string.Join(",", ActiveComponents.Where(a => medicamentData.ActiveComponentId is not null && medicamentData.ActiveComponentId.Contains(a.Id)).Select(n => n.Name));
+                    concoctionLinesList.Add(newConcoctionLine);
+                }
+
+                ConcoctionLines = concoctionLinesList;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         #endregion Static Variables
@@ -581,13 +664,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 {
                     ConcoctionDto update = new();
 
-                    //var medicamentGroup = MedicamentGroupsConcoction.FirstOrDefault(x => x.Id == Concoction.MedicamentGroupId);
-                    //if (medicamentGroup != null)
-                    //{
-                    //    Concoction.MedicamentName = medicamentGroup.Name;
-                    //    Concoction.UomId = medicamentGroup.UoMId;
-                    //    Concoction.DrugFromId = medicamentGroup.FormDrugId;
-                    //}
                     Concoction.PrescribingDoctorId = Pharmacy.PractitionerId;
 
                     if (Concoction.Id == 0)
