@@ -498,7 +498,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         var lastTransactionNumber = 0;
                         if (getReceiving.Contains("WH-IN/"))
                         {
-                            var lastTransactionNumberStr = getReceiving.Split('/')[2];
+                            var lastTransactionNumberStr = getReceiving.Split('/')[1];
                             int.TryParse(lastTransactionNumberStr, out lastTransactionNumber);
                         }
                         var nextTransactionNumber = lastTransactionNumber + 1;
