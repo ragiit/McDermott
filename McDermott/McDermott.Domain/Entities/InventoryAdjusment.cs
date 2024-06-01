@@ -8,7 +8,9 @@
         public DateTime Date { get; set; }
         public EnumStatusInventoryAdjusment Status { get; set; }
 
+        [SetToNull]
         public virtual Location? Location { get; set; }
+        [SetToNull]
         public virtual Company? Company { get; set; }
 
         public virtual IEnumerable<InventoryAdjusmentDetail>? InventoryAdjusmentDetails { get; set; }

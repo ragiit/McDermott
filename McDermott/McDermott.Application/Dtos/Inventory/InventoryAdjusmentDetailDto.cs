@@ -14,14 +14,12 @@
         [NotMapped]
         public long? UomId { get; set; }
 
-        [Required]
         public DateTime? ExpiredDate { get; set; }
 
         [NotMapped]
         public string LotSerialNumber { get; set; } = "-";
 
-        [Required]
-        public long RealQty { get; set; } = 0;
+        public long RealQty { get; set; }
 
         public InventoryAdjusmentDto? InventoryAdjusment { get; set; }
         public ProductDto? Product { get; set; }
