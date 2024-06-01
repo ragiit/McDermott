@@ -17,8 +17,10 @@
         [Parameter]
         public long Id { get; set; }
 
+        private byte[] DocumentContent;
         private IGrid Grid { get; set; }
         private bool IsLoading { get; set; } = false;
+        private bool isPrint { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
@@ -145,5 +147,15 @@
         }
 
         #endregion Grid Configuration
+
+        #region Click
+
+        private async void PrintToLeave()
+        {
+            isPrint = true;
+            //DocumentContent = await DocumentProvider;
+        }
+
+        #endregion Click
     }
 }

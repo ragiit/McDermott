@@ -294,7 +294,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var data = a.Where(x => x.MedicamentGroupId == value?.Id).ToList();
                 List<ConcoctionLineDto> concoctionLinesList = new();
 
-                foreach(var item in data)
+                foreach (var item in data)
                 {
                     var checkProduct = Products.FirstOrDefault(x => x.Id == item.MedicamentId);
                     if (checkProduct == null)
@@ -314,13 +314,22 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         ProductId = checkProduct.Id,
                         ProductName = checkProduct.Name,
                     };
-
+                    float? QtyPerDay = 0;
+                    if (medicamentData.FrequencyId != null)
+                    {
+                        QtyPerDay = medicamentData?.Frequency?.TotalQtyPerDay;
+                    }
+                    else
+                    {
+                        QtyPerDay = 0;
+                    }
                     newConcoctionLine.Id = Helper.RandomNumber;
-                    newConcoctionLine.MedicamentDosage = medicamentData.Dosage;
-                    newConcoctionLine.ActiveComponentId = medicamentData.ActiveComponentId;
-                    newConcoctionLine.Qty = medicamentData.Dosage;
-                    newConcoctionLine.UomId = medicamentData.UomId;
+                    newConcoctionLine.MedicamentDosage = medicamentData?.Dosage;
+                    newConcoctionLine.ActiveComponentId = medicamentData?.ActiveComponentId;
+                    newConcoctionLine.Qty = medicamentData?.Dosage;
+                    newConcoctionLine.UomId = medicamentData?.UomId;
                     newConcoctionLine.UomName = medicamentData?.Uom?.Name;
+                    newConcoctionLine.TotalQty = medicamentData?.Dosage + QtyPerDay?.ToLong();
                     if (stockProduct == null)
                     {
                         newConcoctionLine.AvaliableQty = 0;

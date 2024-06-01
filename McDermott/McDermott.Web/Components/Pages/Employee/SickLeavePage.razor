@@ -2,6 +2,7 @@
 @page "/employee/sick-leave/{Id:long}"
 @rendermode InteractiveServer
 
+
 <div class="wrapper">
     <section class="content-header">
         <div class="container-fluid">
@@ -64,6 +65,7 @@
                                                 <DxButton RenderStyle="ButtonRenderStyle.Success"                                                         
                                                           Attributes="@(new Dictionary<string, object> {  ["title"] = "Print" })"
                                                           IconCssClass="fa-solid fa-print"
+                                                          Click="PrintToLeave"
                                                           CssClass="me-1" />
 
                                                 <DxButton RenderStyle="ButtonRenderStyle.Primary"                                                          
@@ -88,3 +90,11 @@
         </div>
     </section>
 </div>
+
+<DxPopup Visible="isPrint" Width="auto">
+   <DxRichEdit>
+        <MailMergeSettings>
+            <DxMailMergeSettings Data="SickLeaves"></DxMailMergeSettings>
+        </MailMergeSettings>
+   </DxRichEdit>
+</DxPopup>
