@@ -239,6 +239,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 if (InventoryAdjusment.Id == 0)
                 {
+                    InventoryAdjusment.Status = EnumStatusInventoryAdjusment.Draft;
                     InventoryAdjusment = await Mediator.Send(new CreateInventoryAdjusmentRequest(InventoryAdjusment));
                     InventoryAdjusmentDetails.ForEach(x =>
                     {
