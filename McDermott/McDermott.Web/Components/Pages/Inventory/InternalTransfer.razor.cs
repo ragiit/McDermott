@@ -130,6 +130,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 var data = Products.Where(p => p.Id == product.Id).FirstOrDefault();
                 TempFormInternalTransfer.ProductName = data?.Name;
+                TempFormInternalTransfer.TraceAvability = data.TraceAbility;
                 var uomName = Uoms.Where(u => u.Id == data?.UomId).Select(x => x.Name).FirstOrDefault();
                 TempFormInternalTransfer.UomName = uomName;
             }
@@ -408,6 +409,14 @@ namespace McDermott.Web.Components.Pages.Inventory
                         }
                         else
                         {
+                            if (TempFormInternalTransfer.TraceAvability == true && checkedStockOut.Batch != null && checkedStockOut.Expired != null)
+                            {
+                                if (checkStockIn.Batch == null && checkStockIn.Expired == null)
+                                {
+                                    checkStockIn.Batch = checkedStockOut?.Batch;
+                                    checkStockIn.Expired = checkedStockOut?.Expired;
+                                }
+                            }
                             checkStockIn!.Qty = checkStockIn.Qty + a.QtyStock;
                             await Mediator.Send(new UpdateStockProductRequest(checkStockIn));
                         }
