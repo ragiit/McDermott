@@ -139,6 +139,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<ActiveComponentDto> ActiveComponents { get; set; } = [];
 
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
+        private IEnumerable<ActiveComponentDto>? selectedActiveComponentPrescriptions { get; set; } = [];
 
         private List<string> Payments = new List<string>
         {
@@ -251,6 +252,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 newPrescription.DrugRouteId = medicamentDetails.RouteId;
                 newPrescription.PriceUnit = checkProduct.SalesPrice;
                 newPrescription.DrugRoutName = medicamentDetails.Route?.Route;
+                newPrescription.ActiveComponentId = medicamentDetails.ActiveComponentId;
+                newPrescription.ActiveComponentNames = string.Join(",", ActiveComponents.Where(a => medicamentDetails?.ActiveComponentId is not null && medicamentDetails.ActiveComponentId.Contains(a.Id)).Select(n => n.Name));
 
                 prescriptionsList.Add(newPrescription);
             }
@@ -338,7 +341,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     {
                         newConcoctionLine.AvaliableQty = stockProduct;
                     }
-                    newConcoctionLine.ActiveComponentName = string.Join(",", ActiveComponents.Where(a => medicamentData.ActiveComponentId is not null && medicamentData.ActiveComponentId.Contains(a.Id)).Select(n => n.Name));
+                    newConcoctionLine.ActiveComponentName = string.Join(",", ActiveComponents.Where(a => medicamentData?.ActiveComponentId is not null && medicamentData.ActiveComponentId.Contains(a.Id)).Select(n => n.Name));
                     concoctionLinesList.Add(newConcoctionLine);
                 }
 

@@ -3,6 +3,8 @@ using McDermott.Persistence.Extensions;
 using McDermott.Web.Components;
 using Serilog;
 using McDermott.Web.Hubs;
+using McDermott.Application.Interfaces.Repositories;
+using McDermott.Application.Features.Queries;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -19,8 +21,8 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredToast();
 builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
-builder.Services.AddScoped<UserInfoService>();
 
+builder.Services.AddScoped<UserInfoService>();
 
 //builder.Services.AddAuthentication(options =>
 //{
@@ -36,7 +38,6 @@ builder.Services.AddScoped<UserInfoService>();
 //    options.LoginPath = "/Identity/Account/Login";
 //});
 //builder.Services.AddAuthorization();
-
 
 builder.Services.AddPersistenceLayer(builder.Configuration);
 

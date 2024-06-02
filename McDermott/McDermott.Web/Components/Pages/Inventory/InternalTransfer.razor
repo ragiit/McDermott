@@ -106,34 +106,41 @@
                                 </div>
                             </div>
                             <div class="row justify-content-start mb-3">
-
                                 <div class="col-12 align-self-start">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            @if (FormInternalTransfer.StatusTransfer == "Draft")
-                                            {
+
+                                    @if (FormInternalTransfer.StatusTransfer == "Draft")
+                                    {
+                                        <div class="card">
+                                            <div class="card-body">
                                                 <DxButton Text="To do Check" RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-clipboard-check" Click="ToDoCheck"></DxButton>
                                                 <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check"></DxButton>
                                                 <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
-                                            }
-                                            else
-                                            {
-                                                @if (FormInternalTransfer.StatusTransfer == "Ready")
-                                                {
-                                                    <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
-                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
-                                                }
-                                                else if (FormInternalTransfer.StatusTransfer == "Waiting")
-                                                {
-                                                    <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check" Click="ToDoCheck"></DxButton>
-                                                    <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
-                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
-                                                }
-                                            }
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
+                                    }
+                                    else if (FormInternalTransfer.StatusTransfer == "Ready")
+                                    {
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
+                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
+                                            </div>
+                                        </div>
+                                    }
+                                    else if (FormInternalTransfer.StatusTransfer == "Waiting")
+                                    {
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check" Click="ToDoCheck"></DxButton>
+                                                <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
+                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
 
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* </div> *@
+                                </div>
                             </div>
                         }
                         <div class="card">
@@ -281,6 +288,21 @@
                                                                 </DxFormLayoutItem>
                                                             </div>
                                                         </DxFormLayout>
+                                                        @*@if (TempFormInternalTransfer.TraceAvability == true)
+                                                    {
+                                                    <DxFormLayout CssClass="mt">
+                                                    <div class="col-md-6">
+                                                    <DxFormLayoutItem Caption="Serial Number/LoT" CaptionCssClass="normal-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@TempFormInternalTransfer.Batch" ReadOnly></DxTextBox>
+                                                    </DxFormLayoutItem>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                    <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
+                                                    <DxDateEdit @bind-Date="@TempFormInternalTransfer.ExpiredDate" DisplayFormat="dd MMMM yyyy" Format="d"></DxDateEdit>
+                                                    </DxFormLayoutItem>
+                                                    </div>
+                                                    </DxFormLayout>
+                                                    } *@
 
                                                     </EditFormTemplate>
                                                 </DxGrid>

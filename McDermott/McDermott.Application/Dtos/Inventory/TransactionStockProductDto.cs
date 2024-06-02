@@ -14,7 +14,11 @@ namespace McDermott.Application.Dtos.Inventory
         [Required(ErrorMessage = "Please Input Stock Quantity...")]
         public long? QtyStock { get; set; }
 
+        public bool TraceAvability { get; set; } = false;
+
         public string? StatusStock { get; set; }
+        public string? Batch { get; set; }
+        public DateTime? ExpiredDate { get; set; }
 
         public string? ProductName { get; set; }
         public string? UomName { get; set; }

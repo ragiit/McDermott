@@ -92,9 +92,9 @@
 </div>
 
 <DxPopup Visible="isPrint" Width="auto">
-   <DxRichEdit>
-        <MailMergeSettings>
-            <DxMailMergeSettings Data="SickLeaves"></DxMailMergeSettings>
+    <DxRichEdit ActiveRibbonTabIndex="5" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">
+        <MailMergeSettings >
+            <DxMailMergeSettings ViewMergedData="true" Data="SickLeaves"></DxMailMergeSettings>
         </MailMergeSettings>
    </DxRichEdit>
 </DxPopup>

@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Employee
+﻿using McDermott.Application.Features.Services;
+
+namespace McDermott.Web.Components.Pages.Employee
 {
     public partial class SickLeavePage
     {
@@ -17,7 +19,7 @@
         [Parameter]
         public long Id { get; set; }
 
-        private byte[] DocumentContent;
+        public byte[] DocumentContent;
         private IGrid Grid { get; set; }
         private bool IsLoading { get; set; } = false;
         private bool isPrint { get; set; } = false;
@@ -153,7 +155,7 @@
         private async void PrintToLeave()
         {
             isPrint = true;
-            //DocumentContent = await DocumentProvider;
+            DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx");
         }
 
         #endregion Click

@@ -129,8 +129,8 @@ namespace McDermott.Web.Components.Pages.Inventory
             if (product is not null)
             {
                 var data = Products.Where(p => p.Id == product.Id).FirstOrDefault();
-                TempFormInternalTransfer.ProductName = data.Name;
-                var uomName = Uoms.Where(u => u.Id == data.UomId).Select(x => x.Name).FirstOrDefault();
+                TempFormInternalTransfer.ProductName = data?.Name;
+                var uomName = Uoms.Where(u => u.Id == data?.UomId).Select(x => x.Name).FirstOrDefault();
                 TempFormInternalTransfer.UomName = uomName;
             }
         }
@@ -249,7 +249,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         #region Click
 
-        private async Task NewItem_Click()
+        private void NewItem_Click()
         {
             showForm = true;
             FormInternalTransfer = new();
@@ -288,7 +288,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 foreach (var item in TempTransactionStocks)
                 {
                     var d = Products.Where(x => x.Id == item.ProductId).FirstOrDefault();
-                    item.UomName = Uoms.Where(u => u.Id == d.UomId).Select(x => x.Name).FirstOrDefault();
+                    item.UomName = Uoms.Where(u => u.Id == d?.UomId).Select(x => x.Name).FirstOrDefault();
                 }
                 PanelVisible = false;
             }
@@ -316,7 +316,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 foreach (var item in asyncData)
                 {
                     var StockSent = asyncData.Where(t => t.TransactionStock is not null && t.TransactionStock.SourceId == item.TransactionStock!.SourceId && t.ProductId == item.ProductId).FirstOrDefault();
-                    var warehouse_stock = StockProducts.Where(sp => sp.SourceId == item.TransactionStock.SourceId && sp.ProductId == item.ProductId).FirstOrDefault();
+                    var warehouse_stock = StockProducts.Where(sp => sp.SourceId == item?.TransactionStock?.SourceId && sp.ProductId == item?.ProductId).FirstOrDefault();
                     if (warehouse_stock is not null && StockSent is not null)
                     {
                         if (StockSent.QtyStock <= warehouse_stock.Qty)
@@ -336,7 +336,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 bool HasValueFalse = allMatched.Any(x => x == false);
                 var datas = await Mediator.Send(new GetTransactionStockQuery());
-                FormInternalTransfer = datas.Where(x => x.Id == transactionId).FirstOrDefault();
+                FormInternalTransfer = datas.Where(x => x.Id == transactionId).FirstOrDefault()!;
                 if (HasValueFalse)
                 {
                     FormInternalTransfer.StatusTransfer = "Waiting";
@@ -377,7 +377,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 var Stock = await Mediator.Send(new GetStockProductQuery());
                 var transactionProductStock = await Mediator.Send(new GetTransactionStockProductQuery());
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-                FormInternalTransfer = TransactionStocks.Where(x => x.Id == transactionId).FirstOrDefault();
+                FormInternalTransfer = TransactionStocks.Where(x => x.Id == transactionId).FirstOrDefault()!;
                 if (FormInternalTransfer is not null)
                 {
                     FormInternalTransfer.StatusTransfer = "Done";
@@ -397,8 +397,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                         {
                             FormStock.ProductId = a.ProductId;
                             FormStock.SourceId = getInternalTransfer.DestinationId;
-                            FormStock.UomId = a.Product.UomId;
-                            FormStock.Qty = a.QtyStock;
+                            FormStock.UomId = a?.Product?.UomId;
+                            FormStock.Qty = a?.QtyStock;
+                            if (TempFormInternalTransfer.TraceAvability == true && checkedStockOut.Batch != null && checkedStockOut.Expired != null)
+                            {
+                                FormStock.Batch = checkedStockOut?.Batch;
+                                FormStock.Expired = checkedStockOut?.Expired;
+                            }
                             await Mediator.Send(new CreateStockProductRequest(FormStock));
                         }
                         else
@@ -434,7 +439,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 var transactionProductStock = await Mediator.Send(new GetTransactionStockProductQuery());
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-                FormInternalTransfer = TransactionStocks.Where(x => x.Id == transactionId).FirstOrDefault();
+                FormInternalTransfer = TransactionStocks.Where(x => x.Id == transactionId).FirstOrDefault()!;
                 if (FormInternalTransfer is not null)
                 {
                     FormInternalTransfer.StatusTransfer = "Cancel";
