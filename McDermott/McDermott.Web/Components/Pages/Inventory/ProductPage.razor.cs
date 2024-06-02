@@ -460,6 +460,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if (FormProductDetails.Id == 0)
                 {
                     await CreateNewProductAndMedicament();
+
                     ToastService.ShowSuccess("Successfully Added Data...");
                 }
                 else
@@ -480,11 +481,10 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             FormProducts.Id = FormProductDetails.Id;
             FormProducts.Name = FormProductDetails.Name;
-            FormProducts.BpjsClasificationId = FormProductDetails.BpjsClasificationId;
             FormProducts.ProductCategoryId = FormProductDetails.ProductCategoryId;
             FormProducts.ProductType = FormProductDetails.ProductType;
             FormProducts.HospitalType = FormProductDetails.HospitalType;
-            FormProducts.BpjsClasificationId = FormProductDetails.BpjsClasificationId;
+            FormProducts.BpjsClassificationId = FormProductDetails.BpjsClassificationId;
             FormProducts.UomId = FormProductDetails.UomId;
             FormProducts.PurchaseUomId = FormProductDetails.PurchaseUomId;
             FormProducts.SalesPrice = FormProductDetails.SalesPrice;
@@ -526,7 +526,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 if (FormMedicaments.Id == 0)
                 {
-                    await Mediator.Send(new CreateMedicamentRequest(FormMedicaments));
+                    var aazd = await Mediator.Send(new CreateMedicamentRequest(FormMedicaments));
                 }
                 else
                 {

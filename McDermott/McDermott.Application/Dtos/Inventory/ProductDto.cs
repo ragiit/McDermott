@@ -9,7 +9,7 @@ namespace McDermott.Application.Dtos.Inventory
         [Required(ErrorMessage = "Name Must Be Filled In!")]
         public string? Name { get; set; }
 
-        public long? BpjsClasificationId { get; set; }
+        public long? BpjsClassificationId { get; set; }
         public long? UomId { get; set; }
         public long? ProductCategoryId { get; set; }
         public long? CompanyId { get; set; }
@@ -65,7 +65,7 @@ namespace McDermott.Application.Dtos.Inventory
         public long Dosage { get; set; } = 0;
         public string? UomName { get; set; }
         public long? Qtys { get; set; }
-        public long? BpjsClasificationId { get; set; }
+        public long? BpjsClassificationId { get; set; }
         public long? ProductCategoryId { get; set; }
         public long? CompanyId { get; set; }
         public long? PurchaseUomId { get; set; }
