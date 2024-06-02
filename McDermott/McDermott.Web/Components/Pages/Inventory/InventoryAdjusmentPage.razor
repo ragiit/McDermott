@@ -137,6 +137,7 @@
                                                         NullText="Select Location..."
                                                         TextFieldName="Name"
                                                         ValueFieldName="Id"
+                                                        SelectedItemChanged="@((LocationDto freq)=>SelectLocation(freq))"
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                         FilteringMode="@DataGridFilteringMode.Contains"
                                                         @bind-Value="InventoryAdjusment.LocationId">
