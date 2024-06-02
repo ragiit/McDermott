@@ -2,6 +2,7 @@
 using McDermott.Application.Dtos.Inventory;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
+using Unipluss.Sign.Client.Code;
 using static McDermott.Application.Extentions.EnumHelper;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 
@@ -66,6 +67,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<InventoryAdjusmentDetailDto> InventoryAdjusmentDetails { get; set; } = [];
         private List<LocationDto> Locations { get; set; } = [];
         private List<CompanyDto> Companies { get; set; } = [];
+        private List<ProductDto> AllProducts { get; set; } = [];
         private List<ProductDto> Products { get; set; } = [];
         private List<UomDto> Uoms { get; set; } = [];
 
@@ -81,6 +83,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             Companies = await Mediator.Send(new GetCompanyQuery());
             Uoms = await Mediator.Send(new GetUomQuery());
             Products = await Mediator.Send(new GetProductQuery());
+            AllProducts = Products.Select(x => x).ToList();
 
             await GetUserInfo();
             await LoadData();
@@ -123,6 +126,10 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             ShowForm = true;
             InventoryAdjusment = new();
+
+            if (Companies.Count > 0)
+                InventoryAdjusment.CompanyId = Companies[0].Id;
+
             InventoryAdjusmentDetails = [];
         }
 
@@ -232,6 +239,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 if (InventoryAdjusment.Id == 0)
                 {
+                    InventoryAdjusment.Status = EnumStatusInventoryAdjusment.Draft;
                     InventoryAdjusment = await Mediator.Send(new CreateInventoryAdjusmentRequest(InventoryAdjusment));
                     InventoryAdjusmentDetails.ForEach(x =>
                     {
@@ -257,6 +265,19 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 e.HandleException(ToastService);
             }
+        }
+
+        private async Task SelectLocation(LocationDto e)
+        {
+            if (e is null)
+            {
+                Products.Clear();
+                return;
+            }
+
+            var st = await Mediator.Send(new GetStockProductQuery(x => x.SourceId == e.Id));
+
+            Products = AllProducts.Where(x => st.Select(s => s.ProductId).Contains(x.Id)).ToList();
         }
 
         private async Task SaveInventoryAdjusmentDetail(GridEditModelSavingEventArgs e)
@@ -402,12 +423,13 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 case "Start Inventory":
                     InventoryAdjusment.Status = EnumStatusInventoryAdjusment.InProgress;
-                    StagingText = EnumStatusInventoryAdjusment.Invalidate.GetDisplayName();
+                    StagingText = EnumStatusInventoryAdjusment.InProgress.GetDisplayName();
                     await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
                     break;
 
                 case "In-Progress":
-                    InventoryAdjusment.Status = EnumStatusInventoryAdjusment.InProgress;
+                    InventoryAdjusment.Status = EnumStatusInventoryAdjusment.Invalidate;
+                    StagingText = EnumStatusInventoryAdjusment.Invalidate.GetDisplayName();
                     await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
                     break;
 

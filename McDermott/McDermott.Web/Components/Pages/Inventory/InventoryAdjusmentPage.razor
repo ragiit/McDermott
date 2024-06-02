@@ -137,6 +137,7 @@
                                                         NullText="Select Location..."
                                                         TextFieldName="Name"
                                                         ValueFieldName="Id"
+                                                        SelectedItemChanged="@((LocationDto freq)=>SelectLocation(freq))"
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                         FilteringMode="@DataGridFilteringMode.Contains"
                                                         @bind-Value="InventoryAdjusment.LocationId">
@@ -148,8 +149,7 @@
                                             <DxComboBox ShowValidationIcon="true" Data="@Companies"
                                                         NullText="Select Company..."
                                                         TextFieldName="Name"
-                                                        ValueFieldName="Id"
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                        ValueFieldName="Id" 
                                                         FilteringMode="@DataGridFilteringMode.Contains"
                                                         @bind-Value="InventoryAdjusment.CompanyId">
                                             </DxComboBox>
