@@ -205,9 +205,9 @@
                                                             SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed">
                                                         <ToolbarTemplate>
                                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Enabled="@IsStatus(EnumStatusInventoryAdjusment.Draft)" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && !IsStatus(EnumStatusInventoryAdjusment.Invalidate)" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && !IsStatus(EnumStatusInventoryAdjusment.Invalidate)" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Enabled="@IsStatus(EnumStatusInventoryAdjusment.InProgress)" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjusment.InProgress)" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjusment.InProgress)" />
                                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                                 <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                                 <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
@@ -256,7 +256,7 @@
                                                                                         FilteringMode="@DataGridFilteringMode.Contains"
                                                                                         NullText="Select Product..."
                                                                                         TextFieldName="Name"
-                                                                                        ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.Draft))"
+                                                                                        ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.InProgress))"
                                                                                         ValueFieldName="Id"
                                                                                         SelectedItemChanged="@((ProductDto freq) => OnSelectProduct(freq))"
                                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -312,7 +312,7 @@
                                                                     a.ExpiredDate = null;
                                                                     } *@
                                                                             <DxDateEdit ShowValidationIcon="true"
-                                                                                        ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.Draft))"
+                                                                                        ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.InProgress))"
                                                                                         @bind-Date="@a.ExpiredDate"
                                                                                         NullText="Expired Date">
                                                                             </DxDateEdit>
