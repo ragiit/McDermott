@@ -176,26 +176,28 @@ namespace McDermott.Web.Components.Pages.Inventory
                         break;
                 }
 
-                InventoryAdjusmentDetails = await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == InventoryAdjusment.Id));
-                InventoryAdjusmentDetails.ForEach(async e =>
-                {
-                    var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id));
+                await LoadInventoryAdjustmentDetails();
 
-                    TotalQty = StockProducts.Sum(x => x.Qty) ?? 0;
+                //InventoryAdjusmentDetails = await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == InventoryAdjusment.Id));
+                //InventoryAdjusmentDetails.ForEach(async e =>
+                //{
+                //    var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id));
 
-                    UomId = e.UomId ?? null;
+                //    TotalQty = StockProducts.Sum(x => x.Qty) ?? 0;
 
-                    if (e.Product is not null && e.Product.TraceAbility)
-                    {
-                        LotSerialNumber = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Batch ?? "-";
-                        ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Expired;
-                    }
-                    else
-                    {
-                        LotSerialNumber = "-";
-                        ExpiredDate = null;
-                    }
-                });
+                //    UomId = e.UomId ?? null;
+
+                //    if (e.Product is not null && e.Product.TraceAbility)
+                //    {
+                //        LotSerialNumber = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Batch ?? "-";
+                //        ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Expired;
+                //    }
+                //    else
+                //    {
+                //        LotSerialNumber = "-";
+                //        ExpiredDate = null;
+                //    }
+                //});
             }
         }
 
@@ -393,6 +395,48 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             PanelVisible = true;
             InventoryAdjusmentDetails = await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == InventoryAdjusment.Id));
+
+            var tasks = InventoryAdjusmentDetails.Select(async x =>
+            {
+                var stockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == x.ProductId));
+
+                x.TeoriticalQty = stockProducts.Sum(sp => sp.Qty) ?? 0;
+
+                if (x.Product != null)
+                {
+                    x.UomId = x.Product.UomId;
+                    x.Product.Uom = Uoms.FirstOrDefault(z => z.Id == x.Product.UomId);
+
+                    if (x.Product.TraceAbility)
+                    {
+                        var stockProduct = stockProducts.FirstOrDefault(sp => sp.SourceId == InventoryAdjusment.LocationId);
+                        if (stockProduct != null)
+                        {
+                            x.LotSerialNumber = stockProduct.Batch ?? "-";
+                            x.ExpiredDate = stockProduct.Expired;
+                        }
+                        else
+                        {
+                            x.LotSerialNumber = "-";
+                            x.ExpiredDate = null;
+                        }
+                    }
+                    else
+                    {
+                        x.LotSerialNumber = "-";
+                        x.ExpiredDate = null;
+                    }
+                }
+                else
+                {
+                    x.UomId = null;
+                    x.LotSerialNumber = "-";
+                    x.ExpiredDate = null;
+                }
+            });
+
+            await Task.WhenAll(tasks);
+
             PanelVisible = false;
         }
 
@@ -404,6 +448,10 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ToastService.ShowInfo("Please select the Location first.");
                 return;
             }
+
+            TotalQty = 0;
+            LotSerialNumber = "-";
+            UomId = null;
 
             await GridDetail.StartEditNewRowAsync();
         }
