@@ -52,7 +52,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDetailDataItems { get; set; } = [];
 
-        private string StagingText { get; set; } = EnumStatusInventoryAdjusment.Draft.GetDisplayName();
+        private string StagingText { get; set; } = "Start Inventory";
         private bool PanelVisible { get; set; } = true;
         private bool FormValidationState { get; set; } = true;
         private bool ShowForm { get; set; } = false;
@@ -150,7 +150,45 @@ namespace McDermott.Web.Components.Pages.Inventory
             if (inventoryAdjusment.Count > 0)
             {
                 InventoryAdjusment = inventoryAdjusment[0];
+
+                switch (InventoryAdjusment.Status)
+                {
+                    case EnumStatusInventoryAdjusment.Draft:
+                        StagingText = EnumStatusInventoryAdjusment.InProgress.GetDisplayName();
+                        break;
+
+                    case EnumStatusInventoryAdjusment.InProgress:
+                        StagingText = EnumStatusInventoryAdjusment.Invalidate.GetDisplayName();
+                        break;
+
+                    case EnumStatusInventoryAdjusment.Invalidate:
+                        StagingText = EnumStatusInventoryAdjusment.Invalidate.GetDisplayName();
+                        break;
+
+                    default:
+                        break;
+                }
+
                 InventoryAdjusmentDetails = await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == InventoryAdjusment.Id));
+                InventoryAdjusmentDetails.ForEach(async e =>
+                {
+                    var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id));
+
+                    TotalQty = StockProducts.Sum(x => x.Qty) ?? 0;
+
+                    UomId = e.UomId ?? null;
+
+                    if (e.Product is not null && e.Product.TraceAbility)
+                    {
+                        LotSerialNumber = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Batch ?? "-";
+                        ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Expired;
+                    }
+                    else
+                    {
+                        LotSerialNumber = "-";
+                        ExpiredDate = null;
+                    }
+                });
             }
         }
 
@@ -194,20 +232,26 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 if (InventoryAdjusment.Id == 0)
                 {
-                    var result = await Mediator.Send(new CreateInventoryAdjusmentRequest(InventoryAdjusment));
+                    InventoryAdjusment = await Mediator.Send(new CreateInventoryAdjusmentRequest(InventoryAdjusment));
                     InventoryAdjusmentDetails.ForEach(x =>
                     {
                         x.Id = 0;
-                        x.InventoryAdjusmentId = result.Id;
+                        x.InventoryAdjusmentId = InventoryAdjusment.Id;
                     });
-                    await Mediator.Send(new CreateListInventoryAdjusmentDetailRequest(InventoryAdjusmentDetails));
+
+                    InventoryAdjusmentDetails = await Mediator.Send(new CreateListInventoryAdjusmentDetailRequest(InventoryAdjusmentDetails));
+                    InventoryAdjusmentDetails.ForEach(x =>
+                    {
+                        x.Product = Products.FirstOrDefault(z => z.Id == x.ProductId);
+                        x.UomId = x.Product?.UomId;
+                    });
                 }
                 else
                 {
-                    await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+                    InventoryAdjusment = await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
                 }
 
-                await LoadData();
+                //await LoadData();
             }
             catch (Exception e)
             {
@@ -329,6 +373,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             if (InventoryAdjusment.LocationId is null || InventoryAdjusment.LocationId == 0)
             {
+                ToastService.ClearInfoToasts();
+                ToastService.ShowInfo("Please select the Location first.");
                 return;
             }
 
@@ -352,6 +398,27 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task OnClickConfirm()
         {
+            switch (StagingText)
+            {
+                case "Start Inventory":
+                    InventoryAdjusment.Status = EnumStatusInventoryAdjusment.InProgress;
+                    StagingText = EnumStatusInventoryAdjusment.Invalidate.GetDisplayName();
+                    await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+                    break;
+
+                case "In-Progress":
+                    InventoryAdjusment.Status = EnumStatusInventoryAdjusment.InProgress;
+                    await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+                    break;
+
+                case "Invalidate":
+                    InventoryAdjusment.Status = EnumStatusInventoryAdjusment.Invalidate;
+                    await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private long TotalQty { get; set; } = 0;
@@ -377,7 +444,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if (e.TraceAbility)
                 {
                     LotSerialNumber = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Batch ?? "-";
-                    ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId).Expired.GetValueOrDefault();
+                    ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Expired;
                 }
                 else
                 {

@@ -7,7 +7,9 @@
         public DateTime ExpiredDate { get; set; }
         public long RealQty { get; set; } = 0;
 
+        [SetToNull]
         public virtual InventoryAdjusment? InventoryAdjusment { get; set; }
+        [SetToNull]
         public virtual Product? Product { get; set; }
     }
 }
