@@ -70,7 +70,7 @@
                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && InventoryAdjusments.Count > 0" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && InventoryAdjusments.Count > 0" />
+                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && InventoryAdjusments.Count > 0 && IsDeletedAdjusment" />
                                                     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                     <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                     <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
@@ -127,6 +127,7 @@
                                         <DxFormLayoutItem Caption="Name" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
                                             <DxTextBox @bind-Text="@InventoryAdjusment.Name"
                                                        ShowValidationIcon="true"
+                                                       ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.Draft))"
                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                        NullText="Name" />
                                             <ValidationMessage For="@(() => InventoryAdjusment.Name)"   />
@@ -136,6 +137,7 @@
                                             <DxComboBox ShowValidationIcon="true" Data="@Locations"
                                                         NullText="Select Location..."
                                                         TextFieldName="Name"
+                                                        ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.Draft))"
                                                         ValueFieldName="Id" 
                                                         SelectedItemChanged="@((LocationDto freq)=>SelectLocation(freq))"
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -148,6 +150,7 @@
                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Company" ColSpanMd="12">
                                             <DxComboBox ShowValidationIcon="true" Data="@Companies"
                                                         NullText="Select Company..."
+                                                        ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.Draft))"
                                                         TextFieldName="Name"
                                                         ValueFieldName="Id" 
                                                         FilteringMode="@DataGridFilteringMode.Contains"
@@ -158,6 +161,7 @@
 
                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date" ColSpanMd="12">
                                             <DxDateEdit ShowValidationIcon="true"
+                                                        ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.Draft))"
                                                         @bind-Date="@InventoryAdjusment.Date"
                                                         Mask="@DateTimeMask.ShortDate"
                                                         NullText="Select Date">
@@ -207,7 +211,7 @@
                                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Enabled="@IsStatus(EnumStatusInventoryAdjusment.InProgress)" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
                                                                 <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjusment.InProgress)" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjusment.InProgress)" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjusment.InProgress) " />
                                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                                 <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                                 <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
