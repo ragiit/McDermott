@@ -204,6 +204,11 @@ namespace McDermott.Web.Components.Pages.Inventory
             await LoadData();
         }
 
+        private async Task RefreshDetails_Click()
+        {
+            await LoadInventoryAdjustmentDetails();
+        }
+
         private void KeyPressHandler(KeyboardEventArgs args)
         {
             if (args.Key == "Enter")
@@ -240,6 +245,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if (InventoryAdjusment.Id == 0)
                 {
                     InventoryAdjusment.Status = EnumStatusInventoryAdjusment.Draft;
+                    StagingText = "Start Inventory";
                     InventoryAdjusment = await Mediator.Send(new CreateInventoryAdjusmentRequest(InventoryAdjusment));
                     InventoryAdjusmentDetails.ForEach(x =>
                     {
@@ -423,7 +429,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 case "Start Inventory":
                     InventoryAdjusment.Status = EnumStatusInventoryAdjusment.InProgress;
-                    StagingText = EnumStatusInventoryAdjusment.InProgress.GetDisplayName();
+                    StagingText = EnumStatusInventoryAdjusment.Invalidate.GetDisplayName();
                     await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
                     break;
 
