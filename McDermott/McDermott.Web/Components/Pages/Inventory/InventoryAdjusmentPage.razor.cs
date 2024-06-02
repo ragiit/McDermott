@@ -505,6 +505,21 @@ namespace McDermott.Web.Components.Pages.Inventory
                 case "Invalidate":
                     InventoryAdjusment.Status = EnumStatusInventoryAdjusment.Invalidate;
                     await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+
+                    var tasks = InventoryAdjusmentDetails.Select(async x =>
+                    {
+                        var stockProduct = (await Mediator.Send(new GetStockProductQuery(s => s.ProductId == x.ProductId && s.SourceId == InventoryAdjusment.LocationId)))
+                                                           .FirstOrDefault();
+
+                        if (stockProduct != null)
+                        {
+                            stockProduct.Qty = x.RealQty;
+                            await Mediator.Send(new UpdateStockProductRequest(stockProduct));
+                        }
+                    });
+
+                    await Task.WhenAll(tasks);
+
                     break;
 
                 default:
