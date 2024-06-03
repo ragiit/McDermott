@@ -162,7 +162,7 @@ namespace McDermott.Web.Components.Pages.Employee
         {
             try
             {
-                var data = SickLeaves.Where(x => x.PatientId == grid).FirstOrDefault();
+                var data = SickLeaves.Where(x => x.PatientId == grid).FirstOrDefault()!;
                 var age = 0;
                 if (data.brithday == null)
                 {
@@ -170,7 +170,7 @@ namespace McDermott.Web.Components.Pages.Employee
                 }
                 else
                 {
-                    age = data.brithday.Value.Year - DateTime.Now.Year;
+                    age = DateTime.Now.Year - data.brithday.Value.Year;
                 }
                 var days = data.StartSickLeave.Value.Day + data.EndSickLeave.Value.Day;
                 isPrint = true;
@@ -184,7 +184,7 @@ namespace McDermott.Web.Components.Pages.Employee
                 {"%AddressPatient%", data?.Address },
                 {"%AgePatient%", age.ToString() },
                 {"%days%", days.ToString() },
-                {"%DateNow%", DateTime.Now.ToString("dd MMMM yyyy")}
+                {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")}
             };
                 DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
             }
