@@ -1024,12 +1024,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 //var r = await Mediator.Send(new GetPharmacyQuery(x => x.Id == SelectedDataItems[0].Adapt<PharmacyDto>().Id));
 
                 var p = SelectedDataItems[0].Adapt<PharmacyDto>() ?? q;
-                await GetPatientAllergy(p.PatientId);
                 if (p.Status == "Accepted")
                 {
                     isActiveButton = true;
                 }
                 Pharmacy = p!;
+                await GetPatientAllergy(Pharmacy.PatientId);
                 Prescriptions = await Mediator.Send(new GetPrescriptionQuery(x => x.PharmacyId == Pharmacy.Id));
                 Concoctions = await Mediator.Send(new GetConcoctionQuery(x => x.PharmacyId == Pharmacy.Id));
             }

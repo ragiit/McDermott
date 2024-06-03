@@ -280,7 +280,7 @@
                                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                           @bind-Values="@SelectedFoodAllergies"
                                                                                           EditFormat="{1}"
-                                                                                          Enabled="isActiveButton"
+                                                                                          Enabled="!isActiveButton"
                                                                                           InputId="tbMultiColumn">
                                                                                     <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
                                                                                                         Caption="Code"
