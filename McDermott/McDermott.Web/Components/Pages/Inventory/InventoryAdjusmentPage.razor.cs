@@ -1,4 +1,5 @@
 ﻿using DevExpress.Blazor.Internal;
+using DevExpress.Entity.ProjectModel;
 using McDermott.Application.Dtos.Inventory;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
@@ -138,6 +139,8 @@ namespace McDermott.Web.Components.Pages.Inventory
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
+        private bool IsDeletedAdjusment { get; set; } = false;
+
         private void GridDetail_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowDetailVisibleIndex = args.VisibleIndex;
@@ -146,6 +149,15 @@ namespace McDermott.Web.Components.Pages.Inventory
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
+
+            try
+            {
+                if (args.DataItem is null)
+                    return;
+
+                IsDeletedAdjusment = ((InventoryAdjusmentDto)args.DataItem)!.Status == EnumStatusInventoryAdjusment.Draft;
+            }
+            catch { }
         }
 
         private async Task EditItem_Click()
@@ -176,32 +188,39 @@ namespace McDermott.Web.Components.Pages.Inventory
                         break;
                 }
 
-                InventoryAdjusmentDetails = await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == InventoryAdjusment.Id));
-                InventoryAdjusmentDetails.ForEach(async e =>
-                {
-                    var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id));
+                await LoadInventoryAdjustmentDetails();
 
-                    TotalQty = StockProducts.Sum(x => x.Qty) ?? 0;
+                //InventoryAdjusmentDetails = await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == InventoryAdjusment.Id));
+                //InventoryAdjusmentDetails.ForEach(async e =>
+                //{
+                //    var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id));
 
-                    UomId = e.UomId ?? null;
+                //    TotalQty = StockProducts.Sum(x => x.Qty) ?? 0;
 
-                    if (e.Product is not null && e.Product.TraceAbility)
-                    {
-                        LotSerialNumber = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Batch ?? "-";
-                        ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Expired;
-                    }
-                    else
-                    {
-                        LotSerialNumber = "-";
-                        ExpiredDate = null;
-                    }
-                });
+                //    UomId = e.UomId ?? null;
+
+                //    if (e.Product is not null && e.Product.TraceAbility)
+                //    {
+                //        LotSerialNumber = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Batch ?? "-";
+                //        ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Expired;
+                //    }
+                //    else
+                //    {
+                //        LotSerialNumber = "-";
+                //        ExpiredDate = null;
+                //    }
+                //});
             }
         }
 
         private async Task Refresh_Click()
         {
             await LoadData();
+        }
+
+        private async Task RefreshDetails_Click()
+        {
+            await LoadInventoryAdjustmentDetails();
         }
 
         private void KeyPressHandler(KeyboardEventArgs args)
@@ -240,6 +259,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if (InventoryAdjusment.Id == 0)
                 {
                     InventoryAdjusment.Status = EnumStatusInventoryAdjusment.Draft;
+                    StagingText = "Start Inventory";
                     InventoryAdjusment = await Mediator.Send(new CreateInventoryAdjusmentRequest(InventoryAdjusment));
                     InventoryAdjusmentDetails.ForEach(x =>
                     {
@@ -387,6 +407,51 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             PanelVisible = true;
             InventoryAdjusmentDetails = await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == InventoryAdjusment.Id));
+
+            var tasks = InventoryAdjusmentDetails.Select(async x =>
+            {
+                var stockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == x.ProductId && s.SourceId == InventoryAdjusment.LocationId));
+
+                if (stockProducts.Any())
+                {
+                    x.TeoriticalQty = stockProducts.FirstOrDefault()?.Qty ?? 0;
+
+                    if (x.Product != null)
+                    {
+                        x.UomId = x.Product.UomId;
+                        x.Product.Uom = Uoms.FirstOrDefault(z => z.Id == x.Product.UomId);
+
+                        if (x.Product.TraceAbility)
+                        {
+                            var stockProduct = stockProducts.FirstOrDefault(sp => sp.SourceId == InventoryAdjusment.LocationId);
+                            if (stockProduct != null)
+                            {
+                                x.LotSerialNumber = stockProduct.Batch ?? "-";
+                                x.ExpiredDate = stockProduct.Expired;
+                            }
+                            else
+                            {
+                                x.LotSerialNumber = "-";
+                                x.ExpiredDate = null;
+                            }
+                        }
+                        else
+                        {
+                            x.LotSerialNumber = "-";
+                            x.ExpiredDate = null;
+                        }
+                    }
+                    else
+                    {
+                        x.UomId = null;
+                        x.LotSerialNumber = "-";
+                        x.ExpiredDate = null;
+                    }
+                }
+            });
+
+            await Task.WhenAll(tasks);
+
             PanelVisible = false;
         }
 
@@ -398,6 +463,10 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ToastService.ShowInfo("Please select the Location first.");
                 return;
             }
+
+            TotalQty = 0;
+            LotSerialNumber = "-";
+            UomId = null;
 
             await GridDetail.StartEditNewRowAsync();
         }
@@ -423,7 +492,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 case "Start Inventory":
                     InventoryAdjusment.Status = EnumStatusInventoryAdjusment.InProgress;
-                    StagingText = EnumStatusInventoryAdjusment.InProgress.GetDisplayName();
+                    StagingText = EnumStatusInventoryAdjusment.Invalidate.GetDisplayName();
                     await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
                     break;
 
@@ -436,6 +505,21 @@ namespace McDermott.Web.Components.Pages.Inventory
                 case "Invalidate":
                     InventoryAdjusment.Status = EnumStatusInventoryAdjusment.Invalidate;
                     await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+
+                    var tasks = InventoryAdjusmentDetails.Select(async x =>
+                    {
+                        var stockProduct = (await Mediator.Send(new GetStockProductQuery(s => s.ProductId == x.ProductId && s.SourceId == InventoryAdjusment.LocationId)))
+                                                           .FirstOrDefault();
+
+                        if (stockProduct != null)
+                        {
+                            stockProduct.Qty = x.RealQty;
+                            await Mediator.Send(new UpdateStockProductRequest(stockProduct));
+                        }
+                    });
+
+                    await Task.WhenAll(tasks);
+
                     break;
 
                 default:
@@ -457,9 +541,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                     return;
                 }
 
-                var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id));
+                var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id && s.SourceId == InventoryAdjusment.LocationId));
 
-                TotalQty = StockProducts.Sum(x => x.Qty) ?? 0;
+                TotalQty = StockProducts.FirstOrDefault()?.Qty ?? 0;
 
                 UomId = e.UomId ?? null;
 
