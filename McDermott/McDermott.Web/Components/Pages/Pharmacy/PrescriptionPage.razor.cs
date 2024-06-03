@@ -68,7 +68,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             ShowForm = true;
             isActiveButton = true;
-            Pharmacy.Status = "Accepted";
+            Pharmacy.Status = "Confirm";
+            if (Pharmacy.Status == "Accepted")
+            {
+                isView = true;
+            }
             Pharmacy.PatientId = generalConsultantService.FirstOrDefault()!.PatientId;
             Pharmacy.PractitionerId = generalConsultantService.FirstOrDefault()!.PratitionerId;
             Pharmacy.ServiceId = generalConsultantService.FirstOrDefault()!.ServiceId;
@@ -159,6 +163,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private bool PanelVisible { get; set; } = false;
         private bool IsLoading { get; set; } = false;
+        private bool isView { get; set; } = false;
         private bool ShowForm { get; set; } = false;
         private bool isActiveButton { get; set; } = false;
         private bool PopUpConcoctionDetail { get; set; } = false;
@@ -366,11 +371,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 var checkMedicament = Medicaments.Where(x => x.ProductId == value.Id).FirstOrDefault();
                 Prescription.PriceUnit = value.Cost;
+                Prescription.ActiveComponentId = checkMedicament?.ActiveComponentId;
                 Prescription.UomId = checkMedicament?.UomId;
                 Prescription.DrugFromId = checkMedicament?.FormId;
                 Prescription.Dosage = checkMedicament?.Dosage;
                 Prescription.DrugDosageId = checkMedicament?.FrequencyId;
                 Prescription.DrugRouteId = checkMedicament?.RouteId;
+                selectedActiveComponentPrescriptions = ActiveComponents.Where(z => checkMedicament.ActiveComponentId is not null && checkMedicament.ActiveComponentId.Contains(z.Id)).ToList();
 
                 var checkStock = StockProducts.Where(x => x.ProductId == value.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
                 if (checkStock == null)
@@ -466,7 +473,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Services = await Mediator.Send(new GetServiceQuery());
             Products = await Mediator.Send(new GetProductQuery());
             DrugDosages = await Mediator.Send(new GetDrugDosageQuery());
-            MedicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery());
+            MedicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery(x => x.IsConcoction == false));
             MedicamentGroupsConcoction = await Mediator.Send(new GetMedicamentGroupQuery(x => x.IsConcoction == true));
             DrugForms = await Mediator.Send(new GetFormDrugQuery());
             Signas = await Mediator.Send(new GetSignaQuery());
@@ -951,7 +958,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 if (Pharmacy.Id == 0)
                 {
-                    Pharmacy.Status = "Confirm";
+                    Pharmacy.Status = "Accepted";
                     Pharmacy = await Mediator.Send(new CreatePharmacyRequest(Pharmacy));
                     Prescriptions.ForEach(x =>
                     {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MimeKit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
@@ -11,19 +12,19 @@ namespace McDermott.Application.Features.Services
     {
         public async Task SendEmailAsync(string to, string subject, string body, byte[] attachment = null, string attachmentName = null)
         {
-            //var message = new MimeMessage();
+            var message = new MimeMessage();
             //message.From.Add(new MailboxAddress("Your Name", _smtpUser));
             //message.To.Add(new MailboxAddress(to));
-            //message.Subject = subject;
+            message.Subject = subject;
 
-            //var bodyBuilder = new BodyBuilder { HtmlBody = body };
+            var bodyBuilder = new BodyBuilder { HtmlBody = body };
 
             if (attachment != null && attachmentName != null)
             {
-                //bodyBuilder.Attachments.Add(attachmentName, attachment);
+                bodyBuilder.Attachments.Add(attachmentName, attachment);
             }
 
-            //message.Body = bodyBuilder.ToMessageBody();
+            message.Body = bodyBuilder.ToMessageBody();
 
             using (var client = new SmtpClient())
             {
