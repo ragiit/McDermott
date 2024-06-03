@@ -121,7 +121,7 @@
                                         <div class="row justify-content-end mb-3">
                                             <div class="col-auto align-self-end">
                                                 <DxTabs RenderMode="TabsRenderMode.AllTabs">
-                                                    <DxTab Text="Accept" Enabled="@(Pharmacy.Status == "Accepted" || Pharmacy.Status == "Confirm")"></DxTab>
+                                                    <DxTab Text="Receive" Enabled="@(Pharmacy.Status == "Accepted" || Pharmacy.Status == "Confirm")"></DxTab>
                                                     <DxTab Text="Process" Enabled="@(Pharmacy.Status == "Processed")"></DxTab>
                                                     <DxTab Text="Done" Enabled="@(Pharmacy.Status == "Done")"></DxTab>
                                                     <DxTab Text="Cancel" Enabled="@(Pharmacy.Status == "Canceled")"></DxTab>
@@ -135,7 +135,7 @@
                                                 {
                                                     <div class="card">
                                                         <div class="card-body">
-                                                            <DxButton Text="Processed" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="Processed"></DxButton>
+                                                            <DxButton Text="Send To Pharmacy" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="Processed"></DxButton>
                                                             <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                         </div>
                                                     </div>

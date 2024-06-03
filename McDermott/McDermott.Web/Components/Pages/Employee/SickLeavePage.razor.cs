@@ -1,4 +1,10 @@
 ﻿using McDermott.Application.Features.Services;
+using McDermott.Domain.Entities;
+using MailKit.Net.Smtp;
+using MimeKit;
+using MimeKit.Text;
+using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
+using System.Net.Mail;
 
 namespace McDermott.Web.Components.Pages.Employee
 {
@@ -10,6 +16,7 @@ namespace McDermott.Web.Components.Pages.Employee
         private List<GeneralConsultanCPPTDto> CPPTs = [];
         private List<DiagnosisDto> Diagnoses = [];
         private List<SickLeaveDto> SickLeaves = [];
+        private List<EmailSettingDto> EmailSettings = [];
         private List<UserDto> Users = [];
 
         #endregion Relation Data
@@ -83,6 +90,7 @@ namespace McDermott.Web.Components.Pages.Employee
             try
             {
                 IsLoading = true;
+
                 generalConsultans = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.IsSickLeave == true || x.IsMaternityLeave == true));
                 Users = await Mediator.Send(new GetUserQuery());
                 CPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery());
@@ -230,7 +238,34 @@ namespace McDermott.Web.Components.Pages.Employee
                 var fileName = $"SickLeave_{DateTime.Now:yyyyMMddHHmmss}.docx";
                 var subject = "Your Document";
                 var body = $"Dear {data.PatientName},<br/><br/>Please find attached your document.<br/><br/>Best regards,<br/>Your Company";
-                //await EmailService.SendEmailAsync(data.Email, subject, body, DocumentContent, fileName);
+                EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
+                var cek = EmailSettings.Where(x => x.Smtp_User == "nuralimajid@matrica.co.id").FirstOrDefault();
+                var host = cek.Smtp_Host;
+                var port = int.Parse(cek.Smtp_Port);
+                var pass = cek.Smtp_Pass;
+                var user = cek.Smtp_User;
+
+                var message = new MimeMessage();
+                message.From.Add(MailboxAddress.Parse(cek.Smtp_User));
+                message.To.Add(MailboxAddress.Parse(data.Email));
+                message.Subject = subject;
+
+                var bodyBuilder = new BodyBuilder { HtmlBody = body };
+
+                if (DocumentContent != null && fileName != null)
+                {
+                    bodyBuilder.Attachments.Add(fileName, DocumentContent);
+                }
+
+                using var smtp = new MailKit.Net.Smtp.SmtpClient();
+                if (cek.Smtp_Encryption == "SSL/TLS")
+                {
+                    smtp.Connect(host, port, MailKit.Security.SecureSocketOptions.SslOnConnect);
+                    smtp.Authenticate(user, pass);
+                    smtp.Send(message);
+                    smtp.Disconnect(true);
+                    ToastService.ShowSuccess("Success Send Email!");
+                }
             }
             catch (Exception ex)
             {
