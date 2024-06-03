@@ -236,7 +236,7 @@ namespace McDermott.Web.Components.Pages.Employee
                 DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
 
                 var fileName = $"SickLeave_{DateTime.Now:yyyyMMddHHmmss}.docx";
-                var subject = "Your Document";
+                var subject = $"Sick Leave{data.PatientName}";
                 var body = $"Dear {data.PatientName},<br/><br/>Please find attached your document.<br/><br/>Best regards,<br/>Your Company";
                 EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
                 var cek = EmailSettings.Where(x => x.Smtp_User == "nuralimajid@matrica.co.id").FirstOrDefault();
@@ -256,7 +256,7 @@ namespace McDermott.Web.Components.Pages.Employee
                 {
                     bodyBuilder.Attachments.Add(fileName, DocumentContent);
                 }
-
+                message.Body = bodyBuilder.ToMessageBody();
                 using var smtp = new MailKit.Net.Smtp.SmtpClient();
                 if (cek.Smtp_Encryption == "SSL/TLS")
                 {
