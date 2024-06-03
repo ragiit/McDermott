@@ -68,6 +68,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             ShowForm = true;
             isActiveButton = true;
+            Pharmacy.Status = "Accepted";
             Pharmacy.PatientId = generalConsultantService.FirstOrDefault()!.PatientId;
             Pharmacy.PractitionerId = generalConsultantService.FirstOrDefault()!.PratitionerId;
             Pharmacy.ServiceId = generalConsultantService.FirstOrDefault()!.ServiceId;
@@ -97,7 +98,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             //    FormRegis.IsPharmacology = true;
         }
 
-        private async Task GetPatientAllergy()
+        private async Task GetPatientAllergy(long? q = null)
         {
             FoodAllergies.Clear();
             WeatherAllergies.Clear();
@@ -111,7 +112,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             WeatherAllergies = allergies.Where(x => x.Type == "02").ToList();
             PharmacologyAllergies = allergies.Where(x => x.Type == "03").ToList();
 
-            var p = Patients.FirstOrDefault(z => z.Id == Pharmacy.PatientId);
+            var p = Patients.FirstOrDefault(z => z.Id == Pharmacy.PatientId || z.Id == q);
 
             if (p is null || p.PatientAllergyIds is null)
                 return;
@@ -1023,7 +1024,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 //var r = await Mediator.Send(new GetPharmacyQuery(x => x.Id == SelectedDataItems[0].Adapt<PharmacyDto>().Id));
 
                 var p = SelectedDataItems[0].Adapt<PharmacyDto>() ?? q;
-
+                await GetPatientAllergy(p.PatientId);
                 if (p.Status == "Accepted")
                 {
                     isActiveButton = true;

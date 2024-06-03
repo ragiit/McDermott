@@ -101,6 +101,7 @@ namespace McDermott.Web.Components.Pages.Employee
                         PatientName = item.Patient.Name,
                         Address = item.Patient.DomicileAddress1,
                         NoRM = item.NoRM,
+                        Email = item.Patient.Email,
                         StartSickLeave = item.StartDateSickLeave,
                         EndSickLeave = item.EndDateSickLeave,
                         brithday = item.Patient.DateOfBirth,
@@ -175,8 +176,8 @@ namespace McDermott.Web.Components.Pages.Employee
                 var days = data.StartSickLeave.Value.Day + data.EndSickLeave.Value.Day;
                 isPrint = true;
                 var mergeFields = new Dictionary<string, string>
-            {
-                {"%NamePatient%", data?.PatientName},
+                {
+                    {"%NamePatient%", data?.PatientName},
                 {"%startDate%", data?.StartSickLeave?.ToString("dd MMMM yyyy") },
                 {"%endDate%", data?.EndSickLeave?.ToString("dd MMMM yyyy") },
                 {"%NameDoctor%", data?.PhycisianName },
@@ -185,8 +186,51 @@ namespace McDermott.Web.Components.Pages.Employee
                 {"%AgePatient%", age.ToString() },
                 {"%days%", days.ToString() },
                 {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")}
-            };
+                };
+
                 DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task SendToEmail(long? Id)
+        {
+            try
+            {
+                var data = SickLeaves.Where(x => x.PatientId == Id).FirstOrDefault()!;
+                var age = 0;
+                if (data.brithday == null)
+                {
+                    age = 0;
+                }
+                else
+                {
+                    age = DateTime.Now.Year - data.brithday.Value.Year;
+                }
+                var days = data.StartSickLeave.Value.Day + data.EndSickLeave.Value.Day;
+                isPrint = true;
+                var mergeFields = new Dictionary<string, string>
+                {
+                    {"%NamePatient%", data?.PatientName},
+                {"%startDate%", data?.StartSickLeave?.ToString("dd MMMM yyyy") },
+                {"%endDate%", data?.EndSickLeave?.ToString("dd MMMM yyyy") },
+                {"%NameDoctor%", data?.PhycisianName },
+                {"%SIPDoctor%", data?.SIP },
+                {"%AddressPatient%", data?.Address },
+                {"%AgePatient%", age.ToString() },
+                {"%days%", days.ToString() },
+                {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")}
+                };
+
+                DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
+
+                var fileName = $"SickLeave_{DateTime.Now:yyyyMMddHHmmss}.docx";
+                var subject = "Your Document";
+                var body = $"Dear {data.PatientName},<br/><br/>Please find attached your document.<br/><br/>Best regards,<br/>Your Company";
+                //await EmailService.SendEmailAsync(data.Email, subject, body, DocumentContent, fileName);
             }
             catch (Exception ex)
             {

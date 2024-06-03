@@ -19,6 +19,7 @@ namespace McDermott.Application.Dtos.Employee
         public long? Oracel { get; set; }
         public string? PatientName { get; set; }
         public string? Address { get; set; }
+        public string? Email { get; set; }
         public string? SIP { get; set; }
         public string? PhycisianName { get; set; }
         public DateTime? brithday { get; set; }

@@ -115,7 +115,7 @@
                                                 IsContentBlocked="true"
                                                 CssClass="w-100"
                                                 ApplyBackgroundShading="true">
-                                    @if (Pharmacy.Id != 0)
+                                    @if (Pharmacy.Id != 0 || Pharmacy.Status =="Accepted")
                                     {
                                         <div class="row justify-content-end mb-3">
                                             <div class="col-auto align-self-end">

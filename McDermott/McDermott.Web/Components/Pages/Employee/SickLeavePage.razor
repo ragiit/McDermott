@@ -71,6 +71,7 @@
                                                 <DxButton RenderStyle="ButtonRenderStyle.Primary"                                                          
                                                           Attributes="@(new Dictionary<string, object> {  ["title"] = "Send To Email" })"
                                                           IconCssClass="fa-solid fa-paper-plane"
+                                                          Click="@(()=>SendToEmail((context.DataItem as SickLeaveDto).PatientId))"
                                                           IconPosition="ButtonIconPosition.AfterText" />
                                             </CellDisplayTemplate>
                                             <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
