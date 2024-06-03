@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.0.2" />
     <PackageReference Include="LZStringCSharp" Version="1.4.0" />
     <PackageReference Include="Mapster" Version="7.4.0" />
     <PackageReference Include="MediatR" Version="12.2.0" />
@@ -26,6 +27,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\McDermott.Domain\McDermott.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DevExpress.Printing.v23.2.Core">
+      <HintPath>..\..\..\..\..\..\..\Program Files\DevExpress 23.2\Components\Offline Packages\devexpress.printing.core\23.2.4\lib\net6.0\DevExpress.Printing.v23.2.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

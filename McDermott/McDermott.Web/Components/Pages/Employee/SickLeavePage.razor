@@ -65,7 +65,7 @@
                                                 <DxButton RenderStyle="ButtonRenderStyle.Success"                                                         
                                                           Attributes="@(new Dictionary<string, object> {  ["title"] = "Print" })"
                                                           IconCssClass="fa-solid fa-print"
-                                                          Click="PrintToLeave"
+                                                          Click="@(()=>PrintToLeave((context.DataItem as SickLeaveDto).PatientId))"
                                                           CssClass="me-1" />
 
                                                 <DxButton RenderStyle="ButtonRenderStyle.Primary"                                                          
@@ -91,7 +91,7 @@
     </section>
 </div>
 
-<DxPopup Visible="isPrint" Width="auto">
+<DxPopup Visible="isPrint" Width="874px">
     <DxRichEdit ActiveRibbonTabIndex="5" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">
         <MailMergeSettings >
             <DxMailMergeSettings ViewMergedData="true" Data="SickLeaves"></DxMailMergeSettings>

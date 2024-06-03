@@ -94,10 +94,16 @@ namespace McDermott.Web.Components.Pages.Employee
                     var diagnosis = Diagnoses.Where(x => BodyCPPT!.Contains(x.Name)).Select(x => x.Name).FirstOrDefault();
                     var newDataGridSickLeave = new SickLeaveDto
                     {
+                        PatientId = item.PatientId,
+                        PhycisianId = item.PratitionerId,
+                        PhycisianName = item.Pratitioner.Name,
+                        SIP = item.Pratitioner.SipNo,
                         PatientName = item.Patient.Name,
+                        Address = item.Patient.DomicileAddress1,
                         NoRM = item.NoRM,
                         StartSickLeave = item.StartDateSickLeave,
                         EndSickLeave = item.EndDateSickLeave,
+                        brithday = item.Patient.DateOfBirth,
                         Diagnosis = diagnosis
                     };
 
@@ -152,10 +158,40 @@ namespace McDermott.Web.Components.Pages.Employee
 
         #region Click
 
-        private async void PrintToLeave()
+        private async void PrintToLeave(long? grid)
         {
-            isPrint = true;
-            DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx");
+            try
+            {
+                var data = SickLeaves.Where(x => x.PatientId == grid).FirstOrDefault();
+                var age = 0;
+                if (data.brithday == null)
+                {
+                    age = 0;
+                }
+                else
+                {
+                    age = data.brithday.Value.Year - DateTime.Now.Year;
+                }
+                var days = data.StartSickLeave.Value.Day + data.EndSickLeave.Value.Day;
+                isPrint = true;
+                var mergeFields = new Dictionary<string, string>
+            {
+                {"%NamePatient%", data?.PatientName},
+                {"%startDate%", data?.StartSickLeave?.ToString("dd MMMM yyyy") },
+                {"%endDate%", data?.EndSickLeave?.ToString("dd MMMM yyyy") },
+                {"%NameDoctor%", data?.PhycisianName },
+                {"%SIPDoctor%", data?.SIP },
+                {"%AddressPatient%", data?.Address },
+                {"%AgePatient%", age.ToString() },
+                {"%days%", days.ToString() },
+                {"%DateNow%", DateTime.Now.ToString("dd MMMM yyyy")}
+            };
+                DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         #endregion Click

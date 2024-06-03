@@ -12,27 +12,24 @@
         public bool IsWeather { get; set; } = false;
         public bool IsFarmacologi { get; set; } = false;
         public bool IsFood { get; set; } = false;
-        public EnumStatusPharmacy Status { get; set; }
+        public string? Status { get; set; }
 
         [SetToNull]
         public Location? Location { get; set; }
+
         [SetToNull]
         public MedicamentGroup? MedicamentGroup { get; set; }
+
         [SetToNull]
         public Service? Service { get; set; }
+
         [SetToNull]
         public User? Patient { get; set; }
+
         [SetToNull]
         public User? Practitioner { get; set; }
 
         [SetToNull]
         public virtual List<Prescription>? Prescriptions { get; set; }
-    }
-
-    public enum EnumStatusPharmacy
-    {
-        RecipeReceived = 1,
-        RecipeInProcess = 2,
-        RecipeCompleted = 3
     }
 }

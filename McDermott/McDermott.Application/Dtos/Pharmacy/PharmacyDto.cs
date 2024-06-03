@@ -20,13 +20,7 @@
         public bool IsWeather { get; set; } = false;
         public bool IsFarmacologi { get; set; } = false;
         public bool IsFood { get; set; } = false;
-        public Domain.Entities.EnumStatusPharmacy Status { get; set; }
-
-        [NotMapped]
-        public string StatusText
-        {
-            get { return Status.EnumGetValue<string>(); }
-        }
+        public string? Status { get; set; }
 
         public LocationDto? Location { get; set; }
         public MedicamentGroupDto? MedicamentGroup { get; set; }
