@@ -524,15 +524,20 @@ namespace McDermott.Web.Components.Pages.Queue
         private async Task onPrint()
         {
             var noBPJS = "";
+            var nameBPJS = "";
             var aas = ViewQueue.QueueNumber.ToString() ?? string.Empty;
             var NamePatient = ViewQueue?.Kiosk?.Patient?.Name;
             var ServiceKiosk = ViewQueue?.Service?.Name;
+            var TypeNumber = Patients.Select(x => x.TypeNumber).FirstOrDefault();
+            var numbers = Patients.Select(x => x.Numbers).FirstOrDefault();
             if (ViewQueue?.Kiosk?.StageBpjs == true)
             {
+                nameBPJS = "BPJS Kesehatan";
                 noBPJS = BPJS.PolicyNumber;
             }
             else
             {
+                nameBPJS = "-";
                 noBPJS = "-";
             }
             string queueNumber = aas.PadLeft(3, '0');
@@ -545,6 +550,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 <meta charset='UTF-8'>
                 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
                 <title>Cetak Antrian</title>
+                <link re='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'>
                 <style>
                    @page {{size: 80mm 80mm;
     margin: 0;
@@ -552,7 +558,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
 .ticket {{width: 80mm;
     height: 10px;
-    padding: 35px;
+    padding: 0;
     box-sizing: border-box;
     font-family: Arial, sans-serif;
 }}
@@ -588,12 +594,12 @@ namespace McDermott.Web.Components.Pages.Queue
         <p><strong>Tanggal Daftar:</strong> {DateTime.Now}</p>
         <p><strong>Nama:</strong> {NamePatient}</p>
         <p><strong>Poliklinik:</strong> {ServiceKiosk}</p>
-        <p><strong>Jaminan:</strong> BPJS Kesehatan</p>
+        <p><strong>Jaminan:</strong> {nameBPJS}</p>
         <p><strong>Nomor Jaminan:</strong> {noBPJS}</p>
-        <p><strong>NIP:</strong> (Jika ada)</p>
+        <p><strong>{TypeNumber}:</strong> {numbers}</p>
     </div>
 </div>
-
+<script src='https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js' integrity='sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4' crossorigin='anonymous'></script>
             </body>
             </html>";
 

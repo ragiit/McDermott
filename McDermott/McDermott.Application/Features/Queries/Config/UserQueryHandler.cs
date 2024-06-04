@@ -81,12 +81,31 @@ namespace McDermott.Application.Features.Queries.Config
 
                 if (result.Count > 0)
                 {
+                    string type = null;
+                    if (result.Any(x => x.Legacy!.Equals(request.Number)))
+                    {
+                        type = "Legacy";
+                    }
+                    else if (result.Any(x => x.NIP!.Equals(request.Number)))
+                    {
+                        type = "NIP";
+                    }
+                    else if (result.Any(x => x.Oracle!.Equals(request.Number)))
+                    {
+                        type = "Oracle";
+                    }
+                    else if (result.Any(x => x.SAP!.Equals(request.Number)))
+                    {
+                        type = "SAP";
+                    }
                     // Convert the result to UserDto and add to the data list
                     var userDtos = result.Adapt<List<UserDto>>();
                     foreach (var userDto in userDtos)
                     {
                         // Set RelationshipType to "Employee" for userDtos
                         userDto.FamilyRelation = "Employee";
+                        userDto.TypeNumber = type;
+                        userDto.Numbers = request.Number;
                     }
                     data.AddRange(userDtos);
 

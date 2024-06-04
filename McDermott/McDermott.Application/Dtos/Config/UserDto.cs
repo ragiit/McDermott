@@ -138,11 +138,12 @@ namespace McDermott.Application.Dtos.Config
 
         public string? EmployeeStatus { get; set; }
         public string? FamilyRelation { get; set; }
+        public string? TypeNumber { get; set; }
+        public string? Numbers { get; set; }
         public string? setNameFamily => $"{Name} ({FamilyRelation})";
         public DateTime? JoinDate { get; set; }
         public List<long>? DoctorServiceIds { get; set; } = [];
         public List<long> PatientAllergyIds { get; set; } = new List<long>();
-
 
         [SetToNull]
         public virtual SpecialityDto? Speciality { get; set; }

@@ -332,17 +332,17 @@ namespace McDermott.Web.Components.Pages.Inventory
                             FormStockProduct.Batch = a?.Batch;
                             FormStockProduct.Expired = a?.ExpiredDate;
                         }
-                        if (TempFormReceivingStockDetail.TraceAbility == true)
-                        {
-                            FormStockProduct.Expired = a.ExpiredDate;
-                            FormStockProduct.Batch = a.Batch;
-                        }
 
                         FormStockProduct.Qty = a.Qty * x.BiggerRatio.ToLong();
                         await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
                     }
                     else
                     {
+                        if (TempFormReceivingStockDetail.TraceAbility == true)
+                        {
+                            checkStok.Expired = a.ExpiredDate;
+                            checkStok.Batch = a.Batch;
+                        }
                         var totalQty = a.Qty * x.BiggerRatio.ToLong();
                         checkStok!.Qty = checkStok.Qty + a.Qty;
 

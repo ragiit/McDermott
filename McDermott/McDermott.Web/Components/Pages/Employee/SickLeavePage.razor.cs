@@ -219,7 +219,7 @@ namespace McDermott.Web.Components.Pages.Employee
                     age = DateTime.Now.Year - data.brithday.Value.Year;
                 }
                 var days = data.StartSickLeave.Value.Day + data.EndSickLeave.Value.Day;
-                isPrint = true;
+                //isPrint = true;
                 var mergeFields = new Dictionary<string, string>
                 {
                     {"%NamePatient%", data?.PatientName},
@@ -234,9 +234,9 @@ namespace McDermott.Web.Components.Pages.Employee
                 };
 
                 DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
-
+                //var pdfContent = DocumentProvider.ConvertToPdf(DocumentContent);
                 var fileName = $"SickLeave_{DateTime.Now:yyyyMMddHHmmss}.docx";
-                var subject = $"Sick Leave{data.PatientName}";
+                var subject = $"Sick Leave {data.PatientName}";
                 var body = $"Dear {data.PatientName},<br/><br/>Please find attached your document.<br/><br/>Best regards,<br/>Your Company";
                 EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
                 var cek = EmailSettings.Where(x => x.Smtp_User == "nuralimajid@matrica.co.id").FirstOrDefault();
@@ -266,6 +266,8 @@ namespace McDermott.Web.Components.Pages.Employee
                     smtp.Disconnect(true);
                     ToastService.ShowSuccess("Success Send Email!");
                 }
+
+                await LoadData();
             }
             catch (Exception ex)
             {
