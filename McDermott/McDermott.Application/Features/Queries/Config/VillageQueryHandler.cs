@@ -1,4 +1,6 @@
-﻿using static McDermott.Application.Features.Commands.Config.VillageCommand;
+﻿using MapsterMapper;
+using McDermott.Application.Dtos;
+using static McDermott.Application.Features.Commands.Config.VillageCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
@@ -9,10 +11,10 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<CreateListVillageRequest, List<VillageDto>>,
         IRequestHandler<UpdateVillageRequest, VillageDto>,
         IRequestHandler<UpdateListVillageRequest, List<VillageDto>>,
+        IRequestHandler<GetDistrictsQuery, PaginatedList<VillageDto>>,
         IRequestHandler<DeleteVillageRequest, bool>
     {
-        #region GET
-
+        #region GET 
         public async Task<List<VillageDto>> Handle(GetVillageQuery request, CancellationToken cancellationToken)
         {
             try
@@ -204,6 +206,17 @@ namespace McDermott.Application.Features.Queries.Config
             {
                 throw;
             }
+        }
+
+        public async Task<PaginatedList<VillageDto>> Handle(GetDistrictsQuery request, CancellationToken cancellationToken)
+        {
+            var query = _unitOfWork.Repository<Village>()
+                .Entities
+                .Include(d => d.Province)
+                .Include(d => d.City)
+                .Select(d => d.Adapt<VillageDto>()).AsQueryable();
+
+            return await PaginatedList<VillageDto>.CreateAsync(query, request.PageNumber, request.PageSize);
         }
 
         #endregion DELETE

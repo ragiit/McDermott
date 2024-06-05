@@ -1,4 +1,6 @@
-﻿namespace McDermott.Application.Features.Commands.Config
+﻿using McDermott.Application.Dtos;
+
+namespace McDermott.Application.Features.Commands.Config
 {
     public class VillageCommand
     {
@@ -14,6 +16,12 @@
         {
             public Expression<Func<Village, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
+        }
+
+        public class GetDistrictsQuery : IRequest<PaginatedList<VillageDto>>
+        {
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
         }
 
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)
