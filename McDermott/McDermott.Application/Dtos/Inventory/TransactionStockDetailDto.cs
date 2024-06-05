@@ -16,6 +16,10 @@ namespace McDermott.Application.Dtos.Inventory
         public long? DestinationId { get; set; }
         public string? StatusTransfer { get; set; }
         public string? TypeTransaction { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
+        public string? UpdatedBy { get; set; }
+        public DateTime? UpdatedDate { get; set; }
 
         [SetToNull]
         public virtual TransactionStockDto? TransactionStock { get; set; }

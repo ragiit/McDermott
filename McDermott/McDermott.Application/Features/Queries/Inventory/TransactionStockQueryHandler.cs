@@ -171,7 +171,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
 
-                result ??= [];
+                result ??= new List<TransactionStockProduct>();
 
                 if (request.Predicate is not null)
                     result = [.. result.AsQueryable().Where(request.Predicate)];

@@ -1,6 +1,8 @@
 ﻿@page "/inventory/internal-transfer"
 @rendermode InteractiveServer
 
+<PageTitle>@Helper.APP_NAME - Internal Transfer</PageTitle>
+
 <style>
     .my-style {
         min-width: 800px;
@@ -8,7 +10,6 @@
 
 </style>
 
-<PageTitle> Internal Transfer</PageTitle>
 <div class="wrapper">
     <section class="content-header">
         <div class="container-fluid">
@@ -134,7 +135,6 @@
                                                 <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check" Click="ToDoCheck"></DxButton>
                                                 <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
                                                 <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
-
                                             </div>
                                         </div>
                                     }
@@ -196,6 +196,10 @@
                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                     ShowValidationIcon="true"></DxMemo>
                                         </DxFormLayoutItem>
+
+                                    </DxFormLayout>
+
+                                    <DxFormLayout>
                                         <DxFormLayoutGroup ColSpanMd="12">
                                             <CaptionTemplate>
                                                 <div>
@@ -247,6 +251,8 @@
                                                         <DxGridSelectionColumn Width="15px" />
                                                         <DxGridDataColumn FieldName="ProductName" Caption="Product Name" SortIndex="0" />
                                                         <DxGridDataColumn FieldName="QtyStock" Caption="Demand" MinWidth="90" Width="190" />
+                                                        <DxGridDataColumn FieldName="Batch" Caption="Batch" MinWidth="90" Width="190" />
+                                                        <DxGridDataColumn FieldName="ExpiredDate" Caption="Expired Date" />
                                                         <DxGridDataColumn FieldName="UomName" Caption="Unit Of Measure" />
                                                     </Columns>
                                                     <EditFormTemplate Context="EditFormContextt">
@@ -267,6 +273,15 @@
                                                                                 ShowValidationIcon="true"></DxComboBox>
                                                                     <ValidationMessage For="@(()=>TempFormInternalTransfer.ProductId)"></ValidationMessage>
                                                                 </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                    <DxTextBox ShowValidationIcon="true"
+                                                                               @bind-Text="@TempFormInternalTransfer.Batch"
+                                                                               ReadOnly
+                                                                               NullText="Batch"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                    <ValidationMessage For="@(()=> TempFormInternalTransfer.Batch)"   />
+                                                                </DxFormLayoutItem>
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <DxFormLayoutItem Caption="Quantity Stock" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
@@ -276,6 +291,14 @@
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                 ShowValidationIcon="true"></DxSpinEdit>
                                                                     <ValidationMessage For="@(()=>TempFormInternalTransfer.QtyStock)"></ValidationMessage>
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                    <DxDateEdit ShowValidationIcon="true"
+                                                                                ReadOnly
+                                                                                @bind-Date="@TempFormInternalTransfer.ExpiredDate"
+                                                                                NullText="Expired Date">
+                                                                    </DxDateEdit>
                                                                 </DxFormLayoutItem>
                                                             </div>
                                                             <div class="col-md-4">
@@ -309,6 +332,57 @@
                                             </Items>
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>
+
+                                    <DxFormLayout>
+                                        <DxFormLayoutGroup ColSpanMd="12" Caption="Transaction Logs" AnimationType="LayoutAnimationType.Slide" Decoration="FormLayoutGroupDecoration.Card" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start">
+                                            <CaptionTemplate>
+                                                <div>
+                                                    <span class="text-center">Transaction Logs</span>
+                                                </div>
+                                            </CaptionTemplate>
+                                            <Items>
+                                                <DxGrid @ref="GridDetailTransferStockLogs"
+                                                        PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                        Data="Logs"
+                                                        PageSize="10"
+                                                        @bind-SelectedDataItems="@SelectedDataItemsDetailLogs"
+                                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                        KeyFieldName="Id"
+                                                        EditMode="GridEditMode.EditForm"
+                                                        EditorRenderMode="GridEditorRenderMode.Detached"
+                                                        PagerPosition="GridPagerPosition.Bottom"
+                                                        AllowSelectRowByClick="true"
+                                                        PageSizeSelectorVisible="true"
+                                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                        PageSizeSelectorAllRowsItemVisible="true"
+                                                        PagerSwitchToInputBoxButtonCount="10"
+                                                        FocusedRowEnabled="true"
+                                                        PagerVisibleNumericButtonCount="10"
+                                                        ShowGroupPanel="true"
+                                                        AutoExpandAllGroupRows="true"
+                                                        ShowFilterRow="true"
+                                                        CustomizeElement="@GridExtention.Grid_CustomizeElement"
+                                                        TextWrapEnabled="false"
+                                                        ShowSearchBox="true"
+                                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                                        KeyboardNavigationEnabled="true">
+                                                    <Columns>
+                                                        <DxGridDataColumn FieldName="CreatedDate" GroupIndex="0" Caption="Date" />
+                                                        <DxGridDataColumn FieldName="CreatedBy" Caption="CreatedBy" />
+                                                        <DxGridDataColumn FieldName="Source.Name" Caption="Source" />
+                                                        <DxGridDataColumn FieldName="Destination.Name" Caption="Destination" />
+                                                        <DxGridDataColumn FieldName="TypeTransaction" Caption="Type Transaction" />
+                                                        <DxGridDataColumn FieldName="StatusTransfer" Caption="Status">
+                                                            <CellDisplayTemplate>
+                                                                @GetIssueStatusIconHtml((context.DataItem as TransactionStockDetailDto).StatusTransfer)
+                                                            </CellDisplayTemplate>
+                                                        </DxGridDataColumn>
+                                                    </Columns>
+                                                </DxGrid>
+                                            </Items>
+                                        </DxFormLayoutGroup>
+                                    </DxFormLayout>
+
                                     <hr />
                                     @if (isActiveButton)
                                     {
