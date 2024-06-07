@@ -371,6 +371,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     .Select(x => x.Qty)
                     .FirstOrDefault();
 
+                if (stock == null || stock == 0)
+                {
+                    stock = 0;
+                    ToastService.ClearCustomToasts();
+                    ToastService.ShowWarning($"The {checkProduct.Name} product is out of stock, please contact the pharmacy department!!");
+                }
+
                 var medicamentDetails = Medicaments.FirstOrDefault(s => s.ProductId == checkProduct.Id);
                 if (medicamentDetails == null)
                 {
@@ -407,6 +414,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Prescriptions = prescriptionsList;
         }
 
+        private bool isSavePrescription { get; set; } = true;
+
         private async Task SelectedProductPrescriptions(ProductDto value)
         {
             if (value is not null)
@@ -424,15 +433,21 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     selectedActiveComponentPrescriptions = ActiveComponents.Where(z => checkMedicament.ActiveComponentId is not null && checkMedicament.ActiveComponentId.Contains(z.Id)).ToList();
 
                     var checkStock = StockProducts.Where(x => x.ProductId == value.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
-                    if (checkStock == null)
+                    if (checkStock == null || checkStock == 0)
                     {
                         Prescription.Stock = 0;
-                        ToastService.ShowWarning("No Stock On Product!!");
+                        ToastService.ShowWarning("This product is out of stock, or choose another product!!");
+                        isSavePrescription = false;
                     }
                     else
                     {
                         Prescription.Stock = checkStock;
+                        isSavePrescription = true;
                     }
+                }
+                else
+                {
+                    Prescription = new();
                 }
             }
         }
@@ -1215,11 +1230,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
-                var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
+                var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault()!;
                 var chekPrescription = Prescriptions.Where(x => x.PharmacyId == checkData.Id).ToList();
                 foreach (var data in chekPrescription)
                 {
-                    var checkProduct = StockProducts.Where(x => x.ProductId == data.ProductId && x.SourceId == checkData.PrescriptionLocationId).FirstOrDefault();
+                    var checkProduct = StockProducts.Where(x => x.ProductId == data.ProductId && x.SourceId == checkData.PrescriptionLocationId).FirstOrDefault()!;
                     checkProduct.Qty = checkProduct.Qty - data.GivenAmount;
                     await Mediator.Send(new UpdateStockProductRequest(checkProduct));
                 }

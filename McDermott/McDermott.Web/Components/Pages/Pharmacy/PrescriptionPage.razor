@@ -82,8 +82,8 @@
 
                                                 <ToolbarTemplate>
                                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                        <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" Enabled="!IsPopUpForm" />
-                                                        <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemPharmacy_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && !IsPopUpForm" />
+                                                        @* <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" Enabled="!IsPopUpForm" /> *@
+                                                        <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Detail" Click="()=>EditItemPharmacy_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && !IsPopUpForm" />
                                                         <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && !IsPopUpForm" />
                                                         <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" Enabled="!IsPopUpForm" />
                                                         <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" Enabled="!IsPopUpForm" />
@@ -505,7 +505,7 @@
                                                                                 </Template>
                                                                             </DxFormLayoutItem>                                                                           
                                                                             <DxFormLayoutItem ColSpanMd="12">
-                                                                                <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                                                <DxButton Enabled="!IsLoading && isSavePrescription" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Save" SubmitFormOnClick="true"></DxButton>
                                                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridPrescriptionLines.CancelEditAsync())" ></DxButton>
                                                                             </DxFormLayoutItem>
                                                                         </DxFormLayout>
