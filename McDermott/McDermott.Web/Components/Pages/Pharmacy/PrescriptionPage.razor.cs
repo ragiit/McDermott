@@ -256,6 +256,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     ToastService.ShowInfo($"Stock is less than the quantity requested");
                     isSavePrescription = false;
                 }
+                else
+                {
+                    isSavePrescription = true;
+                    return;
+                }
             }
             catch (Exception ex)
             {
@@ -438,37 +443,50 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task SelectedProductPrescriptions(ProductDto value)
         {
-            if (value is not null)
+            if (value is null)
             {
-                var checkMedicament = Medicaments.Where(x => x.ProductId == value.Id).FirstOrDefault();
-                if (checkMedicament is not null)
-                {
-                    Prescription.PriceUnit = value.Cost;
-                    Prescription.ActiveComponentId = checkMedicament?.ActiveComponentId;
-                    Prescription.UomId = checkMedicament?.UomId;
-                    Prescription.DrugFromId = checkMedicament?.FormId;
-                    Prescription.Dosage = checkMedicament?.Dosage;
-                    Prescription.DrugDosageId = checkMedicament?.FrequencyId;
-                    Prescription.DrugRouteId = checkMedicament?.RouteId;
-                    selectedActiveComponentPrescriptions = ActiveComponents.Where(z => checkMedicament.ActiveComponentId is not null && checkMedicament.ActiveComponentId.Contains(z.Id)).ToList();
+                selectedActiveComponentPrescriptions = [];
 
-                    var checkStock = StockProducts.Where(x => x.ProductId == value.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
-                    if (checkStock == null || checkStock == 0)
-                    {
-                        Prescription.Stock = 0;
-                        ToastService.ShowWarning($"The {value.Name} product is out of stock, or choose another product!!");
-                        isSavePrescription = false;
-                    }
-                    else
-                    {
-                        Prescription.Stock = checkStock;
-                        isSavePrescription = true;
-                    }
+                Prescription.PriceUnit = null;
+                Prescription.ActiveComponentId = null;
+                Prescription.UomId = null;  // Set to null if you want to clear this field
+                Prescription.DrugFromId = null;  // Set to null if you want to clear this field
+                Prescription.Dosage = null;
+                Prescription.DrugDosageId = null;
+                Prescription.DrugRouteId = null;
+                Prescription.Stock = null;
+
+                return;
+            }
+            var checkMedicament = Medicaments.Where(x => x.ProductId == value.Id).FirstOrDefault();
+            if (checkMedicament is not null)
+            {
+                Prescription.PriceUnit = value.Cost;
+                Prescription.ActiveComponentId = checkMedicament?.ActiveComponentId;
+                Prescription.UomId = checkMedicament?.UomId;
+                Prescription.DrugFromId = checkMedicament?.FormId;
+                Prescription.Dosage = checkMedicament?.Dosage;
+                Prescription.DrugDosageId = checkMedicament?.FrequencyId;
+                Prescription.DrugRouteId = checkMedicament?.RouteId;
+                selectedActiveComponentPrescriptions = ActiveComponents.Where(z => checkMedicament.ActiveComponentId is not null && checkMedicament.ActiveComponentId.Contains(z.Id)).ToList();
+
+                var checkStock = StockProducts.Where(x => x.ProductId == value.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
+                if (checkStock == null || checkStock == 0)
+                {
+                    Prescription.Stock = 0;
+                    ToastService.ShowWarning($"The {value.Name} product is out of stock, or choose another product!!");
+                    isSavePrescription = false;
                 }
                 else
                 {
-                    Prescription = new();
+                    Prescription.Stock = checkStock;
+                    isSavePrescription = true;
                 }
+            }
+            else
+            {
+                Prescription = new PrescriptionDto();
+                return;
             }
         }
 

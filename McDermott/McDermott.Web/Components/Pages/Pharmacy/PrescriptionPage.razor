@@ -403,13 +403,14 @@
                                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Name" ColSpanMd="6">
                                                                                 <DxComboBox ShowValidationIcon="true" Data="@Products"
                                                                                             NullText="Select Medical Name..."
-                                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                             FilteringMode="@DataGridFilteringMode.Contains"
                                                                                             SelectedItemChanged="@((ProductDto value) => SelectedProductPrescriptions(value))"
                                                                                             @bind-Value="Prescription.ProductId"
                                                                                             Enabled="isActiveButton"
                                                                                             TextFieldName="Name"
-                                                                                            ValueFieldName="Id">
+                                                                                            ValueFieldName="Id"
+                                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                            >
                                                                                 </DxComboBox>
                                                                                 <ValidationMessage For="@(() => Prescription.ProductId)" />
                                                                             </DxFormLayoutItem>
