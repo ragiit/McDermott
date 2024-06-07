@@ -50,10 +50,126 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         #endregion UserLoginAndAccessRole
 
+        #region relation Data
+
+        private PharmacyDto Pharmacy { get; set; } = new();
+        private PrescriptionDto Prescription { get; set; } = new();
+        private ConcoctionDto Concoction { get; set; } = new();
+        private ConcoctionLineDto ConcoctionLine { get; set; } = new();
+        private PatientAllergyDto PatientAllergy = new();
+        private GroupDto NameGroup { get; set; } = new();
+        private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
+        private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
+        private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
+        private List<GroupDto> groups = [];
+        private List<AllergyDto> WeatherAllergies = [];
+        private List<AllergyDto> FoodAllergies = [];
+        private List<AllergyDto> PharmacologyAllergies = [];
+        private List<PharmacyDto> Pharmacies { get; set; } = [];
+        private List<PrescriptionDto> Prescriptions { get; set; } = [];
+        private List<ConcoctionDto> Concoctions { get; set; } = [];
+        private List<ConcoctionLineDto> ConcoctionLines { get; set; } = [];
+        private List<AllergyDto> allergies { get; set; } = [];
+        private List<PatientAllergyDto> PatientAllergies { get; set; } = [];
+        private List<UserDto> Patients { get; set; } = [];
+        private List<UserDto> Practitioners { get; set; } = [];
+        private List<UomDto> Uoms { get; set; } = [];
+        private List<LocationDto> PreciptionLocations { get; set; } = [];
+        private List<ServiceDto> Services { get; set; } = [];
+        private List<ProductDto> Products { get; set; } = [];
+        private List<SignaDto> Signas { get; set; } = [];
+        private List<DrugDosageDto> DrugDosages { get; set; } = [];
+        private List<MedicamentDto> Medicaments { get; set; } = [];
+        private List<MedicamentGroupDto> MedicamentGroups { get; set; } = [];
+        private List<MedicamentGroupDto> MedicamentGroupsConcoction { get; set; } = [];
+        private List<DrugFormDto> DrugForms { get; set; } = [];
+        private List<ActiveComponentDto> ActiveComponentt { get; set; } = [];
+        private List<DrugRouteDto> DrugRoutes { get; set; } = [];
+        private List<StockProductDto> StockProducts { get; set; } = [];
+        private List<ActiveComponentDto> ActiveComponents { get; set; } = [];
+        private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
+        private IEnumerable<ActiveComponentDto>? selectedActiveComponentPrescriptions { get; set; } = [];
+
+        #endregion relation Data
+
         #region Static Variables
 
         [Parameter]
         public long Id { get; set; }
+
+        private IGrid Grid { get; set; }
+        private IGrid GridPrescriptionLines { get; set; }
+        private IGrid GridConcoction { get; set; }
+        private IGrid GridConcoctionLines { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataItemsPrescriptionLines { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataItemsConcoction { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataItemsConcoctionLines { get; set; } = [];
+
+        [Parameter]
+        public bool IsPopUpForm { get; set; } = false;
+
+        [Parameter]
+        public UserDto User { get; set; } = new()
+        {
+            Name = "-"
+        };
+
+        private bool PanelVisible { get; set; } = false;
+        private bool IsLoading { get; set; } = false;
+        private bool isView { get; set; } = false;
+        private bool ShowForm { get; set; } = false;
+        private bool isActiveButton { get; set; } = false;
+        private bool PopUpConcoctionDetail { get; set; } = false;
+        private int FocusedRowVisibleIndex { get; set; }
+        private int FocusedRowVisibleIndexPrescriptionLines { get; set; }
+        private int FocusedRowVisibleIndexPrescriptionConcoction { get; set; }
+        private int FocusedRowVisibleIndexConcoctionLines { get; set; }
+
+        public MarkupString GetIssueStatusIconHtml(string status)
+        {
+            string priorityClass;
+            string title;
+
+            switch (status)
+            {
+                case "Draft":
+                    priorityClass = "secondary";
+                    title = "Draft";
+                    break;
+
+                case "Processed":
+                    priorityClass = "warning";
+                    title = "Processed";
+                    break;
+
+                case "Received":
+                    priorityClass = "primary";
+                    title = "Received";
+                    break;
+
+                case "Done":
+                    priorityClass = "success";
+                    title = "Done";
+                    break;
+
+                case "Cancel":
+                    priorityClass = "danger";
+                    title = "Canceled";
+                    break;
+
+                default:
+                    return new MarkupString("");
+            }
+            string html = $"<div class='row '><div class='col-3'>" +
+                          $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+
+            return new MarkupString(html);
+        }
+
+        #endregion Static Variables
+
+        #region change Data
 
         protected override async Task OnParametersSetAsync()
         {
@@ -68,7 +184,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             ShowForm = true;
             isActiveButton = true;
-            Pharmacy.Status = "Confirm";
+            Pharmacy.Status = "Draft";
             if (Pharmacy.Status == "Accepted")
             {
                 isView = true;
@@ -77,29 +193,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Pharmacy.PractitionerId = generalConsultantService.FirstOrDefault()!.PratitionerId;
             Pharmacy.ServiceId = generalConsultantService.FirstOrDefault()!.ServiceId;
             Pharmacy.PaymentMethod = generalConsultantService.FirstOrDefault()!.Payment;
-            //Pharmacy.IsWeather = generalConsultantService.FirstOrDefault()!.IsWeather;
-            //Pharmacy.IsFarmacologi = generalConsultantService.FirstOrDefault()!.IsPharmacology;
-            //Pharmacy.IsFood = generalConsultantService.FirstOrDefault()!.IsFood;
-            await GetPatientAllergy();
 
-            //var b = Patients.Where(x => x.Id == Pharmacy.PatientId).FirstOrDefault();
-            //var PatientAllergy = PatientAllergies.Where(x => x.UserId == b.Id).FirstOrDefault();
-            //if (PatientAllergy is not null)
-            //{
-            //    PatientAllergy = PatientAllergy;
-            //    PatientAllergy.Food = PatientAllergy.Food;
-            //    PatientAllergy.Weather = PatientAllergy.Weather;
-            //    PatientAllergy.Farmacology = PatientAllergy.Farmacology;
-            //    Pharmacy.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
-            //    Pharmacy.IsFarmacologi = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
-            //    Pharmacy.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
-            //}
-            //if (generalConsultanService.SelectedFoodAllergies.Count() > 0)
-            //    FormRegis.IsFood = true;
-            //if (SelectedWeatherAllergies.Count() > 0)
-            //    FormRegis.IsWeather = true;
-            //if (SelectedPharmacologyAllergies.Count() > 0)
-            //    FormRegis.IsPharmacology = true;
+            await GetPatientAllergy();
         }
 
         private async Task GetPatientAllergy(long? q = null)
@@ -141,74 +236,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        private IGrid Grid { get; set; }
-        private IGrid GridPrescriptionLines { get; set; }
-        private IGrid GridConcoction { get; set; }
-        private IGrid GridConcoctionLines { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        private IReadOnlyList<object> SelectedDataItemsPrescriptionLines { get; set; } = [];
-        private IReadOnlyList<object> SelectedDataItemsConcoction { get; set; } = [];
-        private IReadOnlyList<object> SelectedDataItemsConcoctionLines { get; set; } = [];
-
-        private TaskCompletionSource<bool> DataLoadedTcs { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        [Parameter]
-        public bool IsPopUpForm { get; set; } = false;
-
-        [Parameter]
-        public UserDto User { get; set; } = new()
-        {
-            Name = "-"
-        };
-
-        private bool PanelVisible { get; set; } = false;
-        private bool IsLoading { get; set; } = false;
-        private bool isView { get; set; } = false;
-        private bool ShowForm { get; set; } = false;
-        private bool isActiveButton { get; set; } = false;
-        private bool PopUpConcoctionDetail { get; set; } = false;
-        private int FocusedRowVisibleIndex { get; set; }
-        private int FocusedRowVisibleIndexPrescriptionLines { get; set; }
-        private int FocusedRowVisibleIndexPrescriptionConcoction { get; set; }
-        private int FocusedRowVisibleIndexConcoctionLines { get; set; }
-
-        private PharmacyDto Pharmacy { get; set; } = new();
-        private PrescriptionDto Prescription { get; set; } = new();
-        private ConcoctionDto Concoction { get; set; } = new();
-        private ConcoctionLineDto ConcoctionLine { get; set; } = new();
-        private PatientAllergyDto PatientAllergy = new();
-        private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
-        private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
-        private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
-        private List<AllergyDto> WeatherAllergies = [];
-        private List<AllergyDto> FoodAllergies = [];
-        private List<AllergyDto> PharmacologyAllergies = [];
-        private List<PharmacyDto> Pharmacies { get; set; } = [];
-        private List<PrescriptionDto> Prescriptions { get; set; } = [];
-        private List<ConcoctionDto> Concoctions { get; set; } = [];
-        private List<ConcoctionLineDto> ConcoctionLines { get; set; } = [];
-        private List<AllergyDto> allergies { get; set; } = [];
-        private List<PatientAllergyDto> PatientAllergies { get; set; } = [];
-        private List<UserDto> Patients { get; set; } = [];
-        private List<UserDto> Practitioners { get; set; } = [];
-        private List<UomDto> Uoms { get; set; } = [];
-        private List<LocationDto> PreciptionLocations { get; set; } = [];
-        private List<ServiceDto> Services { get; set; } = [];
-        private List<ProductDto> Products { get; set; } = [];
-        private List<SignaDto> Signas { get; set; } = [];
-        private List<DrugDosageDto> DrugDosages { get; set; } = [];
-        private List<MedicamentDto> Medicaments { get; set; } = [];
-        private List<MedicamentGroupDto> MedicamentGroups { get; set; } = [];
-        private List<MedicamentGroupDto> MedicamentGroupsConcoction { get; set; } = [];
-        private List<DrugFormDto> DrugForms { get; set; } = [];
-        private List<ActiveComponentDto> ActiveComponentt { get; set; } = [];
-        private List<DrugRouteDto> DrugRoutes { get; set; } = [];
-        private List<StockProductDto> StockProducts { get; set; } = [];
-        private List<ActiveComponentDto> ActiveComponents { get; set; } = [];
-
-        private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
-        private IEnumerable<ActiveComponentDto>? selectedActiveComponentPrescriptions { get; set; } = [];
-
         private List<string> Payments = new List<string>
         {
             "Personal",
@@ -216,52 +243,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             "BPJS"
         };
 
-        public MarkupString GetIssueStatusIconHtml(string status)
-        {
-            string priorityClass;
-            string title;
-
-            switch (status)
-            {
-                case "Accepted":
-                    priorityClass = "primary";
-                    title = "Accepted";
-                    break;
-
-                case "Processed":
-                    priorityClass = "warning";
-                    title = "Processed";
-                    break;
-
-                case "Done":
-                    priorityClass = "success";
-                    title = "Done";
-                    break;
-
-                case "Cancel":
-                    priorityClass = "danger";
-                    title = "Canceled";
-                    break;
-
-                default:
-                    return new MarkupString("");
-            }
-            string html = $"<div class='row '><div class='col-3'>" +
-                          $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
-
-            return new MarkupString(html);
-        }
-
         private async Task ChangeProduct(ProductDto product)
         {
             try
             {
                 if (product is null)
-                {
-                    ConcoctionLine = new();
-                    selectedActiveComponents = [];
                     return;
-                }
 
                 var a = await Mediator.Send(new GetMedicamentQuery());
                 var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
@@ -270,6 +257,16 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 ConcoctionLine.Qty = ChekMedicament?.Dosage ?? 0;
                 ConcoctionLine.MedicamentDosage = ChekMedicament?.Dosage ?? 0;
                 ConcoctionLine.UomId = ChekMedicament?.UomId ?? null;
+
+                if (ConcoctionLine.Qty <= ConcoctionLine.MedicamentDosage)
+                {
+                    ConcoctionLine.TotalQty = 1;
+                }
+                else
+                {
+                    var temp = (ConcoctionLine.Qty / ConcoctionLine.MedicamentDosage) + (ConcoctionLine.Qty % ConcoctionLine.MedicamentDosage != 0 ? 1 : 0);
+                    ConcoctionLine.TotalQty = temp * Concoction.TotalQty;
+                }
                 selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament != null && ChekMedicament.ActiveComponentId != null && ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
                 var aa = Pharmacy.PrescriptionLocationId;
                 var checkStock = StockProducts.Where(x => x.ProductId == product.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
@@ -293,13 +290,58 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Concoction.TotalQty = Concoction.QtyByDay * value;
         }
 
-        private void SelectChangeFrequency(DrugDosageDto datas)
-        {
-            var data = DrugDosages.Where(f => f.Id == datas.Id).FirstOrDefault();
+        //private void SelectChangeFrequency(DrugDosageDto datas)
+        //{
+        //    var data = DrugDosages.Where(f => f.Id == datas.Id).FirstOrDefault();
 
-            Concoction.QtyByDay = data!.TotalQtyPerDay.ToLong();
-            Concoction.Days = data.Days.ToLong();
-            Concoction.TotalQty = Concoction?.Qty * Concoction?.QtyByDay;
+        //    Concoction.QtyByDay = data!.TotalQtyPerDay.ToLong();
+        //    Concoction.Days = data.Days.ToLong();
+        //    Concoction.TotalQty = Concoction?.Qty * Concoction?.QtyByDay;
+        //}
+
+        private void changeMedicamentDosage(long value)
+        {
+            ConcoctionLine.MedicamentDosage = value;
+            if (ConcoctionLine.Qty <= value)
+            {
+                ConcoctionLine.TotalQty = 1;
+            }
+            else
+            {
+                var temp = (ConcoctionLine.Qty / value) + (ConcoctionLine.Qty % value != 0 ? 1 : 0);
+                ConcoctionLine.TotalQty = temp * Concoction.TotalQty;
+            }
+        }
+
+        private void ChangeTotalQtyInHeader(long value)
+        {
+            Concoction.TotalQty = value;
+            if (ConcoctionLine.Qty <= ConcoctionLine.MedicamentDosage)
+            {
+                ConcoctionLine.TotalQty = 1;
+            }
+            else
+            {
+                var temp = (ConcoctionLine.Qty / ConcoctionLine.MedicamentDosage) + (ConcoctionLine.Qty % ConcoctionLine.MedicamentDosage != 0 ? 1 : 0);
+                ConcoctionLine.TotalQty = temp * value;
+            }
+        }
+
+        private void ChangeTotalQtyMedicament(long value)
+        {
+            if (value == null)
+                return;
+
+            ConcoctionLine.Qty = value;
+            if (value <= ConcoctionLine.MedicamentDosage)
+            {
+                ConcoctionLine.TotalQty = 1;
+            }
+            else
+            {
+                var temp = (value / ConcoctionLine.MedicamentDosage) + (value % ConcoctionLine.MedicamentDosage != 0 ? 1 : 1);
+                ConcoctionLine.TotalQty = temp * Concoction.TotalQty;
+            }
         }
 
         private void SelectedChangePractition(UserDto? user)
@@ -328,6 +370,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     .Where(s => s.ProductId == checkProduct.Id && s.SourceId == Pharmacy.PrescriptionLocationId)
                     .Select(x => x.Qty)
                     .FirstOrDefault();
+
+                if (stock == null || stock == 0)
+                {
+                    stock = 0;
+                    ToastService.ClearCustomToasts();
+                    ToastService.ShowWarning($"The {checkProduct.Name} product is out of stock, please contact the pharmacy department!!");
+                }
 
                 var medicamentDetails = Medicaments.FirstOrDefault(s => s.ProductId == checkProduct.Id);
                 if (medicamentDetails == null)
@@ -365,25 +414,41 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Prescriptions = prescriptionsList;
         }
 
+        private bool isSavePrescription { get; set; } = true;
+
         private async Task SelectedProductPrescriptions(ProductDto value)
         {
             if (value is not null)
             {
                 var checkMedicament = Medicaments.Where(x => x.ProductId == value.Id).FirstOrDefault();
-                Prescription.PriceUnit = value.Cost;
-                Prescription.ActiveComponentId = checkMedicament?.ActiveComponentId;
-                Prescription.UomId = checkMedicament?.UomId;
-                Prescription.DrugFromId = checkMedicament?.FormId;
-                Prescription.Dosage = checkMedicament?.Dosage;
-                Prescription.DrugDosageId = checkMedicament?.FrequencyId;
-                Prescription.DrugRouteId = checkMedicament?.RouteId;
-                selectedActiveComponentPrescriptions = ActiveComponents.Where(z => checkMedicament.ActiveComponentId is not null && checkMedicament.ActiveComponentId.Contains(z.Id)).ToList();
+                if (checkMedicament is not null)
+                {
+                    Prescription.PriceUnit = value.Cost;
+                    Prescription.ActiveComponentId = checkMedicament?.ActiveComponentId;
+                    Prescription.UomId = checkMedicament?.UomId;
+                    Prescription.DrugFromId = checkMedicament?.FormId;
+                    Prescription.Dosage = checkMedicament?.Dosage;
+                    Prescription.DrugDosageId = checkMedicament?.FrequencyId;
+                    Prescription.DrugRouteId = checkMedicament?.RouteId;
+                    selectedActiveComponentPrescriptions = ActiveComponents.Where(z => checkMedicament.ActiveComponentId is not null && checkMedicament.ActiveComponentId.Contains(z.Id)).ToList();
 
-                var checkStock = StockProducts.Where(x => x.ProductId == value.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
-                if (checkStock == null)
-                    Prescription.Stock = 0;
+                    var checkStock = StockProducts.Where(x => x.ProductId == value.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
+                    if (checkStock == null || checkStock == 0)
+                    {
+                        Prescription.Stock = 0;
+                        ToastService.ShowWarning($"The {value.Name} product is out of stock, or choose another product!!");
+                        isSavePrescription = false;
+                    }
+                    else
+                    {
+                        Prescription.Stock = checkStock;
+                        isSavePrescription = true;
+                    }
+                }
                 else
-                    Prescription.Stock = checkStock;
+                {
+                    Prescription = new();
+                }
             }
         }
 
@@ -433,12 +498,21 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         QtyPerDay = 0;
                     }
                     newConcoctionLine.Id = Helper.RandomNumber;
-                    newConcoctionLine.MedicamentDosage = medicamentData?.Dosage;
+                    newConcoctionLine.MedicamentDosage = medicamentData!.Dosage;
                     newConcoctionLine.ActiveComponentId = medicamentData?.ActiveComponentId;
-                    newConcoctionLine.Qty = medicamentData?.Dosage;
+                    newConcoctionLine.Qty = medicamentData!.Dosage;
                     newConcoctionLine.UomId = medicamentData?.UomId;
                     newConcoctionLine.UomName = medicamentData?.Uom?.Name;
-                    newConcoctionLine.TotalQty = medicamentData?.Dosage + QtyPerDay?.ToLong();
+
+                    if (newConcoctionLine.Qty <= newConcoctionLine.MedicamentDosage)
+                    {
+                        newConcoctionLine.TotalQty = 1;
+                    }
+                    else
+                    {
+                        var temp = (newConcoctionLine.Qty / newConcoctionLine.MedicamentDosage) + (newConcoctionLine.Qty % newConcoctionLine.MedicamentDosage != 0 ? 1 : 0);
+                        newConcoctionLine.TotalQty = temp * Concoction.TotalQty;
+                    }
                     if (stockProduct == null)
                     {
                         newConcoctionLine.AvaliableQty = 0;
@@ -459,9 +533,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        #endregion Static Variables
+        #endregion change Data
 
-        #region Methods
+        #region Load Data
 
         protected override async Task OnInitializedAsync()
         {
@@ -539,8 +613,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        #region Load Data
-
         private async Task LoadData(bool v = false)
         {
             IsLoading = true;
@@ -551,6 +623,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             if (v)
                 User = new() { Name = "-" };
+
+            groups = await Mediator.Send(new GetGroupQuery());
+            NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
+
             IsLoading = false;
         }
 
@@ -958,7 +1034,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 if (Pharmacy.Id == 0)
                 {
-                    Pharmacy.Status = "Accepted";
+                    Pharmacy.Status = "Draft";
                     Pharmacy = await Mediator.Send(new CreatePharmacyRequest(Pharmacy));
                     Prescriptions.ForEach(x =>
                     {
@@ -979,7 +1055,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     Pharmacy = await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
                 }
 
-                await LoadDataPharmacy();
+                await EditItemPharmacy_Click(Pharmacy);
             }
             catch (Exception ex)
             {
@@ -1008,6 +1084,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             PopUpConcoctionDetail = true;
             Concoction = new();
+            Concoction.Qty = 1;
+            Concoction.QtyByDay = 1;
+            Concoction.Days = 1;
+            Concoction.TotalQty = 1;
             ConcoctionLines.Clear();
         }
 
@@ -1028,24 +1108,52 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             try
             {
-                //var r = await Mediator.Send(new GetPharmacyQuery(x => x.Id == SelectedDataItems[0].Adapt<PharmacyDto>().Id));
+                PharmacyDto? p = null;
 
-                var p = SelectedDataItems[0].Adapt<PharmacyDto>() ?? q;
-                if (p.Status == "Accepted")
+                // Check if SelectedDataItems has at least one item
+                if (SelectedDataItems != null && SelectedDataItems.Count > 0)
+                {
+                    p = SelectedDataItems[0].Adapt<PharmacyDto>();
+                }
+                else if (q != null)
+                {
+                    p = q;
+                }
+                else
+                {
+                    throw new InvalidOperationException("No pharmacy item selected or provided.");
+                }
+
+                // Check if the pharmacy status is "Draft"
+                if (p.Status != "Done" && (NameGroup.Name == "Nurse" || NameGroup.Name == "Nursing"))
                 {
                     isActiveButton = true;
                 }
-                Pharmacy = p!;
+
+                if (p.Status == "Processed" && (NameGroup.Name == "Nurse" || NameGroup.Name == "Nursing"))
+                {
+                    p.Status = "Received";
+                    await Mediator.Send(new UpdatePharmacyRequest(p));
+                }
+
+                Pharmacy = p;
+
+                // Fetch related data
                 await GetPatientAllergy(Pharmacy.PatientId);
                 Prescriptions = await Mediator.Send(new GetPrescriptionQuery(x => x.PharmacyId == Pharmacy.Id));
                 Concoctions = await Mediator.Send(new GetConcoctionQuery(x => x.PharmacyId == Pharmacy.Id));
             }
             catch (Exception e)
             {
+                // Handle the exception and provide feedback
                 e.HandleException(ToastService);
+                // Optionally log the error message
+                Console.WriteLine($"Error: {e.Message}");
             }
-
-            IsLoading = false;
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         private void EditItem_Click()
@@ -1104,7 +1212,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         #region Status
 
-        public async void Processed()
+        public async void SendToPharmacy()
         {
             try
             {
@@ -1118,11 +1226,18 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        public async void validation()
+        public async void confirm()
         {
             try
             {
-                var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
+                var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault()!;
+                var chekPrescription = Prescriptions.Where(x => x.PharmacyId == checkData.Id).ToList();
+                foreach (var data in chekPrescription)
+                {
+                    var checkProduct = StockProducts.Where(x => x.ProductId == data.ProductId && x.SourceId == checkData.PrescriptionLocationId).FirstOrDefault()!;
+                    checkProduct.Qty = checkProduct.Qty - data.GivenAmount;
+                    await Mediator.Send(new UpdateStockProductRequest(checkProduct));
+                }
                 Pharmacy.Status = "Done";
                 await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
             }
@@ -1181,8 +1296,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             PopUpConcoctionDetail = false;
         }
-
-        #endregion Methods
 
         #region Grid Properties
 

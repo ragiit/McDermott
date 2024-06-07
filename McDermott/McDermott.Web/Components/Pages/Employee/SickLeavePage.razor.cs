@@ -204,11 +204,12 @@ namespace McDermott.Web.Components.Pages.Employee
             }
         }
 
-        private async Task SendToEmail(long? Id)
+        private async Task SendToEmail(IGrid? grid)
         {
             try
             {
-                var data = SickLeaves.Where(x => x.PatientId == Id).FirstOrDefault()!;
+                SickLeaveDto ces = (SickLeaveDto)grid.SelectedDataItems;
+                var data = SickLeaves.Where(x => x.PatientId == ces.Id).FirstOrDefault()!;
                 var age = 0;
                 if (data.brithday == null)
                 {

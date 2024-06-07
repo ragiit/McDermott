@@ -58,27 +58,33 @@
                                         ShowSearchBox="true"
                                         SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                         KeyboardNavigationEnabled="true">
+                                    <ToolbarTemplate>
+                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                            <DxToolbarItem Text="Delete" Click="()=>SendToEmail(context.Grid)" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems.Count > 0 && SickLeaves.Count > 0" />
+                                        </DxToolbar>
+                                    </ToolbarTemplate>
+
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
                                         <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="70px" MinWidth="200" TextAlignment="GridTextAlignment.Center">
                                             <CellDisplayTemplate>
-                                                <DxButton RenderStyle="ButtonRenderStyle.Success"                                                         
+                                                <DxButton RenderStyle="ButtonRenderStyle.Success"
                                                           Attributes="@(new Dictionary<string, object> {  ["title"] = "Print" })"
                                                           IconCssClass="fa-solid fa-print"
                                                           Click="@(()=>PrintToLeave((context.DataItem as SickLeaveDto).PatientId))"
                                                           CssClass="me-1" />
 
-                                                <DxButton RenderStyle="ButtonRenderStyle.Primary"                                                          
+                                               @*  <DxButton RenderStyle="ButtonRenderStyle.Primary"
                                                           Attributes="@(new Dictionary<string, object> {  ["title"] = "Send To Email" })"
                                                           IconCssClass="fa-solid fa-paper-plane"
                                                           Click="@(()=>SendToEmail((context.DataItem as SickLeaveDto).PatientId))"
-                                                          IconPosition="ButtonIconPosition.AfterText" />
+                                                          IconPosition="ButtonIconPosition.AfterText" /> *@
                                             </CellDisplayTemplate>
                                             <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
                                         </DxGridDataColumn>
                                         <DxGridDataColumn MinWidth="200" FieldName="PatientName" Caption="Patient Name" />
                                         <DxGridDataColumn MinWidth="200" FieldName="NoRM" Caption="NO RM" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="StartSickLeave" Caption="Start Date" DisplayFormat="dd MMMM yyyy"/>
+                                        <DxGridDataColumn MinWidth="200" FieldName="StartSickLeave" Caption="Start Date" DisplayFormat="dd MMMM yyyy" />
                                         <DxGridDataColumn MinWidth="200" FieldName="EndSickLeave" Caption="End Date" DisplayFormat="dd MMMM yyyy" />
                                         <DxGridDataColumn MinWidth="200" FieldName="Diagnosis" Caption="Diagnosis" />
                                     </Columns>
@@ -94,8 +100,8 @@
 
 <DxPopup Visible="isPrint" Width="874px">
     <DxRichEdit ActiveRibbonTabIndex="5" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">
-        <MailMergeSettings >
+        <MailMergeSettings>
             <DxMailMergeSettings ViewMergedData="true" Data="SickLeaves"></DxMailMergeSettings>
         </MailMergeSettings>
-   </DxRichEdit>
+    </DxRichEdit>
 </DxPopup>

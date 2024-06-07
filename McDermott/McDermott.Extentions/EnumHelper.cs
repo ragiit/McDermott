@@ -30,5 +30,26 @@ namespace McDermott.Application.Extentions
             [Display(Name = "Invalidate")]
             Invalidate = 0,
         }
+
+        public enum EnumStatusGeneralConsultantService
+        {
+            // nanti
+            test = 1,
+        }
+
+        public enum EnumStatusSickLeave
+        {
+            [Display(Name = "not-send")]
+            NotSend = 0,
+
+            [Display(Name = "send")]
+            Send = 1,
+
+            [Display(Name = "printed")]
+            Printed = 2,
+
+            [Display(Name = "not-printed")]
+            NotPrinted = 3,
+        }
     }
 }

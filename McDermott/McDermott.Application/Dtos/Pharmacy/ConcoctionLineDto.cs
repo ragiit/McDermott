@@ -12,9 +12,9 @@ namespace McDermott.Application.Dtos.Pharmacy
         public string? ActiveComponentName { get; set; }
         public long? UomId { get; set; }
         public string? UomName { get; set; }
-        public long? MedicamentDosage { get; set; }
+        public long MedicamentDosage { get; set; } = 0;
         public long? MedicamentUnitOfDosage { get; set; }
-        public long? Qty { get; set; }
+        public long Qty { get; set; } = 0;
         public long? TotalQty { get; set; }
         public long? AvaliableQty { get; set; }
 
