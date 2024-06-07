@@ -253,11 +253,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var checkStock = StockProducts.Where(x => x.ProductId == Prescription.ProductId && x.SourceId == Pharmacy.PrescriptionLocationId).FirstOrDefault()!;
                 if (value > checkStock.Qty)
                 {
+
                     ToastService.ShowInfo($"Stock is less than the quantity requested");
                     isSavePrescription = false;
                 }
                 else
                 {
+                    Prescription.GivenAmount = value;
                     isSavePrescription = true;
                     return;
                 }
