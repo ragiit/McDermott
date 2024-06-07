@@ -114,7 +114,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                 Uoms = await Mediator.Send(new GetUomQuery());
                 UomName = Uoms.Select(x => x.Name).FirstOrDefault();
                 TransactionStockDetails = await Mediator.Send(new GetTransactionStockDetailQuery());
-                AllLogs = TransactionStockDetails.ToList();
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -273,6 +272,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private void NewItem_Click()
         {
             showForm = true;
+            Logs.Clear();
             FormInternalTransfer = new();
             TempTransactionStocks.Clear();
             isActiveButton = true;
@@ -324,7 +324,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     }
                 }
 
-                Logs = await Mediator.Send(new GetTransactionStockDetailQuery(x => x.TransactionStockId == FormInternalTransfer.Id));
+                await LoadLogs();
 
                 PanelVisible = false;
             }
@@ -332,6 +332,11 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 ex.HandleException(ToastService);
             }
+        }
+
+        private async Task LoadLogs()
+        {
+            Logs = await Mediator.Send(new GetTransactionStockDetailQuery(x => x.TransactionStockId == FormInternalTransfer.Id));
         }
 
         private async Task EditItemDetail_Click()
@@ -467,6 +472,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormInternalTransferDetail.TypeTransaction = "Transfer";
 
                     await Mediator.Send(new CreateTransactionStockDetailRequest(FormInternalTransferDetail));
+
+                    await LoadLogs();
                 }
                 else
                 {

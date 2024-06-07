@@ -56,22 +56,21 @@ namespace McDermott.Web.Components.Pages.Config
         private List<string> extentions = new() { ".xlsx", ".xls" };
         private const string ExportFileName = "ExportResult";
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
-        private IReadOnlyList<object>? SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-
-        //private IEnumerable<GridSelect> a { get; set; }
-        private dynamic dd;
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         private int Value { get; set; } = 0;
 
         private int FocusedRowVisibleIndex { get; set; }
-
+        private bool PanelVisible { get; set; }
         public IGrid Grid { get; set; }
         private List<OccupationalDto> Occupationals = new();
 
         protected override async Task OnInitializedAsync()
         {
+            PanelVisible = true;
             await GetUserInfo();
             await LoadData();
+            PanelVisible = false;
         }
 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
@@ -189,26 +188,15 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData()
         {
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            PanelVisible = true;
+            SelectedDataItems = [];
             Occupationals = await Mediator.Send(new GetOccupationalQuery());
             Occupationals.ForEach(x =>
             {
                 if (string.IsNullOrWhiteSpace(x.Description))
                     x.Description = "-";
             });
-        }
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
+            PanelVisible = false;
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
@@ -224,6 +212,80 @@ namespace McDermott.Web.Components.Pages.Config
                 await Mediator.Send(new UpdateOccupationalRequest(editModel));
 
             await LoadData();
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "occupational_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Description"
+                },
+            ]);
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Name", "Description" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<OccupationalDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var c = new OccupationalDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Description = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                        };
+
+                        if (!Occupationals.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.Description.Trim().ToLower() == c?.Description?.Trim().ToLower()))
+                            list.Add(c);
+                    }
+
+                    await Mediator.Send(new CreateListOccupationalRequest(list));
+
+                    await LoadData();
+                    SelectedDataItems = [];
+
+                    ToastService.ShowSuccess("Successfully Imported.");
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+            PanelVisible = false;
         }
     }
 }

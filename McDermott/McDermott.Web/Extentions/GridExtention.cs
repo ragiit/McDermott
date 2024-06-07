@@ -8,6 +8,7 @@
             {
                 e.CssClass = "alt-item";
             }
+
             if (e.ElementType == GridElementType.HeaderCell)
             {
                 e.Style = "background-color: rgba(0, 0, 0, 0.08)";

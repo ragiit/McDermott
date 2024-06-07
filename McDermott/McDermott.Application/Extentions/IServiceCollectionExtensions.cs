@@ -16,6 +16,7 @@ namespace McDermott.Application.Extentions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IPCareService, PCareService>();
             services.AddScoped<IDocumentProvider, DocumentProvider>();
+            services.AddScoped<IFileExportService, FileExportService>();
 
             services.AddScoped<ProtectedSessionStorage>();
             services.AddScoped<CustomAuthenticationStateProvider>();

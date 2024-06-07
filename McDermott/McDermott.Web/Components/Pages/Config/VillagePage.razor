@@ -15,73 +15,62 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
+                                <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
                                                 IsContentBlocked="true"
                                                 ApplyBackgroundShading="true"
                                                 IndicatorAreaVisible="true"
                                                 Text="Fetching Data...">
 
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="Data"
-                                            PageSize="10"
+                                    <DxGrid @ref="Grid"
                                             @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            Data="Data"
                                             EditModelSaving="OnSave"
                                             DataItemDeleting="OnDelete"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            PagerNavigationMode="PagerNavigationMode.InputBox"
                                             EditorRenderMode="GridEditorRenderMode.Detached"
-                                            EditMode="GridEditMode.PopupEditForm"
-                                            PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageSize="10"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="@GridExtention.Grid_CustomizeDataRowEditor"
                                             AllowSelectRowByClick="true"
+                                            PagerPosition="GridPagerPosition.Bottom"
                                             PageSizeSelectorVisible="true"
                                             PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                             PageSizeSelectorAllRowsItemVisible="true"
                                             PagerSwitchToInputBoxButtonCount="10"
                                             FocusedRowEnabled="true"
                                             PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
                                             ShowGroupPanel="true"
                                             AutoExpandAllGroupRows="true"
-                                            CssClass="ch-480"
                                             ShowFilterRow="true"
-                                            TextWrapEnabled="false"
-                                            CustomizeElement="Grid_CustomizeElement"
+                                            CustomizeElement="@GridExtention.Grid_CustomizeElement"
                                             ShowSearchBox="true"
                                             SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                             KeyboardNavigationEnabled="true">
                                         <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Data.Count() > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Data.Count() > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Data.ToList().Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Data.ToList().Count > 0" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                 <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
                                                     <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                        <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(Grid))" />
+                                                        <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(Grid))" />
+                                                        <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(Grid))" />
                                                     </Items>
                                                 </DxToolbarItem>
-                                                <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" IconCssClass="fa-solid fa-file-import">
+                                                    <Items>
+                                                        <DxToolbarItem Text="Template" Click=" ExportToExcel" />
+                                                        <DxToolbarItem Text="Import" Click="ImportFile" />
+                                                    </Items>
+                                                </DxToolbarItem>
                                             </DxToolbar>
-                                            @*  <DxComboBox Data="EnumEditModeDatas"
-                                        NullText="Select Grid Edit Mode..."
-                                        TextFieldName="@nameof(EnumEditModeData.DisplayName)"
-                                        ValueFieldName="@nameof(EnumEditModeData.Value)"
-                                        @bind-Value="@Value"
-                                        AllowUserInput="true" /> *@
-
-                                            @* <DxUpload Visible="@UploadVisible"
-                                        ExternalSelectButtonCssSelector="#upload"
-                                        ExternalDropZoneCssSelector="#upload"
-                                        ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
-                                        FileUploadStarted="@OnFileUploadStarted"
-                                        AllowedFileExtensions="@extentions"
-                                        MaxFileSize="15000000">
-                                        </DxUpload> *@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />

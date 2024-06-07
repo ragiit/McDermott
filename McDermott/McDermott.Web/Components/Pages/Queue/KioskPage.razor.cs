@@ -470,16 +470,24 @@ namespace McDermott.Web.Components.Pages.Queue
                 BPJS = InsurancePolices.Where(x => x.UserId == FormKios.PatientId).FirstOrDefault()!;
                 if (BPJS is not null)
                 {
-                    FormKios.BPJS = BPJS.PolicyNumber;
-                    if (BPJS.Active)
+                    var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == BPJS.Id))).FirstOrDefault();
+                    if (bpjs is not null)
                     {
-                        FormKios.StageBpjs = true;
-                        statBPJS = "Active";
+                        if (bpjs.Aktif)
+                        {
+                            FormKios.BPJS = bpjs.NoKartu;
+                            FormKios.StageBpjs = true;
+                            statBPJS = "Active";
+                        }
+                        else
+                        {
+                            FormKios.StageBpjs = false;
+                            statBPJS = "InActive";
+                        }
                     }
                     else
                     {
-                        FormKios.StageBpjs = false;
-                        statBPJS = "InActive";
+                        statBPJS = "no BPJS number";
                     }
                 }
                 else

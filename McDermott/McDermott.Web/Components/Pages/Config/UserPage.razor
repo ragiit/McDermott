@@ -41,35 +41,34 @@
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
                                         <DxGrid @ref="Grid"
-                                                PagerNavigationMode="PagerNavigationMode.InputBox"
                                                 Data="Users"
-                                                PageSize="10"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
-                                                AllowSelectRowByClick="true"
-                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                KeyFieldName="Id"
-                                                EditorRenderMode="GridEditorRenderMode.Detached"
-                                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                 EditModelSaving="OnSave"
                                                 DataItemDeleting="OnDelete"
-                                                TextWrapEnabled="false"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
                                                 RowDoubleClick="OnRowDoubleClick"
-                                                FocusedRowEnabled="true"
-                                                PopupEditFormCssClass="pw-800"
+                                                PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                EditorRenderMode="GridEditorRenderMode.Detached"
+                                                PageSize="10"
+                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                KeyFieldName="Id"
+                                                CustomizeDataRowEditor="@GridExtention.Grid_CustomizeDataRowEditor"
+                                                AllowSelectRowByClick="true"
                                                 PagerPosition="GridPagerPosition.Bottom"
                                                 PageSizeSelectorVisible="true"
                                                 PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                                 PageSizeSelectorAllRowsItemVisible="true"
                                                 PagerSwitchToInputBoxButtonCount="10"
+                                                FocusedRowEnabled="true"
                                                 PagerVisibleNumericButtonCount="10"
-                                                CustomizeElement="Grid_CustomizeElement"
-                                                FocusedRowChanged="Grid_FocusedRowChanged"
                                                 ShowGroupPanel="true"
                                                 AutoExpandAllGroupRows="true"
                                                 ShowFilterRow="true"
+                                                CustomizeElement="@GridExtention.Grid_CustomizeElement"
                                                 ShowSearchBox="true"
                                                 SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                                 KeyboardNavigationEnabled="true">
+
                                             <ToolbarTemplate>
                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
@@ -88,7 +87,7 @@
                                                 </DxToolbar>
                                             </ToolbarTemplate>
                                             <Columns>
-                                                <DxGridSelectionColumn Width="15px"/>
+                                                <DxGridSelectionColumn Width="15px" />
                                                 <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />
                                                 <DxGridDataColumn FieldName="Email" MinWidth="200" />
                                                 <DxGridDataColumn FieldName="Group.Name" MinWidth="200" Caption="Group" />

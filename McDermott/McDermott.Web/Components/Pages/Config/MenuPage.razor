@@ -15,105 +15,101 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
-                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                        TextWrapEnabled="false"
-                                        Data="Menus.OrderBy(x => x.ParentMenu == null).ThenBy(x => x.Sequence.ToInt32())"
-                                        PageSize="10"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                        KeyFieldName="Id"
-                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                        EditModelSaving="OnSave"
-                                        DataItemDeleting="OnDelete"
-                                        EditorRenderMode="GridEditorRenderMode.Detached"
-                                        AllowSelectRowByClick="true"
-                                        EditMode="GridEditMode.PopupEditForm"
-                                        PopupEditFormCssClass="pw-800"
-                                        PagerPosition="GridPagerPosition.Bottom"
-                                        PageSizeSelectorVisible="true"
-                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        PageSizeSelectorAllRowsItemVisible="true"
-                                        PagerSwitchToInputBoxButtonCount="10"
-                                        FocusedRowEnabled="true"
-                                        PagerVisibleNumericButtonCount="10"
-                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                        ShowGroupPanel="true"
-                                        AutoExpandAllGroupRows="true"
-                                        ShowFilterRow="true"
-                                        CustomizeElement="Grid_CustomizeElement"
-                                        ShowSearchBox="true"
-                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                        KeyboardNavigationEnabled="true">
-                                    <ToolbarTemplate>
-                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Menus.Count > 0" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Menus.Count > 0" />
-                                            <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                            <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                <Items>
-                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                </Items>
-                                            </DxToolbarItem>
-                                            <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                        </DxToolbar>
-                                        @*  <DxComboBox Data="EnumEditModeDatas"
-                                    NullText="Select Grid Edit Mode..."
-                                    TextFieldName="@nameof(EnumEditModeData.DisplayName)"
-                                    ValueFieldName="@nameof(EnumEditModeData.Value)"
-                                    @bind-Value="@Value"
-                                    AllowUserInput="true" />
+                                <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
-                                    <DxUpload Visible="@UploadVisible"
-                                    ExternalSelectButtonCssSelector="#upload"
-                                    ExternalDropZoneCssSelector="#upload"
-                                    ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
-                                    FileUploadStarted="@OnFileUploadStarted"
-                                    AllowedFileExtensions="@extentions"
-                                    MaxFileSize="15000000">
-                                    </DxUpload>*@
-                                    </ToolbarTemplate>
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="ParentMenu" Caption="Parent" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Sequence" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Url" Caption="URL" />
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <DxGrid @ref="Grid"
+                                            Data="Menus.OrderBy(x => x.ParentMenu == null).ThenBy(x =>  x.Sequence.GetValueOrDefault().ToInt32())"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            EditModelSaving="OnSave"
+                                            DataItemDeleting="OnDelete"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            PagerNavigationMode="PagerNavigationMode.InputBox"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
+                                            PageSize="10"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="@GridExtention.Grid_CustomizeDataRowEditor"
+                                            AllowSelectRowByClick="true"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            FocusedRowEnabled="true"
+                                            PagerVisibleNumericButtonCount="10"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            ShowFilterRow="true"
+                                            CustomizeElement="@GridExtention.Grid_CustomizeElement"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Menus.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Menus.Count > 0" />
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(Grid))" />
+                                                        <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(Grid))" />
+                                                        <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(Grid))" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" IconCssClass="fa-solid fa-file-import">
+                                                    <Items>
+                                                        <DxToolbarItem Text="Template" Click=" ExportToExcel" />
+                                                        <DxToolbarItem Text="Import" Click="ImportFile" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="ParentMenu" Caption="Parent" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Sequence" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Url" Caption="URL" />
 
-                                    </Columns>
-                                    <EditFormTemplate Context="EditFormContext">
-                                        @{
-                                            var a = (MenuDto)EditFormContext.EditModel;
-                                        }
-                                        <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
-                                                <ValidationMessage For="@(()=> a.Name)"   />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parent Menu" ColSpanMd="12">
-                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                            FilteringMode="@DataGridFilteringMode.Contains"
-                                                            Data="@ParentMenuDto"
-                                                            NullText="Select Parent Menu..."
-                                                            @bind-Value="@a.ParentMenu"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Name">
-                                                </DxComboBox>
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sequence" ColSpanMd="12">
-                                                <DxSpinEdit ShowValidationIcon="true" MinValue="0" @bind-Value="@a.Sequence" NullText="Sequence" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="URL" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@a.Url" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Url" />
-                                                <ValidationMessage For="@(()=> a.Url)"   />
-                                            </DxFormLayoutItem>
-                                        </DxFormLayout>
-                                    </EditFormTemplate>
-                                </DxGrid>
+                                        </Columns>
+                                        <EditFormTemplate Context="EditFormContext">
+                                            @{
+                                                var a = (MenuDto)EditFormContext.EditModel;
+                                            }
+                                            <DxFormLayout CssClass="w-100">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                    <ValidationMessage For="@(()=> a.Name)"   />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parent Menu" ColSpanMd="12">
+                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
+                                                                Data="@ParentMenuDto"
+                                                                NullText="Select Parent Menu..."
+                                                                @bind-Value="@a.ParentMenu"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Name">
+                                                    </DxComboBox>
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sequence" ColSpanMd="12">
+                                                    <DxSpinEdit ShowValidationIcon="true" MinValue="0" @bind-Value="@a.Sequence" NullText="Sequence" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="URL" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.Url" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Url" />
+                                                    <ValidationMessage For="@(()=> a.Url)"   />
+                                                </DxFormLayoutItem>
+                                            </DxFormLayout>
+                                        </EditFormTemplate>
+                                    </DxGrid>
+                                </DxLoadingPanel>
                             </div>
                         </div>
                     </div>

@@ -46,45 +46,6 @@
 
         #endregion UserLoginAndAccessRole
 
-        private async Task SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
-        {
-            //foreach (var file in files)
-            //{
-            //    if (file.Type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            //    {
-            //        using (var stream = new MemoryStream())
-            //        {
-            //            stream.Position = 0;
-
-            //            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            //            // Gunakan EPPlus untuk membaca data Excel dari MemoryStream
-            //            using (var package = new ExcelPackage(stream))
-            //            {
-            //                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Ambil worksheet pertama
-
-            //                long rowCount = worksheet.Dimension.Rows;
-            //                long colCount = worksheet.Dimension.Columns;
-
-            //                // Lakukan sesuatu dengan data dari file Excel
-            //                for (long row = 1; row <= rowCount; row++)
-            //                {
-            //                    for (long col = 1; col <= colCount; col++)
-            //                    {
-            //                        var cellValue = worksheet.Cells[row, col].Value;
-            //                        // Lakukan sesuatu dengan nilai sel, misalnya, simpan ke dalam struktur data atau tampilkan di UI.
-            //                        Console.WriteLine(cellValue);
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-
-            // Refresh tampilan setelah selesai
-            InvokeAsync(StateHasChanged);
-        }
-
         #region Default Grid Components
 
         private bool PanelVisible { get; set; } = true;
@@ -113,32 +74,99 @@
             PanelVisible = false;
         }
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
-        private async Task NewItem_Click(IGrid context)
+        private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Province", "Name" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<CityDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var provName = Provinces.FirstOrDefault(x => x.Name == ws.Cells[row, 1].Value?.ToString()?.Trim());
+
+                        if (provName is null)
+                        {
+                            PanelVisible = false;
+                            ToastService.ShowInfo($"Province with name \"{ws.Cells[row, 1].Value?.ToString()?.Trim()}\" is not found");
+                            return;
+                        }
+
+                        var c = new CityDto
+                        {
+                            ProvinceId = provName.Id,
+                            Name = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                        };
+
+                        if (!Cities.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.ProvinceId == c.ProvinceId))
+                            list.Add(c);
+                    }
+
+                    await Mediator.Send(new CreateListCityRequest(list));
+
+                    await LoadData();
+                    SelectedDataItems = [];
+
+                    ToastService.ShowSuccess("Successfully Imported.");
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+            PanelVisible = false;
+        }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "city_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Province",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+            ]);
         }
 
         private async Task Refresh_Click()
@@ -151,38 +179,9 @@
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
