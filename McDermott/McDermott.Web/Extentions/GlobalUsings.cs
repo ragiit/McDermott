@@ -28,6 +28,7 @@ global using McDermott.Application.Dtos.Patient;
 global using McDermott.Application.Dtos.Pharmacy;
 global using McDermott.Application.Dtos.Inventory;
 global using McDermott.Application.Dtos.BpjsIntegration;
+global using McDermott.Application.Dtos;
 
 global using DevExpress.Data.XtraReports.Native;
 

@@ -52,21 +52,22 @@
         #endregion UserLoginAndAccessRole
 
         public IGrid Grid { get; set; }
-        private List<ProvinceDto> Provinces = new();
-        private List<DistrictDto> Districts = new();
-        private List<CountryDto> Countrys = new();
-        private List<CityDto> Cities = new();
-
-        private List<VillageDto> Villages = new();
+        private List<ProvinceDto> Provinces = [];
+        private List<DistrictDto> Districts = [];
+        private List<CountryDto> Countrys = [];
+        private List<CityDto> Cities = [];
+        private List<VillageDto> Villages = [];
 
         //private object Data { get; set; }
-        private IEnumerable<VillageDto> Data { get; set; }
+        private IEnumerable<VillageDto> Data { get; set; } = [];
 
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private bool PanelVisible { get; set; } = true;
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
+            PanelVisible = true;
             Countrys = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Districts = await Mediator.Send(new GetDistrictQuery());
@@ -74,58 +75,21 @@
 
             await GetUserInfo();
             await LoadData();
-        }
 
-        private bool EditItemsEnabled;
-        private bool PanelVisible { get; set; } = true;
+            PanelVisible = false;
+        }
 
         private async Task LoadData()
         {
             PanelVisible = true;
-            //var dataSource = new GridDevExtremeDataSource<VillageDto>(a.AsQueryable())
-            //{
-            //    CustomizeLoadOptions = (loadOptions) =>
-            //{
-            //    // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
-            //    // This can make SQL execution plans more efficient.
-            //    loadOptions.PrimaryKey = new[] { "Id" };
-            //    loadOptions.PaginateViaPrimaryKey = true;
-            //}
-            //};
-
             Data = await Mediator.Send(new GetVillageQuery());
-
             SelectedDataItems = [];
             PanelVisible = false;
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
-        }
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
         }
 
         private async Task NewItem_Click()
@@ -148,35 +112,6 @@
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            }); ;
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -195,7 +130,7 @@
             }
             catch (Exception ee)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+                ee.HandleException(ToastService);
             }
         }
 
@@ -212,6 +147,125 @@
                 await Mediator.Send(new UpdateVillageRequest(editModel));
 
             await LoadData();
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Province", "City", "District", "Name", "Postal Code" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<VillageDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var a = Provinces.FirstOrDefault(x => x.Name == ws.Cells[row, 1].Value?.ToString()?.Trim());
+
+                        if (a is null)
+                        {
+                            PanelVisible = false;
+                            ToastService.ShowInfo($"Province with name \"{ws.Cells[row, 1].Value?.ToString()?.Trim()}\" is not found");
+                            return;
+                        }
+
+                        var b = Cities.FirstOrDefault(x => x.Name == ws.Cells[row, 2].Value?.ToString()?.Trim());
+
+                        if (b is null)
+                        {
+                            PanelVisible = false;
+                            ToastService.ShowInfo($"City with name \"{ws.Cells[row, 2].Value?.ToString()?.Trim()}\" is not found");
+                            return;
+                        }
+
+                        var c = Districts.FirstOrDefault(x => x.Name == ws.Cells[row, 3].Value?.ToString()?.Trim());
+
+                        if (c is null)
+                        {
+                            PanelVisible = false;
+                            ToastService.ShowInfo($"District with name \"{ws.Cells[row, 3].Value?.ToString()?.Trim()}\" is not found");
+                            return;
+                        }
+
+                        var ee = new VillageDto
+                        {
+                            ProvinceId = a.Id,
+                            CityId = b.Id,
+                            DistrictId = c.Id,
+                            Name = ws.Cells[row, 4].Value?.ToString()?.Trim(),
+                            PostalCode = ws.Cells[row, 5].Value?.ToString()?.Trim(),
+                        };
+
+                        if (!Villages.Any(x => x.CityId == ee.CityId && x.ProvinceId == ee.ProvinceId && x.DistrictId == ee.DistrictId && x.Name.Trim().ToLower() == ee?.Name?.Trim().ToLower() && x.PostalCode.Trim().ToLower() == ee?.PostalCode?.Trim().ToLower()))
+                            list.Add(ee);
+                    }
+
+                    await Mediator.Send(new CreateListVillageRequest(list));
+
+                    await LoadData();
+                    SelectedDataItems = [];
+
+                    ToastService.ShowSuccess("Successfully Imported.");
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+            PanelVisible = false;
+        }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "village_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Province",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "City",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "District",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Postal Code"
+                },
+            ]);
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
     }
 }

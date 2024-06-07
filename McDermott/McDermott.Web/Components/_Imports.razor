@@ -20,8 +20,6 @@
 @using System.Numerics
 @using Blazored.Toast.Services
 
-
-
 @inject IPCareService PcareService
 @inject IFileUploadService FileUploadService
 @inject IHttpContextAccessor HttpContextAccessor
@@ -31,7 +29,7 @@
 @inject IJSRuntime oLocal
 @inject IMemoryCache MemoryCache
 @inject IDocumentProvider DocumentProvider
-
+@inject IFileExportService FileExportService
 
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
@@ -42,7 +40,6 @@
 @using Blazored.TextEditor
 
 @using Newtonsoft.Json
-
 @using McDermott.Application.Dtos.Config
 @using McDermott.Application.Dtos.Queue
 @using McDermott.Application.Dtos.Medical

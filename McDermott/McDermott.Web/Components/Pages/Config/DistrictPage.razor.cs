@@ -60,6 +60,7 @@
         private int Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
+        private bool PanelVisible { get; set; } = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -67,6 +68,105 @@
             Cities = await Mediator.Send(new GetCityQuery());
             await GetUserInfo();
             await LoadData();
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "district_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Province",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "City",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+            ]);
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Province", "City", "Name" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<DistrictDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var provName = Provinces.FirstOrDefault(x => x.Name == ws.Cells[row, 1].Value?.ToString()?.Trim());
+
+                        if (provName is null)
+                        {
+                            PanelVisible = false;
+                            ToastService.ShowInfo($"Province with name \"{ws.Cells[row, 1].Value?.ToString()?.Trim()}\" is not found");
+                            return;
+                        }
+
+                        var cityName = Cities.FirstOrDefault(x => x.Name == ws.Cells[row, 2].Value?.ToString()?.Trim());
+
+                        if (cityName is null)
+                        {
+                            PanelVisible = false;
+                            ToastService.ShowInfo($"City with name \"{ws.Cells[row, 1].Value?.ToString()?.Trim()}\" is not found");
+                            return;
+                        }
+
+                        var c = new DistrictDto
+                        {
+                            ProvinceId = provName.Id,
+                            CityId = cityName.Id,
+                            Name = ws.Cells[row, 3].Value?.ToString()?.Trim(),
+                        };
+
+                        if (!Districts.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.ProvinceId == c.ProvinceId && x.CityId == c.CityId))
+                            list.Add(c);
+                    }
+
+                    await Mediator.Send(new CreateListDistrictRequest(list));
+
+                    await LoadData();
+                    SelectedDataItems = [];
+
+                    ToastService.ShowSuccess("Successfully Imported.");
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+            PanelVisible = false;
         }
 
         private async Task LoadData()

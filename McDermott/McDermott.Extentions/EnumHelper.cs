@@ -19,13 +19,6 @@ namespace McDermott.Application.Extentions
                             ?.GetName() ?? enumValue.ToString();
         }
 
-        public enum EnumStatusPharmacy
-        {
-            RecipeReceived = 1,
-            RecipeInProcess = 2,
-            RecipeCompleted = 3
-        }
-
         public enum EnumStatusInventoryAdjusment
         {
             [Display(Name = "Draft")]
@@ -36,12 +29,6 @@ namespace McDermott.Application.Extentions
 
             [Display(Name = "Invalidate")]
             Invalidate = 0,
-        }
-
-        public enum EnumStatusGeneralConsultantService
-        {
-            // nanti
-            test = 1,
         }
     }
 }

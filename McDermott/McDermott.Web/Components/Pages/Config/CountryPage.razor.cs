@@ -1,4 +1,10 @@
-﻿namespace McDermott.Web.Components.Pages.Config
+﻿using DevExpress.Xpo.DB.Helpers;
+using McDermott.Application.Dtos;
+using McDermott.Application.Features.Services;
+using OfficeOpenXml.Style;
+using System.Drawing;
+
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CountryPage
     {
@@ -91,13 +97,9 @@
 
         #region Grid
 
-        protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
-        {
-            InvokeAsync(StateHasChanged);
-        }
-
         public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
+            PanelVisible = true;
             foreach (var file in e.GetMultipleFiles(1))
             {
                 try
@@ -110,12 +112,12 @@
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Name", "Code" };
+                    var headerNames = new List<string>() { "Code", "Name" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
-                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString().Trim().ToLower()))
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
                     {
-                        ToastService.ShowInfo("The header must match the grid.");
+                        ToastService.ShowInfo("The header must match with the template.");
                         return;
                     }
 
@@ -125,11 +127,11 @@
                     {
                         var country = new CountryDto
                         {
-                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim()
+                            Code = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Name = ws.Cells[row, 2].Value?.ToString()?.Trim(),
                         };
 
-                        if (!Countries.Any(x => x.Name.Trim().ToLower() == country.Name.Trim().ToLower()) && !countries.Any(x => x.Name.Trim().ToLower() == country.Name.Trim().ToLower()))
+                        if (!Countries.Any(x => x.Name.Trim().ToLower() == country?.Name?.Trim().ToLower()) && !countries.Any(x => x.Name.Trim().ToLower() == country?.Name?.Trim().ToLower()))
                             countries.Add(country);
                     }
 
@@ -137,9 +139,15 @@
 
                     await LoadData();
                     SelectedDataItems = [];
+
+                    ToastService.ShowSuccess("Successfully Imported.");
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
             }
+            PanelVisible = false;
         }
 
         private async Task Refresh_Click()
@@ -240,18 +248,85 @@
         //        }
         //    }
         //}
+        //public class FileExportService
+        //{
+        //    public async Task<byte[]> GenerateExcelFileAsync(IEnumerable<MyData> data)
+        //    {
+        //        using var package = new ExcelPackage();
+        //        var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+        //        Color colFromHex = System.Drawing.ColorTranslator.FromHtml("#82b8d7");
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        //        worksheet.Cells[1, 1].Value = "Code";
+        //        worksheet.Cells[1, 2].Value = "Name";
+        //        worksheet.Cells[1, 1].Style.Font.Bold = true;
+        //        worksheet.Cells[1, 2].Style.Font.Bold = true;
+
+        //        worksheet.Cells[1, 1].AddComment("Mandatory Coy");
+        //        worksheet.Cells[1, 2].AddComment("Mandatory Iya nih");
+
+        //        worksheet.Cells[1, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+        //        worksheet.Cells[1, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
+
+        //        int row = 2;
+        //        foreach (var item in data)
+        //        {
+        //            worksheet.Cells[row, 1].Value = item.Column1;
+        //            worksheet.Cells[row, 2].Value = item.Column2;
+        //            row++;
+        //        }
+
+        //        worksheet.Column(1).AutoFit();
+        //        worksheet.Column(2).AutoFit();
+
+        //        // Create the table
+        //        var tableRange = worksheet.Cells[1, 1, 1, 2];
+
+        //        var excelTable = worksheet.Tables.Add(tableRange, "Table");
+        //        excelTable.TableStyle = OfficeOpenXml.Table.TableStyles.Light1;
+
+        //        // Add borders to the table range
+        //        tableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+        //        tableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+        //        tableRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+        //        tableRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+
+        //        // Add thick border to the header row
+        //        tableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+        //        tableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+        //        return await Task.FromResult(package.GetAsByteArray());
+        //    }
+        //}
+
+        //public class MyData
+        //{
+        //    public string Column1 { get; set; }
+        //    public string Column2 { get; set; }
+        //}
+
+        private async Task ExportToExcel()
         {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "country_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Code",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+            ]);
         }
 
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        public async Task GenerateColumnImportTemplateExcelFileAsync(IJSRuntime jSRuntime, IFileExportService file, string fileName, DotNetStreamReference streamReference, List<ExportFileData> data, string? name = "downloadFileFromStream")
         {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
+            var fileContent = await file.GenerateColumnImportTemplateExcelFileAsync(data);
+
+            using var streamRef = new DotNetStreamReference(new MemoryStream(fileContent));
+            await jSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -272,35 +347,6 @@
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
-        }
-
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
         }
 
         private async Task ImportFile()

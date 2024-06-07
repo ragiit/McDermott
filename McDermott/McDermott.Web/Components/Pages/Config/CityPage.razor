@@ -15,6 +15,8 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
+                                <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
                                                 IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                                 IsContentBlocked="true"
@@ -22,81 +24,55 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
 
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                    <DxGrid @ref="Grid"
                                             Data="Cities"
-                                            PageSize="10"
-                                            EditorRenderMode="GridEditorRenderMode.Detached"
                                             @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                             EditModelSaving="OnSave"
                                             DataItemDeleting="OnDelete"
-                                            EditMode="GridEditMode.PopupEditForm"
-                                            PopupEditFormCssClass="pw-800"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            PagerNavigationMode="PagerNavigationMode.InputBox"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
+                                            PageSize="10"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="@GridExtention.Grid_CustomizeDataRowEditor"
+                                            AllowSelectRowByClick="true"
                                             PagerPosition="GridPagerPosition.Bottom"
                                             PageSizeSelectorVisible="true"
                                             PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
                                             PageSizeSelectorAllRowsItemVisible="true"
                                             PagerSwitchToInputBoxButtonCount="10"
-                                            AllowSelectRowByClick="true"
                                             FocusedRowEnabled="true"
                                             PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
                                             ShowGroupPanel="true"
                                             AutoExpandAllGroupRows="true"
                                             ShowFilterRow="true"
-                                            CustomizeElement="Grid_CustomizeElement"
+                                            CustomizeElement="@GridExtention.Grid_CustomizeElement"
                                             ShowSearchBox="true"
                                             SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                             KeyboardNavigationEnabled="true">
+
                                         <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="() => NewItem_Click(context.Grid)" IconCssClass="fa-solid fa-plus" />
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Cities.Count > 0" />
                                                 <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Cities.Count > 0" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                 <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
                                                     <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                        <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(Grid))" />
+                                                        <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(Grid))" />
+                                                        <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(Grid))" />
                                                     </Items>
                                                 </DxToolbarItem>
-
-                                                @*   <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="() => NewItem_Click(context.Grid)" IconCssClass="fa-solid fa-plus" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Cities.Count > 0" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Cities.Count > 0" />
-                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                            <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                            <Items>
-                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                            </Items>
-                                            </DxToolbarItem>
-                                            <DxToolbarItem Visible="false" id="upload" Text="Import" IconCssClass="fa-solid fa-file-import" />
-                                            <DxUpload Name="myFile" ExternalSelectButtonCssSelector="#ToolBarSelectBtn" SelectedFilesChanged="@SelectedFilesChanged"></DxUpload> *@
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" IconCssClass="fa-solid fa-file-import">
+                                                    <Items>
+                                                        <DxToolbarItem Text="Template" Click=" ExportToExcel" />
+                                                        <DxToolbarItem Text="Import" Click="ImportFile" />
+                                                    </Items>
+                                                </DxToolbarItem>
                                             </DxToolbar>
-
-                                            @*  <DxUpload ExternalSelectButtonCssSelector="#upload"
-                                        ExternalDropZoneCssSelector="#upload"
-                                        Visible="false"
-                                        ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
-                                        FileUploaded="OnFileUploaded"
-                                        MaxFileSize="15000000"
-                                        @ref="MyUpload">
-
-                                        </DxUpload>
-                                        <DxUpload Name="myFile"
-                                        ExternalSelectButtonCssSelector="#upload"
-                                        ExternalDropZoneCssSelector="#upload"
-                                        SelectedFilesChanged="@SelectedFilesChanged"
-                                        FileUploadStarted="@OnFileUploadStarted"
-                                        AcceptedFileTypes="@(new List<string> { ".xlxs" })"
-                                        UploadUrl="test">
-                                        </DxUpload> *@
                                         </ToolbarTemplate>
 
                                         <Columns>

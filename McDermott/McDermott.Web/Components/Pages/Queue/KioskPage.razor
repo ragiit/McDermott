@@ -90,7 +90,7 @@
                                                         <DxFormLayoutItem Caption="BPJS" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                             <DxTextBox @bind-Text="@FormKios.BPJS" ReadOnly style="background-color:#949494" />
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem Caption=" BPJS Status" ColSpanMd="12">
+                                                        <DxFormLayoutItem Caption=" BPJS Status" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                             @if (BPJS != null)
                                                             {
                                                                 @if (statBPJS == "Active")
@@ -154,16 +154,16 @@
                                                         @if (showPhysician)
                                                         {
                                                             @* <DxFormLayoutItem Caption="Physician" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                <DxComboBox Data="@Phys"
-                                                                            @bind-Value="@FormKios.PhysicianId"
-                                                                            NullText="Select Physician.."
-                                                                            ValueFieldName="Id"
-                                                                            FilteringMode="DataGridFilteringMode.Contains"
-                                                                            SelectedItemChanged="@((UserDto req)=> ChangePhysician(req))"
-                                                                            TextFieldName="Name"
-                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                            ShowValidationIcon="true" />
-                                                            </DxFormLayoutItem> *@
+                                    <DxComboBox Data="@Phys"
+                                    @bind-Value="@FormKios.PhysicianId"
+                                    NullText="Select Physician.."
+                                    ValueFieldName="Id"
+                                    FilteringMode="DataGridFilteringMode.Contains"
+                                    SelectedItemChanged="@((UserDto req)=> ChangePhysician(req))"
+                                    TextFieldName="Name"
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    ShowValidationIcon="true" />
+                                    </DxFormLayoutItem> *@
 
                                                             <DxFormLayoutItem Caption="Physician Schedule Slot" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                 <DxComboBox Data="@DoctorScheduleSlots"

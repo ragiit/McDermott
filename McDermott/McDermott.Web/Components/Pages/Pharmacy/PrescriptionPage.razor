@@ -2,13 +2,10 @@
 @page "/pharmacy/prescription/{Id:long}"
 @rendermode InteractiveServer
 
-
 @if (!IsPopUpForm)
 {
     <PageTitle>McHealthCare - Insurance Policy</PageTitle>
 }
-
-
 
 @if (IsAccess)
 {
@@ -367,7 +364,7 @@
                                                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                                         EditorRenderMode="GridEditorRenderMode.Detached"
                                                                         DataItemDeleting="OnDeletePrescriptionLines"
-                                                                        EditModelSaving="OnSavePrescription"                                                                        
+                                                                        EditModelSaving="OnSavePrescription"
                                                                         AllowSelectRowByClick="true"
                                                                         PagerPosition="GridPagerPosition.Bottom"
                                                                         PageSizeSelectorVisible="true"
@@ -519,7 +516,7 @@
                                                                                 <ValidationMessage For="@(()=> Prescription.PriceUnit)"   />
                                                                             </DxFormLayoutItem>
                                                                         </DxFormLayout>
-                                                                        
+
                                                                     </EditFormTemplate>
                                                                 </DxGrid>
                                                             </DxLoadingPanel>

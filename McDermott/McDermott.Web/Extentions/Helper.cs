@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using McDermott.Application.Dtos;
+using McDermott.Application.Features.Services;
+using Serilog;
 
 namespace McDermott.Web.Extentions
 {
@@ -27,6 +29,14 @@ namespace McDermott.Web.Extentions
                 Name = "Obat"
             },
         ];
+
+        public static async Task GenerateColumnImportTemplateExcelFileAsync(IJSRuntime jSRuntime, IFileExportService file, string fileName, List<ExportFileData> data, string? name = "downloadFileFromStream")
+        {
+            var fileContent = await file.GenerateColumnImportTemplateExcelFileAsync(data);
+
+            using var streamRef = new DotNetStreamReference(new MemoryStream(fileContent));
+            await jSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+        }
 
         public static readonly string VERSION = "2.0.0";
         public static readonly string APP_NAME = "McHealthCare";

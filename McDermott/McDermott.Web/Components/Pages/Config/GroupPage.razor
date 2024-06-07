@@ -163,7 +163,7 @@
                                                             <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="Read" />
                                                             <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="Update" />
                                                             <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="Delete" />
-                                                            @* <DxGridDataColumn FieldName="Import" /> *@
+                                                            <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="Import" />
                                                         </Columns>
                                                         <EditFormTemplate Context="EditFormContext">
                                                             <DxFormLayout CssClass="w-100">
@@ -213,6 +213,10 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Delete" ColSpanMd="3">
                                                                     <DxCheckBox @bind-Checked="@GroupMenu.Delete" />
                                                                     <ValidationMessage For="@(()=> @GroupMenu.Delete)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Import" ColSpanMd="3">
+                                                                    <DxCheckBox @bind-Checked="@GroupMenu.Import" />
+                                                                    <ValidationMessage For="@(()=> @GroupMenu.Import)"   />
                                                                 </DxFormLayoutItem>
                                                             </DxFormLayout>
                                                         </EditFormTemplate>
