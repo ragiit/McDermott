@@ -1,5 +1,6 @@
 ﻿@page "/test"
 @using DevExpress.Data.Linq
+@using McDermott.Application.Dtos
 @using Microsoft.AspNetCore.Authorization
 @* @attribute [Authorize(AuthenticationSchemes = "CustomAuth")] // Menentukan skema otentikasi *@
 @inherits OwningComponentBase
@@ -7,20 +8,29 @@
 
 <h3>TestPage</h3>
 
-<DxGrid @ref="Grid"
-        Data="Data"
-        ShowGroupPanel="true"
-        VirtualScrollingEnabled="VirtualScrollingEnabled" PageSize="20"
-        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always" CssClass="ch-480"
-        KeyboardNavigationEnabled="true">
+<DxGrid Data="@districts"
+        PageSizeSelectorItems="@(new int[] { 10, 20, 100 })"
+        PageSizeSelectorAllRowsItemVisible="true"
+        PagerSwitchToInputBoxButtonCount="10"
+        PagerVisibleNumericButtonCount="10"
+        KeyboardNavigationEnabled="true"
+        PagerVisible="true"
+        PageSizeSelectorVisible="true"
+        PagerPosition="GridPagerPosition.Bottom"
+        PageSize="@pageSize"
+        PageIndexChanged="PageSizeChangedHandler" >
     <Columns>
-        <DxGridDataColumn FieldName="Name" MinWidth="80" Width="10%" />
+        <DxGridDataColumn FieldName="@nameof(VillageDto.DistrictId)" />
+        <DxGridDataColumn FieldName="@nameof(VillageDto.Name)" />
+        <DxGridDataColumn FieldName="@nameof(VillageDto.Province.Name)" />
+        <DxGridDataColumn FieldName="@nameof(VillageDto.City.Name)" />
+        <DxGridDataColumn FieldName="@nameof(VillageDto.PostalCode)" />
     </Columns>
 </DxGrid>
+
 @code {
-    bool VirtualScrollingEnabled { get; set; } = true;
-    IGrid Grid { get; set; }
-    object Data { get; set; }
+    private PaginatedList<VillageDto> districts;
+    private int pageSize = 20; // Default page size
 
     protected override async Task OnInitializedAsync()
     {
@@ -29,16 +39,12 @@
 
     private async Task LoadData()
     {
-
+        districts = await Mediator.Send(new GetDistrictsQuery { PageNumber = 1, PageSize = pageSize });
     }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+
+    private async Task PageSizeChangedHandler(int newSize)
     {
-        if (firstRender)
-        {
-            await Grid.WaitForDataLoadAsync();
-            Grid.ExpandGroupRow(1);
-            await Grid.WaitForDataLoadAsync();
-            Grid.ExpandGroupRow(2);
-        }
+        pageSize = newSize;
+        await LoadData();
     }
 }

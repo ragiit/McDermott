@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
@@ -9,6 +10,8 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private List<TransactionStockDto> TransactionStocks = [];
         private List<TransactionStockProductDto> TempTransactionStocks = [];
+        private List<TransactionStockDetailDto> AllLogs = [];
+        private List<TransactionStockDetailDto> Logs = [];
         private List<TransactionStockProductDto> TransactionStockProducts = [];
         private List<TransactionStockDetailDto> TransactionStockDetails = [];
         private List<StockProductDto> StockProducts = [];
@@ -64,6 +67,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private IGrid? Grid { get; set; }
         private IGrid? GridDetailTransferStock { get; set; }
+        private IGrid? GridDetailTransferStockLogs { get; set; }
         private bool PanelVisible { get; set; } = false;
         private bool showForm { get; set; } = false;
         private bool showFormDetail { get; set; } = false;
@@ -82,7 +86,9 @@ namespace McDermott.Web.Components.Pages.Inventory
         private string? UomName { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsDetail { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedDataItemsDetailLogs { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
+        private int FocusedRowVisibleIndexDetail { get; set; }
 
         #endregion static Variable
 
@@ -108,6 +114,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 Uoms = await Mediator.Send(new GetUomQuery());
                 UomName = Uoms.Select(x => x.Name).FirstOrDefault();
                 TransactionStockDetails = await Mediator.Send(new GetTransactionStockDetailQuery());
+                AllLogs = TransactionStockDetails.ToList();
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -124,7 +131,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             PanelVisible = false;
         }
 
-        private void SelectedItemProduct(ProductDto product)
+        private async Task SelectedItemProduct(ProductDto product)
         {
             if (product is not null)
             {
@@ -133,6 +140,19 @@ namespace McDermott.Web.Components.Pages.Inventory
                 TempFormInternalTransfer.TraceAvability = data.TraceAbility;
                 var uomName = Uoms.Where(u => u.Id == data?.UomId).Select(x => x.Name).FirstOrDefault();
                 TempFormInternalTransfer.UomName = uomName;
+
+                var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == product.Id && s.SourceId == FormInternalTransfer.SourceId));
+
+                if (product.TraceAbility)
+                {
+                    TempFormInternalTransfer.Batch = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Batch ?? "-";
+                    TempFormInternalTransfer.ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Expired;
+                }
+                else
+                {
+                    TempFormInternalTransfer.Batch = "-";
+                    TempFormInternalTransfer.ExpiredDate = null;
+                }
             }
         }
 
@@ -233,7 +253,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private void Grid_FocusedRowChangedDetail(GridFocusedRowChangedEventArgs args)
         {
-            FocusedRowVisibleIndex = args.VisibleIndex;
+            FocusedRowVisibleIndexDetail = args.VisibleIndex;
         }
 
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)
@@ -243,7 +263,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task OnRowDoubleClickDetail(GridRowClickEventArgs e)
         {
-            await EditItemDetail_Click();
+            EditItemDetail_Click();
         }
 
         #endregion Grid
@@ -274,23 +294,38 @@ namespace McDermott.Web.Components.Pages.Inventory
             try
             {
                 showForm = true;
-                var ase = p;
                 PanelVisible = true;
                 header = "Edit Data";
+
                 FormInternalTransfer = p ?? SelectedDataItems[0].Adapt<TransactionStockDto>();
-                if (FormInternalTransfer.StatusTransfer != "Draft")
-                {
-                    isActiveButton = false;
-                }
+                isActiveButton = FormInternalTransfer.StatusTransfer == "Draft";
                 transactionId = FormInternalTransfer.Id;
 
                 TransactionStockProducts = await Mediator.Send(new GetTransactionStockProductQuery(x => x.TransactionStockId == FormInternalTransfer.Id));
-                TempTransactionStocks = TransactionStockProducts.Select(x => x).ToList();
+                TempTransactionStocks = TransactionStockProducts.ToList();
+
                 foreach (var item in TempTransactionStocks)
                 {
-                    var d = Products.Where(x => x.Id == item.ProductId).FirstOrDefault();
-                    item.UomName = Uoms.Where(u => u.Id == d?.UomId).Select(x => x.Name).FirstOrDefault();
+                    var product = Products.FirstOrDefault(x => x.Id == item.ProductId);
+                    item.UomName = Uoms.FirstOrDefault(u => u.Id == product?.UomId)?.Name;
+
+                    var stockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == item.ProductId && s.SourceId == FormInternalTransfer.SourceId));
+                    var stockProduct = stockProducts.FirstOrDefault();
+
+                    if (item.Product?.TraceAbility == true)
+                    {
+                        item.Batch = stockProduct?.Batch ?? "-";
+                        item.ExpiredDate = stockProduct?.Expired;
+                    }
+                    else
+                    {
+                        item.Batch = "-";
+                        item.ExpiredDate = null;
+                    }
                 }
+
+                Logs = await Mediator.Send(new GetTransactionStockDetailQuery(x => x.TransactionStockId == FormInternalTransfer.Id));
+
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -303,6 +338,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             showFormDetail = true;
             IsAddTransfer = false;
+
+            await GridDetailTransferStock.StartEditRowAsync(FocusedRowVisibleIndexDetail);
         }
 
         private async Task ToDoCheck()
@@ -550,14 +587,14 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
         }
 
-        private async Task onDelete_Detail(GridDataItemDeletingEventArgs e)
+        private void onDelete_Detail(GridDataItemDeletingEventArgs e)
         {
             try
             {
                 StateHasChanged();
                 var data = SelectedDataItemsDetail.Adapt<List<TransactionStockProductDto>>();
                 TempTransactionStocks.RemoveAll(x => data.Select(z => z.TransactionStockId).Contains(x.TransactionStockId));
-                SelectedDataItemsDetail = new ObservableRangeCollection<object>();
+                SelectedDataItemsDetail = [];
             }
             catch (Exception ex)
             {

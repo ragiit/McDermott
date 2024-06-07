@@ -1,7 +1,7 @@
 ﻿@page "/inventory/receiving-transfer"
 @rendermode InteractiveServer
 
-<PageTitle>Good Receipt</PageTitle>
+<PageTitle>@Helper.APP_NAME - Good Receipt</PageTitle>
 
 <style>
     .my-style {
@@ -134,7 +134,7 @@
                                                 <h3 class="fw-bolder">@FormReceivingStocks.KodeReceiving</h3>
                                             </DxFormLayoutItem>
                                         }
-                                        <DxFormLayoutItem Caption="Schendule Date" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                        <DxFormLayoutItem Caption="Schedule Date" CaptionCssClass="normal-caption" ColSpanMd="12">
                                             <DxDateEdit @bind-Date="@FormReceivingStocks.SchenduleDate" Enabled="@isActiveButton" DisplayFormat="dd MMMM yyyy" Format="d"></DxDateEdit>
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem Caption="Destination Location" CaptionCssClass="normal-caption" ColSpanMd="12">
@@ -148,7 +148,10 @@
                                                         Enabled="@isActiveButton"></DxComboBox>
                                             <ValidationMessage For="@(()=>FormReceivingStocks.DestinationId)"></ValidationMessage>
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutGroup Caption="Product Lines" ColSpanMd="12">
+
+                                        <hr />
+
+                                        <DxFormLayoutGroup Caption="Product Lines" ColSpanMd="12" CssClass="mt-3">
                                             <Items>
                                                 <DxGrid @ref="GridProduct"
                                                         PagerNavigationMode="PagerNavigationMode.InputBox"
