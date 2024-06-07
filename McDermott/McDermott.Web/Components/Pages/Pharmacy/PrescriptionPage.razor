@@ -102,7 +102,11 @@
                                                     <DxGridDataColumn MinWidth="200" FieldName="ReceiptDate" Caption="Prescription Date" SortIndex="0" />
                                                     <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
                                                     <DxGridDataColumn MinWidth="200" FieldName="Practitioner.Name" Caption="Prescribing Doctor" />
-                                                    <DxGridDataColumn MinWidth="200" FieldName="Status" Caption="Status" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="Status" Caption="Status">
+                                                        <CellDisplayTemplate>
+                                                            @GetIssueStatusIconHtml((context.DataItem as PharmacyDto).Status)
+                                                        </CellDisplayTemplate>
+                                                    </DxGridDataColumn>
                                                 </Columns>
                                             </DxGrid>
                                         </DxLoadingPanel>
@@ -115,43 +119,46 @@
                                                 IsContentBlocked="true"
                                                 CssClass="w-100"
                                                 ApplyBackgroundShading="true">
-                                    @if (Pharmacy.Id != 0 || Pharmacy.Status == "Confirm")
-                                    {
 
+                                    @* @if (Pharmacy.Status == "Draft")
+                                    { *@
                                         <div class="row justify-content-end mb-3">
                                             <div class="col-auto align-self-end">
                                                 <DxTabs RenderMode="TabsRenderMode.AllTabs">
-                                                    <DxTab Text="Receive" Enabled="@(Pharmacy.Status == "Accepted" || Pharmacy.Status == "Confirm")"></DxTab>
+                                                    <DxTab Text="Draft" Enabled="@(Pharmacy.Status == "Draft" )"></DxTab>
                                                     <DxTab Text="Process" Enabled="@(Pharmacy.Status == "Processed")"></DxTab>
+                                                    <DxTab Text="Received" Enabled="@(Pharmacy.Status == "Received")"></DxTab>
                                                     <DxTab Text="Done" Enabled="@(Pharmacy.Status == "Done")"></DxTab>
                                                     <DxTab Text="Cancel" Enabled="@(Pharmacy.Status == "Canceled")"></DxTab>
                                                 </DxTabs>
                                             </div>
                                         </div>
-                                        <div class="row justify-content-start mb-3">
-                                            <div class="col-12 align-self-start">
-
-                                                @if (Pharmacy.Status == "Accepted")
-                                                {
-                                                    <div class="card">
-                                                        <div class="card-body">
-                                                            <DxButton Text="Send To Pharmacy" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="Processed"></DxButton>
-                                                            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                        @if (Pharmacy.Id != 0)
+                                        {
+                                            <div class="row justify-content-start mb-3">
+                                                <div class="col-12 align-self-start">
+                                                    @if (Pharmacy.Status == "Draft" && (NameGroup.Name == "Administrator" || NameGroup.Name == "Admin"))
+                                                    {
+                                                        <div class="card">
+                                                            <div class="card-body">
+                                                                <DxButton Text="Send To Pharmacy" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="SendToPharmacy"></DxButton>
+                                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                }
-                                                else if (Pharmacy.Status == "Processed")
-                                                {
-                                                    <div class="card">
-                                                        <div class="card-body">
-                                                            <DxButton Text="Confirm" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
-                                                            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                    }
+                                                    else if (Pharmacy.Status == "Received" && (NameGroup.Name.Equals("Nurse") || NameGroup.Name.Equals("Nursing")))
+                                                    {
+                                                        <div class="card">
+                                                            <div class="card-body">
+                                                                <DxButton Text="Confirm" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="confirm"></DxButton>
+                                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                }
+                                                    }
+                                                </div>
                                             </div>
-                                        </div>
-                                    }
+                                        }
+                                    @* } *@
                                     <EditForm Model="@Pharmacy" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
                                         <DataAnnotationsValidator />
                                         <div class="card">
@@ -233,7 +240,6 @@
                                                                                                         Caption="Name" />
                                                                                     <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
                                                                                                         Caption="Type" />
-
                                                                                 </DxTagBox>
                                                                             }
                                                                         </div>
@@ -294,19 +300,7 @@
                                                                             }
                                                                         </div>
                                                                     </div>
-                                                                </DxFormLayoutItem>
-
-                                                                @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="12">
-                                                    <DxCheckBox @bind-Checked="@Pharmacy.IsWeather"  Enabled="isActiveButton"/>
-                                                    </DxFormLayoutItem>
-
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Farmacologi" ColSpanMd="12">
-                                                    <DxCheckBox @bind-Checked="@Pharmacy.IsFarmacologi"  Enabled="isActiveButton"/>
-                                                    </DxFormLayoutItem>
-
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="12">
-                                                    <DxCheckBox @bind-Checked="@Pharmacy.IsFood" Enabled="isActiveButton"/>
-                                                    </DxFormLayoutItem> *@
+                                                                </DxFormLayoutItem>                                                                
                                                             </DxFormLayout>
                                                         </div>
 
@@ -367,7 +361,8 @@
                                                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                                         EditorRenderMode="GridEditorRenderMode.Detached"
                                                                         DataItemDeleting="OnDeletePrescriptionLines"
-                                                                        EditModelSaving="OnSavePrescription"                                                                        
+                                                                        EditModelSaving="OnSavePrescription"
+                                                                        EditFormButtonsVisible="false"
                                                                         AllowSelectRowByClick="true"
                                                                         PagerPosition="GridPagerPosition.Bottom"
                                                                         PageSizeSelectorVisible="true"
@@ -508,18 +503,12 @@
                                                                                         </Items>
                                                                                     </DxGridLayout>
                                                                                 </Template>
-                                                                            </DxFormLayoutItem>
-
-                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Price Unit" ColSpanMd="6">
-                                                                                <DxSpinEdit @bind-Value="Prescription.PriceUnit"
-                                                                                            NullText="Price Unit..."
-                                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                            Enabled="isActiveButton"
-                                                                                            BindValueMode="BindValueMode.OnInput" />
-                                                                                <ValidationMessage For="@(()=> Prescription.PriceUnit)"   />
+                                                                            </DxFormLayoutItem>                                                                           
+                                                                            <DxFormLayoutItem ColSpanMd="12">
+                                                                                <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridPrescriptionLines.CancelEditAsync())" ></DxButton>
                                                                             </DxFormLayoutItem>
                                                                         </DxFormLayout>
-                                                                        
                                                                     </EditFormTemplate>
                                                                 </DxGrid>
                                                             </DxLoadingPanel>
@@ -588,7 +577,7 @@
                                             <div class="card-footer">
                                                 <div class="row justify-content-end">
                                                     <div class="col-auto align-self-end">
-                                                        <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                                                        <DxButton Enabled="!IsLoading || isActiveButton" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true">
 
                                                         </DxButton>
                                                         <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnDiscard" SubmitFormOnClick="true"></DxButton>
@@ -704,19 +693,19 @@ else
                         <ValidationMessage For="@(()=> Concoction.Qty)"   />
                     </DxFormLayoutItem>
 
-                    <DxFormLayoutItem Caption="Frequency" CaptionCssClass="normal-caption" ColSpanMd="12">
-                        <DxComboBox Data="@DrugDosages"
-                                    @bind-Value="@Concoction.DrugDosageId"
-                                    FilteringMode="@DataGridFilteringMode.Contains"
-                                    NullText="Select Dosage signa ..."
-                                    TextFieldName="Frequency"
-                                    ValueFieldName="Id"
-                                    Enabled="isActiveButton"
-                                    SelectedItemChanged="@((DrugDosageDto freq)=>SelectChangeFrequency(freq))"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    ShowValidationIcon="true" />
-                        <ValidationMessage For="@(()=> Concoction.DrugDosageId)"   />
-                    </DxFormLayoutItem>
+                    @*  <DxFormLayoutItem Caption="Frequency" CaptionCssClass="normal-caption" ColSpanMd="12">
+                    <DxComboBox Data="@DrugDosages"
+                    @bind-Value="@Concoction.DrugDosageId"
+                    FilteringMode="@DataGridFilteringMode.Contains"
+                    NullText="Select Dosage signa ..."
+                    TextFieldName="Frequency"
+                    ValueFieldName="Id"
+                    Enabled="isActiveButton"
+                    SelectedItemChanged="@((DrugDosageDto freq)=>SelectChangeFrequency(freq))"
+                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                    ShowValidationIcon="true" />
+                    <ValidationMessage For="@(()=> Concoction.DrugDosageId)"   />
+                    </DxFormLayoutItem> *@
                     <DxFormLayoutItem Caption="Qty Per Day" CaptionCssClass="normal-caption" ColSpanMd="12">
                         <DxSpinEdit Value="@Concoction.QtyByDay"
                                     NullText="0"
@@ -738,7 +727,9 @@ else
                     </DxFormLayoutItem>
 
                     <DxFormLayoutItem Caption="Total Qty" CaptionCssClass="normal-caption" ColSpanMd="12">
-                        <DxSpinEdit @bind-Value="@Concoction.TotalQty"
+                        <DxSpinEdit Value="@Concoction.TotalQty"
+                                    ValueExpression="@(()=>Concoction.TotalQty)"
+                                    ValueChanged="@((long value) => ChangeTotalQtyInHeader(value))"
                                     NullText="Total Qty..."
                                     Enabled="isActiveButton"
                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
@@ -837,10 +828,11 @@ else
                                         </DxFormLayoutItem>
 
                                         <DxFormLayoutItem Caption="Medicine Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                            <DxSpinEdit @bind-Value="@ConcoctionLine.MedicamentDosage"
+                                            <DxSpinEdit Value="@ConcoctionLine.MedicamentDosage"
                                                         NullText="Medicine Unit Of Dosage..."
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                        BindValueMode="BindValueMode.OnInput" />
+                                                        ValueExpression="@(()=>ConcoctionLine.MedicamentDosage)"
+                                                        ValueChanged="@((long value) => changeMedicamentDosage(value))"
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                             <ValidationMessage For="@(()=> ConcoctionLine.MedicamentDosage)"   />
                                         </DxFormLayoutItem>
                                     </DxFormLayout>
@@ -850,10 +842,11 @@ else
                                     <DxFormLayout CssClass="mt w-100">
 
                                         <DxFormLayoutItem Caption="Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                            <DxSpinEdit @bind-Value="@ConcoctionLine.Qty"
+                                            <DxSpinEdit Value="@ConcoctionLine.Qty"
                                                         NullText="Qty Dose..."
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                        BindValueMode="BindValueMode.OnInput" />
+                                                        ValueExpression="@(()=>ConcoctionLine.Qty)"
+                                                        ValueChanged="@((long value)=>ChangeTotalQtyMedicament(value))"
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                             <ValidationMessage For="@(()=> ConcoctionLine.Qty)"   />
                                         </DxFormLayoutItem>
 

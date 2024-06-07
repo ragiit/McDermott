@@ -24,7 +24,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long QtyByDay { get; set; } = 0;
 
         public long? Days { get; set; }
-        public long? TotalQty { get; set; }
+        public long TotalQty { get; set; } = 0;
 
         [SetToNull]
         public UomDto? Uom { get; set; }
