@@ -130,6 +130,19 @@ namespace McDermott.Web.Components.Pages.Inventory
             PanelVisible = false;
         }
 
+        private List<StockProductDto> Batch = [];
+        private DateTime? SelectedBatchExpired { get; set; }
+
+        private async Task SelectedBatch(StockProductDto stockProduct)
+        {
+            SelectedBatchExpired = null;
+
+            if (stockProduct is not null)
+            {
+                SelectedBatchExpired = stockProduct.Expired;
+            }
+        }
+
         private async Task SelectedItemProduct(ProductDto product)
         {
             if (product is not null)
@@ -141,6 +154,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 TempFormInternalTransfer.UomName = uomName;
 
                 var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == product.Id && s.SourceId == FormInternalTransfer.SourceId));
+
+                Batch.Clear();
+                Batch = StockProducts;
 
                 if (product.TraceAbility)
                 {

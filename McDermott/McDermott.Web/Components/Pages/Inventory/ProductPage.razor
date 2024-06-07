@@ -1,6 +1,7 @@
 ﻿@page "/inventory/product"
 @rendermode InteractiveServer
-<PageTitle>Inventory - Product</PageTitle>
+
+<PageTitle>@Helper.APP_NAME - Product</PageTitle>
 
 @if (IsAccess)
 {
@@ -386,7 +387,7 @@
                                                 SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                                 KeyboardNavigationEnabled="true">
                                             <ToolbarTemplate>
-                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">                                                    
+                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                     <DxToolbarItem BeginGroup="true" Text="Back To Product" Click="Back_Click" IconCssClass="fa-solid fa-arrow-left" />
                                                     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshStock_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                 </DxToolbar>

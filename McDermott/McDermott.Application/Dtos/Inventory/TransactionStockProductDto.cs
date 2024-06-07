@@ -10,6 +10,7 @@ namespace McDermott.Application.Dtos.Inventory
 
         [Required(ErrorMessage = "Please Select Product Name...")]
         public long? ProductId { get; set; }
+        public long? StockProductId { get; set; }
 
         [Required(ErrorMessage = "Please Input Stock Quantity...")]
         public long? QtyStock { get; set; }
@@ -31,5 +32,8 @@ namespace McDermott.Application.Dtos.Inventory
 
         [SetToNull]
         public virtual ProductDto? Product { get; set; }
+
+        [SetToNull]
+        public StockProduct? StockProduct { get; set; }
     }
 }

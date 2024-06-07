@@ -302,7 +302,6 @@ else
             try
             {
                 await GetUserInfo();
-                StateHasChanged();
             }
             catch
             {
@@ -325,7 +324,7 @@ else
             var encrypt = Helper.Encrypt(serialize);
             await a.UpdateAuthState(encrypt);
         }
-        catch {   }
+        catch { }
     }
 
     #endregion UserLoginAndAccessRole
