@@ -436,7 +436,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     if (checkStock == null || checkStock == 0)
                     {
                         Prescription.Stock = 0;
-                        ToastService.ShowWarning("This product is out of stock, or choose another product!!");
+                        ToastService.ShowWarning($"The {value.Name} product is out of stock, or choose another product!!");
                         isSavePrescription = false;
                     }
                     else
