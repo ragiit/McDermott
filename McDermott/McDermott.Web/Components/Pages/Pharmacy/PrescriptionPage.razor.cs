@@ -243,6 +243,26 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             "BPJS"
         };
 
+        private void checkStock(long value)
+        {
+            try
+            {
+                if (value == 0)
+                    return;
+
+                var checkStock = StockProducts.Where(x => x.ProductId == Prescription.ProductId && x.SourceId == Pharmacy.PrescriptionLocationId).FirstOrDefault()!;
+                if (value > checkStock.Qty)
+                {
+                    ToastService.ShowInfo($"Stock is less than the quantity requested");
+                    isSavePrescription = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
         private async Task ChangeProduct(ProductDto product)
         {
             try

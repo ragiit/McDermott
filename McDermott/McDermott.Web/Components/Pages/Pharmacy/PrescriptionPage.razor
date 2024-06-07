@@ -395,7 +395,7 @@
                                                                         <DxGridDataColumn MinWidth="200" FieldName="ActiveComponentNames" Caption="Active Component" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="Stock" Caption="Stock" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="DosageFrequency" Caption="Dosage/Frequency" />
-                                                                        <DxGridDataColumn MinWidth="200" FieldName="PriceUnit" Caption="Price Unit" />
+                                                                        @* <DxGridDataColumn MinWidth="200" FieldName="PriceUnit" Caption="Price Unit" /> *@
                                                                         <DxGridDataColumn MinWidth="200" FieldName="DrugRoute.Route" Caption="Route" />
                                                                     </Columns>
                                                                     <EditFormTemplate Context="EditFormContextPrescriptionLines">
@@ -449,12 +449,14 @@
                                                                                 <ValidationMessage For="@(()=> Prescription.Stock)"   />
                                                                             </DxFormLayoutItem>
                                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Prescription Quantity" ColSpanMd="6">
-                                                                                <DxSpinEdit @bind-Value="Prescription.GivenAmount"
+                                                                                <DxSpinEdit Value="Prescription.GivenAmount"
                                                                                             NullText="Given Amount..."
                                                                                             MinValue="0"
+                                                                                            ValueExpression="@(()=>Prescription.GivenAmount)"
+                                                                                            ValueChanged="@((long value)=>checkStock(value))"
                                                                                             Enabled="isActiveButton"
                                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                            BindValueMode="BindValueMode.OnInput" />
+                                                                                             />
                                                                                 <ValidationMessage For="@(()=> Prescription.GivenAmount)"   />
                                                                             </DxFormLayoutItem>
 
@@ -505,7 +507,7 @@
                                                                                 </Template>
                                                                             </DxFormLayoutItem>                                                                           
                                                                             <DxFormLayoutItem ColSpanMd="12">
-                                                                                <DxButton Enabled="!IsLoading && isSavePrescription" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                                                <DxButton Enabled="!IsLoading && isSavePrescription" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Confirm" SubmitFormOnClick="true"></DxButton>
                                                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridPrescriptionLines.CancelEditAsync())" ></DxButton>
                                                                             </DxFormLayoutItem>
                                                                         </DxFormLayout>
@@ -577,7 +579,7 @@
                                             <div class="card-footer">
                                                 <div class="row justify-content-end">
                                                     <div class="col-auto align-self-end">
-                                                        <DxButton Enabled="!IsLoading || isActiveButton" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Submit" SubmitFormOnClick="true">
+                                                        <DxButton Enabled="!IsLoading || isActiveButton" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
 
                                                         </DxButton>
                                                         <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnDiscard" SubmitFormOnClick="true"></DxButton>

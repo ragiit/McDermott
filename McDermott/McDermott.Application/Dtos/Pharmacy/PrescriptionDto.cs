@@ -17,7 +17,7 @@
         public string? DrugDosageName { get; set; }
         public long? Stock { get; set; } // product stock
         public long? Dosage { get; set; }
-        public long? GivenAmount { get; set; } // jumlah yg diberikan
+        public long GivenAmount { get; set; } = 0; // jumlah yg diberikan
         public long? PriceUnit { get; set; }
 
         public DrugFormDto? DrugForm { get; set; }
