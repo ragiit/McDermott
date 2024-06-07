@@ -24,25 +24,22 @@
 {
     <div class="wrapper">
         <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Counter" />
+
         <section class="content">
             <div class="container-fluid">
                 <div class="row ">
                     <div class="col">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="w-100">
-                                    <div class="col align-self-center">
-                                        <DxButton RenderStyle="ButtonRenderStyle.Primary"
-                                                  Click="NewItem_Click"
-                                                  RenderStyleMode="@ButtonRenderStyleMode.Contained"
-                                                  IconCssClass="fa-solid fa-plus"
-                                                  Text="Add New Counter"
-                                                  SubmitFormOnClick="true" />
-                                    </div>
-                                </div>
+                        <div class="w-100">
+                            <div class="col align-self-center">
+                                <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                          Click="NewItem_Click"
+                                          RenderStyleMode="@ButtonRenderStyleMode.Contained"
+                                          IconCssClass="fa-solid fa-plus"
+                                          Text="Add New Counter"
+                                          SubmitFormOnClick="true" />
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mt-3">
                             @if (IsLoading)
                             {
                                 <LoadingIndicatorLayout />
@@ -94,9 +91,10 @@
                                                 <div class="row">
                                                     <div class="row">
                                                         <div class="col-md-3">
-                                                            <label class="me-2">Status:</label>
+                                                            <label class="me-2">Status</label>
                                                         </div>
                                                         <div class="col-md-9">
+                                                            :
                                                             @if (i.Status == "open")
                                                             {
                                                                 <span class='badge bg-primary py-1 px-2' title="Open">Open</span>
@@ -114,10 +112,10 @@
 
                                                     <div class="row">
                                                         <div class="col-md-3">
-                                                            <label class="me-2 mb-0">Service:</label>
+                                                            <label class="me-2 mb-0">Service</label>
                                                         </div>
                                                         <div class="col-md-9">
-                                                            <span class='badge bg-dark py-1 px-2'>@z</span>
+                                                            : <span class='badge bg-dark py-1 px-2'>@z</span>
                                                         </div>
                                                     </div>
 

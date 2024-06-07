@@ -275,11 +275,17 @@
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                    <DxTextBox ShowValidationIcon="true"
-                                                                               @bind-Text="@TempFormInternalTransfer.Batch"
-                                                                               NullText="Batch"
-                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                                    <ValidationMessage For="@(()=> TempFormInternalTransfer.Batch)"   />
+                                                                    <DxComboBox ShowValidationIcon="true" Data="@Batch"
+                                                                                NullText="Select Batch..."
+                                                                                @bind-Value="@TempFormInternalTransfer.StockProductId"
+                                                                                TextFieldName="Batch"
+                                                                                ValueFieldName="Id"
+                                                                                SelectedItemChanged="@((StockProductDto a)=> SelectedBatch(a))"
+                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                FilteringMode="@DataGridFilteringMode.Contains">
+                                                                    </DxComboBox>
+                                                                    <ValidationMessage For="@(() => TempFormInternalTransfer.StockProduct)" />
+
                                                                 </DxFormLayoutItem>
                                                             </div>
                                                             <div class="col-md-4">
@@ -295,7 +301,7 @@
                                                                 <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                     <DxDateEdit ShowValidationIcon="true"
                                                                                 ReadOnly
-                                                                                @bind-Date="@TempFormInternalTransfer.ExpiredDate"
+                                                                                @bind-Date="@SelectedBatchExpired"
                                                                                 NullText="Expired Date">
                                                                     </DxDateEdit>
                                                                 </DxFormLayoutItem>
@@ -335,7 +341,7 @@
                                     @if (Logs.Count > 0)
                                     {
                                         <DxFormLayout>
-                                            <DxFormLayoutGroup ColSpanMd="12" Caption="Transaction Logs" AnimationType="LayoutAnimationType.Slide" Decoration="FormLayoutGroupDecoration.Card" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start">
+                                            <DxFormLayoutGroup ColSpanMd="12" Caption="Transaction Logs" AnimationType="LayoutAnimationType.Slide" Expanded="false" Decoration="FormLayoutGroupDecoration.Card" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start">
                                                 <CaptionTemplate>
                                                     <div>
                                                         <span class="text-center">Transaction Logs</span>
@@ -405,13 +411,53 @@
                                                                                                         break;
                                                                                                 }
 
-                                                                                                string html = $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span>";
+                                                                                                string html = $"<span class='badge text-white bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span>";
                                                                                             }
 
-                                                                                            Status: @((MarkupString)html) <br />
-                                                                                            Type: @(item.TypeTransaction ?? "N/A") <br />
-                                                                                            From: @item.Source?.Name <br />
-                                                                                            To: @item.Destination?.Name <br />
+                                                                                            <div class="row w-100">
+                                                                                                <div class="col-md-1">
+                                                                                                    Status
+                                                                                                </div>
+
+                                                                                                <div class="col-md-11">
+                                                                                                    : @((MarkupString)html)
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div class="row w-100">
+                                                                                                <div class="col-md-1">
+                                                                                                    Type
+                                                                                                </div>
+
+                                                                                                <div class="col-md-11">
+                                                                                                    : @(item.TypeTransaction ?? "N/A")
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div class="row w-100">
+                                                                                                <div class="col-md-1">
+                                                                                                    From
+                                                                                                </div>
+
+                                                                                                <div class="col-md-11">
+                                                                                                    : @item.Source?.Name
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div class="row w-100">
+                                                                                                <div class="col-md-1">
+                                                                                                    To
+                                                                                                </div>
+
+                                                                                                <div class="col-md-11">
+                                                                                                    : @item.Destination?.Name
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            @* Status: @((MarkupString)html) <br />
+                                                                            Type: @(item.TypeTransaction ?? "N/A") <br />
+                                                                            From: @item.Source?.Name <br />
+                                                                            To: @item.Destination?.Name <br /> *@
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>

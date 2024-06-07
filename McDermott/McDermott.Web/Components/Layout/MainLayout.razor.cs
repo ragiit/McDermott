@@ -48,6 +48,7 @@ namespace McDermott.Web.Components.Layout
             {
                 if (firstRender)
                 {
+                    //await JsRuntime.InvokeVoidAsync("initializePushMenu");
                     await JsRuntime.InvokeVoidAsync("scrollFunction");
                     await LoadUser();
                     StateHasChanged();
@@ -185,7 +186,7 @@ namespace McDermott.Web.Components.Layout
 
                 StateHasChanged();
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
         }
