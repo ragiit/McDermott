@@ -143,11 +143,20 @@
                                                             </div>
                                                         </div>
                                                     }
-                                                    else if (Pharmacy.Status == "Received" && (NameGroup.Name.Equals("Nurse") || NameGroup.Name.Equals("Nursing")))
+                                                else if (Pharmacy.Status == "Processed" && (NameGroup.Name.Equals("Nurse") || NameGroup.Name.Equals("Nursing")))
+                                                {
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <DxButton Text="Process" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Processed"></DxButton>
+                                                            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                        </div>
+                                                    </div>
+                                                    }
+                                                else if (Pharmacy.Status == "Received" && (NameGroup.Name.Equals("Nurse") || NameGroup.Name.Equals("Nursing")))
                                                     {
                                                         <div class="card">
                                                             <div class="card-body">
-                                                                <DxButton Text="Confirm" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="confirm"></DxButton>
+                                                            <DxButton Text="Confirm" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
                                                                 <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                             </div>
                                                         </div>

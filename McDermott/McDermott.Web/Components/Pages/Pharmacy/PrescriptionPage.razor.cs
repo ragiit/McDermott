@@ -253,7 +253,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var checkStock = StockProducts.Where(x => x.ProductId == Prescription.ProductId && x.SourceId == Pharmacy.PrescriptionLocationId).FirstOrDefault()!;
                 if (value > checkStock.Qty)
                 {
-
                     ToastService.ShowInfo($"Stock is less than the quantity requested");
                     isSavePrescription = false;
                 }
@@ -1170,12 +1169,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     isActiveButton = true;
                 }
 
-                if (p.Status == "Processed" && (NameGroup.Name == "Nurse" || NameGroup.Name == "Nursing"))
-                {
-                    p.Status = "Received";
-                    await Mediator.Send(new UpdatePharmacyRequest(p));
-                }
-
                 Pharmacy = p;
 
                 // Fetch related data
@@ -1266,7 +1259,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        public async void confirm()
+        public async void Processed()
+        {
+            Pharmacy.Status = "Received";
+            await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+        }
+
+        public async void validation()
         {
             try
             {
