@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application Title="McHealthCare">
+  <BOModel>
+    <Class Name="DevExpress.Persistent.BaseImpl.EF.PermissionPolicy.PermissionPolicyUser" Caption="Base User" />
+  </BOModel>
+  <NavigationItems>
+    <Items>
+      <Item Id="Default" Index="0">
+        <Items>
+          <Item Id="City_ListView" Removed="True" />
+          <Item Id="Country_ListView" Removed="True" />
+          <Item Id="District_ListView" Removed="True" />
+          <Item Id="Occupational_ListView" Removed="True" />
+          <Item Id="Province_ListView" Removed="True" />
+          <Item Id="Religion_ListView" Removed="True" />
+          <Item Id="Village_ListView" Removed="True" />
+        </Items>
+      </Item>
+      <Item Id="Configuration" Caption="Configuration" ImageName="Actions_Settings" Index="100" IsNewNode="True">
+        <Items IsNewNode="True">
+          <Item Id="City_ListView" ViewId="City_ListView" ObjectKey="" IsNewNode="True" />
+          <Item Id="Country_ListView" ViewId="Country_ListView" ObjectKey="" IsNewNode="True" />
+          <Item Id="District_ListView" ViewId="District_ListView" ObjectKey="" IsNewNode="True" />
+          <Item Id="Occupational_ListView" ViewId="Occupational_ListView" ObjectKey="" IsNewNode="True" />
+          <Item Id="Province_ListView" ViewId="Province_ListView" ObjectKey="" IsNewNode="True" />
+          <Item Id="Religion_ListView" ViewId="Religion_ListView" ObjectKey="" IsNewNode="True" />
+          <Item Id="Village_ListView" ViewId="Village_ListView" ObjectKey="" IsNewNode="True" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
+  <Options>
+    <LayoutManagerOptions RequiredFieldMark="*" />
+  </Options>
+  <SchemaModules>
+    <SchemaModule Name="SystemModule" Version="23.2.6.0" IsNewNode="True" />
+  </SchemaModules>
+  <Views>
+    <ListView Id="ApplicationUser_ListView" Caption="Users" />
+  </Views>
+</Application>
