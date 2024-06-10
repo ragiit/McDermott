@@ -31,6 +31,21 @@ namespace McDermott.Application.Extentions
             Invalidate = 0,
         }
 
+        public enum EnumStatusAccident
+        {
+            [Display(Name = "Return to work")]
+            ReturnToWork = 1,
+
+            [Display(Name = "Restricted work case")]
+            RestrictedWorkCase = 2,
+
+            [Display(Name = "Lost Work days case")]
+            LostWorkDaysCase = 3,
+
+            [Display(Name = "Fatality case")]
+            FatalityCase = 4
+        }
+
         public enum EnumStatusGeneralConsultantService
         {
             // nanti

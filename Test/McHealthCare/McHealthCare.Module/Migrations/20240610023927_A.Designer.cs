@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McHealthCare.Module.Migrations
 {
     [DbContext(typeof(McHealthCareEFCoreDbContext))]
-    [Migration("20240609061439_A")]
+    [Migration("20240610023927_A")]
     partial class A
     {
         /// <inheritdoc />
@@ -300,6 +300,160 @@ namespace McHealthCare.Module.Migrations
                     b.ToTable("PermissionPolicyUserLoginInfo");
                 });
 
+            modelBuilder.Entity("McHealthCare.Module.BusinessObjects.City", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ProvinceID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ProvinceID");
+
+                    b.ToTable("Cities");
+                });
+
+            modelBuilder.Entity("McHealthCare.Module.BusinessObjects.Country", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Countries");
+                });
+
+            modelBuilder.Entity("McHealthCare.Module.BusinessObjects.District", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CityID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ProvinceID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("CityID");
+
+                    b.HasIndex("ProvinceID");
+
+                    b.ToTable("Districts");
+                });
+
+            modelBuilder.Entity("McHealthCare.Module.BusinessObjects.Occupational", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Occupationals");
+                });
+
+            modelBuilder.Entity("McHealthCare.Module.BusinessObjects.Province", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<Guid?>("CountryID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("CountryID");
+
+                    b.ToTable("Provinces");
+                });
+
+            modelBuilder.Entity("McHealthCare.Module.BusinessObjects.Religion", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Religions");
+                });
+
+            modelBuilder.Entity("McHealthCare.Module.BusinessObjects.Village", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CityID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("DistrictID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("PostalCode")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<Guid?>("ProvinceID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("CityID");
+
+                    b.HasIndex("DistrictID");
+
+                    b.HasIndex("ProvinceID");
+
+                    b.ToTable("Villages");
+                });
+
             modelBuilder.Entity("PermissionPolicyRolePermissionPolicyUser", b =>
                 {
                     b.Property<Guid>("RolesID")
@@ -399,6 +553,60 @@ namespace McHealthCare.Module.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("McHealthCare.Module.BusinessObjects.City", b =>
+                {
+                    b.HasOne("McHealthCare.Module.BusinessObjects.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceID");
+
+                    b.Navigation("Province");
+                });
+
+            modelBuilder.Entity("McHealthCare.Module.BusinessObjects.District", b =>
+                {
+                    b.HasOne("McHealthCare.Module.BusinessObjects.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityID");
+
+                    b.HasOne("McHealthCare.Module.BusinessObjects.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceID");
+
+                    b.Navigation("City");
+
+                    b.Navigation("Province");
+                });
+
+            modelBuilder.Entity("McHealthCare.Module.BusinessObjects.Province", b =>
+                {
+                    b.HasOne("McHealthCare.Module.BusinessObjects.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryID");
+
+                    b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("McHealthCare.Module.BusinessObjects.Village", b =>
+                {
+                    b.HasOne("McHealthCare.Module.BusinessObjects.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityID");
+
+                    b.HasOne("McHealthCare.Module.BusinessObjects.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictID");
+
+                    b.HasOne("McHealthCare.Module.BusinessObjects.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceID");
+
+                    b.Navigation("City");
+
+                    b.Navigation("District");
+
+                    b.Navigation("Province");
                 });
 
             modelBuilder.Entity("PermissionPolicyRolePermissionPolicyUser", b =>

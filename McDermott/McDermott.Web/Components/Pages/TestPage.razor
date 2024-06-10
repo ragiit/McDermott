@@ -1,50 +1,42 @@
 ﻿@page "/test"
-@using DevExpress.Data.Linq
-@using McDermott.Application.Dtos
-@using Microsoft.AspNetCore.Authorization
-@* @attribute [Authorize(AuthenticationSchemes = "CustomAuth")] // Menentukan skema otentikasi *@
-@inherits OwningComponentBase
-@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 
-<h3>TestPage</h3>
-
-<DxGrid Data="@districts"
-        PageSizeSelectorItems="@(new int[] { 10, 20, 100 })"
-        PageSizeSelectorAllRowsItemVisible="true"
-        PagerSwitchToInputBoxButtonCount="10"
-        PagerVisibleNumericButtonCount="10"
-        KeyboardNavigationEnabled="true"
-        PagerVisible="true"
-        PageSizeSelectorVisible="true"
-        PagerPosition="GridPagerPosition.Bottom"
-        PageSize="@pageSize"
-        PageIndexChanged="PageSizeChangedHandler" >
+<BaseListPage TData="VillageDto"
+              Title="Test"
+              IsAccess="true"
+              Data="Villages">
     <Columns>
-        <DxGridDataColumn FieldName="@nameof(VillageDto.DistrictId)" />
-        <DxGridDataColumn FieldName="@nameof(VillageDto.Name)" />
-        <DxGridDataColumn FieldName="@nameof(VillageDto.Province.Name)" />
-        <DxGridDataColumn FieldName="@nameof(VillageDto.City.Name)" />
-        <DxGridDataColumn FieldName="@nameof(VillageDto.PostalCode)" />
+        <DxGridSelectionColumn Width="15px" />
+        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+        <DxGridDataColumn MinWidth="200" FieldName="PostalCode" SortIndex="0" />
+        <DxGridDataColumn MinWidth="200" FieldName="Province.Name" Caption="Province" />
+        <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" />
+        <DxGridDataColumn MinWidth="200" FieldName="District.Name" Caption="District" />
     </Columns>
-</DxGrid>
+
+    @*  <EditForm Context="C">
+    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+    <DxTextBox  ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+
+    </DxFormLayoutItem>
+    </EditForm>*@
+</BaseListPage>
 
 @code {
-    private PaginatedList<VillageDto> districts;
-    private int pageSize = 20; // Default page size
+    private bool IsLoading { get; set; } = false;
+    private List<VillageDto> Villages = [];
+    private List<ProvinceDto> Provinces = [];
+    private List<DistrictDto> Districts = [];
+    private List<CountryDto> Countrys = [];
+    private List<CityDto> Cities = [];
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
-    }
-
-    private async Task LoadData()
-    {
-        districts = await Mediator.Send(new GetDistrictsQuery { PageNumber = 1, PageSize = pageSize });
-    }
-
-    private async Task PageSizeChangedHandler(int newSize)
-    {
-        pageSize = newSize;
-        await LoadData();
+        IsLoading = true;
+        Villages = await Mediator.Send(new GetVillageQuery());
+        Countrys = await Mediator.Send(new GetCountryQuery());
+        Provinces = await Mediator.Send(new GetProvinceQuery());
+        Districts = await Mediator.Send(new GetDistrictQuery());
+        Cities = await Mediator.Send(new GetCityQuery());
+        IsLoading = false;
     }
 }

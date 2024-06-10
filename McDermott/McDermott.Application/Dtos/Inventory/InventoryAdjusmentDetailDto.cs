@@ -1,9 +1,12 @@
-﻿namespace McDermott.Application.Dtos.Inventory
+﻿using McDermott.Domain.Common;
+
+namespace McDermott.Application.Dtos.Inventory
 {
     public class InventoryAdjusmentDetailDto : IMapFrom<InventoryAdjusmentDetail>
     {
         public long Id { get; set; }
         public long InventoryAdjusmentId { get; set; }
+        public long? StockProductId { get; set; }
 
         [Required]
         public long? ProductId { get; set; }
@@ -23,5 +26,6 @@
 
         public InventoryAdjusmentDto? InventoryAdjusment { get; set; }
         public ProductDto? Product { get; set; }
+        public StockProductDto? StockProduct { get; set; }
     }
 }

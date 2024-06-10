@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McDermott.Web", "McDermott.
 		{BB1FC57B-326E-428E-84DD-86C2DBC02A1C} = {BB1FC57B-326E-428E-84DD-86C2DBC02A1C}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McDermott.Extentions", "McDermott.Extentions\McDermott.Extentions.csproj", "{3CA8CFB5-FDC0-4BAE-B4AF-9BF071EAB6C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McDermott.Extentions", "McDermott.Extentions\McDermott.Extentions.csproj", "{3CA8CFB5-FDC0-4BAE-B4AF-9BF071EAB6C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

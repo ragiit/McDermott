@@ -519,6 +519,8 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                     await Task.WhenAll(tasks);
 
+                    await LoadInventoryAdjustmentDetails();
+
                     break;
 
                 default:
@@ -531,6 +533,19 @@ namespace McDermott.Web.Components.Pages.Inventory
         private string LotSerialNumber { get; set; } = "-";
         private DateTime? ExpiredDate { get; set; }
 
+        private List<StockProductDto> Batch = [];
+        private DateTime? SelectedBatchExpired { get; set; }
+
+        private async Task SelectedBatch(StockProductDto stockProduct)
+        {
+            SelectedBatchExpired = null;
+
+            if (stockProduct is not null)
+            {
+                SelectedBatchExpired = stockProduct.Expired;
+            }
+        }
+
         private async Task OnSelectProduct(ProductDto e)
         {
             try
@@ -541,6 +556,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id && s.SourceId == InventoryAdjusment.LocationId));
+
+                Batch.Clear();
+                Batch = StockProducts;
 
                 TotalQty = StockProducts.FirstOrDefault()?.Qty ?? 0;
 

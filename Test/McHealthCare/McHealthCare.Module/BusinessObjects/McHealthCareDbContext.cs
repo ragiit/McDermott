@@ -29,7 +29,7 @@ public class McHealthCareDesignTimeDbContextFactory : IDesignTimeDbContextFactor
     {
         //throw new InvalidOperationException("Make sure that the database connection string and connection provider are correct. After that, uncomment the code below and remove this exception.");
         var optionsBuilder = new DbContextOptionsBuilder<McHealthCareEFCoreDbContext>();
-        optionsBuilder.UseSqlServer("Integrated Security=SSPI;Data Source=.\\ITSSB;Initial Catalog=McHealthCare;TrustServerCertificate=True");
+        optionsBuilder.UseSqlServer("Integrated Security=SSPI;Data Source=.\\ITSSB;Initial Catalog=McHealthCare3;TrustServerCertificate=True");
         optionsBuilder.UseChangeTrackingProxies();
         //optionsBuilder.UseObjectSpaceLinkProxies();
         return new McHealthCareEFCoreDbContext(optionsBuilder.Options);
