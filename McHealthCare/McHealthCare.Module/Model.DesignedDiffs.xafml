@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application Title="McHealthCare">
+  <BOModel>
+    <Class Name="DevExpress.Persistent.BaseImpl.EF.PermissionPolicy.PermissionPolicyUser" Caption="Base User" />
+  </BOModel>
+  <NavigationItems>
+    <Items>
+      <Item Id="Reports" Index="0" />
+      <Item Id="Default" Index="1">
+        <Items>
+          <Item Id="Country_ListView" Removed="True" />
+          <Item Id="Province_ListView" Removed="True" />
+        </Items>
+      </Item>
+      <Item Id="@7ecee2a6-7c7f-409d-9a80-e2d1474856cd" Caption="Configuration" ImageName="Actions_Settings" IsNewNode="True">
+        <Items IsNewNode="True">
+          <Item Id="Country_ListView" ViewId="Country_ListView" ObjectKey="" IsNewNode="True" />
+          <Item Id="Province_ListView" ViewId="Province_ListView" ObjectKey="" IsNewNode="True" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
+  <Options>
+    <LayoutManagerOptions RequiredFieldMark="*" />
+  </Options>
+  <SchemaModules>
+    <SchemaModule Name="SchedulerModuleBase" Version="23.2.6.0" IsNewNode="True" />
+    <SchemaModule Name="SystemModule" Version="23.2.6.0" IsNewNode="True" />
+  </SchemaModules>
+  <Validation>
+    <Rules>
+      <RuleRequiredField Id="CountryName" TargetType="McHealthCare.Module.BusinessObjects.Country" TargetPropertyName="Name" TargetContextIDs="Save" IsNewNode="True" />
+    </Rules>
+  </Validation>
+  <Views>
+    <ListView Id="ApplicationUser_ListView" Caption="Users" />
+    <DetailView Id="Country_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main" RelativeSize="100">
+          <LayoutGroup Id="SimpleEditors" RelativeSize="100">
+            <LayoutGroup Id="Country" RelativeSize="10.708117443868739">
+              <LayoutItem Id="Name" RelativeSize="51.61290322580645" />
+              <LayoutItem Id="Code" RelativeSize="48.38709677419355" />
+            </LayoutGroup>
+            <LayoutGroup Id="BaseAuditableEntity" RelativeSize="82.72884283246978" Caption="BaseAuditableEntity">
+              <LayoutItem Id="CreatedDate" RelativeSize="100" Index="0" Removed="True" />
+              <LayoutItem Id="UpdatedDate" Index="1" RelativeSize="50" Removed="True" />
+              <LayoutItem Id="CreatedBy" RelativeSize="34.61538461538461" Removed="True" />
+              <LayoutItem Id="UpdatedBy" Removed="True" />
+            </LayoutGroup>
+            <LayoutGroup Id="BaseEntity" RelativeSize="6.563039723661485" Caption="Id">
+              <LayoutItem Id="Id" RelativeSize="100" Removed="True" />
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="Province_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main" RelativeSize="100">
+          <LayoutGroup Id="SimpleEditors" RelativeSize="100">
+            <LayoutGroup Id="Province" RelativeSize="14.853195164075993">
+              <LayoutItem Id="Name" RelativeSize="37.2093023255814" />
+              <LayoutItem Id="Code" RelativeSize="27.906976744186046" />
+              <LayoutItem Id="Country" RelativeSize="34.883720930232556" />
+            </LayoutGroup>
+            <LayoutGroup Id="BaseAuditableEntity" RelativeSize="5.699481865284974" Caption="BaseAuditableEntity">
+              <LayoutItem Id="CreatedDate" RelativeSize="100" Index="0" Removed="True" />
+              <LayoutItem Id="UpdatedBy" RelativeSize="52.63157894736842" Index="1" Removed="True" />
+              <LayoutItem Id="CreatedBy" RelativeSize="37.03703703703704" Index="2" Removed="True" />
+              <LayoutItem Id="UpdatedDate" Removed="True" />
+            </LayoutGroup>
+            <LayoutGroup Id="BaseEntity" RelativeSize="79.44732297063904" Caption="Id">
+              <LayoutItem Id="Id" RelativeSize="100" Removed="True" />
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="ReportDataV2_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="ReportDataV2">
+              <LayoutItem Id="DisplayName" ViewItem="DisplayName" Index="0" IsNewNode="True" Removed="True" />
+              <LayoutItem Id="ParametersObjectType" ViewItem="ParametersObjectType" Index="1" IsNewNode="True" Removed="True" />
+              <LayoutItem Id="DataTypeCaption" ViewItem="DataTypeCaption" Index="2" IsNewNode="True" Removed="True" />
+              <LayoutItem Id="IsInplaceReport" Index="3" ViewItem="IsInplaceReport" />
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+  </Views>
+</Application>
