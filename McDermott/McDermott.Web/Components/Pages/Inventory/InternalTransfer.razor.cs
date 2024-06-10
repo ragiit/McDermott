@@ -447,7 +447,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     {
                         //check product stock OUT availability
                         var checkedStockOut = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.SourceId).FirstOrDefault();
-                        checkedStockOut!.Qty = checkedStockOut.Qty - a.QtyStock;
+                        checkedStockOut.Qty = checkedStockOut.Qty - a.QtyStock;
                         await Mediator.Send(new UpdateStockProductRequest(checkedStockOut));
 
                         //check product stock IN availability
@@ -457,7 +457,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                             FormStock.ProductId = a.ProductId;
                             FormStock.SourceId = getInternalTransfer.DestinationId;
                             FormStock.UomId = a?.Product?.UomId;
-                            FormStock.Qty = a?.QtyStock;
+                            FormStock.Qty = a.QtyStock;
                             if (TempFormInternalTransfer.TraceAvability == true && checkedStockOut.Batch != null && checkedStockOut.Expired != null)
                             {
                                 FormStock.Batch = checkedStockOut?.Batch;

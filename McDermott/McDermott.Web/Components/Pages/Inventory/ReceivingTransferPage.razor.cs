@@ -128,6 +128,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task HandleValidSubmit()
         {
+            FormValidationState = true;
             if (FormValidationState)
             {
                 await OnSave();
@@ -171,7 +172,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
 
             string html = $"<div class='row '><div class='col-3'>" +
-                          $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+                          $"<span class='badge text-white bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
 
             return new MarkupString(html);
         }
@@ -331,7 +332,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         FormStockProduct.Batch = a?.Batch;
                         FormStockProduct.Expired = a?.ExpiredDate;
 
-                        FormStockProduct.Qty = a?.Qty * x?.BiggerRatio?.ToLong();
+                        FormStockProduct.Qty = a.Qty * x.BiggerRatio.ToLong();
                         await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
                     }
                     else

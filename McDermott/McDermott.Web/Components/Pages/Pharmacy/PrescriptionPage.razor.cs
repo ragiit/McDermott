@@ -71,6 +71,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<ConcoctionLineDto> ConcoctionLines { get; set; } = [];
         private List<AllergyDto> allergies { get; set; } = [];
         private List<PatientAllergyDto> PatientAllergies { get; set; } = [];
+        private List<PharmacyLogDto> Logs { get; set; } = [];
         private List<UserDto> Patients { get; set; } = [];
         private List<UserDto> Practitioners { get; set; } = [];
         private List<UomDto> Uoms { get; set; } = [];
@@ -134,7 +135,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             switch (status)
             {
                 case "Draft":
-                    priorityClass = "secondary";
+                    priorityClass = "info";
                     title = "Draft";
                     break;
 
@@ -162,7 +163,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     return new MarkupString("");
             }
             string html = $"<div class='row '><div class='col-3'>" +
-                          $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+                          $"<span class='badge text-white bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
 
             return new MarkupString(html);
         }
@@ -195,6 +196,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Pharmacy.PaymentMethod = generalConsultantService.FirstOrDefault()!.Payment;
 
             await GetPatientAllergy();
+
         }
 
         private async Task GetPatientAllergy(long? q = null)
@@ -250,10 +252,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 if (value == 0)
                     return;
 
-                var checkStock = StockProducts.Where(x => x.ProductId == Prescription.ProductId && x.SourceId == Pharmacy.PrescriptionLocationId).FirstOrDefault()!;
-                if (value > checkStock.Qty)
+                var checkStock = StockProducts.Where(x => x.ProductId == Prescription.ProductId && x.SourceId == Pharmacy.PrescriptionLocationId && x.Qty!=0).Sum(x=>x.Qty)!;
+                if (value > checkStock)
                 {
-                    ToastService.ShowInfo($"Stock is less than the quantity requested");
+                    ToastService.ShowInfo($"Total Stock is less than the requested quantity");
                     isSavePrescription = false;
                 }
                 else
@@ -315,15 +317,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Concoction.Qty = value;
             Concoction.TotalQty = Concoction.QtyByDay * value;
         }
-
-        //private void SelectChangeFrequency(DrugDosageDto datas)
-        //{
-        //    var data = DrugDosages.Where(f => f.Id == datas.Id).FirstOrDefault();
-
-        //    Concoction.QtyByDay = data!.TotalQtyPerDay.ToLong();
-        //    Concoction.Days = data.Days.ToLong();
-        //    Concoction.TotalQty = Concoction?.Qty * Concoction?.QtyByDay;
-        //}
 
         private void changeMedicamentDosage(long value)
         {
@@ -471,7 +464,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 Prescription.DrugRouteId = checkMedicament?.RouteId;
                 selectedActiveComponentPrescriptions = ActiveComponents.Where(z => checkMedicament.ActiveComponentId is not null && checkMedicament.ActiveComponentId.Contains(z.Id)).ToList();
 
-                var checkStock = StockProducts.Where(x => x.ProductId == value.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
+                var checkStock = StockProducts.Where(x => x.ProductId == value.Id && x.SourceId == Pharmacy.PrescriptionLocationId && x.Qty != 0).Sum(x=>x.Qty);
                 if (checkStock == null || checkStock == 0)
                 {
                     Prescription.Stock = 0;
@@ -711,6 +704,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             ConcoctionLines = await Mediator.Send(new GetConcoctionLineQuery());
             IsLoading = false;
             SelectedDataItems = [];
+        }
+
+        private async Task LoadLogs()
+        {
+            Logs = await Mediator.Send(new GetPharmacyLogQuery(x => x.PharmacyId == Pharmacy.Id));
         }
 
         #endregion Load Data
@@ -1067,6 +1065,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
+        PharmacyLogDto PharmaciesLog = new PharmacyLogDto();
         private async Task OnSavePharmacy()
         {
             try
@@ -1088,6 +1087,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         x.Id = 0;
                     });
                     await Mediator.Send(new CreateListConcoctionRequest(Concoctions));
+
+                    PharmaciesLog.PharmacyId = Pharmacy.Id;
+                    PharmaciesLog.UserById = NameGroup.Id;
+                    PharmaciesLog.status = Pharmacy.Status;
+
+                    await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
                 }
                 else
                 {
@@ -1175,6 +1180,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 await GetPatientAllergy(Pharmacy.PatientId);
                 Prescriptions = await Mediator.Send(new GetPrescriptionQuery(x => x.PharmacyId == Pharmacy.Id));
                 Concoctions = await Mediator.Send(new GetConcoctionQuery(x => x.PharmacyId == Pharmacy.Id));
+
+                await LoadLogs();
             }
             catch (Exception e)
             {
@@ -1252,6 +1259,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
                 Pharmacy.Status = "Processed";
                 await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+
+                PharmaciesLog.PharmacyId = Pharmacy.Id;
+                PharmaciesLog.UserById = NameGroup.Id;
+                PharmaciesLog.status = Pharmacy.Status;
+
+                await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
             }
             catch (Exception ex)
             {
@@ -1261,30 +1274,88 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         public async void Processed()
         {
+            var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
             Pharmacy.Status = "Received";
             await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+
+            PharmaciesLog.PharmacyId = Pharmacy.Id;
+            PharmaciesLog.UserById = NameGroup.Id;
+            PharmaciesLog.status = Pharmacy.Status;
+
+            await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
         }
 
-        public async void validation()
+        public async void Validate()
         {
             try
             {
-                var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault()!;
-                var chekPrescription = Prescriptions.Where(x => x.PharmacyId == checkData.Id).ToList();
-                foreach (var data in chekPrescription)
+                // Fetch the pharmacy data based on the Pharmacy ID
+                var pharmacyData = Pharmacies.FirstOrDefault(x => x.Id == Pharmacy.Id);
+
+                // Check if pharmacy data is found
+                if (pharmacyData != null)
                 {
-                    var checkProduct = StockProducts.Where(x => x.ProductId == data.ProductId && x.SourceId == checkData.PrescriptionLocationId).FirstOrDefault()!;
-                    checkProduct.Qty = checkProduct.Qty - data.GivenAmount;
-                    await Mediator.Send(new UpdateStockProductRequest(checkProduct));
+                    // Fetch prescriptions associated with the pharmacy
+                    var prescriptions = Prescriptions.Where(x => x.PharmacyId == pharmacyData.Id).ToList();
+
+                    // Calculate the requested stock amount
+                    long requestedStock = prescriptions.Select(x => x.GivenAmount).FirstOrDefault();
+
+                    // Calculate the total stock available for the requested products
+                    long? totalStock = StockProducts
+                        .Where(sp => prescriptions.Any(p => p.ProductId == sp.ProductId && sp.SourceId == pharmacyData.PrescriptionLocationId))
+                        .Sum(sp => sp.Qty);
+
+                    // Check if requested stock exceeds the available stock
+                    if (requestedStock > totalStock)
+                    {
+                        ToastService.ShowInfo("Stock Demand exceeds stock!!");
+                        return;
+                    }
+
+                    // Update stock quantities for each prescription
+                    foreach (var prescription in prescriptions)
+                    {
+                        var stockProduct = StockProducts
+                            .FirstOrDefault(sp => sp.ProductId == prescription.ProductId && sp.SourceId == pharmacyData.PrescriptionLocationId && sp.Qty != 0);
+
+                        if (stockProduct != null)
+                        {
+                            long stockRequest = prescription.GivenAmount;
+
+                            if (stockProduct.Qty >= stockRequest)
+                            {
+                                stockProduct.Qty -= stockRequest;
+                                stockRequest = 0;
+                            }
+                            else
+                            {
+                                stockRequest -= stockProduct.Qty;
+                                stockProduct.Qty = 0;
+                            }
+
+                            // Update stock product
+                            await Mediator.Send(new UpdateStockProductRequest(stockProduct));
+                        }
+                    }
+
+                    // Update pharmacy status to "Done"
+                    Pharmacy.Status = "Done";
+                    await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+
+                    PharmaciesLog.PharmacyId = pharmacyData.Id;
+                    PharmaciesLog.UserById = NameGroup.Id;
+                    PharmaciesLog.status = Pharmacy.Status;
+
+                    await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
                 }
-                Pharmacy.Status = "Done";
-                await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
         }
+
 
         public async void onCancel()
         {
@@ -1293,6 +1364,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
                 Pharmacy.Status = "Cancel";
                 await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+
+                PharmaciesLog.PharmacyId = Pharmacy.Id;
+                PharmaciesLog.UserById = NameGroup.Id;
+                PharmaciesLog.status = Pharmacy.Status;
             }
             catch (Exception ex)
             {

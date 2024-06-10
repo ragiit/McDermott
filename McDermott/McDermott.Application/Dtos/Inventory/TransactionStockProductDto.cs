@@ -13,7 +13,7 @@ namespace McDermott.Application.Dtos.Inventory
         public long? StockProductId { get; set; }
 
         [Required(ErrorMessage = "Please Input Stock Quantity...")]
-        public long? QtyStock { get; set; }
+        public long QtyStock { get; set; } = 0;
 
         public bool TraceAvability { get; set; } = false;
 

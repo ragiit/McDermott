@@ -1,0 +1,53 @@
+﻿@page "/split-stock"
+@rendermode InteractiveServer
+<div class="wrapper">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3>Stock Manager</h3>
+
+                            <p>
+                                <label>Requested Stock: </label>
+                                <input type="number" @bind="requestedStock" />
+                                <button @onclick="ProcessRequest">Process Request</button>
+                            </p>
+
+                            @if (isRequestFulfilled.HasValue)
+                            {
+                                <p>Request Fulfilled: @isRequestFulfilled.Value</p>
+                            }
+
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Stock</th>
+                                        <th>Batch</th>
+                                        <th>Expiry Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in splitproducts)
+                                    {
+                                        <tr>
+                                            <td>@product.Name</td>
+                                            <td>@product.Stock</td>
+                                            <td>@product.Batch</td>
+                                            <td>@product.ExpiryDate.ToString("dddd MMMM yyyy")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-body mt-3">
+                            @StatusAlert
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

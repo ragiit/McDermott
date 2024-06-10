@@ -15,7 +15,7 @@ namespace McDermott.Application.Dtos.Inventory
         public long? ProductId { get; set; }
 
         [Required(ErrorMessage = "Please input Quantity..")]
-        public long? Qty { get; set; }
+        public long Qty { get; set; } = 0;
 
         public long? UomId { get; set; }
         public DateTime? Expired { get; set; }
