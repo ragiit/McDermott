@@ -54,6 +54,8 @@
             }
         }
 
+
+
         public async Task<(int, string)> UploadFileAsync(IBrowserFile file, int? maxFileSize = 0, string[] allowedExtensions = null)
         {
             if (file == null)

@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application Title="DxBlazorApplication2">
+  <ActionDesign>
+    <Actions>
+      <Action Id="DemoTask.MarkCompleted" ValidationContexts="MarkCompleted" Caption="Mark Completed" />
+    </Actions>
+  </ActionDesign>
+  <BOModel>
+    <Class Name="DevExpress.Persistent.BaseImpl.EF.BaseObject" ImageName="" />
+    <Class Name="DxBlazorApplication2.Module.BusinessObjects.Employee" ImageName="BO_Employee" />
+  </BOModel>
+  <NavigationItems>
+    <Items>
+      <Item Id="Default">
+        <Items>
+          <Item Id="Note" ImageName="BO_Note" ViewId="Note_ListView" Caption="Notes" Index="4" IsNewNode="True" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
+  <Options>
+    <LayoutManagerOptions RequiredFieldMark="*" />
+  </Options>
+  <SchemaModules>
+    <SchemaModule Name="SystemModule" Version="23.2.6.0" IsNewNode="True" />
+  </SchemaModules>
+  <Validation>
+    <Rules>
+      <RuleCriteria Id="@a87606bd-e112-4ab7-ad76-2586dfa0fab2" TargetType="DxBlazorApplication2.Module.BusinessObjects.DemoTask" IsNewNode="True" />
+      <RuleCriteria Id="TaskStarted" TargetType="DxBlazorApplication2.Module.BusinessObjects.DemoTask" Criteria="Status != 'NotStarted'" TargetContextIDs="MarkCompleted" MessageTemplateCollectionValidationMessageSuffix="Cannot set the task as completed because it has not started." IsNewNode="True" />
+    </Rules>
+  </Validation>
+  <Views>
+    <ListView Id="DemoTask_ListView" AllowEdit="True" NewItemRowPosition="Top">
+      <Columns>
+        <ColumnInfo Id="DueDate" DisplayFormat="D" />
+        <ColumnInfo Id="PercentCompleted" DisplayFormat="{0:N0}%" />
+      </Columns>
+    </ListView>
+    <ListView Id="Department_ListView" MasterDetailMode="ListViewAndDetailView" AllowEdit="True" NewItemRowPosition="None" />
+    <DetailView Id="Employee_DetailView">
+      <Items>
+        <PropertyEditor Id="Department.Office" PropertyName="Department.Office" IsNewNode="True" />
+      </Items>
+      <Layout>
+        <LayoutGroup Id="Main" RelativeSize="100">
+          <LayoutGroup Id="SimpleEditors" RelativeSize="27.29528535980149">
+            <LayoutGroup Id="Employee" RelativeSize="100">
+              <LayoutGroup Id="Employee_col1" RelativeSize="49.95260663507109">
+                <LayoutItem Id="FullName" RelativeSize="17.391304347826086" />
+                <LayoutItem Id="FirstName" RelativeSize="13.043478260869565" />
+                <LayoutItem Id="LastName" RelativeSize="13.043478260869565" />
+                <LayoutItem Id="MiddleName" RelativeSize="13.043478260869565" />
+                <LayoutItem Id="Birthday" RelativeSize="13.043478260869565" />
+                <LayoutItem Id="Email" RelativeSize="30.434782608695652" />
+              </LayoutGroup>
+              <LayoutGroup Id="Employee_col2" RelativeSize="50.04739336492891">
+                <LayoutItem Id="WebPageAddress" RelativeSize="17.391304347826086" />
+                <LayoutItem Id="TitleOfCourtesy" RelativeSize="13.043478260869565" />
+                <LayoutItem Id="Department" RelativeSize="13.043478260869565" />
+                <LayoutItem Id="Position" RelativeSize="13.043478260869565" />
+                <LayoutItem Id="Address" RelativeSize="13.043478260869565" />
+                <LayoutItem Id="Manager" RelativeSize="13.043478260869565" />
+                <LayoutItem Id="Department.Office" ViewItem="Department.Office" Index="6" RelativeSize="17.391304347826086" IsNewNode="True" />
+              </LayoutGroup>
+            </LayoutGroup>
+          </LayoutGroup>
+          <LayoutGroup Id="SizeableEditors" RelativeSize="36.35235732009926">
+            <LayoutItem Id="Notes" RelativeSize="100" />
+          </LayoutGroup>
+          <TabbedGroup Id="Tabs" RelativeSize="36.35235732009926">
+            <LayoutGroup Id="PhoneNumbers" RelativeSize="100">
+              <LayoutItem Id="PhoneNumbers" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DemoTasks" RelativeSize="100">
+              <LayoutItem Id="DemoTasks" RelativeSize="100" />
+            </LayoutGroup>
+          </TabbedGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="Employee_ListView" Criteria="" IsGroupPanelVisible="True">
+      <Columns>
+        <ColumnInfo Id="Address" Index="8" />
+        <ColumnInfo Id="Department" SortOrder="Ascending" GroupIndex="0" Index="9" />
+        <ColumnInfo Id="Position" SortOrder="Ascending" GroupIndex="1" Index="10" />
+      </Columns>
+      <Filters CurrentFilterId="Developers">
+        <Filter Id="All Employees" IsNewNode="True" />
+        <Filter Id="Developers" Criteria="[Position.Title] = 'Developer'" IsNewNode="True" />
+        <Filter Id="Development Department Employees" Criteria="[Department.Title] = 'Development Department'" IsNewNode="True" />
+      </Filters>
+    </ListView>
+  </Views>
+</Application>

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace McDermott.Application.Features.Services
 {
-    public class PCareService(IConfiguration configuration, HttpClient httpClient) : IPCareService
+    public class PCareService(IConfiguration configuration, HttpClient httpClient, IMediator mediator) : IPCareService
     {
         private string EncodeToBase64(string input)
         {
@@ -16,12 +16,13 @@ namespace McDermott.Application.Features.Services
             return base64Encoded;
         }
 
-        private readonly IConfiguration _configuration = configuration;
+        //private readonly IConfiguration _configuration = configuration;
+        private readonly IMediator _mediator = mediator;
 
-        private string Signature(string timestamp)
+        private async Task<string> Signature(string timestamp)
         {
-            var data = $"{_configuration["PCareCreds:cons-id"]}&{timestamp}";
-            var secretKey = _configuration["PCareCreds:secret-key"];
+            var data = $"{await GetPCareCredential("cons-id")!}&{timestamp}";
+            string secretKey = await GetPCareCredential("secret-key");
 
             // Initialize the keyed hash object using the secret key as the key
             HMACSHA256 hashObject = new(Encoding.UTF8.GetBytes(secretKey));
@@ -105,25 +106,9 @@ namespace McDermott.Application.Features.Services
             return plaintext;
         }
 
-        private string PCareSignature(string timestamp)
+        private async Task<string> GetPCareCredential(string key)
         {
-            string secretKey = _configuration["PCareCreds:secret-key"]!;
-            var data = $"{_configuration["PCareCreds:cons-id"]!}&{timestamp}";
-
-            // Initialize the keyed hash object using the secret key as the key
-            HMACSHA256 hashObject = new(Encoding.UTF8.GetBytes(secretKey));
-
-            // Computes the signature by hashing the salt with the secret key as the key
-            var signature = hashObject.ComputeHash(Encoding.UTF8.GetBytes(data));
-
-            // Base 64 Encode
-            var encodedSignature = Convert.ToBase64String(signature);
-
-            // URLEncode
-            // encodedSignature = System.Web.HttpUtility.UrlEncode(encodedSignature);
-
-            return encodedSignature;
-
+            return (await _mediator.Send(new GetSystemParameterQuery(x => x.Key.Equals(key)))).FirstOrDefault()?.Value ?? string.Empty;
         }
 
         public async Task<(dynamic, int)> SendPCareService(string requestURL, HttpMethod method, object? requestBody = null)
@@ -133,17 +118,18 @@ namespace McDermott.Application.Features.Services
                 DateTime epochStart = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
                 TimeSpan timeSpan = DateTime.UtcNow - epochStart;
 
-                string baseUrl = _configuration["PCareCreds:baseURL"]!;
-                string serviceName = _configuration["PCareCreds:serviceName"]!;
-                string username = _configuration["PCareCreds:username"]!;
-                string password = _configuration["PCareCreds:password"]!;
-                string kpAplikasi = _configuration["PCareCreds:kdAplikasi"]!;
-                string userKey = _configuration["PCareCreds:user-key"]!;
-                string secretKey = _configuration["PCareCreds:secret-key"]!;
-                string cons = _configuration["PCareCreds:cons-id"]!;
+
+                string baseUrl = await GetPCareCredential("baseURL");
+                string serviceName = await GetPCareCredential("serviceName");
+                string username = await GetPCareCredential("username");
+                string password = await GetPCareCredential("password");
+                string kpAplikasi = await GetPCareCredential("kdAplikasi");
+                string userKey = await GetPCareCredential("user-key");
+                string secretKey = await GetPCareCredential("secret-key");
+                string cons = await GetPCareCredential("cons-id");
 
                 string t = Convert.ToInt64(timeSpan.TotalSeconds).ToString();
-                string sign = Signature(t);
+                string sign = await Signature(t);
                 string auth = EncodeToBase64($"{username}:{password}:{kpAplikasi}");
 
                 var url = $"{baseUrl}/{serviceName}/{requestURL}";

@@ -1,0 +1,173 @@
+﻿@typeparam TData
+
+@if (IsAccess)
+{
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>@Title</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
+                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                        IsContentBlocked="true"
+                                        ApplyBackgroundShading="true"
+                                        IndicatorAreaVisible="false"
+                                        Text="Fetching Data...">
+                            <DxGrid @ref="Grid"
+                                    Data="Data"
+                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                    EditModelSaving="OnSaving"
+                                    DataItemDeleting="OnDeleting"
+                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                    PagerNavigationMode="PagerNavigationMode.InputBox"
+                                    EditorRenderMode="GridEditorRenderMode.Detached"
+                                    PageSize="10"
+                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                    KeyFieldName="Id"
+                                    CustomizeDataRowEditor="@GridExtention.Grid_CustomizeDataRowEditor"
+                                    AllowSelectRowByClick="true"
+                                    PagerPosition="GridPagerPosition.Bottom"
+                                    PageSizeSelectorVisible="true"
+                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                    PageSizeSelectorAllRowsItemVisible="true"
+                                    PagerSwitchToInputBoxButtonCount="10"
+                                    FocusedRowEnabled="true"
+                                    PagerVisibleNumericButtonCount="10"
+                                    ShowGroupPanel="true"
+                                    AutoExpandAllGroupRows="true"
+                                    ShowFilterRow="true"
+                                    CustomizeElement="@GridExtention.Grid_CustomizeElement"
+                                    ShowSearchBox="true"
+                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                    KeyboardNavigationEnabled="true">
+
+                                <ToolbarTemplate>
+                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                        <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                        <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Data.Count > 0" />
+                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Data.Count > 0" />
+                                        <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                        <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                        <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                            <Items>
+                                                <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(Grid))" />
+                                                <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(Grid))" />
+                                                <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(Grid))" />
+                                            </Items>
+                                        </DxToolbarItem>
+                                        <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" IconCssClass="fa-solid fa-file-import">
+                                            <Items>
+                                                <DxToolbarItem Text="Template" Click="ExportToExcel" />
+                                                <DxToolbarItem Text="Import" Click="ImportFile" />
+                                            </Items>
+                                        </DxToolbarItem>
+                                    </DxToolbar>
+                                </ToolbarTemplate>
+
+                                <Columns>
+                                    @Columns
+                                </Columns>
+
+                                <EditFormTemplate>
+                                    @EditForm
+                                </EditFormTemplate>
+                            </DxGrid>
+                        </DxLoadingPanel>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    <LoadingIndicatorLayout></LoadingIndicatorLayout>
+}
+
+@code {
+    [Parameter]
+    public bool IsAccess { get; set; } = false;
+
+    [Parameter]
+    public RenderFragment Columns { get; set; }
+
+    [Parameter]
+    public RenderFragment<GridEditFormTemplateContext> EditForm { get; set; }
+
+    [Parameter]
+    public GroupMenuDto UserAccessCRUID { get; set; } = new();
+
+    [Parameter]
+    public string Title { get; set; } = "-";
+
+    [Parameter]
+    public List<TData> Data { get; set; }
+
+    private IGrid Grid { get; set; }
+    private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+    public bool PanelVisible { get; set; } = false;
+    private int FocusedRowVisibleIndex { get; set; }
+
+    private DxGrid DxGrid { get; set; }
+
+    public async Task ImportExcelFile(InputFileChangeEventArgs e)
+    {
+    }
+
+    private async Task ImportFile()
+    {
+        await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+    }
+
+    public async Task OnSaving(GridEditModelSavingEventArgs e)
+    {
+
+    }
+
+    public async Task OnDeleting(GridDataItemDeletingEventArgs e)
+    {
+
+    }
+
+    private async Task ExportToExcel()
+    {
+
+    }
+
+    private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+    {
+        FocusedRowVisibleIndex = args.VisibleIndex;
+    }
+
+    private async Task NewItem_Click()
+    {
+        await Grid.StartEditNewRowAsync();
+    }
+
+    private async Task EditItem_Click()
+    {
+        await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+    }
+
+    private void DeleteItem_Click()
+    {
+        Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+    }
+
+    private async Task Refresh_Click()
+    {
+        await InvokeAsync(() => StateHasChanged());
+    }
+}
