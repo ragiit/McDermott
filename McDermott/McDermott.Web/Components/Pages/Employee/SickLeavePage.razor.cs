@@ -5,12 +5,15 @@ using MimeKit;
 using MimeKit.Text;
 using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 using System.Net.Mail;
+using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace McDermott.Web.Components.Pages.Employee
 {
     public partial class SickLeavePage
     {
         #region Relation Data
+
 
         private List<GeneralConsultanServiceDto> generalConsultans = [];
         private List<GeneralConsultanCPPTDto> CPPTs = [];
@@ -30,6 +33,7 @@ namespace McDermott.Web.Components.Pages.Employee
         private IGrid Grid { get; set; }
         private bool IsLoading { get; set; } = false;
         private bool isPrint { get; set; } = false;
+        private string? TypeLeaves { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
@@ -91,32 +95,23 @@ namespace McDermott.Web.Components.Pages.Employee
             {
                 IsLoading = true;
 
-                generalConsultans = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.IsSickLeave == true || x.IsMaternityLeave == true));
+                SickLeaves = await Mediator.Send(new GetSickLeaveQuery());
                 Users = await Mediator.Send(new GetUserQuery());
                 CPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery());
                 Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
 
-                foreach (var item in generalConsultans)
+                foreach (var item in SickLeaves)
                 {
-                    var BodyCPPT = CPPTs.Where(x => x.GeneralConsultanServiceId == item.Id && x.Title == "Diagnosis").Select(x => x.Body).FirstOrDefault();
-                    var diagnosis = Diagnoses.Where(x => BodyCPPT!.Contains(x.Name)).Select(x => x.Name).FirstOrDefault();
-                    var newDataGridSickLeave = new SickLeaveDto
+                    var diagnosis = "";
+                    TypeLeaves = item.TypeLeave;
+                    var BodyCPPT = CPPTs.Where(x => x.GeneralConsultanServiceId == item.GeneralConsultans.Id && x.Title == "Diagnosis").Select(x => x.Body).FirstOrDefault();
+                    if (BodyCPPT != null)
                     {
-                        PatientId = item.PatientId,
-                        PhycisianId = item.PratitionerId,
-                        PhycisianName = item.Pratitioner.Name,
-                        SIP = item.Pratitioner.SipNo,
-                        PatientName = item.Patient.Name,
-                        Address = item.Patient.DomicileAddress1,
-                        NoRM = item.NoRM,
-                        Email = item.Patient.Email,
-                        StartSickLeave = item.StartDateSickLeave,
-                        EndSickLeave = item.EndDateSickLeave,
-                        brithday = item.Patient.DateOfBirth,
-                        Diagnosis = diagnosis
-                    };
+                        diagnosis = Diagnoses.Where(x => BodyCPPT!.Contains(x.Name)).Select(x => x.Name).FirstOrDefault();
 
-                    SickLeaves.Add(newDataGridSickLeave);
+                        item.Diagnosis = diagnosis;
+                    }
+
                 }
                 IsLoading = false;
             }
@@ -163,6 +158,10 @@ namespace McDermott.Web.Components.Pages.Employee
             //await EditItem_Click(null);
         }
 
+        private async Task SendToEmail_click()
+        {
+            Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
         #endregion Grid Configuration
 
         #region Click
@@ -204,67 +203,87 @@ namespace McDermott.Web.Components.Pages.Employee
             }
         }
 
-        private async Task SendToEmail(IGrid? grid)
+        private async Task SendToEmail(GridDataItemDeletingEventArgs e)
         {
             try
             {
-                SickLeaveDto ces = (SickLeaveDto)grid.SelectedDataItems;
-                var data = SickLeaves.Where(x => x.PatientId == ces.Id).FirstOrDefault()!;
-                var age = 0;
-                if (data.brithday == null)
-                {
-                    age = 0;
-                }
-                else
-                {
-                    age = DateTime.Now.Year - data.brithday.Value.Year;
-                }
-                var days = data.StartSickLeave.Value.Day + data.EndSickLeave.Value.Day;
-                //isPrint = true;
-                var mergeFields = new Dictionary<string, string>
-                {
-                    {"%NamePatient%", data?.PatientName},
-                {"%startDate%", data?.StartSickLeave?.ToString("dd MMMM yyyy") },
-                {"%endDate%", data?.EndSickLeave?.ToString("dd MMMM yyyy") },
-                {"%NameDoctor%", data?.PhycisianName },
-                {"%SIPDoctor%", data?.SIP },
-                {"%AddressPatient%", data?.Address },
-                {"%AgePatient%", age.ToString() },
-                {"%days%", days.ToString() },
-                {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")}
-                };
+                // Adapt selected data items to SickLeaveDto list
+                List<SickLeaveDto> sickLeavesDtoList = SelectedDataItems.Adapt<List<SickLeaveDto>>();
 
-                DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
-                //var pdfContent = DocumentProvider.ConvertToPdf(DocumentContent);
-                var fileName = $"SickLeave_{DateTime.Now:yyyyMMddHHmmss}.docx";
-                var subject = $"Sick Leave {data.PatientName}";
-                var body = $"Dear {data.PatientName},<br/><br/>Please find attached your document.<br/><br/>Best regards,<br/>Your Company";
-                EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
-                var cek = EmailSettings.Where(x => x.Smtp_User == "nuralimajid@matrica.co.id").FirstOrDefault();
-                var host = cek.Smtp_Host;
-                var port = int.Parse(cek.Smtp_Port);
-                var pass = cek.Smtp_Pass;
-                var user = cek.Smtp_User;
-
-                var message = new MimeMessage();
-                message.From.Add(MailboxAddress.Parse(cek.Smtp_User));
-                message.To.Add(MailboxAddress.Parse(data.Email));
-                message.Subject = subject;
-
-                var bodyBuilder = new BodyBuilder { HtmlBody = body };
-
-                if (DocumentContent != null && fileName != null)
+                foreach (var item in sickLeavesDtoList)
                 {
-                    bodyBuilder.Attachments.Add(fileName, DocumentContent);
-                }
-                message.Body = bodyBuilder.ToMessageBody();
-                using var smtp = new MailKit.Net.Smtp.SmtpClient();
-                if (cek.Smtp_Encryption == "SSL/TLS")
-                {
-                    smtp.Connect(host, port, MailKit.Security.SecureSocketOptions.SslOnConnect);
-                    smtp.Authenticate(user, pass);
-                    smtp.Send(message);
-                    smtp.Disconnect(true);
+                    // Find corresponding sick leave data
+                    var data = SickLeaves.FirstOrDefault(x => x.Id == item.Id);
+                    if (data == null) continue;
+
+                    // Update start and end dates based on leave type
+                    if (TypeLeaves == "SickLeave")
+                    {
+                        item.StartSickLeave = item.GeneralConsultans.StartDateSickLeave;
+                        item.EndSickLeave = item.GeneralConsultans.EndDateSickLeave;
+                    }
+                    else if (TypeLeaves == "Maternity")
+                    {
+                        item.StartSickLeave = item.GeneralConsultans.StartMaternityLeave;
+                        item.EndSickLeave = item.GeneralConsultans.EndMaternityLeave;
+                    }
+
+                    // Calculate patient's age
+                    int age = data.brithday.HasValue
+                        ? DateTime.Now.Year - data.brithday.Value.Year
+                        : 0;
+
+                    // Calculate total days of sick leave
+                    int totalDays = (item.StartSickLeave?.Day ?? 0) + (item.EndSickLeave?.Day ?? 0);
+
+                    // Create merge fields for document generation
+                    var mergeFields = new Dictionary<string, string>
+        {
+            {"%NamePatient%", data?.GeneralConsultans.Patient.Name},
+            {"%startDate%", data?.StartSickLeave?.ToString("dd MMMM yyyy") },
+            {"%endDate%", data?.EndSickLeave?.ToString("dd MMMM yyyy") },
+            {"%NameDoctor%", data?.GeneralConsultans.Pratitioner.Name },
+            {"%SIPDoctor%", data?.SIP },
+            {"%AddressPatient%", data?.Address },
+            {"%AgePatient%", age.ToString() },
+            {"%days%", totalDays.ToString() },
+            {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")}
+        };
+
+                    // Generate document content
+                    byte[] documentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
+                    if (documentContent == null) continue;
+
+                    string fileName = $"SickLeave_{DateTime.Now:yyyyMMddHHmmss}.docx";
+                    string subject = $"Sick Leave {data.GeneralConsultans.Patient.Name}";
+                    string body = $"Dear {data.GeneralConsultans.Patient.Name},<br/><br/>Please find attached your document.<br/><br/>Best regards,<br/>Your Company";
+
+                    // Get email settings
+                    EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
+                    var smtpSettings = EmailSettings.FirstOrDefault(x => x.Smtp_User == "nuralimajid@matrica.co.id");
+                    if (smtpSettings == null) continue;
+
+                    // Create email message
+                    var message = new MimeMessage();
+                    message.From.Add(MailboxAddress.Parse(smtpSettings.Smtp_User));
+                    message.To.Add(MailboxAddress.Parse(data.GeneralConsultans.Patient.Email));
+                    message.Subject = subject;
+
+                    var bodyBuilder = new BodyBuilder { HtmlBody = body };
+                    bodyBuilder.Attachments.Add(fileName, documentContent);
+                    message.Body = bodyBuilder.ToMessageBody();
+
+                    // Send email
+                    using var smtpClient = new MailKit.Net.Smtp.SmtpClient();
+                    if (smtpSettings.Smtp_Encryption == "SSL/TLS")
+                    {
+                        smtpClient.Connect(smtpSettings.Smtp_Host, int.Parse(smtpSettings.Smtp_Port), MailKit.Security.SecureSocketOptions.SslOnConnect);
+                        smtpClient.Authenticate(smtpSettings.Smtp_User, smtpSettings.Smtp_Pass);
+                        smtpClient.Send(message);
+                        smtpClient.Disconnect(true);
+                    }
+
+                    // Show success message
                     ToastService.ShowSuccess("Success Send Email!");
                 }
 

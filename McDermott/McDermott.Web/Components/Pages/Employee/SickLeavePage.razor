@@ -40,6 +40,7 @@
                                         AllowSelectRowByClick="true"
                                         FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                         KeyFieldName="Id"
+                                        DataItemDeleting="SendToEmail"
                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                         FocusedRowEnabled="true"
                                         PopupEditFormCssClass="pw-800"
@@ -59,14 +60,14 @@
                                         SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
                                         KeyboardNavigationEnabled="true">
                                     <ToolbarTemplate>
-                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                            <DxToolbarItem Text="Delete" Click="()=>SendToEmail(context.Grid)" IconCssClass="grid-toolbar-delete" Enabled="SelectedDataItems.Count > 0 && SickLeaves.Count > 0" />
+                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                            <DxToolbarItem Text="Send Email" RenderStyle="ButtonRenderStyle.Primary" CssClass="w-100" Click="SendToEmail_click" IconCssClass="fa-solid fa-print" Enabled="SelectedDataItems.Count > 0 && SickLeaves.Count > 0" />
                                         </DxToolbar>
                                     </ToolbarTemplate>
-
+                                    
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="70px" MinWidth="200" TextAlignment="GridTextAlignment.Center">
+                                        <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="10px" MinWidth="200" TextAlignment="GridTextAlignment.Center">
                                             <CellDisplayTemplate>
                                                 <DxButton RenderStyle="ButtonRenderStyle.Success"
                                                           Attributes="@(new Dictionary<string, object> {  ["title"] = "Print" })"
@@ -82,10 +83,20 @@
                                             </CellDisplayTemplate>
                                             <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
                                         </DxGridDataColumn>
-                                        <DxGridDataColumn MinWidth="200" FieldName="PatientName" Caption="Patient Name" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="NoRM" Caption="NO RM" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="StartSickLeave" Caption="Start Date" DisplayFormat="dd MMMM yyyy" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="EndSickLeave" Caption="End Date" DisplayFormat="dd MMMM yyyy" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="GeneralConsultans.Patient.Name" Caption="Patient Name" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="GeneralConsultans.NoRM" Caption="NO RM" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="TypeLeave" Caption="Type" />
+                                        @if (TypeLeaves == "SickLeave")
+                                        {
+                                            <DxGridDataColumn MinWidth="200" FieldName="GeneralConsultans.StartDateSickLeave" Caption="Start Date Leave" DisplayFormat="dd MMMM yyyy" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="GeneralConsultans.EndDateSickLeave" Caption="End Date Leave" DisplayFormat="dd MMMM yyyy" />
+                                        }
+                                        else if (TypeLeaves == "Maternity")
+                                        {
+                                            <DxGridDataColumn MinWidth="200" FieldName="GeneralConsultans.StartMaternityLeave" Caption="Start Date Leave" DisplayFormat="dd MMMM yyyy" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="GeneralConsultans.EndMaternityLeave" Caption="End Date Leave" DisplayFormat="dd MMMM yyyy" />
+
+                                        }
                                         <DxGridDataColumn MinWidth="200" FieldName="Diagnosis" Caption="Diagnosis" />
                                     </Columns>
                                 </DxGrid>

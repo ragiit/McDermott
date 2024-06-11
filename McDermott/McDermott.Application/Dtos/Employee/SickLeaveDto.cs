@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Employee
 {
-    public class SickLeaveDto
+    public class SickLeaveDto :IMapFrom<SickLeave>
     {
         public long Id { get; set; }
         public long? GeneralConsultansId { get; set; }
@@ -24,6 +24,8 @@ namespace McDermott.Application.Dtos.Employee
         public string? PhycisianName { get; set; }
         public DateTime? brithday { get; set; }
         public string? NoRM { get; set; }
+        public string? Status { get; set; }
+        public string? TypeLeave { get; set; }
         public string? Diagnosis { get; set; }
         public DateTime? StartSickLeave { get; set; }
         public DateTime? EndSickLeave { get; set; }

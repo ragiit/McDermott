@@ -2,6 +2,7 @@
 using QuestPDF.Fluent;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
+using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 using static McDermott.Web.Components.Pages.Queue.KioskPage;
 
 namespace McDermott.Web.Components.Pages.Transaction
@@ -497,6 +498,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                                 GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = null; x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
                                 await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
+
+                                
                                 break;
 
                             case "Physician":
@@ -525,6 +528,21 @@ namespace McDermott.Web.Components.Pages.Transaction
                                     await FileUploadService.UploadFileAsync(item, 0, []);
                                 }
 
+                                if (FormRegis.IsSickLeave == true || FormRegis.IsMaternityLeave == true)
+                                {
+                                    
+                                    var checkDataSickLeave = await Mediator.Send(new GetSickLeaveQuery());
+                                    var crosschek = checkDataSickLeave.Where(x => x.GeneralConsultansId == FormRegis.Id).FirstOrDefault();
+                                    if (crosschek == null)
+                                    {
+                                        if (FormRegis.IsSickLeave == true)
+                                            SickLeaves.TypeLeave = "SickLeave";
+                                        else if (FormRegis.IsMaternityLeave == true)
+                                            SickLeaves.TypeLeave = "Maternity";
+                                        SickLeaves.GeneralConsultansId = FormRegis.Id;
+                                        await Mediator.Send(new CreateSickLeaveRequest(SickLeaves));
+                                    }
+                                }
                                 //if (GeneralConsultanMedicalSupport.Id == 0)
                                 //{
                                 //    GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
@@ -926,6 +944,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private PatientAllergyDto PatientAllergy = new();
         private GeneralConsultantClinicalAssesmentDto GeneralConsultantClinical = new();
+        private SickLeaveDto SickLeaves = new();
         private List<GeneralConsultanServiceDto> GeneralConsultanServices = [];
         private List<UserDto> IsPatient = [];
         private List<UserDto> patients = [];

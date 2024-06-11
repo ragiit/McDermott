@@ -54,17 +54,20 @@ namespace McDermott.Application.Extentions
 
         public enum EnumStatusSickLeave
         {
+            [Display(Name = "not-action")]
+            NotAction = 0,
+
             [Display(Name = "not-send")]
-            NotSend = 0,
+            NotSend = 1,
 
             [Display(Name = "send")]
-            Send = 1,
-
-            [Display(Name = "printed")]
-            Printed = 2,
+            Send = 2,
 
             [Display(Name = "not-printed")]
-            NotPrinted = 3,
+            NotPrinted = 3, 
+            
+            [Display(Name = "printed")]
+            Printed = 4,
         }
     }
 }

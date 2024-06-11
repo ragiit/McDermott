@@ -118,31 +118,31 @@
                                                 ApplyBackgroundShading="true">
 
                                     @* @if (Pharmacy.Status == "Draft")
-                                    { *@
-                                        <div class="row justify-content-end mb-3">
-                                            <div class="col-auto align-self-end">
-                                                <DxTabs RenderMode="TabsRenderMode.AllTabs">
-                                                    <DxTab Text="Draft" Enabled="@(Pharmacy.Status == "Draft" )"></DxTab>
-                                                    <DxTab Text="Process" Enabled="@(Pharmacy.Status == "Processed")"></DxTab>
-                                                    <DxTab Text="Received" Enabled="@(Pharmacy.Status == "Received")"></DxTab>
-                                                    <DxTab Text="Done" Enabled="@(Pharmacy.Status == "Done")"></DxTab>
-                                                    <DxTab Text="Cancel" Enabled="@(Pharmacy.Status == "Canceled")"></DxTab>
-                                                </DxTabs>
-                                            </div>
+                        { *@
+                                    <div class="row justify-content-end mb-3">
+                                        <div class="col-auto align-self-end">
+                                            <DxTabs RenderMode="TabsRenderMode.AllTabs">
+                                                <DxTab Text="Draft" Enabled="@(Pharmacy.Status == "Draft" )"></DxTab>
+                                                <DxTab Text="Process" Enabled="@(Pharmacy.Status == "Processed")"></DxTab>
+                                                <DxTab Text="Received" Enabled="@(Pharmacy.Status == "Received")"></DxTab>
+                                                <DxTab Text="Done" Enabled="@(Pharmacy.Status == "Done")"></DxTab>
+                                                <DxTab Text="Cancel" Enabled="@(Pharmacy.Status == "Canceled")"></DxTab>
+                                            </DxTabs>
                                         </div>
-                                        @if (Pharmacy.Id != 0)
-                                        {
-                                            <div class="row justify-content-start mb-3">
-                                                <div class="col-12 align-self-start">
-                                                    @if (Pharmacy.Status == "Draft" && (NameGroup.Name == "Administrator" || NameGroup.Name == "Admin"))
-                                                    {
-                                                        <div class="card">
-                                                            <div class="card-body">
-                                                                <DxButton Text="Send To Pharmacy" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="SendToPharmacy"></DxButton>
-                                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
-                                                            </div>
+                                    </div>
+                                    @if (Pharmacy.Id != 0)
+                                    {
+                                        <div class="row justify-content-start mb-3">
+                                            <div class="col-12 align-self-start">
+                                                @if (Pharmacy.Status == "Draft" && (NameGroup.Name == "Administrator" || NameGroup.Name == "Admin"))
+                                                {
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <DxButton Text="Send To Pharmacy" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="SendToPharmacy"></DxButton>
+                                                            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                         </div>
-                                                    }
+                                                    </div>
+                                                }
                                                 else if (Pharmacy.Status == "Processed" && (NameGroup.Name.Equals("Nurse") || NameGroup.Name.Equals("Nursing")))
                                                 {
                                                     <div class="card">
@@ -151,23 +151,26 @@
                                                             <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                         </div>
                                                     </div>
-                                                    }
+                                                }
                                                 else if (Pharmacy.Status == "Received" && (NameGroup.Name.Equals("Nurse") || NameGroup.Name.Equals("Nursing")))
-                                                    {
-                                                        <div class="card">
-                                                            <div class="card-body">
+                                                {
+                                                    <div class="card">
+                                                        <div class="card-body">
                                                             <DxButton Text="Confirm" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Validate"></DxButton>
-                                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
-                                                            </div>
+                                                            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                         </div>
-                                                    }
-                                                </div>
+                                                    </div>
+                                                }
                                             </div>
-                                        }
+                                        </div>
+                                    }
                                     @* } *@
                                     <EditForm Model="@Pharmacy" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
                                         <DataAnnotationsValidator />
                                         <div class="card">
+                                            <div class="card-header">
+                                                @header
+                                            </div>
                                             <div class="card-body ">
                                                 <div class="w-100">
                                                     <div class="row w-100">
@@ -306,7 +309,7 @@
                                                                             }
                                                                         </div>
                                                                     </div>
-                                                                </DxFormLayoutItem>                                                                
+                                                                </DxFormLayoutItem>
                                                             </DxFormLayout>
                                                         </div>
 
@@ -418,8 +421,7 @@
                                                                                             Enabled="isActiveButton"
                                                                                             TextFieldName="Name"
                                                                                             ValueFieldName="Id"
-                                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                            >
+                                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
                                                                                 </DxComboBox>
                                                                                 <ValidationMessage For="@(() => Prescription.ProductId)" />
                                                                             </DxFormLayoutItem>
@@ -462,8 +464,7 @@
                                                                                             ValueExpression="@(()=>Prescription.GivenAmount)"
                                                                                             ValueChanged="@((long value)=>checkStock(value))"
                                                                                             Enabled="isActiveButton"
-                                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                             />
+                                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                                 <ValidationMessage For="@(()=> Prescription.GivenAmount)"   />
                                                                             </DxFormLayoutItem>
 
@@ -512,10 +513,10 @@
                                                                                         </Items>
                                                                                     </DxGridLayout>
                                                                                 </Template>
-                                                                            </DxFormLayoutItem>                                                                           
+                                                                            </DxFormLayoutItem>
                                                                             <DxFormLayoutItem ColSpanMd="12">
                                                                                 <DxButton Enabled="!IsLoading && isSavePrescription" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Confirm" SubmitFormOnClick="true"></DxButton>
-                                                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridPrescriptionLines.CancelEditAsync())" ></DxButton>
+                                                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridPrescriptionLines.CancelEditAsync())"></DxButton>
                                                                             </DxFormLayoutItem>
                                                                         </DxFormLayout>
                                                                     </EditFormTemplate>
@@ -584,14 +585,15 @@
                                                 </div>
                                             </div>
                                             <div class="card-footer">
-                                                <div class="row justify-content-end">
-                                                    <div class="col-auto align-self-end">
-                                                        <DxButton Enabled="!IsLoading || isActiveButton" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
-
-                                                        </DxButton>
-                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnDiscard" SubmitFormOnClick="true"></DxButton>
+                                                @if (!isSavePrescription)
+                                                {
+                                                    <div class="row justify-content-end">
+                                                        <div class="col-auto align-self-end">
+                                                            <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnDiscard" SubmitFormOnClick="true"></DxButton>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                }
                                             </div>
                                         </div>
 
@@ -630,7 +632,7 @@
                                                                                         <div class="timeline-item">
                                                                                             <span class="time"><i class="fas fa-clock"></i> @item.CreatedDate.GetValueOrDefault().ToString("HH:mm")</span>
                                                                                             <h3 class="timeline-header">
-                                                                                                <a class="no-underline">@item.UserBy.Name</a>
+                                                                                                <a class="no-underline">@item.UserBy.Name (@item.CreatedBy)</a>
                                                                                             </h3>
 
                                                                                             <div class="timeline-body">
@@ -673,6 +675,16 @@
 
                                                                                                 <div class="row w-100">
                                                                                                     <div class="col-md-1">
+                                                                                                        Patient
+                                                                                                    </div>
+
+                                                                                                    <div class="col-md-11">
+                                                                                                        :  @Pharmacy.Patient.Name
+
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row w-100">
+                                                                                                    <div class="col-md-1">
                                                                                                         Status
                                                                                                     </div>
 
@@ -681,7 +693,7 @@
                                                                                                     </div>
                                                                                                 </div>
 
-                                                                                                
+
                                                                                                 @* Status: @((MarkupString)html) <br />
                                                                         Type: @(item.TypeTransaction ?? "N/A") <br />
                                                                         From: @item.Source?.Name <br />

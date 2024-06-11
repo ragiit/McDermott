@@ -126,6 +126,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private int FocusedRowVisibleIndexPrescriptionLines { get; set; }
         private int FocusedRowVisibleIndexPrescriptionConcoction { get; set; }
         private int FocusedRowVisibleIndexConcoctionLines { get; set; }
+        private string header { get; set; } = string.Empty;
 
         public MarkupString GetIssueStatusIconHtml(string status)
         {
@@ -1114,6 +1115,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task NewItem_Click()
         {
             ShowForm = true;
+            header = "Add Data Pharmacy";
             Pharmacy = new();
             Concoctions.Clear();
             Prescriptions.Clear();
@@ -1149,7 +1151,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             ShowForm = true;
             IsLoading = true;
-
+            header = "Data Pharmacy";
             try
             {
                 PharmacyDto? p = null;
@@ -1169,9 +1171,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
 
                 // Check if the pharmacy status is "Draft"
-                if (p.Status != "Done" && (NameGroup.Name == "Nurse" || NameGroup.Name == "Nursing"))
+                if (p.Status != "Done" || p.Status != "Received" && (NameGroup.Name == "Nurse" || NameGroup.Name == "Nursing"))
                 {
-                    isActiveButton = true;
+                    isActiveButton = false;
                 }
 
                 Pharmacy = p;

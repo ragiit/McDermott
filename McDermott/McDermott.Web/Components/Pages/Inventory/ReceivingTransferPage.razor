@@ -162,6 +162,7 @@
                                                         KeyFieldName="Id"
                                                         EditModelSaving="OnSave_Detail"
                                                         DataItemDeleting="OnDelete_Detail"
+                                                        EditFormButtonsVisible="false"
                                                         EditMode="GridEditMode.EditForm"
                                                         PopupEditFormCssClass="my-style"
                                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
@@ -259,6 +260,16 @@
                                                                     </DxFormLayoutItem>
                                                                 </div>
                                                             </DxFormLayout>
+                                                        }
+
+                                                        @if (isActiveButton)
+                                                        {
+                                                            <div class="row justify-content-end mt-3">
+                                                                <div class="col-auto align-self-end">
+                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Confirm" SubmitFormOnClick="true"></DxButton>
+                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridProduct.CancelEditAsync())"></DxButton>
+                                                                </div>
+                                                            </div>
                                                         }
                                                     </EditFormTemplate>
                                                 </DxGrid>
