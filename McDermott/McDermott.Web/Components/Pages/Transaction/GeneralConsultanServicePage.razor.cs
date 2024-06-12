@@ -1010,7 +1010,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
-                var user = await UserInfoService.GetUserInfo();
+                var user = await UserInfoService.GetUserInfo(ToastService);
                 IsAccess = user.Item1;
                 UserAccessCRUID = user.Item2;
                 UserLogin = user.Item3;
@@ -2405,9 +2405,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 if (FormRegis.ReferVerticalKhususCategoryCode is not null && (FormRegis.ReferVerticalKhususCategoryCode.Equals("THA") || FormRegis.ReferVerticalKhususCategoryCode.Equals("HEM")))
                 {
-                    var result = await PcareService.SendPCareService($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
-
                     Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
+
+                    var result = await PcareService.SendPCareService($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
 
                     if (result.Item2 == 200)
                     {
@@ -2449,7 +2449,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                 {
-                    var result = await PcareService.SendPCareService($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit}", HttpMethod.Get);
+                    Console.WriteLine($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}");
+
+                    var result = await PcareService.SendPCareService($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+
                     if (result.Item2 == 200)
                     {
                         dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);

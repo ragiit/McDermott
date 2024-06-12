@@ -1,9 +1,5 @@
-﻿using Microsoft.JSInterop;
-
-
-namespace McDermott.Web.Components.Pages
+﻿namespace McDermott.Web.Components.Pages
 {
-   
     public partial class SplitStock
     {
         private List<ProductSplit> splitproducts = new List<ProductSplit>

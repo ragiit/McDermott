@@ -1,10 +1,5 @@
-﻿using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
-using MailKit.Net.Smtp;
-using MimeKit;
-using MimeKit.Text;
+﻿using MimeKit;
 using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
-using System.Net.Mail;
 
 namespace McDermott.Web.Components.Pages.Employee
 {
@@ -62,7 +57,7 @@ namespace McDermott.Web.Components.Pages.Employee
         {
             try
             {
-                var user = await UserInfoService.GetUserInfo();
+                var user = await UserInfoService.GetUserInfo(ToastService);
                 IsAccess = user.Item1;
                 UserAccessCRUID = user.Item2;
                 UserLogin = user.Item3;

@@ -1,8 +1,4 @@
-﻿using DevExpress.Xpo.DB.Helpers;
-using McDermott.Application.Dtos;
-using McDermott.Application.Features.Services;
-using OfficeOpenXml.Style;
-using System.Drawing;
+﻿using McDermott.Application.Features.Services;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -37,7 +33,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                var user = await UserInfoService.GetUserInfo();
+                var user = await UserInfoService.GetUserInfo(ToastService);
                 IsAccess = user.Item1;
                 UserAccessCRUID = user.Item2;
                 UserLogin = user.Item3;

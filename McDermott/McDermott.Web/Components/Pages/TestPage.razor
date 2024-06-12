@@ -1,42 +1,240 @@
 ﻿@page "/test"
+@using DevExpress.Data.Linq
 
-<BaseListPage TData="VillageDto"
-              Title="Test"
-              IsAccess="true"
-              Data="Villages">
-    <Columns>
-        <DxGridSelectionColumn Width="15px" />
-        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-        <DxGridDataColumn MinWidth="200" FieldName="PostalCode" SortIndex="0" />
-        <DxGridDataColumn MinWidth="200" FieldName="Province.Name" Caption="Province" />
-        <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" />
-        <DxGridDataColumn MinWidth="200" FieldName="District.Name" Caption="District" />
-    </Columns>
+<div class="content layout-fixed">
+    <DxLoadingPanel @bind-Visible="PanelVisible"
+                    IsContentBlocked="true"
+                    ApplyBackgroundShading="true"
+                    IndicatorAreaVisible="true"
+                    Text="Fetching Data...">
+        <GridTest @ref="Grid"
+                  @bind-SelectedDataItems="@SelectedDataItems"
+                  EditModelSaving="OnSave"
+                  DataItemDeleting="OnDelete"
+                  FocusedRowChanged="Grid_FocusedRowChanged"
+                  KeyFieldName="Id"
+                  FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                  Data="@Villages">
+            <Columns>
+                <DxGridSelectionColumn Width=" 15px" />
+                <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                <DxGridDataColumn MinWidth="200" FieldName="PostalCode" SortIndex="0" />
+                <DxGridDataColumn MinWidth="200" FieldName="Province.Name" Caption="Province" />
+                <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" />
+                <DxGridDataColumn MinWidth="200" FieldName="District.Name" Caption="District" />
+            </Columns>
 
-    @*  <EditForm Context="C">
-    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-    <DxTextBox  ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+            <ToolbarTemplate>
+                <BaseLayoutRazor TItem="VillageDto"
+                                 Items="@Villages"
+                                 SelectedDataItems="@SelectedDataItems"
+                                 NewItem_Click="@NewItem_Click"
+                                 EditItem_Click="@EditItem_Click"
+                                 DeleteItem_Click="@DeleteItem_Click"
+                                 Refresh_Click="@Refresh_Click"
+                                 ExportToExcel="@ExportToExcel"
+                                 ImportFile="@ImportFile" />
+            </ToolbarTemplate>
 
-    </DxFormLayoutItem>
-    </EditForm>*@
-</BaseListPage>
+            <EditFormTemplate Context="EditFormContext">
+                @{
+                    var a = (VillageDto)EditFormContext.EditModel;
+                }
+                <DxFormLayout CssClass="w-100">
+                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                        <MyTextBox @bind-Text="@a.Name" />
+                        <ValidationMessage For="@(()=> a.Name)"   />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Postal Code" ColSpanMd="12">
+                        <MyTextBox @bind-Text="@a.PostalCode"
+                                   NullText="Postal Code" />
+                        <ValidationMessage For="@(()=> a.PostalCode)"   />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
+                        <MyDxComboBox Data="@Provinces"
+                                      NullText="Select Province..."
+                                      @bind-Value="@a.ProvinceId" />
+                        <ValidationMessage For="@(()=>a.ProvinceId)" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
+                        <MyDxComboBox Data="@Cities"
+                                      NullText="Select City..."
+                                      @bind-Value="@a.CityId" />
+                        <ValidationMessage For="@(()=>a.CityId)" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="District" ColSpanMd="12">
+                        <MyDxComboBox Data="@Districts"
+                                      NullText="Select District..."
+                                      @bind-Value="@a.DistrictId" />
+                        <ValidationMessage For="@(()=>a.DistrictId)" />
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            </EditFormTemplate>
+        </GridTest>
+    </DxLoadingPanel>
+
+</div>
 
 @code {
     private bool IsLoading { get; set; } = false;
+    private bool PanelVisible { get; set; } = false;
     private List<VillageDto> Villages = [];
     private List<ProvinceDto> Provinces = [];
     private List<DistrictDto> Districts = [];
     private List<CountryDto> Countrys = [];
     private List<CityDto> Cities = [];
+    private int FocusedRowVisibleIndex { get; set; }
 
+    private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+    public IGrid Grid { get; set; }
+
+    private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+    {
+        FocusedRowVisibleIndex = args.VisibleIndex;
+    }
+    private async Task ExportToExcel()
+    {
+        await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "village_template.xlsx",
+        [
+            new()
+                {
+                    Column = "Province",
+                    Notes = "Mandatory"
+                },
+    new()
+                {
+                    Column = "City",
+                    Notes = "Mandatory"
+                },
+    new()
+                {
+                    Column = "District",
+                    Notes = "Mandatory"
+                },
+    new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+    new()
+                {
+                    Column = "Postal Code"
+                },
+    ]);
+    }
+
+    private async Task ImportFile()
+    {
+        await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+    }
+    private async Task NewItem_Click()
+    {
+        await Grid.StartEditNewRowAsync();
+    }
+
+    private async Task Refresh_Click()
+    {
+        await LoadData();
+    }
+
+    private async Task EditItem_Click()
+    {
+        await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+    }
+
+    private void DeleteItem_Click()
+    {
+        Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+    }
+
+    private async Task OnDelete(GridDataItemDeletingEventArgs e)
+    {
+        try
+        {
+            var aq = SelectedDataItems.Count;
+            if (SelectedDataItems is null)
+            {
+                await Mediator.Send(new DeleteVillageRequest(((VillageDto)e.DataItem).Id));
+            }
+            else
+            {
+                var a = SelectedDataItems.Adapt<List<VillageDto>>();
+                await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
+            }
+            await LoadData();
+        }
+        catch (Exception ee)
+        {
+            ee.HandleException(ToastService);
+        }
+    }
+
+    private async Task OnSave(GridEditModelSavingEventArgs e)
+    {
+        PanelVisible = true;
+
+        var editModel = (VillageDto)e.EditModel;
+
+        if (editModel.Id == 0)
+            await Mediator.Send(new CreateVillageRequest(editModel));
+        else
+            await Mediator.Send(new UpdateVillageRequest(editModel));
+
+        await LoadData();
+    }
+
+    private object Data { get; set; }
+    private EntityInstantFeedbackSource InstantFeedbackSource { get; set; }
+
+    private async Task LoadData()
+    {
+        PanelVisible = true;
+        Villages = await Mediator.Send(new GetVillageQuery());
+
+        // InstantFeedbackSource = new EntityInstantFeedbackSource(e =>
+        // {
+        //     e.KeyExpression = "Id";
+        //     e.QueryableSource = Villages.AsQueryable();
+        // });
+
+        // var dataSource = new GridDevExtremeDataSource<VillageDto>(Villages.AsQueryable());
+        // dataSource.CustomizeLoadOptions = (loadOptions) =>
+        // {
+        //     // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+        //     // This can make SQL execution plans more efficient.
+        //     loadOptions.PrimaryKey = new[] { "Id" };
+        //     loadOptions.PaginateViaPrimaryKey = true;
+        // };
+
+        // Data = dataSource;
+
+        SelectedDataItems = [];
+        PanelVisible = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Grid.WaitForDataLoadAsync();
+            Grid.ExpandGroupRow(1);
+            await Grid.WaitForDataLoadAsync();
+            Grid.ExpandGroupRow(2);
+        }
+    }
+
+    public void Dispose()
+    {
+        InstantFeedbackSource?.Dispose();
+    }
     protected override async Task OnInitializedAsync()
     {
         IsLoading = true;
-        Villages = await Mediator.Send(new GetVillageQuery());
         Countrys = await Mediator.Send(new GetCountryQuery());
         Provinces = await Mediator.Send(new GetProvinceQuery());
         Districts = await Mediator.Send(new GetDistrictQuery());
         Cities = await Mediator.Send(new GetCityQuery());
+        await LoadData();
         IsLoading = false;
     }
 }

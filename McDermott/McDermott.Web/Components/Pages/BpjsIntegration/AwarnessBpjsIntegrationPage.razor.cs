@@ -1,6 +1,4 @@
-﻿using static McDermott.Application.Features.Commands.BpjsIntegration.AwarenessCommand;
-
-namespace McDermott.Web.Components.Pages.BpjsIntegration
+﻿namespace McDermott.Web.Components.Pages.BpjsIntegration
 {
     public partial class AwarnessBpjsIntegrationPage
     {

@@ -2,12 +2,9 @@
 {
     public partial class AllergyBpjsIntegrationPage
     {
-
-
         private string SelectedCodeAllergyType { get; set; } = "Makanan";
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-
 
         private List<AllergyDto> _allergies { get; set; } = new();
         private int parameter1 = 1; // Row data awal yang akan ditampilkan
@@ -18,6 +15,7 @@
         private IGrid Grid { get; set; }
         private bool IsLoading { get; set; } = false;
         private bool PanelVisible { get; set; } = false;
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
@@ -27,14 +25,17 @@
         {
             await LoadData();
         }
+
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
+
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -60,7 +61,6 @@
         {
             try
             {
-
                 var editModel = (AllergyDto)e.EditModel;
 
                 if (string.IsNullOrWhiteSpace(editModel.NmAllergy))
@@ -78,6 +78,7 @@
                 ee.HandleException(ToastService);
             }
         }
+
         private void ColumnChooserButton_Click()
         {
             Grid.ShowColumnChooser();

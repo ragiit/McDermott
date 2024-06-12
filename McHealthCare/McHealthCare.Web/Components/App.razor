@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link href="_content/DevExpress.Blazor.Themes/blazing-berry.bs5.css" rel="stylesheet" asp-append-version="true" />
+
+    @DxResourceManager.RegisterScripts()
+    <link href="themes/css/theme-switcher.css" rel="stylesheet" />
+    <link href="themes/css/themes.css" rel="stylesheet" />
+    <link href="app.css" rel="stylesheet" />
+    <link href="bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <HeadOutlet />
+</head>
+
+<body>
+    <div id="switcher-container" data-permanent></div>
+    <Routes />
+    <script src="_framework/blazor.web.js"></script>
+</body>
+
+</html>

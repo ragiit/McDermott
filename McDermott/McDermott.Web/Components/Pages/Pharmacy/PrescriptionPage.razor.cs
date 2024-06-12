@@ -1,5 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionLineCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
@@ -40,7 +39,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
-                var user = await UserInfoService.GetUserInfo();
+                var user = await UserInfoService.GetUserInfo(ToastService);
                 IsAccess = user.Item1;
                 UserAccessCRUID = user.Item2;
                 UserLogin = user.Item3;
@@ -196,7 +195,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Pharmacy.PaymentMethod = generalConsultantService.FirstOrDefault()!.Payment;
 
             await GetPatientAllergy();
-
         }
 
         private async Task GetPatientAllergy(long? q = null)
@@ -252,7 +250,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 if (value == 0)
                     return;
 
-                var checkStock = StockProducts.Where(x => x.ProductId == Prescription.ProductId && x.SourceId == Pharmacy.PrescriptionLocationId && x.Qty!=0).Sum(x=>x.Qty)!;
+                var checkStock = StockProducts.Where(x => x.ProductId == Prescription.ProductId && x.SourceId == Pharmacy.PrescriptionLocationId && x.Qty != 0).Sum(x => x.Qty)!;
                 if (value > checkStock)
                 {
                     ToastService.ShowInfo($"Total Stock is less than the requested quantity");
@@ -464,7 +462,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 Prescription.DrugRouteId = checkMedicament?.RouteId;
                 selectedActiveComponentPrescriptions = ActiveComponents.Where(z => checkMedicament.ActiveComponentId is not null && checkMedicament.ActiveComponentId.Contains(z.Id)).ToList();
 
-                var checkStock = StockProducts.Where(x => x.ProductId == value.Id && x.SourceId == Pharmacy.PrescriptionLocationId && x.Qty != 0).Sum(x=>x.Qty);
+                var checkStock = StockProducts.Where(x => x.ProductId == value.Id && x.SourceId == Pharmacy.PrescriptionLocationId && x.Qty != 0).Sum(x => x.Qty);
                 if (checkStock == null || checkStock == 0)
                 {
                     Prescription.Stock = 0;
@@ -1065,7 +1063,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        PharmacyLogDto PharmaciesLog = new PharmacyLogDto();
+        private PharmacyLogDto PharmaciesLog = new PharmacyLogDto();
+
         private async Task OnSavePharmacy()
         {
             try
@@ -1355,7 +1354,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 ex.HandleException(ToastService);
             }
         }
-
 
         public async void onCancel()
         {

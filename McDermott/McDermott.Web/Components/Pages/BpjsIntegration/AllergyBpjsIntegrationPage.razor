@@ -75,7 +75,7 @@
                                                 </ToolbarTemplate>
                                                 <Columns>
                                                     <DxGridDataColumn MinWidth="200" FieldName="@nameof(AllergyDto.KdAllergy)" Caption="Code" />
-                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(AllergyDto.NmAllergy)" Caption="Allergy" /> 
+                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(AllergyDto.NmAllergy)" Caption="Allergy" />
                                                 </Columns>
                                                 <EditFormTemplate Context="EditFormContext">
                                                     @{
@@ -96,7 +96,7 @@
                                                             <DxComboBox Data="@_allergyTypes"
                                                                         NullText="Select Allergy Type..."
                                                                         ShowValidationIcon="true"
-                                                                        FilteringMode="@DataGridFilteringMode.Contains" 
+                                                                        FilteringMode="@DataGridFilteringMode.Contains"
                                                                         @bind-Value="@a.Type"
                                                                         TextFieldName="Name"
                                                                         ValueFieldName="Code">

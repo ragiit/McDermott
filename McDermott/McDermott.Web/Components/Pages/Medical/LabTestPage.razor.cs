@@ -31,7 +31,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             try
             {
-                var user = await UserInfoService.GetUserInfo();
+                var user = await UserInfoService.GetUserInfo(ToastService);
                 IsAccess = user.Item1;
                 UserAccessCRUID = user.Item2;
                 UserLogin = user.Item3;
@@ -147,6 +147,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 }
             }
         }
+
         private async Task LoadLabTestDetails()
         {
             SelectedDetailDataItems = [];
@@ -166,7 +167,6 @@ namespace McDermott.Web.Components.Pages.Medical
                 {
                     try
                     {
-
                         LabTestDetailDto update = new();
 
                         if (labTest.Id == 0)

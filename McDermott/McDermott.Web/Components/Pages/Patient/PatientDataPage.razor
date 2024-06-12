@@ -60,7 +60,7 @@
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-syringe"
                                                                Text="@($"Data Vaction")" />
-                                               
+
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-syringe"
                                                                Text="@($"Data wellness")" />
@@ -505,16 +505,16 @@
                                                         <DxTagBox Data="@Allergies"
                                                                   NullText="Select Allergy..."
                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                  @bind-Values="@SelectedAllergies" 
+                                                                  @bind-Values="@SelectedAllergies"
                                                                   EditFormat="{1}"
                                                                   InputId="tbMultiColumn">
                                                             <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
                                                                                 Caption="Code"
                                                                                 Width="100px" />
                                                             <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
-                                                                                Caption="Name" /> 
+                                                                                Caption="Name" />
                                                                                  <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
-                                                                                Caption="Type" /> 
+                                                                                Caption="Type" />
                                                         </DxTagBox>
                                                     </DxFormLayoutItem>
 

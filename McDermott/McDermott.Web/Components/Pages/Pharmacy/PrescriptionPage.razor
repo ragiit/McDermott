@@ -306,7 +306,7 @@
                                                                             }
                                                                         </div>
                                                                     </div>
-                                                                </DxFormLayoutItem>                                                                
+                                                                </DxFormLayoutItem>
                                                             </DxFormLayout>
                                                         </div>
 
@@ -512,7 +512,7 @@
                                                                                         </Items>
                                                                                     </DxGridLayout>
                                                                                 </Template>
-                                                                            </DxFormLayoutItem>                                                                           
+                                                                            </DxFormLayoutItem>
                                                                             <DxFormLayoutItem ColSpanMd="12">
                                                                                 <DxButton Enabled="!IsLoading && isSavePrescription" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Confirm" SubmitFormOnClick="true"></DxButton>
                                                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridPrescriptionLines.CancelEditAsync())" ></DxButton>
@@ -681,7 +681,6 @@
                                                                                                     </div>
                                                                                                 </div>
 
-                                                                                                
                                                                                                 @* Status: @((MarkupString)html) <br />
                                                                         Type: @(item.TypeTransaction ?? "N/A") <br />
                                                                         From: @item.Source?.Name <br />
