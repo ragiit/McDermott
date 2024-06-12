@@ -8,6 +8,7 @@ using System.Net.Mail;
 using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 using DocumentFormat.OpenXml.Bibliography;
 
+
 namespace McDermott.Web.Components.Pages.Employee
 {
     public partial class SickLeavePage
@@ -153,11 +154,14 @@ namespace McDermott.Web.Components.Pages.Employee
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
-        private async Task OnRowDoubleClick(GridRowClickEventArgs e)
+        private async Task ConfirmAndSendEmail()
         {
-            //await EditItem_Click(null);
+            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirmSendEmail");
+            if (confirmed)
+            {
+                await SendToEmail();
+            }
         }
-
         private async Task SendToEmail_click()
         {
             Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
@@ -203,7 +207,7 @@ namespace McDermott.Web.Components.Pages.Employee
             }
         }
 
-        private async Task SendToEmail(GridDataItemDeletingEventArgs e)
+        private async Task SendToEmail()
         {
             try
             {

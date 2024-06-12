@@ -40,14 +40,13 @@
                                         AllowSelectRowByClick="true"
                                         FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                         KeyFieldName="Id"
-                                        DataItemDeleting="SendToEmail"
+                                        EditModelSaving="SendToEmail"
                                         CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                         FocusedRowEnabled="true"
                                         PopupEditFormCssClass="pw-800"
                                         PagerPosition="GridPagerPosition.Bottom"
                                         PageSizeSelectorVisible="true"
                                         PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        RowDoubleClick="OnRowDoubleClick"
                                         PageSizeSelectorAllRowsItemVisible="true"
                                         PagerSwitchToInputBoxButtonCount="10"
                                         PagerVisibleNumericButtonCount="10"
@@ -61,7 +60,7 @@
                                         KeyboardNavigationEnabled="true">
                                     <ToolbarTemplate>
                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                            <DxToolbarItem Text="Send Email" RenderStyle="ButtonRenderStyle.Primary" CssClass="w-100" Click="SendToEmail_click" IconCssClass="fa-solid fa-print" Enabled="SelectedDataItems.Count > 0 && SickLeaves.Count > 0" />
+                                            <DxToolbarItem Text="Send Email" RenderStyle="ButtonRenderStyle.Primary" CssClass="w-100" Click="ConfirmAndSendEmail" IconCssClass="fa-solid fa-envelope-circle-check" Enabled="SelectedDataItems.Count > 0 && SickLeaves.Count > 0" />
                                         </DxToolbar>
                                     </ToolbarTemplate>
                                     
