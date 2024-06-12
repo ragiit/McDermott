@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.Web", "McHealthCare.Web\McHealthCare.Web.csproj", "{B19797CF-E4DA-4BAD-BB24-A64631589567}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McHealthCare.AppHost", "McHealthCare.AppHost\McHealthCare.AppHost.csproj", "{8BD35A31-7942-4D53-9DF8-F80DA1AAAD25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.AppHost", "McHealthCare.AppHost\McHealthCare.AppHost.csproj", "{8BD35A31-7942-4D53-9DF8-F80DA1AAAD25}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.ServiceDefaults", "McHealthCare.ServiceDefaults\McHealthCare.ServiceDefaults.csproj", "{BF54F9AC-522F-4EAF-ACC0-C96D9FA5FEC1}"
 EndProject
@@ -36,6 +36,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{B19797CF-E4DA-4BAD-BB24-A64631589567} = {45449CBB-8359-43C5-B497-0CD3858F5EE4}
 		{8BD35A31-7942-4D53-9DF8-F80DA1AAAD25} = {45449CBB-8359-43C5-B497-0CD3858F5EE4}
+		{BF54F9AC-522F-4EAF-ACC0-C96D9FA5FEC1} = {45449CBB-8359-43C5-B497-0CD3858F5EE4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BFA3EB7B-E28F-47D6-A9E0-6AA3EF129C8E}

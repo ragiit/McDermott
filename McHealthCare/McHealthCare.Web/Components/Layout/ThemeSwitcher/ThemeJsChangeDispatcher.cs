@@ -26,9 +26,13 @@ namespace McHealthCare.Web.Components.Layout.ThemeSwitcher
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
-            if (firstRender)
-                _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./themes/theme-controller.js");
+            try
+            {
+                await base.OnAfterRenderAsync(firstRender);
+                if (firstRender)
+                    _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./themes/theme-controller.js");
+            }
+            catch { }
         }
 
         public async void RequestThemeChange(Theme theme)
