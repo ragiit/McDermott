@@ -102,9 +102,14 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
+        private GroupDto NameGroup = new();
+        private GeneralConsultanlogDto generalLog = new();
+
         private List<AllergyDto> WeatherAllergies = [];
         private List<AllergyDto> FoodAllergies = [];
         private List<AllergyDto> PharmacologyAllergies = [];
+        private List<GroupDto> groups = [];
+
 
         private List<RujukanFaskesKhususSpesialisPCare> RujukanSubSpesialis = [];
         private List<SpesialisSaranaPCare> SpesialisSaranas = [];
@@ -116,7 +121,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 IsLoading = true;
                 var currentStatus = FormRegis.StagingStatus;
-                ToastService.ClearInfoToasts();
+                ToastService.ClearCustomToasts();
                 if (FormRegis.PatientId == null || FormRegis.TypeRegistration == null || FormRegis.ServiceId is null || (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null)))
                 {
                     IsLoading = false;
@@ -174,7 +179,12 @@ namespace McDermott.Web.Components.Pages.Transaction
                     {
                         FormRegis.StagingStatus = "Finished";
                     }
-                    await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+                    var  GeneralServices=await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+
+                    generalLog.GeneralConsultanServiceId = GeneralServices.Id;
+                    generalLog.UserById = NameGroup.Id;
+                    generalLog.Status = FormRegis.StagingStatus;
+                    await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                 }
                 else
                 {
@@ -190,6 +200,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                     FormRegis.StagingStatus = "Confirmed";
                     StagingText = "Nurse Station";
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+
+                    generalLog.GeneralConsultanServiceId = FormRegis.Id;
+                    generalLog.UserById = NameGroup.Id;
+                    generalLog.Status = FormRegis.StagingStatus;
+                    await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
 
                     PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
 
@@ -403,6 +418,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                     StagingText = "Confirmed";
                     PopUpVisible = false;
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+
+                    generalLog.GeneralConsultanServiceId = FormRegis.Id;
+                    generalLog.UserById = NameGroup.Id;
+                    generalLog.Status = FormRegis.StagingStatus;
+                    await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                 }
                 else if (IsAppoiment)
                 {
@@ -417,6 +437,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                     StagingText = "Confirmed";
                     PopUpAppoiment = false;
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+
+                    generalLog.GeneralConsultanServiceId = FormRegis.Id;
+                    generalLog.UserById = NameGroup.Id;
+                    generalLog.Status = FormRegis.StagingStatus;
+                    await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                     await LoadData();
                 }
                 else
@@ -450,6 +475,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                                 //    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
                                 //else
                                 //    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
+                                generalLog.GeneralConsultanServiceId = FormRegis.Id;
+                                generalLog.UserById = NameGroup.Id;
+                                generalLog.Status = FormRegis.StagingStatus;
+                                await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                                 break;
 
                             default:
@@ -614,6 +643,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
                     GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+
+                    generalLog.ProcedureRoomId = GeneralConsultanMedicalSupport.Id;
+                    generalLog.UserById = NameGroup.Id;
+                    generalLog.Status = GeneralConsultanMedicalSupport.Status;
+                    await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                 }
                 else
                     GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
@@ -2022,6 +2056,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             SelectedDataItems = [];
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
             PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
+            groups = await Mediator.Send(new GetGroupQuery());
+            NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
             await SelectData();
             IsReferTo = false;
             PopUpVisible = false;

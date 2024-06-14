@@ -22,9 +22,11 @@ namespace McDermott.Application.Dtos.Employee
         public string? Email { get; set; }
         public string? SIP { get; set; }
         public string? PhycisianName { get; set; }
+        public string? YesOrNoEmployee { get; set; } = "No";
+        public bool? isEmployee { get; set; } = false;
         public DateTime? brithday { get; set; }
         public string? NoRM { get; set; }
-        public string? Status { get; set; }
+        public EnumStatusSickLeave Status { get; set; }
         public string? TypeLeave { get; set; }
         public string? Diagnosis { get; set; }
         public DateTime? StartSickLeave { get; set; }

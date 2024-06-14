@@ -31,6 +31,7 @@ namespace McDermott.Application.Features.Queries.Employee
                     result = await _unitOfWork.Repository<SickLeave>().Entities
                       .Include(x => x.GeneralConsultans)
                       .Include(x => x.GeneralConsultans.Patient)
+                      .Include(x => x.GeneralConsultans.Pratitioner)
                       //.Include(x => x.StockSickLeave)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);

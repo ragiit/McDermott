@@ -94,6 +94,8 @@ namespace McDermott.Persistence.Context
         public DbSet<GeneralConsultanCPPT> GeneralConsultanCPPTs { get; set; }
         public DbSet<GeneralConsultanMedicalSupport> GeneralConsultanMedicalSupports { get; set; }
 
+        public DbSet<GeneralConsultationLog> GeneralConsultationLogs { get; set; }
+
         #endregion Transaction
 
         #region Queue

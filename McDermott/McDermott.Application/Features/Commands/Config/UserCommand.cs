@@ -4,9 +4,10 @@
     {
         #region Get
 
-        public class GetUserQuery(Expression<Func<User, bool>>? predicate = null) : IRequest<List<UserDto>>
+        public class GetUserQuery(Expression<Func<User, bool>>? predicate = null, bool removeCache = false) : IRequest<List<UserDto>>
         {
             public Expression<Func<User, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
         }
 
         public class GetUserInfoGroupQuery(Expression<Func<User, bool>>? predicate = null) : IRequest<List<UserDto>>

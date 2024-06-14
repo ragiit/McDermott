@@ -44,12 +44,17 @@ namespace McDermott.Application.Features.Queries.Config
             try
             {
                 string cacheKey = $"GetUserQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
                 if (!_cache.TryGetValue(cacheKey, out List<User>? result))
                 {
-                    result = await _unitOfWork.Repository<User>().GetAsync(
-                        null,
-                        includes: x => x.Include(z => z.Group),
-                        cancellationToken);
+                    result = await _unitOfWork.Repository<User>().Entities
+                        .Include(x=>x.Group)
+                        .Include(x=>x.Gender)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }

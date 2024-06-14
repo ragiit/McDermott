@@ -286,6 +286,132 @@
                                             </div>
                                         </DxFormLayout>
                                     }
+
+                                    @if (Logs.Count > 0)
+                                    {
+                                        <DxFormLayout>
+                                            <DxFormLayoutGroup ColSpanMd="12" Caption="Transaction Logs" AnimationType="LayoutAnimationType.Slide" Expanded="false" Decoration="FormLayoutGroupDecoration.Card" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start">
+                                                <CaptionTemplate>
+                                                    <div>
+                                                        <span class="text-center">Transaction Logs</span>
+                                                    </div>
+                                                </CaptionTemplate>
+                                                <Items>
+                                                    @{
+                                                        var groupedLogs = Logs
+                                                        .GroupBy(x => x.CreatedDate?.Date) // Group by the date part only
+                                                        .OrderByDescending(g => g.Key)
+                                                        .ToList();
+                                                    }
+
+                                                    <section class="content w-100">
+                                                        <div class="container-fluid w-100">
+                                                            <div class="row w-100">
+                                                                @foreach (var group in groupedLogs)
+                                                                {
+                                                                    <div class="col-md-12">
+                                                                        <div class="timeline">
+                                                                            <div class="time-label">
+                                                                                <span class="bg-red">@group.Key?.ToString("dd MMM, yyyy")</span>
+                                                                            </div>
+
+                                                                            @foreach (var item in group.OrderByDescending(x => x.CreatedDate.GetValueOrDefault().TimeOfDay))
+                                                                            {
+                                                                                <div>
+                                                                                    <i class="fas fa-user bg-green"></i>
+                                                                                    <div class="timeline-item">
+                                                                                        <span class="time"><i class="fas fa-clock"></i> @item.CreatedDate.GetValueOrDefault().ToString("HH:mm")</span>
+                                                                                        <h3 class="timeline-header">
+                                                                                            <a class="no-underline">@item.CreatedBy</a>
+                                                                                        </h3>
+
+                                                                                        <div class="timeline-body">
+                                                                                            @{
+                                                                                                string priorityClass = "";
+                                                                                                string title = "";
+
+                                                                                                switch (item.StatusTransfer)
+                                                                                                {
+                                                                                                    case "Draft":
+                                                                                                        priorityClass = "info";
+                                                                                                        title = "Draft";
+                                                                                                        break;
+
+                                                                                                    case "Waiting":
+                                                                                                        priorityClass = "warning";
+                                                                                                        title = "Waiting";
+                                                                                                        break;
+
+                                                                                                    case "Ready":
+                                                                                                        priorityClass = "primary";
+                                                                                                        title = "Ready";
+                                                                                                        break;
+
+                                                                                                    case "Done":
+                                                                                                        priorityClass = "success";
+                                                                                                        title = "Done";
+                                                                                                        break;
+
+                                                                                                    case "Cancel":
+                                                                                                        priorityClass = "danger";
+                                                                                                        title = "Cancel";
+                                                                                                        break;
+                                                                                                }
+
+                                                                                                string html = $"<span class='badge text-white bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span>";
+                                                                                            }
+
+                                                                                            <div class="row w-100">
+                                                                                                <div class="col-md-2">
+                                                                                                    Status
+                                                                                                </div>
+
+                                                                                                <div class="col-md-10">
+                                                                                                    : @((MarkupString)html)
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div class="row w-100">
+                                                                                                <div class="col-md-2">
+                                                                                                    Type
+                                                                                                </div>
+
+                                                                                                <div class="col-md-10">
+                                                                                                    : @(item.TypeTransaction ?? "N/A")
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div class="row w-100">
+                                                                                                <div class="col-md-2">
+                                                                                                    Destination
+                                                                                                </div>
+
+                                                                                                <div class="col-md-10">
+                                                                                                    : @item.Destination?.Name
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            @* Status: @((MarkupString)html) <br />
+                                                                            Type: @(item.TypeTransaction ?? "N/A") <br />
+                                                                            From: @item.Source?.Name <br />
+                                                                            To: @item.Destination?.Name <br /> *@
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            }
+                                                                            <div>
+                                                                                <i class="fas fa-clock bg-gray"></i>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                </Items>
+                                            </DxFormLayoutGroup>
+                                        </DxFormLayout>
+                                    }
                                 </EditForm>
                             </div>
                         </div>

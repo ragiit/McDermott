@@ -5,7 +5,12 @@
         IRequestHandler<CreateGeneralConsultanServiceRequest, GeneralConsultanServiceDto>,
         IRequestHandler<CreateListGeneralConsultanServiceRequest, List<GeneralConsultanServiceDto>>,
         IRequestHandler<UpdateGeneralConsultanServiceRequest, GeneralConsultanServiceDto>,
-        IRequestHandler<DeleteGeneralConsultanServiceRequest, bool>
+        IRequestHandler<DeleteGeneralConsultanServiceRequest, bool>,
+        IRequestHandler<GetGeneralConsultationLogQuery, List<GeneralConsultanlogDto>>,
+        IRequestHandler<CreateGeneralConsultationLogRequest, GeneralConsultanlogDto>,
+        IRequestHandler<CreateListGeneralConsultationLogRequest, List<GeneralConsultanlogDto>>,
+        IRequestHandler<UpdateGeneralConsultationLogRequest, GeneralConsultanlogDto>,
+        IRequestHandler<DeleteGeneralConsultationLogRequest, bool>
     {
         #region GET
 
@@ -129,6 +134,137 @@
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetGeneralConsultanServiceQuery_"); // Ganti dengan key yang sesuai
+
+                return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion Delete
+
+        #region GET General Consultan Service Log
+
+        public async Task<List<GeneralConsultanlogDto>> Handle(GetGeneralConsultationLogQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                string cacheKey = $"GetGeneralConsultationLogQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<GeneralConsultationLog>? result))
+                {
+                    result = await _unitOfWork.Repository<GeneralConsultationLog>().Entities
+                        .Include(z => z.GeneralConsultanService)
+                        .Include(z => z.ProcedureRoom)
+                        .Include(z => z.UserBy)
+                        
+                        //.ThenInclude(z => z.Gender)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<GeneralConsultanlogDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion GET
+
+        #region CREATE General Consultan Service Log
+
+        public async Task<GeneralConsultanlogDto> Handle(CreateGeneralConsultationLogRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<GeneralConsultationLog>().AddAsync(request.GeneralConsultanlogDto.Adapt<GeneralConsultationLog>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGeneralConsultationLogQuery_");
+
+                return result.Adapt<GeneralConsultanlogDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<GeneralConsultanlogDto>> Handle(CreateListGeneralConsultationLogRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<GeneralConsultationLog>().AddAsync(request.GeneralConsultanlogDto.Adapt<List<GeneralConsultationLog>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGeneralConsultationLogQuery_");
+
+                return result.Adapt<List<GeneralConsultanlogDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region Update General Consultan Service Log
+
+        public async Task<GeneralConsultanlogDto> Handle(UpdateGeneralConsultationLogRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<GeneralConsultationLog>().UpdateAsync(request.GeneralConsultanlogDto.Adapt<GeneralConsultationLog>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGeneralConsultationLogQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<GeneralConsultanlogDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion Update
+
+        #region Delete General Consultan Service Log
+
+        public async Task<bool> Handle(DeleteGeneralConsultationLogRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<GeneralConsultationLog>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<GeneralConsultationLog>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGeneralConsultationLogQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }

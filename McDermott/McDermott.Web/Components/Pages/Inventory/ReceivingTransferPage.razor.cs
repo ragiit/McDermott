@@ -15,6 +15,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<ProductDto> Products = [];
         private List<StockProductDto> Stocks = [];
         private List<UomDto> Uoms = [];
+        private List<TransactionStockDetailDto> AllLogs = [];
+        private List<TransactionStockDetailDto> Logs = [];
         private ReceivingStockProductDto FormReceivingDetailStock = new();
         private ReceivingStockProductDto TempFormReceivingStockDetail = new();
         private ReceivingStockDto GetReceivingStock = new();
@@ -124,6 +126,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                 TempFormReceivingStockDetail.ProductName = productName.Name;
                 TempFormReceivingStockDetail.TraceAbility = productName.TraceAbility;
             }
+        }
+
+        private async Task LoadLogs()
+        {
+            Logs = await Mediator.Send(new GetTransactionStockDetailQuery(x => x.ReceivingStockId == FormReceivingStocks.Id));
         }
 
         private async Task HandleValidSubmit()
@@ -267,6 +274,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 item.UomName = Uoms.Where(u => u.Id == d.UomId).Select(x => x.Name).FirstOrDefault();
                 item.PurchaseName = Uoms.Where(p => p.Id == d.PurchaseUomId).Select(x => x.Name).FirstOrDefault();
             }
+            await LoadLogs();
         }
 
         private async Task DeleteItem_Click()

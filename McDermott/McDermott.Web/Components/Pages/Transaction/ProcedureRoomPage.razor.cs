@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using Org.BouncyCastle.Tls;
+using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 
 namespace McDermott.Web.Components.Pages.Transaction
@@ -48,10 +49,12 @@ namespace McDermott.Web.Components.Pages.Transaction
         private LabResultDetailDto LabResultDetail = new();
         private LabTestDetailDto LabTest = new();
         private LabUomDto LabUom = new();
+        private GroupDto NameGroup { get; set; } = new();
 
         private List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupports = [];
         private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport = new();
         private GeneralConsultanServiceDto GeneralConsultanService = new();
+        private List<GroupDto> groups = [];
         private List<UserDto> Doctors { get; set; } = [];
         private List<LabTestDto> LabTests = [];
         private IEnumerable<LabTestDetailDto> SelectedLabTests = [];
@@ -106,6 +109,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             GeneralConsultanMedicalSupport = new();
             SelectedDataItems = [];
             GeneralConsultanMedicalSupports = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery());
+            groups = await Mediator.Send(new GetGroupQuery());
+            NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
             PanelVisible = false;
         }
 
@@ -340,7 +345,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             LabTest = labTest;
             LabUom = labTest.LabUom;
         }
-
+        GeneralConsultanlogDto generalLog = new GeneralConsultanlogDto();
         private async Task OnSave()
         {
             try
@@ -364,9 +369,23 @@ namespace McDermott.Web.Components.Pages.Transaction
                     GeneralConsultanService.StagingStatus = "Waiting";
 
                     await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+
+                    
+
+                    generalLog.GeneralConsultanServiceId = GeneralConsultanMedicalSupport.GeneralConsultanServiceId;
+                    generalLog.UserById = NameGroup.Id;
+                    generalLog.Status = GeneralConsultanService.StagingStatus;
+
+                    await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                 }
 
                 GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+
+                generalLog.ProcedureRoomId = GeneralConsultanMedicalSupport.Id;
+                generalLog.UserById = NameGroup.Id;
+                generalLog.Status = GeneralConsultanMedicalSupport.Status;
+
+                await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
 
                 if ((GeneralConsultanMedicalSupport.LabTestId is not null && GeneralConsultanMedicalSupport.LabTestId != 0))
                 {

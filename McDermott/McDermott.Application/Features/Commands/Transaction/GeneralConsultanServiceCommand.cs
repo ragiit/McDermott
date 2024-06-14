@@ -49,5 +49,53 @@
         }
 
         #endregion Delete
+
+        #region GET GeneralConsultan Logs
+
+        public class GetGeneralConsultationLogQuery(Expression<Func<GeneralConsultationLog, bool>>? predicate = null, bool removeCache = false) : IRequest<List<GeneralConsultanlogDto>>
+        {
+            public Expression<Func<GeneralConsultationLog, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
+        }
+
+        #endregion GET
+
+        #region Create GeneralConsultan Logs
+
+        public class CreateGeneralConsultationLogRequest(GeneralConsultanlogDto GeneralConsultanlogDto) : IRequest<GeneralConsultanlogDto>
+        {
+            public GeneralConsultanlogDto GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
+        }
+
+        public class CreateListGeneralConsultationLogRequest(List<GeneralConsultanlogDto> GeneralConsultanlogDto) : IRequest<List<GeneralConsultanlogDto>>
+        {
+            public List<GeneralConsultanlogDto> GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
+        }
+
+        #endregion Create
+
+        #region Update GeneralConsultan Logs
+
+        public class UpdateGeneralConsultationLogRequest(GeneralConsultanlogDto GeneralConsultanlogDto) : IRequest<GeneralConsultanlogDto>
+        {
+            public GeneralConsultanlogDto GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
+        }
+
+        public class UpdateListGeneralConsultationLogRequest(List<GeneralConsultanlogDto> GeneralConsultanlogDto) : IRequest<List<GeneralConsultanlogDto>>
+        {
+            public List<GeneralConsultanlogDto> GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
+        }
+
+        #endregion Update
+
+        #region Delete GeneralConsultan Logs
+
+        public class DeleteGeneralConsultationLogRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion Delete
     }
 }

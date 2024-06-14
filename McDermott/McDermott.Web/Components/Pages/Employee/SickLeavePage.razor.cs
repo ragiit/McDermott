@@ -15,13 +15,13 @@ namespace McDermott.Web.Components.Pages.Employee
     {
         #region Relation Data
 
-
         private List<GeneralConsultanServiceDto> generalConsultans = [];
         private List<GeneralConsultanCPPTDto> CPPTs = [];
         private List<DiagnosisDto> Diagnoses = [];
         private List<SickLeaveDto> SickLeaves = [];
         private List<EmailSettingDto> EmailSettings = [];
         private List<UserDto> Users = [];
+        private SickLeaveDto fSickLeave = new();
 
         #endregion Relation Data
 
@@ -34,7 +34,10 @@ namespace McDermott.Web.Components.Pages.Employee
         private IGrid Grid { get; set; }
         private bool IsLoading { get; set; } = false;
         private bool isPrint { get; set; } = false;
+        private bool isShow { get; set; } = false;
+        private bool Employee { get; set; } = false;
         private string? TypeLeaves { get; set; }
+        private string? YesOrNoEmployee { get; set; } = "No";
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
@@ -105,14 +108,24 @@ namespace McDermott.Web.Components.Pages.Employee
                 {
                     var diagnosis = "";
                     TypeLeaves = item.TypeLeave;
+                    var generalConsultans = await Mediator.Send(new GetGeneralConsultanServiceQuery());
                     var BodyCPPT = CPPTs.Where(x => x.GeneralConsultanServiceId == item.GeneralConsultans.Id && x.Title == "Diagnosis").Select(x => x.Body).FirstOrDefault();
+                    
                     if (BodyCPPT != null)
                     {
                         diagnosis = Diagnoses.Where(x => BodyCPPT!.Contains(x.Name)).Select(x => x.Name).FirstOrDefault();
-
                         item.Diagnosis = diagnosis;
                     }
 
+                    var cek = generalConsultans.Where(x => x.Id == item.GeneralConsultansId).FirstOrDefault();
+                    item.PhycisianName = Users.Where(x => x.Id == cek.PratitionerId).Select(x => x.Name).FirstOrDefault();
+                    item.isEmployee = Users.Where(x=>x.Id == cek.PatientId).Select(x=>x.IsEmployee).FirstOrDefault();
+
+                    if (item.isEmployee == true)
+                    {
+                        item.YesOrNoEmployee = "Yes";
+                    }
+                    
                 }
                 IsLoading = false;
             }
@@ -147,25 +160,30 @@ namespace McDermott.Web.Components.Pages.Employee
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
+            try
+            {
+                if ((SickLeaveDto)args.DataItem is null)
+                    return;
+
+                Employee = ((SickLeaveDto)args.DataItem)!.isEmployee == true;
+            }
+            catch { }
         }
 
-        private void Grid_FocusedRowChangedDetail(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndex = args.VisibleIndex;
-        }
+        //private void Grid_FocusedRowChangedDetail(GridFocusedRowChangedEventArgs args)
+        //{
+        //    FocusedRowVisibleIndex = args.VisibleIndex;
+        //}
 
         private async Task ConfirmAndSendEmail()
         {
-            bool confirmed = await JsRuntime.InvokeAsync<bool>("confirmSendEmail");
-            if (confirmed)
-            {
-                await SendToEmail();
-            }
+            isShow = true;
         }
-        private async Task SendToEmail_click()
+        private void Cancel()
         {
-            Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+            isShow = false;
         }
+
         #endregion Grid Configuration
 
         #region Click
@@ -174,29 +192,43 @@ namespace McDermott.Web.Components.Pages.Employee
         {
             try
             {
-                var data = SickLeaves.Where(x => x.PatientId == grid).FirstOrDefault()!;
+                var data = SickLeaves.Where(x => x.GeneralConsultans?.PatientId == grid).FirstOrDefault()!;
+                var patienss = Users.Where(x => x.Id == grid).FirstOrDefault();
                 var age = 0;
-                if (data.brithday == null)
+                if (data.GeneralConsultans?.Patient.DateOfBirth == null)
                 {
                     age = 0;
                 }
                 else
                 {
-                    age = DateTime.Now.Year - data.brithday.Value.Year;
+                    age = DateTime.Now.Year - data.GeneralConsultans.Patient.DateOfBirth.Value.Year;
                 }
-                var days = data.StartSickLeave.Value.Day + data.EndSickLeave.Value.Day;
+                if (data.GeneralConsultans.IsSickLeave)
+                {
+                    data.StartSickLeave = data.GeneralConsultans?.StartDateSickLeave;
+                    data.EndSickLeave = data.GeneralConsultans?.EndDateSickLeave;
+                }
+                else if (data.GeneralConsultans.IsMaternityLeave)
+                {
+                    data.StartSickLeave = data.GeneralConsultans.StartMaternityLeave;
+                    data.EndSickLeave = data.GeneralConsultans.EndMaternityLeave;
+                }
+                int TotalDays = data.EndSickLeave.Value.Day - data.StartSickLeave.Value.Day;
+
+                string WordDays = ConvertNumberToWord(TotalDays);
                 isPrint = true;
                 var mergeFields = new Dictionary<string, string>
                 {
-                    {"%NamePatient%", data?.PatientName},
-                {"%startDate%", data?.StartSickLeave?.ToString("dd MMMM yyyy") },
-                {"%endDate%", data?.EndSickLeave?.ToString("dd MMMM yyyy") },
-                {"%NameDoctor%", data?.PhycisianName },
-                {"%SIPDoctor%", data?.SIP },
-                {"%AddressPatient%", data?.Address },
-                {"%AgePatient%", age.ToString() },
-                {"%days%", days.ToString() },
-                {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")}
+                    {"%NamePatient%", patienss?.Name},
+                    {"%startDate%", data?.StartSickLeave?.ToString("dd MMMM yyyy") },
+                    {"%endDate%", data?.EndSickLeave?.ToString("dd MMMM yyyy") },
+                    {"%NameDoctor%", data?.PhycisianName },
+                    {"%SIPDoctor%", data?.SIP },
+                    {"%AddressPatient%", data?.Address },
+                    {"%AgePatient%", age.ToString() },
+                    {"%WordDays%", WordDays },
+                    {"%days%", TotalDays.ToString() },
+                    {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")}
                 };
 
                 DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
@@ -205,6 +237,44 @@ namespace McDermott.Web.Components.Pages.Employee
             {
                 ex.HandleException(ToastService);
             }
+        }
+
+        private string ConvertNumberToWord(int angka)
+        {
+            if (angka == 0)
+            {
+                return "nol";
+            }
+
+            string[] satuan = { "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan" };
+            string[] puluhan = { "sepuluh", "dua puluh", "tiga puluh", "empat puluh", "lima puluh", "enam puluh", "tujuh puluh", "delapan puluh", "sembilan puluh" };
+            string[] ratusan = { "seratus", "dua ratus", "tiga ratus", "empat ratus", "lima ratus", "enam ratus", "tujuh ratus", "delapan ratus", "sembilan ratus" };
+
+            string hasil = "";
+
+            if (angka >= 100)
+            {
+                hasil += ratusan[angka / 100 - 1];
+                angka %= 100;
+            }
+
+            if (angka >= 10)
+            {
+                if (angka % 10 == 0)
+                {
+                    hasil += puluhan[angka / 10 - 1];
+                }
+                else
+                {
+                    hasil += puluhan[angka / 10 - 1] + " " + satuan[angka % 10 - 1];
+                }
+            }
+            else
+            {
+                hasil += satuan[angka - 1];
+            }
+
+            return hasil;
         }
 
         private async Task SendToEmail()
@@ -220,6 +290,10 @@ namespace McDermott.Web.Components.Pages.Employee
                     var data = SickLeaves.FirstOrDefault(x => x.Id == item.Id);
                     if (data == null) continue;
 
+                    // Find Data Patient
+                    var Patientss = Users.Where(x => x.Id == item.GeneralConsultans.PatientId).FirstOrDefault()!;
+                    if (Patientss == null) continue;
+
                     // Update start and end dates based on leave type
                     if (TypeLeaves == "SickLeave")
                     {
@@ -233,32 +307,58 @@ namespace McDermott.Web.Components.Pages.Employee
                     }
 
                     // Calculate patient's age
-                    int age = data.brithday.HasValue
-                        ? DateTime.Now.Year - data.brithday.Value.Year
+                    int age = Patientss.DateOfBirth.HasValue
+                        ? DateTime.Now.Year - Patientss.DateOfBirth.Value.Year
                         : 0;
 
                     // Calculate total days of sick leave
-                    int totalDays = (item.StartSickLeave?.Day ?? 0) + (item.EndSickLeave?.Day ?? 0);
+                    int totalDays = item.EndSickLeave.Value.Day - item.StartSickLeave.Value.Day;
+                    string wordDays = ConvertNumberToWord(totalDays);
+
+                    data.PatientName = data.GeneralConsultans.Patient.Name;
+                    if (data.GeneralConsultans.PratitionerId is not null)
+                        data.PhycisianName = data.GeneralConsultans.Pratitioner.Name;
+                    data.SIP = data.GeneralConsultans.Pratitioner.SipNo;
+                    data.Address = data.GeneralConsultans.Patient.DomicileAddress1;
+
+                    //Gender
+                    string Gender = "";
+                    string OppositeSex = "";
+                    if (Patientss.GenderId != null)
+                    {
+                        Gender = Patientss.Gender.Name == "Male" ? "MAlE(L)" : "FEMALE(P)";
+                        OppositeSex = Patientss.Gender.Name == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
+                    }
+
+                    //Days
+                    var culture = new System.Globalization.CultureInfo("id-ID");
+                    string todays = item.GeneralConsultans.RegistrationDate.ToString("dddd", culture);
 
                     // Create merge fields for document generation
                     var mergeFields = new Dictionary<string, string>
-        {
-            {"%NamePatient%", data?.GeneralConsultans.Patient.Name},
-            {"%startDate%", data?.StartSickLeave?.ToString("dd MMMM yyyy") },
-            {"%endDate%", data?.EndSickLeave?.ToString("dd MMMM yyyy") },
-            {"%NameDoctor%", data?.GeneralConsultans.Pratitioner.Name },
-            {"%SIPDoctor%", data?.SIP },
-            {"%AddressPatient%", data?.Address },
-            {"%AgePatient%", age.ToString() },
-            {"%days%", totalDays.ToString() },
-            {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")}
-        };
+                    {
+                        {"%NamePatient%", data?.PatientName},
+                        {"%startDate%", item?.StartSickLeave?.ToString("dd MMMM yyyy") },
+                        {"%endDate%", item?.EndSickLeave?.ToString("dd MMMM yyyy") },
+                        {"%NameDoctor%", data?.PhycisianName },
+                        {"%SIPDoctor%", data?.SIP },
+                        {"%AddressPatient%", data?.Address },
+                        {"%AgePatient%", age.ToString() },
+                        {"%Totaldays%", totalDays.ToString() },
+                        {"%KataNumber%", wordDays },
+                        {"%Days%", todays},
+                        {"%Dates%", item.GeneralConsultans.RegistrationDate.ToString("dd MMMM yyyy")},
+                        {"%Times%", item.GeneralConsultans.RegistrationDate.ToString("H:MM")},
+                        {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")},
+                        {"%genders%", Gender},
+                        //{"%oppositeSexs%", OppositeSex},
+                    };
 
                     // Generate document content
-                    byte[] documentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
-                    if (documentContent == null) continue;
+                    DocumentContent = await DocumentProvider.GetDocumentAsync("Employee.docx", mergeFields);
+                    if (DocumentContent == null) continue;
 
-                    string fileName = $"SickLeave_{DateTime.Now:yyyyMMddHHmmss}.docx";
+                    string fileName = $"SickLeave_{data.GeneralConsultans.Patient.Name}_{DateTime.Now:yyyyMMddHHmmss}.docx";
                     string subject = $"Sick Leave {data.GeneralConsultans.Patient.Name}";
                     string body = $"Dear {data.GeneralConsultans.Patient.Name},<br/><br/>Please find attached your document.<br/><br/>Best regards,<br/>Your Company";
 
@@ -274,7 +374,7 @@ namespace McDermott.Web.Components.Pages.Employee
                     message.Subject = subject;
 
                     var bodyBuilder = new BodyBuilder { HtmlBody = body };
-                    bodyBuilder.Attachments.Add(fileName, documentContent);
+                    bodyBuilder.Attachments.Add(fileName, DocumentContent);
                     message.Body = bodyBuilder.ToMessageBody();
 
                     // Send email
@@ -287,7 +387,12 @@ namespace McDermott.Web.Components.Pages.Employee
                         smtpClient.Disconnect(true);
                     }
 
+                    item.Status = Application.Extentions.EnumHelper.EnumStatusSickLeave.Send;
+                    fSickLeave = item;
+                    var aso = await Mediator.Send(new UpdateSickLeaveRequest(fSickLeave));
+                    isShow = false;
                     // Show success message
+                    await LoadData();
                     ToastService.ShowSuccess("Success Send Email!");
                 }
 
