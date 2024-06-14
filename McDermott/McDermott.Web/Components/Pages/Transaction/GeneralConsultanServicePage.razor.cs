@@ -102,13 +102,13 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
-        private GroupDto NameGroup = new();
+        private UserDto NameGroup = new();
         private GeneralConsultanlogDto generalLog = new();
 
         private List<AllergyDto> WeatherAllergies = [];
         private List<AllergyDto> FoodAllergies = [];
         private List<AllergyDto> PharmacologyAllergies = [];
-        private List<GroupDto> groups = [];
+        private List<UserDto> user_group = [];
 
 
         private List<RujukanFaskesKhususSpesialisPCare> RujukanSubSpesialis = [];
@@ -2056,8 +2056,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             SelectedDataItems = [];
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
             PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
-            groups = await Mediator.Send(new GetGroupQuery());
-            NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
+            user_group = await Mediator.Send(new GetGroupQuery());
+            NameGroup = user_group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
             await SelectData();
             IsReferTo = false;
             PopUpVisible = false;

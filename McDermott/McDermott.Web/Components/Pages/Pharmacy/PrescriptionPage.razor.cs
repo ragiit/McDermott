@@ -56,7 +56,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private ConcoctionDto Concoction { get; set; } = new();
         private ConcoctionLineDto ConcoctionLine { get; set; } = new();
         private PatientAllergyDto PatientAllergy = new();
-        private GroupDto NameGroup { get; set; } = new();
+        private UserDto NameGroup { get; set; } = new();
         private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
@@ -655,8 +655,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             if (v)
                 User = new() { Name = "-" };
 
-            groups = await Mediator.Send(new GetGroupQuery());
-            NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
+            var user_group = await Mediator.Send(new GetUserQuery());
+            NameGroup = user_group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
 
             IsLoading = false;
         }
@@ -1348,13 +1348,15 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                     // Update pharmacy status to "Done"
                     Pharmacy.Status = "Done";
-                    await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+                   var pharma= await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
                     PharmaciesLog.PharmacyId = pharmacyData.Id;
                     PharmaciesLog.UserById = NameGroup.Id;
                     PharmaciesLog.status = Pharmacy.Status;
 
                     await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
+
+                    await EditItemPharmacy_Click(pharma);
                 }
             }
             catch (Exception ex)
