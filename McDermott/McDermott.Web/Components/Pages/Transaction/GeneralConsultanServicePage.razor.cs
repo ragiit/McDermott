@@ -110,7 +110,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<AllergyDto> PharmacologyAllergies = [];
         private List<UserDto> user_group = [];
 
-
         private List<RujukanFaskesKhususSpesialisPCare> RujukanSubSpesialis = [];
         private List<SpesialisSaranaPCare> SpesialisSaranas = [];
         private List<SubSpesialisPCare> SubSpesialisPs = [];
@@ -179,7 +178,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     {
                         FormRegis.StagingStatus = "Finished";
                     }
-                    var  GeneralServices=await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+                    var GeneralServices = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
 
                     generalLog.GeneralConsultanServiceId = GeneralServices.Id;
                     generalLog.UserById = NameGroup.Id;
@@ -528,7 +527,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                                 GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = null; x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
                                 await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
 
-                                
                                 break;
 
                             case "Physician":
@@ -559,7 +557,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                                 if (FormRegis.IsSickLeave == true || FormRegis.IsMaternityLeave == true)
                                 {
-                                    
                                     var checkDataSickLeave = await Mediator.Send(new GetSickLeaveQuery());
                                     var crosschek = checkDataSickLeave.Where(x => x.GeneralConsultansId == FormRegis.Id).FirstOrDefault();
                                     if (crosschek == null)
@@ -1309,30 +1306,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region File Upload Attachment
 
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
         //private void RemoveSelectedFile()
         //{
         //    UserForm.SipFile = null;
@@ -2064,24 +2037,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             PanelVisible = false;
         }
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsEnabled = enabled;
@@ -2345,11 +2300,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)
         {
             await EditItemVoid();
-        }
-
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
         }
 
         private void DeleteItem_Click()
