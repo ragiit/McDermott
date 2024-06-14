@@ -663,14 +663,18 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task LoadDataPharmacy()
         {
-            ShowForm = false;
-            IsLoading = true;
-            SelectedDataItems = [];
-            SelectedDataItemsConcoction = [];
-            SelectedDataItemsPrescriptionLines = [];
-            Pharmacies = await Mediator.Send(new GetPharmacyQuery());
+            try
+            {
+                ShowForm = false;
+                IsLoading = true;
+                SelectedDataItems = [];
+                SelectedDataItemsConcoction = [];
+                SelectedDataItemsPrescriptionLines = [];
+                Pharmacies = await Mediator.Send(new GetPharmacyQuery());
 
-            IsLoading = false;
+                IsLoading = false;
+            }
+            catch (Exception ex) { ex.HandleException(ToastService); }
         }
 
         private async Task LoadDataPresciptions()
@@ -1030,6 +1034,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         t.Product = Products.FirstOrDefault(x => x.Id == t.ProductId);
                         t.DrugRoute = DrugRoutes.FirstOrDefault(x => x.Id == t.DrugRouteId);
                         t.DrugDosage = DrugDosages.FirstOrDefault(x => x.Id == t.DrugDosageId);
+                        t.ActiveComponentId = medicamentDetails.ActiveComponentId;                           
+                        t.ActiveComponentNames = string.Join(",", ActiveComponents.Where(a => t.ActiveComponentId is not null && t.ActiveComponentId.Contains(a.Id)).Select(n => n.Name));
                         Prescriptions.Add(t);
                     }
                     else
@@ -1170,9 +1176,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
 
                 // Check if the pharmacy status is "Draft"
-                if (p.Status != "Done" || p.Status != "Received" && (NameGroup.Name == "Nurse" || NameGroup.Name == "Nursing"))
+                if (p.Status != "Done" || p.Status != "Received" )
                 {
-                    isActiveButton = false;
+                    isActiveButton = true;
                 }
 
                 Pharmacy = p;
