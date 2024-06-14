@@ -2029,7 +2029,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             SelectedDataItems = [];
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
             PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
-            user_group = await Mediator.Send(new GetGroupQuery());
+            user_group = await Mediator.Send(new GetUserQuery());
             NameGroup = user_group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
             await SelectData();
             IsReferTo = false;
