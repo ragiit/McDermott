@@ -56,7 +56,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private ConcoctionDto Concoction { get; set; } = new();
         private ConcoctionLineDto ConcoctionLine { get; set; } = new();
         private PatientAllergyDto PatientAllergy = new();
-        private UserDto NameGroup { get; set; } = new();
+        private UserDto NameUser { get; set; } = new();
+        private GroupDto NameGroup { get; set; } = new();
         private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
@@ -139,14 +140,19 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     title = "Draft";
                     break;
 
-                case "Processed":
-                    priorityClass = "warning";
-                    title = "Processed";
+                case "SendToPharmacy":
+                    priorityClass = "primary";
+                    title = "Pharmacy";
                     break;
 
                 case "Received":
                     priorityClass = "primary";
                     title = "Received";
+                    break;
+
+                case "Processed":
+                    priorityClass = "warning";
+                    title = "Processed";
                     break;
 
                 case "Done":
@@ -655,8 +661,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             if (v)
                 User = new() { Name = "-" };
 
+            groups = await Mediator.Send(new GetGroupQuery());
+            NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
+
             var user_group = await Mediator.Send(new GetUserQuery());
-            NameGroup = user_group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
+            NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
 
             IsLoading = false;
         }
@@ -1034,7 +1043,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         t.Product = Products.FirstOrDefault(x => x.Id == t.ProductId);
                         t.DrugRoute = DrugRoutes.FirstOrDefault(x => x.Id == t.DrugRouteId);
                         t.DrugDosage = DrugDosages.FirstOrDefault(x => x.Id == t.DrugDosageId);
-                        t.ActiveComponentId = medicamentDetails.ActiveComponentId;                           
+                        t.ActiveComponentId = medicamentDetails.ActiveComponentId;
                         t.ActiveComponentNames = string.Join(",", ActiveComponents.Where(a => t.ActiveComponentId is not null && t.ActiveComponentId.Contains(a.Id)).Select(n => n.Name));
                         Prescriptions.Add(t);
                     }
@@ -1095,7 +1104,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     await Mediator.Send(new CreateListConcoctionRequest(Concoctions));
 
                     PharmaciesLog.PharmacyId = Pharmacy.Id;
-                    PharmaciesLog.UserById = NameGroup.Id;
+                    PharmaciesLog.UserById = NameUser.Id;
                     PharmaciesLog.status = Pharmacy.Status;
 
                     await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
@@ -1155,10 +1164,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task EditItemPharmacy_Click(PharmacyDto? q = null)
         {
             ShowForm = true;
-            IsLoading = true;
             header = "Data Pharmacy";
             try
             {
+                IsLoading = true;
                 PharmacyDto? p = null;
 
                 // Check if SelectedDataItems has at least one item
@@ -1176,10 +1185,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
 
                 // Check if the pharmacy status is "Draft"
-                if (p.Status != "Done" || p.Status != "Received" )
+                if (p.Status == "Draft" || ((p.Status == "SendToPharmacy" || p.Status == "Received") && NameGroup.Name == "Nurse"))
                 {
                     isActiveButton = true;
                 }
+
 
                 Pharmacy = p;
 
@@ -1189,6 +1199,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 Concoctions = await Mediator.Send(new GetConcoctionQuery(x => x.PharmacyId == Pharmacy.Id));
 
                 await LoadLogs();
+
+                IsLoading = false;
             }
             catch (Exception e)
             {
@@ -1264,11 +1276,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             try
             {
                 var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
-                Pharmacy.Status = "Processed";
+                Pharmacy.Status = "SendToPharmacy";
                 await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
                 PharmaciesLog.PharmacyId = Pharmacy.Id;
-                PharmaciesLog.UserById = NameGroup.Id;
+                PharmaciesLog.UserById = NameUser.Id;
                 PharmaciesLog.status = Pharmacy.Status;
 
                 await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
@@ -1279,14 +1291,26 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        public async void Processed()
+        public async void Pharmacied()
         {
             var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
             Pharmacy.Status = "Received";
             await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
             PharmaciesLog.PharmacyId = Pharmacy.Id;
-            PharmaciesLog.UserById = NameGroup.Id;
+            PharmaciesLog.UserById = NameUser.Id;
+            PharmaciesLog.status = Pharmacy.Status;
+
+            await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
+        }
+        public async void Received()
+        {
+            var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
+            Pharmacy.Status = "Processed";
+            await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+
+            PharmaciesLog.PharmacyId = Pharmacy.Id;
+            PharmaciesLog.UserById = NameUser.Id;
             PharmaciesLog.status = Pharmacy.Status;
 
             await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
@@ -1348,10 +1372,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                     // Update pharmacy status to "Done"
                     Pharmacy.Status = "Done";
-                   var pharma= await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+                    var pharma = await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
                     PharmaciesLog.PharmacyId = pharmacyData.Id;
-                    PharmaciesLog.UserById = NameGroup.Id;
+                    PharmaciesLog.UserById = NameUser.Id;
                     PharmaciesLog.status = Pharmacy.Status;
 
                     await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
@@ -1374,7 +1398,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
                 PharmaciesLog.PharmacyId = Pharmacy.Id;
-                PharmaciesLog.UserById = NameGroup.Id;
+                PharmaciesLog.UserById = NameUser.Id;
                 PharmaciesLog.status = Pharmacy.Status;
             }
             catch (Exception ex)
@@ -1506,7 +1530,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)
         {
-            await EditItemPharmacy_Click();
+
+            await EditItemPharmacy_Click(null);
         }
 
         #endregion Grid Properties

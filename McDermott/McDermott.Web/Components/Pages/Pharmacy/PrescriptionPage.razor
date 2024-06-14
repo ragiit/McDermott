@@ -123,10 +123,17 @@
                                         <div class="col-auto align-self-end">
                                             <DxTabs RenderMode="TabsRenderMode.AllTabs">
                                                 <DxTab Text="Draft" Enabled="@(Pharmacy.Status == "Draft" )"></DxTab>
+                                                @if (Pharmacy.Status == "SendToPharmacy")
+                                                {
+                                                    <DxTab Text="Pharmacy" Enabled="@(Pharmacy.Status == "SendToPharmacy")"></DxTab>
+                                                }
+                                                else if (Pharmacy.Status == "Received")
+                                                {
+                                                    <DxTab Text="Received" Enabled="@(Pharmacy.Status == "Received")"></DxTab>
+                                                }
                                                 <DxTab Text="Process" Enabled="@(Pharmacy.Status == "Processed")"></DxTab>
-                                                <DxTab Text="Received" Enabled="@(Pharmacy.Status == "Received")"></DxTab>
                                                 <DxTab Text="Done" Enabled="@(Pharmacy.Status == "Done")"></DxTab>
-                                                <DxTab Text="Cancel" Enabled="@(Pharmacy.Status == "Canceled")"></DxTab>
+                                                <DxTab Text="Cancel" Enabled="@(Pharmacy.Status == "Cancel")"></DxTab>
                                             </DxTabs>
                                         </div>
                                     </div>
@@ -134,7 +141,7 @@
                                     {
                                         <div class="row justify-content-start mb-3">
                                             <div class="col-12 align-self-start">
-                                                @if (Pharmacy.Status == "Draft" && (NameGroup.Name == "Administrator" || NameGroup.Name == "Admin"))
+                                                @if (Pharmacy.Status == "Draft" && (NameGroup.Name != "Nurse" || NameGroup.Name != "Nurse"))
                                                 {
                                                     <div class="card">
                                                         <div class="card-body">
@@ -143,11 +150,11 @@
                                                         </div>
                                                     </div>
                                                 }
-                                                else if (Pharmacy.Status == "Processed" && (NameGroup.Name.Equals("Nurse") || NameGroup.Name.Equals("Nursing")))
+                                                else if (Pharmacy.Status == "SendToPharmacy" && (NameGroup.Name.Equals("Nurse") || NameGroup.Name.Equals("Nursing")))
                                                 {
                                                     <div class="card">
                                                         <div class="card-body">
-                                                            <DxButton Text="Process" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Processed"></DxButton>
+                                                            <DxButton Text="Received" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Pharmacied"></DxButton>
                                                             <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                         </div>
                                                     </div>
@@ -156,7 +163,16 @@
                                                 {
                                                     <div class="card">
                                                         <div class="card-body">
-                                                            <DxButton Text="Confirm" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Validate"></DxButton>
+                                                            <DxButton Text="Process" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Received"></DxButton>
+                                                            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else if (Pharmacy.Status == "Processed" && (NameGroup.Name.Equals("Nurse") || NameGroup.Name.Equals("Nursing")))
+                                                {
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <DxButton Text="Done" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Validate"></DxButton>
                                                             <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                         </div>
                                                     </div>
@@ -585,14 +601,15 @@
                                                 </div>
                                             </div>
                                             <div class="card-footer">
-                                                
+                                                @if (isActiveButton)
+                                                {
                                                     <div class="row justify-content-end">
                                                         <div class="col-auto align-self-end">
                                                             <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
                                                             <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnDiscard" SubmitFormOnClick="true"></DxButton>
                                                         </div>
                                                     </div>
-                                                
+                                                }
                                             </div>
                                         </div>
 
@@ -648,14 +665,19 @@
                                                                                                             title = "Draft";
                                                                                                             break;
 
-                                                                                                        case "Processed":
-                                                                                                            priorityClass = "warning";
-                                                                                                            title = "Processed";
+                                                                                                        case "SendToPharmacy":
+                                                                                                            priorityClass = "primary";
+                                                                                                            title = "Pharmacy";
                                                                                                             break;
 
                                                                                                         case "Received":
                                                                                                             priorityClass = "primary";
                                                                                                             title = "Received";
+                                                                                                            break;
+
+                                                                                                        case "Processed":
+                                                                                                            priorityClass = "warning";
+                                                                                                            title = "Processed";
                                                                                                             break;
 
                                                                                                         case "Done":
@@ -665,7 +687,7 @@
 
                                                                                                         case "Cancel":
                                                                                                             priorityClass = "danger";
-                                                                                                            title = "Cancel";
+                                                                                                            title = "Canceled";
                                                                                                             break;
                                                                                                     }
 
@@ -673,15 +695,15 @@
                                                                                                 }
 
                                                                                                 @* <div class="row w-100">
-                                                                                                    <div class="col-md-1">
-                                                                                                        Patient
-                                                                                                    </div>
+                                                                        <div class="col-md-1">
+                                                                        Patient
+                                                                        </div>
 
-                                                                                                    <div class="col-md-11">
-                                                                                                        :  @Pharmacy.Patient.Name
+                                                                        <div class="col-md-11">
+                                                                        :  @Pharmacy.Patient.Name
 
-                                                                                                    </div>
-                                                                                                </div> *@
+                                                                        </div>
+                                                                        </div> *@
                                                                                                 <div class="row w-100">
                                                                                                     <div class="col-md-1">
                                                                                                         Status

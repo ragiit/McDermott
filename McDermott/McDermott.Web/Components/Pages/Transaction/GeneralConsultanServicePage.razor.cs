@@ -102,7 +102,8 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
-        private UserDto NameGroup = new();
+        private GroupDto NameGroup = new();
+        private UserDto NameUser = new();
         private GeneralConsultanlogDto generalLog = new();
 
         private List<AllergyDto> WeatherAllergies = [];
@@ -182,7 +183,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     var  GeneralServices=await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
 
                     generalLog.GeneralConsultanServiceId = GeneralServices.Id;
-                    generalLog.UserById = NameGroup.Id;
+                    generalLog.UserById = NameUser.Id;
                     generalLog.Status = FormRegis.StagingStatus;
                     await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                 }
@@ -202,7 +203,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
 
                     generalLog.GeneralConsultanServiceId = FormRegis.Id;
-                    generalLog.UserById = NameGroup.Id;
+                    generalLog.UserById = NameUser.Id;
                     generalLog.Status = FormRegis.StagingStatus;
                     await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
 
@@ -420,7 +421,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
 
                     generalLog.GeneralConsultanServiceId = FormRegis.Id;
-                    generalLog.UserById = NameGroup.Id;
+                    generalLog.UserById = NameUser.Id;
                     generalLog.Status = FormRegis.StagingStatus;
                     await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                 }
@@ -439,7 +440,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
 
                     generalLog.GeneralConsultanServiceId = FormRegis.Id;
-                    generalLog.UserById = NameGroup.Id;
+                    generalLog.UserById = NameUser.Id;
                     generalLog.Status = FormRegis.StagingStatus;
                     await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                     await LoadData();
@@ -476,7 +477,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                                 //else
                                 //    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
                                 generalLog.GeneralConsultanServiceId = FormRegis.Id;
-                                generalLog.UserById = NameGroup.Id;
+                                generalLog.UserById = NameUser.Id;
                                 generalLog.Status = FormRegis.StagingStatus;
                                 await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                                 break;
@@ -645,7 +646,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
 
                     generalLog.ProcedureRoomId = GeneralConsultanMedicalSupport.Id;
-                    generalLog.UserById = NameGroup.Id;
+                    generalLog.UserById = NameUser.Id;
                     generalLog.Status = GeneralConsultanMedicalSupport.Status;
                     await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                 }
@@ -2057,7 +2058,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
             PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
             user_group = await Mediator.Send(new GetUserQuery());
-            NameGroup = user_group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
+            NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id==UserLogin.Id) ?? new();
             await SelectData();
             IsReferTo = false;
             PopUpVisible = false;
