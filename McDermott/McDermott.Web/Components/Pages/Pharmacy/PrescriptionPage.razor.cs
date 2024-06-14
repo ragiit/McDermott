@@ -432,7 +432,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Prescriptions = prescriptionsList;
         }
 
-        private bool isSavePrescription { get; set; } = true;
+        private bool isSavePrescription { get; set; } = false;
 
         private async Task SelectedProductPrescriptions(ProductDto value)
         {
