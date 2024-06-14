@@ -264,7 +264,7 @@
     {
         try
         {
-            var user = await UserInfoService.GetUserInfo();
+            var user = await UserInfoService.GetUserInfo(ToastService);
             IsAccess = user.Item1;
             UserAccessCRUID = user.Item2;
             UserLogin = user.Item3;
@@ -281,7 +281,7 @@
     }
     private async Task C()
     {
-        await LoadData(); 
+        await LoadData();
     }
     private void DeleteItem_Click()
     {
@@ -323,7 +323,6 @@
     private bool PanelVisible { get; set; } = true;
     private int FocusedRowDetailVisibleIndex { get; set; }
     private int FocusedRowVisibleIndex { get; set; }
-
 
     public IGrid Grid { get; set; }
     public IGrid GridDetail { get; set; }
@@ -378,7 +377,7 @@
     }
 
     protected override async Task OnInitializedAsync()
-    { 
+    {
     LabUoms = await Mediator.Send(new GetLabUomQuery());
         await LoadData();
     }

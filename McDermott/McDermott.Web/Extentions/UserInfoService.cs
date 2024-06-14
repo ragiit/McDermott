@@ -2,20 +2,13 @@
 
 namespace McDermott.Web.Extentions
 {
-    public class UserInfoService
+    public class UserInfoService(NavigationManager navigationManager, IJSRuntime oLocal, IMediator mediator)
     {
-        private readonly NavigationManager _navigationManager;
-        private readonly IJSRuntime _oLocal; // Ganti YourLocalService dengan service yang sesuai
-        private readonly IMediator _mediator; // Ganti IMediator dengan interface Mediator yang sesuai
+        private readonly NavigationManager _navigationManager = navigationManager;
+        private readonly IJSRuntime _oLocal = oLocal; // Ganti YourLocalService dengan service yang sesuai
+        private readonly IMediator _mediator = mediator; // Ganti IMediator dengan interface Mediator yang sesuai 
 
-        public UserInfoService(NavigationManager navigationManager, IJSRuntime oLocal, IMediator mediator)
-        {
-            _navigationManager = navigationManager;
-            _oLocal = oLocal;
-            _mediator = mediator;
-        }
-
-        public async Task<(bool, GroupMenuDto, User)> GetUserInfo()
+        public async Task<(bool, GroupMenuDto, User)> GetUserInfo(IToastService? toastService = null)
         {
             try
             {
@@ -42,7 +35,10 @@ namespace McDermott.Web.Extentions
 
                 if (!string.IsNullOrWhiteSpace(url) && userAccessCRUID is null && url != _navigationManager.BaseUri)
                 {
-                    _navigationManager.NavigateTo("", true);
+                    toastService?.ClearErrorToasts();
+                    toastService?.ShowError("Unauthorized Access\r\n\r\nYou are not authorized to view this page. If you need access, please contact the administrator.\r\n");
+                    _navigationManager.NavigateTo("/unauthorized", true);
+                    //return (false, null!, null!);
                 }
 
                 isAccess = true;
@@ -53,7 +49,7 @@ namespace McDermott.Web.Extentions
             }
             catch (JSDisconnectedException)
             {
-                // Handle JSDisconnectedException if needed
+                _navigationManager.NavigateTo("", true);
                 return (false, null!, null!);
             }
         }

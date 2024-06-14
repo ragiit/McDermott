@@ -45,7 +45,7 @@
         {
             try
             {
-                var user = await UserInfoService.GetUserInfo();
+                var user = await UserInfoService.GetUserInfo(ToastService);
                 IsAccess = user.Item1;
                 UserAccessCRUID = user.Item2;
                 UserLogin = user.Item3;

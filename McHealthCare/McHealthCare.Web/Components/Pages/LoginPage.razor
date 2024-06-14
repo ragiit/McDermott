@@ -1,0 +1,87 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Cryptography
+@using System.Text
+@using Newtonsoft.Json
+@using System.Security.Claims
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>McHealthCare - Login</PageTitle>
+
+<div class="hold-transition login-page">
+    <div class="login-box">
+        <div class="card card-outline card-primary">
+            <div class="card-header text-center">
+                <a href="#" class="h1 no-underline">
+                    <img src="https://www.ikariera.cz/uploads/companies/file/28129/22192/17871/c1c103e1-56b0-45cf-b02d-f6acbc7276b8/Logo%20-%20mcdermott_symbol_color%20500x500%2C%2050hrana.png" alt="Logo McHealthCare" style="max-width: 100px; height: auto; vertical-align: middle;"> <!-- Ganti url_ke_gambar_anda dengan URL gambar Anda -->
+                </a>
+            </div>
+            <div class="card-body">
+                <h5 class="text-center mt-2"><b>Welcome</b></h5>
+                <p class="text-center mt-1 mb-2">Please login using your account to continue</p>
+                <EditForm Model="@LoginForm" Context="EditFormContext" FormName="FormUser">
+                    <DataAnnotationsValidator />
+                    <DxFormLayout CssClass="col-md">
+                        <DxFormLayoutItem CaptionCssClass="required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Email" ColSpanMd="12" BeginRow="true">
+                            <DxMaskedInput @bind-Value="LoginForm.Email"
+                                           NullText="mail@domain.com"
+                                           ShowValidationIcon="true"
+                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                           InputId="EmailId"
+                                           MaskMode="MaskMode.RegEx">
+                                <Buttons>
+                                    <DxEditorButton IconCssClass="fa-solid fa-envelope" />
+                                </Buttons>
+                                <ChildContent>
+                                    <DxRegExMaskProperties MaskAutoCompleteMode="@MaskAutoCompleteMode.Strong"
+                                                           Placeholder="@('_')"
+                                                           PlaceholdersVisible="true" />
+                                </ChildContent>
+                            </DxMaskedInput>
+                            <ValidationMessage For="@(()=>LoginForm.Email)"   />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem CaptionCssClass="required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Password" ColSpanMd="12" BeginRow="true">
+                            <DxTextBox @bind-Text="@LoginForm.Password"
+                                       InputId="PasswordId"
+                                       ShowValidationIcon="true"
+                                       NullText="Password" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                       Password="true">
+                                <Buttons>
+                                    <DxEditorButton IconCssClass="fa-solid fa-lock" />
+                                </Buttons>
+                            </DxTextBox>
+                            <ValidationMessage For="@(()=>LoginForm.Password)"   />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem ColSpanMd="12" BeginRow="true">
+                            <div class="row">
+                                <div class="col-12">
+                                    <DxButton RenderStyleMode="@ButtonRenderStyleMode.Contained" CssClass="rounded-button w-100 mt-3" IconCssClass="fa-solid fa-right-to-bracket" Text="LOGIN" SubmitFormOnClick="true" />
+                                </div>
+                            </div>
+                        </DxFormLayoutItem>
+                    </DxFormLayout>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rounded-button {
+        border-radius: 13px; /* Sesuaikan dengan radius yang Anda inginkan */
+    }
+</style>
+
+@code {
+    private LoginTemp LoginForm = new();
+    public class LoginTemp
+    {
+        [Required]
+        public string? Email { get; set; }
+
+        [Required]
+        public string? Password { get; set; }
+    }
+
+}

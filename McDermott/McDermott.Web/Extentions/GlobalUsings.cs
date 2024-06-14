@@ -16,6 +16,7 @@ global using Microsoft.AspNetCore.Components.Forms;
 global using Microsoft.CodeAnalysis;
 global using System.Globalization;
 global using Microsoft.AspNetCore.SignalR.Client;
+global using static McDermott.Application.Extentions.EnumHelper;
 
 global using McDermott.Web.Extentions;
 

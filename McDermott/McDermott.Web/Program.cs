@@ -5,10 +5,13 @@ using Serilog;
 using McDermott.Web.Hubs;
 using McDermott.Application.Interfaces.Repositories;
 using McDermott.Application.Features.Queries;
+using Microsoft.AspNetCore.Authorization;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddAuthenticationCore();
@@ -49,6 +52,8 @@ builder.Services.AddSerilog();
 
 var app = builder.Build();
 
+app.MapDefaultEndpoints();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -60,6 +65,8 @@ else
 {
     app.UseDeveloperExceptionPage();
 }
+
+app.UseMiddleware<AuthorizationMiddleware>();
 
 app.UseSerilogRequestLogging();
 app.UseRouting();

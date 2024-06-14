@@ -1,9 +1,5 @@
 ﻿using DevExpress.Blazor.Internal;
-using DevExpress.Entity.ProjectModel;
-using McDermott.Application.Dtos.Inventory;
-using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
-using static McDermott.Application.Extentions.EnumHelper;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
@@ -37,7 +33,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
-                var user = await UserInfoService.GetUserInfo();
+                var user = await UserInfoService.GetUserInfo(ToastService);
                 IsAccess = user.Item1;
                 UserAccessCRUID = user.Item2;
                 UserLogin = user.Item3;

@@ -43,181 +43,151 @@
     </BlazoredToasts>
 </div>
 
-@* <button id="scrollToTopBtn" @onclick="ScrollToTop"
-        class="btn btn-light shadow"
-        style="display:none; position:fixed; bottom:30px; right:30px; z-index:99999; border:none; outline:none; cursor:pointer; padding:15px; border-radius:20px;">
-    <i class="fas fa-arrow-up text-dark"></i>
-</button> *@
-
 <div class="wrapper">
-    @if (currentUrl.Contains("queue/viewdisplay/"))
+
+    @if (currentUrl.Contains("login") || currentUrl.Contains("queue/kiosk") || currentUrl.Contains("queue/viewdisplay"))
     {
-        <McDermott.Web.Components.Pages.Queue.ViewDisplayPage></McDermott.Web.Components.Pages.Queue.ViewDisplayPage>
+        @Body
     }
     else
     {
-        @if (currentUrl.Contains("queue/kiosk/"))
-        {
-            @*    ToastService.ShowInfo(currentUrl);*@
-            @if (User == null)
+        <div>
+            @if (showPreloader)
             {
-                <McDermott.Web.Components.Pages.LoginPage />
+                <div class="preloader flex-column justify-content-center align-items-center">
+                    <img class="animation__shake" src="mcdermott_logo.png" alt="AdminLTELogo" height="60" width="60">
+                </div>
             }
-            else @if (!currentUrl.Contains("login"))
-            {
-                <McDermott.Web.Components.Pages.Queue.KioskPage></McDermott.Web.Components.Pages.Queue.KioskPage>
-            }
-        }
-        else
-        {
-            @if (User == null)
-            {
-                <McDermott.Web.Components.Pages.LoginPage />
-            }
-            else @if (!currentUrl.Contains("login"))
-            {
-                @if (showPreloader)
-                {
-                    <div class="preloader flex-column justify-content-center align-items-center">
-                        <img class="animation__shake" src="mcdermott_logo.png" alt="AdminLTELogo" height="60" width="60">
-                    </div>
-                }
 
-                <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-                    <ul class="navbar-nav">
-                        <li class="nav-item ml-2">
-                            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                        </li>
+            <nav class="main-header navbar navbar-expand navbar-light navbar-light">
+                <ul class="navbar-nav">
+                    <li class="nav-item ml-2">
+                        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                    </li>
+                    <li class="nav-item d-none d-sm-inline-block">
+                        <a href="" class="nav-link">Home</a>
+                    </li>
+
+                    @if (currentUrl.Contains("clinic-service/reporting-&-analytic"))
+                    {
                         <li class="nav-item d-none d-sm-inline-block">
-                            <a href="" class="nav-link">Home</a>
+                            <a href="https://www.mcdermott.com/" class="nav-link">Report</a>
                         </li>
+                    }
+                </ul>
 
-                        @if (currentUrl.Contains("clinic-service/reporting-&-analytic"))
-                        {
-                            <li class="nav-item d-none d-sm-inline-block">
-                                <a href="https://www.mcdermott.com/" class="nav-link">Report</a>
-                            </li>
-                        }
-                    </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" data-widget="fullscreen" role="button">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown mr-2">
+                        <a class="nav-link" data-toggle="dropdown" href="#">
+                            <i class="fa fa-user" aria-hidden="true"></i>
+                            <label class="ml-2">@User?.Name</label>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" @onclick="OnClickLogout">
+                                <i class="fa-solid fa-right-from-bracket mr-2"></i>
+                                Logout
+                            </a>
+                            <div class="dropdown-divider"></div>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <aside class="main-sidebar sidebar-light-info elevation-4">
+                <a href="/" class="brand-link no-underline">
+                    <img src="https://www.ikariera.cz/uploads/companies/file/28129/22192/17871/c1c103e1-56b0-45cf-b02d-f6acbc7276b8/Logo%20-%20mcdermott_symbol_color%20500x500%2C%2050hrana.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                    <span class="ms-2 brand-text font-weight-bold">McHealthCare</span>
+                </a>
 
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" data-widget="fullscreen" role="button">
-                                <i class="fas fa-expand-arrows-alt"></i>
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown mr-2">
-                            <a class="nav-link" data-toggle="dropdown" href="#">
-                                <i class="fa fa-user" aria-hidden="true"></i>
-                                <label class="ml-2">@User?.Name</label>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" @onclick="OnClickLogout">
-                                    <i class="fa-solid fa-right-from-bracket mr-2"></i>
-                                    Logout
-                                </a>
-                                <div class="dropdown-divider"></div>
+                <div class="sidebar">
+                    <nav class="mt-3">
+                        <div class="form-inline">
+                            <div class="input-group">
+                                <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search" @bind="searchQuery">
                             </div>
-                        </li>
-                    </ul>
-                </nav>
-                <aside class="main-sidebar sidebar-light-info elevation-4">
-                    <a href="/" class="brand-link no-underline">
-                        <img src="https://www.ikariera.cz/uploads/companies/file/28129/22192/17871/c1c103e1-56b0-45cf-b02d-f6acbc7276b8/Logo%20-%20mcdermott_symbol_color%20500x500%2C%2050hrana.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-                        <span class="ms-2 brand-text font-weight-bold">McHealthCare</span>
-                    </a>
+                        </div>
 
-                    <div class="sidebar">
-                        <nav class="mt-3">
-                            <div class="form-inline">
-                                <div class="input-group">
-                                    <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search" @bind="searchQuery">
+                        <ul class="mt-3 nav nav-pills nav-sidebar flex-column sidebar-light-info sidebar-light-bg-info" data-widget="treeview" role="menu" data-accordion="false">
+
+                            <li class="nav-item mb-2">
+                                <div class="input-group input-group-sm">
                                 </div>
-                            </div>
+                                <NavLink href="/" class="nav-link" Match="NavLinkMatch.All">
+                                    <i class="nav-icon fa-solid fa-house"></i>
+                                    <p>Home Page</p>
+                                </NavLink>
+                            </li>
 
-                            <ul class="mt-3 nav nav-pills nav-sidebar flex-column sidebar-light-info sidebar-light-bg-info" data-widget="treeview" role="menu" data-accordion="false">
+                            @foreach (var h in HeaderMenuDtos.Where(x => x.Name.ToLower().Trim().Contains(searchQuery.Trim().ToLower()) ||
+                           DetailMenuDtos.Where(z => z.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower())).Select(a => a.ParentMenu).ToList().Contains(x.Name)))
+                            {
+                                <li class="nav-item">
+                                    @{
+                                        var details = DetailMenuDtos.Where(x => x.ParentMenu == h.Name && x.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower()));
+                                        var parent = details.FirstOrDefault()?.Url?.Split("/")[0] ?? "";
+                                    }
 
-                                <li class="nav-item mb-2">
-                                    <div class="input-group input-group-sm">
-                                    </div>
-                                    <NavLink href="/" class="nav-link" Match="NavLinkMatch.All">
-                                        <i class="nav-icon fa-solid fa-house"></i>
-                                        <p>Home Page</p>
-                                    </NavLink>
-                                </li>
-
-                                @foreach (var h in HeaderMenuDtos.Where(x => x.Name.ToLower().Trim().Contains(searchQuery.Trim().ToLower()) ||
-                               DetailMenuDtos.Where(z => z.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower())).Select(a => a.ParentMenu).ToList().Contains(x.Name)))
-                                {
-                                    <li class="nav-item">
-                                        @{
-                                            var details = DetailMenuDtos.Where(x => x.ParentMenu == h.Name && x.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower()));
-                                        }
-
-                                        <NavLink class="nav-link  " Match="NavLinkMatch.All">
-                                            @if (h.Icon != null)
-                                            {
-                                                @((MarkupString)h.Icon)
-                                            }
-                                            else
-                                            {
-                                                <i class="nav-icon fas fa-book"></i>
-                                            }
-                                            <p>@h.Name <i class="fas fa-angle-left right"></i></p>
-                                        </NavLink>
-
-                                        @if (details.Count() > 0)
+                                    <NavLink class="nav-link" Match="NavLinkMatch.Prefix" href="@($"/{parent}")">
+                                        @if (h.Icon != null)
                                         {
-                                            <ul class="nav nav-treeview  ">
-                                                @foreach (var d in details)
-                                                {
-                                                    if (!d.Name.ToLower().Equals("kiosk"))
-                                                    {
-                                                        var url = string.IsNullOrEmpty(d.Url) ? "test" : d.Url;
-                                                        <li class="nav-item">
-                                                            <NavLink href="@url" class="nav-link sidebar-light-info sidebar-light-bg-info" Match="NavLinkMatch.All">
-                                                                <i class="far fa-circle nav-icon"></i>
-                                                                <p class="ml-3">@d.Name</p>
-                                                            </NavLink>
-                                                        </li>
-                                                    }
-                                                }
-                                            </ul>
+                                            @((MarkupString)h.Icon)
                                         }
-                                    </li>
-                                }
-                            </ul>
-                        </nav>
-                    </div>
+                                        else
+                                        {
+                                            <i class="nav-icon fas fa-book"></i>
+                                        }
+                                        <p>@h.Name <i class="fas fa-angle-left right"></i></p>
+                                    </NavLink>
 
-                </aside>
-
-                <div class="content-wrapper">
-                    @Body
+                                    @if (details.Count() > 0)
+                                    {
+                                        <ul class="nav nav-treeview  ">
+                                            @foreach (var d in details)
+                                            {
+                                                if (!d.Name.ToLower().Equals("kiosk"))
+                                                {
+                                                    var url = string.IsNullOrEmpty(d.Url) ? "test" : d.Url;
+                                                    <li class="nav-item">
+                                                        <NavLink href="@url" class="nav-link sidebar-light-info sidebar-light-bg-info" Match="NavLinkMatch.All">
+                                                            <i class="far fa-circle nav-icon"></i>
+                                                            <p class="ml-3">@d.Name</p>
+                                                        </NavLink>
+                                                    </li>
+                                                }
+                                            }
+                                        </ul>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </nav>
                 </div>
 
-                <footer class="main-footer">
-                    <strong>
-                        Copyright &copy; 2024-2029 <a class="no-underline" href="https://www.mcdermott.com/">McHealthCare</a>.
-                    </strong>
-                    All rights reserved.
-                    <div class="float-right d-none d-sm-inline-block">
-                        <b>Version</b> @Helper.VERSION
-                        <i class="fas fa-arrow-up ml-2" style="cursor: pointer;" @onclick="ScrollToTop"></i>
-                    </div>
-                </footer>
+            </aside>
 
-                <aside class="control-sidebar control-sidebar-dark">
-                </aside>
-            }
+            <div class="content-wrapper layout-fixed">
+                @Body
+            </div>
 
-            else
-            {
-                <McDermott.Web.Components.Pages.LoginPage />
+            <footer class="main-footer">
+                <strong>
+                    Copyright &copy; 2024-2029 <a class="no-underline" href="https://www.mcdermott.com/">McHealthCare</a>.
+                </strong>
+                All rights reserved.
+                <div class="float-right d-none d-sm-inline-block">
+                    <b>Version</b> @Helper.VERSION
+                    <i class="fas fa-arrow-up ml-2" style="cursor: pointer;" @onclick="ScrollToTop"></i>
+                </div>
+            </footer>
 
-            }
-        }
+            <aside class="control-sidebar control-sidebar-light">
+            </aside>
+        </div>
     }
 </div>
 

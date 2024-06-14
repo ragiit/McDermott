@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35004.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{26A1ADEC-F601-402A-AA4F-B9F680F9EF0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McHealthCare", "McHealthCare\McHealthCare.csproj", "{EA4FB882-6F02-4196-965F-D13909BD150D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EA4FB882-6F02-4196-965F-D13909BD150D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA4FB882-6F02-4196-965F-D13909BD150D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA4FB882-6F02-4196-965F-D13909BD150D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA4FB882-6F02-4196-965F-D13909BD150D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EA4FB882-6F02-4196-965F-D13909BD150D} = {26A1ADEC-F601-402A-AA4F-B9F680F9EF0F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {497AB5AF-C0D0-4C24-8113-782C04315A4C}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+
+    @DxResourceManager.RegisterScripts()
+    <link href="themes/css/theme-switcher.css" rel="stylesheet" />
+    <link href="themes/css/themes.css" rel="stylesheet" />
+    <link href="app.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/fontawesome/css/all.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="template/css/adminlte.min.css" />
+
+    <link href="themes/css/themes/lumen/bootstrap.min.css" asp-append-version="true" rel="stylesheet" />
+    <link href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css" rel="stylesheet" asp-append-version="true" />
+
+    <HeadOutlet @rendermode="InteractiveServer" />
+</head>
+
+<body class="hold-transition sidebar-mini sidebar-collapse layout-navbar-fixed layout-footer-fixed layout-fixed">
+    <div id="switcher-container" data-permanent></div>
+    <Routes @rendermode="InteractiveServer" />
+    <script src="_framework/blazor.web.js"></script>
+
+    <script src="template/plugins/jquery/jquery.min.js"></script>
+    <script src="template/js/adminlte.min.js"></script>
+</body>
+
+</html>

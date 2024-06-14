@@ -1,0 +1,55 @@
+﻿@page "/unauthorized"
+@inject NavigationManager Navigation
+@inject CustomAuthenticationStateProvider A
+
+<PageTitle>@Helper.APP_NAME - Unauthorized</PageTitle>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col">
+                        <h1 class="d-flex align-items-center">
+                            Unauthorized Page
+                        </h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="error-page">
+        <h2 class="headline text-warning"> 401</h2>
+
+        <div class="error-content">
+            <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page Unauthorized.</h3>
+
+            <p>
+                Unauthorized Access
+
+                You are not authorized to view this page. If you need access, please contact the administrator.
+
+                Meanwhile, you may <a href="" class="text-decoration-none">return to home.</a>
+            </p>
+        </div>
+        <!-- /.error-content -->
+    </div>
+    <!-- /.error-page -->
+</section>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // var authState = await A.GetAuthenticationStateAsync();
+        // var user = authState.User;
+
+        // // Jika pengguna mencoba mengakses halaman ini secara manual dan tidak berwenang
+        // if (user is not null && user.Identity is not null && !user.Identity.IsAuthenticated)
+        // {
+        //     Navigation.NavigateTo("/");
+        // }
+    }
+}
