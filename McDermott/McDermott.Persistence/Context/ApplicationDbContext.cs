@@ -88,6 +88,7 @@ namespace McDermott.Persistence.Context
 
         #region Transaction
 
+        public DbSet<Accident> Accidents { get; set; }
         public DbSet<LabResultDetail> LabResultDetails { get; set; }
         public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
         public DbSet<GeneralConsultantClinicalAssesment> GeneralConsultantClinicalAssesments { get; set; }

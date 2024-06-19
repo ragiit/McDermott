@@ -314,7 +314,7 @@ namespace McDermott.Web.Components.Pages.Config
                 message.From.Add(MailboxAddress.Parse(EmailFormTemplate.From));
                 message.To.Add(MailboxAddress.Parse(EmailFormTemplate.To));
                 message.Subject = EmailFormTemplate.Subject;
-                message.Body = new TextPart(TextFormat.Html) { Text = EmailFormTemplate.Message };
+                message.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = EmailFormTemplate.Message };
                 //message.Cc.Add(MailboxAddress.Parse(EmailFormTemplate.Cc));
                 //message.Body = new TextPart(TextFormat.Html) { Text = EmailFormTemplate.Message };
 

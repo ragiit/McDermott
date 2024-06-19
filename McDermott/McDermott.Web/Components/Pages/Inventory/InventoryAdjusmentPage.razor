@@ -250,19 +250,14 @@
                                                             </Columns>
                                                             <EditFormTemplate Context="EditFormContext">
                                                                 @{
-                                                                    var a = (InventoryAdjusmentDetailDto)EditFormContext.EditModel;
-
-                                                                    @if (ExpiredDate is not null)
-                                                                    {
-                                                                        a.ExpiredDate = ExpiredDate;
-                                                                    }
+                                                                    FormInventoryAdjusmentDetail = (InventoryAdjusmentDetailDto)EditFormContext.EditModel;
                                                                 }
                                                                 <div class="row w-100">
                                                                     <div class="col-md-6">
                                                                         <DxFormLayout CssClass="w-100">
                                                                             <DxFormLayoutItem Caption="Product" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                 <DxComboBox Data="@Products"
-                                                                                            @bind-Value="@a.ProductId"
+                                                                                            @bind-Value="@FormInventoryAdjusmentDetail.ProductId"
                                                                                             FilteringMode="@DataGridFilteringMode.Contains"
                                                                                             NullText="Select Product..."
                                                                                             TextFieldName="Name"
@@ -271,74 +266,53 @@
                                                                                             SelectedItemChanged="@((ProductDto freq) => OnSelectProduct(freq))"
                                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                             ShowValidationIcon="true" />
-                                                                                <ValidationMessage For="@(()=> a.ProductId)"   />
+                                                                                <ValidationMessage For="@(()=> FormInventoryAdjusmentDetail.ProductId)"   />
                                                                             </DxFormLayoutItem>
 
                                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Teoritical Qty" ColSpanMd="12">
-                                                                                @{
-                                                                                    a.TeoriticalQty = TotalQty;
-                                                                                }
-
                                                                                 <DxSpinEdit ShowValidationIcon="true"
                                                                                             ReadOnly
-                                                                                            MinValue="0" @bind-Value="@a.TeoriticalQty"
+                                                                                            MinValue="0" @bind-Value="@FormInventoryAdjusmentDetail.TeoriticalQty"
                                                                                             NullText="Teoritical Qty"
                                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                                                <ValidationMessage For="@(()=> a.TeoriticalQty)"   />
+                                                                                <ValidationMessage For="@(()=> FormInventoryAdjusmentDetail.TeoriticalQty)"   />
                                                                             </DxFormLayoutItem>
 
                                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Real Qty" ColSpanMd="12">
                                                                                 <DxSpinEdit ShowValidationIcon="true"
-                                                                                            MinValue="0" @bind-Value="@a.RealQty"
+                                                                                            MinValue="0" @bind-Value="@FormInventoryAdjusmentDetail.RealQty"
                                                                                             NullText="Real Qty"
                                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                                                <ValidationMessage For="@(()=> a.RealQty)"   />
+                                                                                <ValidationMessage For="@(()=> FormInventoryAdjusmentDetail.RealQty)"   />
                                                                             </DxFormLayoutItem>
                                                                         </DxFormLayout>
                                                                     </div>
 
                                                                     <div class="col-md-6">
                                                                         <DxFormLayout CssClass="w-100">
-                                                                            @* <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Lot Serial Number" ColSpanMd="12">
-                                                                    @{
-                                                                    a.LotSerialNumber = LotSerialNumber;
-                                                                    }
-
-                                                                    <DxTextBox ShowValidationIcon="true"
-                                                                    @bind-Text="@a.LotSerialNumber"
-                                                                    ReadOnly
-                                                                    NullText="Lot Serial Number"
-                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                                    <ValidationMessage For="@(()=> a.LotSerialNumber)"   />
-                                                                    </DxFormLayoutItem> *@
-
                                                                             <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                 <DxComboBox ShowValidationIcon="true" Data="@Batch"
                                                                                             NullText="Select Batch..."
-                                                                                            @bind-Value="@a.StockProductId"
+                                                                                            @bind-Value="@FormInventoryAdjusmentDetail.StockProductId"
                                                                                             TextFieldName="Batch"
                                                                                             ValueFieldName="Id"
                                                                                             SelectedItemChanged="@((StockProductDto a)=> SelectedBatch(a))"
                                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                             FilteringMode="@DataGridFilteringMode.Contains">
                                                                                 </DxComboBox>
-                                                                                <ValidationMessage For="@(() => a.StockProductId)" />
+                                                                                <ValidationMessage For="@(() => FormInventoryAdjusmentDetail.StockProductId)" />
 
                                                                             </DxFormLayoutItem>
 
                                                                             <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                 <DxDateEdit ShowValidationIcon="true"
                                                                                             ReadOnly
-                                                                                            @bind-Date="@SelectedBatchExpired"
+                                                                                            @bind-Date="@FormInventoryAdjusmentDetail.ExpiredDate"
                                                                                             NullText="Expired Date">
                                                                                 </DxDateEdit>
                                                                             </DxFormLayoutItem>
 
                                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="UoM" ColSpanMd="12">
-                                                                                @{
-                                                                                    a.UomId = UomId;
-                                                                                }
-
                                                                                 <DxComboBox ShowValidationIcon="true" Data="@Uoms"
                                                                                             NullText="UoM"
                                                                                             ReadOnly
@@ -346,9 +320,9 @@
                                                                                             ValueFieldName="Id"
                                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                             FilteringMode="@DataGridFilteringMode.Contains"
-                                                                                            @bind-Value="a.UomId">
+                                                                                            @bind-Value="FormInventoryAdjusmentDetail.UomId">
                                                                                 </DxComboBox>
-                                                                                <ValidationMessage For="@(() => a.UomId)" />
+                                                                                <ValidationMessage For="@(() => FormInventoryAdjusmentDetail.UomId)" />
                                                                             </DxFormLayoutItem>
 
                                                                         </DxFormLayout>
