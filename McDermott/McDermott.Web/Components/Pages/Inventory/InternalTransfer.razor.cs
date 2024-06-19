@@ -139,7 +139,25 @@ namespace McDermott.Web.Components.Pages.Inventory
             if (stockProduct is not null)
             {
                 SelectedBatchExpired = stockProduct.Expired;
+
+                //current Stock
+                var _currentStock = StockProducts.Where(x => x.SourceId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == TempFormInternalTransfer.Batch).FirstOrDefault();
+                if (_currentStock is not null)
+                {
+                    if (_currentStock.Qty > 0)
+                    {
+                        TempFormInternalTransfer.CurrentStock = _currentStock.Qty;
+                    }
+                    else
+                    {
+                        ToastService.ClearCustomToasts();
+                        ToastService.ShowWarning("Empty tock!.. ");
+                    }
+                }
             }
+
+           
+           
         }
 
         private async Task SelectedItemProduct(ProductDto product)
@@ -161,11 +179,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     TempFormInternalTransfer.Batch = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Batch ?? "-";
                     TempFormInternalTransfer.ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Expired;
+                   
                 }
                 else
                 {
                     TempFormInternalTransfer.Batch = "-";
                     TempFormInternalTransfer.ExpiredDate = null;
+                   
                 }
             }
         }

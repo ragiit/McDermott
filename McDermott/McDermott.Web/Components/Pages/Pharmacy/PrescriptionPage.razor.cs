@@ -597,6 +597,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Concoctions = new List<ConcoctionDto>();
             PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
             allergies = await Mediator.Send(new GetAllergyQuery());
+            var user_group = await Mediator.Send(new GetUserQuery());
+            NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
+           
             allergies.ForEach(x =>
              {
                  var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
@@ -604,6 +607,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                      x.TypeString = a.Name;
              });
             var c = Concoctions;
+
+           
             await GetUserInfo();
 
             IsLoading = false;
@@ -664,8 +669,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             groups = await Mediator.Send(new GetGroupQuery());
             NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
 
-            var user_group = await Mediator.Send(new GetUserQuery());
-            NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
+            if (Pharmacy.Id == 0 || Pharmacy.Status!.Equals("Draft") || (Pharmacy.Status!.Equals("SendToPharmacy") || Pharmacy.Status!.Equals("Received") && NameGroup.Name.Equals("Admin")))
+            {
+                var s = "caca";
+            }
 
             IsLoading = false;
         }
@@ -1163,21 +1170,22 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItemPharmacy_Click(PharmacyDto? q = null)
         {
-            ShowForm = true;
-            header = "Data Pharmacy";
+            
             try
             {
+                ShowForm = true;
+                header = "Data Pharmacy";
                 IsLoading = true;
                 PharmacyDto? p = null;
 
                 // Check if SelectedDataItems has at least one item
-                if (SelectedDataItems != null && SelectedDataItems.Count > 0)
-                {
-                    p = SelectedDataItems[0].Adapt<PharmacyDto>();
-                }
-                else if (q != null)
+                if (q != null)
                 {
                     p = q;
+                }
+                else if (SelectedDataItems != null && SelectedDataItems.Count > 0)
+                {
+                    p = SelectedDataItems[0].Adapt<PharmacyDto>();
                 }
                 else
                 {
@@ -1307,13 +1315,15 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
             Pharmacy.Status = "Processed";
-            await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+            var updates = await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
             PharmaciesLog.PharmacyId = Pharmacy.Id;
             PharmaciesLog.UserById = NameUser.Id;
             PharmaciesLog.status = Pharmacy.Status;
 
             await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
+
+            await EditItemPharmacy_Click(updates);
         }
 
         public async void Validate()

@@ -298,24 +298,35 @@
                                                                 </DxFormLayoutItem>
                                                             </div>
                                                             <div class="col-md-4">
-                                                                <DxFormLayoutItem Caption="Quantity Stock" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                <DxFormLayoutItem Caption="Current Stock " CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                    <DxSpinEdit @bind-Value="@TempFormInternalTransfer.CurrentStock"
+                                                                                NullText="Input Stock To Be Sent..."
+                                                                                MinValue="0"
+                                                                                ReadOnly
+                                                                                ShowSpinButtons="false"
+                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                ShowValidationIcon="true"></DxSpinEdit>
+                                                                    <ValidationMessage For="@(()=>TempFormInternalTransfer.QtyStock)"></ValidationMessage>
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem Caption="Stock Shipped" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                     <DxSpinEdit @bind-Value="@TempFormInternalTransfer.QtyStock"
-                                                                                NullText="Input Quantity Stock..."
+                                                                                NullText="Input Stock To Be Sent..."
                                                                                 MinValue="0"
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                 ShowValidationIcon="true"></DxSpinEdit>
                                                                     <ValidationMessage For="@(()=>TempFormInternalTransfer.QtyStock)"></ValidationMessage>
                                                                 </DxFormLayoutItem>
 
+                                                            </div>
+                                                            <div class="col-md-4">
                                                                 <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                     <DxDateEdit ShowValidationIcon="true"
+                                                                                DisplayFormat="dd MMMM yyyy"
                                                                                 ReadOnly
                                                                                 @bind-Date="@SelectedBatchExpired"
                                                                                 NullText="Expired Date">
                                                                     </DxDateEdit>
                                                                 </DxFormLayoutItem>
-                                                            </div>
-                                                            <div class="col-md-4">
                                                                 <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                     <DxTextBox @bind-Text="@TempFormInternalTransfer.UomName"
                                                                                NullText="Unit Of Measure"
