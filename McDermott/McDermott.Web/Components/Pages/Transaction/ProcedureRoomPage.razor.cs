@@ -1,5 +1,4 @@
-﻿using Org.BouncyCastle.Tls;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 
 namespace McDermott.Web.Components.Pages.Transaction
@@ -14,20 +13,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private GroupMenuDto UserAccessCRUID = new();
         private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                }
-                catch { }
-            }
-        }
 
         private async Task GetUserInfo()
         {
@@ -88,16 +73,42 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region LoadData
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            PanelVisible = true;
-            await GetUserInfo();
+            if (firstRender)
+            {
+                try
+                {
+                    await GetUserInfo();
+                    ToastService.ShowInfo("1");
+                    StateHasChanged();
+                }
+                catch { }
 
+                await LoadData();
+
+                ToastService.ShowInfo("2");
+                StateHasChanged();
+
+                await LoadDataAsync();
+
+                ToastService.ShowInfo("3");
+                StateHasChanged();
+            }
+        }
+
+        private async Task LoadDataAsync()
+        {
             LabUoms = await Mediator.Send(new GetLabUomQuery());
             LabTests = await Mediator.Send(new GetLabTestQuery());
             Doctors = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
+            groups = await Mediator.Send(new GetGroupQuery());
+            NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
+        }
 
-            await LoadData();
+        protected override async Task OnInitializedAsync()
+        {
+            PanelVisible = true;
         }
 
         private async Task LoadData()
@@ -109,8 +120,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             GeneralConsultanMedicalSupport = new();
             SelectedDataItems = [];
             GeneralConsultanMedicalSupports = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery());
-            groups = await Mediator.Send(new GetGroupQuery());
-            NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
             PanelVisible = false;
         }
 
@@ -345,7 +354,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             LabTest = labTest;
             LabUom = labTest.LabUom;
         }
-        GeneralConsultanlogDto generalLog = new GeneralConsultanlogDto();
+
+        private GeneralConsultanlogDto generalLog = new GeneralConsultanlogDto();
+
         private async Task OnSave()
         {
             try
@@ -369,8 +380,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                     GeneralConsultanService.StagingStatus = "Waiting";
 
                     await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
-
-                    
 
                     generalLog.GeneralConsultanServiceId = GeneralConsultanMedicalSupport.GeneralConsultanServiceId;
                     generalLog.UserById = NameGroup.Id;

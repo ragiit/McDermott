@@ -111,7 +111,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<AllergyDto> PharmacologyAllergies = [];
         private List<UserDto> user_group = [];
 
-
         private List<RujukanFaskesKhususSpesialisPCare> RujukanSubSpesialis = [];
         private List<SpesialisSaranaPCare> SpesialisSaranas = [];
         private List<SubSpesialisPCare> SubSpesialisPs = [];
@@ -180,7 +179,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     {
                         FormRegis.StagingStatus = "Finished";
                     }
-                    var  GeneralServices=await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+                    var GeneralServices = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
 
                     generalLog.GeneralConsultanServiceId = GeneralServices.Id;
                     generalLog.UserById = NameUser.Id;
@@ -529,7 +528,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                                 GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = null; x.GeneralConsultanServiceId = FormRegis.Id; x.Id = 0; });
                                 await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
 
-                                
                                 break;
 
                             case "Physician":
@@ -560,7 +558,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                                 if (FormRegis.IsSickLeave == true || FormRegis.IsMaternityLeave == true)
                                 {
-                                    
                                     var checkDataSickLeave = await Mediator.Send(new GetSickLeaveQuery());
                                     var crosschek = checkDataSickLeave.Where(x => x.GeneralConsultansId == FormRegis.Id).FirstOrDefault();
                                     if (crosschek == null)
@@ -1046,20 +1043,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                }
-                catch { }
-            }
-        }
-
         private async Task GetUserInfo()
         {
             try
@@ -1309,30 +1292,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         #endregion Grid Setting
 
         #region File Upload Attachment
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
 
         //private void RemoveSelectedFile()
         //{
@@ -1622,10 +1581,41 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private List<AllergyDto> Allergies = [];
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            PanelVisible = true;
+            await base.OnAfterRenderAsync(firstRender);
 
+            if (firstRender)
+            {
+                try
+                {
+                    await GetUserInfo();
+                    StateHasChanged();
+                }
+                catch { }
+
+                await LoadData();
+                StateHasChanged();
+
+                await LoadComboBox();
+                StateHasChanged();
+            }
+        }
+
+        private async Task LoadData()
+        {
+            showForm = false;
+            PanelVisible = true;
+            PatientAllergy = new();
+            SelectedDataItems = [];
+            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
+            IsReferTo = false;
+            PopUpVisible = false;
+            PanelVisible = false;
+        }
+
+        private async Task LoadComboBox()
+        {
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
             Awareness = await Mediator.Send(new GetAwarenessQuery());
 
@@ -1644,7 +1634,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             var nursingDiagnosesTemps = NursingDiagnoses.Select(x => new NursingDiagnosesTemp
             {
                 Id = x.Id,
-                Problem = $"{x.Problem}" // Menggunakan interpolasi string untuk menggabungkan Problem dan Code
+                Problem = $"{x.Problem}"
             }).ToList();
             NursingDiagnosesTemps.AddRange(nursingDiagnosesTemps);
 
@@ -1652,11 +1642,21 @@ namespace McDermott.Web.Components.Pages.Transaction
             var diagnosesTemps = Diagnoses.Select(x => new DiagnosesTemp
             {
                 Id = x.Id,
-                NameCode = $"{x.Name}" // Menggunakan interpolasi string untuk menggabungkan Problem dan Code
+                NameCode = $"{x.Name}"
             }).ToList();
             DiagnosesTemps.AddRange(diagnosesTemps);
 
             AllDiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
+
+            PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
+            user_group = await Mediator.Send(new GetUserQuery());
+            NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
+            await SelectData();
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            PanelVisible = true;
 
             await GetUserInfo();
             await LoadData();
@@ -2049,40 +2049,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             FormValidationState = false;
         }
 
-        private async Task LoadData()
-        {
-            showForm = false;
-            PanelVisible = true;
-            PatientAllergy = new();
-            SelectedDataItems = [];
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
-            PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
-            user_group = await Mediator.Send(new GetUserQuery());
-            NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id==UserLogin.Id) ?? new();
-            await SelectData();
-            IsReferTo = false;
-            PopUpVisible = false;
-            PanelVisible = false;
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsEnabled = enabled;
@@ -2346,11 +2312,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)
         {
             await EditItemVoid();
-        }
-
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
         }
 
         private void DeleteItem_Click()

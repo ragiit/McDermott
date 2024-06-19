@@ -8,7 +8,7 @@
             if (!_initialParametersSet)
             {
                 ShowValidationIcon = true;
-                NullText = "Name";
+                //NullText = "Name";
                 ClearButtonDisplayMode = DataEditorClearButtonDisplayMode.Auto;
                 _initialParametersSet = true;
             }

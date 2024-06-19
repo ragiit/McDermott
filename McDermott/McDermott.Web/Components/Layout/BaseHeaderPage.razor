@@ -1,0 +1,25 @@
+﻿<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col">
+                        <h1 class="d-flex align-items-center">
+                            @if (ShowBackButton)
+                            {
+                                <i @onclick="OnClickBack" class="fa-solid fa-arrow-left fa-sm mr-3 mt-1" role="button"></i>
+                            }
+                            @Title
+                        </h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public bool ShowBackButton { get; set; }
+    [Parameter] public EventCallback OnClickBack { get; set; }
+}

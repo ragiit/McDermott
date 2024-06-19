@@ -5,25 +5,7 @@
 
 @if (IsAccess)
 {
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col">
-                            <h1 class="d-flex align-items-center">
-                                @if (Accident.Id != 0)
-                                {
-                                    <i @onclick="OnClickBack" class="fa-solid fa-arrow-left fa-sm mr-3 mt-1" role="button"></i>
-                                }
-                                Accident
-                            </h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <BaseHeaderPage Title="Accident" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
 
     <section class="content">
         <div class="container-fluid">
@@ -38,861 +20,1002 @@
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
-                                <DxGrid @ref="Grid"
+                                <MyGrid @ref="Grid"
+                                        KeyFieldName="Id"
                                         Data="Data"
                                         @bind-SelectedDataItems="@SelectedDataItems"
-                                        EditModelSaving="OnSaving"
                                         DataItemDeleting="OnDeleting"
                                         FocusedRowChanged="Grid_FocusedRowChanged"
-                                        PagerNavigationMode="PagerNavigationMode.InputBox"
-                                        EditorRenderMode="GridEditorRenderMode.Detached"
-                                        PageSize="10"
-                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                        KeyFieldName="Id"
-                                        CustomizeDataRowEditor="@GridExtention.Grid_CustomizeDataRowEditor"
-                                        AllowSelectRowByClick="true"
-                                        PagerPosition="GridPagerPosition.Bottom"
-                                        PageSizeSelectorVisible="true"
-                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        PageSizeSelectorAllRowsItemVisible="true"
-                                        PagerSwitchToInputBoxButtonCount="10"
-                                        FocusedRowEnabled="true"
-                                        PagerVisibleNumericButtonCount="10"
-                                        ShowGroupPanel="true"
-                                        AutoExpandAllGroupRows="true"
-                                        ShowFilterRow="true"
-                                        CustomizeElement="@GridExtention.Grid_CustomizeElement"
-                                        ShowSearchBox="true"
-                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                        KeyboardNavigationEnabled="true">
+                                        RowDoubleClick="EditItem_Click">
+
+                                    @*   <ToolbarTemplate>
+                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Data.Count > 0" />
+                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Data.Count > 0" />
+                            <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                            <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                            <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                            <Items>
+                            <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(Grid))" />
+                            <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(Grid))" />
+                            <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(Grid))" />
+                            </Items>
+                            </DxToolbarItem>
+                            </DxToolbar>
+                            </ToolbarTemplate> *@
 
                                     <ToolbarTemplate>
-                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Data.Count > 0" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Data.Count > 0" />
-                                            <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                            <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                            <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                <Items>
-                                                    <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(Grid))" />
-                                                    <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(Grid))" />
-                                                    <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(Grid))" />
-                                                </Items>
-                                            </DxToolbarItem>
-                                        </DxToolbar>
+                                        <MyDxToolbarBase TItem="AccidentDto"
+                                                         Items="@Data"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="false"
+                                                         VisibleNew="UserAccessCRUID.Create"
+                                                         VisibleEdit="UserAccessCRUID.Update"
+                                                         VisibleDelete="UserAccessCRUID.Delete" />
                                     </ToolbarTemplate>
 
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.AreaOfYard)" Caption="Test" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Employee.Name" Caption="Employee" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Department.Name" Caption="Department" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.DateOfOccurrence)" Caption="Date Of Occurrence" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.DateOfFirstTreatment)" Caption="Date Of First Treatment" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.AreaOfYard)" Caption="Area Of Yard" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.RibbonSpecialCase)" Caption="Ribbon Special Case" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.StatusName)" Caption="Status" />
                                     </Columns>
-                                </DxGrid>
+                                </MyGrid>
                             </DxLoadingPanel>
                         </div>
                     }
                     else
                     {
-                        <div class="row justify-content-end mb-3">
-                            <div class="col-auto align-self-end">
-                                <DxTabs>
-                                    <DxTab Text="@EnumStatusAccident.ReturnToWork.GetDisplayName()"></DxTab>
-                                    <DxTab Text="@EnumStatusAccident.RestrictedWorkCase.GetDisplayName()"></DxTab>
-                                    <DxTab Text="@EnumStatusAccident.LostWorkDaysCase.GetDisplayName()"></DxTab>
-                                    <DxTab Text="@EnumStatusAccident.FatalityCase.GetDisplayName()"></DxTab>
-                                </DxTabs>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="w-100">
-                                    <div class="col align-self-center">
-                                        <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
-                                    </div>
+                        @if (Accident.Id != 0)
+                        {
+                            <div class="row justify-content-end mb-3">
+                                <div class="col-auto align-self-end">
+                                    <DxTabs>
+                                        <DxTab Text="@EnumStatusAccident.ReturnToWork.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.ReturnToWork)"></DxTab>
+                                        <DxTab Text="@EnumStatusAccident.RestrictedWorkCase.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.RestrictedWorkCase)"></DxTab>
+                                        <DxTab Text="@EnumStatusAccident.LostWorkDaysCase.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.LostWorkDaysCase)"></DxTab>
+                                        <DxTab Text="@EnumStatusAccident.FatalityCase.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.FatalityCase)"></DxTab>
+                                    </DxTabs>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="card">
-                            <div class="card-header">
-                                <span class="fw-bolder">@(Accident.Id == 0 ? "Add Accident" : "Edit Accident")</span>
-                            </div>
-
-                            <div class="card-body">
-                                <EditForm Model="Accident" Context="EditForm">
-                                    <DataAnnotationsValidator />
-
-                                    <div class="row w-100">
-                                        @*     <div class="col-md-12">
-                                <DxFormLayout CssClass="w-100">
-                                @if (Accident.Id != 0)
-                                {
-                                <DxFormLayoutItem ColSpanMd="12">
-                                <h3 class="fw-bolder">@Accident.Test</h3>
-                                </DxFormLayoutItem>
-                                }
-                                </DxFormLayout>
-                                </div> *@
-
-                                        <div class="col-md-6">
-                                            <DxFormLayout CssClass="w-100">
-
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Employee" ColSpanMd="12">
-                                                    <DxComboBox ShowValidationIcon="true" Data="@Data"
-                                                                NullText="Select Employee..."
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="Accident.Id">
-                                                    </DxComboBox>
-                                                    <ValidationMessage For="@(() => Accident.Id)" />
-                                                </DxFormLayoutItem>
-
-                                                <DxFormLayoutItem Caption="Employee No" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                    <DxTextBox ShowValidationIcon="true"
-                                                               @bind-Text="Accident.NatureOfInjury"
-                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="Employee No" />
-                                                </DxFormLayoutItem>
-
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Department" ColSpanMd="12">
-                                                    <DxComboBox ShowValidationIcon="true" Data="@Data"
-                                                                NullText="Select Department..."
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="Accident.Id">
-                                                    </DxComboBox>
-                                                    <ValidationMessage For="@(() => Accident.Id)" />
-                                                </DxFormLayoutItem>
-
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Cause Of Injury" ColSpanMd="12">
-                                                    <DxComboBox ShowValidationIcon="true" Data="@Data"
-                                                                NullText="Select Cause Of Injury..."
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="Accident.Id">
-                                                    </DxComboBox>
-                                                    <ValidationMessage For="@(() => Accident.Id)" />
-                                                </DxFormLayoutItem>
-
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Treatment" ColSpanMd="12">
-                                                    <DxComboBox ShowValidationIcon="true" Data="@Data"
-                                                                NullText="Select Treatment..."
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="Accident.Id">
-                                                    </DxComboBox>
-                                                    <ValidationMessage For="@(() => Accident.Id)" />
-                                                </DxFormLayoutItem>
-
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Ribbon Special Case" ColSpanMd="12">
-                                                    <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase" />
-                                                </DxFormLayoutItem>
-                                            </DxFormLayout>
+                            @if (!IsStatus(EnumStatusAccident.FatalityCase))
+                            {
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="w-100">
+                                            <div class="col align-self-center">
+                                                <DxButton IconCssClass="fa-solid fa-check" Enabled="!IsLoading" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
+                                            </div>
                                         </div>
+                                    </div>
+                                </div>
+                            }
+                        }
 
-                                        <div class="col-md-6">
-                                            <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Date Of Occurrence" ColSpanMd="12">
-                                                    <DxDateEdit ShowValidationIcon="true"
-                                                                @bind-Date="Accident.DateOfFirstTreatment"
-                                                                Mask="@DateTimeMask.ShortDate"
-                                                                NullText="Select Date Of Occurrence">
-                                                    </DxDateEdit>
-                                                </DxFormLayoutItem>
+                        <DxLoadingPanel @bind-Visible="IsLoading"
+                                        IsContentBlocked="true"
+                                        CssClass="w-100"
+                                        ApplyBackgroundShading="true">
+                            <EditForm Model="Accident" Context="EditForm" OnValidSubmit="OnValidSubmitSave" OnInvalidSubmit="OnInvalidSubmitSave">
+                                <DataAnnotationsValidator />
 
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Date Of First Treatment" ColSpanMd="12">
-                                                    <DxDateEdit ShowValidationIcon="true"
-                                                                @bind-Date="Accident.DateOfFirstTreatment"
-                                                                Mask="@DateTimeMask.ShortDate"
-                                                                NullText="Select Date Of First Treatment">
-                                                    </DxDateEdit>
-                                                </DxFormLayoutItem>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="fw-bolder">@(Accident.Id == 0 ? "Add Accident" : "Edit Accident")</span>
+                                    </div>
 
-                                                <DxFormLayoutItem Caption="Area Of Yard" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                    <DxTextBox ShowValidationIcon="true"
-                                                               @bind-Text="Accident.NatureOfInjury"
-                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="Area Of Yard" />
-                                                </DxFormLayoutItem>
+                                    <div class="card-body">
+                                        <div class="row w-100">
+                                            <div class="col-md-6">
+                                                <DxFormLayout CssClass="w-100">
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Class" ColSpanMd="12">
-                                                    <DxComboBox ShowValidationIcon="true" Data="@Data"
-                                                                NullText="Select Class..."
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="Accident.Id">
-                                                    </DxComboBox>
-                                                    <ValidationMessage For="@(() => Accident.Id)" />
-                                                </DxFormLayoutItem>
-                                            </DxFormLayout>
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Employee" ColSpanMd="12">
+                                                        <MyDxComboBox Data="@Employees"
+                                                                      NullText="Select Employee..."
+                                                                      SelectedItemChanged="@((UserDto e) => OnSelectEmployee(e))"
+                                                                      @bind-Value="Accident.EmployeeId">
+                                                        </MyDxComboBox>
+                                                        <ValidationMessage For="@(() => Accident.EmployeeId)" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem Caption="Employee No" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                        <DxTextBox ShowValidationIcon="true"
+                                                                   ReadOnly
+                                                                   @bind-Text="SelectedNIP"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Employee No" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Department" ColSpanMd="12">
+                                                        <MyDxComboBox ShowValidationIcon="true"
+                                                                      Data="@Departments"
+                                                                      NullText="Select Department..."
+                                                                      @bind-Value="Accident.DepartmentId">
+                                                        </MyDxComboBox>
+                                                        <ValidationMessage For="@(() => Accident.DepartmentId)" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Ribbon Special Case" ColSpanMd="12">
+                                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <DxFormLayout CssClass="w-100">
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Date Of Occurrence" ColSpanMd="12">
+                                                        <DxDateEdit ShowValidationIcon="true"
+                                                                    @bind-Date="Accident.DateOfOccurrence"
+                                                                    Mask="@DateTimeMask.ShortDate"
+                                                                    NullText="Select Date Of Occurrence">
+                                                        </DxDateEdit>
+                                                        <ValidationMessage For="@(() => Accident.DateOfOccurrence)" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Date Of First Treatment" ColSpanMd="12">
+                                                        <DxDateEdit ShowValidationIcon="true"
+                                                                    @bind-Date="Accident.DateOfFirstTreatment"
+                                                                    Mask="@DateTimeMask.ShortDate"
+                                                                    NullText="Select Date Of First Treatment">
+                                                        </DxDateEdit>
+                                                        <ValidationMessage For="@(() => Accident.DateOfFirstTreatment)" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem Caption="Area Of Yard" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                        <DxTextBox ShowValidationIcon="true"
+                                                                   @bind-Text="Accident.AreaOfYard"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Area Of Yard" />
+                                                        <ValidationMessage For="@(() => Accident.AreaOfYard)" />
+
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+
                                         </div>
 
                                     </div>
-                                </EditForm>
-                            </div>
-                        </div>
+                                </div>
 
-                        <div class="row w-100">
-                            <DxFormLayout>
-                                <DxFormLayoutGroup CaptionCssClass="fw-bolder" Caption="Nature Of Injury" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
-                                    <Items>
-                                        <div class="content w-100">
-                                            <div class="container-fluid w-100">
-                                                <div class="row w-100">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D1"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S1"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="fw-bolder">Nature Of Injury</span>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="w-100">
+                                            <div class="row w-100">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@NatureOfInjury1"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedNatureOfInjury1"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedNatureOfInjury1.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury1" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D2"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S2"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@NatureOfInjury2"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedNatureOfInjury2"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedNatureOfInjury2.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury2" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D3"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S3"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@NatureOfInjury3"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedNatureOfInjury3"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedNatureOfInjury3.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury3" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D4"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S4"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@NatureOfInjury4"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedNatureOfInjury4"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedNatureOfInjury4.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury4" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D5"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S5"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@NatureOfInjury5"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedNatureOfInjury5"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedNatureOfInjury5.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury5" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D6"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S6"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@NatureOfInjury6"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedNatureOfInjury6"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedNatureOfInjury6.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury6" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D7"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S7"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@NatureOfInjury7"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedNatureOfInjury7"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedNatureOfInjury7.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury7" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D8"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S8"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@NatureOfInjury8"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedNatureOfInjury8"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
-
-                                                @*  <div class="row w-100 mt-2">
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Foreign body</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Eye Irritation</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto flex-fill">
-                                        <DxTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes...A" />
-                                        </div>
-                                        </div>
-
-                                        <div class="row mt-2 w-100">
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Abrasion</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Laceration</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Puncture</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Scratch</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto flex-fill">
-                                        <DxTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                        </div>
-                                        </div>
-
-                                        <div class="row mt-2 w-100">
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Bruise</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Contussion</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Crushing</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto flex-fill">
-                                        <DxTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                        </div>
-                                        </div>
-
-                                        <div class="row mt-2 w-100">
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Sprain</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto flex-fill">
-                                        <DxTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                        </div>
-                                        </div>
-
-                                        <div class="row mt-2 w-100">
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Fracture</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Dislocation</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto flex-fill">
-                                        <DxTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                        </div>
-                                        </div>
-
-                                        <div class="row mt-2 w-100">
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Burn</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Chemical burn</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Electric burn</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto flex-fill">
-                                        <DxTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                        </div>
-                                        </div>
-
-                                        <div class="row mt-2 w-100">
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Occupational illness</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">LBP</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Dermatitis</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto flex-fill">
-                                        <DxTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                        </div>
-                                        </div>
-
-                                        <div class="row mt-2 w-100">
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Asphyxia</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Intoxication</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Amputation</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto">
-                                        <DxCheckBox @bind-Checked="@Accident.RibbonSpecialCase">Concussion</DxCheckBox>
-                                        </div>
-                                        <div class="col-auto flex-fill">
-                                        <DxTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                        </div>
-                                        </div> *@
+                                                @if (Accident.SelectedNatureOfInjury8.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury8" />
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
-                                    </Items>
-                                </DxFormLayoutGroup>
-                            </DxFormLayout>
-                        </div>
+                                    </div>
+                                </div>
 
-                        <div class="row w-100 mt-2">
-                            <DxFormLayout>
-                                <DxFormLayoutGroup CaptionCssClass="fw-bolder" Caption="Part of Body" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
-                                    <Items>
-                                        <div class="content w-100">
-                                            <div class="container-fluid w-100">
-                                                <div class="row w-100">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D9"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S9"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="fw-bolder">Part Of Body</span>
+                                    </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D10"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S10"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                    <div class="card-body">
+                                        <div class="w-100">
+                                            <div class="row w-100">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@PartOfBody1"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedPartOfBody1"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedPartOfBody1.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.PartOfBody1" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D11"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S11"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@PartOfBody2"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedPartOfBody2"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedPartOfBody2.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.PartOfBody2" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D12"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S12"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@PartOfBody3"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedPartOfBody3"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedPartOfBody3.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.PartOfBody3" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D13"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S13"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@PartOfBody4"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedPartOfBody4"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedPartOfBody4.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.PartOfBody4" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D14"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S14"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@PartOfBody5"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedPartOfBody5"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedPartOfBody5.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.PartOfBody5" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D15"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S15"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@PartOfBody6"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedPartOfBody6"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedPartOfBody6.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.PartOfBody6" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D16"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S16"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@PartOfBody7"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedPartOfBody7"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedPartOfBody7.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.PartOfBody7" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D17"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S17"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@PartOfBody8"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedPartOfBody8"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedPartOfBody8.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.PartOfBody8" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D18"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S18"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@PartOfBody9"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedPartOfBody9"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedPartOfBody9.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.PartOfBody9" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D19"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S19"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@PartOfBody10"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedPartOfBody10"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedPartOfBody10.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.PartOfBody10" />
+                                                    </div>
+                                                }
+                                            </div>
 
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D20"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S20"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@PartOfBody11"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedPartOfBody11"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                 </div>
+                                                @if (Accident.SelectedPartOfBody11.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.PartOfBody11" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@PartOfBody12"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedPartOfBody12"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedPartOfBody12.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.PartOfBody12" />
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
-                                    </Items>
-                                </DxFormLayoutGroup>
-                            </DxFormLayout>
-                        </div>
+                                    </div>
+                                </div>
 
-                        <div class="row w-100 mt-2">
-                            <DxFormLayout>
-                                <DxFormLayoutGroup CaptionCssClass="fw-bolder" Caption="Employees: Cause Of Injury" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
-                                    <Items>
-                                        <div class="content w-100">
-                                            <div class="container-fluid w-100">
-                                                <div class="row w-100">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D21"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S21"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="fw-bolder">Employees: Cause Of Injury</span>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="w-100">
+                                            <div class="row w-100">
+                                                <div class="col-md-6">
+                                                    <DxComboBox Data="@EmployeeClass"
+                                                                NullText="Select Class..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                FilteringMode="DataGridFilteringMode.Contains"
+                                                                ListRenderMode="ListRenderMode.Virtual"
+                                                                @bind-Value="Accident.EmployeeClass">
+                                                    </DxComboBox>
                                                 </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D22"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S22"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
+                                                <div class="col-md-6">
+                                                    <MyTextBox NullText="Estimated Disability (days)..."
+                                                               ShowValidationIcon="true"
+                                                               @bind-Text="Accident.EstimatedDisability">
+                                                    </MyTextBox>
+                                                    <ValidationMessage For="@(() => Accident.EstimatedDisability)" />
                                                 </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D23"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S23"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D24"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S24"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D25"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S25"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D26"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S26"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D27"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S27"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D28"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S28"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D29"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S29"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D30"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S30"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D31"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S31"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D32"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S32"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D33"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S33"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
-
-                                                <div class="row w-100 mt-2">
-                                                    <div class="col-md-6">
-                                                        <DxTagBox Data="@D34"
-                                                                  NullText="Select..."
-                                                                  TData="string"
-                                                                  TValue="string"
-                                                                  AllowCustomTags="true"
-                                                                  @bind-Values="@S34"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <MyTextBox @bind-Text="@Accident.NatureOfInjury" NullText="Notes..." />
-                                                    </div>
-                                                </div>
-
                                             </div>
+
+                                            <!-- Employee Cause of Injury 1 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury1"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury1"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury1.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury1" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 2 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury2"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury2"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury2.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury2" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 3 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury3"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury3"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury3.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury3" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 4 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury4"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury4"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury4.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury4" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 5 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury5"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury5"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury5.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury5" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 6 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury6"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury6"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury6.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury6" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 7 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury7"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury7"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury7.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury7" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 8 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury8"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury8"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury8.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury8" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 9 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury9"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury9"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury9.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury9" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 10 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury10"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury10"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury10.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury10" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 11 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury11"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury11"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury11.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury11" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 12 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury12"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury12"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury12.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury12" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 13 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury13"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury13"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury13.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury13" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Employee Cause of Injury 14 -->
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@EmployeeCauseOfInjury14"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedEmployeeCauseOfInjury14"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedEmployeeCauseOfInjury14.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury14" />
+                                                    </div>
+                                                }
+                                            </div>
+
                                         </div>
-                                    </Items>
-                                </DxFormLayoutGroup>
-                            </DxFormLayout>
-                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="fw-bolder">Treatment</span>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="w-100">
+                                            <div class="row w-100">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@Treatment1"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedTreatment1"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedTreatment1.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.Treatment1" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@Treatment2"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedTreatment2"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedTreatment2.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.Treatment2" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@Treatment3"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedTreatment3"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedTreatment3.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.Treatment3" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@Treatment4"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedTreatment4"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedTreatment4.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.Treatment4" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@Treatment5"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedTreatment5"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedTreatment5.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.Treatment5" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@Treatment6"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedTreatment6"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedTreatment6.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.Treatment6" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div class="row w-100 mt-2">
+                                                <div class="col-md-6">
+                                                    <DxTagBox Data="@Treatment7"
+                                                              NullText="Select..."
+                                                              TData="string"
+                                                              TValue="string"
+                                                              AllowCustomTags="true"
+                                                              @bind-Values="@Accident.SelectedTreatment7"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </div>
+                                                @if (Accident.SelectedTreatment7.Count() > 0)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <MyTextBox @bind-Text="@Accident.Treatment7" />
+                                                    </div>
+                                                }
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if (!IsStatus(EnumStatusAccident.FatalityCase))
+                                {
+                                    <div class="row  justify-content-end mb-2 mt-2">
+                                        <div class="col-auto align-self-end">
+
+                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" />
+
+                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnClickCancel"></DxButton>
+                                        </div>
+                                    </div>
+                                }
+                            </EditForm>
+
+                        </DxLoadingPanel>
                     }
                 </div>
             </div>
@@ -901,5 +1024,5 @@
 }
 else
 {
-    <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    <LoadingIndicatorLayout />
 } 

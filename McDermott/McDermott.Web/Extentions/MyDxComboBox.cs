@@ -10,8 +10,6 @@ namespace McDermott.Web.Extentions
             if (!_initialParametersSet)
             {
                 NullText = "Select Name...";
-                TextFieldName = "Name";
-                ValueFieldName = "Id";
                 ShowValidationIcon = true;
                 ClearButtonDisplayMode = DataEditorClearButtonDisplayMode.Auto;
                 FilteringMode = DataGridFilteringMode.Contains;

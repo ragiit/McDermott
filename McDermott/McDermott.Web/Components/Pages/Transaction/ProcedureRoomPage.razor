@@ -7,21 +7,7 @@
 {
     <div class="wrapper">
 
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Procedure Room</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
-                            <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/clinic-service/procedure-room">Procedure Room</a></li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <BaseHeaderPage Title="Procedure Room" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
 
         <section class="content">
             <div class="container-fluid">
@@ -30,66 +16,56 @@
                         @if (!ShowForm)
                         {
                             <div class="card">
-                                <div class="card-body">
-                                    <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                    IsContentBlocked="true"
-                                                    ApplyBackgroundShading="true"
-                                                    IndicatorAreaVisible="false"
-                                                    Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                Data="GeneralConsultanMedicalSupports"
-                                                PageSize="10"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                KeyFieldName="Id"
-                                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                                EditModelSaving="OnSave"
-                                                EditorRenderMode="GridEditorRenderMode.Detached"
-                                                DataItemDeleting="OnDelete"
-                                                AllowSelectRowByClick="true"
-                                                EditMode="GridEditMode.PopupEditForm"
-                                                PopupEditFormCssClass="pw-800"
-                                                PagerPosition="GridPagerPosition.Bottom"
-                                                PageSizeSelectorVisible="true"
-                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                PageSizeSelectorAllRowsItemVisible="true"
-                                                PagerSwitchToInputBoxButtonCount="10"
-                                                FocusedRowEnabled="true"
-                                                PagerVisibleNumericButtonCount="10"
-                                                FocusedRowChanged="Grid_FocusedRowChanged"
-                                                ShowGroupPanel="true"
-                                                AutoExpandAllGroupRows="true"
-                                                ShowFilterRow="true"
-                                                RowDoubleClick="EditItem_Click"
-                                                CustomizeElement="Grid_CustomizeElement"
-                                                ShowSearchBox="true"
-                                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                                KeyboardNavigationEnabled="true">
-                                            <ToolbarTemplate>
-                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanMedicalSupports.Count > 0" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanMedicalSupports.Count > 0" />
-                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                        <Items>
-                                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                        </Items>
-                                                    </DxToolbarItem>
-                                                </DxToolbar>
-                                            </ToolbarTemplate>
-                                            <Columns>
-                                                <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn FieldName="GeneralConsultanService.RegistrationDate" DisplayFormat="ddd, dd MMM yyyy" Caption="Registration Date" />
-                                                <DxGridDataColumn FieldName="GeneralConsultanService.Patient.Name" Caption="Patient" />
-                                                <DxGridDataColumn FieldName="Status" Caption="Status" />
-                                            </Columns>
-                                        </DxGrid>
-                                    </DxLoadingPanel>
-                                </div>
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <MyGrid @ref="Grid"
+                                            Data="GeneralConsultanMedicalSupports"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            EditModelSaving="OnSave"
+                                            DataItemDeleting="OnDelete"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            KeyFieldName="Id"
+                                            RowDoubleClick="EditItem_Click">
+                                        @*    <ToolbarTemplate>
+                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanMedicalSupports.Count > 0" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanMedicalSupports.Count > 0" />
+                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                <Items>
+                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                </Items>
+                                </DxToolbarItem>
+                                </DxToolbar>
+                                </ToolbarTemplate> *@
+
+                                        <ToolbarTemplate>
+                                            <MyDxToolbarBase TItem="GeneralConsultanMedicalSupportDto"
+                                                             Items="@GeneralConsultanMedicalSupports"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             EditItem_Click="@EditItem_Click"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             Refresh_Click="@Refresh_Click"
+                                                             IsImport="false"
+                                                             VisibleNew="false"
+                                                             VisibleDelete="UserAccessCRUID.Delete"
+                                                             VisibleEdit="UserAccessCRUID.Update" />
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="GeneralConsultanService.RegistrationDate" DisplayFormat="ddd, dd MMM yyyy" Caption="Registration Date" />
+                                            <DxGridDataColumn FieldName="GeneralConsultanService.Patient.Name" Caption="Patient" />
+                                            <DxGridDataColumn FieldName="Status" Caption="Status" />
+                                        </Columns>
+                                    </MyGrid>
+                                </DxLoadingPanel>
                             </div>
                         }
                         else
@@ -147,16 +123,6 @@
                                                             </DxComboBox>
                                                             <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerLabEximinationId)" />
                                                         </DxFormLayoutItem>
-
-                                                        @*  <DxFormLayoutItem Caption="Lab Test:" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                <DxTagBox Data="@LabTests"
-                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                @bind-Values="@SelectedLabTests"
-                                                TextFieldName="Name"
-                                                ValueFieldName="Name"
-                                                NullText="Select Lab Test..."
-                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                </DxFormLayoutItem> *@
 
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
                                                             <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.LabEximinationAttachment"
@@ -815,10 +781,5 @@
 }
 else
 {
-    <div class="wrapper">
-
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Procedure Room" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
-}
+    <LoadingIndicatorLayout />
+} 

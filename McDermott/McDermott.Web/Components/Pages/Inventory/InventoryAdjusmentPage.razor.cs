@@ -1,4 +1,5 @@
 ﻿using DevExpress.Blazor.Internal;
+using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 
@@ -150,7 +151,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if (args.DataItem is null)
                     return;
 
-                IsDeletedAdjusment = ((InventoryAdjusmentDto)args.DataItem)!.Status == EnumStatusInventoryAdjusment.Draft;
+                IsDeletedAdjusment = ((InventoryAdjusmentDto)args.DataItem)!.Status != EnumStatusInventoryAdjusment.Invalidate;
             }
             catch { }
         }
@@ -459,6 +460,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 return;
             }
 
+            FormInventoryAdjusmentDetail = new();
             TotalQty = 0;
             LotSerialNumber = "-";
             UomId = null;
@@ -468,6 +470,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task EditItemDetail_Click(IGrid context)
         {
+            FormInventoryAdjusmentDetail = new();
             await GridDetail.StartEditRowAsync(FocusedRowDetailVisibleIndex);
         }
 
@@ -534,41 +537,62 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task SelectedBatch(StockProductDto stockProduct)
         {
-            SelectedBatchExpired = null;
+            FormInventoryAdjusmentDetail.StockProductId = null;
+            FormInventoryAdjusmentDetail.UomId = null;
+            FormInventoryAdjusmentDetail.ExpiredDate = null;
+            FormInventoryAdjusmentDetail.TeoriticalQty = 0;
 
-            if (stockProduct is not null)
+            if (stockProduct is null)
             {
-                SelectedBatchExpired = stockProduct.Expired;
+                return;
+            }
+
+            FormInventoryAdjusmentDetail.StockProductId = stockProduct.Id;
+
+            if (FormInventoryAdjusmentDetail.ProductId is not null)
+            {
+                var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == FormInventoryAdjusmentDetail.ProductId && s.SourceId == InventoryAdjusment.LocationId));
+                FormInventoryAdjusmentDetail.UomId = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId && x.ProductId == FormInventoryAdjusmentDetail.ProductId && x.Batch == Batch.FirstOrDefault(z => z.Id == FormInventoryAdjusmentDetail.StockProductId)?.Batch)?.UomId ?? null;
+                FormInventoryAdjusmentDetail.ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId && x.ProductId == FormInventoryAdjusmentDetail.ProductId && x.Batch == Batch.FirstOrDefault(z => z.Id == FormInventoryAdjusmentDetail.StockProductId)?.Batch)?.Expired;
+                FormInventoryAdjusmentDetail.TeoriticalQty = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId && x.ProductId == FormInventoryAdjusmentDetail.ProductId && x.Batch == Batch.FirstOrDefault(z => z.Id == FormInventoryAdjusmentDetail.StockProductId)?.Batch)?.Qty ?? 0;
             }
         }
+
+        private InventoryAdjusmentDetailDto FormInventoryAdjusmentDetail = new();
 
         private async Task OnSelectProduct(ProductDto e)
         {
             try
             {
+                Batch.Clear();
+                FormInventoryAdjusmentDetail.ExpiredDate = null;
+                FormInventoryAdjusmentDetail.ProductId = null;
+                FormInventoryAdjusmentDetail.StockProductId = null;
+                FormInventoryAdjusmentDetail.UomId = null;
+                FormInventoryAdjusmentDetail.TeoriticalQty = 0;
+
                 if (e is null)
                 {
                     return;
                 }
 
-                var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id && s.SourceId == InventoryAdjusment.LocationId));
-
-                Batch.Clear();
-                Batch = StockProducts;
-
-                TotalQty = StockProducts.FirstOrDefault()?.Qty ?? 0;
-
-                UomId = e.UomId ?? null;
+                FormInventoryAdjusmentDetail.ProductId = e.Id;
 
                 if (e.TraceAbility)
                 {
-                    LotSerialNumber = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Batch ?? "-";
-                    ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId)?.Expired;
+                    var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id && s.SourceId == InventoryAdjusment.LocationId));
+                    Batch = StockProducts;
+                    FormInventoryAdjusmentDetail.UomId = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId && x.ProductId == e.Id && x.Batch == Batch.FirstOrDefault(z => z.Id == FormInventoryAdjusmentDetail.StockProductId)?.Batch)?.UomId ?? null;
+                    FormInventoryAdjusmentDetail.TeoriticalQty = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId && x.ProductId == e.Id && x.Batch == Batch.FirstOrDefault(z => z.Id == FormInventoryAdjusmentDetail.StockProductId)?.Batch)?.Qty ?? 0;
+                    //FormInventoryAdjusmentDetail.LotSerialNumber = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId && x.ProductId == e.Id)?.Batch ?? "-";
+                    FormInventoryAdjusmentDetail.ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId && x.ProductId == e.Id && x.Batch == Batch.FirstOrDefault(z => z.Id == FormInventoryAdjusmentDetail.StockProductId)?.Batch)?.Expired;
                 }
                 else
                 {
-                    LotSerialNumber = "-";
-                    ExpiredDate = null;
+                    var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id && s.SourceId == InventoryAdjusment.LocationId));
+                    FormInventoryAdjusmentDetail.UomId = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId && x.ProductId == e.Id)?.UomId ?? null;
+
+                    FormInventoryAdjusmentDetail.TeoriticalQty = StockProducts.FirstOrDefault(x => x.SourceId == InventoryAdjusment.LocationId && x.ProductId == e.Id)?.Qty ?? 0;
                 }
             }
             catch (Exception ex)
