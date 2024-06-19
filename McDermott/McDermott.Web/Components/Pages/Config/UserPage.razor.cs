@@ -19,11 +19,20 @@ namespace McDermott.Web.Components.Pages.Config
 
             if (firstRender)
             {
+                IsLoading = true;
                 try
                 {
                     await GetUserInfo();
                 }
                 catch { }
+
+                await LoadData();
+                StateHasChanged();
+
+                await LoadComboBox();
+                ToastService.ShowInfo("Kesini");
+                IsLoading = false;
+                StateHasChanged();
             }
         }
 
@@ -130,7 +139,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             ShowForm = false;
             PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
             Users = await Mediator.Send(new GetUserQuery());
             Loading = false;
             PanelVisible = false;
@@ -164,7 +173,12 @@ namespace McDermott.Web.Components.Pages.Config
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+        }
 
+        private bool IsLoading { get; set; } = false;
+
+        private async Task LoadComboBox()
+        {
             Countries = await Mediator.Send(new GetCountryQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Cities = await Mediator.Send(new GetCityQuery());
@@ -175,9 +189,6 @@ namespace McDermott.Web.Components.Pages.Config
             Genders = await Mediator.Send(new GetGenderQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());
             JobPositions = await Mediator.Send(new GetJobPositionQuery());
-
-            await LoadData();
-            await GetUserInfo();
         }
 
         private async Task OnSave()

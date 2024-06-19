@@ -27,8 +27,15 @@ namespace McDermott.Web.Components.Pages.Transaction
                 try
                 {
                     await GetUserInfo();
+                    StateHasChanged();
                 }
                 catch { }
+
+                await LoadData();
+                StateHasChanged();
+
+                await LoadComboBox();
+                StateHasChanged();
             }
         }
 
@@ -355,12 +362,12 @@ namespace McDermott.Web.Components.Pages.Transaction
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+        }
 
+        private async Task LoadComboBox()
+        {
             Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true));
             Departments = await Mediator.Send(new GetDepartmentQuery());
-
-            await GetUserInfo();
-            await LoadData();
         }
 
         private async Task OnValidSubmitSave()
@@ -387,10 +394,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private void OnInvalidSubmitSave()
         {
             ToastService.ShowInfoSubmittingForm();
-        }
-
-        public async Task OnSaving(GridEditModelSavingEventArgs e)
-        {
         }
 
         private async Task LoadData()
