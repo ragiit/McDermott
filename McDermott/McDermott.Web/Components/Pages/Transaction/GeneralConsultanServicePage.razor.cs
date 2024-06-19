@@ -1043,20 +1043,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                }
-                catch { }
-            }
-        }
-
         private async Task GetUserInfo()
         {
             try
@@ -1595,10 +1581,41 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private List<AllergyDto> Allergies = [];
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            PanelVisible = true;
+            await base.OnAfterRenderAsync(firstRender);
 
+            if (firstRender)
+            {
+                try
+                {
+                    await GetUserInfo();
+                    StateHasChanged();
+                }
+                catch { }
+
+                await LoadData();
+                StateHasChanged();
+
+                await LoadComboBox();
+                StateHasChanged();
+            }
+        }
+
+        private async Task LoadData()
+        {
+            showForm = false;
+            PanelVisible = true;
+            PatientAllergy = new();
+            SelectedDataItems = [];
+            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
+            IsReferTo = false;
+            PopUpVisible = false;
+            PanelVisible = false;
+        }
+
+        private async Task LoadComboBox()
+        {
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
             Awareness = await Mediator.Send(new GetAwarenessQuery());
 
@@ -1617,7 +1634,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             var nursingDiagnosesTemps = NursingDiagnoses.Select(x => new NursingDiagnosesTemp
             {
                 Id = x.Id,
-                Problem = $"{x.Problem}" // Menggunakan interpolasi string untuk menggabungkan Problem dan Code
+                Problem = $"{x.Problem}"
             }).ToList();
             NursingDiagnosesTemps.AddRange(nursingDiagnosesTemps);
 
@@ -1625,11 +1642,21 @@ namespace McDermott.Web.Components.Pages.Transaction
             var diagnosesTemps = Diagnoses.Select(x => new DiagnosesTemp
             {
                 Id = x.Id,
-                NameCode = $"{x.Name}" // Menggunakan interpolasi string untuk menggabungkan Problem dan Code
+                NameCode = $"{x.Name}"
             }).ToList();
             DiagnosesTemps.AddRange(diagnosesTemps);
 
             AllDiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
+
+            PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
+            user_group = await Mediator.Send(new GetUserQuery());
+            NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
+            await SelectData();
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            PanelVisible = true;
 
             await GetUserInfo();
             await LoadData();
@@ -2020,22 +2047,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
             FormValidationState = false;
-        }
-
-        private async Task LoadData()
-        {
-            showForm = false;
-            PanelVisible = true;
-            PatientAllergy = new();
-            SelectedDataItems = [];
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
-            PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
-            user_group = await Mediator.Send(new GetUserQuery());
-            NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id==UserLogin.Id) ?? new();
-            await SelectData();
-            IsReferTo = false;
-            PopUpVisible = false;
-            PanelVisible = false;
         }
 
         private void UpdateEditItemsEnabled(bool enabled)

@@ -1,6 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
-using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
+﻿using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
