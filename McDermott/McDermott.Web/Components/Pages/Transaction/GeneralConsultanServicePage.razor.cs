@@ -214,8 +214,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                         PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
                 }
 
-                var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
-                FormRegis = result[0];
+                //var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
+                //FormRegis = result[0];
 
                 //FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
                 //FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
@@ -587,8 +587,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                     }
                 }
 
-                var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
-                FormRegis = result[0];
+                FormRegis.Patient = patients.FirstOrDefault(x => x.Id == FormRegis.PatientId);
+
+                //var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
+                //FormRegis = result[0];
 
                 //FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
                 //FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
@@ -601,6 +603,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (SelectedPharmacologyAllergies.Any())
                     FormRegis.IsPharmacology = true;
 
+                ToastService.ClearSuccessToasts();
                 ToastService.ShowSuccess("Saved Successfully");
 
                 IsLoading = false;

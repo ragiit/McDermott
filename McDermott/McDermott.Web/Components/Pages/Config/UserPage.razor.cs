@@ -30,7 +30,6 @@ namespace McDermott.Web.Components.Pages.Config
                 StateHasChanged();
 
                 await LoadComboBox();
-                ToastService.ShowInfo("Kesini");
                 IsLoading = false;
                 StateHasChanged();
             }
