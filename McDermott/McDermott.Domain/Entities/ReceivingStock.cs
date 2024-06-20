@@ -12,6 +12,7 @@ namespace McDermott.Domain.Entities
         public DateTime? SchenduleDate { get; set; }
 
         public string? KodeReceiving { get; set; }
+        public string? NumberPurchase { get; set; }
         public string? Reference { get; set; }
 
         public string? StatusReceived { get; set; }

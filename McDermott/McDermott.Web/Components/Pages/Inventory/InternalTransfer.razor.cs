@@ -132,6 +132,17 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<StockProductDto> Batch = [];
         private DateTime? SelectedBatchExpired { get; set; }
 
+        public int GetStatusSortOrder(TransactionStockDto item)
+        {
+            return item.StatusTransfer switch
+            {
+                "Draft" => 1,
+                "Waiting" => 2,
+                "Ready" => 3,
+                "Done" => 4,
+                _ => 5,
+            };
+        }
         private async Task SelectedBatch(StockProductDto stockProduct)
         {
             SelectedBatchExpired = null;
