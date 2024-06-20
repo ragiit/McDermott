@@ -197,7 +197,7 @@
                                                         <div class="col-md-6">
                                                             <DxFormLayout CssClass="mt w-100">
                                                                 <DxFormLayoutItem Caption="Patient" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
-                                                                    <DxComboBox ReadOnly="@(Pharmacy.Id == 0 || Pharmacy.Status!.Equals("Draft") || (!Pharmacy.Status!.Equals("SendToPharmacy") || !Pharmacy.Status!.Equals("Received") && NameGroup.Name.Equals("Admin")))"
+                                                                    <DxComboBox ReadOnly="@(isActive)"
                                                                                 ShowValidationIcon="true"
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                 FilteringMode="@DataGridFilteringMode.Contains"
@@ -210,11 +210,10 @@
                                                                     <ValidationMessage For="@(()=> Pharmacy.PatientId)" />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem Caption="Practitioner" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
-                                                                    <DxComboBox ReadOnly="@(Pharmacy.Status.Equals("Draft")|| (Pharmacy.Status.Equals("SendToPharmacy") || Pharmacy.Status.Equals("Received") && NameGroup.Name.Equals("Nurse")))"
+                                                                    <DxComboBox ReadOnly="@(isActive)"
                                                                         ShowValidationIcon="true"
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 Data="@Practitioners"
-                                                                                Enabled="isActiveButton"
                                                                                 NullText="Select Practitioner..."
                                                                                 @bind-Value="@Pharmacy.PractitionerId"
                                                                                 SelectedItemChanged="@((UserDto practitioner)=>SelectedChangePractition(practitioner))"
@@ -225,11 +224,9 @@
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem Caption="Preciption Location" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
-                                                                    <DxComboBox ReadOnly="@(Pharmacy.Status.Equals("Draft")|| (Pharmacy.Status.Equals("SendToPharmacy") || Pharmacy.Status.Equals("Received") && NameGroup.Name.Equals("Nurse")))"
-                                                                        ShowValidationIcon="true"
+                                                                    <DxComboBox ReadOnly="@(isActive)"
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                                 Data="@PreciptionLocations"
-                                                                                Enabled="isActiveButton"
                                                                                 NullText="Select Preciption Location..."
                                                                                 @bind-Value="@Pharmacy.PrescriptionLocationId"
                                                                                 TextFieldName="NameAndParent"
@@ -239,7 +236,7 @@
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem Caption=" Medicament Group" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                    <DxComboBox ReadOnly="@(Pharmacy.Status.Equals("Draft")|| (Pharmacy.Status.Equals("SendToPharmacy") || Pharmacy.Status.Equals("Received") && NameGroup.Name.Equals("Nurse")))"
+                                                                    <DxComboBox ReadOnly="@(isActive)"
                                                                         Data="@MedicamentGroups"
                                                                                 @bind-Value="@Pharmacy.MedicamentGroupId"
                                                                                 NullText="Select Medicament Group..."
@@ -253,14 +250,14 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="12">
                                                                     <div class="row w-100">
                                                                         <div class="col-md-1">
-                                                                            <DxCheckBox ReadOnly="@(!isActiveButton)" @bind-Checked="@Pharmacy.IsWeather" />
+                                                                            <DxCheckBox ReadOnly="@(isActive)" @bind-Checked="@Pharmacy.IsWeather" />
                                                                         </div>
                                                                         <div class="col-md-11">
                                                                             @if (PatientAllergy.Weather is not null || Pharmacy.IsWeather)
                                                                             {
                                                                                 <DxTagBox Data="@WeatherAllergies"
                                                                                           NullText="Select Allergy..."
-                                                                                          Enabled="isActiveButton"
+                                                                                          ReadOnly="@(isActive)"
                                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                           @bind-Values="@SelectedWeatherAllergies"
                                                                                           EditFormat="{1}"
@@ -281,13 +278,13 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacology" ColSpanMd="12">
                                                                     <div class="row w-100">
                                                                         <div class="col-md-1">
-                                                                            <DxCheckBox @bind-Checked="@Pharmacy.IsFarmacologi" ReadOnly="@(!isActiveButton)" />
+                                                                            <DxCheckBox @bind-Checked="@Pharmacy.IsFarmacologi" ReadOnly="@(isActive)" />
                                                                         </div>
                                                                         <div class="col">
                                                                             @if (PatientAllergy.Farmacology is not null || Pharmacy.IsFarmacologi)
                                                                             {
                                                                                 <DxTagBox Data="@PharmacologyAllergies"
-                                                                                          Enabled="isActiveButton"
+                                                                                          ReadOnly="@(isActive)"
                                                                                           NullText="Select Allergy..."
                                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                           @bind-Values="@SelectedPharmacologyAllergies"
@@ -309,7 +306,7 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="12">
                                                                     <div class="row w-100">
                                                                         <div class="col-md-1">
-                                                                            <DxCheckBox ReadOnly="@(!isActiveButton)" @bind-Checked="@Pharmacy.IsFood" />
+                                                                            <DxCheckBox ReadOnly="@(isActive)" @bind-Checked="@Pharmacy.IsFood" />
                                                                         </div>
                                                                         <div class="col-md-11">
                                                                             @if (PatientAllergy.Food is not null || Pharmacy.IsFood)
@@ -319,7 +316,7 @@
                                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                           @bind-Values="@SelectedFoodAllergies"
                                                                                           EditFormat="{1}"
-                                                                                          Enabled="!isActiveButton"
+                                                                                          ReadOnly="@(isActive)"
                                                                                           InputId="tbMultiColumn">
                                                                                     <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
                                                                                                         Caption="Code"
@@ -365,7 +362,7 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption text-center" Caption="Prescription Date" ColSpanMd="12">
                                                                     <DxDateEdit @bind-Date="@Pharmacy.ReceiptDate"
                                                                                 ReadOnly
-                                                                                Enabled="!isActiveButton"
+                                                                                Enabled="isActiveButton"
                                                                                 TimeSectionVisible="true" />
                                                                 </DxFormLayoutItem>
 

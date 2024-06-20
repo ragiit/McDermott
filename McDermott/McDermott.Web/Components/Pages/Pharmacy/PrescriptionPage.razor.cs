@@ -119,6 +119,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private bool PanelVisible { get; set; } = false;
         private bool IsLoading { get; set; } = false;
         private bool isView { get; set; } = false;
+        private bool isActive { get; set; } = true;
         private bool ShowForm { get; set; } = false;
         private bool isActiveButton { get; set; } = false;
         private bool PopUpConcoctionDetail { get; set; } = false;
@@ -671,7 +672,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             if (Pharmacy.Id == 0 || Pharmacy.Status!.Equals("Draft") || (Pharmacy.Status!.Equals("SendToPharmacy") || Pharmacy.Status!.Equals("Received") && NameGroup.Name.Equals("Admin")))
             {
-                var s = "caca";
+                isActive = false;
             }
 
             IsLoading = false;
@@ -1193,11 +1194,16 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
 
                 // Check if the pharmacy status is "Draft"
-                if (p.Status == "Draft" || ((p.Status == "SendToPharmacy" || p.Status == "Received") && NameGroup.Name == "Nurse"))
+
+                if (p.Status!.Equals("Draft") || ((p.Status!.Equals("SendToPharmacy") || p.Status!.Equals("Received")) && NameGroup.Name.Equals("Admin")))
                 {
+                    isActive = false;
                     isActiveButton = true;
                 }
-
+                else
+                {
+                    isActive = true;
+                }
 
                 Pharmacy = p;
 
