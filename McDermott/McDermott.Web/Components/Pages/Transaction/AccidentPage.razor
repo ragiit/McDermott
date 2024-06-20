@@ -122,6 +122,8 @@
                                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Employee" ColSpanMd="12">
                                                         <MyDxComboBox Data="@Employees"
                                                                       NullText="Select Employee..."
+                                                                      TextFieldName="Name"
+                                                                      ValueFieldName="Id"
                                                                       SelectedItemChanged="@((UserDto e) => OnSelectEmployee(e))"
                                                                       @bind-Value="Accident.EmployeeId">
                                                         </MyDxComboBox>
@@ -140,6 +142,8 @@
                                                         <MyDxComboBox ShowValidationIcon="true"
                                                                       Data="@Departments"
                                                                       NullText="Select Department..."
+                                                                      TextFieldName="Name"
+                                                                      ValueFieldName="Id"
                                                                       @bind-Value="Accident.DepartmentId">
                                                         </MyDxComboBox>
                                                         <ValidationMessage For="@(() => Accident.DepartmentId)" />

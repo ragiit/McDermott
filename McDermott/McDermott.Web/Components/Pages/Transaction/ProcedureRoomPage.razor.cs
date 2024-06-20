@@ -80,19 +80,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                 try
                 {
                     await GetUserInfo();
-                    ToastService.ShowInfo("1");
                     StateHasChanged();
                 }
                 catch { }
 
                 await LoadData();
-
-                ToastService.ShowInfo("2");
                 StateHasChanged();
 
                 await LoadDataAsync();
-
-                ToastService.ShowInfo("3");
                 StateHasChanged();
             }
         }

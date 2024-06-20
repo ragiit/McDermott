@@ -24,8 +24,14 @@ namespace McDermott.Web.Components.Pages.Config
                 try
                 {
                     await GetUserInfo();
+                    StateHasChanged();
                 }
                 catch { }
+
+                await LoadData();
+                StateHasChanged();
+                await LoadComboBox();
+                StateHasChanged();
             }
         }
 
@@ -89,33 +95,22 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
+            PanelVisible = true;
+        }
+
+        private async Task LoadComboBox()
+        {
             Menus = await Mediator.Send(new GetMenuQuery());
             Menus.Insert(0, new MenuDto
             {
                 Id = 0,
                 Name = "All",
             });
-
-            await GetUserInfo();
-            await LoadData();
         }
 
         private async Task Refresh_Click()
         {
             await LoadData();
-        }
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
         }
 
         private void NewItem_Click()
@@ -125,10 +120,13 @@ namespace McDermott.Web.Components.Pages.Config
             Group = new();
         }
 
+        private bool IsLoading { get; set; } = false;
+
         private async Task EditItem_Click()
         {
             try
             {
+                IsLoading = true;
                 Group = SelectedDataItems[0].Adapt<GroupDto>();
                 ShowForm = true;
 
@@ -143,6 +141,7 @@ namespace McDermott.Web.Components.Pages.Config
                 var zz = e;
             }
             //await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            IsLoading = false;
         }
 
         private void DeleteItem_Click()
@@ -218,11 +217,11 @@ namespace McDermott.Web.Components.Pages.Config
                 SelectedDataItems = [];
                 Group = new();
                 ShowForm = false;
-                GroupMenus = new();
+                GroupMenus = [];
                 Groups = await Mediator.Send(new GetGroupQuery());
                 PanelVisible = false;
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.HandleException(ToastService); }
         }
 
         private void ColumnChooserButton_Click()
