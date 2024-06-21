@@ -22,6 +22,7 @@ namespace McDermott.Web.Components.Pages.Config
                 try
                 {
                     await GetUserInfo();
+                    StateHasChanged();
                 }
                 catch { }
 
@@ -36,6 +37,9 @@ namespace McDermott.Web.Components.Pages.Config
                     }
                 }
                 catch { }
+
+                await LoadData();
+                StateHasChanged();
             }
         }
 
@@ -68,14 +72,6 @@ namespace McDermott.Web.Components.Pages.Config
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await GetUserInfo();
-            await LoadData();
-            PanelVisible = false;
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -92,11 +88,6 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadData();
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
         private bool EditItemsEnabled { get; set; }
 
         private async Task NewItem_Click()
@@ -107,48 +98,6 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task Refresh_Click()
         {
             await LoadData();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            }); ;
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        // private void ImportItem_Click()
-        // {
-        //     /// .....
-        // }
-
-        // private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        // {
-        //     if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-        //     {
-        //         e.CssClass = "alt-item";
-        //     }
-        //     if (e.ElementType == GridElementType.HeaderCell)
-        //     {
-        //         e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-        //         e.CssClass = "header-bold";
-        //     }
-        // }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
         }
 
         private bool UploadVisible { get; set; } = false;

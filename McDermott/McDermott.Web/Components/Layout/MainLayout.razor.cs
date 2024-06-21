@@ -49,8 +49,11 @@ namespace McDermott.Web.Components.Layout
                 if (firstRender)
                 {
                     //await JsRuntime.InvokeVoidAsync("initializePushMenu");
-                    await JsRuntime.InvokeVoidAsync("scrollFunction");
+                    showPreloader = false;
+                    StateHasChanged();
+                    //await JsRuntime.InvokeVoidAsync("scrollFunction");
                     await LoadUser();
+                    //showPreloader = false;
                     StateHasChanged();
                 }
 
@@ -66,6 +69,25 @@ namespace McDermott.Web.Components.Layout
                 var userJson = await CookieHelper.GetCookie(JsRuntime, CookieHelper.USER_INFO);
                 User = JsonConvert.DeserializeObject<User>(userJson);
                 _isInitComplete = true;
+
+                StateHasChanged();
+
+                if (User is null)
+                    return;
+
+                if (User.GroupId is null)
+                {
+                    showPreloader = false;
+                    return;
+                }
+
+                var menus = await Mediator.Send(new GetMenuQuery());
+                var groups = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)User!.GroupId!)!);
+
+                var ids = groups.Select(x => x.MenuId).ToList();
+
+                HeaderMenuDtos = [.. menus.Where(x => x.ParentMenu == null && ids.Contains(x.Id) && !x.Name.Equals("Template Page")).OrderBy(x => x.Sequence.ToInt32())];
+                DetailMenuDtos = [.. menus.Where(x => x.ParentMenu != null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
             }
             catch { }
         }
@@ -144,47 +166,8 @@ namespace McDermott.Web.Components.Layout
         {
             try
             {
+                showPreloader = true;
                 currentUrl = NavigationManager.Uri;
-                await LoadUser();
-
-                var userJson = await CookieHelper.GetCookie(JsRuntime, CookieHelper.USER_INFO);
-                var user = JsonConvert.DeserializeObject<User>(userJson);
-
-                if (user is null)
-                    return;
-
-                if (user.GroupId is null)
-                {
-                    showPreloader = false;
-                    return;
-                }
-
-                var menus = await Mediator.Send(new GetMenuQuery());
-                var groups = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)user!.GroupId!)!);
-
-                var ids = groups.Select(x => x.MenuId).ToList();
-
-                HeaderMenuDtos = [.. menus.Where(x => x.ParentMenu == null && ids.Contains(x.Id) && !x.Name.Equals("Template Page")).OrderBy(x => x.Sequence.ToInt32())];
-                DetailMenuDtos = [.. menus.Where(x => x.ParentMenu != null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
-
-                //if (user.GroupId is not null)
-                //{
-                //    var g = await Mediator.Send(new GetGroupMenuByGroupIdRequest((long)user.GroupId));
-
-                //    var encryptMenu = Helper.Encrypt(JsonConvert.SerializeObject(g));
-
-                //    await JsRuntime.InvokeVoidAsync("setCookie", CookieHelper.USER_GROUP, encryptMenu, 30);
-                //    // await oLocal.SetItemAsync("dotnet2", encryptMenu);
-                //}
-                //else
-                //{
-                //    await JsRuntime.InvokeVoidAsync("setCookie", CookieHelper.USER_GROUP, string.Empty, 30);
-                //    // await oLocal.SetItemAsync("dotnet2", new List<string>());
-                //}
-
-                showPreloader = false;
-
-                StateHasChanged();
             }
             catch (Exception)
             {

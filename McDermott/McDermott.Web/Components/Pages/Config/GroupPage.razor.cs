@@ -202,11 +202,6 @@ namespace McDermott.Web.Components.Pages.Config
             UpdateEditItemsEnabled(state);
         }
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
         private async Task LoadData()
         {
             try
@@ -222,35 +217,6 @@ namespace McDermott.Web.Components.Pages.Config
                 PanelVisible = false;
             }
             catch (Exception ex) { ex.HandleException(ToastService); }
-        }
-
-        private void ColumnChooserButton_Click()
-        {
-            GridGropMenu.ShowColumnChooser();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            }); ;
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
         }
 
         private void OnDeleteGroupMenu()

@@ -22,25 +22,7 @@
 }
 else
 {
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col">
-                    <div class="loading-panel-container">
-                        <DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                        CssClass="loading-panel"
-                                        IndicatorVisible="true"
-                                        IndicatorAreaVisible="true"
-                                        Visible="true"
-                                        Text="Processing..."
-                                        TextAlignment="LoadingPanelTextAlignment.Right">
-                            <div style="min-height: 50px;"></div>
-                        </DxLoadingPanel>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <LoadingIndicatorLayout />
 }
 
 @code {
@@ -268,12 +250,6 @@ else
         // Dashboard.NurseCount = users.Where(x => x.IsNurse == true).Count();
         // Dashboard.EmployeeCount = users.Where(x => x.IsEmployee == true).Count();
 
-        try
-        {
-            await GetUserInfo();
-        }
-        catch { }
-
         PanelVisible = false;
         // try
         // {
@@ -302,10 +278,10 @@ else
             try
             {
                 await GetUserInfo();
+                StateHasChanged();
             }
             catch
             {
-                await GetUserInfo();
             }
         }
     }

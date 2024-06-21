@@ -20,8 +20,12 @@
                 try
                 {
                     await GetUserInfo();
+                    StateHasChanged();
                 }
                 catch { }
+
+                await LoadData();
+                StateHasChanged();
             }
         }
 
@@ -49,9 +53,6 @@
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await GetUserInfo();
-            await LoadData();
-            PanelVisible = false;
         }
 
         private async Task LoadData()

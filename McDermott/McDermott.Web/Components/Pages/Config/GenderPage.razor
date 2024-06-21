@@ -1,13 +1,13 @@
 ﻿@page "/config/gender"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Master Data Gender</PageTitle>
+<PageTitle>McHealthCare - Gender</PageTitle>
 
 @if (IsAccess)
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Gender" />
+        <BaseHeaderPage Title="Gender" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
@@ -15,29 +15,19 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
-                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                </DxLoadingPanel>
+                                <MyGrid @ref="Grid"
                                         Data="Genders"
-                                        PageSize="10"
-                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                         KeyFieldName="Id"
-                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                         EditModelSaving="OnSave"
-                                        DataItemDeleting="OnDelete"
-                                        EditorRenderMode="GridEditorRenderMode.Detached"
-                                        EditMode="GridEditMode.EditForm"
-                                        PopupEditFormCssClass="pw-800"
-                                        PagerPosition="GridPagerPosition.Bottom"
-                                        PageSizeSelectorVisible="true"
-                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        PageSizeSelectorAllRowsItemVisible="true"
-                                        PagerSwitchToInputBoxButtonCount="10"
-                                        PagerVisibleNumericButtonCount="10"
-                                        ShowGroupPanel="true"
-                                        AutoExpandAllGroupRows="true"
-                                        ShowFilterRow="true"
-                                        ShowSearchBox="true"
-                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                        KeyboardNavigationEnabled="true">
+                                        DataItemDeleting="OnDelete">
+
                                     <Columns>
                                         <DxGridDataColumn FieldName="Name" SortIndex="0" />
                                         <DxGridCommandColumn MinWidth="200" Width="160px" />
@@ -49,7 +39,7 @@
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>
-                                </DxGrid>
+                                </MyGrid>
                             </div>
                         </div>
                     </div>
@@ -60,9 +50,5 @@
 }
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Gender" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <LoadingIndicatorLayout />
 }

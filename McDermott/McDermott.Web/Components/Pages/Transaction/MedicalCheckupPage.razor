@@ -1,0 +1,206 @@
+﻿@page "/clinic-service/medical-checkup"
+@rendermode InteractiveServer
+
+<PageTitle>@Helper.APP_NAME - Medical Checkup</PageTitle>
+
+<canvas id="signature-pad" width="1000" height="1000" style="border: 2px solid #000;"></canvas>
+<div>
+    <button @onclick="ClearCanvas">Clear</button>
+    <button @onclick="SaveCanvas">Save</button>
+</div>
+
+@if (IsAccess)
+{
+    <BaseHeaderPage Title="Medical Checkup" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    @if (!ShowForm)
+                    {
+                        <div class="card">
+                            <DxLoadingPanel @bind-Visible="IsLoading"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <MyGrid @ref="Grid"
+                                        KeyFieldName="Id"
+                                        Data="GeneralConsultanServices"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        DataItemDeleting="OnDeleting"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        RowDoubleClick="EditItem_Click">
+
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="GeneralConsultanServiceDto"
+                                                         Items="@GeneralConsultanServices"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@(async () => await LoadData())"
+                                                         IsImport="false"
+                                                         VisibleNew="UserAccessCRUID.Create"
+                                                         VisibleEdit="UserAccessCRUID.Update"
+                                                         VisibleDelete="UserAccessCRUID.Delete" />
+                                    </ToolbarTemplate>
+
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Employee.Name" Caption="Employee" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Department.Name" Caption="Department" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.DateOfOccurrence)" Caption="Date Of Occurrence" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.DateOfFirstTreatment)" Caption="Date Of First Treatment" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.AreaOfYard)" Caption="Area Of Yard" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.RibbonSpecialCase)" Caption="Ribbon Special Case" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.StatusName)" Caption="Status" />
+                                    </Columns>
+                                </MyGrid>
+                            </DxLoadingPanel>
+                        </div>
+                    }
+                    else
+                    {
+                        @* @if (Accident.Id != 0)
+                {
+                <div class="row justify-content-end mb-3">
+                <div class="col-auto align-self-end">
+                <DxTabs>
+                <DxTab Text="@EnumStatusAccident.ReturnToWork.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.ReturnToWork)"></DxTab>
+                <DxTab Text="@EnumStatusAccident.RestrictedWorkCase.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.RestrictedWorkCase)"></DxTab>
+                <DxTab Text="@EnumStatusAccident.LostWorkDaysCase.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.LostWorkDaysCase)"></DxTab>
+                <DxTab Text="@EnumStatusAccident.FatalityCase.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.FatalityCase)"></DxTab>
+                </DxTabs>
+                </div>
+                </div>
+
+                @if (!IsStatus(EnumStatusAccident.FatalityCase))
+                {
+                <div class="card">
+                <div class="card-body">
+                <div class="w-100">
+                <div class="col align-self-center">
+                <DxButton IconCssClass="fa-solid fa-check" Enabled="!IsLoading" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
+                </div>
+                </div>
+                </div>
+                </div>
+                } *@
+                    }
+
+                    <DxLoadingPanel @bind-Visible="IsLoading"
+                                    IsContentBlocked="true"
+                                    CssClass="w-100"
+                                    ApplyBackgroundShading="true">
+                        <EditForm Model="GeneralConsultanService" Context="EditForm" OnValidSubmit="OnValidSubmitSave" OnInvalidSubmit="OnInvalidSubmitSave">
+                            <DataAnnotationsValidator />
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <span class="fw-bolder">@(GeneralConsultanService.Id == 0 ? "Add Accident" : "Edit Accident")</span>
+                                </div>
+
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <span class="fw-bolder">Nature Of Injury</span>
+                                </div>
+
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <span class="fw-bolder">Part Of Body</span>
+                                </div>
+
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <span class="fw-bolder">Employees: Cause Of Injury</span>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <span class="fw-bolder">Treatment</span>
+                                </div>
+
+                            </div>
+
+                            @*  @if (!IsStatus(EnumStatusAccident.FatalityCase))
+                        {
+                        <div class="row  justify-content-end mb-2 mt-2">
+                        <div class="col-auto align-self-end">
+
+                        <DxButton RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" />
+
+                        <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnClickCancel"></DxButton>
+                        </div>
+                        </div>
+                        } *@
+                        </EditForm>
+
+                    </DxLoadingPanel>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    <LoadingIndicatorLayout />
+}
+
+<script>
+    window.initializeSignaturePad = () => {
+        const canvas = document.getElementById('signature-pad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        });
+
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mouseout', () => isDrawing = false);
+
+        // Initialize canvas settings
+        ctx.strokeStyle = '#000';
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 2;
+    };
+
+    window.clearCanvas = () => {
+        const canvas = document.getElementById('signature-pad');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+
+    window.saveCanvas = () => {
+        const canvas = document.getElementById('signature-pad');
+        const dataURL = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'signature.png';
+        link.click();
+    };
+
+</script>

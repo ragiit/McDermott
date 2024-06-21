@@ -2,34 +2,13 @@
 {
     public partial class GenderPage
     {
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
         private GroupMenuDto UserAccessCRUID = new();
-        public IGrid Grid { get; set; }
-        private List<GenderDto> Genders = new();
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private async Task OnDelete(GridDataItemDeletingEventArgs e)
-        {
-            await Mediator.Send(new DeleteGenderRequest(((GenderDto)e.DataItem).Id));
-            await LoadData();
-        }
-
-        protected override async Task OnInitializedAsync()
-        {
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
-
-            await LoadData();
-        }
-
+        private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -40,17 +19,50 @@
             {
                 try
                 {
-                    var result = await NavigationManager.CheckAccessUser(oLocal);
-                    IsAccess = result.Item1;
-                    UserAccessCRUID = result.Item2;
+                    await GetUserInfo();
+                    StateHasChanged();
                 }
                 catch { }
+
+                await LoadData();
+                StateHasChanged();
             }
+        }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo(ToastService);
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
+        public IGrid Grid { get; set; }
+        private List<GenderDto> Genders = new();
+        private bool PanelVisible { get; set; } = false;
+
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
+        {
+            await Mediator.Send(new DeleteGenderRequest(((GenderDto)e.DataItem).Id));
+            await LoadData();
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            PanelVisible = true;
         }
 
         private async Task LoadData()
         {
+            PanelVisible = true;
             Genders = await Mediator.Send(new GetGenderQuery());
+            PanelVisible = false;
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)

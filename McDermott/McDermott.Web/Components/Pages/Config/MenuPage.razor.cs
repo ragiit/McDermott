@@ -20,8 +20,15 @@
                 try
                 {
                     await GetUserInfo();
+                    StateHasChanged();
                 }
                 catch { }
+
+                await LoadData();
+                StateHasChanged();
+
+                ParentMenuDto = (await Mediator.Send(new GetMenuQuery())).Where(x => x.ParentMenu == null || x.ParentMenu == string.Empty).OrderBy(x => x.Sequence).ToList();
+                StateHasChanged();
             }
         }
 
@@ -59,21 +66,13 @@
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            var q = await Mediator.Send(new GetMenuQuery());
-            ParentMenuDto = [.. q.Where(x => x.ParentMenu == null || x.ParentMenu == string.Empty).OrderBy(x => x.Sequence)];
-
-            await GetUserInfo();
-            await LoadData();
-
-            PanelVisible = false;
         }
 
         private async Task LoadData()
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            Menus = await Mediator.Send(new GetMenuQuery());
-            Menus = [.. Menus.OrderBy(x => x.ParentMenu == null).ThenBy(x => x.Sequence!.ToInt32())];
+            Menus = (await Mediator.Send(new GetMenuQuery())).OrderBy(x => x.ParentMenu == null).ThenBy(x => x.Sequence!.ToInt32()).ToList();
             PanelVisible = false;
         }
 
@@ -101,11 +100,6 @@
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-        }
-
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
         }
 
         private void DeleteItem_Click()
