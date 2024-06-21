@@ -27,7 +27,9 @@ namespace McDermott.Application.Features.Services
 
                 if (!string.IsNullOrWhiteSpace(data[i - 1].Notes))
                 {
-                    worksheet.Cells[1, i].AddComment(data[i - 1].Notes);
+                    //worksheet.Cells[1, i].AddComment(data[i - 1].Notes);
+                    var comment = worksheet.Cells[1, i].AddComment(data[i - 1].Notes);
+                    comment.AutoFit = true; // AutoFit the comment box size
                 }
 
                 worksheet.Cells[1, i].Style.Font.Bold = true;

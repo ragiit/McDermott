@@ -20,6 +20,9 @@
 
         public long? ClassTypeId { get; set; }
         public string? StagingStatus { get; set; } = "Planned";
+        public EnumStatusMCU StatusMCU { get; set; } = EnumStatusMCU.Draft;
+        [NotMapped]
+        public string StatusName => StatusMCU.GetDisplayName();
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }
 
@@ -33,6 +36,7 @@
 
         [Required]
         public string? TypeRegistration { get; set; }
+        public string? MedexType { get; set; }
         public string? HomeStatus { get; set; }
 
         public string? TypeMedical { get; set; }
@@ -69,6 +73,36 @@
         public TimeSpan? WorkTo { get; set; }
         public bool Temp { get; set; } = false;
         public bool IsAlertInformationSpecialCase { get; set; } = false;
+
+        private bool _isBatam = true;
+        public bool IsBatam
+        {
+            get => _isBatam;
+            set
+            {
+                if (_isBatam != value)
+                {
+                    _isBatam = value;
+                    IsOutsideBatam = !_isBatam;
+                }
+            }
+        }
+        public bool IsMcu { get; set; } = false;
+
+        private bool _isOutsideBatam;
+        public bool IsOutsideBatam
+        {
+            get => _isOutsideBatam;
+            set
+            {
+                if (_isOutsideBatam != value)
+                {
+                    _isOutsideBatam = value;
+                    _isBatam = !_isOutsideBatam;
+                }
+            }
+        }
+
         public bool IsSickLeave { get; set; } = false;
         public bool IsMaternityLeave { get; set; } = false;
         public DateTime? StartDateSickLeave { get; set; }

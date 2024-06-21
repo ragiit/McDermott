@@ -1691,6 +1691,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
+                return;
                 var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == FormRegis.PratitionerId && x.StartDate.Date == FormRegis.RegistrationDate.Date && x.DoctorSchedule.ServiceId == FormRegis.ServiceId));
 
                 Times.Clear();
@@ -2073,6 +2074,20 @@ namespace McDermott.Web.Components.Pages.Transaction
             catch { }
 
             UpdateEditItemsEnabled(true);
+        }
+
+        private void Grid_FocusedRowChanged1(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+
+            try
+            {
+                if ((GeneralConsultanServiceDto)args.DataItem is null)
+                    return;
+
+                IsDeletedConsultantService = ((GeneralConsultanServiceDto)args.DataItem)!.StagingStatus!.Equals("Planned") || ((GeneralConsultanServiceDto)args.DataItem)!.StagingStatus!.Equals("Canceled");
+            }
+            catch { }
         }
 
         private async Task NewItem_Click()
@@ -2825,6 +2840,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
+                return;
                 await SetTimeSchedule();
             }
             catch (Exception ex)

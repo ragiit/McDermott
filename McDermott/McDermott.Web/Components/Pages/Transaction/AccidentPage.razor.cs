@@ -317,24 +317,23 @@ namespace McDermott.Web.Components.Pages.Transaction
                         case "Restricted work case":
                             Accident.SentStatus = EnumStatusAccident.RestrictedWorkCase;
                             StagingText = EnumStatusAccident.LostWorkDaysCase.GetDisplayName();
-                            await Mediator.Send(new UpdateAccidentRequest(Accident));
                             break;
 
                         case "Lost Work days case":
                             Accident.SentStatus = EnumStatusAccident.LostWorkDaysCase;
                             StagingText = EnumStatusAccident.FatalityCase.GetDisplayName();
-                            await Mediator.Send(new UpdateAccidentRequest(Accident));
                             break;
 
                         case "Fatality case":
                             Accident.SentStatus = EnumStatusAccident.FatalityCase;
                             StagingText = EnumStatusAccident.FatalityCase.GetDisplayName();
-                            await Mediator.Send(new UpdateAccidentRequest(Accident));
                             break;
 
                         default:
                             break;
                     }
+
+                    await Mediator.Send(new UpdateAccidentRequest(Accident));
 
                     Accident.Employee = Employees.FirstOrDefault(x => x.Id == Accident.EmployeeId);
                     Accident.Department = Departments.FirstOrDefault(x => x.Id == Accident.DepartmentId);

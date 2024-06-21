@@ -51,6 +51,7 @@
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             DataItemDeleting="OnDelete"
                                             RowDoubleClick="OnRowDoubleClick"
+                                            FocusedRowChanged="Grid_FocusedRowChanged1"
                                             KeyFieldName="Id">
 
                                         <ToolbarTemplate>
@@ -227,13 +228,13 @@
                                             <div class="w-100">
                                                 <div class="card">
                                                     <div class="card-header">
-                                                        <span class="fw-bolder">General Information</span>
+                                                        <span class="fw-bolder">General Consultation Service Information</span>
                                                     </div>
 
                                                     <div class="card-body">
                                                         <div class="row">
                                                             <div class="col-md-6">
-                                                                <DxFormLayout Enabled="false" CssClass="mt ">
+                                                                <DxFormLayout Enabled="false">
                                                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Patient" ColSpanMd="12">
                                                                         <MyDxComboBox ReadOnly="@(!FormRegis.StagingStatus!.Equals("Planned"))"
                                                                                       Data="@patients"

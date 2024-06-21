@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using System.Xml.Linq;
 
 namespace McDermott.Application.Extentions
 {
@@ -46,20 +47,25 @@ namespace McDermott.Application.Extentions
             FatalityCase = 4
         }
 
-
         public enum EnumStatusMCU
         {
-            [Display(Name = "Return to work")]
-            ReturnToWork = 1,
+            [Display(Name = "Draft")]
+            Draft = 1,
 
-            [Display(Name = "Restricted work case")]
-            RestrictedWorkCase = 2,
+            [Display(Name = "Employee Test")]
+            EmployeeTest = 2,
 
-            [Display(Name = "Lost Work days case")]
-            LostWorkDaysCase = 3,
+            [Display(Name = "HR Candidat")]
+            HRCandidat = 3,
 
-            [Display(Name = "Fatality case")]
-            FatalityCase = 4
+            [Display(Name = "Examination")]
+            Examination = 4,
+
+            [Display(Name = "Result")]
+            Result = 5,
+
+            [Display(Name = "Done")]
+            Done = 6
         }
 
         public enum EnumStatusGeneralConsultantService

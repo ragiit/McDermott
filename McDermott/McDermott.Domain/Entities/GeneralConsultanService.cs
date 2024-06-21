@@ -49,6 +49,11 @@
         public string? PPKRujukanCode { get; set; }
         public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
         /// </BPJS Rujukan>
+        public string? MedexType { get; set; }
+        public bool IsMcu { get; set; } = false;
+        public bool IsBatam { get; set; }
+        public bool IsOutsideBatam { get; set; }
+        public EnumStatusMCU StatusMCU { get; set; } = EnumStatusMCU.Draft;
 
 
 
