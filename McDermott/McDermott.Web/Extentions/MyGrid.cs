@@ -16,7 +16,7 @@
                 PagerPosition = GridPagerPosition.Bottom;
                 PageSizeSelectorVisible = true;
                 PageSizeSelectorItems = (new int[] { 10, 20, 50, 100 });
-                PageSizeSelectorAllRowsItemVisible = true;
+                //PageSizeSelectorAllRowsItemVisible = true;
                 PagerSwitchToInputBoxButtonCount = 10;
                 FocusedRowEnabled = true;
                 PagerVisibleNumericButtonCount = 10;

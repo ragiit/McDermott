@@ -20,8 +20,12 @@
                 try
                 {
                     await GetUserInfo();
+                    StateHasChanged();
                 }
                 catch { }
+
+                await LoadData();
+                StateHasChanged();
 
                 try
                 {
@@ -31,9 +35,16 @@
                         Grid.ExpandGroupRow(1);
                         await Grid.WaitForDataLoadAsync();
                         Grid.ExpandGroupRow(2);
+                        StateHasChanged();
                     }
                 }
                 catch { }
+
+                Countrys = await Mediator.Send(new GetCountryQuery());
+                Provinces = await Mediator.Send(new GetProvinceQuery());
+                Districts = await Mediator.Send(new GetDistrictQuery());
+                Cities = await Mediator.Send(new GetCityQuery());
+                StateHasChanged();
             }
         }
 
@@ -68,15 +79,6 @@
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            Countrys = await Mediator.Send(new GetCountryQuery());
-            Provinces = await Mediator.Send(new GetProvinceQuery());
-            Districts = await Mediator.Send(new GetDistrictQuery());
-            Cities = await Mediator.Send(new GetCityQuery());
-
-            await GetUserInfo();
-            await LoadData();
-
-            PanelVisible = false;
         }
 
         private async Task LoadData()

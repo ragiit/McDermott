@@ -20,8 +20,15 @@
                 try
                 {
                     await GetUserInfo();
+                    StateHasChanged();
                 }
                 catch { }
+
+                await LoadData();
+                StateHasChanged();
+
+                Countries = await Mediator.Send(new GetCountryQuery());
+                StateHasChanged();
             }
         }
 
@@ -74,12 +81,6 @@
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            Countries = await Mediator.Send(new GetCountryQuery());
-
-            await GetUserInfo();
-            await LoadData();
-
-            PanelVisible = false;
         }
 
         private async Task ImportFile()

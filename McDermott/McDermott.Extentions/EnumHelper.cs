@@ -46,6 +46,22 @@ namespace McDermott.Application.Extentions
             FatalityCase = 4
         }
 
+
+        public enum EnumStatusMCU
+        {
+            [Display(Name = "Return to work")]
+            ReturnToWork = 1,
+
+            [Display(Name = "Restricted work case")]
+            RestrictedWorkCase = 2,
+
+            [Display(Name = "Lost Work days case")]
+            LostWorkDaysCase = 3,
+
+            [Display(Name = "Fatality case")]
+            FatalityCase = 4
+        }
+
         public enum EnumStatusGeneralConsultantService
         {
             // nanti
@@ -64,8 +80,8 @@ namespace McDermott.Application.Extentions
             Send = 2,
 
             [Display(Name = "not-printed")]
-            NotPrinted = 3, 
-            
+            NotPrinted = 3,
+
             [Display(Name = "printed")]
             Printed = 4,
         }

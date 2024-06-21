@@ -2,7 +2,7 @@
 @using McDermott.Web.Components.Layout
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Master Data Group</PageTitle>
+<PageTitle>McHealthCare - Group</PageTitle>
 
 @if (IsAccess)
 {
@@ -79,30 +79,27 @@
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Context="ItemContext" CaptionPosition="CaptionPosition.Vertical" Caption="Menu" ColSpanMd="12">
                                                     <Template>
                                                         <MyGrid @ref="GridGropMenu"
-                                                                Data="GroupMenus.Where(x => x.Menu is not null && !string.IsNullOrWhiteSpace(x.Menu.ParentMenu))"
+                                                                Data="GroupMenus.Where(x => x.Menu is not null)"
                                                                 @bind-SelectedDataItems="@SelectedDataItemsGroupMenu"
                                                                 KeyFieldName="MenuId"
                                                                 FocusedRowChanged="GridGroupMenu_FocusedRowChanged"
                                                                 EditModelSaving="OnSaveGroupMenu"
                                                                 DataItemDeleting="OnDeleteGroupMenu">
+
                                                             <ToolbarTemplate>
-                                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                                    <DxToolbarItem Text="New" Click="NewItemGroup_Click" IconCssClass="fa-solid fa-plus" />
-                                                                    <DxToolbarItem Text="Edit" Click="() => EditItemGroup_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsGroupMenu.Count > 0 && GroupMenus.Count > 0" />
-                                                                    <DxToolbarItem Text="Delete" Click="DeleteItemGrid_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsGroupMenu.Count > 0 && GroupMenus.Count > 0" />
-                                                                    @* <DxToolbarItem Context="ToolbarContext" Text="Save" RenderStyle="ButtonRenderStyle.Primary" BeginGroup="true" IconCssClass="fa-solid fa-floppy-disk" Click="SaveItemGroupMenuGrid_Click" Enabled="GroupMenus.Count > 0" />
-                                                            <DxToolbarItem Context="ToolbarContext" Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-rotate-left" Click="CancelItemGroupMenuGrid_Click" /> *@
-                                                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                                        <Items>
-                                                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                                        </Items>
-                                                                    </DxToolbarItem>
-                                                                    @* <DxToolbarItem Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" /> *@
-                                                                </DxToolbar>
+                                                                <MyDxToolbarBase TItem="GroupMenuDto"
+                                                                                 Items="@GroupMenus"
+                                                                                 SelectedDataItems="@SelectedDataItems"
+                                                                                 NewItem_Click="@NewItemGroup_Click"
+                                                                                 EditItem_Click="() => EditItemGroup_Click(context.Grid)"
+                                                                                 DeleteItem_Click="@DeleteItem_Click"
+                                                                                 Refresh_Click="@Refresh_Click"
+                                                                                 IsImport="false"
+                                                                                 VisibleNew="UserAccessCRUID.Create"
+                                                                                 VisibleEdit="UserAccessCRUID.Update"
+                                                                                 VisibleDelete="UserAccessCRUID.Delete" />
                                                             </ToolbarTemplate>
+
                                                             <Columns>
                                                                 <DxGridSelectionColumn Context="ToolbarContext" Width="15px" />
                                                                 <DxGridDataColumn MinWidth="200" Context="ToolbarContext" FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
@@ -144,23 +141,23 @@
                                                                             </Columns>
                                                                         </MyDxComboBox>
                                                                     </DxFormLayoutItem>
-                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Create" ColSpanMd="3">
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Create">
                                                                         <DxCheckBox @bind-Checked="@GroupMenu.Create" />
                                                                         <ValidationMessage For="@(()=> @GroupMenu.Create)"   />
                                                                     </DxFormLayoutItem>
-                                                                    <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Read" ColSpanMd="3">
+                                                                    <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Read">
                                                                         <DxCheckBox @bind-Checked="@GroupMenu.Read" />
                                                                         <ValidationMessage For="@(()=> @GroupMenu.Read)"   />
                                                                     </DxFormLayoutItem>
-                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Update" ColSpanMd="3">
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Update">
                                                                         <DxCheckBox @bind-Checked="@GroupMenu.Update" />
                                                                         <ValidationMessage For="@(()=> @GroupMenu.Update)"   />
                                                                     </DxFormLayoutItem>
-                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Delete" ColSpanMd="3">
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Delete">
                                                                         <DxCheckBox @bind-Checked="@GroupMenu.Delete" />
                                                                         <ValidationMessage For="@(()=> @GroupMenu.Delete)"   />
                                                                     </DxFormLayoutItem>
-                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Import" ColSpanMd="3">
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Import">
                                                                         <DxCheckBox @bind-Checked="@GroupMenu.Import" />
                                                                         <ValidationMessage For="@(()=> @GroupMenu.Import)"   />
                                                                     </DxFormLayoutItem>
