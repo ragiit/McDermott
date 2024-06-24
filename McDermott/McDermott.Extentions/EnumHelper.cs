@@ -85,5 +85,19 @@ namespace McDermott.Application.Extentions
             [Display(Name = "printed")]
             Printed = 4,
         }
+
+        public enum EnumStatusInternalTransfer
+        {
+            [Display(Name ="draft")]
+            Draft = 0,
+            //    [Display(Name ="draft")]
+            //Draft = 0,
+            //    [Display(Name ="draft")]
+            //Draft = 0,
+            //    [Display(Name ="draft")]
+            //Draft = 0,
+            //    [Display(Name ="draft")]
+            //Draft = 0
+        }
     }
 }
