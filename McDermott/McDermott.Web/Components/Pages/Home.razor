@@ -4,6 +4,7 @@
 @using McDermott.Application.Features.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @using static McDermott.Web.Components.Pages.Transaction.GeneralConsultanServicePage
+@inject NavigationManager NavigationManager
 
 @inject CustomAuthenticationStateProvider CustomAuth
 
@@ -17,6 +18,8 @@
             <h1><label>Home</label></h1>
 
             <p>Welcome, @UserLogin.Name. @Greeting</p>
+
+            <DxButton Click="Clicktop" Text="oooooooooooo"></DxButton>
         </div>
     </div>
 }
@@ -26,7 +29,7 @@ else
 }
 
 @code {
-
+    private string mail { get; set; } = "argipurwanto0@gmil.com";
     private IGrid Grid { get; set; }
     private bool PanelVisible { get; set; } = false;
     public bool IsAddForm { get; set; }
@@ -67,6 +70,11 @@ else
         public int PhysicianCount { get; set; }
         public int NurseCount { get; set; }
         public int EmployeeCount { get; set; }
+    }
+
+    private async Task Clicktop()
+    {
+        NavigationManager.NavigateTo($"https://teams.microsoft.com/l/call/0/0?users={mail}" );
     }
 
     private DashboardTemp Dashboard { get; set; } = new();

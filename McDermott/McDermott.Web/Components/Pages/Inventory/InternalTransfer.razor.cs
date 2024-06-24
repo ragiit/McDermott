@@ -132,16 +132,14 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<StockProductDto> Batch = [];
         private DateTime? SelectedBatchExpired { get; set; }
 
-        public int GetStatusSortOrder(TransactionStockDto item)
+        public class StatusComparer : IComparer<string>
         {
-            return item.StatusTransfer switch
+            private static readonly List<string> StatusOrder = new List<string> { "Draft", "Waiting", "Ready", "Done", "Cancel" };
+
+            public int Compare(string x, string y)
             {
-                "Draft" => 1,
-                "Waiting" => 2,
-                "Ready" => 3,
-                "Done" => 4,
-                _ => 5,
-            };
+                return StatusOrder.IndexOf(x).CompareTo(StatusOrder.IndexOf(y));
+            }
         }
         private async Task SelectedBatch(StockProductDto stockProduct)
         {
@@ -167,8 +165,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
             }
 
-           
-           
         }
 
         private async Task SelectedItemProduct(ProductDto product)

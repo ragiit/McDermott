@@ -40,7 +40,7 @@
                                                 IndicatorAreaVisible="true"
                                                 Text="Fetching Data...">
                                     <DxGrid @ref="Grid"
-                                            Data="@(TransactionStocks.OrderBy(x => x.StatusTransfer == "Draft").ThenBy(x => x.StatusTransfer == "Waiting").ThenBy(x => x.StatusTransfer == "Ready").ThenBy(x => x.StatusTransfer == "Done").ThenBy(x => x.StatusTransfer == "Cancel").ToList())"
+                                            Data="@(TransactionStocks.OrderBy(x => x.StatusTransfer, new StatusComparer()).ToList())"
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             DataItemDeleting="OnDelete"
                                             FocusedRowChanged="Grid_FocusedRowChanged"
@@ -86,11 +86,11 @@
 
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="KodeTransaksi" Caption="No Transaksi"  />
+                                            <DxGridDataColumn FieldName="KodeTransaksi" Caption="No Transaksi" />
                                             <DxGridDataColumn FieldName="Source.Name" Caption="Source Location" />
                                             <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Location" />
                                             <DxGridDataColumn FieldName="SchenduleDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
-                                            <DxGridDataColumn FieldName="StatusTransfer" Caption="Status"  >
+                                            <DxGridDataColumn FieldName="StatusTransfer" Caption="Status">
                                                 <CellDisplayTemplate>
                                                     @((MarkupString)GetIssueStatusIconHtml((context.DataItem as TransactionStockDto).StatusTransfer))
                                                 </CellDisplayTemplate>
@@ -112,6 +112,7 @@
                                         <DxTab Text="Waiting" Enabled="@(FormInternalTransfer.StatusTransfer == "Waiting")"></DxTab>
                                         <DxTab Text="Ready" Enabled="@(FormInternalTransfer.StatusTransfer == "Ready")"></DxTab>
                                         <DxTab Text="Done" Enabled="@(FormInternalTransfer.StatusTransfer == "Done")"></DxTab>
+                                        <DxTab Text="Cancel" Enabled="@(FormInternalTransfer.StatusTransfer == "Cancel")"></DxTab>
                                     </DxTabs>
                                 </div>
                             </div>
@@ -123,8 +124,7 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <DxButton Text="To do Check" RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-clipboard-check" Click="ToDoCheck"></DxButton>
-                                                @*                                                 <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check"></DxButton>
-                                    *@                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
+                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
                                             </div>
                                         </div>
                                     }
@@ -142,8 +142,7 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check" Click="ToDoCheck"></DxButton>
-                                                @*                                                 <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
-                                    *@                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
+                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
                                             </div>
                                         </div>
                                     }
