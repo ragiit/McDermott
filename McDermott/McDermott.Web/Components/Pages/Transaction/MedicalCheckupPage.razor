@@ -56,7 +56,7 @@
                                         <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
                                         <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
                                         <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="StatusMcuName" Caption="Status" />
                                     </Columns>
                                 </MyGrid>
                             </DxLoadingPanel>
@@ -123,7 +123,7 @@
                                             <div class="col-md-6">
                                                 <DxFormLayout Enabled="false">
                                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Patient" ColSpanMd="12">
-                                                        <MyDxComboBox ReadOnly="@(!GeneralConsultanService.StagingStatus!.Equals("Planned"))"
+                                                        <MyDxComboBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
                                                                       Data="@Patients"
                                                                       NullText="Select Patient..."
                                                                       @bind-Value="@GeneralConsultanService.PatientId"

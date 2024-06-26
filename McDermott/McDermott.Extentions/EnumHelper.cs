@@ -70,8 +70,22 @@ namespace McDermott.Application.Extentions
 
         public enum EnumStatusGeneralConsultantService
         {
-            // nanti
-            test = 1,
+            [Display(Name = "Planned")]
+            Planned = 1,
+            [Display(Name = "Confirmed")]
+            Confirmed = 2,
+            [Display(Name = "Nurse Station")]
+            NurseStation = 3,
+            [Display(Name = "Waiting")]
+            Waiting = 4,
+            [Display(Name = "Physician")]
+            Physician = 6,
+            [Display(Name = "Finished")]
+            Finished = 7,
+            [Display(Name = "Canceled")]
+            Canceled = 0,
+            [Display(Name = "Procedure Room")]
+            ProcedureRoom = 5
         }
 
         public enum EnumStatusSickLeave
