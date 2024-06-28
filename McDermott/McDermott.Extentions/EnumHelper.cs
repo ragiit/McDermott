@@ -70,16 +70,16 @@ namespace McDermott.Application.Extentions
 
         public enum EnumStatusSickLeave
         {
-            [Display(Name = "not-action")]
+            [Display(Name = "not action")]
             NotAction = 0,
 
-            [Display(Name = "not-send")]
+            [Display(Name = "not send")]
             NotSend = 1,
 
             [Display(Name = "send")]
             Send = 2,
 
-            [Display(Name = "not-printed")]
+            [Display(Name = "not printed")]
             NotPrinted = 3,
 
             [Display(Name = "printed")]
@@ -88,16 +88,43 @@ namespace McDermott.Application.Extentions
 
         public enum EnumStatusInternalTransfer
         {
-            [Display(Name ="draft")]
+            [Display(Name = "draft")]
             Draft = 0,
-            //    [Display(Name ="draft")]
-            //Draft = 0,
-            //    [Display(Name ="draft")]
-            //Draft = 0,
-            //    [Display(Name ="draft")]
-            //Draft = 0,
-            //    [Display(Name ="draft")]
-            //Draft = 0
+
+            [Display(Name = "request")]
+            Request = 1,
+
+            [Display(Name = "approve request")]
+            ApproveRequest = 2,
+
+            [Display(Name = "waiting")]
+            Waiting = 4,
+
+            [Display(Name = "ready")]
+            Ready = 3,
+
+            [Display(Name = "done")]
+            Done = 5,
+            [Display(Name = "cancel")]
+            Cancel = 6
+        }
+
+        public enum  EnumStatusReceiving 
+        {
+            [Display(Name = "draft")]
+            Draft = 0,
+
+            [Display(Name = "waiting")]
+            Waiting = 1,
+
+            [Display(Name = "ready")]
+            Ready = 2,
+
+            [Display(Name ="done")]
+            Done = 3,
+
+            [Display(Name ="cancel")]
+            Cancel = 4,
         }
     }
 }

@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240624063136_Pharmacy")]
+    partial class Pharmacy
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -4042,50 +4045,6 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("QueueDisplays");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingLog", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("ReceivingId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("SourceId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("UserById")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceivingId");
-
-                    b.HasIndex("SourceId");
-
-                    b.HasIndex("UserById");
-
-                    b.ToTable("ReceivingLogs");
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.ReceivingStock", b =>
                 {
                     b.Property<long>("Id")
@@ -4116,8 +4075,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("SchenduleDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("StatusReceived")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -4574,14 +4533,11 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("SourceId")
                         .HasColumnType("bigint");
 
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("StatusTransfer")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("StockProductId")
                         .HasColumnType("bigint");
-
-                    b.Property<bool?>("StockRequest")
-                        .HasColumnType("bit");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -6173,30 +6129,6 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingLog", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.ReceivingStock", "Receiving")
-                        .WithMany()
-                        .HasForeignKey("ReceivingId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("McDermott.Domain.Entities.Location", "Source")
-                        .WithMany()
-                        .HasForeignKey("SourceId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("McDermott.Domain.Entities.User", "UserBy")
-                        .WithMany()
-                        .HasForeignKey("UserById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Receiving");
-
-                    b.Navigation("Source");
-
-                    b.Navigation("UserBy");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.ReceivingStock", b =>

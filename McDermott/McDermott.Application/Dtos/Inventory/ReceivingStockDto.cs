@@ -17,7 +17,7 @@ namespace McDermott.Application.Dtos.Inventory
         public string? KodeReceiving { get; set; }
         public string? Reference { get; set; }
 
-        public string? StatusReceived { get; set; }
+        public EnumStatusReceiving? Status { get; set; }
 
         [SetToNull]
         public virtual LocationDto? Destination { get; set; }

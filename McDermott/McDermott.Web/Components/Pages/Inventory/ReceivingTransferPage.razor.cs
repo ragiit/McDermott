@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.ReceivingCommand;
+using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
@@ -10,19 +11,21 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<ReceivingStockDto> ReceivingStocks = [];
         private List<ReceivingStockProductDto> receivingStockDetails = [];
         private List<ReceivingStockProductDto> TempReceivingStockDetails = [];
-        private List<TransactionStockDetailDto> TransactionStockDetails = [];
+        private List<ReceivingLogDto> ReceivingLogs = [];
         private List<LocationDto> Locations = [];
         private List<ProductDto> Products = [];
         private List<StockProductDto> Stocks = [];
         private List<UomDto> Uoms = [];
         private List<TransactionStockDetailDto> AllLogs = [];
-        private List<TransactionStockDetailDto> Logs = [];
+        private List<ReceivingLogDto> Logs = [];
+        private UserDto NameUser = new();
+       
         private ReceivingStockProductDto FormReceivingDetailStock = new();
         private ReceivingStockProductDto TempFormReceivingStockDetail = new();
         private ReceivingStockDto GetReceivingStock = new();
         private StockProductDto FormStockProduct = new();
         private ReceivingStockDto FormReceivingStocks = new();
-        private TransactionStockDetailDto FormTransactionDetail = new();
+        private ReceivingLogDto FormReceivingLog = new();
 
         #endregion Relation Data
 
@@ -86,6 +89,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 Products = await Mediator.Send(new GetProductQuery());
                 Uoms = await Mediator.Send(new GetUomQuery());
                 Stocks = await Mediator.Send(new GetStockProductQuery());
+                var user_group = await Mediator.Send(new GetUserQuery());
+                NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
                 StateHasChanged();
             }
         }
@@ -143,7 +148,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task LoadLogs()
         {
-            Logs = await Mediator.Send(new GetTransactionStockDetailQuery(x => x.ReceivingStockId == FormReceivingStocks.Id));
+            Logs = await Mediator.Send(new GetReceivingLogQuery(x => x.ReceivingId == FormReceivingStocks.Id));
         }
 
         private async Task HandleValidSubmit()
@@ -165,24 +170,24 @@ namespace McDermott.Web.Components.Pages.Inventory
             FormValidationState = false;
         }
 
-        public MarkupString GetIssueStatusIconHtml(string status)
+        public MarkupString GetIssueStatusIconHtml(EnumStatusReceiving? status)
         {
             string priorityClass;
             string title;
 
             switch (status)
             {
-                case "Draft":
+                case EnumStatusReceiving.Draft:
                     priorityClass = "info";
                     title = "Draft";
                     break;
 
-                case "Done":
+                case EnumStatusReceiving.Done:
                     priorityClass = "success";
                     title = "Done";
                     break;
 
-                case "Cancel":
+                case EnumStatusReceiving.Cancel:
                     priorityClass = "danger";
                     title = "Cancel";
                     break;
@@ -228,7 +233,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if ((ReceivingStockDto)args.DataItem is null)
                     return;
 
-                isActiveButton = ((ReceivingStockDto)args.DataItem)!.StatusReceived!.Equals("Draft");
+                isActiveButton = ((ReceivingStockDto)args.DataItem)!.Status!.Equals(EnumStatusReceiving.Draft);
             }
             catch (Exception ex)
             {
@@ -274,13 +279,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                 header = "Edit Data";
                 FormReceivingStocks = p ?? SelectedDataItems[0].Adapt<ReceivingStockDto>();
 
-                isActiveButton = FormReceivingStocks.StatusReceived == "Draft";
+                isActiveButton = FormReceivingStocks.Status == EnumStatusReceiving.Draft;
 
                 receivingId = FormReceivingStocks.Id;
 
                 receivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery(x => x.ReceivingStockId == FormReceivingStocks.Id));
-
-                TempReceivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery());
+                TempReceivingStockDetails = receivingStockDetails.Select(x => x).ToList();
 
                 foreach (var item in TempReceivingStockDetails)
                 {
@@ -347,7 +351,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             if (FormReceivingStocks is not null)
             {
-                FormReceivingStocks.StatusReceived = "Done";
+                FormReceivingStocks.Status = EnumStatusReceiving.Done;
                 GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
 
                 var CheckReceivedProduct = receivedProductStock.Where(x => x.ReceivingStockId == GetReceivingStock.Id).ToList()!;
@@ -381,15 +385,16 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 //Save Log..
 
-                FormTransactionDetail.DestinationId = GetReceivingStock.DestinationId;
-                FormTransactionDetail.ReceivingStockId = GetReceivingStock.Id;
-                FormTransactionDetail.StatusTransfer = GetReceivingStock.StatusReceived;
-                FormTransactionDetail.TypeTransaction = "Received";
+                FormReceivingLog.SourceId = GetReceivingStock.DestinationId;
+                FormReceivingLog.UserById = NameUser.Id;
+                FormReceivingLog.ReceivingId = GetReceivingStock.Id;
+                FormReceivingLog.Status = GetReceivingStock.Status;
 
-                await Mediator.Send(new CreateTransactionStockDetailRequest(FormTransactionDetail));
+                await Mediator.Send(new CreateReceivingLogRequest(FormReceivingLog));
 
                 isActiveButton = false;
             }
+            StateHasChanged();
             await LoadData();
         }
 
@@ -401,17 +406,17 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             if (FormReceivingStocks is not null)
             {
-                FormReceivingStocks.StatusReceived = " Cancel";
+                FormReceivingStocks.Status = EnumStatusReceiving.Cancel;
                 GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
             }
 
             //Save Log
-            FormTransactionDetail.DestinationId = GetReceivingStock.DestinationId;
-            FormTransactionDetail.ReceivingStockId = GetReceivingStock.Id;
-            FormTransactionDetail.StatusTransfer = GetReceivingStock.StatusReceived;
-            FormTransactionDetail.TypeTransaction = "Received";
+            FormReceivingLog.SourceId = GetReceivingStock.DestinationId;
+            FormReceivingLog.UserById = NameUser.Id;
+            FormReceivingLog.ReceivingId = GetReceivingStock.Id;
+            FormReceivingLog.Status = GetReceivingStock.Status;
 
-            await Mediator.Send(new CreateTransactionStockDetailRequest(FormTransactionDetail));
+            await Mediator.Send(new CreateReceivingLogRequest(FormReceivingLog));
         }
 
         #endregion Validation
@@ -439,8 +444,8 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                     //Delete Data Transaction Detail (log)
 
-                    DetailsIdsToDelete = TransactionStockDetails
-                        .Where(x => x.ReceivingStockId == receivingId)
+                    DetailsIdsToDelete = ReceivingLogs
+                        .Where(x => x.ReceivingId == receivingId)
                         .Select(x => x.Id)
                         .ToList();
                     await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: DetailsIdsToDelete));
@@ -462,8 +467,8 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                         //Delete Data Transaction Detail (log)
 
-                        DetailsIdsToDelete = TransactionStockDetails
-                            .Where(x => x.ReceivingStockId == Uid)
+                        DetailsIdsToDelete = ReceivingLogs
+                            .Where(x => x.ReceivingId == Uid)
                             .Select(x => x.Id)
                             .ToList();
                         await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: DetailsIdsToDelete));
@@ -535,7 +540,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         FormReceivingStocks.KodeReceiving = $"WH-IN/{nextTransactionNumber.ToString("0000")}";
                     }
 
-                    FormReceivingStocks.StatusReceived = "Draft";
+                    FormReceivingStocks.Status = EnumStatusReceiving.Draft;
 
                     GetReceivingStock = await Mediator.Send(new CreateReceivingStockRequest(FormReceivingStocks));
 
@@ -547,12 +552,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                     await Mediator.Send(new CreateListReceivingStockProductRequest(TempReceivingStockDetails));
                     ToastService.ShowSuccess("Add Data Success...");
 
-                    FormTransactionDetail.DestinationId = GetReceivingStock.DestinationId;
-                    FormTransactionDetail.ReceivingStockId = GetReceivingStock.Id;
-                    FormTransactionDetail.StatusTransfer = GetReceivingStock.StatusReceived;
-                    FormTransactionDetail.TypeTransaction = "Received";
+                    FormReceivingLog.SourceId = GetReceivingStock.DestinationId;
+                    FormReceivingLog.UserById = NameUser.Id;
+                    FormReceivingLog.ReceivingId = GetReceivingStock.Id;
+                    FormReceivingLog.Status = EnumStatusReceiving.Draft;
 
-                    await Mediator.Send(new CreateTransactionStockDetailRequest(FormTransactionDetail));
+                    await Mediator.Send(new CreateReceivingLogRequest(FormReceivingLog));
                 }
                 else
                 {
@@ -561,7 +566,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 ToastService.ClearSuccessToasts();
-
+                StateHasChanged();
                 await EditItem_Click(GetReceivingStock);
             }
             catch (Exception ex)

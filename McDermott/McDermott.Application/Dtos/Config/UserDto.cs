@@ -95,6 +95,7 @@ namespace McDermott.Application.Dtos.Config
         public string? EmployeeCode { get; set; }
         public long? DegreeId { get; set; }
         public bool? IsEmployee { get; set; } = false;
+        public bool? IsPharmacy { get; set; } = false;
         public bool? IsPatient { get; set; } = false;
         public bool? IsUser { get; set; } = false;
         public bool IsSameDomicileAddress { get; set; } = true;

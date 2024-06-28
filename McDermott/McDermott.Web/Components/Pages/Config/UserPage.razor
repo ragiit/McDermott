@@ -57,6 +57,7 @@
                                             <DxGridDataColumn FieldName="IsUser" MinWidth="200" Caption="User" />
                                             <DxGridDataColumn FieldName="IsPhysicion" MinWidth="200" Caption="Physicion" />
                                             <DxGridDataColumn FieldName="IsNurse" MinWidth="200" Caption="Nurse" />
+                                            <DxGridDataColumn FieldName="IsPharmacy" MinWidth="200" Caption="Pharmacy" />
                                         </Columns>
                                     </MyGrid>
                                 </DxLoadingPanel>
@@ -362,6 +363,7 @@
                                                             <DxGridLayoutColumn />
                                                             <DxGridLayoutColumn />
                                                             <DxGridLayoutColumn />
+                                                            <DxGridLayoutColumn />
                                                         </Columns>
                                                         <Items>
                                                             <DxGridLayoutItem Row="0" Column="0">
@@ -389,6 +391,13 @@
                                                                 <Template>
                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient">
                                                                         <DxCheckBox @bind-Checked="@UserForm.IsPatient" />
+                                                                    </DxFormLayoutItem>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="0" Column="4" CssClass="layout-margin-l">
+                                                                <Template>
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacy">
+                                                                        <DxCheckBox @bind-Checked="@UserForm.IsPharmacy" />
                                                                     </DxFormLayoutItem>
                                                                 </Template>
                                                             </DxGridLayoutItem>

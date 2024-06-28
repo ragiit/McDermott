@@ -30,8 +30,30 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 try
                 {
                     await GetUserInfo();
+                    StateHasChanged();
                 }
                 catch { }
+
+                await LoadData();
+                StateHasChanged();
+
+                try
+                {
+                    if (Grid is not null)
+                    {
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(1);
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(2);
+                        StateHasChanged();
+
+                    }
+                }
+                catch { }
+
+                await LoadAsyncData();
+                StateHasChanged();
+
             }
         }
 
@@ -577,7 +599,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         protected override async Task OnInitializedAsync()
         {
-            IsLoading = true;
+            PanelVisible = true;
+        }
+
+        private async Task LoadAsyncData()
+        {
+            PanelVisible = true;
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
             Practitioners = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
             PreciptionLocations = await Mediator.Send(new GetLocationQuery());
@@ -598,22 +625,19 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Concoctions = new List<ConcoctionDto>();
             PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
             allergies = await Mediator.Send(new GetAllergyQuery());
+            groups = await Mediator.Send(new GetGroupQuery());
+            NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
             var user_group = await Mediator.Send(new GetUserQuery());
             NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
-           
+
             allergies.ForEach(x =>
-             {
-                 var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
-                 if (a is not null)
-                     x.TypeString = a.Name;
-             });
+            {
+                var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+                if (a is not null)
+                    x.TypeString = a.Name;
+            });
             var c = Concoctions;
-
-           
-            await GetUserInfo();
-
-            IsLoading = false;
-            await LoadData();
+            PanelVisible = false;
         }
 
         private async Task SelectedItemMedicalNamePresciptionLinesChanged(ProductDto e)
@@ -658,7 +682,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task LoadData(bool v = false)
         {
-            IsLoading = true;
+            PanelVisible = true;
             if (User != null && User.Id != 0)
             {
                 Pharmacies = Pharmacies.Where(x => x.PatientId == User.Id).ToList();
@@ -669,13 +693,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             groups = await Mediator.Send(new GetGroupQuery());
             NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
-
+            var user_group = await Mediator.Send(new GetUserQuery());
+            NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
             if (Pharmacy.Id == 0 || Pharmacy.Status!.Equals("Draft") || (Pharmacy.Status!.Equals("SendToPharmacy") || Pharmacy.Status!.Equals("Received") && NameGroup.Name.Equals("Admin")))
             {
                 isActive = false;
             }
 
-            IsLoading = false;
+            PanelVisible = false;
         }
 
         private async Task LoadDataPharmacy()
@@ -755,8 +780,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
+        private string? Prescription_Name { get; set; }
+
+        List<PrescriptionDto> Prescriptions_Data = new List<PrescriptionDto>();
         private async Task OnDeletePrescriptionLines(GridDataItemDeletingEventArgs e)
         {
+            var data = SelectedDataItemsPrescriptionLines.Adapt<List<PrescriptionDto>>();
             if (Pharmacy.Id == 0)
             {
                 try
@@ -782,15 +811,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 try
                 {
-                    if (SelectedDataItemsPrescriptionLines is null || SelectedDataItemsPrescriptionLines.Count == 1)
+                    Prescription_Name = "Prescription";
+                    foreach (var item in data)
                     {
-                        await Mediator.Send(new DeletePrescriptionRequest(((PrescriptionDto)e.DataItem).Id));
+                        Prescriptions.RemoveAll(x => data.Select(z => z.Id).Contains(x.Id));
+                        Prescriptions_Data.Add(item);
                     }
-                    else
-                    {
-                        await Mediator.Send(new DeletePrescriptionRequest(ids: SelectedDataItemsPrescriptionLines.Adapt<List<PrescriptionDto>>().Select(x => x.Id).ToList()));
-                    }
-                    await LoadDataPresciptions();
+
                 }
                 catch (Exception ex)
                 {
@@ -799,8 +826,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
+        private string? Concoction_Name { get; set; }
+        List<ConcoctionDto> Concoction_data = new List<ConcoctionDto>();
         private async Task OnDeleteConcoction(GridDataItemDeletingEventArgs e)
         {
+            var data = SelectedDataItemsConcoction.Adapt<List<ConcoctionDto>>();
             if (Pharmacy.Id == 0)
             {
                 try
@@ -819,15 +849,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 try
                 {
-                    if (SelectedDataItemsConcoction is null || SelectedDataItemsConcoction.Count == 1)
+
+                    Concoction_Name = "Concoction";
+                    foreach (var item in data)
                     {
-                        await Mediator.Send(new DeleteConcoctionRequest(((ConcoctionDto)e.DataItem).Id));
+                        Concoctions.RemoveAll(x => data.Select(z => z.Id).Contains(x.Id));
+                        Concoction_data.Add(item);
                     }
-                    else
-                    {
-                        await Mediator.Send(new DeleteConcoctionRequest(ids: SelectedDataItemsConcoction.Adapt<List<ConcoctionDto>>().Select(x => x.Id).ToList()));
-                    }
-                    await LoadDataConcoctions();
                 }
                 catch (Exception ex)
                 {
@@ -836,8 +864,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
+        private string? ConcoctionLine_Name { get; set; }
+        List<ConcoctionLineDto> ConcoctionLine_Data = new List<ConcoctionLineDto>();
         private async Task OnDeleteConcoctionLine(GridDataItemDeletingEventArgs e)
         {
+            var data = SelectedDataItemsConcoctionLines.Adapt<List<ConcoctionLineDto>>();
             if (Pharmacy.Id == 0)
             {
                 try
@@ -856,15 +887,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 try
                 {
-                    if (SelectedDataItemsConcoctionLines is null || SelectedDataItemsConcoctionLines.Count == 1)
+                    ConcoctionLine_Name = "ConcoctionLine";
+                    foreach (var item in data)
                     {
-                        await Mediator.Send(new DeleteConcoctionLineRequest(((ConcoctionLineDto)e.DataItem).Id));
+                        ConcoctionLines.RemoveAll(x => data.Select(z => z.Id).Contains(x.Id));
+                        ConcoctionLine_Data.Add(item);
                     }
-                    else
-                    {
-                        await Mediator.Send(new DeleteConcoctionLineRequest(ids: SelectedDataItemsConcoctionLines.Adapt<List<ConcoctionLineDto>>().Select(x => x.Id).ToList()));
-                    }
-                    await LoadDataConcoctionLines();
                 }
                 catch (Exception ex)
                 {
@@ -1083,7 +1111,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 else
                     await Mediator.Send(new UpdatePrescriptionRequest(t));
 
-                await LoadDataPresciptions();
+                await EditItemPharmacy_Click(null);
             }
         }
 
@@ -1116,10 +1144,45 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     PharmaciesLog.status = Pharmacy.Status;
 
                     await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
+                    ToastService.ShowSuccess("Add Data Success..");
                 }
                 else
                 {
                     Pharmacy = await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+
+                    if (Prescription_Name is not null)
+                    {
+                        if (Prescriptions_Data.Count > 0)
+                        {
+                            foreach (var items in Prescriptions_Data)
+                            {
+                                await Mediator.Send(new DeletePrescriptionRequest(items.Id));
+                            }
+                        }
+                    }
+
+                    if(Concoction_Name is not null)
+                    {
+                        if(Concoction_data.Count > 0)
+                        {
+                            foreach(var items in Concoction_data)
+                            {
+                                await Mediator.Send(new DeleteConcoctionRequest(items.Id));
+                            }
+                        }
+                    }
+
+                    if (ConcoctionLine_Name is not null)
+                    {
+                        if(ConcoctionLine_Data.Count > 0)
+                        {
+                            foreach(var items in ConcoctionLine_Data)
+                            {
+                                await Mediator.Send(new DeleteConcoctionLineRequest(items.Id));
+                            }
+                        }
+                    }
+                    ToastService.ShowSuccess("Update Data Success..");
                 }
 
                 await EditItemPharmacy_Click(Pharmacy);
@@ -1171,12 +1234,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItemPharmacy_Click(PharmacyDto? q = null)
         {
-            
+
             try
             {
                 ShowForm = true;
                 header = "Data Pharmacy";
-                IsLoading = true;
+                PanelVisible = true;
                 PharmacyDto? p = null;
 
                 // Check if SelectedDataItems has at least one item
@@ -1195,7 +1258,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 // Check if the pharmacy status is "Draft"
 
-                if (p.Status!.Equals("Draft") || ((p.Status!.Equals("SendToPharmacy") || p.Status!.Equals("Received")) && NameGroup.Name.Equals("Admin")))
+                if (p.Status!.Equals("Draft") || ((p.Status!.Equals("SendToPharmacy") || p.Status!.Equals("Received")) && NameUser.IsPharmacy == true))
                 {
                     isActive = false;
                     isActiveButton = true;
@@ -1214,7 +1277,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 await LoadLogs();
 
-                IsLoading = false;
+                PanelVisible = false;
             }
             catch (Exception e)
             {
@@ -1481,7 +1544,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
             {
                 ExportSelectedRowsOnly = true,
-            }); ;
+            });
         }
 
         private async Task ExportXlsItem_Click()

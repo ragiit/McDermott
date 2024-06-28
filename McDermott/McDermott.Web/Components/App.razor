@@ -144,15 +144,20 @@
             color: #e50000;
         }
 
-        .sticky-section {
-            position: -webkit-sticky;
+        .sticky {
+            position: -webkit-sticky; /* Safari */
             position: sticky;
-            top: 80px; /* Adjust this value according to your navbar height */
-            z-index: 1000; /* Ensure the section appears above the navbar */
+            top: 60px;
+            z-index: 1;
+            background-color: rgba(252, 247, 246, 0.99);
+            border-radius: 8px;
+            padding: 8px 5px 0 5px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
         }
 
         .dxbl-tabs {
             display: inline !important;
+            border-top:1px !important;
         }
 
         /* .dxbl-btn-standalone.dxbl-btn-primary {
@@ -163,19 +168,21 @@
             border-radius: 10px !important;
             padding-inline-start: 25px !important;
             padding-inline-end: 25px !important;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+            box-shadow: 1px 4px 6px rgba(0, 0, 0, 0.3) !important;
         }
 
-        .dxbl-tabs > .dxbl-tabs-tablist > .dxbl-scroll-viewer > .dxbl-scroll-viewer-content > ul > li > .dxbl-tabs-item:not(.dxbl-tabs-tmpl):not(.dxbl-disabled):not(:disabled).dxbl-active {
-            background-color: rgb(100, 172, 200 ) !important;
+         .dxbl-tabs > .dxbl-tabs-tablist > .dxbl-scroll-viewer > .dxbl-scroll-viewer-content > ul > li > .dxbl-tabs-item:not(.dxbl-tabs-tmpl):not(.dxbl-disabled):not(:disabled).dxbl-active {
+            background-color: rgb(10, 172, 200 ) !important;
             color: white !important;
             font-weight: bolder;
-            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-        }
+            border:1px solid;
+            box-shadow: rgba(0,2, 5, 0.24)  1px 3px  8px;
 
-        .dxbl-tabs-item {
+        } 
+
+         .dxbl-tabs-item {
             border-radius: 20px !important;
-        }
+        } 
 
         .dxbl-tabs > .dxbl-tabs-tablist {
             border-radius: 20px !important;

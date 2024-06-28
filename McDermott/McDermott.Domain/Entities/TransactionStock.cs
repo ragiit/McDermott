@@ -12,8 +12,9 @@ namespace McDermott.Domain.Entities
         public long? DestinationId { get; set; }
         public DateTime? SchenduleDate { get; set; }
         public string? KodeTransaksi { get; set; }
-        public string? StatusTransfer { get; set; }
+        public EnumStatusInternalTransfer? Status { get; set; }
         public string? Reference { get; set; }
+        public bool? StockRequest { get; set; }
 
         [SetToNull]
         public Location? Source { get; set; }

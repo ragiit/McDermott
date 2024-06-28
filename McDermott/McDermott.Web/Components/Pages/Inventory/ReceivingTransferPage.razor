@@ -79,11 +79,11 @@
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Name" />
-                                            <DxGridDataColumn FieldName="SchenduleDate" Caption="Schendule Date" />
-                                            <DxGridDataColumn FieldName="NumberPurchase" Caption="Number Purchase" />
-                                            <DxGridDataColumn FieldName="StatusReceived" Caption="Status">
+                                            <DxGridDataColumn FieldName="SchenduleDate" Caption="Schendule Date" DisplayFormat="dd MMMM yyyy" />
+                                            <DxGridDataColumn FieldName="NumberPurchase" Caption="Purchase Number" />
+                                            <DxGridDataColumn FieldName="Status" Caption="Status">
                                                 <CellDisplayTemplate>
-                                                    @GetIssueStatusIconHtml((context.DataItem as ReceivingStockDto).StatusReceived)
+                                                    @GetIssueStatusIconHtml((context.DataItem as ReceivingStockDto).Status)
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
                                         </Columns>
@@ -97,26 +97,29 @@
                         //Button
                         @if (FormReceivingStocks.Id != 0)
                         {
-                            <div class="row justify-content-end mb-3">
-                                <div class="col-auto align-self-end">
-                                    <DxTabs RenderMode="TabsRenderMode.AllTabs">
-                                        <DxTab Text="Draft" Enabled="@(FormReceivingStocks.StatusReceived == "Draft")"></DxTab>
-                                        <DxTab Text="Done" Enabled="@(FormReceivingStocks.StatusReceived == "Done")"></DxTab>
-                                        <DxTab Text="Cancel" Enabled="@(FormReceivingStocks.StatusReceived == "Cancel")"></DxTab>
-                                    </DxTabs>
+                            <div class="sticky">
+                                <div class="row justify-content-end mb-3">
+                                    <div class="col-auto align-self-end">
+                                        <DxTabs RenderMode="TabsRenderMode.AllTabs">
+                                            <DxTab Text="Draft" Enabled="@(FormReceivingStocks.Status == EnumStatusReceiving.Draft)"></DxTab>
+                                            <DxTab Text="Done" Enabled="@(FormReceivingStocks.Status == EnumStatusReceiving.Done)"></DxTab>
+                                            <DxTab Text="Cancel" Enabled="@(FormReceivingStocks.Status == EnumStatusReceiving.Cancel)"></DxTab>
+                                        </DxTabs>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row justify-content-start mb-3">
-                                <div class="col-12 align-self-start">
-                                    @if (FormReceivingStocks.StatusReceived == "Draft")
-                                    {
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <DxButton Text="Receiving" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check" Click="onValidation"></DxButton>
-                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+
+                                <div class="row justify-content-start mb-3">
+                                    <div class="col-12 align-self-start">
+                                        @if (FormReceivingStocks.Status == EnumStatusReceiving.Draft)
+                                        {
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <DxButton Text="Receiving" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onValidation"></DxButton>
+                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                </div>
                                             </div>
-                                        </div>
-                                    }
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         }
@@ -149,9 +152,9 @@
                                                         Enabled="@isActiveButton"></DxComboBox>
                                             <ValidationMessage For="@(()=>FormReceivingStocks.DestinationId)"></ValidationMessage>
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Number Purchase" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                        <DxFormLayoutItem Caption="Purchase Number" CaptionCssClass="normal-caption" ColSpanMd="12">
                                             <DxTextBox @bind-Text="@FormReceivingStocks.NumberPurchase"
-                                                       NullText="Input Number Purchase..."
+                                                       NullText="Input Purchase Number..."
                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                        ShowValidationIcon="true"
                                                        Enabled="@isActiveButton" />
@@ -329,7 +332,7 @@
                                                                                     <div class="timeline-item">
                                                                                         <span class="time"><i class="fas fa-clock"></i> @item.CreatedDate.GetValueOrDefault().ToString("HH:mm")</span>
                                                                                         <h3 class="timeline-header">
-                                                                                            <a class="no-underline">@item.CreatedBy</a>
+                                                                                            <a class="no-underline">@item.UserBy.Name</a>
                                                                                         </h3>
 
                                                                                         <div class="timeline-body">
@@ -337,29 +340,29 @@
                                                                                                 string priorityClass = "";
                                                                                                 string title = "";
 
-                                                                                                switch (item.StatusTransfer)
+                                                                                                switch (item.Status)
                                                                                                 {
-                                                                                                    case "Draft":
+                                                                                                    case EnumStatusReceiving.Draft:
                                                                                                         priorityClass = "info";
                                                                                                         title = "Draft";
                                                                                                         break;
 
-                                                                                                    case "Waiting":
+                                                                                                    case EnumStatusReceiving.Waiting:
                                                                                                         priorityClass = "warning";
                                                                                                         title = "Waiting";
                                                                                                         break;
 
-                                                                                                    case "Ready":
+                                                                                                    case EnumStatusReceiving.Ready:
                                                                                                         priorityClass = "primary";
                                                                                                         title = "Ready";
                                                                                                         break;
 
-                                                                                                    case "Done":
+                                                                                                    case EnumStatusReceiving.Done:
                                                                                                         priorityClass = "success";
                                                                                                         title = "Done";
                                                                                                         break;
 
-                                                                                                    case "Cancel":
+                                                                                                    case EnumStatusReceiving.Cancel:
                                                                                                         priorityClass = "danger";
                                                                                                         title = "Cancel";
                                                                                                         break;
@@ -380,21 +383,11 @@
 
                                                                                             <div class="row w-100">
                                                                                                 <div class="col-md-2">
-                                                                                                    Type
-                                                                                                </div>
-
-                                                                                                <div class="col-md-10">
-                                                                                                    : @(item.TypeTransaction ?? "N/A")
-                                                                                                </div>
-                                                                                            </div>
-
-                                                                                            <div class="row w-100">
-                                                                                                <div class="col-md-2">
                                                                                                     Destination
                                                                                                 </div>
 
                                                                                                 <div class="col-md-10">
-                                                                                                    : @item.Destination?.Name
+                                                                                                    : @item.Source?.Name
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>

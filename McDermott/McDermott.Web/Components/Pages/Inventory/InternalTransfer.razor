@@ -10,6 +10,7 @@
 
 </style>
 
+
 <div class="wrapper">
     <section class="content-header">
         <div class="container-fluid">
@@ -40,7 +41,7 @@
                                                 IndicatorAreaVisible="true"
                                                 Text="Fetching Data...">
                                     <DxGrid @ref="Grid"
-                                            Data="@(TransactionStocks.OrderBy(x => x.StatusTransfer, new StatusComparer()).ToList())"
+                                            Data="@(TransactionStocks.OrderBy<TransactionStockDto, EnumStatusInternalTransfer>(x => x.Status ?? EnumStatusInternalTransfer.Draft, new StatusComparer()).ToList())"
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             DataItemDeleting="OnDelete"
                                             FocusedRowChanged="Grid_FocusedRowChanged"
@@ -90,9 +91,9 @@
                                             <DxGridDataColumn FieldName="Source.Name" Caption="Source Location" />
                                             <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Location" />
                                             <DxGridDataColumn FieldName="SchenduleDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
-                                            <DxGridDataColumn FieldName="StatusTransfer" Caption="Status">
+                                            <DxGridDataColumn FieldName="Status" Caption="Status">
                                                 <CellDisplayTemplate>
-                                                    @((MarkupString)GetIssueStatusIconHtml((context.DataItem as TransactionStockDto).StatusTransfer))
+                                                    @((MarkupString)GetIssueStatusIconHtml((context.DataItem as TransactionStockDto).Status))
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
                                         </Columns>
@@ -103,54 +104,104 @@
                     }
                     else
                     {
-                        @if (FormInternalTransfer.Id != 0)
-                        {
-                            <div class="row justify-content-end mb-3">
-                                <div class="col-auto align-self-end">
-                                    <DxTabs RenderMode="TabsRenderMode.AllTabs">
-                                        <DxTab Text="Draft" Enabled="@(FormInternalTransfer.StatusTransfer == "Draft")"></DxTab>
-                                        <DxTab Text="Waiting" Enabled="@(FormInternalTransfer.StatusTransfer == "Waiting")"></DxTab>
-                                        <DxTab Text="Ready" Enabled="@(FormInternalTransfer.StatusTransfer == "Ready")"></DxTab>
-                                        <DxTab Text="Done" Enabled="@(FormInternalTransfer.StatusTransfer == "Done")"></DxTab>
-                                        <DxTab Text="Cancel" Enabled="@(FormInternalTransfer.StatusTransfer == "Cancel")"></DxTab>
-                                    </DxTabs>
+                        <div class="sticky">
+                            @if (FormInternalTransfer.Id != 0)
+                            {
+                                <div class="row justify-content-end mb-3">
+                                    <div class="col-auto align-self-end">
+                                        <DxTabs RenderMode="TabsRenderMode.AllTabs">
+                                            <DxTab Text="Draft" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)"></DxTab>
+                                            @if (FormInternalTransfer.StockRequest == true)
+                                            {
+                                                @if (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null)
+                                                {
+                                                    <DxTab Text="Request" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Request)"></DxTab>
+                                                }
+                                                <DxTab Text="Approve Request" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.ApproveRequest)"></DxTab>
+                                                <DxTab Text="Waiting" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Waiting)"></DxTab>
+                                            }
+                                            <DxTab Text="Ready" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)"></DxTab>
+                                            <DxTab Text="Done" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Done)"></DxTab>
+                                            <DxTab Text="Cancel" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Cancel)"></DxTab>
+                                        </DxTabs>
+                                    </div>
+                                </div>
+                                <div class="row justify-content-start mb-3">
+                                    <div class="col-12 align-self-start">
+
+                                        @if (FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)
+                                        {
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    @if (FormInternalTransfer.StockRequest == true)
+                                                    {
+                                                        @if (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null)
+                                                        {
+                                                            <DxButton Text="Request" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-clipboard-check" Click="Request"></DxButton>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <DxButton Text="Ready" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Ready"></DxButton>
+                                                    }
+
+                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (FormInternalTransfer.Status == EnumStatusInternalTransfer.Request)
+                                        {
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <DxButton Text="Approve Request" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Approv_Check"></DxButton>
+                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (FormInternalTransfer.Status == EnumStatusInternalTransfer.ApproveRequest)
+                                        {
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <DxButton Text="Ready" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Ready"></DxButton>
+                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)
+                                        {
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" Click="validation" IconCssClass="fa-solid fa-check"></DxButton>
+                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (FormInternalTransfer.Status == EnumStatusInternalTransfer.Waiting)
+                                        {
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check" Click="Request"></DxButton>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    @if (isActiveButton)
+                                    {
+                                        <div class="col d-flex justify-content-end">
+                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" CssClass="ml-1" Text="Discard" Click="onDiscard"></DxButton>
+                                        </div>
+                                    }
                                 </div>
                             </div>
-                            <div class="row justify-content-start mb-3">
-                                <div class="col-12 align-self-start">
-
-                                    @if (FormInternalTransfer.StatusTransfer == "Draft")
-                                    {
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <DxButton Text="To do Check" RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-clipboard-check" Click="ToDoCheck"></DxButton>
-                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
-                                            </div>
-                                        </div>
-                                    }
-                                    else if (FormInternalTransfer.StatusTransfer == "Ready")
-                                    {
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
-                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
-                                            </div>
-                                        </div>
-                                    }
-                                    else if (FormInternalTransfer.StatusTransfer == "Waiting")
-                                    {
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check" Click="ToDoCheck"></DxButton>
-                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
-                                            </div>
-                                        </div>
-                                    }
-
-                                    @* </div> *@
-                                </div>
-                            </div>
-                        }
+                             
+                        </div>
                         <div class="card">
                             <div class="card-header">
                                 <span class="fw-bolder">@header</span>
@@ -175,6 +226,7 @@
                                                         Enabled="@isActiveButton"
                                                         FilteringMode="@DataGridFilteringMode.Contains"
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                        SelectedItemChanged="((LocationDto value)=>SelectedItemProduct(value))"
                                                         ShowValidationIcon="true"></DxComboBox>
                                             <ValidationMessage For="@(()=>FormInternalTransfer.SourceId)"></ValidationMessage>
                                         </DxFormLayoutItem>
@@ -204,7 +256,9 @@
                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                     ShowValidationIcon="true"></DxMemo>
                                         </DxFormLayoutItem>
-
+                                        <DxFormLayoutItem Caption="Stock Request" ColSpanMd="12" CaptionCssClass="normal-caption">
+                                            <DxCheckBox @bind-Checked="@FormInternalTransfer.StockRequest"></DxCheckBox>
+                                        </DxFormLayoutItem>
                                     </DxFormLayout>
 
                                     <DxFormLayout>
@@ -223,7 +277,7 @@
                                                         FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                                         KeyFieldName="Id"
                                                         EditModelSaving="OnSave_Detail"
-                                                        DataItemDeleting="OnDelete"
+                                                        DataItemDeleting="onDelete_Detail"
                                                         EditFormButtonsVisible="false"
                                                         EditMode="GridEditMode.EditForm"
                                                         PopupEditFormCssClass="my-style"
@@ -261,7 +315,7 @@
                                                         <DxGridDataColumn FieldName="ProductName" Caption="Product Name" SortIndex="0" />
                                                         <DxGridDataColumn FieldName="QtyStock" Caption="Demand" MinWidth="90" Width="190" />
                                                         <DxGridDataColumn FieldName="Batch" Caption="Batch" MinWidth="90" Width="190" />
-                                                        <DxGridDataColumn FieldName="ExpiredDate" Caption="Expired Date" />
+                                                        <DxGridDataColumn FieldName="ExpiredDate" Caption="Expired Date" DisplayFormat="dd MMMM yyyy" />
                                                         <DxGridDataColumn FieldName="UomName" Caption="Unit Of Measure" />
                                                     </Columns>
                                                     <EditFormTemplate Context="EditFormContextt">
@@ -271,7 +325,7 @@
                                                         <DxFormLayout CssClass="mt w-100">
                                                             <div class="col-md-4">
                                                                 <DxFormLayoutItem Caption="Product Name" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                    <DxComboBox Data="@Products"
+                                                                    <DxComboBox Data="@filteredProducts"
                                                                                 @bind-Value="@TempFormInternalTransfer.ProductId"
                                                                                 NullText="Select Product.."
                                                                                 TextFieldName="Name"
@@ -350,15 +404,7 @@
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>
 
-                                    @if (isActiveButton)
-                                    {
-                                        <hr />
 
-                                        <div class="col d-flex justify-content-end">
-                                            <DxButton  RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" CssClass="ml-1" Text="Discard" Click="onDiscard"></DxButton>
-                                        </div>
-                                    }
 
                                     @if (Logs.Count > 0)
                                     {
@@ -405,29 +451,39 @@
                                                                                                 string priorityClass = "";
                                                                                                 string title = "";
 
-                                                                                                switch (item.StatusTransfer)
+                                                                                                switch (item.Status)
                                                                                                 {
-                                                                                                    case "Draft":
+                                                                                                    case EnumStatusInternalTransfer.Draft:
                                                                                                         priorityClass = "info";
                                                                                                         title = "Draft";
                                                                                                         break;
 
-                                                                                                    case "Waiting":
+                                                                                                    case EnumStatusInternalTransfer.Request:
+                                                                                                        priorityClass = "info";
+                                                                                                        title = "Request";
+                                                                                                        break;
+
+                                                                                                    case EnumStatusInternalTransfer.ApproveRequest:
+                                                                                                        priorityClass = "info";
+                                                                                                        title = "Approval Request";
+                                                                                                        break;
+
+                                                                                                    case EnumStatusInternalTransfer.Waiting:
                                                                                                         priorityClass = "warning";
                                                                                                         title = "Waiting";
                                                                                                         break;
 
-                                                                                                    case "Ready":
-                                                                                                        priorityClass = "primary";
+                                                                                                    case EnumStatusInternalTransfer.Ready:
+                                                                                                        priorityClass = "Primary";
                                                                                                         title = "Ready";
                                                                                                         break;
 
-                                                                                                    case "Done":
+                                                                                                    case EnumStatusInternalTransfer.Done:
                                                                                                         priorityClass = "success";
                                                                                                         title = "Done";
                                                                                                         break;
 
-                                                                                                    case "Cancel":
+                                                                                                    case EnumStatusInternalTransfer.Cancel:
                                                                                                         priorityClass = "danger";
                                                                                                         title = "Cancel";
                                                                                                         break;
