@@ -442,14 +442,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                             GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
                         break;
 
-<<<<<<< HEAD
-                    generalLog.GeneralConsultanServiceId = GeneralConsultanMedicalSupport.GeneralConsultanServiceId;
-                    generalLog.UserById = NameUser.Id;
-                    generalLog.Status = GeneralConsultanService.StagingStatus;
-=======
+
+//                    generalLog.GeneralConsultanServiceId = GeneralConsultanMedicalSupport.GeneralConsultanServiceId;
+//                    generalLog.UserById = NameUser.Id;
+//                    generalLog.Status = GeneralConsultanService.StagingStatus;
+
                     case EnumStatusGeneralConsultantServiceProcedureRoom.InProgress:
                         GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
->>>>>>> Sprint3
+
 
                         break;
 
@@ -473,15 +473,13 @@ namespace McDermott.Web.Components.Pages.Transaction
                 //generalLog.UserById = NameGroup.Id;
                 //generalLog.Status = GeneralConsultanMedicalSupport.Status;
 
-<<<<<<< HEAD
-                generalLog.ProcedureRoomId = GeneralConsultanMedicalSupport.Id;
-                generalLog.UserById = NameUser.Id;
-                generalLog.Status = GeneralConsultanMedicalSupport.Status;
+
+                //generalLog.ProcedureRoomId = GeneralConsultanMedicalSupport.Id;
+                //generalLog.UserById = NameUser.Id;
+                //generalLog.Status = GeneralConsultanMedicalSupport.Status;
 
                 await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
-=======
-                //await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
->>>>>>> Sprint3
+
 
                 if ((GeneralConsultanMedicalSupport.LabTestId is not null && GeneralConsultanMedicalSupport.LabTestId != 0))
                 {
