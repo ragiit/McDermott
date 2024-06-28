@@ -1,4 +1,6 @@
-﻿namespace McDermott.Application.Dtos.Transaction
+﻿using McDermott.Application.Dtos.Queue;
+
+namespace McDermott.Application.Dtos.Transaction
 {
     public partial class GeneralConsultanServiceDto : IMapFrom<GeneralConsultanService>
     {
@@ -9,8 +11,6 @@
         [Required(ErrorMessage = "The Patient field is required.")]
         public long? PatientId { get; set; }
 
-        public long? InsuranceId { get; set; }
-
         public long? InsurancePolicyId { get; set; }
 
         [Required(ErrorMessage = "The Service field is required.")]
@@ -19,21 +19,17 @@
         public long? PratitionerId { get; set; }
 
         public long? ClassTypeId { get; set; }
-        public string? StagingStatus { get; set; } = "Planned";
+        public EnumStatusGeneralConsultantService Status { get; set; } = EnumStatusGeneralConsultantService.Planned;
+        [NotMapped]
+        public string StatusName => Status.GetDisplayName();
         public EnumStatusMCU StatusMCU { get; set; } = EnumStatusMCU.Draft;
         [NotMapped]
-        public string StatusName => StatusMCU.GetDisplayName();
+        public string StatusMcuName => StatusMCU.GetDisplayName();
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }
 
         [Required]
         public string? Payment { get; set; } = "BPJS";
-
-        public string? NoRM { get; set; }
-
-        public string? IdentityNumber { get; set; }
-        public DateTime? BirthDay { get; set; }
-
         [Required]
         public string? TypeRegistration { get; set; }
         public string? MedexType { get; set; }
@@ -60,18 +56,14 @@
             { }
         }
 
-        public DateTime? CreateDate { get; set; }
-
         [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime RegistrationDate { get; set; } = DateTime.Now;
 
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
-        public DateTime? AppoimentDate { get; set; }
-
+        public DateTime? AppointmentDate { get; set; }
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }
-        public bool Temp { get; set; } = false;
         public bool IsAlertInformationSpecialCase { get; set; } = false;
 
         private bool _isBatam = true;
@@ -131,11 +123,97 @@
         public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
         /// </BPJS Rujukan>
 
-        public virtual KioskQueue? KioskQueue { get; set; }
+
+        #region Clinical Assesment
+        public double _Weight { get; set; }
+
+        public double Weight
+        {
+            get => _Weight;
+            set
+            {
+                _Weight = value;
+                CalculateBMI(Height, value);
+            }
+        }
+
+        public double _Height { get; set; }
+
+        public double Height
+        {
+            get => _Height;
+            set
+            {
+                _Height = value;
+                CalculateBMI(value, Weight);
+            }
+        }
+
+        public void CalculateBMI(double height, double weight)
+        {
+            BMIIndex = 0;
+            BMIState = "-";
+
+            if (height > 0 && weight > 0)
+            {
+                weight = weight / 100;
+                height = height / 1000;
+
+                BMIIndex = weight / (height * height);
+                BMIIndexString = Math.Round(BMIIndex, 2).ToString();
+
+                if (BMIIndex < 18.5)
+                {
+                    BMIState = "Low Weight";
+                }
+                else if (BMIIndex >= 18.5 && BMIIndex <= 24.9)
+                {
+                    BMIState = "Normal";
+                }
+                else if (BMIIndex == 25.0 && BMIIndex <= 29.9)
+                {
+                    BMIState = "Overweight";
+                }
+                else
+                {
+                    BMIState = "Obesity";
+                }
+                return;
+            }
+        }
+
+        public long RR { get; set; }
+        public long Temp { get; set; }
+
+        [Required]
+        public long HR { get; set; }
+
+        public long PainScale { get; set; }
+        public long Systolic { get; set; }
+        public long DiastolicBP { get; set; }
+        public long SpO2 { get; set; }
+        public long Sistole { get; set; }
+        public long Diastole { get; set; }
+        public long WaistCircumference { get; set; }
+
+        public double BMIIndex { get; set; }
+        public string BMIIndexString { get; set; } = "0";
+
+        public string BMIState { get; set; } = "-";
+        public string ClinicVisitTypes { get; set; } = "Sick";
+        public long? AwarenessId { get; set; }
+
+        public long E { get; set; } = 4;
+        public long V { get; set; } = 5;
+        public long M { get; set; } = 6;
+
+        #endregion
+
+        public virtual AwarenessDto? AwarenessDto { get; set; }
+        public virtual KioskQueueDto? KioskQueue { get; set; }
         public virtual ClassTypeDto? ClassType { get; set; }
         public virtual UserDto Patient { get; set; } = new();
         public virtual UserDto? Pratitioner { get; set; }
-        public virtual InsuranceDto? Insurance { get; set; }
         public virtual ServiceDto? Service { get; set; }
         public virtual InsurancePolicyDto? InsurancePolicy { get; set; }
     }

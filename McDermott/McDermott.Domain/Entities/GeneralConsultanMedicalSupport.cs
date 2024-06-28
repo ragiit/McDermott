@@ -1,4 +1,6 @@
-﻿namespace McDermott.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace McDermott.Domain.Entities
 {
     public class GeneralConsultanMedicalSupport : BaseAuditableEntity
     {
@@ -49,7 +51,10 @@
         //public bool IsSupraventricularExtraSystole { get; set; } = false;
         public bool IsOtherECG { get; set; } = false;
         public string? OtherDesc { get; set; }
-        public string? Status { get; set; }
+
+        public EnumStatusGeneralConsultantServiceProcedureRoom? Status { get; set; } = EnumStatusGeneralConsultantServiceProcedureRoom.Draft;
+        [NotMapped]
+        public string StatusName => Status.GetDisplayName();
         public long? LabTestId { get; set; }
 
         [SetToNull]

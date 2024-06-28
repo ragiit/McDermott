@@ -55,6 +55,7 @@
                                                              Refresh_Click="@Refresh_Click"
                                                              IsImport="false"
                                                              VisibleNew="false"
+                                                             Grid="Grid"
                                                              VisibleDelete="UserAccessCRUID.Delete"
                                                              VisibleEdit="UserAccessCRUID.Update" />
                                         </ToolbarTemplate>
@@ -62,7 +63,7 @@
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="GeneralConsultanService.RegistrationDate" DisplayFormat="ddd, dd MMM yyyy" Caption="Registration Date" />
                                             <DxGridDataColumn FieldName="GeneralConsultanService.Patient.Name" Caption="Patient" />
-                                            <DxGridDataColumn FieldName="Status" Caption="Status" />
+                                            <DxGridDataColumn FieldName="StatusName" Caption="Status" />
                                         </Columns>
                                     </MyGrid>
                                 </DxLoadingPanel>
@@ -73,20 +74,20 @@
                             <div class="row justify-content-end mb-3">
                                 <div class="col-auto align-self-end">
                                     <DxTabs>
-                                        <DxTab Text="Draft" Enabled="@(GeneralConsultanMedicalSupport.Status == "Draft")"></DxTab>
-                                        <DxTab Text="In-Progress" Enabled="@(GeneralConsultanMedicalSupport.Status == "In-Progress")"></DxTab>
-                                        <DxTab Text="Finish" Enabled="@(GeneralConsultanMedicalSupport.Status == "Finish")"></DxTab>
+                                        <DxTab Text="Draft" Enabled="@IsStatus(EnumStatusGeneralConsultantServiceProcedureRoom.Draft)"></DxTab>
+                                        <DxTab Text="In-Progress" Enabled="@IsStatus(EnumStatusGeneralConsultantServiceProcedureRoom.InProgress)"></DxTab>
+                                        <DxTab Text="Finish" Enabled="@IsStatus(EnumStatusGeneralConsultantServiceProcedureRoom.Finish)"></DxTab>
                                     </DxTabs>
                                 </div>
                             </div>
 
-                            @if (GeneralConsultanMedicalSupport.Status is not null && !GeneralConsultanMedicalSupport.Status.Equals("Finish"))
+                            @if (GeneralConsultanMedicalSupport.Status is not null && !GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))
                             {
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="w-100">
                                             <div class="col align-self-center">
-                                                <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary" Enabled="@(!GeneralConsultanMedicalSupport.Status.Equals("Finish") && !Loading)"></DxButton>
+                                                <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary" Enabled="@(!GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish) && !Loading)"></DxButton>
                                             </div>
                                         </div>
                                     </div>
@@ -115,7 +116,7 @@
                                                 <DxFormLayoutGroup ColSpanMd="12" Caption="Lab Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                                                     <Items>
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
-                                                            <DxComboBox ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals("Finish"))" ShowValidationIcon="true" Data="@Doctors"
+                                                            <DxComboBox ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" ShowValidationIcon="true" Data="@Doctors"
                                                                         NullText="Select Practitioner..."
                                                                         @bind-Value="@GeneralConsultanMedicalSupport.PractitionerLabEximinationId"
                                                                         TextFieldName="Name"
@@ -278,7 +279,7 @@
                                                 <DxFormLayoutGroup ColSpanMd="12" Caption="Radiology Result" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                                                     <Items>
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
-                                                            <DxComboBox ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals("Finish"))" ShowValidationIcon="true" Data="@Doctors"
+                                                            <DxComboBox ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" ShowValidationIcon="true" Data="@Doctors"
                                                                         NullText="Select Practitioner..."
                                                                         @bind-Value="@GeneralConsultanMedicalSupport.PractitionerRadiologyEximinationId"
                                                                         TextFieldName="Name"
@@ -287,7 +288,7 @@
                                                             <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerRadiologyEximinationId)" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
-                                                            <DxTextBox ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals("Finish"))" @bind-Text="@GeneralConsultanMedicalSupport.RadiologyEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            <DxTextBox ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" @bind-Text="@GeneralConsultanMedicalSupport.RadiologyEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
                                                             <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.RadiologyEximinationAttachment"
@@ -312,7 +313,7 @@
                                                                         NullText="Select Practitioner..."
                                                                         @bind-Value="@GeneralConsultanMedicalSupport.PractitionerAlcoholEximinationId"
                                                                         TextFieldName="Name"
-                                                                        ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals("Finish"))"
+                                                                        ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"
                                                                         ValueFieldName="Id">
                                                             </DxComboBox>
                                                             <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.PractitionerAlcoholEximinationId)" />
@@ -347,7 +348,7 @@
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
                                                             <DxComboBox ShowValidationIcon="true" Data="@Doctors"
                                                                         NullText="Select Practitioner..."
-                                                                        ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals("Finish"))"
+                                                                        ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"
                                                                         @bind-Value="@GeneralConsultanMedicalSupport.PractitionerDrugEximinationId"
                                                                         TextFieldName="Name"
                                                                         ValueFieldName="Id">
@@ -649,7 +650,7 @@
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Practitioner" ColSpanMd="12">
                                                             <DxComboBox ShowValidationIcon="true" Data="@Doctors"
                                                                         NullText="Select Practitioner..."
-                                                                        ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals("Finish"))"
+                                                                        ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"
                                                                         @bind-Value="@GeneralConsultanMedicalSupport.PractitionerECGId"
                                                                         TextFieldName="Name"
                                                                         ValueFieldName="Id">

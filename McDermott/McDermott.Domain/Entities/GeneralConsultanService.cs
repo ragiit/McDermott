@@ -4,18 +4,13 @@
     {
         public long? KioskQueueId { get; set; }
         public long? PatientId { get; set; }
-        public long? InsuranceId { get; set; }
         public long? InsurancePolicyId { get; set; }
         public long? ServiceId { get; set; }
         public long? PratitionerId { get; set; }
         public long? ClassTypeId { get; set; }
-        public string? StagingStatus { get; set; }
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }
         public string? Payment { get; set; }
-        public string? NoRM { get; set; }
-        public string? IdentityNumber { get; set; }
-        public DateTime? BirthDay { get; set; }
         public string? TypeRegistration { get; set; }
         public string? HomeStatus { get; set; }
         public string? TypeMedical { get; set; }
@@ -28,7 +23,7 @@
         public DateTime? StartMaternityLeave { get; set; }
         public DateTime? EndMaternityLeave { get; set; }
         public DateTime? RegistrationDate { get; set; }
-        public DateTime? AppoimentDate { get; set; }
+        public DateTime? AppointmentDate { get; set; }
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }
         public string? SerialNo { get; set; } // NoUrut
@@ -53,9 +48,42 @@
         public bool IsMcu { get; set; } = false;
         public bool IsBatam { get; set; }
         public bool IsOutsideBatam { get; set; }
+        public EnumStatusGeneralConsultantService Status { get; set; } = EnumStatusGeneralConsultantService.Planned;
         public EnumStatusMCU StatusMCU { get; set; } = EnumStatusMCU.Draft;
 
+        #region Clinical Assesment
 
+        public double Weight { get; set; }
+
+        public double Height { get; set; }
+        public long RR { get; set; }
+        public long Temp { get; set; }
+        public long HR { get; set; }
+        public long PainScale { get; set; }
+        public long Systolic { get; set; }
+        public long DiastolicBP { get; set; }
+        public long SpO2 { get; set; }
+        public long Sistole { get; set; }
+        public long Diastole { get; set; }
+        public long WaistCircumference { get; set; }
+
+        public double BMIIndex { get; set; }
+        public string BMIIndexString { get; set; } = "0";
+
+        public string BMIState { get; set; } = "-";
+        public string ClinicVisitTypes { get; set; } = "Sick";
+        public long? AwarenessId { get; set; }
+
+        public long E { get; set; } = 4;
+        public long V { get; set; } = 5;
+        public long M { get; set; } = 6;
+
+        #endregion
+
+        [SetToNull]
+        public virtual Awareness? AwarenessDto { get; set; }
+        [SetToNull]
+        public virtual KioskQueue? KioskQueue { get; set; }
 
         [SetToNull]
         public virtual User? Patient { get; set; }
@@ -63,8 +91,6 @@
         [SetToNull]
         public virtual User? Pratitioner { get; set; }
 
-        [SetToNull]
-        public virtual Insurance? Insurance { get; set; }
 
         [SetToNull]
         public virtual Service? Service { get; set; }
@@ -76,6 +102,9 @@
         public virtual List<GeneralConsultanCPPT>? GeneralConsultanCPPTs { get; set; }
 
         [SetToNull]
+        public virtual List<GeneralConsultationLog>? GeneralConsultationLogs { get; set; }
+
+        [SetToNull]
         public virtual List<GeneralConsultanMedicalSupport>? GeneralConsultanMedicalSupports { get; set; }
 
         [SetToNull]
@@ -83,8 +112,5 @@
 
         [SetToNull]
         public virtual ClassType? ClassType { get; set; }
-
-        [SetToNull]
-        public virtual KioskQueue? KioskQueue { get; set; }
     }
 }

@@ -68,6 +68,17 @@ namespace McDermott.Application.Extentions
             Done = 6
         }
 
+        public enum EnumStatusGeneralConsultantServiceProcedureRoom
+        {
+            [Display(Name = "Draft")]
+            Draft = 1,
+
+            [Display(Name = "In-Progress")]
+            InProgress = 2,
+
+            [Display(Name = "Finish")]
+            Finish = 3
+        }
         public enum EnumStatusGeneralConsultantService
         {
             [Display(Name = "Planned")]

@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240625074711_MigrateClinicalAssesmentToGeneralConsultant")]
+    partial class MigrateClinicalAssesmentToGeneralConsultant
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1999,8 +2002,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("RadiologyEximinationName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("THCCannabinoidMarijuanaNegative")
                         .HasColumnType("bit");
@@ -2100,6 +2103,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<string>("HomeStatus")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("InsuranceId")
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("InsurancePolicyId")
                         .HasColumnType("bigint");
@@ -2256,6 +2262,8 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("AwarenessId");
 
                     b.HasIndex("ClassTypeId");
+
+                    b.HasIndex("InsuranceId");
 
                     b.HasIndex("InsurancePolicyId");
 
@@ -5580,6 +5588,11 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ClassTypeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("McDermott.Domain.Entities.Insurance", "Insurance")
+                        .WithMany()
+                        .HasForeignKey("InsuranceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("McDermott.Domain.Entities.InsurancePolicy", "InsurancePolicy")
                         .WithMany()
                         .HasForeignKey("InsurancePolicyId")
@@ -5608,6 +5621,8 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("AwarenessDto");
 
                     b.Navigation("ClassType");
+
+                    b.Navigation("Insurance");
 
                     b.Navigation("InsurancePolicy");
 
