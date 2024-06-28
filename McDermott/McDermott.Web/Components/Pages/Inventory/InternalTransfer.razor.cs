@@ -51,6 +51,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 await LoadData();
                 StateHasChanged();
+<<<<<<< HEAD
 
                 try
                 {
@@ -75,6 +76,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 var user_group = await Mediator.Send(new GetUserQuery());
                 NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
                 StateHasChanged();
+=======
+>>>>>>> Sprint3
             }
         }
 
@@ -134,10 +137,22 @@ namespace McDermott.Web.Components.Pages.Inventory
             try
             {
                 PanelVisible = true;
-                showForm = false;
-                showFormDetail = false;
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                 PanelVisible = false;
+
+                showForm = false;
+                showFormDetail = false;
+<<<<<<< HEAD
+                TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+                PanelVisible = false;
+=======
+                StockProducts = await Mediator.Send(new GetStockProductQuery());
+                Locations = await Mediator.Send(new GetLocationQuery());
+                Products = await Mediator.Send(new GetProductQuery());
+                Uoms = await Mediator.Send(new GetUomQuery());
+                UomName = Uoms.Select(x => x.Name).FirstOrDefault();
+                TransactionStockDetails = await Mediator.Send(new GetTransactionStockDetailQuery());
+>>>>>>> Sprint3
             }
             catch (Exception ex)
             {
@@ -169,6 +184,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 return indexX.CompareTo(indexY);
             }
         }
+
         private async Task SelectedBatch(StockProductDto stockProduct)
         {
             SelectedBatchExpired = null;
@@ -192,6 +208,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     }
                 }
             }
+<<<<<<< HEAD
 
         }
 
@@ -205,6 +222,8 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 ex.HandleException(ToastService);
             }
+=======
+>>>>>>> Sprint3
         }
 
         private async Task SelectedItemProduct(ProductDto product)
@@ -232,13 +251,19 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     TempFormInternalTransfer.Batch = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Batch ?? "-";
                     TempFormInternalTransfer.ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Expired;
+<<<<<<< HEAD
                     TempFormInternalTransfer.CurrentStock = 0;
+=======
+>>>>>>> Sprint3
                 }
                 else
                 {
                     TempFormInternalTransfer.Batch = "-";
                     TempFormInternalTransfer.ExpiredDate = null;
+<<<<<<< HEAD
                     TempFormInternalTransfer.CurrentStock = StockProducts.Where(x => x.SourceId == FormInternalTransfer.SourceId && x.ProductId == product.Id).Select(x => x.Qty).FirstOrDefault();
+=======
+>>>>>>> Sprint3
                 }
             }
         }

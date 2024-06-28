@@ -3,15 +3,10 @@
 
 <PageTitle>@Helper.APP_NAME - Medical Checkup</PageTitle>
 
-<canvas id="signature-pad" width="1000" height="1000" style="border: 2px solid #000;"></canvas>
-<div>
-    <button @onclick="ClearCanvas">Clear</button>
-    <button @onclick="SaveCanvas">Save</button>
-</div>
-
 @if (IsAccess)
 {
     <BaseHeaderPage Title="Medical Checkup" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
+
     <section class="content">
         <div class="container-fluid">
             <div class="row">
@@ -19,6 +14,7 @@
                     @if (!ShowForm)
                     {
                         <div class="card">
+                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
                             <DxLoadingPanel @bind-Visible="IsLoading"
                                             IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                             IsContentBlocked="true"
@@ -34,14 +30,17 @@
                                         RowDoubleClick="EditItem_Click">
 
                                     <ToolbarTemplate>
-                                        <MyDxToolbarBase TItem="GeneralConsultanServiceDto"
+                                        <MyDxToolbarBase Grid="Grid"
+                                                         TItem="GeneralConsultanServiceDto"
                                                          Items="@GeneralConsultanServices"
                                                          SelectedDataItems="@SelectedDataItems"
                                                          NewItem_Click="@NewItem_Click"
                                                          EditItem_Click="@EditItem_Click"
                                                          DeleteItem_Click="@DeleteItem_Click"
                                                          Refresh_Click="@(async () => await LoadData())"
-                                                         IsImport="false"
+                                                         IsImport="true"
+                                                         ImportFile="ImportFile"
+                                                         ExportToExcel="ExportToExcel"
                                                          VisibleNew="UserAccessCRUID.Create"
                                                          VisibleEdit="UserAccessCRUID.Update"
                                                          VisibleDelete="UserAccessCRUID.Delete" />
@@ -49,13 +48,15 @@
 
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Employee.Name" Caption="Employee" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Department.Name" Caption="Department" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.DateOfOccurrence)" Caption="Date Of Occurrence" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.DateOfFirstTreatment)" Caption="Date Of First Treatment" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.AreaOfYard)" Caption="Area Of Yard" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.RibbonSpecialCase)" Caption="Ribbon Special Case" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.StatusName)" Caption="Status" />
+                                        <DxGridDataColumn MinWidth="200"
+                                                          FieldName="RegistrationDate"
+                                                          FilterRowOperatorType="GridFilterRowOperatorType.Contains"
+                                                          DisplayFormat="ddd, dd MMM yyyy"
+                                                          Caption="Registration Date" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="StatusMcuName" Caption="Status" />
                                     </Columns>
                                 </MyGrid>
                             </DxLoadingPanel>
@@ -63,89 +64,209 @@
                     }
                     else
                     {
-                        @* @if (Accident.Id != 0)
-                {
-                <div class="row justify-content-end mb-3">
-                <div class="col-auto align-self-end">
-                <DxTabs>
-                <DxTab Text="@EnumStatusAccident.ReturnToWork.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.ReturnToWork)"></DxTab>
-                <DxTab Text="@EnumStatusAccident.RestrictedWorkCase.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.RestrictedWorkCase)"></DxTab>
-                <DxTab Text="@EnumStatusAccident.LostWorkDaysCase.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.LostWorkDaysCase)"></DxTab>
-                <DxTab Text="@EnumStatusAccident.FatalityCase.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.FatalityCase)"></DxTab>
-                </DxTabs>
-                </div>
-                </div>
+                        <DxLoadingPanel @bind-Visible="IsLoading"
+                                        IsContentBlocked="true"
+                                        CssClass="w-100"
+                                        ApplyBackgroundShading="true">
+                            <EditForm Model="GeneralConsultanService" Context="EditForm" OnValidSubmit="OnValidSubmitSave" OnInvalidSubmit="OnInvalidSubmitSave">
+                                <DataAnnotationsValidator />
 
-                @if (!IsStatus(EnumStatusAccident.FatalityCase))
-                {
-                <div class="card">
-                <div class="card-body">
-                <div class="w-100">
-                <div class="col align-self-center">
-                <DxButton IconCssClass="fa-solid fa-check" Enabled="!IsLoading" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
-                </div>
-                </div>
-                </div>
-                </div>
-                } *@
+                                @if (GeneralConsultanService.Id != 0)
+                                {
+                                    <div class="row justify-content-end mb-3">
+                                        <div class="col-auto align-self-end">
+                                            @if (GeneralConsultanService.IsBatam)
+                                            {
+                                                <DxTabs>
+                                                    <DxTab Text="@EnumStatusMCU.Draft.GetDisplayName()" Enabled="@IsStatus(EnumStatusMCU.Draft)"></DxTab>
+                                                    <DxTab Text="@EnumStatusMCU.HRCandidat.GetDisplayName()" Enabled="@IsStatus(EnumStatusMCU.HRCandidat)"></DxTab>
+                                                    <DxTab Text="@EnumStatusMCU.Examination.GetDisplayName()" Enabled="@IsStatus(EnumStatusMCU.Examination)"></DxTab>
+                                                    <DxTab Text="@EnumStatusMCU.Result.GetDisplayName()" Enabled="@IsStatus(EnumStatusMCU.Result)"></DxTab>
+                                                    <DxTab Text="@EnumStatusMCU.Done.GetDisplayName()" Enabled="@IsStatus(EnumStatusMCU.Done)"></DxTab>
+                                                </DxTabs>
+                                            }
+                                            else
+                                            {
+                                                <DxTabs>
+                                                    <DxTab Text="@EnumStatusMCU.Draft.GetDisplayName()" Enabled="@IsStatus(EnumStatusMCU.Draft)"></DxTab>
+                                                    <DxTab Text="@EnumStatusMCU.EmployeeTest.GetDisplayName()" Enabled="@IsStatus(EnumStatusMCU.EmployeeTest)"></DxTab>
+                                                    <DxTab Text="@EnumStatusMCU.HRCandidat.GetDisplayName()" Enabled="@IsStatus(EnumStatusMCU.HRCandidat)"></DxTab>
+                                                    <DxTab Text="@EnumStatusMCU.Examination.GetDisplayName()" Enabled="@IsStatus(EnumStatusMCU.Examination)"></DxTab>
+                                                    <DxTab Text="@EnumStatusMCU.Result.GetDisplayName()" Enabled="@IsStatus(EnumStatusMCU.Result)"></DxTab>
+                                                    <DxTab Text="@EnumStatusMCU.Done.GetDisplayName()" Enabled="@IsStatus(EnumStatusMCU.Done)"></DxTab>
+                                                </DxTabs>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    @if (!GeneralConsultanService.StatusMCU.Equals(EnumStatusMCU.Done))
+                                    {
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="w-100">
+                                                    <div class="col align-self-center">
+                                                        <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="fw-bolder">@(GeneralConsultanService.Id == 0 ? "Add Medical Checkup Information" : "Medical Checkup Information")</span>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <DxFormLayout Enabled="false">
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Patient" ColSpanMd="12">
+                                                        <MyDxComboBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                                      Data="@Patients"
+                                                                      NullText="Select Patient..."
+                                                                      @bind-Value="@GeneralConsultanService.PatientId"
+                                                                      TextFieldName="Name"
+                                                                      SelectedItemChanged="@((UserDto e) => SelectedItemPatientChanged(e))"
+                                                                      ValueFieldName="Id">
+                                                        </MyDxComboBox>
+                                                        <ValidationMessage For="@(() => GeneralConsultanService.PatientId)"   />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="(GeneralConsultanService.Patient.NoRm)" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="(GeneralConsultanService.Patient.NoId)" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
+                                                        <Template>
+                                                            <DxGridLayout>
+                                                                <Rows>
+                                                                    <DxGridLayoutRow />
+                                                                </Rows>
+                                                                <Columns>
+                                                                    <DxGridLayoutColumn Width="90%" />
+                                                                    <DxGridLayoutColumn Width="30%" />
+                                                                </Columns>
+                                                                <Items>
+                                                                    <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
+                                                                        <Template>
+                                                                            <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Age" NullText="Age" ReadOnly InputCssClass="fw-normal" />
+                                                                        </Template>
+                                                                    </DxGridLayoutItem>
+                                                                    <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                                        <Template>
+                                                                            <h6 class="pl-1 pt-2 normal-caption">Year</h6>
+                                                                        </Template>
+                                                                    </DxGridLayoutItem>
+                                                                </Items>
+                                                            </DxGridLayout>
+
+                                                        </Template>
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
+                                                        <DxDateEdit @bind-Date="@GeneralConsultanService.RegistrationDate"
+                                                                    Mask="@DateTimeMask.ShortDate"
+                                                                    NullText="Select Registration Date">
+                                                        </DxDateEdit>
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
+                                                        <MyDxComboBox Data="@Services"
+                                                                      NullText="Select Service.."
+                                                                      SelectedItemChanged="@((ServiceDto e) => SelectedItemServiceChanged(e))"
+                                                                      @bind-Value="@GeneralConsultanService.ServiceId"
+                                                                      TextFieldName="Name"
+                                                                      ValueFieldName="Id">
+                                                        </MyDxComboBox>
+                                                        <ValidationMessage For="@(() => GeneralConsultanService.ServiceId)" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Physicion" ColSpanMd="12">
+                                                        <MyDxComboBox Data="@Physicions"
+                                                                      NullText="Select Physicion..."
+                                                                      @bind-Value="@GeneralConsultanService.PratitionerId"
+                                                                      TextFieldName="Name"
+                                                                      ValueFieldName="Id">
+                                                        </MyDxComboBox>
+                                                        <ValidationMessage For="@(() => GeneralConsultanService.PratitionerId)" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <DxFormLayout Enabled="true">
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg. Type" ColSpanMd="12">
+                                                        <MyDxComboBox Data="@RegisType"
+                                                                      ReadOnly
+                                                                      NullText="Select Registration Type..."
+                                                                      AllowUserInput="true"
+                                                                      @bind-Value="@GeneralConsultanService.TypeRegistration">
+                                                        </MyDxComboBox>
+                                                        <ValidationMessage For="@(() => GeneralConsultanService.TypeRegistration)" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="MCU Type" ColSpanMd="12">
+                                                        <MyDxComboBox Data="@MCUType"
+                                                                      NullText="Select MCU Type..."
+                                                                      AllowUserInput="true"
+                                                                      @bind-Value="@GeneralConsultanService.TypeMedical">
+                                                        </MyDxComboBox>
+                                                        <ValidationMessage For="@(() => GeneralConsultanService.TypeMedical)" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Medex Type" ColSpanMd="12">
+                                                        <MyDxComboBox Data="@MedexType"
+                                                                      NullText="Select Medex Type..."
+                                                                      AllowUserInput="true"
+                                                                      @bind-Value="@GeneralConsultanService.MedexType">
+                                                        </MyDxComboBox>
+                                                        <ValidationMessage For="@(() => GeneralConsultanService.MedexType)" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Alert Information Special Case" ColSpanMd="12">
+                                                        <DxCheckBox CssClass="normal-caption" @bind-Checked="@GeneralConsultanService.IsBatam">
+                                                            <div class="normal-caption">Batam</div>
+                                                        </DxCheckBox>
+                                                        <DxCheckBox @bind-Checked="@(GeneralConsultanService.IsOutsideBatam)">
+                                                            <div class="normal-caption">Outside Batam</div>
+                                                        </DxCheckBox>
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @* <div class="card">
+                        <div class="card-header">
+                        <span class="fw-bolder">Nature Of Injury</span>
+                        </div>
+
+                        </div> *@
+
+                                @if (!GeneralConsultanService.StatusMCU.Equals(EnumStatusMCU.Done))
+                                {
+                                    <div class="row  justify-content-end mb-2 mt-2">
+                                        <div class="col-auto align-self-end">
+
+                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" />
+
+                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(async () => await LoadData())"></DxButton>
+                                        </div>
+                                    </div>
+                                }
+                            </EditForm>
+
+                        </DxLoadingPanel>
+
                     }
 
-                    <DxLoadingPanel @bind-Visible="IsLoading"
-                                    IsContentBlocked="true"
-                                    CssClass="w-100"
-                                    ApplyBackgroundShading="true">
-                        <EditForm Model="GeneralConsultanService" Context="EditForm" OnValidSubmit="OnValidSubmitSave" OnInvalidSubmit="OnInvalidSubmitSave">
-                            <DataAnnotationsValidator />
-
-                            <div class="card">
-                                <div class="card-header">
-                                    <span class="fw-bolder">@(GeneralConsultanService.Id == 0 ? "Add Accident" : "Edit Accident")</span>
-                                </div>
-
-                            </div>
-
-                            <div class="card">
-                                <div class="card-header">
-                                    <span class="fw-bolder">Nature Of Injury</span>
-                                </div>
-
-                            </div>
-
-                            <div class="card">
-                                <div class="card-header">
-                                    <span class="fw-bolder">Part Of Body</span>
-                                </div>
-
-                            </div>
-
-                            <div class="card">
-                                <div class="card-header">
-                                    <span class="fw-bolder">Employees: Cause Of Injury</span>
-                                </div>
-                            </div>
-
-                            <div class="card">
-                                <div class="card-header">
-                                    <span class="fw-bolder">Treatment</span>
-                                </div>
-
-                            </div>
-
-                            @*  @if (!IsStatus(EnumStatusAccident.FatalityCase))
-                        {
-                        <div class="row  justify-content-end mb-2 mt-2">
-                        <div class="col-auto align-self-end">
-
-                        <DxButton RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" />
-
-                        <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnClickCancel"></DxButton>
-                        </div>
-                        </div>
-                        } *@
-                        </EditForm>
-
-                    </DxLoadingPanel>
-                    }
                 </div>
             </div>
         </div>
@@ -155,6 +276,14 @@ else
 {
     <LoadingIndicatorLayout />
 }
+
+<div hidden>
+    <canvas id="signature-pad" width="1000" height="1000" style="border: 2px solid #000;"></canvas>
+    <div>
+        <button @onclick="ClearCanvas">Clear</button>
+        <button @onclick="SaveCanvas">Save</button>
+    </div>
+</div>
 
 <script>
     window.initializeSignaturePad = () => {

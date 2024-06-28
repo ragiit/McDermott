@@ -10,6 +10,7 @@
 
 </style>
 
+<<<<<<< HEAD
 
 <div class="wrapper">
     <section class="content-header">
@@ -35,54 +36,53 @@
                     {
                         <div class="card">
                             <div class="card-body">
+=======
+@if (IsAccess)
+{
+    <div class="wrapper">
+
+        <BaseHeaderPage Title="Internal Transfer" OnClickBack="@(async () => await LoadData())" ShowBackButton="showForm" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        @if (!showForm)
+                        {
+                            <div class="card">
+>>>>>>> Sprint3
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
                                                 IsContentBlocked="true"
                                                 ApplyBackgroundShading="true"
                                                 IndicatorAreaVisible="true"
                                                 Text="Fetching Data...">
+<<<<<<< HEAD
                                     <DxGrid @ref="Grid"
                                             Data="@(TransactionStocks.OrderBy<TransactionStockDto, EnumStatusInternalTransfer>(x => x.Status ?? EnumStatusInternalTransfer.Draft, new StatusComparer()).ToList())"
+=======
+                                    <MyGrid @ref="Grid"
+                                            Data="@(TransactionStocks.OrderBy(x => x.StatusTransfer == "Draft").ThenBy(x => x.StatusTransfer == "Waiting").ThenBy(x => x.StatusTransfer == "Ready").ThenBy(x => x.StatusTransfer == "Done").ThenBy(x => x.StatusTransfer == "Cancel").ToList())"
+>>>>>>> Sprint3
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             DataItemDeleting="OnDelete"
                                             FocusedRowChanged="Grid_FocusedRowChanged"
                                             RowDoubleClick="OnRowDoubleClick"
-                                            PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            EditorRenderMode="GridEditorRenderMode.Detached"
-                                            PageSize="10"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="@GridExtention.Grid_CustomizeDataRowEditor"
-                                            AllowSelectRowByClick="true"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            ShowFilterRow="true"
-                                            CustomizeElement="@GridExtention.Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
+                                            KeyFieldName="Id">
 
                                         <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItem_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && TransactionStocks.Count > 0 " />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && TransactionStocks.Count > 0" />
-                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(Grid))" />
-                                                        <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(Grid))" />
-                                                        <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(Grid))" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                            </DxToolbar>
+                                            <MyDxToolbarBase TItem="TransactionStockDto"
+                                                             Items="@TransactionStocks"
+                                                             Grid="Grid"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@NewItem_Click"
+                                                             EditItem_Click="@(async () => await EditItem_Click(null))"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             Refresh_Click="@Refresh_Click"
+                                                             IsImport="false"
+                                                             EnableDelete="isActiveButton"
+                                                             VisibleNew="UserAccessCRUID.Create"
+                                                             VisibleEdit="UserAccessCRUID.Update"
+                                                             VisibleDelete="UserAccessCRUID.Delete" />
                                         </ToolbarTemplate>
 
                                         <Columns>
@@ -91,25 +91,36 @@
                                             <DxGridDataColumn FieldName="Source.Name" Caption="Source Location" />
                                             <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Location" />
                                             <DxGridDataColumn FieldName="SchenduleDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
+<<<<<<< HEAD
                                             <DxGridDataColumn FieldName="Status" Caption="Status">
+=======
+                                            <DxGridDataColumn FieldName="StatusTransfer" Caption="Status">
+>>>>>>> Sprint3
                                                 <CellDisplayTemplate>
                                                     @((MarkupString)GetIssueStatusIconHtml((context.DataItem as TransactionStockDto).Status))
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
                                         </Columns>
-                                    </DxGrid>
+                                    </MyGrid>
                                 </DxLoadingPanel>
                             </div>
+<<<<<<< HEAD
                         </div>
                     }
                     else
                     {
                         <div class="sticky">
+=======
+                        }
+                        else
+                        {
+>>>>>>> Sprint3
                             @if (FormInternalTransfer.Id != 0)
                             {
                                 <div class="row justify-content-end mb-3">
                                     <div class="col-auto align-self-end">
                                         <DxTabs RenderMode="TabsRenderMode.AllTabs">
+<<<<<<< HEAD
                                             <DxTab Text="Draft" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)"></DxTab>
                                             @if (FormInternalTransfer.StockRequest == true)
                                             {
@@ -123,11 +134,18 @@
                                             <DxTab Text="Ready" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)"></DxTab>
                                             <DxTab Text="Done" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Done)"></DxTab>
                                             <DxTab Text="Cancel" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Cancel)"></DxTab>
+=======
+                                            <DxTab Text="Draft" Enabled="@(FormInternalTransfer.StatusTransfer == "Draft")"></DxTab>
+                                            <DxTab Text="Waiting" Enabled="@(FormInternalTransfer.StatusTransfer == "Waiting")"></DxTab>
+                                            <DxTab Text="Ready" Enabled="@(FormInternalTransfer.StatusTransfer == "Ready")"></DxTab>
+                                            <DxTab Text="Done" Enabled="@(FormInternalTransfer.StatusTransfer == "Done")"></DxTab>
+>>>>>>> Sprint3
                                         </DxTabs>
                                     </div>
                                 </div>
                                 <div class="row justify-content-start mb-3">
                                     <div class="col-12 align-self-start">
+<<<<<<< HEAD
 
                                         @if (FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)
                                         {
@@ -209,10 +227,12 @@
                             <div class="card-body">
                                 <EditForm Model="@FormInternalTransfer" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
                                     <DataAnnotationsValidator />
+=======
+>>>>>>> Sprint3
 
-                                    <DxFormLayout CssClass="mt">
-                                        @if (FormInternalTransfer.Id != 0)
+                                        @if (FormInternalTransfer.StatusTransfer == "Draft")
                                         {
+<<<<<<< HEAD
                                             <DxFormLayoutItem ColSpanMd="12">
                                                 <h3 class="fw-bolder">@FormInternalTransfer.KodeTransaksi</h3>
                                             </DxFormLayoutItem>
@@ -551,17 +571,407 @@
                                                         </div>
                                                     </section>
 
+=======
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <DxButton Text="To do Check" RenderStyle="ButtonRenderStyle.Info" IconCssClass="fa-solid fa-clipboard-check" Click="ToDoCheck"></DxButton>
+                                                    @*                                                 <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check"></DxButton>
+                                    *@                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (FormInternalTransfer.StatusTransfer == "Ready")
+                                        {
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
+                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (FormInternalTransfer.StatusTransfer == "Waiting")
+                                        {
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check" Click="ToDoCheck"></DxButton>
+                                                    @*                                                 <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-check" Click="validation"></DxButton>
+                                    *@                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="Cancel"></DxButton>
+                                                </div>
+                                            </div>
+                                        }
+
+                                        @* </div> *@
+                                    </div>
+                                </div>
+                            }
+                            <div class="card">
+                                <div class="card-header">
+                                    <span class="fw-bolder">@header</span>
+                                </div>
+                                <div class="card-body">
+                                    <EditForm Model="@FormInternalTransfer" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
+                                        <DataAnnotationsValidator />
+
+                                        <DxFormLayout CssClass="mt">
+                                            @if (FormInternalTransfer.Id != 0)
+                                            {
+                                                <DxFormLayoutItem ColSpanMd="12">
+                                                    <h3 class="fw-bolder">@FormInternalTransfer.KodeTransaksi</h3>
+                                                </DxFormLayoutItem>
+                                            }
+                                            <DxFormLayoutItem Caption="Source Location" CssClass="mt-2" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                <DxComboBox Data="@Locations"
+                                                            @bind-Value="@FormInternalTransfer.SourceId"
+                                                            NullText="Select Location Source..."
+                                                            TextFieldName="NameAndParent"
+                                                            ValueFieldName="Id"
+                                                            Enabled="@isActiveButton"
+                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                            ShowValidationIcon="true"></DxComboBox>
+                                                <ValidationMessage For="@(()=>FormInternalTransfer.SourceId)"></ValidationMessage>
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem Caption="Destination Location" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                <DxComboBox Data="@Locations"
+                                                            @bind-Value="@FormInternalTransfer.DestinationId"
+                                                            NullText=" Select Location Destinance..."
+                                                            TextFieldName="NameAndParent"
+                                                            ValueFieldName="Id"
+                                                            Enabled="@isActiveButton"
+                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                            ShowValidationIcon="true"></DxComboBox>
+                                                <ValidationMessage For="@(()=>FormInternalTransfer.DestinationId)"></ValidationMessage>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Schendule Date" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                <DxDateEdit @bind-Date="@FormInternalTransfer.SchenduleDate"
+                                                            Enabled="@isActiveButton"
+                                                            ShowValidationIcon="true"
+                                                            DisplayFormat="dd MMMM yyyy">
+                                                </DxDateEdit>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Reference" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                <DxMemo @bind-Text="@FormInternalTransfer.Reference" NullText="Input Reference.."
+                                                        Enabled="@isActiveButton"
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                        ShowValidationIcon="true"></DxMemo>
+                                            </DxFormLayoutItem>
+
+                                        </DxFormLayout>
+
+                                        <DxFormLayout>
+                                            <DxFormLayoutGroup ColSpanMd="12">
+                                                <CaptionTemplate>
+                                                    <div>
+                                                        <span class="text-center">Transfer Lines</span>
+
+                                                    </div>
+                                                </CaptionTemplate>
+                                                <Items>
+                                                    <DxGrid @ref="GridDetailTransferStock" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                            Data="TempTransactionStocks"
+                                                            PageSize="10"
+                                                            @bind-SelectedDataItems="@SelectedDataItemsDetail"
+                                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                            KeyFieldName="Id"
+                                                            EditModelSaving="OnSave_Detail"
+                                                            DataItemDeleting="OnDelete"
+                                                            EditMode="GridEditMode.EditForm"
+                                                            PopupEditFormCssClass="my-style"
+                                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                                            EditorRenderMode="GridEditorRenderMode.Detached"
+                                                            PagerPosition="GridPagerPosition.Bottom"
+                                                            AllowSelectRowByClick="true"
+                                                            PageSizeSelectorVisible="true"
+                                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                            PageSizeSelectorAllRowsItemVisible="true"
+                                                            PagerSwitchToInputBoxButtonCount="10"
+                                                            FocusedRowEnabled="true"
+                                                            PagerVisibleNumericButtonCount="10"
+                                                            FocusedRowChanged="Grid_FocusedRowChangedDetail"
+                                                            ShowGroupPanel="true"
+                                                            AutoExpandAllGroupRows="true"
+                                                            CssClass="ch-480"
+                                                            ShowFilterRow="true"
+                                                            RowDoubleClick="OnRowDoubleClickDetail"
+                                                            TextWrapEnabled="false"
+                                                            CustomizeElement="Grid_CustomizeElement"
+                                                            ShowSearchBox="true"
+                                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                                            KeyboardNavigationEnabled="true">
+                                                        <ToolbarTemplate>
+                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="isActiveButton" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0 && isActiveButton" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0 && isActiveButton" />
+
+                                                            </DxToolbar>
+                                                        </ToolbarTemplate>
+                                                        <Columns>
+                                                            <DxGridSelectionColumn Width="15px" />
+                                                            <DxGridDataColumn FieldName="ProductName" Caption="Product Name" SortIndex="0" />
+                                                            <DxGridDataColumn FieldName="QtyStock" Caption="Demand" MinWidth="90" Width="190" />
+                                                            <DxGridDataColumn FieldName="Batch" Caption="Batch" MinWidth="90" Width="190" />
+                                                            <DxGridDataColumn FieldName="ExpiredDate" Caption="Expired Date" />
+                                                            <DxGridDataColumn FieldName="UomName" Caption="Unit Of Measure" />
+                                                        </Columns>
+                                                        <EditFormTemplate Context="EditFormContextt">
+                                                            @{
+                                                                TempFormInternalTransfer = (TransactionStockProductDto)EditFormContextt.EditModel;
+                                                            }
+                                                            <DxFormLayout CssClass="mt w-100">
+                                                                <div class="col-md-4">
+                                                                    <DxFormLayoutItem Caption="Product Name" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                        <DxComboBox Data="@Products"
+                                                                                    @bind-Value="@TempFormInternalTransfer.ProductId"
+                                                                                    NullText="Select Product.."
+                                                                                    TextFieldName="Name"
+                                                                                    ValueFieldName="Id"
+                                                                                    FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                    SelectedItemChanged="@((ProductDto product)=> SelectedItemProduct(product))"
+                                                                                    ShowValidationIcon="true"></DxComboBox>
+                                                                        <ValidationMessage For="@(()=>TempFormInternalTransfer.ProductId)"></ValidationMessage>
+                                                                    </DxFormLayoutItem>
+
+                                                                    <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                        <DxComboBox ShowValidationIcon="true" Data="@Batch"
+                                                                                    NullText="Select Batch..."
+                                                                                    @bind-Value="@TempFormInternalTransfer.StockProductId"
+                                                                                    TextFieldName="Batch"
+                                                                                    ValueFieldName="Id"
+                                                                                    SelectedItemChanged="@((StockProductDto a)=> SelectedBatch(a))"
+                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                    FilteringMode="@DataGridFilteringMode.Contains">
+                                                                        </DxComboBox>
+                                                                        <ValidationMessage For="@(() => TempFormInternalTransfer.StockProductId)" />
+
+                                                                    </DxFormLayoutItem>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <DxFormLayoutItem Caption="Current Stock " CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                        <DxSpinEdit @bind-Value="@TempFormInternalTransfer.CurrentStock"
+                                                                                    NullText="Input Stock To Be Sent..."
+                                                                                    MinValue="0"
+                                                                                    ReadOnly
+                                                                                    ShowSpinButtons="false"
+                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                    ShowValidationIcon="true"></DxSpinEdit>
+                                                                        <ValidationMessage For="@(()=>TempFormInternalTransfer.QtyStock)"></ValidationMessage>
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem Caption="Stock Shipped" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                        <DxSpinEdit @bind-Value="@TempFormInternalTransfer.QtyStock"
+                                                                                    NullText="Input Stock To Be Sent..."
+                                                                                    MinValue="0"
+                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                    ShowValidationIcon="true"></DxSpinEdit>
+                                                                        <ValidationMessage For="@(()=>TempFormInternalTransfer.QtyStock)"></ValidationMessage>
+                                                                    </DxFormLayoutItem>
+
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                        <DxDateEdit ShowValidationIcon="true"
+                                                                                    DisplayFormat="dd MMMM yyyy"
+                                                                                    ReadOnly
+                                                                                    @bind-Date="@SelectedBatchExpired"
+                                                                                    NullText="Expired Date">
+                                                                        </DxDateEdit>
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                        <DxTextBox @bind-Text="@TempFormInternalTransfer.UomName"
+                                                                                   NullText="Unit Of Measure"
+                                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                   ReadOnly
+                                                                                   ShowValidationIcon="true"></DxTextBox>
+                                                                    </DxFormLayoutItem>
+                                                                </div>
+                                                            </DxFormLayout>
+                                                            @*@if (TempFormInternalTransfer.TraceAvability == true)
+                                                    {
+                                                    <DxFormLayout CssClass="mt">
+                                                    <div class="col-md-6">
+                                                    <DxFormLayoutItem Caption="Serial Number/LoT" CaptionCssClass="normal-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@TempFormInternalTransfer.Batch" ReadOnly></DxTextBox>
+                                                    </DxFormLayoutItem>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                    <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
+                                                    <DxDateEdit @bind-Date="@TempFormInternalTransfer.ExpiredDate" DisplayFormat="dd MMMM yyyy" Format="d"></DxDateEdit>
+                                                    </DxFormLayoutItem>
+                                                    </div>
+                                                    </DxFormLayout>
+                                                    } *@
+
+                                                        </EditFormTemplate>
+                                                    </DxGrid>
+>>>>>>> Sprint3
                                                 </Items>
                                             </DxFormLayoutGroup>
                                         </DxFormLayout>
-                                    }
 
-                                </EditForm>
+                                        @if (isActiveButton)
+                                        {
+                                            <hr />
+
+                                            <div class="col d-flex justify-content-end">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" CssClass="ml-1" Text="Discard" Click="onDiscard"></DxButton>
+                                            </div>
+                                        }
+
+                                        @if (Logs.Count > 0)
+                                        {
+                                            <DxFormLayout>
+                                                <DxFormLayoutGroup ColSpanMd="12" Caption="Transaction Logs" AnimationType="LayoutAnimationType.Slide" Expanded="false" Decoration="FormLayoutGroupDecoration.Card" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start">
+                                                    <CaptionTemplate>
+                                                        <div>
+                                                            <span class="text-center">Transaction Logs</span>
+                                                        </div>
+                                                    </CaptionTemplate>
+                                                    <Items>
+                                                        @{
+                                                            var groupedLogs = Logs
+                                                            .GroupBy(x => x.CreatedDate?.Date) // Group by the date part only
+                                                            .OrderByDescending(g => g.Key)
+                                                            .ToList();
+                                                        }
+
+                                                        <section class="content w-100">
+                                                            <div class="container-fluid w-100">
+                                                                <div class="row w-100">
+                                                                    @foreach (var group in groupedLogs)
+                                                                    {
+                                                                        <div class="col-md-12">
+                                                                            <div class="timeline">
+                                                                                <div class="time-label">
+                                                                                    <span class="bg-red">@group.Key?.ToString("dd MMM, yyyy")</span>
+                                                                                </div>
+
+                                                                                @foreach (var item in group.OrderByDescending(x => x.CreatedDate.GetValueOrDefault().TimeOfDay))
+                                                                                {
+                                                                                    <div>
+                                                                                        <i class="fas fa-user bg-green"></i>
+                                                                                        <div class="timeline-item">
+                                                                                            <span class="time"><i class="fas fa-clock"></i> @item.CreatedDate.GetValueOrDefault().ToString("HH:mm")</span>
+                                                                                            <h3 class="timeline-header">
+                                                                                                <a class="no-underline">@item.CreatedBy</a>
+                                                                                            </h3>
+
+                                                                                            <div class="timeline-body">
+
+                                                                                                @{
+
+                                                                                                    string priorityClass = "";
+                                                                                                    string title = "";
+
+                                                                                                    switch (item.StatusTransfer)
+                                                                                                    {
+                                                                                                        case "Draft":
+                                                                                                            priorityClass = "info";
+                                                                                                            title = "Draft";
+                                                                                                            break;
+
+                                                                                                        case "Waiting":
+                                                                                                            priorityClass = "warning";
+                                                                                                            title = "Waiting";
+                                                                                                            break;
+
+                                                                                                        case "Ready":
+                                                                                                            priorityClass = "primary";
+                                                                                                            title = "Ready";
+                                                                                                            break;
+
+                                                                                                        case "Done":
+                                                                                                            priorityClass = "success";
+                                                                                                            title = "Done";
+                                                                                                            break;
+
+                                                                                                        case "Cancel":
+                                                                                                            priorityClass = "danger";
+                                                                                                            title = "Cancel";
+                                                                                                            break;
+                                                                                                    }
+
+                                                                                                    string html = $"<span class='badge text-white bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span>";
+                                                                                                }
+
+                                                                                                <div class="row w-100">
+                                                                                                    <div class="col-md-1">
+                                                                                                        Status
+                                                                                                    </div>
+
+                                                                                                    <div class="col-md-11">
+                                                                                                        : @((MarkupString)html)
+                                                                                                    </div>
+                                                                                                </div>
+
+                                                                                                <div class="row w-100">
+                                                                                                    <div class="col-md-1">
+                                                                                                        Type
+                                                                                                    </div>
+
+                                                                                                    <div class="col-md-11">
+                                                                                                        : @(item.TypeTransaction ?? "N/A")
+                                                                                                    </div>
+                                                                                                </div>
+
+                                                                                                <div class="row w-100">
+                                                                                                    <div class="col-md-1">
+                                                                                                        From
+                                                                                                    </div>
+
+                                                                                                    <div class="col-md-11">
+                                                                                                        : @item.Source?.Name
+                                                                                                    </div>
+                                                                                                </div>
+
+                                                                                                <div class="row w-100">
+                                                                                                    <div class="col-md-1">
+                                                                                                        To
+                                                                                                    </div>
+
+                                                                                                    <div class="col-md-11">
+                                                                                                        : @item.Destination?.Name
+                                                                                                    </div>
+                                                                                                </div>
+
+                                                                                                @* Status: @((MarkupString)html) <br />
+                                                                            Type: @(item.TypeTransaction ?? "N/A") <br />
+                                                                            From: @item.Source?.Name <br />
+                                                                            To: @item.Destination?.Name <br /> *@
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                }
+
+                                                                                <div>
+                                                                                    <i class="fas fa-clock bg-gray"></i>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </section>
+
+                                                    </Items>
+                                                </DxFormLayoutGroup>
+                                            </DxFormLayout>
+                                        }
+
+                                    </EditForm>
+                                </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-</div>
+        </section>
+    </div>
+}
+else
+{
+
+}

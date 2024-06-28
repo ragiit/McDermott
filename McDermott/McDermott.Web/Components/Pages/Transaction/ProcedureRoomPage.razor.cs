@@ -91,6 +91,22 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 await LoadDataAsync();
                 StateHasChanged();
+
+                PanelVisible = true;
+
+                var uri = new Uri(NavigationManager.Uri);
+                var queryDictionary = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+
+                ShowForm = false;
+                GeneralConsultanService = new();
+                if (queryDictionary.TryGetValue("genserv", out var genSetValue))
+                {
+                    ShowForm = true;
+                    GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == genSetValue.ToString().ToLong()))).FirstOrDefault() ?? new();
+                }
+                PanelVisible = false;
+
+                StateHasChanged();
             }
         }
 
@@ -107,7 +123,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         protected override async Task OnInitializedAsync()
         {
-            PanelVisible = true;
         }
 
         private async Task LoadData()
@@ -197,22 +212,60 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             switch (GeneralConsultanMedicalSupport.Status)
             {
-                case "Draft":
-                    StagingText = "Finish";
-                    GeneralConsultanMedicalSupport.Status = "In-Progress";
+                case EnumStatusGeneralConsultantServiceProcedureRoom.Draft:
+                    StagingText = EnumStatusGeneralConsultantServiceProcedureRoom.Finish.GetDisplayName();
+                    GeneralConsultanMedicalSupport.Status = EnumStatusGeneralConsultantServiceProcedureRoom.InProgress;
+
+                    if (GeneralConsultanMedicalSupport.Id == 0)
+                    {
+                        StagingText = EnumStatusGeneralConsultantServiceProcedureRoom.Finish.GetDisplayName();
+                        GeneralConsultanService.Status = EnumStatusGeneralConsultantService.ProcedureRoom;
+                        await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+
+                        GeneralConsultanMedicalSupport.GeneralConsultanServiceId = GeneralConsultanService.Id;
+                        GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                    }
+                    else
+                        GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+
+                    if ((GeneralConsultanMedicalSupport.LabTestId is not null && GeneralConsultanMedicalSupport.LabTestId != 0))
+                    {
+                        await Mediator.Send(new DeleteLabResultDetailRequest(ids: DeletedLabTestIds));
+
+                        LabResultDetails.ForEach(x => x.Id = 0);
+
+                        await Mediator.Send(new CreateListLabResultDetailRequest(LabResultDetails));
+
+                        LabResultDetails.Clear();
+
+                        LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
+
+                        DeletedLabTestIds = LabResultDetails.Select(x => x.Id).ToList();
+
+                        IsAddOrUpdateOrDeleteLabResult = false;
+                    }
                     break;
 
-                case "In-Progress":
-                case "Finish":
-                    StagingText = "Finish";
-                    GeneralConsultanMedicalSupport.Status = "Finish";
+                case EnumStatusGeneralConsultantServiceProcedureRoom.InProgress:
+                    GeneralConsultanService.Status = EnumStatusGeneralConsultantService.Waiting;
+                    await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+
+                    GeneralConsultanMedicalSupport.Status = EnumStatusGeneralConsultantServiceProcedureRoom.Finish;
+                    StagingText = EnumStatusGeneralConsultantServiceProcedureRoom.Finish.GetDisplayName();
+                    await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                    break;
+
+                case EnumStatusGeneralConsultantServiceProcedureRoom.Finish:
+                    GeneralConsultanMedicalSupport.Status = EnumStatusGeneralConsultantServiceProcedureRoom.Finish;
+                    StagingText = EnumStatusGeneralConsultantServiceProcedureRoom.Finish.GetDisplayName();
+                    await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
                     break;
 
                 default:
                     break;
             }
 
-            await OnSave();
+            //await OnSave();
         }
 
         private void OnSaveLabTest(GridEditModelSavingEventArgs e)
@@ -356,14 +409,13 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private GeneralConsultanlogDto generalLog = new GeneralConsultanlogDto();
 
+        private bool IsStatus(EnumStatusGeneralConsultantServiceProcedureRoom status) => GeneralConsultanMedicalSupport.Status == status;
+
         private async Task OnSave()
         {
             try
             {
                 Loading = true;
-
-                if (GeneralConsultanMedicalSupport.Id == 0)
-                    return;
 
                 BrowserFiles.Distinct();
 
@@ -374,26 +426,62 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 GeneralConsultanMedicalSupport.LabResulLabExaminationtIds = SelectedLabTests.Select(x => x.Id).ToList();
 
-                if (GeneralConsultanMedicalSupport.Status == "Finish")
+                switch (GeneralConsultanMedicalSupport.Status)
                 {
-                    GeneralConsultanService.StagingStatus = "Waiting";
+                    case EnumStatusGeneralConsultantServiceProcedureRoom.Draft:
 
-                    await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+                        if (GeneralConsultanMedicalSupport.Id == 0)
+                        {
+                            StagingText = "In-Progress";
+                            GeneralConsultanService.Status = EnumStatusGeneralConsultantService.ProcedureRoom;
+                            await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+                            GeneralConsultanMedicalSupport.GeneralConsultanServiceId = GeneralConsultanService.Id;
+                            GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                        }
+                        else
+                            GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                        break;
 
+<<<<<<< HEAD
                     generalLog.GeneralConsultanServiceId = GeneralConsultanMedicalSupport.GeneralConsultanServiceId;
                     generalLog.UserById = NameUser.Id;
                     generalLog.Status = GeneralConsultanService.StagingStatus;
+=======
+                    case EnumStatusGeneralConsultantServiceProcedureRoom.InProgress:
+                        GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+>>>>>>> Sprint3
 
-                    await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
+                        break;
+
+                    case EnumStatusGeneralConsultantServiceProcedureRoom.Finish:
+                        GeneralConsultanService.Status = EnumStatusGeneralConsultantService.Waiting;
+
+                        await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+
+                        //generalLog.GeneralConsultanServiceId = GeneralConsultanMedicalSupport.GeneralConsultanServiceId;
+                        //generalLog.UserById = NameGroup.Id;
+                        //generalLog.Status = GeneralConsultanService.StagingStatus;
+
+                        //await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
+                        break;
+
+                    default:
+                        break;
                 }
 
-                GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                //generalLog.ProcedureRoomId = GeneralConsultanMedicalSupport.Id;
+                //generalLog.UserById = NameGroup.Id;
+                //generalLog.Status = GeneralConsultanMedicalSupport.Status;
 
+<<<<<<< HEAD
                 generalLog.ProcedureRoomId = GeneralConsultanMedicalSupport.Id;
                 generalLog.UserById = NameUser.Id;
                 generalLog.Status = GeneralConsultanMedicalSupport.Status;
 
                 await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
+=======
+                //await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
+>>>>>>> Sprint3
 
                 if ((GeneralConsultanMedicalSupport.LabTestId is not null && GeneralConsultanMedicalSupport.LabTestId != 0))
                 {
@@ -444,10 +532,30 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 if (SelectedDataItems is null || SelectedDataItems.Count == 1)
                 {
+                    var u = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == ((GeneralConsultanMedicalSupportDto)e.DataItem).GeneralConsultanServiceId))).FirstOrDefault();
+
+                    if (u is not null)
+                    {
+                        u.Status = EnumStatusGeneralConsultantService.Physician;
+                        await Mediator.Send(new UpdateGeneralConsultanServiceRequest(u));
+                    }
+
                     await Mediator.Send(new DeleteGeneralConsultanMedicalSupportRequest(((GeneralConsultanMedicalSupportDto)e.DataItem).Id));
                 }
                 else
                 {
+                    var selectedItems = SelectedDataItems.Adapt<List<GeneralConsultanMedicalSupportDto>>();
+                    foreach (var item in selectedItems)
+                    {
+                        var u = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == item.GeneralConsultanServiceId))).FirstOrDefault();
+
+                        if (u is not null)
+                        {
+                            u.Status = EnumStatusGeneralConsultantService.Physician;
+                            await Mediator.Send(new UpdateGeneralConsultanServiceRequest(u));
+                        }
+                    }
+
                     await Mediator.Send(new DeleteGeneralConsultanMedicalSupportRequest(ids: SelectedDataItems.Adapt<List<GeneralConsultanMedicalSupportDto>>().Select(x => x.Id).ToList()));
                 }
 
@@ -649,13 +757,13 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             switch (GeneralConsultanMedicalSupport.Status)
             {
-                case "Draft":
-                    StagingText = "In-Progress";
+                case EnumStatusGeneralConsultantServiceProcedureRoom.Draft:
+                    StagingText = EnumStatusGeneralConsultantServiceProcedureRoom.InProgress.GetDisplayName();
                     break;
 
-                case "In-Progress":
-                case "Finish":
-                    StagingText = "Finish";
+                case EnumStatusGeneralConsultantServiceProcedureRoom.InProgress:
+                case EnumStatusGeneralConsultantServiceProcedureRoom.Finish:
+                    StagingText = EnumStatusGeneralConsultantServiceProcedureRoom.Finish.GetDisplayName();
                     break;
 
                 default:
