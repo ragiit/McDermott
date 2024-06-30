@@ -454,6 +454,39 @@ namespace McDermott.Web.Components.Pages.Queue
             showForm = false;
         }
 
+        private async Task<bool> OnClickGetBPJS(string number)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(number))
+                {
+                    ToastService.ShowInfo("Please insert the Policy Number!");
+                    return false;
+                }
+
+                var result = await PcareService.SendPCareService($"peserta/{number}", HttpMethod.Get);
+                if (result.Item2 == 200)
+                {
+                    if (result.Item1 == null)
+                    {
+                        return false;
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+
+            return false;
+        }
+
         private async Task OnSearch()
         {
             var group = await Mediator.Send(new GetGroupQuery());
@@ -470,24 +503,34 @@ namespace McDermott.Web.Components.Pages.Queue
                 BPJS = InsurancePolices.Where(x => x.UserId == FormKios.PatientId).FirstOrDefault()!;
                 if (BPJS is not null)
                 {
-                    var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == BPJS.Id))).FirstOrDefault();
-                    if (bpjs is not null)
+                    var isActive = await OnClickGetBPJS(BPJS.PolicyNumber);
+                    if (!isActive)
                     {
-                        if (bpjs.Aktif)
-                        {
-                            FormKios.BPJS = bpjs.NoKartu;
-                            FormKios.StageBpjs = true;
-                            statBPJS = "Active";
-                        }
-                        else
-                        {
-                            FormKios.StageBpjs = false;
-                            statBPJS = "InActive";
-                        }
+                        FormKios.BPJS = BPJS.PolicyNumber;
+                        FormKios.StageBpjs = false;
+                        statBPJS = "InActive";
                     }
                     else
                     {
-                        statBPJS = "no BPJS number";
+                        var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == BPJS.Id))).FirstOrDefault();
+                        if (bpjs is not null)
+                        {
+                            if (bpjs.Aktif)
+                            {
+                                FormKios.BPJS = bpjs.NoKartu;
+                                FormKios.StageBpjs = true;
+                                statBPJS = "Active";
+                            }
+                            else
+                            {
+                                FormKios.StageBpjs = false;
+                                statBPJS = "InActive";
+                            }
+                        }
+                        else
+                        {
+                            statBPJS = "no BPJS number";
+                        }
                     }
                 }
                 else

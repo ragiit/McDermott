@@ -182,18 +182,24 @@
 
                 InsurancePoliciyForm.UserId = User.Id;
 
-                if (IsBPJS)
                 {
-                    var query = BPJSIntegration.Id == 0
-                                ? new GetBPJSIntegrationQuery(x => !string.IsNullOrWhiteSpace(x.NoKartu) && x.NoKartu.ToLower().Trim().Equals(BPJSIntegration.NoKartu))
-                                : new GetBPJSIntegrationQuery(x => x.Id != BPJSIntegration.Id && !string.IsNullOrWhiteSpace(x.NoKartu) && x.NoKartu.ToLower().Trim().Equals(BPJSIntegration.NoKartu));
+                    //var query = BPJSIntegration.Id == 0
+                    //            ? new GetBPJSIntegrationQuery(x => x.Id != BPJSIntegration.Id && !string.IsNullOrWhiteSpace(x.NoKartu) && x.NoKartu.ToLower().Trim().Equals(BPJSIntegration.NoKartu))
+                    //            : new GetBPJSIntegrationQuery(x => x.Id != BPJSIntegration.Id && !string.IsNullOrWhiteSpace(x.NoKartu) && x.NoKartu.ToLower().Trim().Equals(BPJSIntegration.NoKartu));
 
-                    var bpjs = await Mediator.Send(query);
-                    if (bpjs.Count > 0)
+                    if (BPJSIntegration.NoKartu != InsurancePoliciyForm.PolicyNumber)
                     {
-                        ToastService.ShowInfo("Card Number already exist");
+                        ToastService.ShowInfo("Card Number & Policy Number must be same");
                         return;
                     }
+
+                    //var query = new GetBPJSIntegrationQuery(x => x.Id != BPJSIntegration.Id && !string.IsNullOrWhiteSpace(x.NoKartu) && x.NoKartu.ToLower().Trim().Equals(BPJSIntegration.NoKartu));
+                    //var bpjs = await Mediator.Send(query);
+                    //if (bpjs.Count > 0)
+                    //{
+                    //    ToastService.ShowInfo("Card Number already exist");
+                    //    return;
+                    //}
                 }
 
                 if (InsurancePoliciyForm.Id == 0)
@@ -401,6 +407,14 @@
                 var result = await PcareService.SendPCareService($"peserta/{InsurancePoliciyForm.PolicyNumber}", HttpMethod.Get);
                 if (result.Item2 == 200)
                 {
+                    if (result.Item1 == null)
+                    {
+                        ResponseAPIBPJSIntegrationGetPeserta = new();
+                        BPJSIntegration = new();
+                        IsLoadingGetBPJS = false;
+                        return;
+                    }
+
                     ResponseAPIBPJSIntegrationGetPeserta = System.Text.Json.JsonSerializer.Deserialize<ResponseAPIBPJSIntegrationGetPeserta>(result.Item1);
                     BPJSIntegration = ResponseAPIBPJSIntegrationGetPeserta.Adapt<BPJSIntegrationDto>();
 
