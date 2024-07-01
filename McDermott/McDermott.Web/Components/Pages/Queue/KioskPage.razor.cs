@@ -1,4 +1,5 @@
 ﻿using McDermott.Application.Dtos.Queue;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 
@@ -465,112 +466,185 @@ namespace McDermott.Web.Components.Pages.Queue
                 }
 
                 var result = await PcareService.SendPCareService($"peserta/{number}", HttpMethod.Get);
-                if (result.Item2 == 200)
-                {
-                    if (result.Item1 == null)
-                    {
-                        return false;
-                    }
-
-                    return true;
-                }
-                else
+                if (result.Item2 != 200 || result.Item1 == null)
                 {
                     return false;
                 }
+
+                var response = System.Text.Json.JsonSerializer.Deserialize<ResponseAPIBPJSIntegrationGetPeserta>(result.Item1) as ResponseAPIBPJSIntegrationGetPeserta;
+
+                if (response is null)
+                    return false;
+
+                return response.Aktif;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
+                return false;
             }
-
-            return false;
         }
 
         private async Task OnSearch()
         {
             var group = await Mediator.Send(new GetGroupQuery());
             var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
-            var types = FormKios.Type;
             var InputSearch = FormKios.NumberType ?? string.Empty;
             Patients = await Mediator.Send(new GetDataUserForKioskQuery(InputSearch));
 
-            if (Patients != null)
+            if (Patients == null)
             {
-                showForm = true;
-                NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
-                FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
-                BPJS = InsurancePolices.Where(x => x.UserId == FormKios.PatientId).FirstOrDefault()!;
-                if (BPJS is not null)
+                showForm = false;
+                return;
+            }
+
+            showForm = true;
+            NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
+            FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
+            BPJS = InsurancePolices.FirstOrDefault(x => x.UserId == FormKios.PatientId);
+
+            if (BPJS != null)
+            {
+                var isActive = await OnClickGetBPJS(BPJS.PolicyNumber);
+                if (!isActive)
                 {
-                    var isActive = await OnClickGetBPJS(BPJS.PolicyNumber);
-                    if (!isActive)
-                    {
-                        FormKios.BPJS = BPJS.PolicyNumber;
-                        FormKios.StageBpjs = false;
-                        statBPJS = "InActive";
-                    }
-                    else
-                    {
-                        var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == BPJS.Id))).FirstOrDefault();
-                        if (bpjs is not null)
-                        {
-                            if (bpjs.Aktif)
-                            {
-                                FormKios.BPJS = bpjs.NoKartu;
-                                FormKios.StageBpjs = true;
-                                statBPJS = "Active";
-                            }
-                            else
-                            {
-                                FormKios.StageBpjs = false;
-                                statBPJS = "InActive";
-                            }
-                        }
-                        else
-                        {
-                            statBPJS = "no BPJS number";
-                        }
-                    }
+                    FormKios.BPJS = BPJS.PolicyNumber;
+                    FormKios.StageBpjs = false;
+                    statBPJS = "InActive";
                 }
                 else
                 {
-                    statBPJS = "no BPJS number";
-                }
-                if (NameGroup.Name == "Nurse" || NameGroup.Name == "Perawat" || NameGroup.Name == "Nursing")
-                {
-                    showClass = true;
-                }
-
-                foreach (var kiosk in KioskConf)
-                {
-                    var serviceIds = kiosk.ServiceIds ?? [];
-                    CountServiceId = KioskConf.SelectMany(k => k.ServiceIds).Count();
-
-                    if (CountServiceId > 1)
+                    var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == BPJS.Id))).FirstOrDefault();
+                    if (bpjs != null)
                     {
-                        serv.AddRange(Services.Where(service => serviceIds.Contains(service.Id)));
+                        FormKios.BPJS = bpjs.NoKartu;
+                        FormKios.StageBpjs = bpjs.Aktif;
+                        statBPJS = bpjs.Aktif ? "Active" : "InActive";
                     }
                     else
                     {
-                        FormKios.ServiceId = Services.FirstOrDefault(service => serviceIds.Contains(service.Id))?.Id;
-                        var serviceId = FormKios.ServiceId;
-                        if (serviceId.HasValue)
-                        {
-                            await LoadPhysicians(serviceId.Value);
-                        }
-
-                        showPhysician = true;
+                        statBPJS = "no BPJS number";
                     }
                 }
             }
             else
             {
-                showForm = false;
+                statBPJS = "no BPJS number";
+            }
+
+            if (new[] { "Nurse", "Perawat", "Nursing" }.Contains(NameGroup.Name))
+            {
+                showClass = true;
+            }
+
+            foreach (var kiosk in KioskConf)
+            {
+                var serviceIds = kiosk.ServiceIds ?? [];
+                CountServiceId = KioskConf.Where(x => x.ServiceIds != null).SelectMany(k => k.ServiceIds).Count();
+
+                if (CountServiceId > 1)
+                {
+                    serv.AddRange(Services.Where(service => serviceIds.Contains(service.Id)));
+                }
+                else
+                {
+                    FormKios.ServiceId = Services.FirstOrDefault(service => serviceIds.Contains(service.Id))?.Id;
+                    if (FormKios.ServiceId.HasValue)
+                    {
+                        await LoadPhysicians(FormKios.ServiceId.Value);
+                    }
+
+                    showPhysician = true;
+                }
             }
 
             await SelectScheduleSlots();
         }
+
+        //private async Task OnSearch()
+        //{
+        //    var group = await Mediator.Send(new GetGroupQuery());
+        //    var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
+        //    var types = FormKios.Type;
+        //    var InputSearch = FormKios.NumberType ?? string.Empty;
+        //    Patients = await Mediator.Send(new GetDataUserForKioskQuery(InputSearch));
+
+        //    if (Patients != null)
+        //    {
+        //        showForm = true;
+        //        NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
+        //        FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
+        //        BPJS = InsurancePolices.Where(x => x.UserId == FormKios.PatientId).FirstOrDefault()!;
+        //        if (BPJS is not null)
+        //        {
+        //            var isActive = await OnClickGetBPJS(BPJS.PolicyNumber);
+        //            if (!isActive)
+        //            {
+        //                FormKios.BPJS = BPJS.PolicyNumber;
+        //                FormKios.StageBpjs = false;
+        //                statBPJS = "InActive";
+        //            }
+        //            else
+        //            {
+        //                var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == BPJS.Id))).FirstOrDefault();
+        //                if (bpjs is not null)
+        //                {
+        //                    if (bpjs.Aktif)
+        //                    {
+        //                        FormKios.BPJS = bpjs.NoKartu;
+        //                        FormKios.StageBpjs = true;
+        //                        statBPJS = "Active";
+        //                    }
+        //                    else
+        //                    {
+        //                        FormKios.StageBpjs = false;
+        //                        statBPJS = "InActive";
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    statBPJS = "no BPJS number";
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            statBPJS = "no BPJS number";
+        //        }
+        //        if (NameGroup.Name == "Nurse" || NameGroup.Name == "Perawat" || NameGroup.Name == "Nursing")
+        //        {
+        //            showClass = true;
+        //        }
+
+        //        foreach (var kiosk in KioskConf)
+        //        {
+        //            var serviceIds = kiosk.ServiceIds ?? [];
+        //            CountServiceId = KioskConf.SelectMany(k => k.ServiceIds).Count();
+
+        //            if (CountServiceId > 1)
+        //            {
+        //                serv.AddRange(Services.Where(service => serviceIds.Contains(service.Id)));
+        //            }
+        //            else
+        //            {
+        //                FormKios.ServiceId = Services.FirstOrDefault(service => serviceIds.Contains(service.Id))?.Id;
+        //                var serviceId = FormKios.ServiceId;
+        //                if (serviceId.HasValue)
+        //                {
+        //                    await LoadPhysicians(serviceId.Value);
+        //                }
+
+        //                showPhysician = true;
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        showForm = false;
+        //    }
+
+        //    await SelectScheduleSlots();
+        //}
 
         private async Task onPrint()
         {

@@ -20,7 +20,7 @@ namespace McDermott.Application.Extentions
                             ?.GetName() ?? enumValue.ToString();
         }
 
-        public enum EnumStatusInventoryAdjusment
+        public enum EnumStatusInventoryAdjustment
         {
             [Display(Name = "Draft")]
             Draft = 1,
