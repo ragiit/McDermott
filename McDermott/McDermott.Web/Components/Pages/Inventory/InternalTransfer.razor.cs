@@ -66,14 +66,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 catch { }
 
-                StockProducts = await Mediator.Send(new GetStockProductQuery());
-                Locations = await Mediator.Send(new GetLocationQuery());
-                Products = await Mediator.Send(new GetProductQuery());
-                Uoms = await Mediator.Send(new GetUomQuery());
-                UomName = Uoms.Select(x => x.Name).FirstOrDefault();
-                TransactionStockDetails = await Mediator.Send(new GetTransactionStockDetailQuery());
-                var user_group = await Mediator.Send(new GetUserQuery());
-                NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
+                await LoadAsyncData();
                 StateHasChanged();
             }
         }
@@ -129,6 +122,17 @@ namespace McDermott.Web.Components.Pages.Inventory
             PanelVisible = true;
         }
 
+        private async Task LoadAsyncData()
+        {
+            StockProducts = await Mediator.Send(new GetStockProductQuery());
+            Locations = await Mediator.Send(new GetLocationQuery());
+            Products = await Mediator.Send(new GetProductQuery());
+            Uoms = await Mediator.Send(new GetUomQuery());
+            UomName = Uoms.Select(x => x.Name).FirstOrDefault();
+            TransactionStockDetails = await Mediator.Send(new GetTransactionStockDetailQuery());
+            var user_group = await Mediator.Send(new GetUserQuery());
+            NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
+        }
         private async Task LoadData()
         {
             try
@@ -183,6 +187,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     if (_currentStock.Qty > 0)
                     {
+                        TempFormInternalTransfer.StockProductId= stockProduct.Id;
+                        TempFormInternalTransfer.Batch = stockProduct.Batch;
+                        TempFormInternalTransfer.ExpiredDate = stockProduct.Expired;
                         TempFormInternalTransfer.CurrentStock = _currentStock.Qty;
                     }
                     else
@@ -230,7 +237,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 if (product.TraceAbility)
                 {
-                    TempFormInternalTransfer.Batch = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Batch ?? "-";
+                    TempFormInternalTransfer.Batch = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Batch ;
                     TempFormInternalTransfer.ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Expired;
                     TempFormInternalTransfer.CurrentStock = 0;
                 }
@@ -394,12 +401,19 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task NewItemDetail_Click()
         {
-            showFormDetail = true;
-            IsAddTransfer = true;
-            TempFormInternalTransfer = new();
-            //Products.Clear();
-            headerDetail = "Add product Transfer Internal";
-            await GridDetailTransferStock.StartEditNewRowAsync();
+            try
+            {
+                showFormDetail = true;
+                IsAddTransfer = true;
+                TempFormInternalTransfer = new();
+                //Products.Clear();
+                headerDetail = "Add product Transfer Internal";
+                await GridDetailTransferStock.StartEditNewRowAsync();
+            
+            }catch(Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task EditItem_Click(TransactionStockDto? p = null)
@@ -824,6 +838,9 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             if (FormInternalTransfer.Id == 0)
             {
+                /*
+                 Kesalahan Batch yang di Simpan
+                 */
                 try
                 {
                     TransactionStockProductDto Updates = new();

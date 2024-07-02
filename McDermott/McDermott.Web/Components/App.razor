@@ -164,6 +164,19 @@
                                                                                                                                                                                                                                                                                                                                                                                             border-radius: 13px !important;
                                                                                                                                                                                                                                                                                                                                                                                         } */
 
+
+        .rounded-button .dxbl-toolbar-item {
+            border-radius: 50px;
+            transition: background-color 0.3s;
+        }
+
+            .rounded-button .dxbl-toolbar-item:hover {
+                background-color: #f0f0f0;
+            }
+
+            .rounded-button .dxbl-toolbar-item:active {
+                background-color: #e0e0e0;
+            }
         .dxbl-btn-standalone {
             border-radius: 10px !important;
             padding-inline-start: 25px !important;
@@ -376,6 +389,30 @@
         function confirmSendEmail() {
             return confirm('Apakah Anda yakin ingin mengirim email ini?');
         }
+
+        function printDocument(base64String) {
+            const byteCharacters = atob(base64String);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            iframe.contentWindow.location.href = url;
+
+            // Tunggu sebentar agar dokumen selesai dimuat
+            setTimeout(() => {
+                iframe.contentWindow.print();
+                document.body.removeChild(iframe);
+                URL.revokeObjectURL(url);
+            }, 1000); // Sesuaikan waktu tunggu jika diperlukan
+        }
+
 
     </script>
 

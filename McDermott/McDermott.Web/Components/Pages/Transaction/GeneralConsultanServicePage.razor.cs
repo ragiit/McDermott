@@ -12,7 +12,9 @@ namespace McDermott.Web.Components.Pages.Transaction
         #region OnSave and Staging
 
         private bool P { get; set; } = false;
-        private string SelectedRujukanType { get; set; }
+        private bool IsOpen { get; set; } = false;
+    
+    private string SelectedRujukanType { get; set; }
         private string SelectedRujukanExternal { get; set; }
         private string SelectedRujukanVertical { get; set; }
         private IEnumerable<string> RujukanTypes = new[] { "Rujuk Internal", "Rujukan External" };
@@ -95,6 +97,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             public string KdPoliRujuk { get; set; }
         }
 
+        
         private IGrid GridRujukanRefer { get; set; }
         private List<SpesialisRefrensiKhususPCare> SpesialisRefrensiKhusus = [];
         private List<SpesialisPCare> SpesialisPs = [];
@@ -250,6 +253,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
+
+        private async Task SendToPrint(long Id)
+        {
+            
+        }
         private async Task<bool> SendPcareRequestKunjungan()
         {
             if (FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Nurse Station") && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
