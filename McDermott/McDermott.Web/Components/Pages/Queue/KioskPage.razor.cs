@@ -514,17 +514,21 @@ namespace McDermott.Web.Components.Pages.Queue
                 }
                 else
                 {
-                    var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == BPJS.Id))).FirstOrDefault();
-                    if (bpjs != null)
-                    {
-                        FormKios.BPJS = bpjs.NoKartu;
-                        FormKios.StageBpjs = bpjs.Aktif;
-                        statBPJS = bpjs.Aktif ? "Active" : "InActive";
-                    }
-                    else
-                    {
-                        statBPJS = "no BPJS number";
-                    }
+                    FormKios.BPJS = BPJS.PolicyNumber;
+                    FormKios.StageBpjs = true;
+                    statBPJS = "Active";
+
+                    //var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == BPJS.Id))).FirstOrDefault();
+                    //if (bpjs != null)
+                    //{
+                    //    FormKios.BPJS = bpjs.NoKartu;
+                    //    FormKios.StageBpjs = bpjs.Aktif;
+                    //    statBPJS = bpjs.Aktif ? "Active" : "InActive";
+                    //}
+                    //else
+                    //{
+                    //    statBPJS = "no BPJS number";
+                    //}
                 }
             }
             else

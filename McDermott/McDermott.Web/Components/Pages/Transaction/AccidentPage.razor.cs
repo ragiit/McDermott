@@ -350,9 +350,11 @@ namespace McDermott.Web.Components.Pages.Transaction
         private void OnSelectEmployee(UserDto e)
         {
             SelectedNIP = "-";
+            Accident.DepartmentId = 0;
             if (e is null)
                 return;
 
+            Accident.DepartmentId = e.DepartmentId.GetValueOrDefault();
             SelectedNIP = e.NIP ?? "-";
         }
 

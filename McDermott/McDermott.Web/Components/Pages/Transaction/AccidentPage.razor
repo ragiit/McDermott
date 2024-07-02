@@ -48,8 +48,8 @@
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Employee.Name" Caption="Employee" SortIndex="0" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Department.Name" Caption="Department" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.DateOfOccurrence)" Caption="Date Of Occurrence" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.DateOfFirstTreatment)" Caption="Date Of First Treatment" />
+                                            <DxGridDataColumn MinWidth="200" DisplayFormat="ddd, dd MMM yyyy HH:mm:ss" FieldName="@nameof(AccidentDto.DateOfOccurrence)" Caption="Date Of Occurrence" />
+                                            <DxGridDataColumn MinWidth="200" DisplayFormat="ddd, dd MMM yyyy HH:mm:ss" FieldName="@nameof(AccidentDto.DateOfFirstTreatment)" Caption="Date Of First Treatment" />
                                             <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.AreaOfYard)" Caption="Area Of Yard" />
                                             <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.RibbonSpecialCase)" Caption="Ribbon Special Case" />
                                             <DxGridDataColumn MinWidth="200" FieldName="@nameof(AccidentDto.StatusName)" Caption="Status" />
@@ -127,6 +127,7 @@
                                                             <MyDxComboBox ShowValidationIcon="true"
                                                                           Data="@Departments"
                                                                           NullText="Select Department..."
+                                                                          ReadOnly
                                                                           TextFieldName="Name"
                                                                           ValueFieldName="Id"
                                                                           @bind-Value="Accident.DepartmentId">
@@ -146,7 +147,7 @@
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Date Of Occurrence" ColSpanMd="12">
                                                             <DxDateEdit ShowValidationIcon="true"
                                                                         @bind-Date="Accident.DateOfOccurrence"
-                                                                        Mask="@DateTimeMask.ShortDate"
+                                                                        TimeSectionVisible="true"
                                                                         NullText="Select Date Of Occurrence">
                                                             </DxDateEdit>
                                                             <ValidationMessage For="@(() => Accident.DateOfOccurrence)" />
@@ -155,7 +156,7 @@
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Date Of First Treatment" ColSpanMd="12">
                                                             <DxDateEdit ShowValidationIcon="true"
                                                                         @bind-Date="Accident.DateOfFirstTreatment"
-                                                                        Mask="@DateTimeMask.ShortDate"
+                                                                        TimeSectionVisible="true"
                                                                         NullText="Select Date Of First Treatment">
                                                             </DxDateEdit>
                                                             <ValidationMessage For="@(() => Accident.DateOfFirstTreatment)" />
