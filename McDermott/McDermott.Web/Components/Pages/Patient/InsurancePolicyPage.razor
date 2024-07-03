@@ -12,7 +12,7 @@
 
         @if (!IsPopUpForm)
         {
-            <section class="content-header">
+            @* <section class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
@@ -26,7 +26,10 @@
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> *@
+
+            <BaseHeaderPage Title="Insurance Policy" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
+
         }
         else
         {
@@ -48,7 +51,6 @@
                     <div class="row">
                         <div class="col">
                             <div class="card">
-                                <div class="card-body">
                                     <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
                                     <DxLoadingPanel @bind-Visible="PanelVisible"
@@ -57,35 +59,32 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                        <MyGrid @ref="Grid"
                                                 Data="InsurancePolicies"
-                                                PageSize="10"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
-                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                                 KeyFieldName="Id"
-                                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                                 EditModelSaving="OnSave"
                                                 DataItemDeleting="OnDelete"
                                                 RowDoubleClick="EditItem_Click"
-                                                AllowSelectRowByClick="true"
-                                                EditMode="GridEditMode.PopupEditForm"
-                                                PopupEditFormCssClass="pw-800"
-                                                CustomizeElement="GridExtention.Grid_CustomizeElement"
-                                                PagerPosition="GridPagerPosition.Bottom"
-                                                PageSizeSelectorVisible="true"
-                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                PageSizeSelectorAllRowsItemVisible="true"
-                                                PagerSwitchToInputBoxButtonCount="10"
-                                                FocusedRowEnabled="true"
-                                                PagerVisibleNumericButtonCount="10"
-                                                FocusedRowChanged="Grid_FocusedRowChanged"
-                                                ShowGroupPanel="true"
-                                                AutoExpandAllGroupRows="true"
-                                                ShowFilterRow="true"
-                                                ShowSearchBox="true"
-                                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                                KeyboardNavigationEnabled="true">
-                                            <ToolbarTemplate>
+                                                FocusedRowChanged="Grid_FocusedRowChanged">
+
+
+                                        <ToolbarTemplate>
+                                            <MyDxToolbarBase TItem="InsurancePolicyDto"
+                                                             Items="@InsurancePolicies"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@NewItem_Click"
+                                                             EditItem_Click="@EditItem_Click"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             Refresh_Click="@Refresh_Click"
+                                                             IsImport="false"
+                                                             Grid="Grid"
+                                                             VisibleNew="UserAccessCRUID.Create"
+                                                             VisibleEdit="UserAccessCRUID.Update"
+                                                             VisibleDelete="UserAccessCRUID.Delete" />
+                                        </ToolbarTemplate>
+
+                                           @*  <ToolbarTemplate>
                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Countries.Count > 0" />
@@ -101,7 +100,7 @@
                                                     </DxToolbarItem>
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Import" Click="@ImportFile" Text="Import" IconCssClass="fa-solid fa-file-import" />
                                                 </DxToolbar>
-                                            </ToolbarTemplate>
+                                            </ToolbarTemplate> *@
                                             <Columns>
                                                 <DxGridSelectionColumn Width="15px" />
                                                 <DxGridDataColumn FieldName="User.Name" Caption="Patient" SortIndex="0" />
@@ -109,9 +108,8 @@
                                                 <DxGridDataColumn FieldName="PolicyNumber" Caption="Policy Number" />
                                                 <DxGridDataColumn FieldName="Active" />
                                             </Columns>
-                                        </DxGrid>
+                                        </MyGrid>
                                     </DxLoadingPanel>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -380,9 +378,5 @@
 }
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Insurance Police" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <LoadingIndicatorLayout />
 }

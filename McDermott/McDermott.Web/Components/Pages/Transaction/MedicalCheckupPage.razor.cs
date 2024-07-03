@@ -1,4 +1,7 @@
-﻿namespace McDermott.Web.Components.Pages.Transaction
+﻿using DocumentFormat.OpenXml;
+using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
+
+namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class MedicalCheckupPage
     {
@@ -40,25 +43,269 @@
         private int FocusedRowVisibleIndex { get; set; }
         private bool ShowForm { get; set; } = false;
         private bool IsLoading { get; set; } = false;
+        private string StagingText { get; set; } = EnumStatusMCU.HRCandidat.GetDisplayName();
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
-        private List<GeneralConsultanServiceDto> GeneralConsultanServices { get; set; } = [];
-        private GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
-
-        private async Task OnDeleting()
+        private GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new()
         {
+            TypeRegistration = "MCU",
+            MedexType = "CANDIDATE EMPLOYEE PEA",
+            TypeMedical = "Annual MCU",
+        };
+
+        private bool IsStatus(EnumStatusMCU status) => GeneralConsultanService.StatusMCU == status;
+
+        private List<GeneralConsultanServiceDto> GeneralConsultanServices { get; set; } = [];
+        private List<UserDto> Patients = [];
+        private List<UserDto> Physicions = [];
+        private List<ServiceDto> Services = [];
+
+        private List<string> RegisType = new List<string>
+        {
+            "MCU"
+        };
+
+        private List<string> MedexType = new List<string>
+        {
+            "CANDIDATE EMPLOYEE PEA",
+            "PRE-EMPLOYMENT POST PEA",
+            "PRE-EMPLOYMENT FULL"
+        };
+
+        private List<string> MCUType = [
+            "Annual MCU",
+            "Pre Employment MCU",
+            "Oil & Gas UK",
+            "HIV & AIDS",
+            "Covid19*",
+            "Drug & Alcohol Test",
+            "Maternity Checkup"
+        ];
+
+        private async Task SelectedItemServiceChanged(ServiceDto e)
+        {
+            try
+            {
+                if (e is null)
+                {
+                    GeneralConsultanService.ServiceId = null;
+                    return;
+                }
+
+                Physicions = await Mediator.Send(new GetUserQuery(x => x.DoctorServiceIds != null && x.DoctorServiceIds.Contains(e.Id)));
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task SelectedItemPatientChanged(UserDto e)
+        {
+            if (e is null)
+            {
+                GeneralConsultanService.Patient = new();
+                return;
+            }
+
+            GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
+        }
+
+        private async Task OnClickConfirm()
+        {
+            IsLoading = true;
+            try
+            {
+                if (GeneralConsultanService.Id == 0)
+                {
+                    IsLoading = false;
+                    return;
+                }
+
+                if (GeneralConsultanService.IsBatam)
+                {
+                    switch (GeneralConsultanService.StatusMCU)
+                    {
+                        case EnumStatusMCU.Draft:
+                            GeneralConsultanService.StatusMCU = EnumStatusMCU.HRCandidat;
+                            StagingText = EnumStatusMCU.Examination.GetDisplayName();
+                            break;
+
+                        case EnumStatusMCU.HRCandidat:
+                            GeneralConsultanService.StatusMCU = EnumStatusMCU.Examination;
+                            StagingText = EnumStatusMCU.Result.GetDisplayName();
+                            break;
+
+                        case EnumStatusMCU.Examination:
+                            GeneralConsultanService.StatusMCU = EnumStatusMCU.Result;
+                            StagingText = EnumStatusMCU.Done.GetDisplayName();
+                            break;
+
+                        case EnumStatusMCU.Result:
+                            GeneralConsultanService.StatusMCU = EnumStatusMCU.Done;
+                            StagingText = EnumStatusMCU.Done.GetDisplayName();
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (GeneralConsultanService.StatusMCU)
+                    {
+                        case EnumStatusMCU.Draft:
+                            GeneralConsultanService.StatusMCU = EnumStatusMCU.EmployeeTest;
+                            StagingText = EnumStatusMCU.HRCandidat.GetDisplayName();
+                            break;
+
+                        case EnumStatusMCU.EmployeeTest:
+                            GeneralConsultanService.StatusMCU = EnumStatusMCU.HRCandidat;
+                            StagingText = EnumStatusMCU.Examination.GetDisplayName();
+                            break;
+
+                        case EnumStatusMCU.HRCandidat:
+                            GeneralConsultanService.StatusMCU = EnumStatusMCU.Examination;
+                            StagingText = EnumStatusMCU.Result.GetDisplayName();
+                            break;
+
+                        case EnumStatusMCU.Examination:
+                            GeneralConsultanService.StatusMCU = EnumStatusMCU.Result;
+                            StagingText = EnumStatusMCU.Done.GetDisplayName();
+                            break;
+
+                        case EnumStatusMCU.Result:
+                            GeneralConsultanService.StatusMCU = EnumStatusMCU.Done;
+                            StagingText = EnumStatusMCU.Done.GetDisplayName();
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+            }
+            catch (Exception Ex)
+            {
+                Ex.HandleException(ToastService);
+            }
+            IsLoading = false;
+        }
+
+        private async Task OnDeleting(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                if (SelectedDataItems is null)
+                    return;
+
+                if (SelectedDataItems is not null && SelectedDataItems.Count == 1)
+                {
+                    await Mediator.Send(new DeleteGeneralConsultanServiceRequest(((GeneralConsultanServiceDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<GeneralConsultanServiceDto>>();
+
+                    //a = a.Where(x => x.StagingStatus == "Planned" || x.StagingStatus == "Canceled").ToList();
+
+                    await Mediator.Send(new DeleteGeneralConsultanServiceRequest(ids: a.Select(x => x.Id).ToList()));
+                }
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private void NewItem_Click()
         {
+            ShowForm = true;
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
+            FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
         private async Task EditItem_Click()
         {
+            ShowForm = true;
+            IsLoading = true;
+            try
+            {
+                GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>().Id))).FirstOrDefault() ?? new();
+                if (GeneralConsultanService is not null)
+                {
+                    if (GeneralConsultanService.IsBatam)
+                    {
+                        switch (GeneralConsultanService.StatusMCU)
+                        {
+                            case EnumStatusMCU.Draft:
+                                StagingText = EnumStatusMCU.HRCandidat.GetDisplayName();
+                                break;
+
+                            case EnumStatusMCU.HRCandidat:
+                                StagingText = EnumStatusMCU.Examination.GetDisplayName();
+                                break;
+
+                            case EnumStatusMCU.Examination:
+                                StagingText = EnumStatusMCU.Result.GetDisplayName();
+                                break;
+
+                            case EnumStatusMCU.Result:
+                                StagingText = EnumStatusMCU.Done.GetDisplayName();
+                                break;
+
+                            case EnumStatusMCU.Done:
+                                StagingText = EnumStatusMCU.Done.GetDisplayName();
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (GeneralConsultanService.StatusMCU)
+                        {
+                            case EnumStatusMCU.Draft:
+                                StagingText = EnumStatusMCU.EmployeeTest.GetDisplayName();
+                                break;
+
+                            case EnumStatusMCU.EmployeeTest:
+                                StagingText = EnumStatusMCU.HRCandidat.GetDisplayName();
+                                break;
+
+                            case EnumStatusMCU.HRCandidat:
+                                StagingText = EnumStatusMCU.Examination.GetDisplayName();
+                                break;
+
+                            case EnumStatusMCU.Examination:
+                                StagingText = EnumStatusMCU.Result.GetDisplayName();
+                                break;
+
+                            case EnumStatusMCU.Result:
+                                StagingText = EnumStatusMCU.Done.GetDisplayName();
+                                break;
+
+                            case EnumStatusMCU.Done:
+                                StagingText = EnumStatusMCU.Done.GetDisplayName();
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            IsLoading = false;
         }
 
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)
@@ -67,6 +314,8 @@
 
         private async Task LoadComboBox()
         {
+            Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
+            Services = await Mediator.Send(new GetServiceQuery());
         }
 
         private void DeleteItem_Click()
@@ -76,14 +325,217 @@
 
         private async Task LoadData()
         {
+            ShowForm = false;
+            GeneralConsultanService = new()
+            {
+                TypeRegistration = "MCU",
+                MedexType = "CANDIDATE EMPLOYEE PEA",
+                TypeMedical = "Annual MCU",
+            };
+            SelectedDataItems = [];
+            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "MCU" && x.IsMcu == true));
+            IsLoading = false;
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            IsLoading = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Patient", "MCU Type", "Medex Type", "Candidate Form", "Registration Date" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var a = new List<GeneralConsultanServiceDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var col1Patient = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                        var patient = (await Mediator.Send(new GetUserQuery(x => x.NIP == col1Patient || x.Oracle == col1Patient || x.SAP == col1Patient))).FirstOrDefault() ?? null;
+                        if (patient is null)
+                        {
+                            ShowErrorImport(row, 1, col1Patient);
+                            IsLoading = false;
+                            return;
+                        }
+
+                        var col2MCUType = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                        if (MCUType.FirstOrDefault(x => x == col2MCUType) is null)
+                        {
+                            ShowErrorImport(row, 2, col2MCUType);
+                            IsLoading = false;
+                            return;
+                        }
+
+                        var col3Medex = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        if (MedexType.FirstOrDefault(x => x == col3Medex) is null)
+                        {
+                            ShowErrorImport(row, 3, col3Medex);
+                            IsLoading = false;
+                            return;
+                        }
+
+                        var col4Candidate = ws.Cells[row, 4].Value?.ToString()?.Trim();
+                        if (!col4Candidate.Equals("Batam") && !col4Candidate.Equals("Outside Batam"))
+                        {
+                            ShowErrorImport(row, 4, col4Candidate);
+                            IsLoading = false;
+                            return;
+                        }
+
+                        var col5Date = ws.Cells[row, 5].Value?.ToString()?.Trim();
+                        bool successDate = DateTime.TryParseExact(col5Date, "dd-MM-yyyy",
+                                            CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                                            out DateTime dateValue);
+
+                        if (!successDate)
+                        {
+                            ShowErrorImport(row, 5, col5Date);
+                            IsLoading = false;
+                            return;
+                        }
+
+                        var b = new GeneralConsultanServiceDto
+                        {
+                            PatientId = patient.Id,
+                            TypeRegistration = "MCU",
+                            RegistrationDate = dateValue,
+                            IsMcu = true,
+                            TypeMedical = col2MCUType,
+                            MedexType = col3Medex,
+                            IsBatam = col4Candidate.Equals("Batam"),
+                            IsOutsideBatam = col4Candidate.Equals("OutsideBatam"),
+                        };
+
+                        if (!GeneralConsultanServices.Any(x => x.PatientId == b.PatientId &&
+                                       x.TypeRegistration == b.TypeRegistration &&
+                                       x.RegistrationDate == b.RegistrationDate &&
+                                       x.IsMcu == b.IsMcu &&
+                                       x.TypeMedical == b.TypeMedical &&
+                                       x.MedexType == b.MedexType &&
+                                       x.IsBatam == b.IsBatam &&
+                                       x.IsOutsideBatam == b.IsOutsideBatam))
+                        {
+                            a.Add(b);
+                        }
+                    }
+
+                    await Mediator.Send(new CreateListGeneralConsultanServiceRequest(a));
+
+                    await LoadData();
+                    SelectedDataItems = [];
+
+                    ToastService.ShowSuccess("Successfully Imported.");
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+
+            IsLoading = false;
+        }
+
+        private void ShowErrorImport(int row, int col, string val)
+        {
+            ToastService.ShowInfo($"Data \"{val}\" in row {row} and column {col} is invalid");
         }
 
         private async Task OnValidSubmitSave()
         {
+            try
+            {
+                IsLoading = true;
+                try
+                {
+                    GeneralConsultanService.IsMcu = true;
+
+                    if (GeneralConsultanService.StatusMCU == EnumStatusMCU.Draft)
+                    {
+                        if (GeneralConsultanService.IsBatam)
+                            StagingText = EnumStatusMCU.HRCandidat.GetDisplayName();
+                        else
+                            StagingText = EnumStatusMCU.EmployeeTest.GetDisplayName();
+                    }
+
+                    if (GeneralConsultanService.Id == 0)
+                        GeneralConsultanService = await Mediator.Send(new CreateGeneralConsultanServiceRequest(GeneralConsultanService));
+                    else
+                        await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+
+                    GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId) ?? new();
+
+                    ToastService.ClearInfoToasts();
+                    ToastService.ShowInfo("Saved Successfully");
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            IsLoading = false;
+        }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "medical_checkup_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Patient",
+                    Notes = "Mandatory \nNIP/Oracle/SAP"
+                },
+                new()
+                {
+                    Column = "MCU Type",
+                    Notes = "Mandatory \nSelect one: \nAnnual MCU \nPre Employment MCU \nOil & Gas UK \nHIV & AIDS \nCovid19* \nDrug & Alcohol Test \nMaternity Checkup"
+                },
+                new()
+                {
+                    Column = "Medex Type ",
+                    Notes = "Mandatory \nSelect one: \nCANDIDATE EMPLOYEE PEA \nPRE-EMPLOYMENT POST PEA \nPRE-EMPLOYMENT FULL"
+                },
+                new()
+                {
+                    Column = "Candidate Form",
+                    Notes = "Mandatory \nSelect one: \nBatam \nOutside Batam"
+                },
+                new()
+                {
+                    Column = "Registration Date",
+                    Notes = "Mandatory \nDD-MM-YYYY"
+                },
+            ]);
         }
 
         private async Task OnInvalidSubmitSave()
         {
+            ToastService.ShowInfoSubmittingForm();
         }
 
         protected override Task OnInitializedAsync()

@@ -7,7 +7,7 @@ namespace McDermott.Application.Dtos.Bpjs
     {
         public long Id { get; set; }
         public long? InsurancePolicyId { get; set; }
-        [JsonPropertyName("noKartu")]
+        [JsonPropertyName("noKartu")]   
         public string? NoKartu { get; set; }
 
         [JsonPropertyName("nama")]

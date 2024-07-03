@@ -24,8 +24,10 @@
                     result = await _unitOfWork.Repository<InventoryAdjusmentDetail>().Entities
                         .Include(x => x.InventoryAdjusment)
                         .Include(x => x.Product)
-                       .AsNoTracking()
-                       .ToListAsync(cancellationToken);
+                        .ThenInclude(z => z.Uom)
+                        .Include(x => x.StockProduct)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }

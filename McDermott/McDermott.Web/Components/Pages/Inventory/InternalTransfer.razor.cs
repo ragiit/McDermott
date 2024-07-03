@@ -61,7 +61,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                         await Grid.WaitForDataLoadAsync();
                         Grid.ExpandGroupRow(2);
                         StateHasChanged();
-
                     }
                 }
                 catch { }
@@ -138,6 +137,9 @@ namespace McDermott.Web.Components.Pages.Inventory
             try
             {
                 PanelVisible = true;
+                TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+                PanelVisible = false;
+
                 showForm = false;
                 showFormDetail = false;
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
@@ -199,7 +201,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                     }
                 }
             }
-
         }
 
         private async Task SelectedItemProduct(LocationDto value)
@@ -227,13 +228,11 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 TempFormInternalTransfer.TraceAvability = product.TraceAbility;
 
-
                 Batch.Clear();
                 if (StockProducts is not null)
                     Batch = StockProducts;
                 else
                     ToastService.ShowWarning("The selected product does not have stock in all batches!!");
-
 
                 if (product.TraceAbility)
                 {
@@ -304,8 +303,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                     priorityClass = "danger";
                     title = "Cancel";
                     break;
-
-
 
                 default:
                     return new MarkupString("");
@@ -409,7 +406,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                 //Products.Clear();
                 headerDetail = "Add product Transfer Internal";
                 await GridDetailTransferStock.StartEditNewRowAsync();
-            
             }catch(Exception ex)
             {
                 ex.HandleException(ToastService);
