@@ -120,22 +120,22 @@
                                         <div class="row justify-content-end mb-3">
                                             <div class="col-auto align-self-end">
                                                 <DxTabs RenderMode="TabsRenderMode.AllTabs">
-                                                    <DxTab Text="Draft" Enabled="@(Pharmacy.Status == "Draft" )"></DxTab>
-                                                    @if (Pharmacy.Status == "SendToPharmacy")
+                                                    <DxTab Text="Draft" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Draft)"></DxTab>
+                                                    @if (Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy)
                                                     {
-                                                        <DxTab Text="Pharmacy" Enabled="@(Pharmacy.Status == "SendToPharmacy")"></DxTab>
+                                                        <DxTab Text="Pharmacy" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy)"></DxTab>
                                                     }
-                                                    else if (Pharmacy.Status == "Received")
+                                                    else if (Pharmacy.Status == EnumStatusPharmacy.Received)
                                                     {
-                                                        <DxTab Text="Received" Enabled="@(Pharmacy.Status == "Received")"></DxTab>
+                                                        <DxTab Text="Received" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Received)"></DxTab>
                                                     }
                                                     else
                                                     {
-                                                        <DxTab Text="Received" Enabled="@(Pharmacy.Status == "Received")"></DxTab>
+                                                        <DxTab Text="Received" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Received)"></DxTab>
                                                     }
-                                                    <DxTab Text="Process" Enabled="@(Pharmacy.Status == "Processed")"></DxTab>
-                                                    <DxTab Text="Done" Enabled="@(Pharmacy.Status == "Done")"></DxTab>
-                                                    <DxTab Text="Cancel" Enabled="@(Pharmacy.Status == "Cancel")"></DxTab>
+                                                    <DxTab Text="Process" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Processed)"></DxTab>
+                                                    <DxTab Text="Done" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Done)"></DxTab>
+                                                    <DxTab Text="Cancel" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Cancel)"></DxTab>
                                                 </DxTabs>
                                             </div>
                                         </div>
@@ -143,7 +143,7 @@
                                         {
                                             <div class="row justify-content-start mb-3">
                                                 <div class="col-12 align-self-start">
-                                                    @if (Pharmacy.Status == "Draft" && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))
+                                                    @if (Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))
                                                     {
                                                         <div class="card">
                                                             <div class="card-body">
@@ -152,7 +152,7 @@
                                                             </div>
                                                         </div>
                                                     }
-                                                    else if (Pharmacy.Status == "SendToPharmacy" && NameUser.IsPharmacy == true )
+                                                    else if (Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy && NameUser.IsPharmacy == true)
                                                     {
                                                         <div class="card">
                                                             <div class="card-body">
@@ -161,7 +161,7 @@
                                                             </div>
                                                         </div>
                                                     }
-                                                    else if (Pharmacy.Status == "Received" && NameUser.IsPharmacy == true)
+                                                    else if (Pharmacy.Status == EnumStatusPharmacy.Received && NameUser.IsPharmacy == true)
                                                     {
                                                         <div class="card">
                                                             <div class="card-body">
@@ -170,7 +170,7 @@
                                                             </div>
                                                         </div>
                                                     }
-                                                else if (Pharmacy.Status == "Processed" && NameUser.IsPharmacy == true)
+                                                    else if (Pharmacy.Status == EnumStatusPharmacy.Processed && NameUser.IsPharmacy == true)
                                                     {
                                                         <div class="card">
                                                             <div class="card-body">
@@ -418,6 +418,19 @@
                                                                     </ToolbarTemplate>
                                                                     <Columns>
                                                                         <DxGridSelectionColumn Width="15px" />
+                                                                        @if (NameUser.IsPharmacy == true)
+                                                                        {
+                                                                            <DxGridDataColumn FieldName="Id" AllowSort="false" Width="10px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                                                                                <CellDisplayTemplate>
+                                                                                    <DxButton RenderStyle="ButtonRenderStyle.Success"
+                                                                                    Attributes="@(new Dictionary<string, object> {  ["title"] = "Select Batch" })"
+                                                                                    IconCssClass="fa-solid fa-clipboard-list"
+                                                                                    Click="@(()=>ShowCutStock((context.DataItem as PrescriptionDto).Id))"
+                                                                                    CssClass="me-1" />
+                                                                                </CellDisplayTemplate>
+                                                                                <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
+                                                                            </DxGridDataColumn>
+                                                                        }
                                                                         <DxGridDataColumn MinWidth="200" FieldName="Product.Name" Caption="Medicine Name" SortIndex="0" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="GivenAmount" Caption="Prescription Quantity" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="ActiveComponentNames" Caption="Active Component" />
@@ -425,6 +438,7 @@
                                                                         <DxGridDataColumn MinWidth="200" FieldName="DosageFrequency" Caption="Dosage/Frequency" />
                                                                         @* <DxGridDataColumn MinWidth="200" FieldName="PriceUnit" Caption="Price Unit" /> *@
                                                                         <DxGridDataColumn MinWidth="200" FieldName="DrugRoute.Route" Caption="Route" />
+
                                                                     </Columns>
                                                                     <EditFormTemplate Context="EditFormContextPrescriptionLines">
                                                                         @{
@@ -663,32 +677,32 @@
 
                                                                                                     switch (item.status)
                                                                                                     {
-                                                                                                        case "Draft":
+                                                                                                        case EnumStatusPharmacy.Draft:
                                                                                                             priorityClass = "info";
                                                                                                             title = "Draft";
                                                                                                             break;
 
-                                                                                                        case "SendToPharmacy":
+                                                                                                        case EnumStatusPharmacy.SendToPharmacy:
                                                                                                             priorityClass = "primary";
                                                                                                             title = "Pharmacy";
                                                                                                             break;
 
-                                                                                                        case "Received":
+                                                                                                        case EnumStatusPharmacy.Received:
                                                                                                             priorityClass = "primary";
                                                                                                             title = "Received";
                                                                                                             break;
 
-                                                                                                        case "Processed":
+                                                                                                        case EnumStatusPharmacy.Processed:
                                                                                                             priorityClass = "warning";
                                                                                                             title = "Processed";
                                                                                                             break;
 
-                                                                                                        case "Done":
+                                                                                                        case EnumStatusPharmacy.Done:
                                                                                                             priorityClass = "success";
                                                                                                             title = "Done";
                                                                                                             break;
 
-                                                                                                        case "Cancel":
+                                                                                                        case EnumStatusPharmacy.Cancel:
                                                                                                             priorityClass = "danger";
                                                                                                             title = "Canceled";
                                                                                                             break;
@@ -848,20 +862,6 @@ else
                                     ShowValidationIcon="true" />
                         <ValidationMessage For="@(()=> Concoction.Qty)"   />
                     </DxFormLayoutItem>
-
-                    @*  <DxFormLayoutItem Caption="Frequency" CaptionCssClass="normal-caption" ColSpanMd="12">
-                    <DxComboBox Data="@DrugDosages"
-                    @bind-Value="@Concoction.DrugDosageId"
-                    FilteringMode="@DataGridFilteringMode.Contains"
-                    NullText="Select Dosage signa ..."
-                    TextFieldName="Frequency"
-                    ValueFieldName="Id"
-                    Enabled="isActiveButton"
-                    SelectedItemChanged="@((DrugDosageDto freq)=>SelectChangeFrequency(freq))"
-                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    ShowValidationIcon="true" />
-                    <ValidationMessage For="@(()=> Concoction.DrugDosageId)"   />
-                    </DxFormLayoutItem> *@
                     <DxFormLayoutItem Caption="Qty Per Day" CaptionCssClass="normal-caption" ColSpanMd="12">
                         <DxSpinEdit Value="@Concoction.QtyByDay"
                                     NullText="0"
@@ -1052,4 +1052,107 @@ else
             </div>
         </div>
     </EditForm>
+</DxPopup>
+
+@* PopUp Detail Prescription *@
+
+<DxPopup @bind-Visible="@isDetailPrescription" HeaderCssClass="fw-bold" HeaderText="Select Batch on product"
+         HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
+         VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
+    <DxLoadingPanel @bind-Visible="PanelVisible"
+                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                    IsContentBlocked="true"
+                    ApplyBackgroundShading="true"
+                    IndicatorAreaVisible="false"
+                    Text="Fetching Data...">
+        <DxGrid @ref="GridStockOut"
+                PagerNavigationMode="PagerNavigationMode.InputBox"
+                Data="StockOutPrescriptions"
+                PageSize="10"
+                @bind-SelectedDataItems="@SelectedDataItemsStockOut"
+                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                KeyFieldName="Id"
+                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                EditorRenderMode="GridEditorRenderMode.Detached"
+                DataItemDeleting="OnDeleteStockCutPrescription"
+                EditModelSaving="OnSaveStockOut"
+                AllowSelectRowByClick="true"
+                PagerPosition="GridPagerPosition.Bottom"
+                PageSizeSelectorVisible="true"
+                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                PageSizeSelectorAllRowsItemVisible="true"
+                PagerSwitchToInputBoxButtonCount="10"
+                FocusedRowEnabled="true"
+                PagerVisibleNumericButtonCount="10"
+                FocusedRowChanged=" GridFocusedRowVisibleIndexStockOut_FocusedRowChanged"
+                ShowGroupPanel="true"
+                AutoExpandAllGroupRows="true"
+                ShowFilterRow="true"
+                CustomizeElement="Grid_CustomizeElement"
+                ShowSearchBox="true"
+                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                KeyboardNavigationEnabled="true">
+            <ToolbarTemplate>
+                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOut_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed)" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOut_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && !isActiveButton" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && IsPopUpForm && isActiveButton" />                   
+                </DxToolbar>
+            </ToolbarTemplate>
+            <Columns>
+                <DxGridSelectionColumn Width="15px" />
+                <DxGridDataColumn FieldName="Batch" Caption="Batch" SortIndex="0" />
+                <DxGridDataColumn FieldName="QuantityStock" Caption="QuantityStock" />
+                
+            </Columns>
+            <EditFormTemplate Context="EditFormContextStockOut">
+                @* <EditForm Model="@ConcoctionLine" Context="EditFormContextPrescriptionConcoctionLinesForm" OnInvalidSubmit="@HandleValidConcoctionSubmit" OnValidSubmit="@HandleInvalidConcoctionSubmit"> *@
+                <DataAnnotationsValidator />
+                @{
+                    FormStockOutPrescriptions = (StockOutPrescriptionDto)EditFormContextStockOut.EditModel;
+                }
+                <div class="row w-100">
+                    <div class="col-md-6">
+                        <DxFormLayout CssClass="mt w-100">
+                            <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                <DxComboBox ShowValidationIcon="true"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                            Data="@StockOutProducts"
+                                            NullText="Select Batch..."
+                                            @bind-Value="@FormStockOutPrescriptions.StockId"
+                                            SelectedItemChanged="@((StockProductDto value)=> ChangeOutStock(value))"
+                                            TextFieldName="Batch"
+                                            ValueFieldName="Id">
+                                </DxComboBox>
+                                <ValidationMessage For="@(()=> FormStockOutPrescriptions.StockId)" />
+                            </DxFormLayoutItem>
+
+                            @* <DxFormLayoutItem Caption="Active Component" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                <DxTagBox Data="@ActiveComponents"
+                                          FilteringMode="@DataGridFilteringMode.Contains"
+                                          @bind-Values="@selectedActiveComponents"
+                                          NullText="Select Active Component.."
+                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                          TextFieldName="Name" />
+                                <ValidationMessage For="@(()=> ConcoctionLine.ActiveComponentId)" />
+                            </DxFormLayoutItem>
+
+                            <DxFormLayoutItem Caption="Medicine Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                <DxSpinEdit Value="@ConcoctionLine.MedicamentDosage"
+                                            NullText="Medicine Unit Of Dosage..."
+                                            ValueExpression="@(()=>ConcoctionLine.MedicamentDosage)"
+                                            ValueChanged="@((long value) => changeMedicamentDosage(value))"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                <ValidationMessage For="@(()=> ConcoctionLine.MedicamentDosage)"   />
+                            </DxFormLayoutItem> *@
+                        </DxFormLayout>
+                    </div>
+
+                    
+                </div>
+                @* </EditForm> *@
+            </EditFormTemplate>
+        </DxGrid>
+    </DxLoadingPanel>
+
 </DxPopup>

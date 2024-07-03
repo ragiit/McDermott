@@ -126,5 +126,25 @@ namespace McDermott.Application.Extentions
             [Display(Name ="cancel")]
             Cancel = 4,
         }
+
+        public enum EnumStatusPharmacy
+        {
+            [Display(Name = "draft")]
+            Draft = 0,
+
+            [Display(Name = "Send To Pharmacy")]
+            SendToPharmacy = 1,
+
+            [Display(Name = "Received")]
+            Received = 2,
+
+            [Display(Name = "Processed")]
+            Processed = 3,
+
+            [Display(Name = "Done")]
+            Done = 4,
+            [Display(Name = "Cancel")]
+            Cancel = 5,
+        }
     }
 }

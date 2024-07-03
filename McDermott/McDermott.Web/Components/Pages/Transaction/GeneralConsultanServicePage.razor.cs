@@ -1,4 +1,10 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Humanizer;
+using McDermott.Application.Features.Services;
+using McDermott.Domain.Entities;
+using McDermott.Extentions;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.JSInterop;
 using QuestPDF.Fluent;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
@@ -13,8 +19,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private bool P { get; set; } = false;
         private bool IsOpen { get; set; } = false;
-    
-    private string SelectedRujukanType { get; set; }
+
+        private string SelectedRujukanType { get; set; }
         private string SelectedRujukanExternal { get; set; }
         private string SelectedRujukanVertical { get; set; }
         private IEnumerable<string> RujukanTypes = new[] { "Rujuk Internal", "Rujukan External" };
@@ -97,7 +103,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             public string KdPoliRujuk { get; set; }
         }
 
-        
+
         private IGrid GridRujukanRefer { get; set; }
         private List<SpesialisRefrensiKhususPCare> SpesialisRefrensiKhusus = [];
         private List<SpesialisPCare> SpesialisPs = [];
@@ -253,11 +259,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-
-        private async Task SendToPrint(long Id)
-        {
-            
-        }
         private async Task<bool> SendPcareRequestKunjungan()
         {
             if (FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Nurse Station") && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
@@ -3112,7 +3113,104 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 FormRegis.TypeMedical = null;
         }
+
+        #region Print
+
+        private List<SickLeaveDto> dataSickLeaves = [];
+        private List<UserDto> Users = [];
+        public byte[]? DocumentContent;
+        private bool isPrint { get; set; } = false;
+        private async void SendToPrint(long? grid)
+        {
+            try
+            {
+                DateTime? startSickLeave = null;
+                DateTime? endSickLeave = null;
+
+                var culture = new System.Globalization.CultureInfo("id-ID");
+
+                Users = await Mediator.Send(new GetUserQuery());
+                var data = GeneralConsultanServices.Where(x => x.Id == grid).FirstOrDefault()!;
+                var patienss = Users.Where(x => x.Id == data.PatientId).FirstOrDefault();
+                var age = 0;
+                if (data.Patient.DateOfBirth == null)
+                {
+                    age = 0;
+                }
+                else
+                {
+                    age = DateTime.Now.Year - patienss.DateOfBirth.Value.Year;
+                }
+                if (data.IsSickLeave)
+                {
+                    startSickLeave = data.StartDateSickLeave;
+                    endSickLeave = data.EndDateSickLeave;
+                }
+                else if (data.IsMaternityLeave)
+                {
+                    startSickLeave = data.StartMaternityLeave;
+                    endSickLeave = data.EndMaternityLeave;
+                }
+
+                int TotalDays = endSickLeave.Value.Day - startSickLeave.Value.Day;
+
+                string WordDays = ConvertNumberHelper.ConvertNumberToWord(TotalDays);
+
+                string todays = data.RegistrationDate.ToString("dddd", culture);
+
+
+                //Gender
+                string Gender = "";
+                string OppositeSex = "";
+                if (patienss.GenderId != null)
+                {
+                    Gender = patienss.Gender.Name == "Male" ? "MAlE(L)" : "FEMALE(P)";
+                    OppositeSex = patienss.Gender.Name == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
+                }
+
+                isPrint = true;
+                var mergeFields = new Dictionary<string, string>
+                {
+                    {"%NamePatient%", patienss.Name},
+                    {"%startDate%", startSickLeave?.ToString("dd MMMM yyyy") },
+                    {"%endDate%", endSickLeave?.ToString("dd MMMM yyyy") },
+                    {"%NameDoctor%", data?.Pratitioner.Name },
+                    {"%SIPDoctor%", data?.Pratitioner.SipNo },
+                    {"%AddressPatient%", patienss.DomicileAddress1 },
+                    {"%AgePatient%", age.ToString() },
+                    {"%WordDays%", WordDays },
+                    {"%Days%", todays},
+                    {"%days%", TotalDays.ToString() },
+                    {"%Dates%", data.RegistrationDate.ToString("dd MMMM yyyy")},
+                    {"%Times%", data.RegistrationDate.ToString("H:MM")},
+                    {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")},
+                    {"%genders%", Gender},
+                };
+
+                if (patienss.IsEmployee == false)
+                {
+                    DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
+                }
+                else if (patienss.IsEmployee == true)
+                {
+                    DocumentContent = await DocumentProvider.GetDocumentAsync("Employee.docx", mergeFields);
+                }
+                // Konversi byte array menjadi base64 string
+                //var base64String = Convert.ToBase64String(DocumentContent);
+
+                //// Panggil JavaScript untuk membuka dan mencetak dokumen
+                //await JsRuntime.InvokeVoidAsync("printDocument", base64String);
+
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+        #endregion
     }
 
     #endregion Function
+
+
 }

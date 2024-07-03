@@ -38,5 +38,8 @@
 
         [SetToNull]
         public List<ActiveComponent>? ActiveComponent { get; set; }
+
+        [SetToNull]
+        public List<StockOutPrescription>? StockOutPrescription { get;set; }
     }
 }

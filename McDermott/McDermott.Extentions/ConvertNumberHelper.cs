@@ -29,9 +29,43 @@ namespace McDermott.Extentions
 
             if (angka >= 10)
             {
-                if (angka % 10 == 0)
+                if (angka / 10 == 1)
                 {
-                    hasil += puluhan[angka / 10 - 1];
+                    switch (angka % 10)
+                    {
+                        case 1:
+                            hasil += "sebelas";
+                            break;
+                        case 2:
+                            hasil += "dua belas";
+                            break;
+                        case 3:
+                            hasil += "tiga belas";
+                            break;
+                        case 4:
+                            hasil += "empat belas";
+                            break;
+                        case 5:
+                            hasil += "lima belas";
+                            break;
+                        case 6:
+                            hasil += "enam belas";
+                            break;
+                        case 7:
+                            hasil += "tujuh belas";
+                            break;
+                        case 8:
+                            hasil += "delapan belas";
+                            break;
+                        case 9:
+                            hasil += "sembilan belas";
+                            break;
+                            
+                        // Tambahkan kasus untuk angka 13 hingga 19
+                        default:
+                            hasil += puluhan[angka / 10 - 1] + " " + satuan[angka % 10 - 1];
+                            break;
+                    }
                 }
                 else
                 {

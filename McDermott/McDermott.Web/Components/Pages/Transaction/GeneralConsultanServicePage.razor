@@ -166,7 +166,7 @@
                                                         {
                                                                                     <div class="col-sm-4 ">
                                                                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                                                            <DxToolbarItem Text="Print" BeginGroup="true" RenderStyle="ButtonRenderStyle.Success" CssClass="rounded-button">
+                                                                                            <DxToolbarItem Text="Print" BeginGroup="true" RenderStyle="ButtonRenderStyle.Success" CssClass="rounded-button" IconCssClass="fa-solid fa-print">
                                                                                                 <Items>
                                                                                                     <DxToolbarItem IconCssClass="fa-solid fa-file-arrow-down" Text="SLIP" GroupName="italic" Click="OnPrint" />
                                                                             @if (FormRegis.IsSickLeave == true || FormRegis.IsMaternityLeave == true)
@@ -2829,4 +2829,12 @@ else
 
         </div>
     </div>
+</DxPopup>
+
+<DxPopup Visible="isPrint" Width="874px">
+    <DxRichEdit ActiveRibbonTabIndex="5" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">
+        <MailMergeSettings>
+            <DxMailMergeSettings ViewMergedData="true" Data="SickLeaves"></DxMailMergeSettings>
+        </MailMergeSettings>
+    </DxRichEdit>
 </DxPopup>
