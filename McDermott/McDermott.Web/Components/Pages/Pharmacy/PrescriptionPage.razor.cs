@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionLineCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
@@ -613,13 +614,37 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             var PrescriptionIds = PrescriptionId;
             StockIds = Prescriptions.Where(x => x.Id == PrescriptionIds).Select(x=>x.ProductId).FirstOrDefault();
             isDetailPrescription = true;
-            StockOutProducts = StockProducts.Where(x => x.ProductId == StockIds && x.SourceId == Pharmacy.PrescriptionLocationId).ToList();
+            StockOutProducts = StockProducts.Where(x => x.ProductId == StockIds && x.SourceId == Pharmacy.PrescriptionLocationId && x.Qty != 0).OrderBy(x=>x.Expired).ToList();
+
 
         }
-
+        private DateTime? SelectedBatchExpired { get; set; }
         private async Task ChangeOutStock(StockProductDto value)
         {
+            SelectedBatchExpired = null;
 
+            if (value is not null)
+            {
+                SelectedBatchExpired = value.Expired;
+
+                //current Stock
+                var _currentStock = StockProducts.Where(x => x.SourceId == Pharmacy.PrescriptionLocationId && x.ProductId == StockIds && x.Batch == value.Batch).FirstOrDefault();
+                if (_currentStock is not null)
+                {
+                    if (_currentStock.Qty > 0)
+                    {
+                        FormStockOutPrescriptions.StockId = value.Id;
+                        FormStockOutPrescriptions.Batch = value.Batch;
+                        FormStockOutPrescriptions.Expired = value.Expired;
+                        FormStockOutPrescriptions.CurrentStock = _currentStock.Qty;
+                    }
+                    else
+                    {
+                        ToastService.ClearCustomToasts();
+                        ToastService.ShowWarning("Empty Stock!.. ");
+                    }
+                }
+            }
         }
         private async Task LoadAsyncData()
         {
@@ -1138,8 +1163,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 return;
 
             var Sc = (StockOutPrescriptionDto)e.EditModel;
-            if (Pharmacy.Id == 0)
-            {
+            //if (Pharmacy.Id == 0)
+            //{
                 try
                 {
                     StockOutPrescriptionDto update = new();
@@ -1163,20 +1188,20 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 {
                     ex.HandleException(ToastService);
                 }
-            }
-            else
-            {
-                Sc.PrescriptionId = Prescription.Id;
-                if (Sc.Id == 0)
-                {
-                    await Mediator.Send(new CreateStockOutPrescriptionRequest(Sc));
-                }
-                else
-                {
-                    await Mediator.Send(new UpdateStockOutPrescriptionRequest(FormStockOutPrescriptions));
-                }
-                await LoadDataStockOut();
-            }
+            //}
+            //else
+            //{
+            //    Sc.PrescriptionId = Prescription.Id;
+            //    if (Sc.Id == 0)
+            //    {
+            //        await Mediator.Send(new CreateStockOutPrescriptionRequest(Sc));
+            //    }
+            //    else
+            //    {
+            //        await Mediator.Send(new UpdateStockOutPrescriptionRequest(FormStockOutPrescriptions));
+            //    }
+            //    await LoadDataStockOut();
+            //}
         }
 
         private async Task OnSavePrescription(GridEditModelSavingEventArgs e)

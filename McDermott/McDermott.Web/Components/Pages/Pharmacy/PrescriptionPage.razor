@@ -423,10 +423,10 @@
                                                                             <DxGridDataColumn FieldName="Id" AllowSort="false" Width="10px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
                                                                                 <CellDisplayTemplate>
                                                                                     <DxButton RenderStyle="ButtonRenderStyle.Success"
-                                                                                    Attributes="@(new Dictionary<string, object> {  ["title"] = "Select Batch" })"
-                                                                                    IconCssClass="fa-solid fa-clipboard-list"
-                                                                                    Click="@(()=>ShowCutStock((context.DataItem as PrescriptionDto).Id))"
-                                                                                    CssClass="me-1" />
+                                                                                              Attributes="@(new Dictionary<string, object> {  ["title"] = "Select Batch" })"
+                                                                                              IconCssClass="fa-solid fa-clipboard-list"
+                                                                                              Click="@(()=>ShowCutStock((context.DataItem as PrescriptionDto).Id))"
+                                                                                              CssClass="me-1" />
                                                                                 </CellDisplayTemplate>
                                                                                 <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
                                                                             </DxGridDataColumn>
@@ -1096,14 +1096,16 @@ else
                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOut_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed)" />
                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOut_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && !isActiveButton" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && IsPopUpForm && isActiveButton" />                   
+                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && IsPopUpForm && isActiveButton" />
                 </DxToolbar>
             </ToolbarTemplate>
             <Columns>
                 <DxGridSelectionColumn Width="15px" />
-                <DxGridDataColumn FieldName="Batch" Caption="Batch" SortIndex="0" />
-                <DxGridDataColumn FieldName="QuantityStock" Caption="QuantityStock" />
-                
+                <DxGridDataColumn MinWidth="200" FieldName="Batch" Caption="Batch" SortIndex="0" />
+                <DxGridDataColumn MinWidth="200" FieldName="Expired" Caption="Expired Date" DisplayFormat="dd MMMM yyyy"/>
+                <DxGridDataColumn MinWidth="200" FieldName="CurrentStock" Caption="Current Stock" />
+                <DxGridDataColumn MinWidth="200" FieldName="CutStock" Caption="Input Stock"  />
+
             </Columns>
             <EditFormTemplate Context="EditFormContextStockOut">
                 @* <EditForm Model="@ConcoctionLine" Context="EditFormContextPrescriptionConcoctionLinesForm" OnInvalidSubmit="@HandleValidConcoctionSubmit" OnValidSubmit="@HandleInvalidConcoctionSubmit"> *@
@@ -1112,47 +1114,60 @@ else
                     FormStockOutPrescriptions = (StockOutPrescriptionDto)EditFormContextStockOut.EditModel;
                 }
                 <div class="row w-100">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <DxFormLayout CssClass="mt w-100">
-                            <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                <DxComboBox ShowValidationIcon="true"
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                            Data="@StockOutProducts"
-                                            NullText="Select Batch..."
-                                            @bind-Value="@FormStockOutPrescriptions.StockId"
-                                            SelectedItemChanged="@((StockProductDto value)=> ChangeOutStock(value))"
-                                            TextFieldName="Batch"
-                                            ValueFieldName="Id">
-                                </DxComboBox>
-                                <ValidationMessage For="@(()=> FormStockOutPrescriptions.StockId)" />
-                            </DxFormLayoutItem>
+                            <div class="col-6">
+                                <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                    <DxComboBox ShowValidationIcon="true"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                Data="@StockOutProducts"
+                                                NullText="Select Batch..."
+                                                @bind-Value="@FormStockOutPrescriptions.StockId"
+                                                SelectedItemChanged="@((StockProductDto value)=> ChangeOutStock(value))"
+                                                TextFieldName="Batch"
+                                                ValueFieldName="Id">
+                                       
+                                    </DxComboBox>
+                                    <ValidationMessage For="@(()=> FormStockOutPrescriptions.StockId)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                    <DxDateEdit ShowValidationIcon="true"
+                                                DisplayFormat="dd MMMM yyyy"
+                                                ReadOnly
+                                                @bind-Date="@FormStockOutPrescriptions.Expired"
+                                                NullText="Expired Date">
+                                    </DxDateEdit>
+                                </DxFormLayoutItem>
+                            </div>
+                            <div class="col-6">
+                                <DxFormLayoutItem Caption="Current Stock" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                    <DxSpinEdit @bind-Value="@FormStockOutPrescriptions.CurrentStock"
+                                                ReadOnly />
+                                    <ValidationMessage For="@(()=> FormStockOutPrescriptions.CurrentStock)"   />
+                                </DxFormLayoutItem>
 
-                            @* <DxFormLayoutItem Caption="Active Component" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                <DxTagBox Data="@ActiveComponents"
-                                          FilteringMode="@DataGridFilteringMode.Contains"
-                                          @bind-Values="@selectedActiveComponents"
-                                          NullText="Select Active Component.."
-                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                          TextFieldName="Name" />
-                                <ValidationMessage For="@(()=> ConcoctionLine.ActiveComponentId)" />
-                            </DxFormLayoutItem>
-
-                            <DxFormLayoutItem Caption="Medicine Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                <DxSpinEdit Value="@ConcoctionLine.MedicamentDosage"
-                                            NullText="Medicine Unit Of Dosage..."
-                                            ValueExpression="@(()=>ConcoctionLine.MedicamentDosage)"
-                                            ValueChanged="@((long value) => changeMedicamentDosage(value))"
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                <ValidationMessage For="@(()=> ConcoctionLine.MedicamentDosage)"   />
-                            </DxFormLayoutItem> *@
+                                <DxFormLayoutItem Caption="Stock Input" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                    <DxSpinEdit @bind-Value="@FormStockOutPrescriptions.CutStock"
+                                                MinValue="0"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                    <ValidationMessage For="@(()=> FormStockOutPrescriptions.CutStock)"   />
+                                </DxFormLayoutItem>
+                            </div>
                         </DxFormLayout>
                     </div>
 
-                    
                 </div>
                 @* </EditForm> *@
             </EditFormTemplate>
         </DxGrid>
     </DxLoadingPanel>
-
+    <div class="card-footer">
+        <div class="row  justify-content-end">
+            <div class="col-auto align-self-end">
+                <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                </DxButton>
+                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnDiscardConcoctionLines"></DxButton>
+            </div>
+        </div>
+    </div>
 </DxPopup>
