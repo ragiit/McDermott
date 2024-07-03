@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionLineCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
@@ -74,6 +75,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #region relation Data
 
         private PharmacyDto Pharmacy { get; set; } = new();
+        private StockOutPrescriptionDto FormStockOutPrescriptions { get; set; } = new();
         private PrescriptionDto Prescription { get; set; } = new();
         private ConcoctionDto Concoction { get; set; } = new();
         private ConcoctionLineDto ConcoctionLine { get; set; } = new();
@@ -83,6 +85,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
+        private List<StockOutPrescriptionDto> ListStockOutPrescriptions { get; set; } = [];
         private List<GroupDto> groups = [];
         private List<AllergyDto> WeatherAllergies = [];
         private List<AllergyDto> FoodAllergies = [];
@@ -91,6 +94,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<PrescriptionDto> Prescriptions { get; set; } = [];
         private List<ConcoctionDto> Concoctions { get; set; } = [];
         private List<ConcoctionLineDto> ConcoctionLines { get; set; } = [];
+        private List<StockOutPrescriptionDto> StockOutPrescriptions { get; set; } = [];
         private List<AllergyDto> allergies { get; set; } = [];
         private List<PatientAllergyDto> PatientAllergies { get; set; } = [];
         private List<PharmacyLogDto> Logs { get; set; } = [];
@@ -109,6 +113,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<ActiveComponentDto> ActiveComponentt { get; set; } = [];
         private List<DrugRouteDto> DrugRoutes { get; set; } = [];
         private List<StockProductDto> StockProducts { get; set; } = [];
+        private List<StockProductDto> StockOutProducts { get; set; } = [];
         private List<ActiveComponentDto> ActiveComponents { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponentPrescriptions { get; set; } = [];
@@ -124,10 +129,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private IGrid GridPrescriptionLines { get; set; }
         private IGrid GridConcoction { get; set; }
         private IGrid GridConcoctionLines { get; set; }
+        private IGrid GridStockOut { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsPrescriptionLines { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsConcoction { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsConcoctionLines { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataItemsStockOut { get; set; } = [];
 
         [Parameter]
         public bool IsPopUpForm { get; set; } = false;
@@ -149,41 +156,42 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private int FocusedRowVisibleIndexPrescriptionLines { get; set; }
         private int FocusedRowVisibleIndexPrescriptionConcoction { get; set; }
         private int FocusedRowVisibleIndexConcoctionLines { get; set; }
+        private int FocusedRowVisibleIndexStockOut{ get; set; }
         private string header { get; set; } = string.Empty;
 
-        public MarkupString GetIssueStatusIconHtml(string status)
+        public MarkupString GetIssueStatusIconHtml(EnumStatusPharmacy? status)
         {
             string priorityClass;
             string title;
 
             switch (status)
             {
-                case "Draft":
+                case EnumStatusPharmacy.Draft:
                     priorityClass = "info";
                     title = "Draft";
                     break;
 
-                case "SendToPharmacy":
+                case EnumStatusPharmacy.SendToPharmacy:
                     priorityClass = "primary";
                     title = "Pharmacy";
                     break;
 
-                case "Received":
+                case EnumStatusPharmacy.Received:
                     priorityClass = "primary";
                     title = "Received";
                     break;
 
-                case "Processed":
+                case EnumStatusPharmacy.Processed:
                     priorityClass = "warning";
                     title = "Processed";
                     break;
 
-                case "Done":
+                case EnumStatusPharmacy.Done:
                     priorityClass = "success";
                     title = "Done";
                     break;
 
-                case "Cancel":
+                case EnumStatusPharmacy.Cancel:
                     priorityClass = "danger";
                     title = "Canceled";
                     break;
@@ -214,11 +222,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             ShowForm = true;
             isActiveButton = true;
-            Pharmacy.Status = "Draft";
-            if (Pharmacy.Status == "Accepted")
-            {
-                isView = true;
-            }
+            Pharmacy.Status = EnumStatusPharmacy.Draft;
+            
             Pharmacy.PatientId = generalConsultantService.FirstOrDefault()!.PatientId;
             Pharmacy.PractitionerId = generalConsultantService.FirstOrDefault()!.PratitionerId;
             Pharmacy.ServiceId = generalConsultantService.FirstOrDefault()!.ServiceId;
@@ -602,42 +607,87 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             PanelVisible = true;
         }
 
+        private bool isDetailPrescription { get; set; } = false;
+        private long? StockIds { get; set; }
+        private void ShowCutStock(long PrescriptionId)
+        {
+            var PrescriptionIds = PrescriptionId;
+            StockIds = Prescriptions.Where(x => x.Id == PrescriptionIds).Select(x=>x.ProductId).FirstOrDefault();
+            isDetailPrescription = true;
+            StockOutProducts = StockProducts.Where(x => x.ProductId == StockIds && x.SourceId == Pharmacy.PrescriptionLocationId && x.Qty != 0).OrderBy(x=>x.Expired).ToList();
+
+
+        }
+        private DateTime? SelectedBatchExpired { get; set; }
+        private async Task ChangeOutStock(StockProductDto value)
+        {
+            SelectedBatchExpired = null;
+
+            if (value is not null)
+            {
+                SelectedBatchExpired = value.Expired;
+
+                //current Stock
+                var _currentStock = StockProducts.Where(x => x.SourceId == Pharmacy.PrescriptionLocationId && x.ProductId == StockIds && x.Batch == value.Batch).FirstOrDefault();
+                if (_currentStock is not null)
+                {
+                    if (_currentStock.Qty > 0)
+                    {
+                        FormStockOutPrescriptions.StockId = value.Id;
+                        FormStockOutPrescriptions.Batch = value.Batch;
+                        FormStockOutPrescriptions.Expired = value.Expired;
+                        FormStockOutPrescriptions.CurrentStock = _currentStock.Qty;
+                    }
+                    else
+                    {
+                        ToastService.ClearCustomToasts();
+                        ToastService.ShowWarning("Empty Stock!.. ");
+                    }
+                }
+            }
+        }
         private async Task LoadAsyncData()
         {
-            PanelVisible = true;
-            Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
-            Practitioners = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
-            PreciptionLocations = await Mediator.Send(new GetLocationQuery());
-            ActiveComponentt = await Mediator.Send(new GetActiveComponentQuery());
-            Services = await Mediator.Send(new GetServiceQuery());
-            Products = await Mediator.Send(new GetProductQuery());
-            DrugDosages = await Mediator.Send(new GetDrugDosageQuery());
-            MedicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery(x => x.IsConcoction == false));
-            MedicamentGroupsConcoction = await Mediator.Send(new GetMedicamentGroupQuery(x => x.IsConcoction == true));
-            DrugForms = await Mediator.Send(new GetFormDrugQuery());
-            Signas = await Mediator.Send(new GetSignaQuery());
-            DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
-            Uoms = await Mediator.Send(new GetUomQuery());
-            StockProducts = await Mediator.Send(new GetStockProductQuery());
-            Medicaments = await Mediator.Send(new GetMedicamentQuery());
-            ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
-            Pharmacies = await Mediator.Send(new GetPharmacyQuery());
-            Concoctions = new List<ConcoctionDto>();
-            PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
-            allergies = await Mediator.Send(new GetAllergyQuery());
-            groups = await Mediator.Send(new GetGroupQuery());
-            NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
-            var user_group = await Mediator.Send(new GetUserQuery());
-            NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
-
-            allergies.ForEach(x =>
+            try
             {
-                var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
-                if (a is not null)
-                    x.TypeString = a.Name;
-            });
-            var c = Concoctions;
-            PanelVisible = false;
+                PanelVisible = true;
+                Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
+                Practitioners = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
+                PreciptionLocations = await Mediator.Send(new GetLocationQuery());
+                ActiveComponentt = await Mediator.Send(new GetActiveComponentQuery());
+                Services = await Mediator.Send(new GetServiceQuery());
+                Products = await Mediator.Send(new GetProductQuery());
+                DrugDosages = await Mediator.Send(new GetDrugDosageQuery());
+                MedicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery(x => x.IsConcoction == false));
+                MedicamentGroupsConcoction = await Mediator.Send(new GetMedicamentGroupQuery(x => x.IsConcoction == true));
+                DrugForms = await Mediator.Send(new GetFormDrugQuery());
+                Signas = await Mediator.Send(new GetSignaQuery());
+                DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
+                Uoms = await Mediator.Send(new GetUomQuery());
+                StockProducts = await Mediator.Send(new GetStockProductQuery());
+                Medicaments = await Mediator.Send(new GetMedicamentQuery());
+                ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
+                Pharmacies = await Mediator.Send(new GetPharmacyQuery());
+                Concoctions = new List<ConcoctionDto>();
+                PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
+                allergies = await Mediator.Send(new GetAllergyQuery());
+                groups = await Mediator.Send(new GetGroupQuery());
+                NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
+                var user_group = await Mediator.Send(new GetUserQuery());
+                NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
+
+                allergies.ForEach(x =>
+                {
+                    var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+                    if (a is not null)
+                        x.TypeString = a.Name;
+                });
+                var c = Concoctions;
+                PanelVisible = false;
+            }catch(Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task SelectedItemMedicalNamePresciptionLinesChanged(ProductDto e)
@@ -747,6 +797,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             IsLoading = true;
             ConcoctionLines = await Mediator.Send(new GetConcoctionLineQuery());
+            IsLoading = false;
+            SelectedDataItems = [];
+        }
+
+        private async Task LoadDataStockOut()
+        {
+            IsLoading = true;
+            StockOutPrescriptions = await Mediator.Send(new GetStockOutPrescriptionQuery());
             IsLoading = false;
             SelectedDataItems = [];
         }
@@ -901,6 +959,43 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
+        private string? StockCut_Name { get; set; }
+        List<StockOutPrescriptionDto> StockOut_data = new List<StockOutPrescriptionDto>();
+        private async Task OnDeleteStockCutPrescription(GridDataItemDeletingEventArgs e)
+        {
+            var data = SelectedDataItemsStockOut.Adapt<List<StockOutPrescriptionDto>>();
+            if (Pharmacy.Id == 0)
+            {
+                try
+                {
+                    if (SelectedDataItemsStockOut is null || SelectedDataItemsStockOut.Count == 1)
+                    {
+                        StockOutPrescriptions.Remove((StockOutPrescriptionDto)e.DataItem);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+            }
+            else
+            {
+                try
+                {
+                    StockCut_Name = "StockCut";
+                    foreach (var item in data)
+                    {
+                        StockOutPrescriptions.RemoveAll(x => data.Select(z => z.Id).Contains(x.Id));
+                        StockOut_data.Add(item);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+            }
+        }
+
         #endregion Delete Function
 
         #region handleValidation
@@ -929,12 +1024,23 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 await OnSaveConcoction();
         }
 
+        private async Task HandleValidStockOutSubmit()
+        {
+            FormValidationState = true;
+            
+        }
+
         private async Task HandleInvalidSubmit()
         {
             FormValidationState = true;
             ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
         }
 
+        private async Task HandleInvalidStockOutSubmit()
+        {
+            FormValidationState = true;
+            ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
+        }
         #endregion handleValidation
 
         #region Fungsi Save
@@ -1051,6 +1157,53 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
+        private async Task OnSaveStockOut(GridEditModelSavingEventArgs e)
+        {
+            if (StockOutPrescriptions is null)
+                return;
+
+            var Sc = (StockOutPrescriptionDto)e.EditModel;
+            //if (Pharmacy.Id == 0)
+            //{
+                try
+                {
+                    StockOutPrescriptionDto update = new();
+
+                   
+                    if (Sc.Id == 0)
+                    {
+                        Sc.Id = Helper.RandomNumber;
+                        StockOutPrescriptions.Add(Sc);
+                    }
+                    else
+                    {
+                        var q = SelectedDataItemsStockOut[0].Adapt<ConcoctionLineDto>();
+                        update = StockOutPrescriptions.FirstOrDefault(x => x.Id == q.Id)!;
+                        var index = StockOutPrescriptions.IndexOf(update);
+                        StockOutPrescriptions[index] = FormStockOutPrescriptions;
+                    }
+                    SelectedDataItemsStockOut = [];
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+            //}
+            //else
+            //{
+            //    Sc.PrescriptionId = Prescription.Id;
+            //    if (Sc.Id == 0)
+            //    {
+            //        await Mediator.Send(new CreateStockOutPrescriptionRequest(Sc));
+            //    }
+            //    else
+            //    {
+            //        await Mediator.Send(new UpdateStockOutPrescriptionRequest(FormStockOutPrescriptions));
+            //    }
+            //    await LoadDataStockOut();
+            //}
+        }
+
         private async Task OnSavePrescription(GridEditModelSavingEventArgs e)
         {
             if (e is null)
@@ -1123,7 +1276,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 if (Pharmacy.Id == 0)
                 {
-                    Pharmacy.Status = "Draft";
+                    Pharmacy.Status = EnumStatusPharmacy.Draft;
                     Pharmacy = await Mediator.Send(new CreatePharmacyRequest(Pharmacy));
                     Prescriptions.ForEach(x =>
                     {
@@ -1228,6 +1381,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await GridConcoctionLines.StartEditNewRowAsync();
         }
 
+        private async Task NewItemStockOut_Click()
+        {
+            selectedActiveComponents = [];
+            await GridStockOut.StartEditNewRowAsync();
+        }
+
         #endregion NewItem Click
 
         #region function Edit Click
@@ -1322,6 +1481,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await GridConcoctionLines.StartEditRowAsync(FocusedRowVisibleIndexConcoctionLines);
         }
 
+        private async Task EditItemStockOut_Click(IGrid context)
+        {
+            var selected = (StockOutPrescriptionDto)context.SelectedDataItem;
+            await GridStockOut.StartEditRowAsync(FocusedRowVisibleIndexStockOut);
+        }
         #endregion function Edit Click
 
         #region Refresh fuction
@@ -1353,12 +1517,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             try
             {
                 var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
-                Pharmacy.Status = "SendToPharmacy";
+                Pharmacy.Status = EnumStatusPharmacy.SendToPharmacy;
                 await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
                 PharmaciesLog.PharmacyId = Pharmacy.Id;
                 PharmaciesLog.UserById = NameUser.Id;
-                PharmaciesLog.status = Pharmacy.Status;
+                PharmaciesLog.status = EnumStatusPharmacy.SendToPharmacy;
 
                 await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
             }
@@ -1371,24 +1535,24 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         public async void Pharmacied()
         {
             var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
-            Pharmacy.Status = "Received";
+            Pharmacy.Status = EnumStatusPharmacy.Received;
             await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
             PharmaciesLog.PharmacyId = Pharmacy.Id;
             PharmaciesLog.UserById = NameUser.Id;
-            PharmaciesLog.status = Pharmacy.Status;
+            PharmaciesLog.status = EnumStatusPharmacy.Received;
 
             await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
         }
         public async void Received()
         {
             var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
-            Pharmacy.Status = "Processed";
+            Pharmacy.Status = EnumStatusPharmacy.Processed;
             var updates = await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
             PharmaciesLog.PharmacyId = Pharmacy.Id;
             PharmaciesLog.UserById = NameUser.Id;
-            PharmaciesLog.status = Pharmacy.Status;
+            PharmaciesLog.status = EnumStatusPharmacy.Processed;
 
             await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
 
@@ -1450,12 +1614,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     }
 
                     // Update pharmacy status to "Done"
-                    Pharmacy.Status = "Done";
+                    Pharmacy.Status = EnumStatusPharmacy.Done;
                     var pharma = await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
                     PharmaciesLog.PharmacyId = pharmacyData.Id;
                     PharmaciesLog.UserById = NameUser.Id;
-                    PharmaciesLog.status = Pharmacy.Status;
+                    PharmaciesLog.status = EnumStatusPharmacy.Done;
 
                     await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
 
@@ -1473,12 +1637,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             try
             {
                 var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
-                Pharmacy.Status = "Cancel";
+                Pharmacy.Status = EnumStatusPharmacy.Cancel;
                 await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
                 PharmaciesLog.PharmacyId = Pharmacy.Id;
                 PharmaciesLog.UserById = NameUser.Id;
-                PharmaciesLog.status = Pharmacy.Status;
+                PharmaciesLog.status = EnumStatusPharmacy.Cancel;
             }
             catch (Exception ex)
             {
@@ -1498,6 +1662,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private void DeleteItemConcoctionLines_Click()
         {
             GridConcoctionLines.ShowRowDeleteConfirmation(FocusedRowVisibleIndexConcoctionLines);
+        }
+
+        private void DeleteItemStockOut_Click()
+        {
+            GridStockOut.ShowRowDeleteConfirmation(FocusedRowVisibleIndexStockOut);
         }
 
         private void DeleteItemPrescriptionLines_Click()
@@ -1605,6 +1774,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private void GridFocusedRowVisibleIndexConcoctionLines_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndexConcoctionLines = args.VisibleIndex;
+        }
+
+        private void GridFocusedRowVisibleIndexStockOut_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndexStockOut = args.VisibleIndex;
         }
 
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)

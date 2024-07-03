@@ -2,8 +2,11 @@
 using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 using System.Net.Mail;
 using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
-using DocumentFormat.OpenXml.Bibliography;
-
+using McDermott.Extentions;
+using Document = DocumentFormat.OpenXml.Wordprocessing.Document;
+using Aspose.Words;
+using Aspose.Words.Saving;
+using DocumentFormat.OpenXml.Packaging;
 
 namespace McDermott.Web.Components.Pages.Employee
 {
@@ -26,7 +29,7 @@ namespace McDermott.Web.Components.Pages.Employee
         [Parameter]
         public long Id { get; set; }
 
-        public byte[] DocumentContent;
+        public byte[]? DocumentContent;
         private IGrid Grid { get; set; }
         private bool IsLoading { get; set; } = false;
         private bool isPrint { get; set; } = false;
@@ -211,8 +214,8 @@ namespace McDermott.Web.Components.Pages.Employee
                 }
                 int TotalDays = data.EndSickLeave.Value.Day - data.StartSickLeave.Value.Day;
 
-                string WordDays = ConvertNumberToWord(TotalDays);
-                isPrint = true;
+                string WordDays = ConvertNumberHelper.ConvertNumberToWord(TotalDays);
+                //isPrint = true;
                 var mergeFields = new Dictionary<string, string>
                 {
                     {"%NamePatient%", patienss?.Name},
@@ -226,8 +229,14 @@ namespace McDermott.Web.Components.Pages.Employee
                     {"%days%", TotalDays.ToString() },
                     {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")}
                 };
-
+             
                 DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
+                // Konversi byte array menjadi base64 string
+                 var base64String = Convert.ToBase64String(DocumentContent);
+
+                // Panggil JavaScript untuk membuka dan mencetak dokumen
+                await JsRuntime.InvokeVoidAsync("printDocument", base64String);
+
             }
             catch (Exception ex)
             {
@@ -235,43 +244,7 @@ namespace McDermott.Web.Components.Pages.Employee
             }
         }
 
-        private string ConvertNumberToWord(int angka)
-        {
-            if (angka == 0)
-            {
-                return "nol";
-            }
-
-            string[] satuan = { "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan" };
-            string[] puluhan = { "sepuluh", "dua puluh", "tiga puluh", "empat puluh", "lima puluh", "enam puluh", "tujuh puluh", "delapan puluh", "sembilan puluh" };
-            string[] ratusan = { "seratus", "dua ratus", "tiga ratus", "empat ratus", "lima ratus", "enam ratus", "tujuh ratus", "delapan ratus", "sembilan ratus" };
-
-            string hasil = "";
-
-            if (angka >= 100)
-            {
-                hasil += ratusan[angka / 100 - 1];
-                angka %= 100;
-            }
-
-            if (angka >= 10)
-            {
-                if (angka % 10 == 0)
-                {
-                    hasil += puluhan[angka / 10 - 1];
-                }
-                else
-                {
-                    hasil += puluhan[angka / 10 - 1] + " " + satuan[angka % 10 - 1];
-                }
-            }
-            else
-            {
-                hasil += satuan[angka - 1];
-            }
-
-            return hasil;
-        }
+        
 
         private async Task SendToEmail()
         {
@@ -309,7 +282,7 @@ namespace McDermott.Web.Components.Pages.Employee
 
                     // Calculate total days of sick leave
                     int totalDays = item.EndSickLeave.Value.Day - item.StartSickLeave.Value.Day;
-                    string wordDays = ConvertNumberToWord(totalDays);
+                    string wordDays = ConvertNumberHelper.ConvertNumberToWord(totalDays);
 
                     data.PatientName = data.GeneralConsultans.Patient.Name;
                     if (data.GeneralConsultans.PratitionerId is not null)

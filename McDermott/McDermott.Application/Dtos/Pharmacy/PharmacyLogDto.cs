@@ -12,7 +12,7 @@ namespace McDermott.Application.Dtos.Pharmacy
 
         public long? PharmacyId { get; set; }
         public long? UserById { get; set; }
-        public string? status { get; set; }
+        public EnumStatusPharmacy? status { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
 

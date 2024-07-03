@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240702065430_StatusPharmacy")]
+    partial class StatusPharmacy
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1999,8 +2002,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("RadiologyEximinationName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("THCCannabinoidMarijuanaNegative")
                         .HasColumnType("bit");
@@ -2047,29 +2050,14 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("AdmissionQueue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("AppointmentDate")
+                    b.Property<DateTime?>("AppoimentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("AwarenessId")
-                        .HasColumnType("bigint");
-
-                    b.Property<double>("BMIIndex")
-                        .HasColumnType("float");
-
-                    b.Property<string>("BMIIndexString")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BMIState")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("BirthDay")
+                        .HasColumnType("datetime2");
 
                     b.Property<long?>("ClassTypeId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("ClinicVisitTypes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -2077,29 +2065,20 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("Diastole")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("DiastolicBP")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("E")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime?>("EndDateSickLeave")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("EndMaternityLeave")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("HR")
-                        .HasColumnType("bigint");
-
-                    b.Property<double>("Height")
-                        .HasColumnType("float");
-
                     b.Property<string>("HomeStatus")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdentityNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("InsuranceId")
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("InsurancePolicyId")
                         .HasColumnType("bigint");
@@ -2107,16 +2086,7 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool>("IsAlertInformationSpecialCase")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsBatam")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsMaternityLeave")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsMcu")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsOutsideBatam")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsSarana")
@@ -2128,13 +2098,10 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("KioskQueueId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("M")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("MedexType")
+                    b.Property<string>("Method")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Method")
+                    b.Property<string>("NoRM")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PPKRujukanCode")
@@ -2143,9 +2110,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("PPKRujukanName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("PainScale")
-                        .HasColumnType("bigint");
-
                     b.Property<long?>("PatientId")
                         .HasColumnType("bigint");
 
@@ -2153,9 +2117,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("PratitionerId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("RR")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("ReferDateVisit")
@@ -2200,29 +2161,14 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("ServiceId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Sistole")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("SpO2")
-                        .HasColumnType("bigint");
+                    b.Property<string>("StagingStatus")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("StartDateSickLeave")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("StartMaternityLeave")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StatusMCU")
-                        .HasColumnType("int");
-
-                    b.Property<long>("Systolic")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("Temp")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("TypeMedical")
                         .HasColumnType("nvarchar(max)");
@@ -2236,15 +2182,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("V")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("WaistCircumference")
-                        .HasColumnType("bigint");
-
-                    b.Property<double>("Weight")
-                        .HasColumnType("float");
-
                     b.Property<TimeSpan?>("WorkFrom")
                         .HasColumnType("time");
 
@@ -2253,9 +2190,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AwarenessId");
-
                     b.HasIndex("ClassTypeId");
+
+                    b.HasIndex("InsuranceId");
 
                     b.HasIndex("InsurancePolicyId");
 
@@ -5659,14 +5596,14 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanService", b =>
                 {
-                    b.HasOne("McDermott.Domain.Entities.Awareness", "AwarenessDto")
-                        .WithMany()
-                        .HasForeignKey("AwarenessId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.ClassType", "ClassType")
                         .WithMany()
                         .HasForeignKey("ClassTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.Insurance", "Insurance")
+                        .WithMany()
+                        .HasForeignKey("InsuranceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.InsurancePolicy", "InsurancePolicy")
@@ -5694,9 +5631,9 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("AwarenessDto");
-
                     b.Navigation("ClassType");
+
+                    b.Navigation("Insurance");
 
                     b.Navigation("InsurancePolicy");
 
@@ -5729,9 +5666,9 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultationLog", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
-                        .WithMany("GeneralConsultationLogs")
+                        .WithMany()
                         .HasForeignKey("GeneralConsultanServiceId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanMedicalSupport", "ProcedureRoom")
                         .WithMany()
@@ -6734,8 +6671,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("GeneralConsultanMedicalSupports");
 
                     b.Navigation("GeneralConsultantClinicalAssesments");
-
-                    b.Navigation("GeneralConsultationLogs");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Group", b =>
