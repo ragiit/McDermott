@@ -6,21 +6,7 @@
 @if (IsAccess)
 {
     <div class="wrapper">
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Inventory Adjusment</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
-                            <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/inventory/inventory-adjusment">Inventory Adjusment</a></li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <BaseHeaderPage Title="Inventory Adjusment" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
 
         <section class="content">
             <div class="container-fluid">
@@ -30,70 +16,48 @@
                         @if (!ShowForm)
                         {
                             <div class="card">
-                                <div class="card-body">
-                                    <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                    IsContentBlocked="true"
-                                                    ApplyBackgroundShading="true"
-                                                    IndicatorAreaVisible="false"
-                                                    Text="Fetching Data...">
-                                        <DxGrid @ref="Grid"
-                                                Data="InventoryAdjusments"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                DataItemDeleting="OnDelete"
-                                                FocusedRowChanged="Grid_FocusedRowChanged"
-                                                RowDoubleClick="EditItem_Click"
-                                                PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                EditorRenderMode="GridEditorRenderMode.Detached"
-                                                PageSize="10"
-                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                KeyFieldName="Id"
-                                                CustomizeDataRowEditor="@GridExtention.Grid_CustomizeDataRowEditor"
-                                                AllowSelectRowByClick="true"
-                                                PagerPosition="GridPagerPosition.Bottom"
-                                                PageSizeSelectorVisible="true"
-                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                PageSizeSelectorAllRowsItemVisible="true"
-                                                PagerSwitchToInputBoxButtonCount="10"
-                                                FocusedRowEnabled="true"
-                                                PagerVisibleNumericButtonCount="10"
-                                                ShowGroupPanel="true"
-                                                AutoExpandAllGroupRows="true"
-                                                ShowFilterRow="true"
-                                                CustomizeElement="@GridExtention.Grid_CustomizeElement"
-                                                ShowSearchBox="true"
-                                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                                KeyboardNavigationEnabled="true">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <MyGrid @ref="Grid"
+                                            Data="InventoryAdjusments"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            DataItemDeleting="OnDelete"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            RowDoubleClick="EditItem_Click"
+                                            KeyFieldName="Id">
 
-                                            <ToolbarTemplate>
-                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && InventoryAdjusments.Count > 0" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && InventoryAdjusments.Count > 0 && IsDeletedAdjusment" />
-                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                    <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                        <Items>
-                                                            <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(Grid))" />
-                                                            <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(Grid))" />
-                                                            <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(Grid))" />
-                                                        </Items>
-                                                    </DxToolbarItem>
-                                                </DxToolbar>
-                                            </ToolbarTemplate>
+                                        <ToolbarTemplate>
+                                            <MyDxToolbarBase TItem="InventoryAdjusmentDto"
+                                                             Items="@InventoryAdjusments"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@NewItem_Click"
+                                                             EditItem_Click="@EditItem_Click"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             Refresh_Click="@Refresh_Click"
+                                                             IsImport="false"
+                                                             Grid="Grid"
+                                                             EnableDelete="IsDeletedAdjusment"
+                                                             VisibleNew="UserAccessCRUID.Create"
+                                                             VisibleEdit="UserAccessCRUID.Update"
+                                                             VisibleDelete="UserAccessCRUID.Delete" />
+                                        </ToolbarTemplate>
 
-                                            <Columns>
-                                                <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                                <DxGridDataColumn MinWidth="200" FieldName="Date" />
-                                                <DxGridDataColumn MinWidth="200" FieldName="Company.Name" Caption="Company" />
-                                                <DxGridDataColumn MinWidth="200" FieldName="Location.Name" Caption="Location" />
-                                                <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" />
-                                            </Columns>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Date" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Company.Name" Caption="Company" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Location.Name" Caption="Location" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" />
+                                        </Columns>
 
-                                        </DxGrid>
-                                    </DxLoadingPanel>
-                                </div>
+                                    </MyGrid>
+                                </DxLoadingPanel>
+
                             </div>
                         }
                         else
@@ -101,14 +65,14 @@
                             <div class="row justify-content-end mb-3">
                                 <div class="col-auto align-self-end">
                                     <DxTabs>
-                                        <DxTab Text="@EnumStatusInventoryAdjusment.Draft.GetDisplayName()" Enabled="@IsStatus(EnumStatusInventoryAdjusment.Draft)"></DxTab>
-                                        <DxTab Text="@EnumStatusInventoryAdjusment.InProgress.GetDisplayName()" Enabled="@IsStatus(EnumStatusInventoryAdjusment.InProgress)"></DxTab>
-                                        <DxTab Text="@EnumStatusInventoryAdjusment.Invalidate.GetDisplayName()" Enabled="@IsStatus(EnumStatusInventoryAdjusment.Invalidate)"></DxTab>
+                                        <DxTab Text="@EnumStatusInventoryAdjustment.Draft.GetDisplayName()" Enabled="@IsStatus(EnumStatusInventoryAdjustment.Draft)"></DxTab>
+                                        <DxTab Text="@EnumStatusInventoryAdjustment.InProgress.GetDisplayName()" Enabled="@IsStatus(EnumStatusInventoryAdjustment.InProgress)"></DxTab>
+                                        <DxTab Text="@EnumStatusInventoryAdjustment.Invalidate.GetDisplayName()" Enabled="@IsStatus(EnumStatusInventoryAdjustment.Invalidate)"></DxTab>
                                     </DxTabs>
                                 </div>
                             </div>
 
-                            @if (InventoryAdjusment.Id != 0 && !InventoryAdjusment.Status.Equals(EnumStatusInventoryAdjusment.Invalidate))
+                            @if (InventoryAdjusment.Id != 0 && !InventoryAdjusment.Status.Equals(EnumStatusInventoryAdjustment.Invalidate))
                             {
                                 <div class="card">
                                     <div class="card-body">
@@ -140,7 +104,7 @@
                                             <DxFormLayoutItem Caption="Name" CssClass="mt-2" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@InventoryAdjusment.Name"
                                                            ShowValidationIcon="true"
-                                                           ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.Draft))"
+                                                           ReadOnly="@(!IsStatus(EnumStatusInventoryAdjustment.Draft))"
                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                            NullText="Name" />
                                                 <ValidationMessage For="@(() => InventoryAdjusment.Name)"   />
@@ -150,7 +114,7 @@
                                                 <DxComboBox ShowValidationIcon="true" Data="@Locations"
                                                             NullText="Select Location..."
                                                             TextFieldName="Name"
-                                                            ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.Draft))"
+                                                            ReadOnly="@(!IsStatus(EnumStatusInventoryAdjustment.Draft))"
                                                             ValueFieldName="Id"
                                                             SelectedItemChanged="@((LocationDto freq)=>SelectLocation(freq))"
                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -163,7 +127,7 @@
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Company" ColSpanMd="12">
                                                 <DxComboBox ShowValidationIcon="true" Data="@Companies"
                                                             NullText="Select Company..."
-                                                            ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.Draft))"
+                                                            ReadOnly="@(!IsStatus(EnumStatusInventoryAdjustment.Draft))"
                                                             TextFieldName="Name"
                                                             ValueFieldName="Id"
                                                             FilteringMode="@DataGridFilteringMode.Contains"
@@ -174,7 +138,7 @@
 
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date" ColSpanMd="12">
                                                 <DxDateEdit ShowValidationIcon="true"
-                                                            ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.Draft))"
+                                                            ReadOnly="@(!IsStatus(EnumStatusInventoryAdjustment.Draft))"
                                                             @bind-Date="@InventoryAdjusment.Date"
                                                             Mask="@DateTimeMask.ShortDate"
                                                             NullText="Select Date">
@@ -224,9 +188,9 @@
 
                                                             <ToolbarTemplate>
                                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Enabled="@IsStatus(EnumStatusInventoryAdjusment.InProgress)" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjusment.InProgress)" />
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjusment.InProgress) " />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Enabled="@IsStatus(EnumStatusInventoryAdjustment.InProgress)" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="async () => await EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjustment.InProgress)" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjustment.InProgress) " />
                                                                     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshDetails_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                                     <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(GridDetail))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                                     <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
@@ -241,16 +205,20 @@
 
                                                             <Columns>
                                                                 <DxGridSelectionColumn Width="15px" />
-                                                                <DxGridDataColumn MinWidth="200" FieldName="Product.Name" Caption="Product" SortIndex="0" />
-                                                                <DxGridDataColumn MinWidth="200" FieldName="TeoriticalQty" Caption="Teoritical Qty" />
+                                                                <DxGridDataColumn MinWidth="200" FieldName="Product.Name" Caption="Product" />
+                                                                <DxGridDataColumn MinWidth="200" FieldName="StockProduct.Qty" Caption="Teoritical Qty" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="RealQty" Caption="Real Qty" />
-                                                                <DxGridDataColumn MinWidth="200" FieldName="LotSerialNumber" Caption="Lot Serial Number" />
-                                                                <DxGridDataColumn MinWidth="200" FieldName="ExpiredDate" Caption="Expired Date" />
+                                                                <DxGridDataColumn MinWidth="200" FieldName="StockProduct.Batch" Caption="Lot Serial Number" />
+                                                                <DxGridDataColumn MinWidth="200" FieldName="ExpiredDate" Caption="Expired Date" SortIndex="0" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="Product.Uom.Name" Caption="UoM" />
                                                             </Columns>
                                                             <EditFormTemplate Context="EditFormContext">
                                                                 @{
-                                                                    FormInventoryAdjusmentDetail = (InventoryAdjusmentDetailDto)EditFormContext.EditModel;
+                                                                    var aaa = EditFormContext;
+                                                                    if (EditFormContext.DataItem is null)
+                                                                    {
+                                                                        FormInventoryAdjusmentDetail = (InventoryAdjusmentDetailDto)EditFormContext.EditModel;
+                                                                    }
                                                                 }
                                                                 <div class="row w-100">
                                                                     <div class="col-md-6">
@@ -261,9 +229,9 @@
                                                                                             FilteringMode="@DataGridFilteringMode.Contains"
                                                                                             NullText="Select Product..."
                                                                                             TextFieldName="Name"
-                                                                                            ReadOnly="@(!IsStatus(EnumStatusInventoryAdjusment.InProgress))"
+                                                                                            ReadOnly="@(!IsStatus(EnumStatusInventoryAdjustment.InProgress))"
                                                                                             ValueFieldName="Id"
-                                                                                            SelectedItemChanged="@((ProductDto freq) => OnSelectProduct(freq))"
+                                                                                            SelectedItemChanged="@(async (ProductDto freq) => await OnSelectProduct(freq))"
                                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                             ShowValidationIcon="true" />
                                                                                 <ValidationMessage For="@(()=> FormInventoryAdjusmentDetail.ProductId)"   />
@@ -335,7 +303,7 @@
                                             </DxFormLayoutGroup>
                                         </DxFormLayout>
 
-                                        @if (IsStatus(EnumStatusInventoryAdjusment.Draft))
+                                        @if (IsStatus(EnumStatusInventoryAdjustment.Draft))
                                         {
                                             <div class="card-footer">
                                                 <div class="row  justify-content-end">
@@ -360,9 +328,5 @@
 }
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Inventory Adjusment" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <LoadingIndicatorLayout />
 } 

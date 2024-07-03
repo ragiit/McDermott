@@ -11,8 +11,6 @@ DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
-
 // Add services to the container.
 builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
@@ -51,8 +49,6 @@ Log.Logger = new LoggerConfiguration()
 builder.Services.AddSerilog();
 
 var app = builder.Build();
-
-app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

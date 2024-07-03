@@ -26,8 +26,7 @@
                 if (!_cache.TryGetValue(cacheKey, out List<GeneralConsultanService>? result))
                 {
                     result = await _unitOfWork.Repository<GeneralConsultanService>().Entities
-                        .Include(z => z.Service)
-                        .Include(z => z.Insurance)
+                        .Include(z => z.Service) 
                         .Include(z => z.Pratitioner)
                         .Include(z => z.ClassType)
                         .Include(z => z.Patient!.Gender)

@@ -271,7 +271,9 @@
         public bool IsOtherExaminationECG { get; set; } = false;
         public string? OtherExaminationTypeECG { get; set; }
         public string? OtherExaminationRemarkECG { get; set; }
-        public string? Status { get; set; } = "Draft";
+        public EnumStatusGeneralConsultantServiceProcedureRoom? Status { get; set; } = EnumStatusGeneralConsultantServiceProcedureRoom.Draft;
+        [NotMapped]
+        public string StatusName => Status.GetDisplayName();
         public long? LabTestId { get; set; }
 
         public LabTestDto? LabTest { get; set; }

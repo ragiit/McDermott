@@ -6,7 +6,7 @@
         public long? CompanyId { get; set; }
         public string Name { get; set; } = string.Empty;
         public DateTime Date { get; set; }
-        public EnumStatusInventoryAdjusment Status { get; set; }
+        public EnumStatusInventoryAdjustment Status { get; set; }
 
         [SetToNull]
         public virtual Location? Location { get; set; }

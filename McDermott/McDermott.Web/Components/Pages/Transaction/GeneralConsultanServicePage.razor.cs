@@ -27,6 +27,26 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IEnumerable<string> RujukanExtenalTypes = new[] { "Rujukan Horizontal", "Rujukan Vertical" };
         private IEnumerable<string> RujukanExtenalVertical = new[] { "Kondisi Khusus", "Spesialis" };
 
+        private bool IsStatus(EnumStatusGeneralConsultantService status) => FormRegis.Status == status;
+
+        // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
+
+        public class SubSpesialisPCare
+        {
+            [JsonProperty("kdSubSpesialis")]
+            public string KdSubSpesialis { get; set; }
+
+            [JsonProperty("nmSubSpesialis")]
+            public string NmSubSpesialis { get; set; }
+
+            [JsonProperty("kdPoliRujuk")]
+            public string KdPoliRujuk { get; set; }
+        }
+
+        private IGrid GridRujukanRefer { get; set; }
+        private List<SpesialisRefrensiKhususPCare> SpesialisRefrensiKhusus = [];
+        private List<SpesialisPCare> SpesialisPs = [];
+
         public class SpesialisRefrensiKhususPCare
         {
             [JsonProperty("kdKhusus")]
@@ -36,14 +56,21 @@ namespace McDermott.Web.Components.Pages.Transaction
             public string NmKhusus { get; set; }
         }
 
-        public class SpesialisPCare
-        {
-            [JsonProperty("kdSpesialis")]
-            public string KdSpesialis { get; set; }
+        private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
+        private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
+        private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
+        private GroupDto NameGroup = new();
+        private UserDto NameUser = new();
+        private GeneralConsultanlogDto generalLog = new();
 
-            [JsonProperty("nmSpesialis")]
-            public string NmSpesialis { get; set; }
-        }
+        private List<AllergyDto> WeatherAllergies = [];
+        private List<AllergyDto> FoodAllergies = [];
+        private List<AllergyDto> PharmacologyAllergies = [];
+        private List<UserDto> user_group = [];
+
+        private List<RujukanFaskesKhususSpesialisPCare> RujukanSubSpesialis = [];
+        private List<SpesialisSaranaPCare> SpesialisSaranas = [];
+        private List<SubSpesialisPCare> SubSpesialisPs = [];
 
         public class SpesialisSaranaPCare
         {
@@ -54,7 +81,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             public string NmSarana { get; set; }
         }
 
-        // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
         public class RujukanFaskesKhususSpesialisPCare
         {
             [JsonProperty("kdppk")]
@@ -91,45 +117,12 @@ namespace McDermott.Web.Components.Pages.Transaction
             public int Persentase { get; set; }
         }
 
-        public class SubSpesialisPCare
-        {
-            [JsonProperty("kdSubSpesialis")]
-            public string KdSubSpesialis { get; set; }
-
-            [JsonProperty("nmSubSpesialis")]
-            public string NmSubSpesialis { get; set; }
-
-            [JsonProperty("kdPoliRujuk")]
-            public string KdPoliRujuk { get; set; }
-        }
-
-
-        private IGrid GridRujukanRefer { get; set; }
-        private List<SpesialisRefrensiKhususPCare> SpesialisRefrensiKhusus = [];
-        private List<SpesialisPCare> SpesialisPs = [];
-
-        private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
-        private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
-        private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
-        private GroupDto NameGroup = new();
-        private UserDto NameUser = new();
-        private GeneralConsultanlogDto generalLog = new();
-
-        private List<AllergyDto> WeatherAllergies = [];
-        private List<AllergyDto> FoodAllergies = [];
-        private List<AllergyDto> PharmacologyAllergies = [];
-        private List<UserDto> user_group = [];
-
-        private List<RujukanFaskesKhususSpesialisPCare> RujukanSubSpesialis = [];
-        private List<SpesialisSaranaPCare> SpesialisSaranas = [];
-        private List<SubSpesialisPCare> SubSpesialisPs = [];
-
         private async Task OnClickConfirm()
         {
             try
             {
                 IsLoading = true;
-                var currentStatus = FormRegis.StagingStatus;
+                var currentStatus = FormRegis.Status;
                 ToastService.ClearCustomToasts();
                 if (FormRegis.PatientId == null || FormRegis.TypeRegistration == null || FormRegis.ServiceId is null || (!FormRegis.Payment!.Equals("Personal") && (FormRegis.InsurancePolicyId == 0 || FormRegis.InsurancePolicyId is null)))
                 {
@@ -138,7 +131,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     return;
                 }
 
-                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Planned"))
+                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && FormRegis.Status.Equals("Planned"))
                 {
                     var isSuccess = await SendPcareRequestRegistration();
                     if (!isSuccess)
@@ -152,7 +145,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     }
                 }
 
-                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Physician"))
+                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && FormRegis.Status.Equals("Physician"))
                 {
                     var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
 
@@ -165,39 +158,86 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 if (FormRegis.Id != 0)
                 {
-                    var text = FormRegis.StagingStatus == "Physician" ? "Consultation Done" : FormRegis.StagingStatus;
-                    var index = Stagings.FindIndex(x => x == text);
-                    if (text != "Consultation Done")
+                    switch (FormRegis.Status)
                     {
-                        FormRegis.StagingStatus = Stagings[index + 1];
-                        if (index + 1 == 4)
-                        {
-                            FormRegis.StagingStatus = "Physician";
-                        }
-                        else if (index + 1 == 5)
-                        {
-                            FormRegis.StagingStatus = "Finished";
-                        }
-                        try
-                        {
-                            StagingText = FormRegis.StagingStatus == "In Consultant" ? "Finished" : Stagings[index + 2];
-                        }
-                        catch { }
-                    }
-                    else
-                    {
-                        FormRegis.StagingStatus = "Finished";
-                    }
-                    var GeneralServices = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+                        case EnumStatusGeneralConsultantService.Planned:
 
-                    generalLog.GeneralConsultanServiceId = GeneralServices.Id;
+                            FormRegis.Status = EnumStatusGeneralConsultantService.Confirmed;
+                            StagingText = EnumStatusGeneralConsultantService.NurseStation.GetDisplayName();
+
+                            break;
+
+                        case EnumStatusGeneralConsultantService.Confirmed:
+
+                            FormRegis.Status = EnumStatusGeneralConsultantService.NurseStation;
+                            StagingText = EnumStatusGeneralConsultantService.Waiting.GetDisplayName();
+
+                            break;
+
+                        case EnumStatusGeneralConsultantService.NurseStation:
+
+                            FormRegis.Status = EnumStatusGeneralConsultantService.Waiting;
+                            StagingText = EnumStatusGeneralConsultantService.Physician.GetDisplayName();
+
+                            break;
+
+                        case EnumStatusGeneralConsultantService.Waiting:
+
+                            FormRegis.Status = EnumStatusGeneralConsultantService.Physician;
+                            StagingText = EnumStatusGeneralConsultantService.Finished.GetDisplayName();
+
+                            break;
+
+                        case EnumStatusGeneralConsultantService.Physician:
+
+                            FormRegis.Status = EnumStatusGeneralConsultantService.Finished;
+                            StagingText = EnumStatusGeneralConsultantService.Finished.GetDisplayName();
+
+                            break;
+
+                        case EnumStatusGeneralConsultantService.ProcedureRoom:
+                            break;
+
+                        case EnumStatusGeneralConsultantService.Canceled:
+                            break;
+
+                        default:
+                            break;
+                    }
+                    //var text = FormRegis.Status == EnumStatusGeneralConsultantService.Physician ? "Consultation Done" : FormRegis.Status;
+                    //var index = Stagings.FindIndex(x => x == text);
+                    //if (text != "Consultation Done")
+                    //{
+                    //    FormRegis.Status = Stagings[index + 1];
+                    //    if (index + 1 == 4)
+                    //    {
+                    //        FormRegis.Status = "Physician";
+                    //    }
+                    //    else if (index + 1 == 5)
+                    //    {
+                    //        FormRegis.Status = "Finished";
+                    //    }
+                    //    try
+                    //    {
+                    //        StagingText = FormRegis.Status == "In Consultant" ? "Finished" : Stagings[index + 2];
+                    //    }
+                    //    catch { }
+                    //}
+                    //else
+                    //{
+                    //    FormRegis.Status = "Finished";
+                    //}
+                    FormRegis = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+                    IsLoading = false;
+
+                    generalLog.GeneralConsultanServiceId = FormRegis.Id;
                     generalLog.UserById = NameUser.Id;
-                    generalLog.Status = FormRegis.StagingStatus;
+                    //generalLog.Status = FormRegis.Status;
                     await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                 }
                 else
                 {
-                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.Status!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
 
                     if (patient.Count > 0)
                     {
@@ -206,13 +246,15 @@ namespace McDermott.Web.Components.Pages.Transaction
                         return;
                     }
 
-                    FormRegis.StagingStatus = "Confirmed";
+                    //FormRegis.Status = "Confirmed";
                     StagingText = "Nurse Station";
+                    FormRegis.Status = EnumStatusGeneralConsultantService.Confirmed;
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                    IsLoading = false;
 
                     generalLog.GeneralConsultanServiceId = FormRegis.Id;
                     generalLog.UserById = NameUser.Id;
-                    generalLog.Status = FormRegis.StagingStatus;
+                    //generalLog.Status = FormRegis.Status;
                     await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
 
                     PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
@@ -226,6 +268,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                 //var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
                 //FormRegis = result[0];
 
+                FormRegis.Patient = patients.FirstOrDefault(x => x.Id == FormRegis.PatientId) ?? new();
+
                 //FormRegis.IsWeather = !string.IsNullOrWhiteSpace(PatientAllergy.Weather);
                 //FormRegis.IsPharmacology = !string.IsNullOrWhiteSpace(PatientAllergy.Farmacology);
                 //FormRegis.IsFood = !string.IsNullOrWhiteSpace(PatientAllergy.Food);
@@ -237,20 +281,18 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (SelectedPharmacologyAllergies.Count() > 0)
                     FormRegis.IsPharmacology = true;
 
-                if (FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Physician"))
-                {
-                    if (Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
-                    {
-                        IsPratition = [.. AllDoctors.Where(x => x.Id == UserLogin.Id).ToList()];
-                        FormRegis.PratitionerId = IsPratition.Count > 0 ? IsPratition[0].Id : null;
-                    }
-                    else
-                        IsPratition = [.. AllDoctors.Where(x => x.IsDoctor == true && x.IsPhysicion == true).ToList()];
-                }
+                //if ( FormRegis.Status.Equals("Physician"))
+                //{
+                //    if (Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
+                //    {
+                //        IsPratition = [.. AllDoctors.Where(x => x.Id == UserLogin.Id).ToList()];
+                //        FormRegis.PratitionerId = IsPratition.Count > 0 ? IsPratition[0].Id : null;
+                //    }
+                //    else
+                //        IsPratition = [.. AllDoctors.Where(x => x.IsDoctor == true && x.IsPhysicion == true).ToList()];
+                //}
 
                 await ReadHeightWeightPatient();
-
-                IsLoading = false;
             }
             catch (Exception ex)
             {
@@ -261,13 +303,13 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task<bool> SendPcareRequestKunjungan()
         {
-            if (FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Nurse Station") && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
+            if (FormRegis.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
             {
                 var ll = GeneralConsultanCPPTs.Where(x => x.Title == "Diagnosis").Select(x => x.Body).ToList();
 
                 string diag1 = null!;
 
-                if (FormRegis.StagingStatus.Equals("Nurse Station"))
+                if (FormRegis.Status.Equals(EnumStatusGeneralConsultantService.NurseStation))
                 {
                     if (GeneralConsultanCPPTs.Count > 0)
                     {
@@ -279,7 +321,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     }
                 }
 
-                if (FormRegis.StagingStatus.Equals("Physician"))
+                if (FormRegis.Status.Equals(EnumStatusGeneralConsultantService.Physician))
                 {
                     if (GeneralConsultanCPPTs.Count > 0)
                     {
@@ -336,7 +378,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task<bool> SendPcareRequestRegistration()
         {
-            if (FormRegis.StagingStatus is not null && FormRegis.StagingStatus.Equals("Planned") && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
+            if (FormRegis.Status.Equals(EnumStatusGeneralConsultantService.Planned) && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
             {
                 var regis = new PendaftaranRequest
                 {
@@ -405,7 +447,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 if (FormRegis.Id == 0)
                 {
-                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.ServiceId == FormRegis.ServiceId && x.PatientId == FormRegis.PatientId && x.StagingStatus!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.ServiceId == FormRegis.ServiceId && x.PatientId == FormRegis.PatientId && x.Status!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
 
                     if (patient.Count > 0)
                     {
@@ -423,33 +465,35 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (IsReferTo && SelectedRujukanType is not null && SelectedRujukanType == RujukanTypes.ToList()[0])
                 {
                     FormRegis.Id = 0;
-                    FormRegis.StagingStatus = "Planned";
+                    FormRegis.Status = EnumStatusGeneralConsultantService.Planned;
                     StagingText = "Confirmed";
                     PopUpVisible = false;
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                    IsLoading = false;
 
                     generalLog.GeneralConsultanServiceId = FormRegis.Id;
                     generalLog.UserById = NameUser.Id;
-                    generalLog.Status = FormRegis.StagingStatus;
+                    //generalLog.Status = FormRegis.Status;
                     await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                 }
                 else if (IsAppoiment)
                 {
-                    if (FormRegis.AppoimentDate is null)
+                    if (FormRegis.AppointmentDate is null)
                     {
                         ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
                         return;
                     }
 
                     FormRegis.Id = 0;
-                    FormRegis.StagingStatus = "Planned";
+                    FormRegis.Status = EnumStatusGeneralConsultantService.Planned;
                     StagingText = "Confirmed";
                     PopUpAppoiment = false;
                     FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                    IsLoading = false;
 
                     generalLog.GeneralConsultanServiceId = FormRegis.Id;
                     generalLog.UserById = NameUser.Id;
-                    generalLog.Status = FormRegis.StagingStatus;
+                    //generalLog.Status = FormRegis.Status;
                     await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                     await LoadData();
                 }
@@ -458,9 +502,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                     // Ketika Kondisi New
                     if (FormRegis.Id == 0)
                     {
-                        switch (FormRegis.StagingStatus)
+                        switch (FormRegis.Status)
                         {
-                            case "Planned":
+                            case EnumStatusGeneralConsultantService.Planned:
                                 if (FormRegis.IsPharmacology || FormRegis.IsFood || FormRegis.IsWeather)
                                 {
                                     var ids = new List<long>();
@@ -477,16 +521,18 @@ namespace McDermott.Web.Components.Pages.Transaction
                                 }
 
                                 FormRegis = await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormRegis));
+                                IsLoading = false;
 
-                                //PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
+                                PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
 
-                                //if (PatientAllergy.Id == 0)
-                                //    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
-                                //else
-                                //    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
+                                if (PatientAllergy.Id == 0)
+                                    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
+                                else
+                                    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
+
                                 generalLog.GeneralConsultanServiceId = FormRegis.Id;
                                 generalLog.UserById = NameUser.Id;
-                                generalLog.Status = FormRegis.StagingStatus;
+                                generalLog.Status = FormRegis.Status.GetDisplayName();
                                 await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                                 break;
 
@@ -496,10 +542,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                     }
                     else
                     {
-                        switch (FormRegis.StagingStatus)
+                        switch (FormRegis.Status)
                         {
-                            case "Planned":
+                            case EnumStatusGeneralConsultantService.Planned:
                                 FormRegis = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
+                                IsLoading = false;
 
                                 PatientAllergy.UserId = FormRegis.PatientId.GetValueOrDefault();
 
@@ -520,7 +567,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                                 break;
 
-                            case "Nurse Station":
+                            case EnumStatusGeneralConsultantService.NurseStation:
 
                                 if (GeneralConsultantClinical.Id == 0)
                                 {
@@ -539,7 +586,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                                 break;
 
-                            case "Physician":
+                            case EnumStatusGeneralConsultantService.Physician:
 
                                 if (GeneralConsultantClinical.Id == 0)
                                 {
@@ -596,7 +643,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     }
                 }
 
-                FormRegis.Patient = patients.FirstOrDefault(x => x.Id == FormRegis.PatientId);
+                FormRegis.Patient = patients.FirstOrDefault(x => x.Id == FormRegis.PatientId) ?? new();
 
                 //var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
                 //FormRegis = result[0];
@@ -622,6 +669,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 IsLoading = false;
                 exx.HandleException(ToastService);
             }
+            IsLoading = false;
         }
 
         private async Task OnSaveProcedureRoom()
@@ -646,7 +694,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     await FileUploadService.UploadFileAsync(item, 0, []);
                 }
 
-                FormRegis.StagingStatus = "Procedure Room";
+                //FormRegis.Status = "Procedure Room";
                 await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
 
                 if (GeneralConsultanMedicalSupport.Id == 0)
@@ -656,7 +704,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     generalLog.ProcedureRoomId = GeneralConsultanMedicalSupport.Id;
                     generalLog.UserById = NameUser.Id;
-                    generalLog.Status = GeneralConsultanMedicalSupport.Status;
+                    generalLog.Status = GeneralConsultanMedicalSupport.Status.GetDisplayName();
                     await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                 }
                 else
@@ -1008,7 +1056,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             if (priority is not null)
             {
-                string html = $"<span class='badge bg-dark py-1 px-2' title='{priority.StagingStatus} Priority'>{priority.StagingStatus}</span>";
+                string html = $"<span class='badge bg-dark py-1 px-2' title='{priority.Status} Priority'>{priority.Status}</span>";
 
                 return new MarkupString(html);
             }
@@ -1136,8 +1184,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                         Age = currentDate.Year - Birthdate!.Value.Year;
                     }
 
-                    FormRegis.NoRM = item.NoRm;
-                    FormRegis.IdentityNumber = item.NoId ?? "";
+                    //FormRegis.NoRM = item.NoRm;
+                    //FormRegis.IdentityNumber = item.NoId ?? "";
                     FormRegis.PatientId = item.Id;
                 }
                 catch { }
@@ -1208,7 +1256,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             "General Consultation",
             "Emergency",
-            "MCU"
+            //"MCU"
         };
 
         private List<ClassTypeDto> ClassTypes = [];
@@ -1614,6 +1662,15 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
+        public class SpesialisPCare
+        {
+            [JsonProperty("kdSpesialis")]
+            public string KdSpesialis { get; set; }
+
+            [JsonProperty("nmSpesialis")]
+            public string NmSpesialis { get; set; }
+        }
+
         private async Task LoadData()
         {
             showForm = false;
@@ -1669,9 +1726,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-
-            await GetUserInfo();
-            await LoadData();
         }
 
         private void GetInsurancePhysician(long value)
@@ -1700,6 +1754,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
+                return;
                 var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == FormRegis.PratitionerId && x.StartDate.Date == FormRegis.RegistrationDate.Date && x.DoctorSchedule.ServiceId == FormRegis.ServiceId));
 
                 Times.Clear();
@@ -1908,9 +1963,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (services.Count <= 0 || services.Count == 1)
                 return;
 
-            var ID = services.OrderByDescending(z => z.CreateDate).ToList();
+            var ID = services.OrderByDescending(z => z.CreatedDate).Take(2).ToList();
 
-            var secondLastItem = ID.ToList()[ID.Count - 2];
+            var secondLastItem = ID.FirstOrDefault() ?? new();
 
             var assesments = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == secondLastItem.Id));
 
@@ -1936,7 +1991,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     }
                 }
 
-                FormRegis.StagingStatus = "Canceled";
+                FormRegis.Status = EnumStatusGeneralConsultantService.Canceled;
 
                 await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
 
@@ -2077,11 +2132,25 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if ((GeneralConsultanServiceDto)args.DataItem is null)
                     return;
 
-                IsDeletedConsultantService = ((GeneralConsultanServiceDto)args.DataItem)!.StagingStatus!.Equals("Planned") || ((GeneralConsultanServiceDto)args.DataItem)!.StagingStatus!.Equals("Canceled");
+                IsDeletedConsultantService = ((GeneralConsultanServiceDto)args.DataItem)!.Status!.Equals("Planned") || ((GeneralConsultanServiceDto)args.DataItem)!.Status!.Equals("Canceled");
             }
             catch { }
 
             UpdateEditItemsEnabled(true);
+        }
+
+        private void Grid_FocusedRowChanged1(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+
+            try
+            {
+                if ((GeneralConsultanServiceDto)args.DataItem is null)
+                    return;
+
+                IsDeletedConsultantService = ((GeneralConsultanServiceDto)args.DataItem)!.Status!.Equals("Planned") || ((GeneralConsultanServiceDto)args.DataItem)!.Status!.Equals("Canceled");
+            }
+            catch { }
         }
 
         private async Task NewItem_Click()
@@ -2143,7 +2212,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == FormRegis.InsurancePolicyId));
                 if (bpjs.Count > 0)
                 {
-                    var count = GeneralConsultanServices.Where(x => x.PatientId == FormRegis.PatientId && x.StagingStatus == "Planned").Count();
+                    var count = GeneralConsultanServices.Where(x => x.PatientId == FormRegis.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
                     if (!string.IsNullOrWhiteSpace(bpjs[0].KdProviderPstKdProvider))
                     {
                         var parameter = await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")));
@@ -2160,9 +2229,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                     }
                 }
 
-                if (FormRegis.StagingStatus != "Finished")
+                if (FormRegis.Status != EnumStatusGeneralConsultantService.Finished)
                 {
-                    var text = FormRegis.StagingStatus == "Physician" ? "In Consultation" : FormRegis.StagingStatus;
+                    var text = FormRegis.Status == EnumStatusGeneralConsultantService.Physician ? "In Consultation" : FormRegis.Status.GetDisplayName();
                     if (!string.IsNullOrWhiteSpace(text) && text.Equals("Procedure Room"))
                     {
                         StagingText = "Procedure Room";
@@ -2196,9 +2265,9 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 await GetPatientAllergy();
 
-                switch (FormRegis.StagingStatus)
+                switch (FormRegis.Status)
                 {
-                    case "Nurse Station":
+                    case EnumStatusGeneralConsultantService.NurseStation:
                         var clinical = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
                         GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
                         AllGeneralConsultanCPPTs = GeneralConsultanCPPTs.Select(item => item).ToList();
@@ -2207,13 +2276,13 @@ namespace McDermott.Web.Components.Pages.Transaction
                             GeneralConsultantClinical = clinical[0];
                         break;
 
-                    case "Procedure Room":
+                    case EnumStatusGeneralConsultantService.ProcedureRoom:
                         var supportP = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
                         if (supportP.Count > 0)
                             GeneralConsultanMedicalSupport = supportP[0];
                         break;
 
-                    case "Physician":
+                    case EnumStatusGeneralConsultantService.Physician:
                         var clinicals = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
                         if (clinicals.Count > 0)
                             GeneralConsultantClinical = clinicals[0];
@@ -2239,7 +2308,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                         FormRegis.EndMaternityLeave = DateTime.Now.AddMonths(3);
                         break;
 
-                    case "Waiting":
+                    case EnumStatusGeneralConsultantService.Waiting:
                         var support1 = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
                         if (support1.Count > 0)
                             GeneralConsultanMedicalSupport = support1[0];
@@ -2370,7 +2439,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     var a = SelectedDataItems.Adapt<List<GeneralConsultanServiceDto>>();
 
-                    a = a.Where(x => x.StagingStatus == "Planned" || x.StagingStatus == "Canceled").ToList();
+                    //a = a.Where(x => x.Status == "Planned" || x.Status == "Canceled").ToList();
 
                     await Mediator.Send(new DeleteGeneralConsultanServiceRequest(ids: a.Select(x => x.Id).ToList()));
                 }
@@ -2834,6 +2903,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
+                return;
                 await SetTimeSchedule();
             }
             catch (Exception ex)
@@ -2847,7 +2917,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task SelectedItemRegistrationDateChanged(DateTime e)
         {
             FormRegis.RegistrationDate = e;
-            FormRegis.AppoimentDate = e;
+            FormRegis.AppointmentDate = e;
             await SetTimeSchedule();
         }
 
@@ -2908,7 +2978,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.InsurancePolicyId));
             if (bpjs.Count > 0)
             {
-                var count = GeneralConsultanServices.Where(x => x.PatientId == FormRegis.PatientId && x.StagingStatus == "Planned").Count();
+                var count = GeneralConsultanServices.Where(x => x.PatientId == FormRegis.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
                 if (!string.IsNullOrWhiteSpace(bpjs[0].KdProviderPstKdProvider))
                 {
                     var parameter = await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")));
@@ -3003,8 +3073,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
             {
                 FormRegis.InsurancePolicyId = null;
-                FormRegis.NoRM = null;
-                FormRegis.IdentityNumber = null;
+                //FormRegis.NoRM = null;
+                //FormRegis.IdentityNumber = null;
                 PatientAllergy.Food = null;
                 PatientAllergy.Weather = null;
                 PatientAllergy.Farmacology = null;
@@ -3024,8 +3094,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                FormRegis.NoRM = item?.NoRm ?? null;
-                FormRegis.IdentityNumber = item?.NoId ?? null;
+                //FormRegis.NoRM = item?.NoRm ?? null;
+                //FormRegis.IdentityNumber = item?.NoId ?? null;
                 FormRegis.PatientId = item.Id;
             }
             catch { }
