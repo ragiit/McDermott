@@ -501,8 +501,8 @@ namespace McDermott.Web.Components.Pages.Queue
             showForm = true;
             NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
             FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
-            BPJS = InsurancePolices.FirstOrDefault(x => x.UserId == FormKios.PatientId);
-
+            //BPJS = InsurancePolices.FirstOrDefault(x => x.UserId == FormKios.PatientId);
+            BPJS = (await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == FormKios.PatientId))).FirstOrDefault();
             if (BPJS != null)
             {
                 var isActive = await OnClickGetBPJS(BPJS.PolicyNumber);

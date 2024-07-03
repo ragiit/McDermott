@@ -222,23 +222,38 @@
 
                     var insurance = Insurances.FirstOrDefault(x => x.Name.Contains("BPJS Kesehatan"));
 
-                    if (DeletedBPJSID != 0 && !IsBPJS)
+                    var cek = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == InsurancePoliciyForm.Id));
+
+                    if (insurance is not null && cek is not null && cek.Count > 0)
                     {
-                        await Mediator.Send(new DeleteBPJSIntegrationRequest(DeletedBPJSID));
+                        //BPJSIntegration = cek.Adapt<BPJSIntegrationDto>();
+                        cek.Adapt(BPJSIntegration); // Adapt cek to BPJSIntegration
+                        var aa = BPJSIntegration;
+                        BPJSIntegration.Id = cek[0].Id;
+                        BPJSIntegration.InsurancePolicyId = cek[0].InsurancePolicyId;
+                        await Mediator.Send(new UpdateBPJSIntegrationRequest(BPJSIntegration));
                     }
                     else
                     {
-                        if (insurance is not null && InsurancePoliciyForm.InsuranceId == insurance.Id)
-                        {
-                            if (IsBPJS && BPJSIntegration.Id == 0)
-                            {
-                                BPJSIntegration.InsurancePolicyId = InsurancePoliciyForm.Id;
-                                await Mediator.Send(new CreateBPJSIntegrationRequest(BPJSIntegration));
-                            }
-                            else
-                                await Mediator.Send(new UpdateBPJSIntegrationRequest(BPJSIntegration));
-                        }
+                        await Mediator.Send(new DeleteBPJSIntegrationRequest(DeletedBPJSID));
+                        BPJSIntegration.InsurancePolicyId = InsurancePoliciyForm.Id;
+                        await Mediator.Send(new CreateBPJSIntegrationRequest(BPJSIntegration));
                     }
+
+                    //if (DeletedBPJSID != 0 && !IsBPJS)
+                    //{
+                    //    await Mediator.Send(new DeleteBPJSIntegrationRequest(DeletedBPJSID));
+                    //}
+                    //else
+                    //{
+                    //    if (insurance is not null && InsurancePoliciyForm.InsuranceId == insurance.Id)
+                    //    {
+                    //        if (IsBPJS && BPJSIntegration.Id != 0)
+                    //        {
+                    //            await Mediator.Send(new UpdateBPJSIntegrationRequest(BPJSIntegration));
+                    //        }
+                    //    }
+                    //}
                 }
 
                 DeletedBPJSID = 0;
