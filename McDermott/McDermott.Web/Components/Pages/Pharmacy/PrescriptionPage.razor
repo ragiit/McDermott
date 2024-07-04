@@ -96,7 +96,7 @@
 
                                                 <Columns>
                                                     <DxGridSelectionColumn Width="15px" />
-                                                    <DxGridDataColumn MinWidth="200" FieldName="ReceiptDate" Caption="Prescription Date" SortIndex="0" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="ReceiptDate" Caption="Prescription Date" SortIndex="0" DisplayFormat="dd MMMM yyyy"/>
                                                     <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
                                                     <DxGridDataColumn MinWidth="200" FieldName="Practitioner.Name" Caption="Prescribing Doctor" />
                                                     <DxGridDataColumn MinWidth="200" FieldName="Status" Caption="Status">
@@ -433,7 +433,7 @@
                                                                         }
                                                                         <DxGridDataColumn MinWidth="200" FieldName="Product.Name" Caption="Medicine Name" SortIndex="0" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="GivenAmount" Caption="Prescription Quantity" />
-                                                                        <DxGridDataColumn MinWidth="200" FieldName="ActiveComponentNames" Caption="Active Component" />
+                                                                        <DxGridDataColumn MinWidth="200" Visible="false" FieldName="ActiveComponentNames" Caption="Active Component" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="Stock" Caption="Stock" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="DosageFrequency" Caption="Dosage/Frequency" />
                                                                         @* <DxGridDataColumn MinWidth="200" FieldName="PriceUnit" Caption="Price Unit" /> *@
@@ -1056,9 +1056,11 @@ else
 
 @* PopUp Detail Prescription *@
 
-<DxPopup @bind-Visible="@isDetailPrescription" HeaderCssClass="fw-bold" HeaderText="Select Batch on product"
+<DxPopup @bind-Visible="@isDetailPrescription" HeaderCssClass="fw-bold" HeaderText="Input Detail Stock "
          HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
+<div class="card">
+    <div class="card-body">
     <DxLoadingPanel @bind-Visible="PanelVisible"
                     IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                     IsContentBlocked="true"
@@ -1101,23 +1103,27 @@ else
             </ToolbarTemplate>
             <Columns>
                 <DxGridSelectionColumn Width="15px" />
-                <DxGridDataColumn MinWidth="200" FieldName="Batch" Caption="Batch" SortIndex="0" />
-                <DxGridDataColumn MinWidth="200" FieldName="Expired" Caption="Expired Date" DisplayFormat="dd MMMM yyyy"/>
-                <DxGridDataColumn MinWidth="200" FieldName="CurrentStock" Caption="Current Stock" />
+                        @if (traceAvailability == true)
+                        {
+                            <DxGridDataColumn MinWidth="200" FieldName="Batch" Caption="Batch" SortIndex="0" />
+                            <DxGridDataColumn MinWidth="200" FieldName="Expired" Caption="Expired Date" DisplayFormat="dd MMMM yyyy"/>
+                        }
+                        <DxGridDataColumn MinWidth="200" FieldName="CurrentStock" Caption="Current Stock" />
                 <DxGridDataColumn MinWidth="200" FieldName="CutStock" Caption="Input Stock"  />
 
             </Columns>
             <EditFormTemplate Context="EditFormContextStockOut">
-                @* <EditForm Model="@ConcoctionLine" Context="EditFormContextPrescriptionConcoctionLinesForm" OnInvalidSubmit="@HandleValidConcoctionSubmit" OnValidSubmit="@HandleInvalidConcoctionSubmit"> *@
                 <DataAnnotationsValidator />
-                @{
-                    FormStockOutPrescriptions = (StockOutPrescriptionDto)EditFormContextStockOut.EditModel;
-                }
-                <div class="row w-100">
-                    <div class="col-md-12">
-                        <DxFormLayout CssClass="mt w-100">
-                            <div class="col-6">
-                                <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                        @{
+                            FormStockOutPrescriptions = (StockOutPrescriptionDto)EditFormContextStockOut.EditModel;
+                        }
+                        <div class="row w-100">
+                            <div class="col-md-12">
+                                <DxFormLayout CssClass="mt w-100">
+                                    @if (traceAvailability == true)
+                                    {
+                                        <div class="col-6">
+                                            <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                     <DxComboBox ShowValidationIcon="true"
                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                 Data="@StockOutProducts"
@@ -1139,6 +1145,7 @@ else
                                     </DxDateEdit>
                                 </DxFormLayoutItem>
                             </div>
+                            }
                             <div class="col-6">
                                 <DxFormLayoutItem Caption="Current Stock" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                     <DxSpinEdit @bind-Value="@FormStockOutPrescriptions.CurrentStock"
@@ -1157,17 +1164,17 @@ else
                     </div>
 
                 </div>
-                @* </EditForm> *@
             </EditFormTemplate>
         </DxGrid>
     </DxLoadingPanel>
+    </div>
     <div class="card-footer">
         <div class="row  justify-content-end">
             <div class="col-auto align-self-end">
-                <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
-                </DxButton>
-                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnDiscardConcoctionLines"></DxButton>
+                <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="SaveStockOut"></DxButton>
+                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="HandleDiscard"></DxButton>
             </div>
         </div>
+    </div
     </div>
 </DxPopup>

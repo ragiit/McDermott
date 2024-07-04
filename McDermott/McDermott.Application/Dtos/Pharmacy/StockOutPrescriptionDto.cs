@@ -11,6 +11,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long Id { get; set; }
         public long? PrescriptionId { get; set; }
         public long? StockId { get; set; }
+        [Required(ErrorMessage ="Input Stock Not Null!!")]
         public long? CutStock {  get; set; }
         public string? Batch { get; set; }
         public long? CurrentStock { get; set; }
