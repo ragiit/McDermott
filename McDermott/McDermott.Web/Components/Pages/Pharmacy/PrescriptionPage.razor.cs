@@ -692,7 +692,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                     await Mediator.Send(new CreateStockOutPrescriptionRequest(item_cutstock));
                 }
-
+                await EditItemPharmacy_Click(null);
             }
             catch (Exception ex)
             {
