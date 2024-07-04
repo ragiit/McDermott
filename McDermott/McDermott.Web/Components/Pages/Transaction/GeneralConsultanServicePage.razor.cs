@@ -3234,7 +3234,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 string OppositeSex = "";
                 if (patienss.GenderId != null)
                 {
-                    Gender = patienss.Gender.Name == "Male" ? "MAlE(L)" : "FEMALE(P)";
+                    Gender = patienss.Gender.Name == "Male" ? "MALE(L)" : "FEMALE(P)";
                     OppositeSex = patienss.Gender.Name == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
                 }
 
@@ -3244,8 +3244,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                     {"%NamePatient%", patienss.Name},
                     {"%startDate%", startSickLeave?.ToString("dd MMMM yyyy") },
                     {"%endDate%", endSickLeave?.ToString("dd MMMM yyyy") },
-                    {"%NameDoctor%", data?.Pratitioner.Name },
-                    {"%SIPDoctor%", data?.Pratitioner.SipNo },
+                    {"%NameDoctor%", data?.Pratitioner.Name ?? "-" },
+                    {"%SIPDoctor%", data?.Pratitioner.SipNo ?? "-"},
                     {"%AddressPatient%", patienss.DomicileAddress1 },
                     {"%AgePatient%", age.ToString() },
                     {"%WordDays%", WordDays },

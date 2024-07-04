@@ -130,28 +130,34 @@ namespace McDermott.Web.Components.Pages.Transaction
                 string OppositeSex = "";
                 if (patienss.GenderId != null)
                 {
-                    Gender = patienss.Gender.Name == "Male" ? "MAlE(L)" : "FEMALE(P)";
+                    Gender = patienss.Gender.Name == "Male" ? "MALE(L)" : "FEMALE(P)";
                     OppositeSex = patienss.Gender.Name == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
                 }
 
                 isPrint = true;
-                var mergeFields = new Dictionary<string, string>
+                string GetDefaultValue(string value, string defaultValue = "-")
                 {
-                    {"%NamePatient%", patienss.Name},
-                    {"%startDate%", startSickLeave?.ToString("dd MMMM yyyy") },
-                    {"%endDate%", endSickLeave?.ToString("dd MMMM yyyy") },
-                    {"%NameDoctor%", data?.Pratitioner.Name },
-                    {"%SIPDoctor%", data?.Pratitioner.SipNo },
-                    {"%AddressPatient%", patienss.DomicileAddress1 },
-                    {"%AgePatient%", age.ToString() },
-                    {"%WordDays%", WordDays },
-                    {"%Days%", todays},
-                    {"%days%", TotalDays.ToString() },
-                    {"%Dates%", data.RegistrationDate.ToString("dd MMMM yyyy")},
-                    {"%Times%", data.RegistrationDate.ToString("H:MM")},
-                    {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")},
-                    {"%genders%", Gender},
-                };
+                    return value ?? defaultValue;
+                }
+
+                var mergeFields = new Dictionary<string, string>
+        {
+            {"%NamePatient%", GetDefaultValue(patienss.Name)},
+            {"%startDate%", GetDefaultValue(startSickLeave?.ToString("dd MMMM yyyy"))},
+            {"%endDate%", GetDefaultValue(endSickLeave?.ToString("dd MMMM yyyy"))},
+            {"%NameDoctor%", GetDefaultValue(data?.Pratitioner?.Name)},
+            {"%SIPDoctor%", GetDefaultValue(data?.Pratitioner?.SipNo)},
+            {"%AddressPatient%", GetDefaultValue(patienss.DomicileAddress1)},
+            {"%AgePatient%", GetDefaultValue(age.ToString())},
+            {"%WordDays%", GetDefaultValue(WordDays)},
+            {"%Days%", GetDefaultValue(todays)},
+            {"%days%", GetDefaultValue(TotalDays.ToString())},
+            {"%Dates%", GetDefaultValue(data?.RegistrationDate.ToString("dd MMMM yyyy"))},
+            {"%Times%", GetDefaultValue(data?.RegistrationDate.ToString("H:MM"))},
+            {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")},  // Still no null check needed
+            {"%genders%", GetDefaultValue(Gender)},
+            {"%OppositeSex%", GetDefaultValue(OppositeSex, "")} // Use empty string if null
+        };
 
                 if (patienss.IsEmployee == false)
                 {
