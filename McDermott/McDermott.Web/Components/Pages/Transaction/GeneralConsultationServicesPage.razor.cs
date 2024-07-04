@@ -147,7 +147,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             {"%endDate%", GetDefaultValue(endSickLeave?.ToString("dd MMMM yyyy"))},
             {"%NameDoctor%", GetDefaultValue(data?.Pratitioner?.Name)},
             {"%SIPDoctor%", GetDefaultValue(data?.Pratitioner?.SipNo)},
-            {"%AddressPatient%", GetDefaultValue(patienss.DomicileAddress1)},
+            {"%AddressPatient%", GetDefaultValue(patienss.DomicileAddress1) + GetDefaultValue(patienss.DomicileAddress2)},
             {"%AgePatient%", GetDefaultValue(age.ToString())},
             {"%WordDays%", GetDefaultValue(WordDays)},
             {"%Days%", GetDefaultValue(todays)},

@@ -174,7 +174,7 @@
                                                     {
                                                         <div class="card">
                                                             <div class="card-body">
-                                                                <DxButton Text="Done" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Validate"></DxButton>
+                                                                <DxButton Text="Done" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="ValidateAsync"></DxButton>
                                                                 <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                             </div>
                                                         </div>
@@ -425,6 +425,7 @@
                                                                                     <DxButton RenderStyle="ButtonRenderStyle.Success"
                                                                                               Attributes="@(new Dictionary<string, object> {  ["title"] = "Select Batch" })"
                                                                                               IconCssClass="fa-solid fa-clipboard-list"
+                                                                                              Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed)"
                                                                                               Click="@(()=>ShowCutStock((context.DataItem as PrescriptionDto).Id))"
                                                                                               CssClass="me-1" />
                                                                                 </CellDisplayTemplate>
