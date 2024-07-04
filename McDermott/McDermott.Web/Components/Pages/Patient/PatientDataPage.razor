@@ -8,21 +8,7 @@
 {
     <div class="wrapper">
 
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Patients</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item" @onclick="LoadData"><a href="/patient/patient-data">Patients</a></li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <BaseHeaderPage Title="Patients" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
 
         @if (ShowForm)
         {
@@ -35,12 +21,6 @@
                                     <div class="w-100">
                                         <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
                                             <Items>
-                                                @*  <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
-                                        IconCssClass="fa-solid fa-user"
-                                        Text="@($"Employee Relation dihapus")" />
-                                        <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
-                                        IconCssClass="fa-solid fa-users"
-                                        Text="@($"Family Relation ini tab dibawah ")" /> *@
 
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("Insurance Policy"))"
                                                                IconCssClass="fa-solid fa-notes-medical"
@@ -64,22 +44,8 @@
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-syringe"
                                                                Text="@($"Data wellness")" />
-
-                                                @*   <DxToolbarItem Text="Data Alergi" BeginGroup="true" Alignment="ToolbarItemAlignment.Right" IconCssClass="fa-solid fa-virus">
-                                        <Items>
-                                        <DxToolbarItem IconCssClass="fa-solid fa-syringe" Text="Farmacologi" GroupName="Farmacologi" />
-                                        <DxToolbarItem IconCssClass="fa-solid fa-syringe" Text="Cuaca" GroupName="Cuaca" />
-                                        <DxToolbarItem IconCssClass="fa-solid fa-syringe" Text="Makanan" GroupName="Makanan" />
-                                        </Items>
-                                        </DxToolbarItem> *@
                                             </Items>
                                         </DxToolbar>
-                                        @*
-                                <DxTabs ActiveTabIndex="@TabIndex" TabClick="OnTabClick">
-                                <DxTab Text="Vaccination"></DxTab>
-                                <DxTab Text="Products"></DxTab>
-                                <DxTab Text="Test"></DxTab>
-                                </DxTabs> *@
 
                                         @if (TabIndex != -1)
                                         {
@@ -103,7 +69,7 @@
                                                 <InsurancePolicyPageListForm User="@UserForm" />
                                                 break;
                                             case 1:
-                                                <PrescriptionPage User="@UserForm"/>
+                                                <PrescriptionPage User="@UserForm" />
                                                 break;
                                             default:
                                                 break;
@@ -127,65 +93,62 @@
                             <div class="card">
                                 @if (!ShowForm)
                                 {
-                                    <div class="card-body">
-                                        <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                        IsContentBlocked="true"
-                                                        ApplyBackgroundShading="true"
-                                                        IndicatorAreaVisible="false"
-                                                        Text="Fetching Data...">
-                                            <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                    Data="Users"
-                                                    PageSize="10"
-                                                    @bind-SelectedDataItems="@SelectedDataItems"
-                                                    AllowSelectRowByClick="true"
-                                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                    KeyFieldName="Id"
-                                                    CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                                    DataItemDeleting="OnDelete"
-                                                    FocusedRowEnabled="true"
-                                                    PopupEditFormCssClass="pw-800"
-                                                    PagerPosition="GridPagerPosition.Bottom"
-                                                    PageSizeSelectorVisible="true"
-                                                    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                    RowDoubleClick="OnRowDoubleClick"
-                                                    PageSizeSelectorAllRowsItemVisible="true"
-                                                    PagerSwitchToInputBoxButtonCount="10"
-                                                    PagerVisibleNumericButtonCount="10"
-                                                    FocusedRowChanged="Grid_FocusedRowChanged"
-                                                    ShowGroupPanel="true"
-                                                    AutoExpandAllGroupRows="true"
-                                                    ShowFilterRow="true"
-                                                    CustomizeElement="Grid_CustomizeElement"
-                                                    ShowSearchBox="true"
-                                                    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                                    KeyboardNavigationEnabled="true">
-                                                <ToolbarTemplate>
-                                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                        <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                        <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
-                                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0 && !IsDeleted" />
-                                                        <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                        <DxToolbarItem Text="Column Chooser" BeginGroup="true" Click="ColumnChooserButton_Click" IconCssClass="fa-solid fa-table-columns" />
-                                                        <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                            <Items>
-                                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                            </Items>
-                                                        </DxToolbarItem>
-                                                        @* <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" /> *@
-                                                    </DxToolbar>
-                                                </ToolbarTemplate>
-                                                <Columns>
-                                                    <DxGridSelectionColumn Width="15px" />
-                                                    <DxGridDataColumn MinWidth="200" FieldName="NoRm" Caption="Medical Record" SortOrder="GridColumnSortOrder.Descending" />
-                                                    <DxGridDataColumn MinWidth="200" FieldName="Name" />
-                                                    <DxGridDataColumn MinWidth="200" FieldName="DateOfBirth" Caption="Date of Birth" />
-                                                </Columns>
-                                            </DxGrid>
-                                        </DxLoadingPanel>
-                                    </div>
+                                    <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                    IsContentBlocked="true"
+                                                    ApplyBackgroundShading="true"
+                                                    IndicatorAreaVisible="false"
+                                                    Text="Fetching Data...">
+                                        <MyGrid @ref="Grid"
+                                                Data="Users"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                DataItemDeleting="OnDelete"
+                                                RowDoubleClick="OnRowDoubleClick"
+                                                KeyFieldName="Id"
+                                                FocusedRowChanged="Grid_FocusedRowChanged">
+
+                                            <ToolbarTemplate>
+                                                <MyDxToolbarBase TItem="UserDto"
+                                                                 Items="@Users"
+                                                                 SelectedDataItems="@SelectedDataItems"
+                                                                 NewItem_Click="@NewItem_Click"
+                                                                 EditItem_Click="@EditItem"
+                                                                 DeleteItem_Click="@DeleteItem_Click"
+                                                                 Refresh_Click="@Refresh_Click"
+                                                                 EnableDelete="!IsDeleted"
+                                                                 IsImport="false"
+                                                                 Grid="Grid"
+                                                                 VisibleNew="UserAccessCRUID.Create"
+                                                                 VisibleEdit="UserAccessCRUID.Update"
+                                                                 VisibleDelete="UserAccessCRUID.Delete" />
+                                            </ToolbarTemplate>
+
+                                            @*  <ToolbarTemplate>
+                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0 && !IsDeleted" />
+                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                <DxToolbarItem Text="Column Chooser" BeginGroup="true" Click="ColumnChooserButton_Click" IconCssClass="fa-solid fa-table-columns" />
+                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                <Items>
+                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                </Items>
+                                </DxToolbarItem>
+
+                                            </DxToolbar>
+                                            </ToolbarTemplate>
+                                    *@
+                                <Columns>
+                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="NoRm" Caption="Medical Record" SortOrder="GridColumnSortOrder.Descending" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="Name" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="DateOfBirth" Caption="Date of Birth" />
+                                </Columns>
+                                        </MyGrid>
+                                    </DxLoadingPanel>
                                 }
                                 else
                                 {
@@ -490,7 +453,7 @@
                                                             <DxGridLayoutItem Row="0" Column="0">
                                                                 <Template>
                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Employee Relation">
-                                                                        <DxCheckBox @bind-Checked="@UserForm.IsEmployeeRelation" />
+                                                                        <DxCheckBox @bind-Checked="@UserForm.IsEmployee" />
                                                                     </DxFormLayoutItem>
                                                                 </Template>
                                                             </DxGridLayoutItem>
@@ -513,55 +476,55 @@
                                                                                 Width="100px" />
                                                             <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
                                                                                 Caption="Name" />
-                                                                                 <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                                                            <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
                                                                                 Caption="Type" />
                                                         </DxTagBox>
                                                     </DxFormLayoutItem>
 
-                                                   @*  <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Farmacologi" ColSpanMd="3">
-                                                        <DxTextBox @bind-Text="@UserForm.PatientAllergy.FarmacologiCode"
-                                                                   ShowValidationIcon="true"
-                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                   NullText="Code" />
-                                                        <ValidationMessage For="@(() => UserForm.PatientAllergy.FarmacologiCode)"   />
-                                                    </DxFormLayoutItem>
+                                                    @*  <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Farmacologi" ColSpanMd="3">
+                                        <DxTextBox @bind-Text="@UserForm.PatientAllergy.FarmacologiCode"
+                                        ShowValidationIcon="true"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        NullText="Code" />
+                                        <ValidationMessage For="@(() => UserForm.PatientAllergy.FarmacologiCode)"   />
+                                        </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="9" Caption="">
-                                                        <DxMemo @bind-Text="@UserForm.PatientAllergy.Farmacology"
-                                                                NullText="Farmacologi"
-                                                                ShowValidationIcon="true"
-                                                                Rows="1" />
-                                                    </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="9" Caption="">
+                                        <DxMemo @bind-Text="@UserForm.PatientAllergy.Farmacology"
+                                        NullText="Farmacologi"
+                                        ShowValidationIcon="true"
+                                        Rows="1" />
+                                        </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather Code" ColSpanMd="3">
-                                                        <DxTextBox @bind-Text="@UserForm.PatientAllergy.WeatherCode"
-                                                                   ShowValidationIcon="true"
-                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                   NullText="Code" />
-                                                        <ValidationMessage For="@(() => UserForm.PatientAllergy.WeatherCode)"   />
-                                                    </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather Code" ColSpanMd="3">
+                                        <DxTextBox @bind-Text="@UserForm.PatientAllergy.WeatherCode"
+                                        ShowValidationIcon="true"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        NullText="Code" />
+                                        <ValidationMessage For="@(() => UserForm.PatientAllergy.WeatherCode)"   />
+                                        </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="9" Caption="">
-                                                        <DxMemo @bind-Text="@UserForm.PatientAllergy.Weather"
-                                                                ShowValidationIcon="true"
-                                                                NullText="Weather"
-                                                                Rows="1" />
-                                                    </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="9" Caption="">
+                                        <DxMemo @bind-Text="@UserForm.PatientAllergy.Weather"
+                                        ShowValidationIcon="true"
+                                        NullText="Weather"
+                                        Rows="1" />
+                                        </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Food" ColSpanMd="3">
-                                                        <DxTextBox @bind-Text="@UserForm.PatientAllergy.FoodCode"
-                                                                   ShowValidationIcon="true"
-                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                   NullText="Code" />
-                                                        <ValidationMessage For="@(() => UserForm.PatientAllergy.FoodCode)"   />
-                                                    </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Food" ColSpanMd="3">
+                                        <DxTextBox @bind-Text="@UserForm.PatientAllergy.FoodCode"
+                                        ShowValidationIcon="true"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        NullText="Code" />
+                                        <ValidationMessage For="@(() => UserForm.PatientAllergy.FoodCode)"   />
+                                        </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="9" Caption="">
-                                                        <DxMemo @bind-Text="@UserForm.PatientAllergy.Food"
-                                                                ShowValidationIcon="true"
-                                                                NullText="Food"
-                                                                Rows="1" />
-                                                    </DxFormLayoutItem> *@
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="9" Caption="">
+                                        <DxMemo @bind-Text="@UserForm.PatientAllergy.Food"
+                                        ShowValidationIcon="true"
+                                        NullText="Food"
+                                        Rows="1" />
+                                        </DxFormLayoutItem> *@
                                                 </Items>
                                             </DxFormLayoutGroup>
 

@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
+﻿using System.ComponentModel;
+using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -6,7 +7,7 @@ namespace McDermott.Web.Components.Pages.Transaction
     {
         #region UserLoginAndAccessRole
 
-        private bool IsStatus(EnumStatusAccident status) => Accident.SentStatus == status;
+        private bool IsStatus(EnumStatusGeneralConsultantService status) => GeneralConsultanService.Status == status;
 
         [Inject]
         public UserInfoService UserInfoService { get; set; }
@@ -15,6 +16,10 @@ namespace McDermott.Web.Components.Pages.Transaction
         private (bool, GroupMenuDto, User) Test = new();
         private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
+        private string SelectedRegType { get; set; } = "Accident";
+
+        private string GetNullText(IEnumerable<string> natureOfInjury) =>
+      string.Join(" / ", natureOfInjury);
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -55,6 +60,30 @@ namespace McDermott.Web.Components.Pages.Transaction
             Accident = new();
             await LoadData();
         }
+
+        private List<string> ClassType = new List<string>
+        {
+            "FA",
+            "MTC",
+            "RWC",
+            "LTA",
+            "FATALITY",
+            "OCCUPATIONAL ILLNESS"
+        };
+
+        private List<string> RegisType = new List<string>
+        {
+            "Accident"
+        };
+
+        private List<string> SentType = new List<string>
+        {
+            "Back to Work",
+            "Main Clinic",
+            "Home",
+            "Hospital",
+            //"MCU"
+        };
 
         #region Nature of Injury
 
@@ -295,8 +324,219 @@ namespace McDermott.Web.Components.Pages.Transaction
         private bool ShowForm { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
 
+        private List<UserDto> Physicions { get; set; } = [];
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private List<InsurancePolicyDto> InsurancePolicies { get; set; } = [];
+        private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
+
+        private GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
+
+        private async Task SelectedItemInsurancePolicyChanged(InsurancePolicyDto result)
+        {
+        }
+
+        private List<string> Payments = new List<string>
+        {
+            "Personal",
+            "Insurance",
+            "BPJS"
+        };
+
+        private async Task SelectedItemPaymentChanged(string e)
+        {
+            //GeneralConsultanService.Payment = null;
+            //GeneralConsultanService.InsurancePolicyId = null;
+            //SelectedInsurancePolicy = new();
+
+            //if (e is null)
+            //    return;
+
+            //InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+        }
+
+        private async Task SelectedItemPaymentChangedReferTo(string e)
+        {
+            //ReferToGeneralConsultanService.Payment = null;
+            //ReferToGeneralConsultanService.InsurancePolicyId = null;
+            //SelectedInsurancePolicyFollowUp = new();
+
+            //if (e is null)
+            //    return;
+
+            //ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == ReferToGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+        }
+
+        #region CPPT
+
+        private List<NursingDiagnosesDto> NursingDiagnoses = [];
+        private List<DiagnosisDto> Diagnoses = [];
+        private DiagnosisDto SelectedDiagnosis { get; set; } = new();
+        private int FocusedGridTabCPPTRowVisibleIndex { get; set; }
+        private IReadOnlyList<object> SelectedDataItemsCPPT { get; set; } = [];
+        private NursingDiagnosesDto SelectedNursingDiagnosis { get; set; } = new();
+        private List<GeneralConsultanCPPTDto> GeneralConsultanCPPTs = [];
+        private List<AwarenessDto> Awareness { get; set; } = [];
+
+        private List<string> ClinicVisitTypes = new List<string>
+        {
+            "Healthy",
+            "Sick"
+        }; private bool IsPopUpPainScale { get; set; } = false;
+
+        private IGrid? GridCppt { get; set; }
+
+        private void OnDeleteTabCPPTConfirm(GridDataItemDeletingEventArgs e)
+        {
+            GeneralConsultanCPPTs.Remove((GeneralConsultanCPPTDto)e.DataItem);
+            GridCppt.Reload();
+        }
+
+        private void OnClickPainScalePopUp()
+        {
+            IsPopUpPainScale = true;
+        }
+
+        private async Task OnClickSaveCPPT()
+        {
+            try
+            {
+                await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: GeneralConsultanService.Id));
+
+                GeneralConsultanCPPTs.ForEach(x => { x.GeneralConsultanService = null; x.GeneralConsultanServiceId = GeneralConsultanService.Id; x.Id = 0; });
+                GeneralConsultanCPPTs = await Mediator.Send(new CreateListGeneralConsultanCPPTRequest(GeneralConsultanCPPTs));
+
+                ToastService.ShowSuccess("Successfully Saving CPPT");
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private void GridTabCPPT_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedGridTabCPPTRowVisibleIndex = args.VisibleIndex;
+        }
+
+        public static List<string> GetPropertyNames<T>(T obj)
+        {
+            List<string> propertyNames = new List<string>();
+            Type type = typeof(T);
+
+            foreach (PropertyInfo prop in type.GetProperties())
+            {
+                propertyNames.Add(prop.Name);
+            }
+
+            return propertyNames;
+        }
+
+        private class InputCPPTGeneralConsultanCPPT
+        {
+            public string? Subjective { get; set; }
+            public string? Objective { get; set; }
+
+            [DisplayName("Planning")]
+            public string? Plan { get; set; }
+
+            public string? Diagnosis { get; set; }
+
+            [DisplayName("Nurse Diagnosis")]
+            public string? NursingDiagnosis { get; set; }
+
+            public DateTime Date { get; set; } = DateTime.Now;
+        }
+
+        private InputCPPTGeneralConsultanCPPT FormInputCPPTGeneralConsultan = new();
+
+        private void OnClickConfirmCPPT()
+        {
+            var temps = new List<GeneralConsultanCPPTDto>();
+            temps.Add(new GeneralConsultanCPPTDto
+            {
+                Id = new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second,
+                Title = UserLogin.Name,
+            });
+            temps.Add(new GeneralConsultanCPPTDto
+            {
+                Id = new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second,
+                Title = "Date and Time",
+                Body = DateTime.Now.ToString("dd-MMM-yyy HH:mm:tt")
+            });
+
+            foreach (var key in GetPropertyNames(new InputCPPTGeneralConsultanCPPT()))
+            {
+                if (key == "Date")
+                    continue;
+
+                PropertyInfo property = typeof(InputCPPTGeneralConsultanCPPT).GetProperty(key);
+                object? value = property?.GetValue(FormInputCPPTGeneralConsultan);
+
+                if (value != null)
+                {
+                    string title = key;
+
+                    if (title.Equals("Plan"))
+                        title = "Planning";
+                    else if (title.Equals("NursingDiagnosis"))
+                        title = "Nurse Diagnosis";
+
+                    temps.Add(new GeneralConsultanCPPTDto
+                    {
+                        Id = new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second,
+                        Title = title,
+                        Body = (value is null ? "" : value.ToString()) ?? "",
+                    });
+
+                    //if (title.Equals("Planning"))
+                    //{
+                    //    if (IsStatus(EnumStatusGeneralConsultantService.NurseStation))
+                    //    {
+                    //        temps.Add(new GeneralConsultanCPPTDto
+                    //        {
+                    //            Id = new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second,
+                    //            Title = "Nursing Diagnosis",
+                    //            Body = SelectedNursingDiagnosis.Problem,
+                    //        });
+                    //    }
+                    //    else
+                    //    {
+                    //        temps.Add(new GeneralConsultanCPPTDto
+                    //        {
+                    //            Id = new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second,
+                    //            Title = "Diagnosis",
+                    //            Body = SelectedDiagnosis.Name,
+                    //        });
+                    //    }
+                    //}
+                }
+            }
+
+            GeneralConsultanCPPTs.AddRange(temps);
+
+            GridCppt.Reload();
+            OnClickClearCPPT();
+        }
+
+        private void OnClickClearCPPT()
+        {
+            FormInputCPPTGeneralConsultan = new InputCPPTGeneralConsultanCPPT();
+            SelectedDiagnosis = new();
+            SelectedNursingDiagnosis = new();
+        }
+
+        private void OnClickGetObjectives()
+        {
+            FormInputCPPTGeneralConsultan.Objective = $"Weight: {GeneralConsultanService.Weight}, Height: {GeneralConsultanService.Height}, RR: {GeneralConsultanService.RR}, SpO2: {GeneralConsultanService.SpO2}, BMIIndex: {Math.Round(GeneralConsultanService.BMIIndex, 2).ToString()}, BMIState: {GeneralConsultanService.BMIState}, Temp: {GeneralConsultanService.Temp}, HR: {GeneralConsultanService.HR}, Systolic: {GeneralConsultanService.Systolic}, DiastolicBP: {GeneralConsultanService.DiastolicBP}, E: {GeneralConsultanService.E}, V: {GeneralConsultanService.V}, M: {GeneralConsultanService.M}";
+        }
+
+        private void OnClickClearAllCPPT()
+        {
+            GeneralConsultanCPPTs.Clear();
+        }
+
+        #endregion CPPT
 
         private AccidentDto Accident { get; set; } = new();
         private List<AccidentDto> Data = [];
@@ -358,14 +598,26 @@ namespace McDermott.Web.Components.Pages.Transaction
             SelectedNIP = e.NIP ?? "-";
         }
 
+        private string supName = string.Empty;
+
         protected override async Task OnInitializedAsync()
         {
-            PanelVisible = true;
+        }
+
+        private async Task RefreshSupervisorName()
+        {
+            var selectedSupervisor = await Mediator.Send(new GetUserQuery(x => x.Id == Accident.EmployeeId));
+            var supervisor = selectedSupervisor.FirstOrDefault();
+
+            if (supervisor != null)
+            {
+                supName = supervisor.Name;
+            }
         }
 
         private async Task LoadComboBox()
         {
-            Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true));
+            Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true && x.IsPatient == true));
             Departments = await Mediator.Send(new GetDepartmentQuery());
         }
 
@@ -451,50 +703,50 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 Id = 0,
 
-                SelectedEmployeeCauseOfInjury1 = EmployeeCauseOfInjury1.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury2 = EmployeeCauseOfInjury2.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury3 = EmployeeCauseOfInjury3.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury4 = EmployeeCauseOfInjury4.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury5 = EmployeeCauseOfInjury5.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury6 = EmployeeCauseOfInjury6.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury7 = EmployeeCauseOfInjury7.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury8 = EmployeeCauseOfInjury8.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury9 = EmployeeCauseOfInjury9.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury10 = EmployeeCauseOfInjury10.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury11 = EmployeeCauseOfInjury11.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury12 = EmployeeCauseOfInjury12.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury13 = EmployeeCauseOfInjury13.Select(x => x).AsEnumerable(),
-                SelectedEmployeeCauseOfInjury14 = EmployeeCauseOfInjury14.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury1 = EmployeeCauseOfInjury1.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury2 = EmployeeCauseOfInjury2.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury3 = EmployeeCauseOfInjury3.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury4 = EmployeeCauseOfInjury4.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury5 = EmployeeCauseOfInjury5.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury6 = EmployeeCauseOfInjury6.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury7 = EmployeeCauseOfInjury7.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury8 = EmployeeCauseOfInjury8.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury9 = EmployeeCauseOfInjury9.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury10 = EmployeeCauseOfInjury10.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury11 = EmployeeCauseOfInjury11.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury12 = EmployeeCauseOfInjury12.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury13 = EmployeeCauseOfInjury13.Select(x => x).AsEnumerable(),
+                //SelectedEmployeeCauseOfInjury14 = EmployeeCauseOfInjury14.Select(x => x).AsEnumerable(),
 
-                SelectedNatureOfInjury1 = NatureOfInjury1.Select(x => x).AsEnumerable(),
-                SelectedNatureOfInjury2 = NatureOfInjury2.Select(x => x).AsEnumerable(),
-                SelectedNatureOfInjury3 = NatureOfInjury3.Select(x => x).AsEnumerable(),
-                SelectedNatureOfInjury4 = NatureOfInjury4.Select(x => x).AsEnumerable(),
-                SelectedNatureOfInjury5 = NatureOfInjury5.Select(x => x).AsEnumerable(),
-                SelectedNatureOfInjury6 = NatureOfInjury6.Select(x => x).AsEnumerable(),
-                SelectedNatureOfInjury7 = NatureOfInjury7.Select(x => x).AsEnumerable(),
-                SelectedNatureOfInjury8 = NatureOfInjury8.Select(x => x).AsEnumerable(),
+                //SelectedNatureOfInjury1 = NatureOfInjury1.Select(x => x).AsEnumerable(),
+                //SelectedNatureOfInjury2 = NatureOfInjury2.Select(x => x).AsEnumerable(),
+                //SelectedNatureOfInjury3 = NatureOfInjury3.Select(x => x).AsEnumerable(),
+                //SelectedNatureOfInjury4 = NatureOfInjury4.Select(x => x).AsEnumerable(),
+                //SelectedNatureOfInjury5 = NatureOfInjury5.Select(x => x).AsEnumerable(),
+                //SelectedNatureOfInjury6 = NatureOfInjury6.Select(x => x).AsEnumerable(),
+                //SelectedNatureOfInjury7 = NatureOfInjury7.Select(x => x).AsEnumerable(),
+                //SelectedNatureOfInjury8 = NatureOfInjury8.Select(x => x).AsEnumerable(),
 
-                SelectedPartOfBody1 = PartOfBody1.Select(x => x).AsEnumerable(),
-                SelectedPartOfBody2 = PartOfBody2.Select(x => x).AsEnumerable(),
-                SelectedPartOfBody3 = PartOfBody3.Select(x => x).AsEnumerable(),
-                SelectedPartOfBody4 = PartOfBody4.Select(x => x).AsEnumerable(),
-                SelectedPartOfBody5 = PartOfBody5.Select(x => x).AsEnumerable(),
-                SelectedPartOfBody6 = PartOfBody6.Select(x => x).AsEnumerable(),
-                SelectedPartOfBody7 = PartOfBody7.Select(x => x).AsEnumerable(),
-                SelectedPartOfBody8 = PartOfBody8.Select(x => x).AsEnumerable(),
-                SelectedPartOfBody9 = PartOfBody9.Select(x => x).AsEnumerable(),
-                SelectedPartOfBody10 = PartOfBody10.Select(x => x).AsEnumerable(),
-                SelectedPartOfBody11 = PartOfBody11.Select(x => x).AsEnumerable(),
-                SelectedPartOfBody12 = PartOfBody12.Select(x => x).AsEnumerable(),
+                //SelectedPartOfBody1 = PartOfBody1.Select(x => x).AsEnumerable(),
+                //SelectedPartOfBody2 = PartOfBody2.Select(x => x).AsEnumerable(),
+                //SelectedPartOfBody3 = PartOfBody3.Select(x => x).AsEnumerable(),
+                //SelectedPartOfBody4 = PartOfBody4.Select(x => x).AsEnumerable(),
+                //SelectedPartOfBody5 = PartOfBody5.Select(x => x).AsEnumerable(),
+                //SelectedPartOfBody6 = PartOfBody6.Select(x => x).AsEnumerable(),
+                //SelectedPartOfBody7 = PartOfBody7.Select(x => x).AsEnumerable(),
+                //SelectedPartOfBody8 = PartOfBody8.Select(x => x).AsEnumerable(),
+                //SelectedPartOfBody9 = PartOfBody9.Select(x => x).AsEnumerable(),
+                //SelectedPartOfBody10 = PartOfBody10.Select(x => x).AsEnumerable(),
+                //SelectedPartOfBody11 = PartOfBody11.Select(x => x).AsEnumerable(),
+                //SelectedPartOfBody12 = PartOfBody12.Select(x => x).AsEnumerable(),
 
-                SelectedTreatment1 = Treatment1.Select(x => x).AsEnumerable(),
-                SelectedTreatment2 = Treatment2.Select(x => x).AsEnumerable(),
-                SelectedTreatment3 = Treatment3.Select(x => x).AsEnumerable(),
-                SelectedTreatment4 = Treatment4.Select(x => x).AsEnumerable(),
-                SelectedTreatment5 = Treatment5.Select(x => x).AsEnumerable(),
-                SelectedTreatment6 = Treatment6.Select(x => x).AsEnumerable(),
-                SelectedTreatment7 = Treatment7.Select(x => x).AsEnumerable()
+                //SelectedTreatment1 = Treatment1.Select(x => x).AsEnumerable(),
+                //SelectedTreatment2 = Treatment2.Select(x => x).AsEnumerable(),
+                //SelectedTreatment3 = Treatment3.Select(x => x).AsEnumerable(),
+                //SelectedTreatment4 = Treatment4.Select(x => x).AsEnumerable(),
+                //SelectedTreatment5 = Treatment5.Select(x => x).AsEnumerable(),
+                //SelectedTreatment6 = Treatment6.Select(x => x).AsEnumerable(),
+                //SelectedTreatment7 = Treatment7.Select(x => x).AsEnumerable()
             };
 
             StagingText = EnumStatusAccident.RestrictedWorkCase.GetDisplayName();
@@ -534,6 +786,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                             break;
                     }
                 }
+                await RefreshSupervisorName();
             }
             catch (Exception ex)
             {

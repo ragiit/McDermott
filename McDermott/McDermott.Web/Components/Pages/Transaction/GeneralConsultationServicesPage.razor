@@ -285,18 +285,20 @@
                                                                                   ValueFieldName="Code">
                                                                     </MyDxComboBox>
                                                                 </DxFormLayoutItem>
-                                                                <DxFormLayoutItem CaptionCssClass="" Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" Caption=" " ColSpanMd="12">
 
-                                                                </DxFormLayoutItem>
-                                                                <DxFormLayoutItem Visible="@(!string.IsNullOrWhiteSpace(GeneralConsultanService.TypeRegistration) && !GeneralConsultanService.TypeRegistration.Equals("General Consultation"))"
-                                                                                  CaptionCssClass="required-caption normal-caption"
-                                                                                  Caption="Medical Type" ColSpanMd="12">
-                                                                    <MyDxComboBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                                                  Data="@Method"
-                                                                                  NullText="Select Method..."
-                                                                                  @bind-Value="@GeneralConsultanService.TypeMedical">
-                                                                    </MyDxComboBox>
-                                                                </DxFormLayoutItem>
+                                                                @*  <DxFormLayoutItem CaptionCssClass="" Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" Caption=" " ColSpanMd="12">
+
+                                                        </DxFormLayoutItem>
+
+                                                        <DxFormLayoutItem Visible="@(!string.IsNullOrWhiteSpace(GeneralConsultanService.TypeRegistration) && !GeneralConsultanService.TypeRegistration.Equals("General Consultation"))"
+                                                        CaptionCssClass="required-caption normal-caption"
+                                                        Caption="Medical Type" ColSpanMd="12">
+                                                        <MyDxComboBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                        Data="@Method"
+                                                        NullText="Select Method..."
+                                                        @bind-Value="@GeneralConsultanService.TypeMedical">
+                                                        </MyDxComboBox>
+                                                        </DxFormLayoutItem> *@
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Alert Information Special Case" ColSpanMd="12">
                                                                     <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))" @bind-Checked="@GeneralConsultanService.IsAlertInformationSpecialCase" />

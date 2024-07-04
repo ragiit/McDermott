@@ -959,7 +959,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
                 return;
 
-            ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == ReferToGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == e.Equals("BPJS") && x.Active == true));
+            ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == ReferToGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
         }
 
         private async Task SelectedItemPaymentChangedFollowUp(string e)
@@ -971,7 +971,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
                 return;
 
-            FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == FollowUpGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == e.Equals("BPJS") && x.Active == true));
+            FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == FollowUpGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
         }
 
         private async Task SelectedItemPaymentChanged(string e)
@@ -983,7 +983,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
                 return;
 
-            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == e.Equals("BPJS") && x.Active == true));
+            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
         }
 
         private void SelectedItemRegisTypeChangedReferTo(String e)
@@ -1063,32 +1063,32 @@ namespace McDermott.Web.Components.Pages.Transaction
                 return;
             }
 
-            if (e.Equals("Emergency"))
-            {
-                Method =
-                [
-                    "General",
-                    "Work Related Injury",
-                    "Road Accident Injury",
-                ];
-                FollowUpGeneralConsultanService.TypeMedical = Method[0];
-            }
-            else if (e.Equals("MCU"))
-            {
-                Method =
-                [
-                    "Annual MCU",
-                    "Pre Employment MCU",
-                    "Oil & Gas UK",
-                    "HIV & AIDS",
-                    "Covid19*",
-                    "Drug & Alcohol Test",
-                    "Maternity Checkup"
-                ];
-                FollowUpGeneralConsultanService.TypeMedical = Method[0];
-            }
-            else if (e.Equals("General Consultation"))
-                FollowUpGeneralConsultanService.TypeMedical = null;
+            //if (e.Equals("Emergency"))
+            //{
+            //    Method =
+            //    [
+            //        "General",
+            //        "Work Related Injury",
+            //        "Road Accident Injury",
+            //    ];
+            //    FollowUpGeneralConsultanService.TypeMedical = Method[0];
+            //}
+            //else if (e.Equals("MCU"))
+            //{
+            //    Method =
+            //    [
+            //        "Annual MCU",
+            //        "Pre Employment MCU",
+            //        "Oil & Gas UK",
+            //        "HIV & AIDS",
+            //        "Covid19*",
+            //        "Drug & Alcohol Test",
+            //        "Maternity Checkup"
+            //    ];
+            //    FollowUpGeneralConsultanService.TypeMedical = Method[0];
+            //}
+            //else if (e.Equals("General Consultation"))
+            FollowUpGeneralConsultanService.TypeMedical = null;
         }
 
         private async Task SelectedItemPatientChangedReferTo(UserDto e)
@@ -1104,7 +1104,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             ReferToGeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
             ReferToGeneralConsultanService.PatientId = e.Id;
 
-            ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && ReferToGeneralConsultanService.Payment != null && x.Insurance.IsBPJS == ReferToGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
+            ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && ReferToGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == ReferToGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
         }
 
         private async Task SelectedItemPatientChangedFollowUp(UserDto e)
@@ -1120,7 +1120,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             FollowUpGeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
             FollowUpGeneralConsultanService.PatientId = e.Id;
 
-            FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && FollowUpGeneralConsultanService.Payment != null && x.Insurance.IsBPJS == FollowUpGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
+            FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && FollowUpGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == FollowUpGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
         }
 
         private async Task SelectedItemPatientChanged(UserDto e)
@@ -1136,7 +1136,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
             GeneralConsultanService.PatientId = e.Id;
 
-            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && GeneralConsultanService.Payment != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
+            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && GeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
 
             await GetPatientAllergy();
         }
@@ -2272,7 +2272,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (!isFromQuery)
                     GeneralConsultanService = SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>();
 
-                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && GeneralConsultanService.Payment != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
+                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && GeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
 
                 //if (GeneralConsultanService.StagingStatus != "Finished")
                 //{

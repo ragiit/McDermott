@@ -169,12 +169,21 @@
                                                         </Template>
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
-                                                        <DxDateEdit @bind-Date="@GeneralConsultanService.RegistrationDate"
-                                                                    Mask="@DateTimeMask.ShortDate"
-                                                                    NullText="Select Registration Date">
-                                                        </DxDateEdit>
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg. Type" ColSpanMd="12">
+                                                        <MyDxComboBox Data="@RegisType"
+                                                                      ReadOnly
+                                                                      NullText="Select Registration Type..."
+                                                                      AllowUserInput="true"
+                                                                      @bind-Value="@GeneralConsultanService.TypeRegistration">
+                                                        </MyDxComboBox>
+                                                        <ValidationMessage For="@(() => GeneralConsultanService.TypeRegistration)" />
                                                     </DxFormLayoutItem>
+
+                                                </DxFormLayout>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <DxFormLayout Enabled="true">
 
                                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
                                                         <MyDxComboBox Data="@Services"
@@ -196,20 +205,6 @@
                                                         </MyDxComboBox>
                                                         <ValidationMessage For="@(() => GeneralConsultanService.PratitionerId)" />
                                                     </DxFormLayoutItem>
-                                                </DxFormLayout>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <DxFormLayout Enabled="true">
-                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg. Type" ColSpanMd="12">
-                                                        <MyDxComboBox Data="@RegisType"
-                                                                      ReadOnly
-                                                                      NullText="Select Registration Type..."
-                                                                      AllowUserInput="true"
-                                                                      @bind-Value="@GeneralConsultanService.TypeRegistration">
-                                                        </MyDxComboBox>
-                                                        <ValidationMessage For="@(() => GeneralConsultanService.TypeRegistration)" />
-                                                    </DxFormLayoutItem>
 
                                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="MCU Type" ColSpanMd="12">
                                                         <MyDxComboBox Data="@MCUType"
@@ -229,13 +224,20 @@
                                                         <ValidationMessage For="@(() => GeneralConsultanService.MedexType)" />
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Alert Information Special Case" ColSpanMd="12">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Candidate From" ColSpanMd="12">
                                                         <DxCheckBox CssClass="normal-caption" @bind-Checked="@GeneralConsultanService.IsBatam">
                                                             <div class="normal-caption">Batam</div>
                                                         </DxCheckBox>
                                                         <DxCheckBox @bind-Checked="@(GeneralConsultanService.IsOutsideBatam)">
                                                             <div class="normal-caption">Outside Batam</div>
                                                         </DxCheckBox>
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
+                                                        <DxDateEdit @bind-Date="@GeneralConsultanService.RegistrationDate"
+                                                                    Mask="@DateTimeMask.ShortDate"
+                                                                    NullText="Select Registration Date">
+                                                        </DxDateEdit>
                                                     </DxFormLayoutItem>
                                                 </DxFormLayout>
                                             </div>

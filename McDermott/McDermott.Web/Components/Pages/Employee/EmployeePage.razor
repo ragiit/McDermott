@@ -7,21 +7,7 @@
 {
     <div class="wrapper">
 
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Employee</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item" @onclick="LoadData"><a href="/config/employees">Employee</a></li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <BaseHeaderPage Title="Employees" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
 
         <section class="content">
             <div class="container-fluid">
@@ -30,67 +16,63 @@
                         <div class="card">
                             @if (!ShowForm)
                             {
-                                <div class="card-body">
-                                    <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                    IsContentBlocked="true"
-                                                    ApplyBackgroundShading="true"
-                                                    IndicatorAreaVisible="false"
-                                                    Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                Data="Users"
-                                                PageSize="10"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                AllowSelectRowByClick="true"
-                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                KeyFieldName="Id"
-                                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                                DataItemDeleting="OnDelete"
-                                                FocusedRowEnabled="true"
-                                                PopupEditFormCssClass="pw-800"
-                                                PagerPosition="GridPagerPosition.Bottom"
-                                                PageSizeSelectorVisible="true"
-                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                RowDoubleClick="OnRowDoubleClick"
-                                                PageSizeSelectorAllRowsItemVisible="true"
-                                                PagerSwitchToInputBoxButtonCount="10"
-                                                PagerVisibleNumericButtonCount="10"
-                                                FocusedRowChanged="Grid_FocusedRowChanged"
-                                                ShowGroupPanel="true"
-                                                CustomizeElement="GridExtention.Grid_CustomizeElement"
-                                                AutoExpandAllGroupRows="true"
-                                                ShowFilterRow="true"
-                                                ShowSearchBox="true"
-                                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                                KeyboardNavigationEnabled="true">
-                                            <ToolbarTemplate>
-                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0 && !IsDeleted" />
-                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                        <Items>
-                                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                        </Items>
-                                                    </DxToolbarItem>
-                                                    @* <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" /> *@
-                                                </DxToolbar>
-                                            </ToolbarTemplate>
-                                            <Columns>
-                                                <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn FieldName="NIP" SortIndex="0" />
-                                                <DxGridDataColumn FieldName="Name" />
-                                                <DxGridDataColumn FieldName="Email" />
-                                                <DxGridDataColumn FieldName="JobPosition.Name" Caption="Job Position" />
-                                                <DxGridDataColumn FieldName="Department.Name" Caption="Department" />
-                                            </Columns>
-                                        </DxGrid>
-                                    </DxLoadingPanel>
-                                </div>
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <MyGrid @ref="Grid"
+                                            Data="Users"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            KeyFieldName="Id"
+                                            DataItemDeleting="OnDelete"
+                                            RowDoubleClick="OnRowDoubleClick"
+                                            FocusedRowChanged="Grid_FocusedRowChanged">
+
+                                        <ToolbarTemplate>
+                                            <MyDxToolbarBase TItem="UserDto"
+                                                             Items="@Users"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@NewItem_Click"
+                                                             EditItem_Click="@EditItem_Click"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             Refresh_Click="@Refresh_Click"
+                                                             EnableDelete="!IsDeleted"
+                                                             IsImport="false"
+                                                             Grid="Grid"
+                                                             VisibleNew="UserAccessCRUID.Create"
+                                                             VisibleEdit="UserAccessCRUID.Update"
+                                                             VisibleDelete="UserAccessCRUID.Delete" />
+                                        </ToolbarTemplate>
+
+                                        @*  <ToolbarTemplate>
+                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0 && !IsDeleted" />
+                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                <Items>
+                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                </Items>
+                                </DxToolbarItem>
+                                </DxToolbar>
+                                </ToolbarTemplate> *@
+
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="NIP" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Name" />
+                                            <DxGridDataColumn FieldName="Email" />
+                                            <DxGridDataColumn FieldName="JobPosition.Name" Caption="Job Position" />
+                                            <DxGridDataColumn FieldName="Department.Name" Caption="Department" />
+                                        </Columns>
+                                    </MyGrid>
+                                </DxLoadingPanel>
                             }
                             else
                             {
@@ -382,6 +364,17 @@
                                         </DxFormLayoutGroup>
 
                                         <DxFormLayoutGroup Caption="Employee" ColSpanMd="12">
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Payment Method" ColSpanMd="12">
+                                                <MyDxComboBox Data="@(Users.Where(x => x.Id != UserForm.Id).AsEnumerable())"
+                                                              NullText="Select Supervisor..."
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              @bind-Value="UserForm.SupervisorId">
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(() => UserForm.SupervisorId)" />
+                                            </DxFormLayoutItem>
+
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Job Position">
                                                 <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                             Data="@JobPositions"
@@ -447,7 +440,7 @@
                                             <div class="col-auto align-self-end">
                                                 <DxButton RenderStyleMode="@ButtonRenderStyleMode.Outline"
                                                           Text="Save"
-                                                          RenderStyle="ButtonRenderStyle.Info"
+                                                          RenderStyle="ButtonRenderStyle.Primary"
                                                           SubmitFormOnClick="true"
                                                           IconCssClass="fa-solid fa-floppy-disk"
                                                           CssClass="w-20 ml" />

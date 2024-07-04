@@ -32,7 +32,7 @@
                 InsurancePoliciyForm.InsuranceId = (long)value;
                 _InsuranceId = value;
 
-                IsBPJS = Insurances.Any(x => x.IsBPJS == true && x.Id == value) ? true : false;
+                IsBPJS = Insurances.Any(x => x.IsBPJSKesehatan == true && x.Id == value) ? true : false;
             }
         }
 
@@ -127,7 +127,7 @@
             if (e is null)
                 return;
 
-            IsBPJS = Insurances.Any(x => x.IsBPJS == true && x.Id == e.Id);
+            IsBPJS = Insurances.Any(x => x.IsBPJSKesehatan == true && x.Id == e.Id);
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -335,7 +335,7 @@
                 BPJSIntegration = new();
                 DeletedBPJSID = 0;
                 InsurancePoliciyForm = SelectedDataItems[0].Adapt<InsurancePolicyDto>();
-                IsBPJS = Insurances.Any(x => x.IsBPJS == true && x.Id == InsurancePoliciyForm.InsuranceId);
+                IsBPJS = Insurances.Any(x => x.IsBPJSKesehatan == true && x.Id == InsurancePoliciyForm.InsuranceId);
                 if (IsBPJS)
                 {
                     var BPJSIntegration = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == InsurancePoliciyForm.Id));

@@ -22,29 +22,31 @@ namespace McDermott.Application.Dtos.Transaction
         [Required]
         public string? AreaOfYard { get; set; }
         public bool RibbonSpecialCase { get; set; } = false;
+        public string? Sent { get; set; }
         public string? EmployeeClass { get; set; }
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? EstimatedDisability { get; set; }
 
         public EnumStatusAccident SentStatus { get; set; } = EnumStatusAccident.ReturnToWork;
         public string StatusName => SentStatus.GetDisplayName();
+        public string? EmployeeDescription { get; set; }
 
 
         #region Employee Cause Of Injury
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury1 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury2 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury3 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury4 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury5 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury6 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury7 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury8 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury9 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury10 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury11 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury12 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury13 { get; set; }
-        public IEnumerable<string> SelectedEmployeeCauseOfInjury14 { get; set; }
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury1 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury2 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury3 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury4 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury5 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury6 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury7 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury8 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury9 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury10 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury11 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury12 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury13 { get; set; } = [];
+        public IEnumerable<string> SelectedEmployeeCauseOfInjury14 { get; set; } = [];
 
         public string? EmployeeCauseOfInjury1 { get; set; }
         public string? EmployeeCauseOfInjury2 { get; set; }
