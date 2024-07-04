@@ -1098,7 +1098,7 @@ else
             <ToolbarTemplate>
                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOut_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed)" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOut_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && !isActiveButton" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOut_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed" />
                     <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && IsPopUpForm && isActiveButton" />
                 </DxToolbar>
             </ToolbarTemplate>
