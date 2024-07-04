@@ -145,6 +145,10 @@ namespace McDermott.Application.Dtos.Config
         public DateTime? JoinDate { get; set; }
         public List<long>? DoctorServiceIds { get; set; } = [];
         public List<long> PatientAllergyIds { get; set; } = new List<long>();
+        public long? SupervisorId { get; set; }  // ID Supervisor
+
+        [SetToNull]
+        public UserDto? Supervisor { get; set; }  // Referensi ke Supervisor
 
         [SetToNull]
         public virtual SpecialityDto? Speciality { get; set; }

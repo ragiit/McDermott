@@ -345,7 +345,7 @@ else
             InsurancePoliciyForm.InsuranceId = value;
             _InsuranceId = value;
 
-            IsBPJS = Insurances.Any(x => x.IsBPJS == true && x.Id == value) ? true : false;
+            IsBPJS = Insurances.Any(x => x.IsBPJSKesehatan == true && x.Id == value) ? true : false;
         }
     }
 

@@ -1140,7 +1140,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 if (PaymentMethod.Equals("BPJS"))
                 {
-                    var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS == true).ToList();
+                    var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJSKesehatan == true).ToList();
                     Temps = all.Select(x => new InsuranceTemp
                     {
                         InsurancePolicyId = x.Id,
@@ -1151,7 +1151,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                 {
-                    var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS != true).ToList();
+                    var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJSKesehatan != true).ToList();
                     Temps = all.Select(x => new InsuranceTemp
                     {
                         InsurancePolicyId = x.Id,
@@ -1737,11 +1737,11 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             if (PaymentMethod.Equals("BPJS"))
             {
-                Insurances = AllInsurances.Where(x => InsurancePolicies.Select(z => z.InsuranceId).Contains(x.Id) && x.IsBPJS == true).ToList();
+                Insurances = AllInsurances.Where(x => InsurancePolicies.Select(z => z.InsuranceId).Contains(x.Id) && x.IsBPJSKesehatan == true).ToList();
             }
             else
             {
-                Insurances = AllInsurances.Where(x => InsurancePolicies.Select(z => z.InsuranceId).Contains(x.Id) && x.IsBPJS == false).ToList();
+                Insurances = AllInsurances.Where(x => InsurancePolicies.Select(z => z.InsuranceId).Contains(x.Id) && x.IsBPJSKesehatan == false).ToList();
             }
         }
 
@@ -2186,7 +2186,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 if (FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS"))
                 {
-                    var all = InsurancePolicies.Where(x => x.UserId == FormRegis.PatientId && x.Insurance is not null && x.Insurance.IsBPJS == true && x.Active == true).ToList();
+                    var all = InsurancePolicies.Where(x => x.UserId == FormRegis.PatientId && x.Insurance is not null && x.Insurance.IsBPJSKesehatan == true && x.Active == true).ToList();
                     Temps = all.Select(x => new InsuranceTemp
                     {
                         InsurancePolicyId = x.Id,
@@ -2197,7 +2197,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                 {
-                    var all = InsurancePolicies.Where(x => x.UserId == FormRegis.PatientId && x.Insurance is not null && x.Insurance.IsBPJS != true && x.Active == true).ToList();
+                    var all = InsurancePolicies.Where(x => x.UserId == FormRegis.PatientId && x.Insurance is not null && x.Insurance.IsBPJSKesehatan != true && x.Active == true).ToList();
                     Temps = all.Select(x => new InsuranceTemp
                     {
                         InsurancePolicyId = x.Id,
@@ -2940,7 +2940,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             if (PaymentMethod.Equals("BPJS"))
             {
-                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS == true && x.Active == true).ToList();
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJSKesehatan == true && x.Active == true).ToList();
                 Temps = all.Select(x => new InsuranceTemp
                 {
                     InsurancePolicyId = x.Id,
@@ -2951,7 +2951,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             else
             {
-                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJS != true && x.Active == true).ToList();
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance.IsBPJSKesehatan != true && x.Active == true).ToList();
                 Temps = all.Select(x => new InsuranceTemp
                 {
                     InsurancePolicyId = x.Id,
@@ -3102,7 +3102,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             if (FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS"))
             {
-                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance != null && x.Insurance.IsBPJS == true).ToList();
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == true).ToList();
                 Temps = all.Select(x => new InsuranceTemp
                 {
                     InsurancePolicyId = x.Id,
@@ -3113,7 +3113,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             else
             {
-                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance != null && x.Insurance.IsBPJS != true).ToList();
+                var all = InsurancePolicies.Where(x => x.UserId == PatientsId && x.Insurance != null && x.Insurance.IsBPJSKesehatan != true).ToList();
                 Temps = all.Select(x => new InsuranceTemp
                 {
                     InsurancePolicyId = x.Id,
@@ -3190,6 +3190,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<UserDto> Users = [];
         public byte[]? DocumentContent;
         private bool isPrint { get; set; } = false;
+
         private async void SendToPrint(long? grid)
         {
             try
@@ -3227,7 +3228,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                 string WordDays = ConvertNumberHelper.ConvertNumberToWord(TotalDays);
 
                 string todays = data.RegistrationDate.ToString("dddd", culture);
-
 
                 //Gender
                 string Gender = "";
@@ -3270,17 +3270,15 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 //// Panggil JavaScript untuk membuka dan mencetak dokumen
                 //await JsRuntime.InvokeVoidAsync("printDocument", base64String);
-
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
         }
-        #endregion
+
+        #endregion Print
     }
 
     #endregion Function
-
-
 }

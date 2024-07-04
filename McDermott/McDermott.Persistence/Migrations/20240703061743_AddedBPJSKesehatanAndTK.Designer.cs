@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240703061743_AddedBPJSKesehatanAndTK")]
+    partial class AddedBPJSKesehatanAndTK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2574,6 +2577,7 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasMaxLength(5)
                         .HasColumnType("nvarchar(5)");
 
@@ -2598,6 +2602,7 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Type")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
@@ -5118,9 +5123,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("StrNo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("SupervisorId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("TypeId")
                         .HasColumnType("nvarchar(max)");
 
@@ -5190,8 +5192,6 @@ namespace McDermott.Persistence.Migrations
                         .HasFilter("[SAP] IS NOT NULL");
 
                     b.HasIndex("SpecialityId");
-
-                    b.HasIndex("SupervisorId");
 
                     b.ToTable("Users");
                 });
@@ -6599,11 +6599,6 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("SpecialityId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.User", "Supervisor")
-                        .WithMany()
-                        .HasForeignKey("SupervisorId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Degree");
 
                     b.Navigation("Department");
@@ -6637,8 +6632,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Religion");
 
                     b.Navigation("Speciality");
-
-                    b.Navigation("Supervisor");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Village", b =>

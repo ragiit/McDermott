@@ -1,124 +1,126 @@
 ﻿@page "/medical/insurance"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Master Data Insurance</PageTitle>
+<PageTitle>McHealthCare - Insurance</PageTitle>
 
 @if (IsAccess)
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Insurance" />
+        <BaseHeaderPage Title="Insurance" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
                         <div class="card">
-                            <div class="card-body">
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
-                                                Text="Fetching Data...">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
 
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="Insurances"
-                                            PageSize="10"
-                                            TextWrapEnabled="false"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            EditModelSaving="OnSave"
-                                            DataItemDeleting="OnDelete"
-                                            EditMode="GridEditMode.PopupEditForm"
-                                            AllowSelectRowByClick="true"
-                                            PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            ShowFilterRow="true"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            EditorRenderMode="GridEditorRenderMode.Detached"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
-                                        <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Insurances.Count > 0" />
-                                                <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Insurances.Count > 0" />
-                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                            </DxToolbar>
-                                        </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Code" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="IsBPJS" Caption="BPJS" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Type" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Presentase" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="AdminFee" Caption="Admin Fee %" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="AdminFeeMax" Caption="Admin Fee Max" />
-                                        </Columns>
-                                        <EditFormTemplate Context="EditFormContext">
-                                            @{
-                                                var a = (InsuranceDto)EditFormContext.EditModel;
-                                            }
-                                            <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption"
-                                                                  Caption="Name" ColSpanMd="12">
-                                                    <div class="pop-warning">
-                                                        @EditFormContext.GetEditor("Name")
-                                                    </div>
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
-                                                                  Caption="Code" ColSpanMd="12">
-                                                    @EditFormContext.GetEditor("Code")
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
-                                                                  Caption="Type" ColSpanMd="12">
-                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                Data="@Types" @bind-Value="@a.Type" NullText="Types" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
-                                                                  Caption="Admin Fee %" ColSpanMd="12">
-                                                    @EditFormContext.GetEditor("AdminFee")
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
-                                                                  Caption="Presentase %" ColSpanMd="12">
-                                                    @EditFormContext.GetEditor("Presentase")
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
-                                                                  Caption="Admin Fee Max" ColSpanMd="12">
-                                                    @EditFormContext.GetEditor("AdminFeeMax")
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption"
-                                                                  Caption="BPJS" ColSpanMd="3">
-                                                    <DxCheckBox @bind-Checked="a.IsBPJS" />
-                                                </DxFormLayoutItem>
-                                            </DxFormLayout>
-                                        </EditFormTemplate>
-                                    </DxGrid>
-                                </DxLoadingPanel>
-                            </div>
+                                <MyGrid @ref="Grid"
+                                        Data="Insurances"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        KeyFieldName="Id"
+                                        EditModelSaving="OnSave"
+                                        DataItemDeleting="OnDelete"
+                                        FocusedRowChanged="Grid_FocusedRowChanged">
+
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="InsuranceDto"
+                                                         Items="@Insurances"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="false"
+                                                         Grid="Grid"
+                                                         VisibleNew="UserAccessCRUID.Create"
+                                                         VisibleEdit="UserAccessCRUID.Update"
+                                                         VisibleDelete="UserAccessCRUID.Delete" />
+                                    </ToolbarTemplate>
+
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Code" Visible="false" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="IsBPJSKesehatan" Caption="BPJS KS" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="IsBPJSTK" Caption="BPJS TK" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Type" Visible="false" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Presentase" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="AdminFee" Caption="Admin Fee %" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="AdminFeeMax" Caption="Admin Fee Max" />
+                                    </Columns>
+
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (InsuranceDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem Caption="Name" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@a.Name"
+                                                           NullText="Name" />
+                                                <ValidationMessage For="@(() => a.Name)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem Caption="Code" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@a.Code"
+                                                           NullText="Code" />
+                                                <ValidationMessage For="@(() => a.Code)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Payment Method" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Types"
+                                                              NullText="Select Type..."
+                                                              @bind-Value="a.Type">
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(() => a.Type)" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Admin Fee" ColSpanMd="12">
+                                                <DxSpinEdit ShowValidationIcon="true"
+                                                            MinValue="0"
+                                                            @bind-Value="@a.AdminFee"
+                                                            NullText="AdminFee"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                <ValidationMessage For="@(()=> a.AdminFee)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Presentase %" ColSpanMd="12">
+                                                <DxSpinEdit ShowValidationIcon="true"
+                                                            MinValue="0"
+                                                            @bind-Value="@a.Presentase"
+                                                            NullText="Presentase %"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                <ValidationMessage For="@(()=> a.Presentase)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Admin Fee Max" ColSpanMd="12">
+                                                <DxSpinEdit ShowValidationIcon="true"
+                                                            MinValue="0"
+                                                            @bind-Value="@a.AdminFeeMax"
+                                                            NullText="Admin Fee Max"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                <ValidationMessage For="@(()=> a.AdminFeeMax)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption"
+                                                              Caption="BPJS Kesehatan" ColSpanMd="3">
+                                                <DxCheckBox @bind-Checked="a.IsBPJSKesehatan" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption"
+                                                              Caption="BPJS TK" ColSpanMd="3">
+                                                <DxCheckBox @bind-Checked="a.IsBPJSTK" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </MyGrid>
+                            </DxLoadingPanel>
                         </div>
                     </div>
                 </div>
@@ -128,9 +130,5 @@
 }
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Insurance" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <LoadingIndicatorLayout />
 }
