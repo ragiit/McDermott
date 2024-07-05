@@ -989,7 +989,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
                 return;
 
-            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+            if (e.Equals("BPJS"))
+                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+            else
+                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && (x.Insurance.IsBPJSKesehatan == false || x.Insurance.IsBPJSTK == false) && x.Active == true));
         }
 
         private void SelectedItemRegisTypeChangedReferTo(String e)
@@ -2036,7 +2039,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             Services = await Mediator.Send(new GetServiceQuery());
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
             Awareness = await Mediator.Send(new GetAwarenessQuery());
-
+            Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
             Allergies = await Mediator.Send(new GetAllergyQuery());
             Allergies.ForEach(x =>
             {
@@ -2219,7 +2222,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                         StagingText = EnumStatusGeneralConsultantService.Finished;
                         GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id));
 
-                        if (GeneralConsultanService.PratitionerId is not null)
+                        if (GeneralConsultanService.PratitionerId is null)
                         {
                             if (!Convert.ToBoolean(UserLogin.IsEmployee) && !Convert.ToBoolean(UserLogin.IsPatient) && Convert.ToBoolean(UserLogin.IsUser) && !Convert.ToBoolean(UserLogin.IsNurse) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
                             {
