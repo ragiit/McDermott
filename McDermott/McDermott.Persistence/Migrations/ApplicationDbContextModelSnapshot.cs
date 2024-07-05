@@ -46,8 +46,11 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("AreaOfYard")
+                    b.Property<string>("AccidentLocation")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AreaOfYard")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
@@ -64,7 +67,7 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DepartmentId")
+                    b.Property<long?>("DepartmentId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("EmployeeCauseOfInjury1")
@@ -112,11 +115,17 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("EmployeeClass")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("EmployeeId")
+                    b.Property<string>("EmployeeDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("EmployeeId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("EstimatedDisability")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("GeneralConsultanServiceId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("NatureOfInjury1")
                         .HasColumnType("nvarchar(max)");
@@ -345,7 +354,10 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SentStatus")
+                    b.Property<string>("Sent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("Treatment1")
@@ -380,6 +392,8 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("EmployeeId");
+
+                    b.HasIndex("GeneralConsultanServiceId");
 
                     b.ToTable("Accidents");
                 });
@@ -5269,18 +5283,24 @@ namespace McDermott.Persistence.Migrations
                     b.HasOne("McDermott.Domain.Entities.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.User", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
+                        .WithMany("Accidents")
+                        .HasForeignKey("GeneralConsultanServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Department");
 
                     b.Navigation("Employee");
+
+                    b.Navigation("GeneralConsultanService");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.ActiveComponent", b =>
@@ -5737,7 +5757,7 @@ namespace McDermott.Persistence.Migrations
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
                         .WithMany("GeneralConsultationLogs")
                         .HasForeignKey("GeneralConsultanServiceId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanMedicalSupport", "ProcedureRoom")
                         .WithMany()
@@ -6742,6 +6762,8 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanService", b =>
                 {
+                    b.Navigation("Accidents");
+
                     b.Navigation("GeneralConsultanCPPTs");
 
                     b.Navigation("GeneralConsultanMedicalSupports");

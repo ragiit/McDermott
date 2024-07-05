@@ -149,21 +149,21 @@
             position: sticky;
             top: 60px;
             z-index: 1;
-            background-color: rgba(252, 247, 246, 0.99);
+            /* background-color: rgba(252, 247, 246, 0.99); */
+            background-color: rgba(255, 255, 255);
             border-radius: 8px;
-            padding: 8px 5px 0 5px;
+            padding: 8px 5px 1px 5px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
         }
 
         .dxbl-tabs {
             display: inline !important;
-            border-top:1px !important;
+            border-top: 1px !important;
         }
 
         /* .dxbl-btn-standalone.dxbl-btn-primary {
-                                                                                                                                                                                                                                                                                                                                                                                            border-radius: 13px !important;
-                                                                                                                                                                                                                                                                                                                                                                                        } */
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            border-radius: 13px !important;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
 
         .rounded-button .dxbl-toolbar-item {
             border-radius: 50px;
@@ -177,6 +177,7 @@
             .rounded-button .dxbl-toolbar-item:active {
                 background-color: #e0e0e0;
             }
+
         .dxbl-btn-standalone {
             border-radius: 10px !important;
             padding-inline-start: 25px !important;
@@ -184,18 +185,17 @@
             box-shadow: 1px 4px 6px rgba(0, 0, 0, 0.3) !important;
         }
 
-         .dxbl-tabs > .dxbl-tabs-tablist > .dxbl-scroll-viewer > .dxbl-scroll-viewer-content > ul > li > .dxbl-tabs-item:not(.dxbl-tabs-tmpl):not(.dxbl-disabled):not(:disabled).dxbl-active {
+        .dxbl-tabs > .dxbl-tabs-tablist > .dxbl-scroll-viewer > .dxbl-scroll-viewer-content > ul > li > .dxbl-tabs-item:not(.dxbl-tabs-tmpl):not(.dxbl-disabled):not(:disabled).dxbl-active {
             background-color: rgb(10, 172, 200 ) !important;
             color: white !important;
             font-weight: bolder;
-            border:1px solid;
-            box-shadow: rgba(0,2, 5, 0.24)  1px 3px  8px;
+            border: 1px solid;
+            box-shadow: rgba(0,2, 5, 0.24) 1px 3px 8px;
+        }
 
-        } 
-
-         .dxbl-tabs-item {
+        .dxbl-tabs-item {
             border-radius: 20px !important;
-        } 
+        }
 
         .dxbl-tabs > .dxbl-tabs-tablist {
             border-radius: 20px !important;
@@ -412,7 +412,6 @@
                 URL.revokeObjectURL(url);
             }, 1000); // Sesuaikan waktu tunggu jika diperlukan
         }
-
 
     </script>
 

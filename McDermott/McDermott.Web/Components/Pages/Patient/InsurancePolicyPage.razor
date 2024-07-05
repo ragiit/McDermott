@@ -13,20 +13,20 @@
         @if (!IsPopUpForm)
         {
             @* <section class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1>Patients</h1>
-                        </div>
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/">Home</a></li>
-                                <li class="breadcrumb-item" @onclick="() => LoadData(true)"><a href="/patient/insurance-policy">Insurance Policy</a></li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-            </section> *@
+    <div class="container-fluid">
+    <div class="row mb-2">
+    <div class="col-sm-6">
+    <h1>Patients</h1>
+    </div>
+    <div class="col-sm-6">
+    <ol class="breadcrumb float-sm-right">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item" @onclick="() => LoadData(true)"><a href="/patient/insurance-policy">Insurance Policy</a></li>
+    </ol>
+    </div>
+    </div>
+    </div>
+    </section> *@
 
             <BaseHeaderPage Title="Insurance Policy" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
 
@@ -51,23 +51,22 @@
                     <div class="row">
                         <div class="col">
                             <div class="card">
-                                    <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+                                <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
-                                    <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                    IsContentBlocked="true"
-                                                    ApplyBackgroundShading="true"
-                                                    IndicatorAreaVisible="false"
-                                                    Text="Fetching Data...">
-                                        <MyGrid @ref="Grid"
-                                                Data="InsurancePolicies"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                KeyFieldName="Id"
-                                                EditModelSaving="OnSave"
-                                                DataItemDeleting="OnDelete"
-                                                RowDoubleClick="EditItem_Click"
-                                                FocusedRowChanged="Grid_FocusedRowChanged">
-
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <MyGrid @ref="Grid"
+                                            Data="InsurancePolicies"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            KeyFieldName="Id"
+                                            EditModelSaving="OnSave"
+                                            DataItemDeleting="OnDelete"
+                                            RowDoubleClick="EditItem_Click"
+                                            FocusedRowChanged="Grid_FocusedRowChanged">
 
                                         <ToolbarTemplate>
                                             <MyDxToolbarBase TItem="InsurancePolicyDto"
@@ -79,37 +78,37 @@
                                                              Refresh_Click="@Refresh_Click"
                                                              IsImport="false"
                                                              Grid="Grid"
-                                                             VisibleNew="UserAccessCRUID.Create"
+                                                             VisibleNew="@(IsPopUpForm ? true : false)"
                                                              VisibleEdit="UserAccessCRUID.Update"
                                                              VisibleDelete="UserAccessCRUID.Delete" />
                                         </ToolbarTemplate>
 
-                                           @*  <ToolbarTemplate>
-                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Countries.Count > 0" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Countries.Count > 0" />
-                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                        <Items>
-                                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                        </Items>
-                                                    </DxToolbarItem>
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Import" Click="@ImportFile" Text="Import" IconCssClass="fa-solid fa-file-import" />
-                                                </DxToolbar>
-                                            </ToolbarTemplate> *@
-                                            <Columns>
-                                                <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn FieldName="User.Name" Caption="Patient" SortIndex="0" />
-                                                <DxGridDataColumn FieldName="Insurance.Name" Caption="Insurance Company" />
-                                                <DxGridDataColumn FieldName="PolicyNumber" Caption="Policy Number" />
-                                                <DxGridDataColumn FieldName="Active" />
-                                            </Columns>
-                                        </MyGrid>
-                                    </DxLoadingPanel>
+                                        @*  <ToolbarTemplate>
+                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Countries.Count > 0" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Countries.Count > 0" />
+                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                <Items>
+                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                </Items>
+                                </DxToolbarItem>
+                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Click="@ImportFile" Text="Import" IconCssClass="fa-solid fa-file-import" />
+                                </DxToolbar>
+                                </ToolbarTemplate> *@
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="User.Name" Caption="Patient" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Insurance.Name" Caption="Insurance Company" />
+                                            <DxGridDataColumn FieldName="PolicyNumber" Caption="Policy Number" />
+                                            <DxGridDataColumn FieldName="Active" />
+                                        </Columns>
+                                    </MyGrid>
+                                </DxLoadingPanel>
                             </div>
                         </div>
                     </div>

@@ -8,22 +8,22 @@ namespace McDermott.Domain.Entities
 {
     public class Accident : BaseAuditableEntity
     {
-        [Required]
-        public long EmployeeId { get; set; }
-        public long DepartmentId { get; set; }
+        public long GeneralConsultanServiceId { get; set; }
 
         [Display(Name = "Date Of Occurrence")]
         [Required]
         public DateTime? DateOfOccurrence { get; set; }
         [Required]
         public DateTime? DateOfFirstTreatment { get; set; }
-        [Required]
-        public string? AreaOfYard { get; set; }
         public bool RibbonSpecialCase { get; set; } = false;
+        public string? Sent { get; set; }
         public string? EmployeeClass { get; set; }
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? EstimatedDisability { get; set; }
-        public EnumStatusAccident SentStatus { get; set; } = EnumStatusAccident.ReturnToWork;
+        public string? AreaOfYard { get; set; }
+        public EnumStatusAccident Status { get; set; } = EnumStatusAccident.Draft;
+        public string? EmployeeDescription { get; set; }
+        public string AccidentLocation { get; set; } = "Inside";
 
         #region Employee Cause Of Injury
         public List<string> SelectedEmployeeCauseOfInjury1 { get; set; } = [];
@@ -126,6 +126,9 @@ namespace McDermott.Domain.Entities
         public string? Treatment6 { get; set; }
         public string? Treatment7 { get; set; }
         #endregion
+
+        [SetToNull]
+        public virtual GeneralConsultanService? GeneralConsultanService { get; set; }
 
         [SetToNull]
         public virtual User? Employee { get; set; }

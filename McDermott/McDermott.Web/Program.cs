@@ -6,6 +6,7 @@ using McDermott.Web.Hubs;
 using McDermott.Application.Interfaces.Repositories;
 using McDermott.Application.Features.Queries;
 using Microsoft.AspNetCore.Authorization;
+using McDermott.Persistence.Context;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -76,5 +77,38 @@ app.UseAntiforgery();
 app.MapHub<RealTimeHub>("/realTimeHub");
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+
+//// Tambahkan migrasi otomatis di sini
+//using (var scope = app.Services.CreateScope())
+//{
+//    var services = scope.ServiceProvider;
+//    try
+//    {
+//        var context = services.GetRequiredService<ApplicationDbContext>(); // Ganti dengan nama DbContext Anda
+//        context.Database.Migrate();
+//    }
+//    catch (Exception ex)
+//    {
+//        var logger = services.GetRequiredService<ILogger<Program>>();
+//        logger.LogError(ex, "An error occurred while migrating the database.");
+//    }
+//}
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>(); // Ganti dengan nama DbContext Anda
+        //context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database.");
+    }
+}
+
 
 app.Run();

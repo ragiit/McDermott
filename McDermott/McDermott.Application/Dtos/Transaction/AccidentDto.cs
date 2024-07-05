@@ -9,28 +9,24 @@ namespace McDermott.Application.Dtos.Transaction
     public class AccidentDto : IMapFrom<Accident>
     {
         public long Id { get; set; }
-
-        [Required]
-        public long? EmployeeId { get; set; }
-        public long DepartmentId { get; set; }
+        public long GeneralConsultanServiceId { get; set; }
 
         [Display(Name = "Date Of Occurrence")]
         [Required]
         public DateTime? DateOfOccurrence { get; set; }
         [Required]
         public DateTime? DateOfFirstTreatment { get; set; }
-        [Required]
-        public string? AreaOfYard { get; set; }
         public bool RibbonSpecialCase { get; set; } = false;
         public string? Sent { get; set; }
         public string? EmployeeClass { get; set; }
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? EstimatedDisability { get; set; }
+        public string? AreaOfYard { get; set; }
 
-        public EnumStatusAccident SentStatus { get; set; } = EnumStatusAccident.ReturnToWork;
-        public string StatusName => SentStatus.GetDisplayName();
+        public EnumStatusAccident Status { get; set; } = EnumStatusAccident.Draft;
+        public string StatusName => Status.GetDisplayName();
         public string? EmployeeDescription { get; set; }
-
+        public string AccidentLocation { get; set; } = "Inside";
 
         #region Employee Cause Of Injury
         public IEnumerable<string> SelectedEmployeeCauseOfInjury1 { get; set; } = [];
@@ -134,6 +130,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? Treatment7 { get; set; }
         #endregion
 
+        public virtual GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
         public virtual UserDto? Employee { get; set; }
         public virtual DepartmentDto? Department { get; set; }
     }
