@@ -1,12 +1,12 @@
+
 using McDermott.Application.Extentions;
+using McDermott.Persistence.Context;
 using McDermott.Persistence.Extensions;
 using McDermott.Web.Components;
-using Serilog;
 using McDermott.Web.Hubs;
-using McDermott.Application.Interfaces.Repositories;
-using McDermott.Application.Features.Queries;
 using Microsoft.AspNetCore.Authorization;
-using McDermott.Persistence.Context;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -78,35 +78,21 @@ app.MapHub<RealTimeHub>("/realTimeHub");
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
-//// Tambahkan migrasi otomatis di sini
-//using (var scope = app.Services.CreateScope())
-//{
-//    var services = scope.ServiceProvider;
-//    try
-//    {
-//        var context = services.GetRequiredService<ApplicationDbContext>(); // Ganti dengan nama DbContext Anda
-//        context.Database.Migrate();
-//    }
-//    catch (Exception ex)
-//    {
-//        var logger = services.GetRequiredService<ILogger<Program>>();
-//        logger.LogError(ex, "An error occurred while migrating the database.");
-//    }
-//}
 
-
+// Menjalankan migrasi otomatis
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<ApplicationDbContext>(); // Ganti dengan nama DbContext Anda
-        //context.Database.Migrate();
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate();
+        Console.WriteLine("Successfully Migrate the database");
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating the database.");
+        Console.WriteLine("Error occurred while migrating the database.");
+        Console.WriteLine(ex.Message);
     }
 }
 
