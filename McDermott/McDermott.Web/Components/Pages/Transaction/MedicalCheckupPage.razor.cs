@@ -237,6 +237,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             try
             {
                 GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>().Id))).FirstOrDefault() ?? new();
+                Physicions = (await Mediator.Send(new GetUserQuery(x => x.DoctorServiceIds != null && x.DoctorServiceIds.Contains(GeneralConsultanService.ServiceId.GetValueOrDefault()))));
+                GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId) ?? new();
                 if (GeneralConsultanService is not null)
                 {
                     if (GeneralConsultanService.IsBatam)
@@ -342,6 +344,47 @@ namespace McDermott.Web.Components.Pages.Transaction
             await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
 
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "medical_checkup_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Patient",
+                    Notes = "Mandatory \nNIP/Oracle/SAP"
+                },
+                new()
+                {
+                    Column = "Service",
+                    Notes = "Mandatory"
+                },
+                 new()
+                {
+                    Column = "Physicion"
+                },
+                new()
+                {
+                    Column = "MCU Type",
+                    Notes = "Mandatory \nSelect one: \nAnnual MCU \nPre Employment MCU \nOil & Gas UK \nHIV & AIDS \nCovid19* \nDrug & Alcohol Test \nMaternity Checkup"
+                },
+                new()
+                {
+                    Column = "Medex Type ",
+                    Notes = "Mandatory \nSelect one: \nCANDIDATE EMPLOYEE PEA \nPRE-EMPLOYMENT POST PEA \nPRE-EMPLOYMENT FULL"
+                },
+                new()
+                {
+                    Column = "Candidate Form",
+                    Notes = "Mandatory \nSelect one: \nBatam \nOutside Batam"
+                },
+                new()
+                {
+                    Column = "Registration Date",
+                    Notes = "Mandatory \nDD-MM-YYYY"
+                },
+            ]);
+        }
+
         public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
             IsLoading = true;
@@ -357,7 +400,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Patient", "MCU Type", "Medex Type", "Candidate Form", "Registration Date" };
+                    var headerNames = new List<string>() { "Patient", "Service", "Physicion", "MCU Type", "Medex Type", "Candidate Form", "Registration Date" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
@@ -379,31 +422,54 @@ namespace McDermott.Web.Components.Pages.Transaction
                             return;
                         }
 
-                        var col2MCUType = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                        var colService = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                        var ser = Services.FirstOrDefault(x => x.Name == colService);
+                        if (ser is null)
+                        {
+                            ShowErrorImport(row, 2, colService);
+                            IsLoading = false;
+                            return;
+                        }
+
+                        var colPhysician = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        long? phyId = null;
+                        if (!string.IsNullOrWhiteSpace(colPhysician))
+                        {
+                            var cekPhys = (await Mediator.Send(new GetUserQuery(x => x.Name == colPhysician && x.DoctorServiceIds != null && x.DoctorServiceIds.Contains(ser.Id)))).FirstOrDefault();
+                            if (cekPhys is null)
+                            {
+                                ShowErrorImport(row, 3, colPhysician);
+                                IsLoading = false;
+                                return;
+                            }
+                            phyId = cekPhys.Id;
+                        }
+
+                        var col2MCUType = ws.Cells[row, 4].Value?.ToString()?.Trim();
                         if (MCUType.FirstOrDefault(x => x == col2MCUType) is null)
                         {
-                            ShowErrorImport(row, 2, col2MCUType);
+                            ShowErrorImport(row, 4, col2MCUType);
                             IsLoading = false;
                             return;
                         }
 
-                        var col3Medex = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        var col3Medex = ws.Cells[row, 5].Value?.ToString()?.Trim();
                         if (MedexType.FirstOrDefault(x => x == col3Medex) is null)
                         {
-                            ShowErrorImport(row, 3, col3Medex);
+                            ShowErrorImport(row, 5, col3Medex);
                             IsLoading = false;
                             return;
                         }
 
-                        var col4Candidate = ws.Cells[row, 4].Value?.ToString()?.Trim();
+                        var col4Candidate = ws.Cells[row, 6].Value?.ToString()?.Trim();
                         if (!col4Candidate.Equals("Batam") && !col4Candidate.Equals("Outside Batam"))
                         {
-                            ShowErrorImport(row, 4, col4Candidate);
+                            ShowErrorImport(row, 6, col4Candidate);
                             IsLoading = false;
                             return;
                         }
 
-                        var col5Date = ws.Cells[row, 5].Value?.ToString()?.Trim();
+                        var col5Date = ws.Cells[row, 7].Value?.ToString()?.Trim();
                         bool successDate = DateTime.TryParseExact(col5Date, "dd-MM-yyyy",
                                             CultureInfo.InvariantCulture,
                         DateTimeStyles.None,
@@ -411,7 +477,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                         if (!successDate)
                         {
-                            ShowErrorImport(row, 5, col5Date);
+                            ShowErrorImport(row, 7, col5Date);
                             IsLoading = false;
                             return;
                         }
@@ -423,6 +489,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                             RegistrationDate = dateValue,
                             IsMcu = true,
                             TypeMedical = col2MCUType,
+                            PratitionerId = phyId,
+                            ServiceId = ser.Id,
                             MedexType = col3Medex,
                             IsBatam = col4Candidate.Equals("Batam"),
                             IsOutsideBatam = col4Candidate.Equals("OutsideBatam"),
@@ -432,6 +500,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                                        x.TypeRegistration == b.TypeRegistration &&
                                        x.RegistrationDate == b.RegistrationDate &&
                                        x.IsMcu == b.IsMcu &&
+                                       x.ServiceId == ser.Id &&
+                                       x.PratitionerId == phyId &&
                                        x.TypeMedical == b.TypeMedical &&
                                        x.MedexType == b.MedexType &&
                                        x.IsBatam == b.IsBatam &&
@@ -499,38 +569,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                 ex.HandleException(ToastService);
             }
             IsLoading = false;
-        }
-
-        private async Task ExportToExcel()
-        {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "medical_checkup_template.xlsx",
-            [
-                new()
-                {
-                    Column = "Patient",
-                    Notes = "Mandatory \nNIP/Oracle/SAP"
-                },
-                new()
-                {
-                    Column = "MCU Type",
-                    Notes = "Mandatory \nSelect one: \nAnnual MCU \nPre Employment MCU \nOil & Gas UK \nHIV & AIDS \nCovid19* \nDrug & Alcohol Test \nMaternity Checkup"
-                },
-                new()
-                {
-                    Column = "Medex Type ",
-                    Notes = "Mandatory \nSelect one: \nCANDIDATE EMPLOYEE PEA \nPRE-EMPLOYMENT POST PEA \nPRE-EMPLOYMENT FULL"
-                },
-                new()
-                {
-                    Column = "Candidate Form",
-                    Notes = "Mandatory \nSelect one: \nBatam \nOutside Batam"
-                },
-                new()
-                {
-                    Column = "Registration Date",
-                    Notes = "Mandatory \nDD-MM-YYYY"
-                },
-            ]);
         }
 
         private async Task OnInvalidSubmitSave()

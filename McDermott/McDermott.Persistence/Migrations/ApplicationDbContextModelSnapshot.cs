@@ -6394,9 +6394,9 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.SickLeave", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultans")
-                        .WithMany()
+                        .WithMany("SickLeaves")
                         .HasForeignKey("GeneralConsultansId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("GeneralConsultans");
                 });
@@ -6771,6 +6771,8 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("GeneralConsultantClinicalAssesments");
 
                     b.Navigation("GeneralConsultationLogs");
+
+                    b.Navigation("SickLeaves");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Group", b =>

@@ -83,15 +83,19 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
+        Log.Information("=== ===");
+        Log.Information("=== Starting Migrate the database. ===");
         var context = services.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate();
-        Console.WriteLine("Successfully Migrate the database");
     }
     catch (Exception ex)
     {
-        Console.WriteLine("Error occurred while migrating the database.");
-        Console.WriteLine(ex.Message);
+        Log.Error("Error occurred while migrating the database.");
         Log.Error(ex.Message);
+    }
+    finally
+    {
+        Log.Information("=== ===");
     }
 }
 
