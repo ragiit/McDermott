@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using DevExpress.Blazor.RichEdit;
+using System.ComponentModel;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction
@@ -7,7 +8,9 @@ namespace McDermott.Web.Components.Pages.Transaction
     {
         #region UserLoginAndAccessRole
 
-        private bool IsStatus(EnumStatusGeneralConsultantService status) => GeneralConsultanService.Status == status;
+        private bool IsStatus(EnumStatusAccident status) => Accident.Status == status;
+
+        private bool IsStatusGenSet(EnumStatusGeneralConsultantService status) => GeneralConsultanService.Status == status;
 
         [Inject]
         public UserInfoService UserInfoService { get; set; }
@@ -39,6 +42,76 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 await LoadComboBox();
                 StateHasChanged();
+
+                try
+                {
+                    // Retrieve the 'id' query parameter from the URL
+                    var query = new Uri(NavigationManager.Uri).Query;
+                    var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(query);
+
+                    if (queryParams.TryGetValue("id", out var idParam))
+                    {
+                        if (long.TryParse(idParam, out var id))
+                        {
+                            ShowForm = true;
+                            IsLoading = true;
+                            Id = id;
+                            GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id))).FirstOrDefault() ?? new();
+
+                            await LoadSelectedData();
+                            IsLoading = false;
+                        }
+                    }
+                    StateHasChanged();
+                }
+                catch (Exception ex)
+                {
+                    var aaa = ex;
+                }
+            }
+        }
+
+        public byte[]? DocumentContent;
+        private bool isPrint { get; set; } = false;
+        private DxRichEdit richEdit;
+        private DevExpress.Blazor.RichEdit.Document documentAPI;
+
+        private async Task PrintAccident()
+        {
+            try
+            {
+                if (GeneralConsultanService.Id == 0)
+                    return;
+
+                var gen = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanService.Id))).FirstOrDefault() ?? new();
+                var accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == gen.Id))).FirstOrDefault() ?? new();
+
+                var mergeFields = new Dictionary<string, string>
+                {
+                    {"%EmployeeName%", "dadadawd"},
+                    {"<<EmployeeName>>", "WKOWAKOAWO"},
+                    //{"%EmployeeName%", gen?.Patient?.Name.GetDefaultValue() ?? "-"},
+                    {"%EmployeeNIP%", gen?.Patient?.NIP?.GetDefaultValue() ?? "-"},
+                    {"%EmployeeDepartment%", gen?.Patient?.Department?.Name.GetDefaultValue() ?? "-"},
+                    {"%DateOfOccurence%", accident.DateOfOccurrence.GetValueOrDefault().ToString("dd MMM yyyy")},
+                    {"%TimeOccurence%", accident.DateOfOccurrence.GetValueOrDefault().ToString("HH:mm:ss")},
+                    {"%DateTreatment%", accident.DateOfFirstTreatment.GetValueOrDefault().ToString("dd MMM yyyy")},
+                    {"%TimeTreatment%", accident.DateOfFirstTreatment.GetValueOrDefault().ToString("HH:mm:ss")},
+                    {"%AreaOfYard%", accident.AreaOfYard?.GetDefaultValue() ?? "-"},
+                    {"%SupervisorName%", gen?.Patient?.Supervisor?.Name.GetDefaultValue() ?? "-"},
+                };
+
+                //Field dateField = await documentAPI.Fields.Cr(, "DATE");
+
+                //await documentAPI.Fields.UpdateAsync(dateField);
+
+                DocumentContent = await DocumentProvider.GetDocumentAsync("AccidentForm.docx", mergeFields);
+
+                isPrint = true;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
             }
         }
 
@@ -318,7 +391,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #endregion UserLoginAndAccessRole
 
-        private string StagingText = EnumStatusAccident.RestrictedWorkCase.GetDisplayName();
+        private EnumStatusAccident StagingText = EnumStatusAccident.MedicalTreatment;
 
         private bool PanelVisible { get; set; } = true;
         private bool ShowForm { get; set; } = false;
@@ -331,6 +404,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
 
         private GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
+        private List<GeneralConsultanServiceDto> GeneralConsultanServices { get; set; } = [];
 
         private async Task SelectedItemInsurancePolicyChanged(InsurancePolicyDto result)
         {
@@ -343,20 +417,35 @@ namespace McDermott.Web.Components.Pages.Transaction
             "BPJS"
         };
 
+        private List<string> AccidentLocations = new List<string>
+        {
+            "Inside",
+            "Outside"
+        };
+
         private async Task SelectedItemPaymentChanged(string e)
         {
             //GeneralConsultanService.Payment = null;
             //GeneralConsultanService.InsurancePolicyId = null;
             //SelectedInsurancePolicy = new();
 
-            //if (e is null)
-            //    return;
+            SelectedInsurancePolicy = new();
 
-            //InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+            if (e is null)
+                return;
+
+            await OnChangeInsuracePolicies(GeneralConsultanService.Patient, e);
         }
 
         private async Task SelectedItemPaymentChangedReferTo(string e)
         {
+            //SelectedInsurancePolicy = new();
+
+            //if (e.Equals("BPJS"))
+            //    InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+            //else
+            //    InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && (x.Insurance.IsBPJSKesehatan == false || x.Insurance.IsBPJSTK == false) && x.Active == true));
+
             //ReferToGeneralConsultanService.Payment = null;
             //ReferToGeneralConsultanService.InsurancePolicyId = null;
             //SelectedInsurancePolicyFollowUp = new();
@@ -397,8 +486,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsPopUpPainScale = true;
         }
 
+        private bool IsLoadingCPPT = false;
+
         private async Task OnClickSaveCPPT()
         {
+            IsLoadingCPPT = true;
             try
             {
                 await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(deleteByGeneralServiceId: GeneralConsultanService.Id));
@@ -412,6 +504,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 ex.HandleException(ToastService);
             }
+            IsLoadingCPPT = false;
         }
 
         private void GridTabCPPT_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -544,6 +637,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<UserDto> Employees = [];
 
         private string SelectedNIP { get; set; } = "-";
+        private string SelectedDepartment { get; set; } = "-";
 
         private async Task OnClickConfirm()
         {
@@ -552,31 +646,114 @@ namespace McDermott.Web.Components.Pages.Transaction
                 IsLoading = true;
                 if (Accident.Id != 0)
                 {
-                    switch (StagingText)
+                    if (GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS"))
                     {
-                        case "Restricted work case":
-                            Accident.SentStatus = EnumStatusAccident.RestrictedWorkCase;
-                            StagingText = EnumStatusAccident.LostWorkDaysCase.GetDisplayName();
-                            break;
+                        switch (Accident.Status)
+                        {
+                            case EnumStatusAccident.Draft:
+                                if (Accident.AccidentLocation.Equals("Inside"))
+                                {
+                                    Accident.Status = EnumStatusAccident.MedicalTreatment;
+                                }
+                                else
+                                {
+                                    if (Accident.Sent is not null && Accident.Sent.Equals("Hospital"))
+                                    {
+                                        Accident.Status = EnumStatusAccident.HospitalizationReferral;
+                                    }
+                                    else
+                                    {
+                                        Accident.Status = EnumStatusAccident.PatientControlMonitoring;
+                                    }
+                                }
+                                break;
 
-                        case "Lost Work days case":
-                            Accident.SentStatus = EnumStatusAccident.LostWorkDaysCase;
-                            StagingText = EnumStatusAccident.FatalityCase.GetDisplayName();
-                            break;
+                            case EnumStatusAccident.MedicalTreatment:
+                                if (Accident.AccidentLocation.Equals("Inside"))
+                                {
+                                    if (Accident.Sent is not null && Accident.Sent.Equals("Hospital"))
+                                    {
+                                        Accident.Status = EnumStatusAccident.HospitalizationReferral;
+                                    }
+                                    else
+                                    {
+                                        Accident.Status = EnumStatusAccident.PatientControlMonitoring;
+                                    }
+                                }
+                                break;
 
-                        case "Fatality case":
-                            Accident.SentStatus = EnumStatusAccident.FatalityCase;
-                            StagingText = EnumStatusAccident.FatalityCase.GetDisplayName();
-                            break;
+                            case EnumStatusAccident.HospitalizationReferral:
+                                if (Accident.AccidentLocation.Equals("Inside"))
+                                {
+                                    if (Accident.Sent is not null && Accident.Sent.Equals("Hospital"))
+                                    {
+                                        Accident.Status = EnumStatusAccident.PatientControlMonitoring;
+                                    }
+                                }
+                                else
+                                {
+                                    if (Accident.Sent is not null && Accident.Sent.Equals("Hospital"))
+                                    {
+                                        Accident.Status = EnumStatusAccident.PatientControlMonitoring;
+                                    }
+                                }
+                                break;
 
-                        default:
-                            break;
+                            case EnumStatusAccident.PatientControlMonitoring:
+                                Accident.Status = EnumStatusAccident.Done;
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (Accident.Status)
+                        {
+                            case EnumStatusAccident.Draft:
+                                if (Accident.AccidentLocation.Equals("Inside"))
+                                {
+                                    Accident.Status = EnumStatusAccident.MedicalTreatment;
+                                }
+                                else
+                                {
+                                    if (Accident.Sent is not null && Accident.Sent.Equals("Hospital"))
+                                    {
+                                        Accident.Status = EnumStatusAccident.HospitalizationReferral;
+                                    }
+                                    else
+                                    {
+                                        Accident.Status = EnumStatusAccident.Done;
+                                    }
+                                }
+                                break;
+
+                            case EnumStatusAccident.MedicalTreatment:
+                                if (Accident.AccidentLocation.Equals("Inside"))
+                                {
+                                    if (Accident.Sent is not null && Accident.Sent.Equals("Hospital"))
+                                    {
+                                        Accident.Status = EnumStatusAccident.HospitalizationReferral;
+                                    }
+                                    else
+                                        Accident.Status = EnumStatusAccident.Done;
+                                }
+                                break;
+
+                            case EnumStatusAccident.HospitalizationReferral:
+
+                                Accident.Status = EnumStatusAccident.Done;
+                                break;
+
+                            default:
+                                break;
+                        }
                     }
 
                     await Mediator.Send(new UpdateAccidentRequest(Accident));
 
-                    Accident.Employee = Employees.FirstOrDefault(x => x.Id == Accident.EmployeeId);
-                    Accident.Department = Departments.FirstOrDefault(x => x.Id == Accident.DepartmentId);
+                    RefreshStagingText();
                 }
             }
             catch (Exception ex)
@@ -587,15 +764,135 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsLoading = false;
         }
 
-        private void OnSelectEmployee(UserDto e)
+        private void RefreshStagingText()
+        {
+            if (GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS"))
+            {
+                switch (Accident.Status)
+                {
+                    case EnumStatusAccident.Draft:
+                        if (Accident.AccidentLocation.Equals("Inside"))
+                        {
+                            StagingText = EnumStatusAccident.MedicalTreatment;
+                        }
+                        else
+                        {
+                            if (Accident.Sent is not null && Accident.Sent.Equals("Hospital"))
+                            {
+                                StagingText = EnumStatusAccident.HospitalizationReferral;
+                            }
+                            else
+                            {
+                                StagingText = EnumStatusAccident.PatientControlMonitoring;
+                            }
+                        }
+                        break;
+
+                    case EnumStatusAccident.MedicalTreatment:
+                        if (Accident.AccidentLocation.Equals("Inside"))
+                        {
+                            if (Accident.Sent is not null && Accident.Sent.Equals("Hospital"))
+                            {
+                                StagingText = EnumStatusAccident.HospitalizationReferral;
+                            }
+                            else
+                            {
+                                StagingText = EnumStatusAccident.PatientControlMonitoring;
+                            }
+                        }
+                        break;
+
+                    case EnumStatusAccident.HospitalizationReferral:
+                        StagingText = EnumStatusAccident.PatientControlMonitoring;
+                        break;
+
+                    case EnumStatusAccident.PatientControlMonitoring:
+                        StagingText = EnumStatusAccident.Done;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                switch (Accident.Status)
+                {
+                    case EnumStatusAccident.Draft:
+                        if (Accident.AccidentLocation.Equals("Inside"))
+                        {
+                            StagingText = EnumStatusAccident.MedicalTreatment;
+                        }
+                        else
+                        {
+                            if (Accident.Sent is not null && Accident.Sent.Equals("Hospital"))
+                            {
+                                StagingText = EnumStatusAccident.HospitalizationReferral;
+                            }
+                            else
+                            {
+                                StagingText = EnumStatusAccident.Done;
+                            }
+                        }
+                        break;
+
+                    case EnumStatusAccident.MedicalTreatment:
+                        if (Accident.AccidentLocation.Equals("Inside"))
+                        {
+                            if (Accident.Sent is not null && Accident.Sent.Equals("Hospital"))
+                            {
+                                StagingText = EnumStatusAccident.HospitalizationReferral;
+                            }
+                            else
+                                StagingText = EnumStatusAccident.Done;
+                        }
+                        break;
+
+                    case EnumStatusAccident.HospitalizationReferral:
+
+                        StagingText = EnumStatusAccident.Done;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void RefreshDate()
+        {
+            Accident.DateOfFirstTreatment = DateTime.Now;
+            Accident.DateOfOccurrence = DateTime.Now;
+        }
+
+        private async Task OnSelectEmployee(UserDto e)
         {
             SelectedNIP = "-";
-            Accident.DepartmentId = 0;
+            SelectedDepartment = "-";
+            supName = "-";
+            SelectedInsurancePolicy = new();
+            GeneralConsultanService.Patient = new();
             if (e is null)
                 return;
 
-            Accident.DepartmentId = e.DepartmentId.GetValueOrDefault();
             SelectedNIP = e.NIP ?? "-";
+            SelectedDepartment = e.Department?.Name ?? "-";
+            supName = e.Supervisor?.Name ?? "-";
+
+            GeneralConsultanService.Patient = Employees.FirstOrDefault(x => x.Id == e.Id) ?? new();
+
+            await OnChangeInsuracePolicies(e, GeneralConsultanService.Payment);
+
+            //Accident.DepartmentId = e.DepartmentId.GetValueOrDefault();
+            //SelectedNIP = e.NIP ?? "-";
+        }
+
+        private async Task OnChangeInsuracePolicies(UserDto d, string ee)
+        {
+            if (ee.Equals("BPJS"))
+                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == d.Id && x.Insurance != null && x.Insurance.IsBPJSTK == ee.Equals("BPJS") && x.Active == true));
+            else if (ee.Equals("Insurance"))
+                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == d.Id && x.Insurance != null && (x.Insurance.IsBPJSTK == false || x.Insurance.IsBPJSKesehatan == false) && x.Active == true));
         }
 
         private string supName = string.Empty;
@@ -606,7 +903,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task RefreshSupervisorName()
         {
-            var selectedSupervisor = await Mediator.Send(new GetUserQuery(x => x.Id == Accident.EmployeeId));
+            var selectedSupervisor = await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId));
             var supervisor = selectedSupervisor.FirstOrDefault();
 
             if (supervisor != null)
@@ -618,28 +915,47 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task LoadComboBox()
         {
             Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true && x.IsPatient == true));
+            Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
             Departments = await Mediator.Send(new GetDepartmentQuery());
         }
 
         private async Task OnValidSubmitSave()
         {
+            IsLoading = true;
             try
             {
+                GeneralConsultanService.TypeRegistration = "Accident";
+
+                GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicy.Id != 0 ? SelectedInsurancePolicy.Id : null;
+
+                if (GeneralConsultanService.Id == 0)
+                    GeneralConsultanService = await Mediator.Send(new CreateGeneralConsultanServiceRequest(GeneralConsultanService));
+                else
+                    GeneralConsultanService = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+
+                Accident.GeneralConsultanServiceId = GeneralConsultanService.Id;
+
                 if (Accident.Id == 0)
                     Accident = await Mediator.Send(new CreateAccidentRequest(Accident));
                 else
-                    await Mediator.Send(new UpdateAccidentRequest(Accident));
+                    Accident = await Mediator.Send(new UpdateAccidentRequest(Accident));
 
-                Accident.Employee = Employees.FirstOrDefault(x => x.Id == Accident.EmployeeId);
-                Accident.Department = Departments.FirstOrDefault(x => x.Id == Accident.DepartmentId);
+                //Accident.Employee = Employees.FirstOrDefault(x => x.Id == General);
+                //Accident.Department = Departments.FirstOrDefault(x => x.Id == Accident.DepartmentId);
+
+                GeneralConsultanService.Patient = Employees.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId);
+
+                RefreshStagingText();
 
                 ToastService.ClearInfoToasts();
-                ToastService.ShowInfo("Saved Successfully");
+                ToastService.ShowSuccess("Saved Successfully");
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
+
+            IsLoading = false;
         }
 
         private void OnInvalidSubmitSave()
@@ -651,7 +967,15 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             PanelVisible = true;
             ShowForm = false;
-            Data = await Mediator.Send(new GetAccidentQuery());
+            SelectedDataItems = [];
+            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "Accident"));
+            // Populate the Accident property
+            foreach (var service in GeneralConsultanServices)
+            {
+                service.Accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == service.Id))).FirstOrDefault() ?? new();
+            }
+
+            GeneralConsultanService = new();
             Accident = new();
             PanelVisible = false;
         }
@@ -667,11 +991,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 if (SelectedDataItems is null || SelectedDataItems.Count == 1)
                 {
-                    await Mediator.Send(new DeleteAccidentRequest(((AccidentDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteGeneralConsultanServiceRequest(((GeneralConsultanServiceDto)e.DataItem).Id));
                 }
                 else
                 {
-                    await Mediator.Send(new DeleteAccidentRequest(ids: SelectedDataItems.Adapt<List<AccidentDto>>().Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteGeneralConsultanServiceRequest(ids: SelectedDataItems.Adapt<List<GeneralConsultanServiceDto>>().Select(x => x.Id).ToList()));
                 }
 
                 await LoadData();
@@ -749,10 +1073,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                 //SelectedTreatment7 = Treatment7.Select(x => x).AsEnumerable()
             };
 
-            StagingText = EnumStatusAccident.RestrictedWorkCase.GetDisplayName();
+            RefreshDate();
+            //StagingText = EnumStatusAccident.RestrictedWorkCase.GetDisplayName();
         }
 
         private bool IsLoading { get; set; } = false;
+
+        [SupplyParameterFromQuery]
+        public long Id { get; set; }
 
         private async Task EditItem_Click()
         {
@@ -761,32 +1089,10 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                Accident = (await Mediator.Send(new GetAccidentQuery(x => x.Id == SelectedDataItems[0].Adapt<AccidentDto>().Id))).FirstOrDefault() ?? new();
-                if (Accident is not null)
-                {
-                    switch (Accident.SentStatus)
-                    {
-                        case EnumStatusAccident.ReturnToWork:
-                            StagingText = EnumStatusAccident.RestrictedWorkCase.GetDisplayName();
-                            break;
-
-                        case EnumStatusAccident.RestrictedWorkCase:
-                            StagingText = EnumStatusAccident.LostWorkDaysCase.GetDisplayName();
-                            break;
-
-                        case EnumStatusAccident.LostWorkDaysCase:
-                            StagingText = EnumStatusAccident.FatalityCase.GetDisplayName();
-                            break;
-
-                        case EnumStatusAccident.FatalityCase:
-                            StagingText = EnumStatusAccident.FatalityCase.GetDisplayName();
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-                await RefreshSupervisorName();
+                GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>().Id))).FirstOrDefault() ?? new();
+                //NavigationManager.NavigateTo($"clinic-service/accident?id={GeneralConsultanService.Id}");
+                //Id = GeneralConsultanService.Id;
+                await LoadSelectedData();
             }
             catch (Exception ex)
             {
@@ -794,6 +1100,21 @@ namespace McDermott.Web.Components.Pages.Transaction
                 ShowForm = false;
             }
             IsLoading = false;
+        }
+
+        private async Task LoadSelectedData()
+        {
+            Accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id))).FirstOrDefault() ?? new();
+
+            GeneralConsultanCPPTs.Clear();
+            GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id));
+
+            await OnSelectEmployee(GeneralConsultanService.Patient);
+
+            SelectedInsurancePolicy = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId) ?? new();
+
+            await RefreshSupervisorName();
+            RefreshStagingText();
         }
 
         private void DeleteItem_Click()

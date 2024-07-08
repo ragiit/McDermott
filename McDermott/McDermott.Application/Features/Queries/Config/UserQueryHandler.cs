@@ -26,6 +26,7 @@ namespace McDermott.Application.Features.Queries.Config
                     result = await _unitOfWork.Repository<User>().Entities
                         .Include(x => x.Group)
                         .Include(x => x.Supervisor)
+                        .Include(x => x.Department)
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
 
@@ -58,6 +59,8 @@ namespace McDermott.Application.Features.Queries.Config
                     result = await _unitOfWork.Repository<User>().Entities
                         .Include(x => x.Group)
                         .Include(x => x.Gender)
+                        .Include(x => x.Supervisor)
+                        .Include(x => x.Department)
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
 

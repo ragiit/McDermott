@@ -192,8 +192,8 @@ namespace McDermott.Persistence.Context
 
             // Menentukan indeks menggunakan Fluent API
             modelBuilder.Entity<StockOutPrescription>()
-                .HasOne(h=>h.Prescription)
-                .WithMany(x=>x.StockOutPrescription)
+                .HasOne(h => h.Prescription)
+                .WithMany(x => x.StockOutPrescription)
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<StockOutPrescription>()
@@ -292,9 +292,20 @@ namespace McDermott.Persistence.Context
                   .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GeneralConsultanService>()
-                .HasMany(m => m.GeneralConsultationLogs)
+                  .HasMany(m => m.GeneralConsultanCPPTs)
+                  .WithOne(c => c.GeneralConsultanService)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GeneralConsultanService>()
+                .HasMany(m => m.Accidents)
                 .WithOne(c => c.GeneralConsultanService)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GeneralConsultanService>()
+                .HasMany(m => m.SickLeaves)
+                .WithOne(c => c.GeneralConsultans)
+                .OnDelete(DeleteBehavior.Cascade);
+
 
             modelBuilder.Entity<InsurancePolicy>()
                 .HasMany(m => m.BPJSIntegrations)

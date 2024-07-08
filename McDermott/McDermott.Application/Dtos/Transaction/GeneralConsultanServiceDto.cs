@@ -8,12 +8,12 @@ namespace McDermott.Application.Dtos.Transaction
 
         public long? KioskQueueId { get; set; }
 
-        [Required(ErrorMessage = "The Patient field is required.")]
+        //[Required(ErrorMessage = "The Patient field is required.")]
         public long? PatientId { get; set; }
 
         public long? InsurancePolicyId { get; set; }
 
-        [Required(ErrorMessage = "The Service field is required.")]
+        //[Required(ErrorMessage = "The Service field is required.")]
         public long? ServiceId { get; set; }
 
         public long? PratitionerId { get; set; }
@@ -31,7 +31,7 @@ namespace McDermott.Application.Dtos.Transaction
         [Required]
         public string? Payment { get; set; } = "BPJS";
         [Required]
-        public string? TypeRegistration { get; set; }
+        public string? TypeRegistration { get; set; } = "General Consultation";
         public string? MedexType { get; set; }
         public string? HomeStatus { get; set; }
 
@@ -212,9 +212,13 @@ namespace McDermott.Application.Dtos.Transaction
         public virtual AwarenessDto? AwarenessDto { get; set; }
         public virtual KioskQueueDto? KioskQueue { get; set; }
         public virtual ClassTypeDto? ClassType { get; set; }
-        public virtual UserDto Patient { get; set; } = new();
+        public virtual UserDto? Patient { get; set; } = new();
         public virtual UserDto? Pratitioner { get; set; }
         public virtual ServiceDto? Service { get; set; }
         public virtual InsurancePolicyDto? InsurancePolicy { get; set; }
+
+        // Add this property
+        [NotMapped]
+        public virtual AccidentDto? Accident { get; set; }
     }
 }

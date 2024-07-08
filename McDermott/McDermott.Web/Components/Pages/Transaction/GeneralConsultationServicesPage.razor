@@ -807,62 +807,60 @@
                                                             }
 
                                                             <div class="w-100 mt-2">
-                                                                <div class="card">
+                                                                <div class="card w-100">
                                                                     <div class="card-header">
                                                                         <span class="fw-bolder">CPPT</span>
                                                                     </div>
 
-                                                                    <div class="card-body">
-                                                                        <div class="row w-100">
-                                                                            <div class="col-md-12">
-                                                                                <DxFormLayout CssClass="w-100">
-                                                                                    <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                                                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                                                                    IsContentBlocked="true"
-                                                                                                    ApplyBackgroundShading="true"
-                                                                                                    IndicatorAreaVisible="false"
-                                                                                                    Text="Fetching Data...">
-                                                                                        <MyGrid @ref="GridCppt"
-                                                                                                Data="GeneralConsultanCPPTs"
-                                                                                                @bind-SelectedDataItems="@SelectedDataItemsCPPT"
-                                                                                                EditModelSaving="OnClickConfirmCPPT"
-                                                                                                DataItemDeleting="OnDeleteTabCPPTConfirm"
-                                                                                                FocusedRowChanged="GridTabCPPT_FocusedRowChanged">
-                                                                                            <Columns>
-                                                                                                <DxGridDataColumn FieldName="Title" />
-                                                                                                <DxGridDataColumn FieldName="Body" />
-                                                                                                @if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
-                                                                                                {
-                                                                                                    <DxGridCommandColumn NewButtonVisible="false" EditButtonVisible="false" Width="160px" />
-                                                                                                }
-                                                                                            </Columns>
-                                                                                        </MyGrid>
-                                                                                    </DxLoadingPanel>
-                                                                                </DxFormLayout>
-                                                                            </div>
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-12 w-100">
+                                                                            <DxFormLayout CssClass="w-100">
+                                                                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                                                IsContentBlocked="true"
+                                                                                                ApplyBackgroundShading="true"
+                                                                                                IndicatorAreaVisible="false"
+                                                                                                Text="Fetching Data...">
+                                                                                    <MyGrid @ref="GridCppt"
+                                                                                            Data="GeneralConsultanCPPTs"
+                                                                                            @bind-SelectedDataItems="@SelectedDataItemsCPPT"
+                                                                                            EditModelSaving="OnClickConfirmCPPT"
+                                                                                            DataItemDeleting="OnDeleteTabCPPTConfirm"
+                                                                                            FocusedRowChanged="GridTabCPPT_FocusedRowChanged">
+                                                                                        <Columns>
+                                                                                            <DxGridDataColumn FieldName="Title" />
+                                                                                            <DxGridDataColumn FieldName="Body" />
+                                                                                            @if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
+                                                                                            {
+                                                                                                <DxGridCommandColumn NewButtonVisible="false" EditButtonVisible="false" Width="160px" />
+                                                                                            }
+                                                                                        </Columns>
+                                                                                    </MyGrid>
+                                                                                </DxLoadingPanel>
+                                                                            </DxFormLayout>
+                                                                        </div>
 
-                                                                            @if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
-                                                                            {
-                                                                                <div class="col-md-12">
-                                                                                    <div class="ml-2 mt-1 mb-2 mr-3">
-                                                                                        <div class="row justify-content-end">
-                                                                                            <div class="col-auto align-self-end">
-                                                                                                <DxButton Text="Save CPPT"
-                                                                                                          Click="OnClickSaveCPPT"
-                                                                                                          RenderStyle="ButtonRenderStyle.Primary"
-                                                                                                          IconCssClass="fa-solid fa-floppy-disk"
-                                                                                                          CssClass="w-20 ml" />
-                                                                                                <DxButton Text="Clear All"
-                                                                                                          RenderStyle="ButtonRenderStyle.Danger"
-                                                                                                          Click="OnClickClearAllCPPT"
-                                                                                                          IconCssClass="fa-solid fa-xmark"
-                                                                                                          CssClass="w-20 ml" />
-                                                                                            </div>
+                                                                        @if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
+                                                                        {
+                                                                            <div class="col-md-12 w-100">
+                                                                                <div class="ml-2 mt-1 mb-2">
+                                                                                    <div class="row justify-content-end">
+                                                                                        <div class="col-auto align-self-end">
+                                                                                            <DxButton Text="Save CPPT"
+                                                                                                      Click="OnClickSaveCPPT"
+                                                                                                      RenderStyle="ButtonRenderStyle.Primary"
+                                                                                                      IconCssClass="fa-solid fa-floppy-disk"
+                                                                                                      CssClass="w-20 ml" />
+                                                                                            <DxButton Text="Clear All"
+                                                                                                      RenderStyle="ButtonRenderStyle.Danger"
+                                                                                                      Click="OnClickClearAllCPPT"
+                                                                                                      IconCssClass="fa-solid fa-xmark"
+                                                                                                      CssClass="w-20 ml" />
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                            }
-                                                                        </div>
+                                                                            </div>
+                                                                        }
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -1762,7 +1760,7 @@ else
 <DxPopup Visible="isPrint" Width="874px">
     <DxRichEdit ActiveRibbonTabIndex="5" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">
         <MailMergeSettings>
-            <DxMailMergeSettings ViewMergedData="true" Data="SickLeaves"></DxMailMergeSettings>
+            <DxMailMergeSettings ViewMergedData="true"></DxMailMergeSettings>
         </MailMergeSettings>
     </DxRichEdit>
 </DxPopup>

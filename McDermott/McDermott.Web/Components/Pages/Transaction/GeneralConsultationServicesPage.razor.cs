@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using static McDermott.Web.Components.Pages.Queue.KioskPage;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using McDermott.Extentions;
+using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -141,23 +142,23 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
 
                 var mergeFields = new Dictionary<string, string>
-        {
-            {"%NamePatient%", GetDefaultValue(patienss.Name)},
-            {"%startDate%", GetDefaultValue(startSickLeave?.ToString("dd MMMM yyyy"))},
-            {"%endDate%", GetDefaultValue(endSickLeave?.ToString("dd MMMM yyyy"))},
-            {"%NameDoctor%", GetDefaultValue(data?.Pratitioner?.Name)},
-            {"%SIPDoctor%", GetDefaultValue(data?.Pratitioner?.SipNo)},
-            {"%AddressPatient%", GetDefaultValue(patienss.DomicileAddress1) + GetDefaultValue(patienss.DomicileAddress2)},
-            {"%AgePatient%", GetDefaultValue(age.ToString())},
-            {"%WordDays%", GetDefaultValue(WordDays)},
-            {"%Days%", GetDefaultValue(todays)},
-            {"%days%", GetDefaultValue(TotalDays.ToString())},
-            {"%Dates%", GetDefaultValue(data?.RegistrationDate.ToString("dd MMMM yyyy"))},
-            {"%Times%", GetDefaultValue(data?.RegistrationDate.ToString("H:MM"))},
-            {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")},  // Still no null check needed
-            {"%genders%", GetDefaultValue(Gender)},
-            {"%OppositeSex%", GetDefaultValue(OppositeSex, "")} // Use empty string if null
-        };
+                {
+                    {"%NamePatient%", GetDefaultValue(patienss.Name)},
+                    {"%startDate%", GetDefaultValue(startSickLeave?.ToString("dd MMMM yyyy"))},
+                    {"%endDate%", GetDefaultValue(endSickLeave?.ToString("dd MMMM yyyy"))},
+                    {"%NameDoctor%", GetDefaultValue(data?.Pratitioner?.Name)},
+                    {"%SIPDoctor%", GetDefaultValue(data?.Pratitioner?.SipNo)},
+                    {"%AddressPatient%", GetDefaultValue(patienss.DomicileAddress1) + GetDefaultValue(patienss.DomicileAddress2)},
+                    {"%AgePatient%", GetDefaultValue(age.ToString())},
+                    {"%WordDays%", GetDefaultValue(WordDays)},
+                    {"%Days%", GetDefaultValue(todays)},
+                    {"%days%", GetDefaultValue(TotalDays.ToString())},
+                    {"%Dates%", GetDefaultValue(data?.RegistrationDate.ToString("dd MMMM yyyy"))},
+                    {"%Times%", GetDefaultValue(data?.RegistrationDate.ToString("H:MM"))},
+                    {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")},  // Still no null check needed
+                    {"%genders%", GetDefaultValue(Gender)},
+                    {"%OppositeSex%", GetDefaultValue(OppositeSex, "")} // Use empty string if null
+                };
 
                 if (patienss.IsEmployee == false)
                 {
@@ -989,7 +990,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
                 return;
 
-            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+            if (e.Equals("BPJS"))
+                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+            else
+                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && (x.Insurance.IsBPJSKesehatan == false || x.Insurance.IsBPJSTK == false) && x.Active == true));
         }
 
         private void SelectedItemRegisTypeChangedReferTo(String e)
@@ -1627,6 +1631,21 @@ namespace McDermott.Web.Components.Pages.Transaction
                         GeneralConsultanService = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
                         StagingText = EnumStatusGeneralConsultantService.Finished;
 
+                        if (GeneralConsultanService.IsSickLeave == true || GeneralConsultanService.IsMaternityLeave == true)
+                        {
+                            var checkDataSickLeave = await Mediator.Send(new GetSickLeaveQuery(x => x.GeneralConsultansId == GeneralConsultanService.Id));
+                            if (checkDataSickLeave != null && checkDataSickLeave.Count == 0)
+                            {
+                                if (GeneralConsultanService.IsSickLeave == true)
+                                    SickLeaves.TypeLeave = "SickLeave";
+                                else if (GeneralConsultanService.IsMaternityLeave == true)
+                                    SickLeaves.TypeLeave = "Maternity";
+
+                                SickLeaves.GeneralConsultansId = GeneralConsultanService.Id;
+                                await Mediator.Send(new CreateSickLeaveRequest(SickLeaves));
+                            }
+                        }
+
                         break;
 
                     case EnumStatusGeneralConsultantService.ProcedureRoom:
@@ -1975,6 +1994,22 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     case EnumStatusGeneralConsultantService.Physician:
                         GeneralConsultanService = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+
+                        if (GeneralConsultanService.IsSickLeave == true || GeneralConsultanService.IsMaternityLeave == true)
+                        {
+                            var checkDataSickLeave = await Mediator.Send(new GetSickLeaveQuery(x => x.GeneralConsultansId == GeneralConsultanService.Id));
+                            if (checkDataSickLeave != null && checkDataSickLeave.Count == 0)
+                            {
+                                if (GeneralConsultanService.IsSickLeave == true)
+                                    SickLeaves.TypeLeave = "SickLeave";
+                                else if (GeneralConsultanService.IsMaternityLeave == true)
+                                    SickLeaves.TypeLeave = "Maternity";
+
+                                SickLeaves.GeneralConsultansId = GeneralConsultanService.Id;
+                                await Mediator.Send(new CreateSickLeaveRequest(SickLeaves));
+                            }
+                        }
+
                         await SaveAllergyData();
                         break;
 
@@ -2036,7 +2071,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             Services = await Mediator.Send(new GetServiceQuery());
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
             Awareness = await Mediator.Send(new GetAwarenessQuery());
-
+            Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
             Allergies = await Mediator.Send(new GetAllergyQuery());
             Allergies.ForEach(x =>
             {
@@ -2219,7 +2254,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                         StagingText = EnumStatusGeneralConsultantService.Finished;
                         GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id));
 
-                        if (GeneralConsultanService.PratitionerId is not null)
+                        if (GeneralConsultanService.PratitionerId is null)
                         {
                             if (!Convert.ToBoolean(UserLogin.IsEmployee) && !Convert.ToBoolean(UserLogin.IsPatient) && Convert.ToBoolean(UserLogin.IsUser) && !Convert.ToBoolean(UserLogin.IsNurse) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
                             {

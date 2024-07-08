@@ -34,17 +34,20 @@ namespace McDermott.Application.Extentions
 
         public enum EnumStatusAccident
         {
-            [Display(Name = "Return to work")]
-            ReturnToWork = 1,
+            [Display(Name = "Draft")]
+            Draft = 1,
 
-            [Display(Name = "Restricted work case")]
-            RestrictedWorkCase = 2,
+            [Display(Name = "Medical Treatment")]
+            MedicalTreatment = 2,
 
-            [Display(Name = "Lost Work days case")]
-            LostWorkDaysCase = 3,
+            [Display(Name = "Hospitalization Referral")]
+            HospitalizationReferral = 3,
 
-            [Display(Name = "Fatality case")]
-            FatalityCase = 4
+            [Display(Name = "Patient Control Monitoring")]
+            PatientControlMonitoring = 4,
+
+            [Display(Name = "Done")]
+            Done = 5
         }
 
         public enum EnumStatusMCU
@@ -140,7 +143,7 @@ namespace McDermott.Application.Extentions
             Cancel = 6
         }
 
-        public enum  EnumStatusReceiving 
+        public enum EnumStatusReceiving
         {
             [Display(Name = "draft")]
             Draft = 0,
@@ -151,10 +154,10 @@ namespace McDermott.Application.Extentions
             [Display(Name = "ready")]
             Ready = 2,
 
-            [Display(Name ="done")]
+            [Display(Name = "done")]
             Done = 3,
 
-            [Display(Name ="cancel")]
+            [Display(Name = "cancel")]
             Cancel = 4,
         }
 

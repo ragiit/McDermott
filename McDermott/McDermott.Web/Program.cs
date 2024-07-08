@@ -1,11 +1,12 @@
+
 using McDermott.Application.Extentions;
+using McDermott.Persistence.Context;
 using McDermott.Persistence.Extensions;
 using McDermott.Web.Components;
-using Serilog;
 using McDermott.Web.Hubs;
-using McDermott.Application.Interfaces.Repositories;
-using McDermott.Application.Features.Queries;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -76,5 +77,27 @@ app.UseAntiforgery();
 app.MapHub<RealTimeHub>("/realTimeHub");
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        Log.Information("=== ===");
+        Log.Information("=== Starting Migrate the database. ===");
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Log.Error("Error occurred while migrating the database.");
+        Log.Error(ex.Message);
+    }
+    finally
+    {
+        Log.Information("=== ===");
+    }
+}
+
 
 app.Run();

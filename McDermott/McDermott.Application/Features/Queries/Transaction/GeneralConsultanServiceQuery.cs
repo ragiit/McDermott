@@ -26,9 +26,10 @@
                 if (!_cache.TryGetValue(cacheKey, out List<GeneralConsultanService>? result))
                 {
                     result = await _unitOfWork.Repository<GeneralConsultanService>().Entities
-                        .Include(z => z.Service) 
+                        .Include(z => z.Service)
                         .Include(z => z.Pratitioner)
                         .Include(z => z.ClassType)
+                        .Include(z => z.InsurancePolicy)
                         .Include(z => z.Patient!.Gender)
                         .Include(z => z.Patient.Department)
                         //.ThenInclude(z => z.Gender)
@@ -161,7 +162,7 @@
                         .Include(z => z.GeneralConsultanService)
                         .Include(z => z.ProcedureRoom)
                         .Include(z => z.UserBy)
-                        
+
                         //.ThenInclude(z => z.Gender)
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);

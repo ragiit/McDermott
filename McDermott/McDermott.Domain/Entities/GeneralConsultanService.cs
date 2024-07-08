@@ -111,6 +111,12 @@
         public virtual List<GeneralConsultantClinicalAssesment>? GeneralConsultantClinicalAssesments { get; set; }
 
         [SetToNull]
+        public virtual List<Accident>? Accidents { get; set; }
+
+        [SetToNull]
+        public virtual List<SickLeave>? SickLeaves { get; set; }
+
+        [SetToNull]
         public virtual ClassType? ClassType { get; set; }
     }
 }
