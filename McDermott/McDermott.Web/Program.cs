@@ -78,8 +78,6 @@ app.MapHub<RealTimeHub>("/realTimeHub");
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
-
-// Menjalankan migrasi otomatis
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -93,6 +91,7 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine("Error occurred while migrating the database.");
         Console.WriteLine(ex.Message);
+        Log.Error(ex.Message);
     }
 }
 

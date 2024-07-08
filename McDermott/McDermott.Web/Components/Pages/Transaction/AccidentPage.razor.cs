@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using DevExpress.Blazor.RichEdit;
+using System.ComponentModel;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction
@@ -67,6 +68,50 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     var aaa = ex;
                 }
+            }
+        }
+
+        public byte[]? DocumentContent;
+        private bool isPrint { get; set; } = false;
+        private DxRichEdit richEdit;
+        private DevExpress.Blazor.RichEdit.Document documentAPI;
+
+        private async Task PrintAccident()
+        {
+            try
+            {
+                if (GeneralConsultanService.Id == 0)
+                    return;
+
+                var gen = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanService.Id))).FirstOrDefault() ?? new();
+                var accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == gen.Id))).FirstOrDefault() ?? new();
+
+                var mergeFields = new Dictionary<string, string>
+                {
+                    {"%EmployeeName%", "dadadawd"},
+                    {"<<EmployeeName>>", "WKOWAKOAWO"},
+                    //{"%EmployeeName%", gen?.Patient?.Name.GetDefaultValue() ?? "-"},
+                    {"%EmployeeNIP%", gen?.Patient?.NIP?.GetDefaultValue() ?? "-"},
+                    {"%EmployeeDepartment%", gen?.Patient?.Department?.Name.GetDefaultValue() ?? "-"},
+                    {"%DateOfOccurence%", accident.DateOfOccurrence.GetValueOrDefault().ToString("dd MMM yyyy")},
+                    {"%TimeOccurence%", accident.DateOfOccurrence.GetValueOrDefault().ToString("HH:mm:ss")},
+                    {"%DateTreatment%", accident.DateOfFirstTreatment.GetValueOrDefault().ToString("dd MMM yyyy")},
+                    {"%TimeTreatment%", accident.DateOfFirstTreatment.GetValueOrDefault().ToString("HH:mm:ss")},
+                    {"%AreaOfYard%", accident.AreaOfYard?.GetDefaultValue() ?? "-"},
+                    {"%SupervisorName%", gen?.Patient?.Supervisor?.Name.GetDefaultValue() ?? "-"},
+                };
+
+                //Field dateField = await documentAPI.Fields.Cr(, "DATE");
+
+                //await documentAPI.Fields.UpdateAsync(dateField);
+
+                DocumentContent = await DocumentProvider.GetDocumentAsync("AccidentForm.docx", mergeFields);
+
+                isPrint = true;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
             }
         }
 

@@ -136,6 +136,14 @@
                                                                       Click="OnClickConfirm"
                                                                       RenderStyle=" ButtonRenderStyle.Primary">
                                                             </DxButton>
+
+                                                            <DxButton IconCssClass="fa-solid fa-print"
+                                                                      Text="Print"
+                                                                      Visible="GeneralConsultanService.Id > 0"
+                                                                      Click="PrintAccident"
+                                                                      RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                      RenderStyle=" ButtonRenderStyle.Success">
+                                                            </DxButton>
                                                             @*  <DxButton
                                                 Enabled="!IsLoading"
                                                 IconCssClass="fa-solid fa-xmark"
@@ -343,15 +351,15 @@
 
                                                         </DxFormLayoutItem>
 
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Accident Location" ColSpanMd="12">
-                                                                <MyDxComboBox Data="@AccidentLocations"
-                                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                                              NullText="Select Accident Location..."
-                                                                              ReadOnly="!IsStatus(EnumStatusAccident.Draft)"
-                                                                              @bind-Value="Accident.AccidentLocation">
-                                                                </MyDxComboBox>
-                                                                <ValidationMessage For="@(() => Accident.AccidentLocation)" />
-                                                            </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Accident Location" ColSpanMd="12">
+                                                            <MyDxComboBox Data="@AccidentLocations"
+                                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                          NullText="Select Accident Location..."
+                                                                          ReadOnly="!IsStatus(EnumStatusAccident.Draft)"
+                                                                          @bind-Value="Accident.AccidentLocation">
+                                                            </MyDxComboBox>
+                                                            <ValidationMessage For="@(() => Accident.AccidentLocation)" />
+                                                        </DxFormLayoutItem>
 
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sick Leave" ColSpanMd="12">
                                                             <DxCheckBox @bind-Checked="@GeneralConsultanService.IsSickLeave" />
@@ -1623,4 +1631,12 @@ else
 
         </div>
     </div>
+</DxPopup>
+
+<DxPopup Visible="isPrint" Width="874px">
+    <DxRichEdit @ref="richEdit" ActiveRibbonTabIndex="0" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">
+        <MailMergeSettings>
+            <DxMailMergeSettings ViewMergedData="true"></DxMailMergeSettings>
+        </MailMergeSettings>
+    </DxRichEdit>
 </DxPopup>

@@ -12,6 +12,11 @@ namespace McDermott.Web.Extentions
             public string Name { get; set; } = string.Empty;
         }
 
+        public static string GetDefaultValue(this string value, string defaultValue = "-")
+        {
+            return value ?? defaultValue;
+        }
+
         public static List<AllergyType> _allergyTypes = [
             new()
             {
