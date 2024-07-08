@@ -21,44 +21,87 @@
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
-                                <MyGrid @ref="Grid"
-                                        KeyFieldName="Id"
-                                        Data="GeneralConsultanServices"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        DataItemDeleting="OnDeleting"
-                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                        RowDoubleClick="EditItem_Click">
 
-                                    <ToolbarTemplate>
-                                        <MyDxToolbarBase Grid="Grid"
-                                                         TItem="GeneralConsultanServiceDto"
-                                                         Items="@GeneralConsultanServices"
-                                                         SelectedDataItems="@SelectedDataItems"
-                                                         NewItem_Click="@NewItem_Click"
-                                                         EditItem_Click="@EditItem_Click"
-                                                         DeleteItem_Click="@DeleteItem_Click"
-                                                         Refresh_Click="@(async () => await LoadData())"
-                                                         IsImport="true"
-                                                         ImportFile="ImportFile"
-                                                         ExportToExcel="ExportToExcel"
-                                                         VisibleNew="UserAccessCRUID.Create"
-                                                         VisibleEdit="UserAccessCRUID.Update"
-                                                         VisibleDelete="UserAccessCRUID.Delete" />
-                                    </ToolbarTemplate>
+                                <DxToolbar>
+                                    <Items>
+                                        <DxToolbarItem Click="@(() => IsDashboard = true)" Tooltip="Dashboard" Alignment="ToolbarItemAlignment.Right" IconCssClass="fa-solid fa-table-columns" />
+                                        <DxToolbarItem Click="@(() => IsDashboard = false)" Tooltip="List" Alignment="ToolbarItemAlignment.Right" IconCssClass="fa-solid fa-list" />
+                                    </Items>
+                                </DxToolbar>
 
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200"
-                                                          FieldName="RegistrationDate"
-                                                          FilterRowOperatorType="GridFilterRowOperatorType.Contains"
-                                                          DisplayFormat="ddd, dd MMM yyyy"
-                                                          Caption="Registration Date" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="StatusMcuName" Caption="Status" />
-                                    </Columns>
-                                </MyGrid>
+                                @if (!IsDashboard)
+                                {
+                                    <MyGrid @ref="Grid"
+                                            KeyFieldName="Id"
+                                            Data="GeneralConsultanServices"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            DataItemDeleting="OnDeleting"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            RowDoubleClick="EditItem_Click">
+
+                                        <ToolbarTemplate>
+                                            <MyDxToolbarBase Grid="Grid"
+                                                             TItem="GeneralConsultanServiceDto"
+                                                             Items="@GeneralConsultanServices"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@NewItem_Click"
+                                                             EditItem_Click="@EditItem_Click"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             Refresh_Click="@(async () => await LoadData())"
+                                                             IsImport="true"
+                                                             ImportFile="ImportFile"
+                                                             ExportToExcel="ExportToExcel"
+                                                             VisibleNew="UserAccessCRUID.Create"
+                                                             VisibleEdit="UserAccessCRUID.Update"
+                                                             VisibleDelete="UserAccessCRUID.Delete" />
+                                        </ToolbarTemplate>
+
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn MinWidth="200"
+                                                              FieldName="RegistrationDate"
+                                                              FilterRowOperatorType="GridFilterRowOperatorType.Contains"
+                                                              DisplayFormat="ddd, dd MMM yyyy"
+                                                              Caption="Registration Date" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="StatusMcuName" Caption="Status" />
+                                        </Columns>
+                                    </MyGrid>
+                                }
+                                else
+                                {
+                                    <DxPieChart Data="@statusMcuData"
+                                                T="StatusMcuData"
+                                                Diameter="null">
+                                        <DxPieChartSeries T="StatusMcuData"
+                                                          TArgument="string"
+                                                          TValue="int"
+                                                          ArgumentField="s => s.Status"
+                                                          SummaryMethod="Enumerable.Sum"
+                                                          ValueField="s => s.Count">
+                                            <DxChartSeriesLabel Visible="true"
+                                                                Position="RelativePosition.Outside">
+                                                <DxChartSeriesLabelConnector Visible="true" />
+                                            </DxChartSeriesLabel>
+                                        </DxPieChartSeries>
+                                        <DxChartTooltip Enabled="true"
+                                                        Position="RelativePosition.Outside">
+                                            <div style="margin: 0.75rem">
+                                                <div class="fw-bold">@context.Point.Argument</div>
+                                                <div>Total: @($"{context.Point.Value}")</div>
+                                            </div>
+                                        </DxChartTooltip>
+                                        <DxChartTitle Text="Medical Checkup">
+                                            <DxChartSubTitle Text="Sorted by Status" />
+                                        </DxChartTitle>
+                                        <DxChartLegend HorizontalAlignment="HorizontalAlignment.Center"
+                                                       VerticalAlignment="VerticalEdge.Bottom"
+                                                       Position="RelativePosition.Outside"
+                                                       Orientation="Orientation.Horizontal" />
+                                    </DxPieChart>
+                                }
                             </DxLoadingPanel>
                         </div>
                     }
