@@ -138,6 +138,7 @@ namespace McDermott.Persistence.Context
         public DbSet<PharmacyLog> PharmacyLogs { get; set; }
         public DbSet<SickLeave> SickLeaves { get; set; }
         public DbSet<StockOutPrescription> StockOutPrescriptions { get; set; }
+        public DbSet<StockOutLines> StockOutLines { get; set; }
 
         #endregion Pharmacy
 
