@@ -5,6 +5,7 @@ using static McDermott.Web.Components.Pages.Queue.KioskPage;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using McDermott.Extentions;
 using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
+using MediatR;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -1217,7 +1218,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             ids.AddRange(SelectedWeatherAllergies.Select(x => x.Id).ToList());
             ids.AddRange(SelectedFoodAllergies.Select(x => x.Id).ToList());
 
-            var u = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId);
+            //var u = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId);
+            var u = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
             if (u is not null)
             {
                 u.PatientAllergyIds = ids;
