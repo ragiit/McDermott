@@ -1,6 +1,6 @@
 ﻿@typeparam TItem
 
-<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" >
     <DxToolbarItem Text="New" Visible="VisibleNew" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
     <DxToolbarItem Text="Edit" Visible="VisibleEdit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Items.Count > 0" />
     <DxToolbarItem Text="Delete" Visible="VisibleDelete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Items.Count > 0 && EnableDelete" />
@@ -19,6 +19,7 @@
             <DxToolbarItem Text="Import" Click="ImportFile" />
         </Items>
     </DxToolbarItem>
+
 </DxToolbar>
 
 @code {
@@ -27,9 +28,13 @@
     [Parameter] public bool VisibleNew { get; set; } = true;
     [Parameter] public bool VisibleEdit { get; set; } = true;
     [Parameter] public bool VisibleDelete { get; set; } = true;
+    [Parameter] public bool VisibleDashboard { get; set; } = false;
+    [Parameter] public bool VisibleList { get; set; } = false;
     [Parameter] public IGrid Grid { get; set; }
     [Parameter] public List<TItem> Items { get; set; } = [];
     [Parameter] public IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+    [Parameter] public EventCallback Dashboard_Click { get; set; }
+    [Parameter] public EventCallback List_Click { get; set; }
     [Parameter] public EventCallback NewItem_Click { get; set; }
     [Parameter] public EventCallback EditItem_Click { get; set; }
     [Parameter] public EventCallback DeleteItem_Click { get; set; }

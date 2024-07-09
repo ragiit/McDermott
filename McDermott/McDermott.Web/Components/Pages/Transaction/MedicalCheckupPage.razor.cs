@@ -43,6 +43,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private int FocusedRowVisibleIndex { get; set; }
         private bool ShowForm { get; set; } = false;
         private bool IsLoading { get; set; } = false;
+        private bool IsDashboard { get; set; } = false;
         private string StagingText { get; set; } = EnumStatusMCU.HRCandidat.GetDisplayName();
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
@@ -99,6 +100,27 @@ namespace McDermott.Web.Components.Pages.Transaction
                 ex.HandleException(ToastService);
             }
         }
+
+        #region Chart
+
+        public class StatusMcuData
+        {
+            public string Status { get; set; }
+            public int Count { get; set; }
+        }
+
+        public List<StatusMcuData> GetStatusMcuCounts(List<GeneralConsultanServiceDto> services)
+        {
+            var aa = services.GroupBy(s => s.StatusMCU)
+                            .Select(g => new StatusMcuData
+                            {
+                                Status = g.Key.GetDisplayName(),
+                                Count = g.Count()
+                            }).ToList();
+            return aa;
+        }
+
+        #endregion Chart
 
         private async Task SelectedItemPatientChanged(UserDto e)
         {
@@ -325,6 +347,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
+        private List<StatusMcuData> statusMcuData = [];
+
         private async Task LoadData()
         {
             ShowForm = false;
@@ -336,6 +360,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             };
             SelectedDataItems = [];
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "MCU" && x.IsMcu == true));
+
+            statusMcuData = GetStatusMcuCounts(GeneralConsultanServices);
+
             IsLoading = false;
         }
 
@@ -411,6 +438,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     var a = new List<GeneralConsultanServiceDto>();
 
+                    bool IsValid = true;
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
                         var col1Patient = ws.Cells[row, 1].Value?.ToString()?.Trim();
@@ -418,8 +446,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                         if (patient is null)
                         {
                             ShowErrorImport(row, 1, col1Patient);
-                            IsLoading = false;
-                            return;
+                            IsValid = false;
                         }
 
                         var colService = ws.Cells[row, 2].Value?.ToString()?.Trim();
@@ -427,8 +454,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                         if (ser is null)
                         {
                             ShowErrorImport(row, 2, colService);
-                            IsLoading = false;
-                            return;
+                            IsValid = false;
                         }
 
                         var colPhysician = ws.Cells[row, 3].Value?.ToString()?.Trim();
@@ -439,8 +465,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                             if (cekPhys is null)
                             {
                                 ShowErrorImport(row, 3, colPhysician);
-                                IsLoading = false;
-                                return;
+                                IsValid = false;
                             }
                             phyId = cekPhys.Id;
                         }
@@ -449,24 +474,21 @@ namespace McDermott.Web.Components.Pages.Transaction
                         if (MCUType.FirstOrDefault(x => x == col2MCUType) is null)
                         {
                             ShowErrorImport(row, 4, col2MCUType);
-                            IsLoading = false;
-                            return;
+                            IsValid = false;
                         }
 
                         var col3Medex = ws.Cells[row, 5].Value?.ToString()?.Trim();
                         if (MedexType.FirstOrDefault(x => x == col3Medex) is null)
                         {
                             ShowErrorImport(row, 5, col3Medex);
-                            IsLoading = false;
-                            return;
+                            IsValid = false;
                         }
 
                         var col4Candidate = ws.Cells[row, 6].Value?.ToString()?.Trim();
                         if (!col4Candidate.Equals("Batam") && !col4Candidate.Equals("Outside Batam"))
                         {
                             ShowErrorImport(row, 6, col4Candidate);
-                            IsLoading = false;
-                            return;
+                            IsValid = false;
                         }
 
                         var col5Date = ws.Cells[row, 7].Value?.ToString()?.Trim();
@@ -478,9 +500,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                         if (!successDate)
                         {
                             ShowErrorImport(row, 7, col5Date);
-                            IsLoading = false;
-                            return;
+                            IsValid = false;
                         }
+
+                        if (!IsValid)
+                            continue;
 
                         var b = new GeneralConsultanServiceDto
                         {

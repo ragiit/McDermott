@@ -21,50 +21,93 @@
                                                 ApplyBackgroundShading="true"
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
-                                    <MyGrid @ref="Grid"
-                                            Data="GeneralConsultanServices.OrderByDescending(x => x.RegistrationDate).ThenByDescending(x => x.IsAlertInformationSpecialCase).ThenByDescending(x => x.ClassType is not null)"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            DataItemDeleting="OnDelete"
-                                            RowDoubleClick="@(async () => await EditItem_Click())"
-                                            FocusedRowChanged="Grid_FocusedRowChanged1"
-                                            KeyFieldName="Id">
 
-                                        <ToolbarTemplate>
-                                            <MyDxToolbarBase TItem="GeneralConsultanServiceDto"
-                                                             Items="@GeneralConsultanServices"
-                                                             SelectedDataItems="@SelectedDataItems"
-                                                             NewItem_Click="@(async () => await NewItem_Click())"
-                                                             Grid="Grid"
-                                                             EditItem_Click="@(async () => await EditItem_Click())"
-                                                             DeleteItem_Click="@DeleteItem_Click"
-                                                             Refresh_Click="@(async () => await Refresh_Click())"
-                                                             EnableDelete="IsDeletedConsultantService"
-                                                             IsImport="false" />
-                                        </ToolbarTemplate>
+                                    <DxToolbar>
+                                        <Items>
+                                            <DxToolbarItem Click="@(() => IsDashboard = true)" Tooltip="Dashboard" Alignment="ToolbarItemAlignment.Right" IconCssClass="fa-solid fa-table-columns" />
+                                            <DxToolbarItem Click="@(() => IsDashboard = false)" Tooltip="List" Alignment="ToolbarItemAlignment.Right" IconCssClass="fa-solid fa-list" />
+                                        </Items>
+                                    </DxToolbar>
 
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn MinWidth="200"
-                                                              FieldName="RegistrationDate"
-                                                              FilterRowOperatorType="GridFilterRowOperatorType.Contains"
-                                                              DisplayFormat="ddd, dd MMM yyyy"
-                                                              Caption="Registration Date" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Payment" Caption="Payment Method" Visible="false" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="AppointmentDate" Caption="Appoiment" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
-                                                <CellDisplayTemplate>
-                                                    @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
-                                                </CellDisplayTemplate>
-                                            </DxGridDataColumn>
-                                        </Columns>
-                                        <GroupSummary>
-                                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="StatusName" />
-                                        </GroupSummary>
-                                    </MyGrid>
+                                    @if (IsDashboard)
+                                    {
+                                        <DxPieChart Data="@statusMcuData"
+                                                    T="StatusMcuData"
+                                                    Diameter="null">
+                                            <DxPieChartSeries T="StatusMcuData"
+                                                              TArgument="string"
+                                                              TValue="int"
+                                                              ArgumentField="s => s.Status"
+                                                              SummaryMethod="Enumerable.Sum"
+                                                              ValueField="s => s.Count">
+                                                <DxChartSeriesLabel Visible="true"
+                                                                    Position="RelativePosition.Outside">
+                                                    <DxChartSeriesLabelConnector Visible="true" />
+                                                </DxChartSeriesLabel>
+                                            </DxPieChartSeries>
+                                            <DxChartTooltip Enabled="true"
+                                                            Position="RelativePosition.Outside">
+                                                <div style="margin: 0.75rem">
+                                                    <div class="fw-bold">@context.Point.Argument</div>
+                                                    <div>Total: @($"{context.Point.Value}")</div>
+                                                </div>
+                                            </DxChartTooltip>
+                                            <DxChartTitle Text="General Consultation Services">
+                                                <DxChartSubTitle Text="Sorted by Status" />
+                                            </DxChartTitle>
+                                            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Center"
+                                                           VerticalAlignment="VerticalEdge.Bottom"
+                                                           Position="RelativePosition.Outside"
+                                                           Orientation="Orientation.Horizontal" />
+                                        </DxPieChart>
+                                    }
+                                    else
+                                    {
+                                        <MyGrid @ref="Grid"
+                                                Data="GeneralConsultanServices.OrderByDescending(x => x.RegistrationDate).ThenByDescending(x => x.IsAlertInformationSpecialCase).ThenByDescending(x => x.ClassType is not null)"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                DataItemDeleting="OnDelete"
+                                                RowDoubleClick="@(async () => await EditItem_Click())"
+                                                FocusedRowChanged="Grid_FocusedRowChanged1"
+                                                KeyFieldName="Id">
+
+                                            <ToolbarTemplate>
+                                                <MyDxToolbarBase TItem="GeneralConsultanServiceDto"
+                                                                 Items="@GeneralConsultanServices"
+                                                                 SelectedDataItems="@SelectedDataItems"
+                                                                 NewItem_Click="@(async () => await NewItem_Click())"
+                                                                 Grid="Grid"
+                                                                 EditItem_Click="@(async () => await EditItem_Click())"
+                                                                 DeleteItem_Click="@DeleteItem_Click"
+                                                                 Refresh_Click="@(async () => await Refresh_Click())"
+                                                                 EnableDelete="IsDeletedConsultantService"
+                                                                 IsImport="false" />
+                                            </ToolbarTemplate>
+
+                                            <Columns>
+                                                <DxGridSelectionColumn Width="15px" />
+                                                <DxGridDataColumn MinWidth="200"
+                                                                  FieldName="RegistrationDate"
+                                                                  FilterRowOperatorType="GridFilterRowOperatorType.Contains"
+                                                                  DisplayFormat="ddd, dd MMM yyyy"
+                                                                  Caption="Registration Date" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="Payment" Caption="Payment Method" Visible="false" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="AppointmentDate" Caption="Appoiment" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
+                                                    <CellDisplayTemplate>
+                                                        @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
+                                                    </CellDisplayTemplate>
+                                                </DxGridDataColumn>
+                                            </Columns>
+                                            <GroupSummary>
+                                                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="StatusName" />
+                                            </GroupSummary>
+                                        </MyGrid>
+                                    }
                                 </DxLoadingPanel>
                             </div>
                         }
@@ -146,25 +189,37 @@
                                                                 </DxToolbar>
                                                             </div>
                                                         }
+
+                                                        @if (!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Confirmed) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) && !GeneralConsultanService.StatusName.Equals("Canceled"))
+                                                        {
+                                                            <div class="col-sm align-self-end">
+                                                                <div class="row justify-content-end">
+                                                                    <div class="col-auto">
+                                                                        <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="@(async () => await LoadData())"></DxButton>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            @if (!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Confirmed) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) && !GeneralConsultanService.StatusName.Equals("Canceled"))
-                                            {
-                                                <div class="card ">
-                                                    <div class="card-body">
-                                                        <div class="w-100">
-                                                            <div class="row w-100">
-                                                                <div class="col-md-12 align-self-center">
-                                                                    <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="@(async () => await LoadData())"></DxButton>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            }
+                                            @*  @if (!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Confirmed) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) && !GeneralConsultanService.StatusName.Equals("Canceled"))
+                            {
+                            <div class="card ">
+                            <div class="card-body">
+                            <div class="w-100">
+                            <div class="row w-100">
+                            <div class="col-md-12 align-self-center">
+                            <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="@(async () => await LoadData())"></DxButton>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            } *@
                                         }
                                     }
 

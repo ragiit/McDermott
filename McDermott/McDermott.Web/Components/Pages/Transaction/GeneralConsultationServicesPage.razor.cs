@@ -2025,7 +2025,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                     default:
                         break;
                 }
-
                 GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId) ?? new();
 
                 ToastService.ClearSuccessToasts();
@@ -2084,12 +2083,38 @@ namespace McDermott.Web.Components.Pages.Transaction
             NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
         }
 
+        private bool IsDashboard { get; set; } = false;
+
+        #region Chart
+
+        public class StatusMcuData
+        {
+            public string Status { get; set; }
+            public int Count { get; set; }
+        }
+
+        public List<StatusMcuData> GetStatusMcuCounts(List<GeneralConsultanServiceDto> services)
+        {
+            var aa = services.GroupBy(s => s.Status)
+                            .Select(g => new StatusMcuData
+                            {
+                                Status = g.Key.GetDisplayName(),
+                                Count = g.Count()
+                            }).ToList();
+            return aa;
+        }
+
+        #endregion Chart
+
+        private List<StatusMcuData> statusMcuData = [];
+
         private async Task LoadData()
         {
             PanelVisible = true;
             SelectedDataItems = [];
             ShowForm = false;
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
+            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "General Consultation" || x.TypeRegistration == "Emergency"));
+            statusMcuData = GetStatusMcuCounts(GeneralConsultanServices);
             PanelVisible = false;
         }
 
