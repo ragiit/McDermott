@@ -12,7 +12,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long Id { get; set; }
         public long? LinesId { get; set; }
         public long? StockId { get; set; }
-        public long? CutStock { get; set; }
+        public long CutStock { get; set; } = 0;
         public long? CurrentStock { get; set; }
         public string? Batch { get; set; }
         public DateTime? Expired { get; set; }

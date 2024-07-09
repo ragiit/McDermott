@@ -15,7 +15,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long MedicamentDosage { get; set; } = 0;
         public long? MedicamentUnitOfDosage { get; set; }
         public long Qty { get; set; } = 0;
-        public long? TotalQty { get; set; }
+        public long TotalQty { get; set; } = 0;
         public long? AvaliableQty { get; set; }
 
         [SetToNull]
