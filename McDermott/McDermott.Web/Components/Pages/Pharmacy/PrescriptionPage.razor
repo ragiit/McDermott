@@ -1197,8 +1197,8 @@ else
     </div>
 </DxPopup>
 
-@* PopUp Detail Prescription *@
-<DxPopup @bind-Visible="@isDetailPrescription" HeaderCssClass="fw-bold" HeaderText="Input Detail Stock "
+@* PopUp Detail ConcoctionLine *@
+  <DxPopup @bind-Visible="@isDetailPrescription" HeaderCssClass="fw-bold" HeaderText="Input Detail Stock "
          HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
 <div class="card">
@@ -1209,7 +1209,7 @@ else
                     ApplyBackgroundShading="true"
                     IndicatorAreaVisible="false"
                     Text="Fetching Data...">
-        <DxGrid @ref="GridStockOut"
+        <DxGrid @ref="GridStockOutLines"
                 PagerNavigationMode="PagerNavigationMode.InputBox"
                 Data="StockOutLines"
                 PageSize="10"
@@ -1323,3 +1323,4 @@ else
     </div
     </div>
 </DxPopup>
+ 

@@ -136,6 +136,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private IGrid GridConcoction { get; set; }
         private IGrid GridConcoctionLines { get; set; }
         private IGrid GridStockOut { get; set; }
+        private IGrid GridStockOutLines { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsPrescriptionLines { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsConcoction { get; set; } = [];
@@ -1667,7 +1668,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 ex.HandleException(ToastService);
             }
-           
+
         }
 
 
@@ -1743,6 +1744,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             try
             {
                 var data_pharmacy = new PharmacyDto();
+                var data_concoctions = new List<ConcoctionDto>();
                 if (Pharmacy.Id == 0)
                 {
                     Pharmacy.Status = EnumStatusPharmacy.Draft;
@@ -1759,7 +1761,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         x.PharmacyId = data_pharmacy.Id;
                         x.Id = 0;
                     });
-                    await Mediator.Send(new CreateListConcoctionRequest(Concoctions));
+                    data_concoctions = await Mediator.Send(new CreateListConcoctionRequest(Concoctions));
+
+                    ConcoctionLines.ForEach(x =>
+                    {
+                        x.ConcoctionId = data_concoctions.Id; 
+                        x.Id = 0;
+                    });
 
                     PharmaciesLog.PharmacyId = data_pharmacy.Id;
                     PharmaciesLog.UserById = NameUser.Id;
@@ -2078,8 +2086,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 #endregion
                 #region ConcoctionLine CutStock
                 var data_concoctions = Concoctions.FirstOrDefault(x => x.PharmacyId == pharmacyData.Id);
-                var data_lines = ConcoctionLines.Where(x => x.ConcoctionId == data_concoctions.Id).ToList();
-                if(data_lines == null )
+                var data_lines = ConcoctionLines.Where(x => x.ConcoctionId == data_concoctions?.Id).ToList();
+                if (data_lines == null)
                 {
                     return;
                 }
@@ -2093,7 +2101,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     }
 
                     var StockOutData = StockOutLines.Where(x => x.LinesId == line.Id).ToList();
-                    foreach(var stockOut in StockOutData)
+                    foreach (var stockOut in StockOutData)
                     {
                         var stock = StockProducts.FirstOrDefault(x => x.Id == stockOut.StockId);
                         if (stock == null)
