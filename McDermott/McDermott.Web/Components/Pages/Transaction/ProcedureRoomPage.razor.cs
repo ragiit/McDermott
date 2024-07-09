@@ -106,6 +106,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 PanelVisible = false;
 
+                Grid?.SelectRow(0, true);
                 StateHasChanged();
             }
         }

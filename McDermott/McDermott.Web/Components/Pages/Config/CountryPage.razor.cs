@@ -75,6 +75,7 @@ namespace McDermott.Web.Components.Pages.Config
             try
             {
                 Countries = await Mediator.Send(new GetCountryQuery());
+                Grid.SelectRow(0);
             }
             catch { }
 

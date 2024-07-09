@@ -68,6 +68,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     var aaa = ex;
                 }
+
+                Grid?.SelectRow(0, true);
             }
         }
 
@@ -88,9 +90,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 var mergeFields = new Dictionary<string, string>
                 {
-                    {"%EmployeeName%", "dadadawd"},
-                    {"<<EmployeeName>>", "WKOWAKOAWO"},
-                    //{"%EmployeeName%", gen?.Patient?.Name.GetDefaultValue() ?? "-"},
+                    {"%EmployeeName%", gen?.Patient?.Name.GetDefaultValue() ?? "-"},
                     {"%EmployeeNIP%", gen?.Patient?.NIP?.GetDefaultValue() ?? "-"},
                     {"%EmployeeDepartment%", gen?.Patient?.Department?.Name.GetDefaultValue() ?? "-"},
                     {"%DateOfOccurence%", accident.DateOfOccurrence.GetValueOrDefault().ToString("dd MMM yyyy")},
