@@ -7,15 +7,18 @@ using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Pharmacy
 {
-    public class StockOutLines: IMapFrom<StockOutLines>
+    public class StockOutLinesDto : IMapFrom<StockOutLines>
     {
+        public long Id { get; set; }
         public long? LinesId { get; set; }
         public long? StockId { get; set; }
         public long? CutStock { get; set; }
         public long? CurrentStock { get; set; }
+        public string? Batch { get; set; }
+        public DateTime? Expired { get; set; }
 
         [SetToNull]
-       public virtual ConcoctionLineDto? Lines { get; set; }
+        public virtual ConcoctionLineDto? Lines { get; set; }
         [SetToNull]
         public virtual StockProductDto? Stock { get; set; }
     }
