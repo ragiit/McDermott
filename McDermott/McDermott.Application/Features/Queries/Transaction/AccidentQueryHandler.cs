@@ -28,6 +28,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     result = await _unitOfWork.Repository<Accident>().Entities
                        .Include(x => x.Department)
                        .Include(x => x.Employee)
+                       .Include(x => x.SafetyPersonnel)
                        .AsNoTracking()
                        .ToListAsync(cancellationToken);
 

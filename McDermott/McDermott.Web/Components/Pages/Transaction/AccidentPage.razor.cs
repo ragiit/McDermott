@@ -73,6 +73,17 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
+        private void OnSelectAccidentLocation(string e)
+        {
+            if (e is null)
+                return;
+
+            if (e.Equals("Outside"))
+            {
+                Accident.Sent = "Hospital";
+            }
+        }
+
         public byte[]? DocumentContent;
         private bool isPrint { get; set; } = false;
         private DxRichEdit richEdit;
@@ -916,6 +927,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true && x.IsPatient == true));
             Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
+            Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());
         }
 

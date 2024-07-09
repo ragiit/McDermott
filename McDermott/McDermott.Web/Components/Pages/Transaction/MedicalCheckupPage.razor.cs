@@ -339,7 +339,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task LoadComboBox()
         {
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
-            Services = await Mediator.Send(new GetServiceQuery());
+            Services = await Mediator.Send(new GetServiceQuery(x => x.IsMcu == true));
         }
 
         private void DeleteItem_Click()

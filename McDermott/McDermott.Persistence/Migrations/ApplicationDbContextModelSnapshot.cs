@@ -190,6 +190,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool>("RibbonSpecialCase")
                         .HasColumnType("bit");
 
+                    b.Property<long>("SafetyPersonnelId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("SelectedEmployeeCauseOfInjury1")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -394,6 +397,8 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.HasIndex("GeneralConsultanServiceId");
+
+                    b.HasIndex("SafetyPersonnelId");
 
                     b.ToTable("Accidents");
                 });
@@ -4396,6 +4401,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool>("IsKiosk")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsMcu")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsPatient")
                         .HasColumnType("bit");
 
@@ -5335,11 +5343,19 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("McDermott.Domain.Entities.User", "SafetyPersonnel")
+                        .WithMany()
+                        .HasForeignKey("SafetyPersonnelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Department");
 
                     b.Navigation("Employee");
 
                     b.Navigation("GeneralConsultanService");
+
+                    b.Navigation("SafetyPersonnel");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.ActiveComponent", b =>

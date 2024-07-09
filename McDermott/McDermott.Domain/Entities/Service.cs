@@ -11,6 +11,7 @@
         public string Quota { get; set; } = string.Empty;
         public bool IsPatient { get; set; }
         public bool IsKiosk { get; set; }
+        public bool IsMcu { get; set; } = false;
         public long? ServicedId { get; set; }
 
         [SetToNull]

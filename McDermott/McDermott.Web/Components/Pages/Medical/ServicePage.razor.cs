@@ -81,20 +81,38 @@
             }
         }
 
-        private async Task OnSave()
+        private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(FormService.Name))
-                return;
+            //if (string.IsNullOrWhiteSpace(FormService.Name))
+            //    return;
 
-            if (FormService.Id == 0)
+            //if (FormService.Id == 0)
+            //{
+            //    await Mediator.Send(new CreateServiceRequest(FormService));
+            //}
+            //else
+            //{
+            //    await Mediator.Send(new UpdateServiceRequest(FormService));
+            //}
+            //await LoadData();
+            try
             {
-                await Mediator.Send(new CreateServiceRequest(FormService));
+                var editModel = (ServiceDto)e.EditModel;
+
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateServiceRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateServiceRequest(editModel));
+
+                //await hubConnection.SendAsync("SendCountry", editModel);
+
+                SelectedDataItems = [];
+                await LoadData();
             }
-            else
+            catch (Exception ex)
             {
-                await Mediator.Send(new UpdateServiceRequest(FormService));
+                ex.HandleException(ToastService);
             }
-            await LoadData();
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -118,6 +136,9 @@
 
         private async Task NewItem_Click()
         {
+            await Grid.StartEditNewRowAsync();
+
+            return;
             FormService = new();
             PopUpVisible = true;
             TextPopUp = "Add Services";
@@ -130,6 +151,8 @@
 
         private async Task EditItem_Click()
         {
+            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            return;
             FormService = SelectedDataItems[0].Adapt<ServiceDto>();
 
             PopUpVisible = true;

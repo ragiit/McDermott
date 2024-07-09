@@ -1,123 +1,92 @@
 ﻿@page "/medical/service"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Master Data Service</PageTitle>
+<PageTitle>McHealthCare - Service</PageTitle>
 
 @if (IsAccess)
 {
 
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Service" />
+        <BaseHeaderPage Title="Service" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
                         <div class="card">
-                            <div class="card-body">
-                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                        Data="Services"
-                                        PageSize="10"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                        KeyFieldName="Id"
-                                        TextWrapEnabled="false"
-                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                        AllowSelectRowByClick="true"
-                                        EditModelSaving="OnSave"
-                                        DataItemDeleting="OnDelete"
-                                        EditMode="GridEditMode.PopupEditForm"
-                                        PopupEditFormCssClass="pw-800"
-                                        PagerPosition="GridPagerPosition.Bottom"
-                                        PageSizeSelectorVisible="true"
-                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        PageSizeSelectorAllRowsItemVisible="true"
-                                        EditorRenderMode="GridEditorRenderMode.Detached"
-                                        PagerSwitchToInputBoxButtonCount="10"
-                                        FocusedRowEnabled="true"
-                                        PagerVisibleNumericButtonCount="10"
-                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                        ShowGroupPanel="true"
-                                        AutoExpandAllGroupRows="true"
-                                        ShowFilterRow="true"
-                                        CustomizeElement="Grid_CustomizeElement"
-                                        ShowSearchBox="true"
-                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                        KeyboardNavigationEnabled="true">
-                                    <ToolbarTemplate>
-                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                            <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                            <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Services.Count > 0" />
-                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Services.Count > 0" />
-                                            <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                            <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                <Items>
-                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                </Items>
-                                            </DxToolbarItem>
-                                        </DxToolbar>
-                                    </ToolbarTemplate>
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" Width="200px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Code" Width="100px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Quota" Width="90px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Flag" Width="130px" Caption="Flag" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="KioskName" Caption=" Service Counter" />
-                                    </Columns>
-                                </DxGrid>
+                            <MyGrid @ref="Grid"
+                                    Data="Services"
+                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                    KeyFieldName="Id"
+                                    EditModelSaving="OnSave"
+                                    DataItemDeleting="OnDelete"
+                                    FocusedRowChanged="Grid_FocusedRowChanged">
 
-                                <DxPopup @bind-Visible="@PopUpVisible"
-                                         AllowResize="true"
-                                         HeaderText="@TextPopUp"
-                                         MinWidth="300"
-                                         MinHeight="200"
-                                         Width="50%"
-                                         Height="50%">
-                                    <EditForm Model=@FormService Context="EditFormContext">
-                                        <DataAnnotationsValidator />
-                                        <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@FormService.Name" NullText="Name Service.." ShowValidationIcon="true" />
-                                                <ValidationMessage For="@(()=>FormService.Name)" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Code:" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@FormService.Code" NullText="Code.." />
-                                            </DxFormLayoutItem>
+                                <ToolbarTemplate>
+                                    <MyDxToolbarBase TItem="ServiceDto"
+                                                     Items="@Services"
+                                                     Grid="Grid"
+                                                     SelectedDataItems="@SelectedDataItems"
+                                                     NewItem_Click="@NewItem_Click"
+                                                     EditItem_Click="@EditItem_Click"
+                                                     DeleteItem_Click="@DeleteItem_Click"
+                                                     Refresh_Click="@Refresh_Click"
+                                                     IsImport="true"
+                                                     VisibleNew="UserAccessCRUID.Create"
+                                                     VisibleEdit="UserAccessCRUID.Update"
+                                                     VisibleDelete="UserAccessCRUID.Delete" />
+                                </ToolbarTemplate>
 
-                                            <DxFormLayoutItem Caption="Quota:" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@FormService.Quota" NullText="Quota Service.." />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Patient" ColSpanMd="6">
-                                                <DxCheckBox @bind-Checked="@FormService.IsPatient" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Counter" ColSpanMd="6">
-                                                <DxCheckBox @bind-Checked="@FormService.IsKiosk" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="caption normal-caption" Caption="Service Counter" Visible="@Convert.ToBoolean(@FormService.IsPatient)">
-                                                <DxComboBox Data="@ServicesK"
-                                                            @bind-Value="@FormService.ServicedId"
-                                                            NullText="select Service Counter.."
-                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id"></DxComboBox>
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem ColSpanMd="12">
-                                                <div class="row justify-content-end">
-                                                    <div class="col-auto align-self-end">
-                                                        <DxButton Text="Save" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Info" SubmitFormOnClick="true" Click="OnSave"></DxButton>
-                                                        <DxButton Text="Discard" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" Click="OnCancel"></DxButton>
-                                                    </div>
-                                                </div>
-                                            </DxFormLayoutItem>
-                                        </DxFormLayout>
-                                    </EditForm>
-                                </DxPopup>
-                            </div>
+                                <Columns>
+                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" Width="200px" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="Code" Width="100px" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="Quota" Width="90px" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="Flag" Width="130px" Caption="Flag" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="KioskName" Caption=" Service Counter" />
+                                </Columns>
+
+                                <EditFormTemplate Context="EditFormContext">
+                                    @{
+                                        var a = (ServiceDto)EditFormContext.EditModel;
+                                    }
+                                    <DxFormLayout CssClass="w-100">
+                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-captionS" Caption="Service Name" ColSpanMd="12">
+                                            <MyTextBox @bind-Text="@a.Name" NullText="Service Name..." />
+                                            <ValidationMessage For="@(()=>a.Name)" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
+                                            <MyTextBox @bind-Text="@a.Code" NullText="Code..." />
+                                            <ValidationMessage For="@(()=>a.Code)" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quota:" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@a.Quota" NullText="Quota Service.." />
+                                            <ValidationMessage For="@(()=>a.Quota)" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient" ColSpanMd="12">
+                                            <DxCheckBox @bind-Checked="@a.IsPatient" />
+                                            <ValidationMessage For="@(()=>a.IsPatient)" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Service Counter" Visible="@Convert.ToBoolean(a.IsPatient)">
+                                            <MyDxComboBox Data="@ServicesK"
+                                                          @bind-Value="@a.ServicedId"
+                                                          NullText="select Service Counter.."
+                                                          TextFieldName="Name"
+                                                          ValueFieldName="Id"></MyDxComboBox>
+                                            <ValidationMessage For="@(()=>a.ServicedId)" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Counter" ColSpanMd="12">
+                                            <DxCheckBox @bind-Checked="@a.IsKiosk" />
+                                            <ValidationMessage For="@(()=>a.IsKiosk)" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Mcu" ColSpanMd="12">
+                                            <DxCheckBox @bind-Checked="@a.IsMcu" />
+                                            <ValidationMessage For="@(()=>a.IsMcu)" />
+                                        </DxFormLayoutItem>
+                                    </DxFormLayout>
+                                </EditFormTemplate>
+                            </MyGrid>
                         </div>
                     </div>
                 </div>
@@ -127,9 +96,5 @@
 }
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Service" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <LoadingIndicatorLayout />
 }

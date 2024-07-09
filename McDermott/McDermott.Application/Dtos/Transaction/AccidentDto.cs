@@ -10,6 +10,7 @@ namespace McDermott.Application.Dtos.Transaction
     {
         public long Id { get; set; }
         public long GeneralConsultanServiceId { get; set; }
+        public long SafetyPersonnelId { get; set; }
 
         [Display(Name = "Date Of Occurrence")]
         [Required]
@@ -133,5 +134,6 @@ namespace McDermott.Application.Dtos.Transaction
         public virtual GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
         public virtual UserDto? Employee { get; set; }
         public virtual DepartmentDto? Department { get; set; }
+        public virtual UserDto? SafetyPersonnel { get; set; }
     }
 }
