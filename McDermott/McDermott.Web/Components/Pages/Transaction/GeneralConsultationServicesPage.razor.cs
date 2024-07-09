@@ -2063,6 +2063,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 await LoadComboBox();
                 StateHasChanged();
+
+                Grid?.SelectRow(0, true);
             }
         }
 

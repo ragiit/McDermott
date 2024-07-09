@@ -32,6 +32,8 @@ namespace McDermott.Web.Components.Pages.Config
                 await LoadComboBox();
                 IsLoading = false;
                 StateHasChanged();
+
+                Grid?.SelectRow(0, true);
             }
         }
 

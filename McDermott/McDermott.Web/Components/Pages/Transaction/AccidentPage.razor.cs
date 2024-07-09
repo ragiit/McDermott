@@ -68,6 +68,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     var aaa = ex;
                 }
+
+                Grid?.SelectRow(0, true);
             }
         }
 
