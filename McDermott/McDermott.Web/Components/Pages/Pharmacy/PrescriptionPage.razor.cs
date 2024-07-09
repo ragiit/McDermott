@@ -616,6 +616,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         #region Cut Stock
         private bool isDetailPrescription { get; set; } = false;
+        private bool isDetailLines { get; set; } = false;
         //private long? StockIds { get; set; }
         private bool traceAvailability { get; set; } = false;
         private long PrescripId { get; set; } = 0;
@@ -642,7 +643,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             // Update state variables
             traceAvailability = product.TraceAbility;
 
-            isDetailPrescription = true;
+            isDetailLines = true;
 
             // Filter stock products based on specific conditions
             StockOutProducts = StockProducts
@@ -910,6 +911,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             isDetailPrescription = false;
         }
+        private void HandleDiscardLines()
+        {
+            isDetailLines = false;
+        }
 
         private async Task SaveStockOut()
         {
@@ -947,7 +952,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                     await Mediator.Send(new CreateStockOutLinesRequest(item_cutstock));
                 }
-                isDetailPrescription = false;
+                isDetailLines = false;
                 await EditItemPharmacy_Click(null);
                 StateHasChanged();
             }
@@ -984,7 +989,36 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
             }
         }
+
+        private async Task ChangeOutStockLines(StockProductDto value)
+        {
+            SelectedBatchExpired = null;
+
+            if (value is not null)
+            {
+                SelectedBatchExpired = value.Expired;
+
+                //current Stock
+                var _currentStock = StockProducts.Where(x => x.SourceId == Pharmacy.PrescriptionLocationId && x.ProductId == value.ProductId && x.Batch == value.Batch).FirstOrDefault();
+                if (_currentStock is not null)
+                {
+                    if (_currentStock.Qty > 0)
+                    {
+                        FormStockOutLines.StockId = value.Id;
+                        FormStockOutLines.Batch = value.Batch;
+                        FormStockOutLines.Expired = value.Expired;
+                        FormStockOutLines.CurrentStock = _currentStock.Qty;
+                    }
+                    else
+                    {
+                        ToastService.ClearCustomToasts();
+                        ToastService.ShowWarning("Empty Stock!.. ");
+                    }
+                }
+            }
+        }
         #endregion
+        
         private async Task LoadAsyncData()
         {
             try
@@ -1391,6 +1425,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private string? StockCut_Name { get; set; }
         List<StockOutPrescriptionDto> StockOut_data = new List<StockOutPrescriptionDto>();
+        private string? StockCutLines_Name { get; set; }
+        List<StockOutLinesDto> StockOutLines_data = new List<StockOutLinesDto>();
         private async Task OnDeleteStockCutPrescription(GridDataItemDeletingEventArgs e)
         {
             var data = SelectedDataItemsStockOut.Adapt<List<StockOutPrescriptionDto>>();
@@ -1417,6 +1453,41 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     {
                         StockOutPrescriptions.RemoveAll(x => data.Select(z => z.Id).Contains(x.Id));
                         StockOut_data.Add(item);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+            }
+        }
+
+        private async Task OnDeleteStockCutLines(GridDataItemDeletingEventArgs e)
+        {
+            var data = SelectedDataItemsStockOut.Adapt<List<StockOutLinesDto>>();
+            if (Pharmacy.Id == 0)
+            {
+                try
+                {
+                    if (SelectedDataItemsStockOut is null || SelectedDataItemsStockOut.Count == 1)
+                    {
+                        StockOutLines.Remove((StockOutLinesDto)e.DataItem);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+            }
+            else
+            {
+                try
+                {
+                    StockCutLines_Name = "StockCut";
+                    foreach (var item in data)
+                    {
+                        StockOutLines.RemoveAll(x => data.Select(z => z.Id).Contains(x.Id));
+                        StockOutLines_data.Add(item);
                     }
                 }
                 catch (Exception ex)
@@ -1605,6 +1676,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 if (Sc.Id == 0)
                 {
                     Sc.Id = Helper.RandomNumber;
+                    Sc.PrescriptionId = PrescripId;
                     StockOutPrescriptions.Add(Sc);
                 }
                 else
@@ -1653,6 +1725,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 if (Sc.Id == 0)
                 {
                     Sc.Id = Helper.RandomNumber;
+                    Sc.LinesId = Lines_Id;
                     StockOutLines.Add(Sc);
                 }
                 else
@@ -1763,11 +1836,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     });
                     data_concoctions = await Mediator.Send(new CreateListConcoctionRequest(Concoctions));
 
+                    // Assign new ConcoctionId to ConcoctionLines and reset Ids
                     ConcoctionLines.ForEach(x =>
                     {
-                        x.ConcoctionId = data_concoctions.Id; 
+                        x.ConcoctionId = data_concoctions.FirstOrDefault()?.Id ?? 0;
                         x.Id = 0;
                     });
+
+                    await Mediator.Send(new CreateListConcoctionLineRequest(ConcoctionLines));
 
                     PharmaciesLog.PharmacyId = data_pharmacy.Id;
                     PharmaciesLog.UserById = NameUser.Id;
@@ -1866,9 +1942,20 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 var data_products = Prescriptions.Where(x => x.Id == PrescripId).Select(x => x.ProductId).FirstOrDefault();
                 var Qty_stock = StockProducts.Where(x => x.ProductId == data_products && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
-                FormStockOutPrescriptions.CurrentStock = Qty_stock;
+                FormStockOutLines.CurrentStock = Qty_stock;
             }
             await GridStockOut.StartEditNewRowAsync();
+        }
+        private async Task NewItemStockOutLines_Click()
+        {
+            selectedActiveComponents = [];
+            if (!traceAvailability)
+            {
+                var data_products = ConcoctionLines.Where(x => x.Id == Lines_Id).Select(x => x.ProductId).FirstOrDefault();
+                var Qty_stock = StockProducts.Where(x => x.ProductId == data_products && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
+                FormStockOutLines.CurrentStock = Qty_stock;
+            }
+            await GridStockOutLines.StartEditNewRowAsync();
         }
 
         #endregion NewItem Click
@@ -1917,6 +2004,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 await GetPatientAllergy(Pharmacy.PatientId);
                 Prescriptions = await Mediator.Send(new GetPrescriptionQuery(x => x.PharmacyId == Pharmacy.Id));
                 Concoctions = await Mediator.Send(new GetConcoctionQuery(x => x.PharmacyId == Pharmacy.Id));
+                var ConcoctionId = Concoctions.FirstOrDefault()?.Id ?? 0;
+                ConcoctionLines = await Mediator.Send(new GetConcoctionLineQuery(x => x.ConcoctionId == ConcoctionId));
 
                 await LoadLogs();
 
@@ -1969,6 +2058,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             var selected = (StockOutPrescriptionDto)context.SelectedDataItem;
             await GridStockOut.StartEditRowAsync(FocusedRowVisibleIndexStockOut);
+        }
+
+        private async Task EditItemStockOutLines_Click(IGrid context)
+        {
+            var selected = (StockOutLinesDto)context.SelectedDataItem;
+            await GridStockOutLines.StartEditRowAsync(FocusedRowVisibleIndexStockOut);
         }
         #endregion function Edit Click
 
@@ -2168,6 +2263,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private void DeleteItemStockOut_Click()
         {
             GridStockOut.ShowRowDeleteConfirmation(FocusedRowVisibleIndexStockOut);
+        }
+        private void DeleteItemStockOutLines_Click()
+        {
+            GridStockOutLines.ShowRowDeleteConfirmation(FocusedRowVisibleIndexStockOut);
         }
 
         private void DeleteItemPrescriptionLines_Click()

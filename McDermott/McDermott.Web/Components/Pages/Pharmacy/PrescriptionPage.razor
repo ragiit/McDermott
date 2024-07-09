@@ -1113,7 +1113,7 @@ else
                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOut_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed)" />
                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOut_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && IsPopUpForm && isActiveButton" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && IsPopUpForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed" />
                 </DxToolbar>
             </ToolbarTemplate>
             <Columns>
@@ -1198,7 +1198,7 @@ else
 </DxPopup>
 
 @* PopUp Detail ConcoctionLine *@
-  <DxPopup @bind-Visible="@isDetailPrescription" HeaderCssClass="fw-bold" HeaderText="Input Detail Stock "
+  <DxPopup @bind-Visible="@isDetailLines" HeaderCssClass="fw-bold" HeaderText="Input Detail Stock "
          HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
 <div class="card">
@@ -1218,7 +1218,7 @@ else
                 KeyFieldName="Id"
                 CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                 EditorRenderMode="GridEditorRenderMode.Detached"
-                DataItemDeleting="OnDeleteStockCutPrescription"
+                DataItemDeleting="OnDeleteStockCutLines"
                 EditModelSaving="OnSaveStockOutLines"
                 AllowSelectRowByClick="true"
                 PagerPosition="GridPagerPosition.Bottom"
@@ -1238,9 +1238,9 @@ else
                 KeyboardNavigationEnabled="true">
             <ToolbarTemplate>
                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOut_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed)" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOut_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && IsPopUpForm && isActiveButton" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOutLines_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed)" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOutLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOutLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && IsPopUpForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed" />
                 </DxToolbar>
             </ToolbarTemplate>
             <Columns>
@@ -1265,13 +1265,13 @@ else
                                     @if (traceAvailability == true)
                                     {
                                         <div class="col-6">
-                                            <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                    <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                     <DxComboBox ShowValidationIcon="true"
                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                 Data="@StockOutProducts"
                                                 NullText="Select Batch..."
-                                                @bind-Value="@FormStockOutPrescriptions.StockId"
-                                                SelectedItemChanged="@((StockProductDto value)=> ChangeOutStock(value))"
+                                                @bind-Value="@FormStockOutLines.StockId"
+                                                SelectedItemChanged="@((StockProductDto value)=> ChangeOutStockLines(value))"
                                                 TextFieldName="Batch"
                                                 ValueFieldName="Id">
                                        
@@ -1282,7 +1282,7 @@ else
                                     <DxDateEdit ShowValidationIcon="true"
                                                 DisplayFormat="dd MMMM yyyy"
                                                 ReadOnly
-                                                @bind-Date="@FormStockOutPrescriptions.Expired"
+                                                @bind-Date="@FormStockOutLines.Expired"
                                                 NullText="Expired Date">
                                     </DxDateEdit>
                                 </DxFormLayoutItem>
@@ -1316,7 +1316,7 @@ else
             <div class="row justify-content-end">
                 <div class="col-auto align-self-end">
                     <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="SaveStockOutLines"></DxButton>
-                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="HandleDiscard"></DxButton>
+                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="HandleDiscardLines"></DxButton>
                 </div>
             </div>
         }
