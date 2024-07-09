@@ -9,7 +9,7 @@ namespace McDermott.Domain.Entities
     public class Accident : BaseAuditableEntity
     {
         public long GeneralConsultanServiceId { get; set; }
-
+        public long SafetyPersonnelId { get; set; }
         [Display(Name = "Date Of Occurrence")]
         [Required]
         public DateTime? DateOfOccurrence { get; set; }
@@ -134,5 +134,8 @@ namespace McDermott.Domain.Entities
         public virtual User? Employee { get; set; }
         [SetToNull]
         public virtual Department? Department { get; set; }
+
+        [SetToNull]
+        public virtual User? SafetyPersonnel { get; set; }
     }
 }

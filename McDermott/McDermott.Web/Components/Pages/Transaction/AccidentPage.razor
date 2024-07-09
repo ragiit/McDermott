@@ -47,9 +47,10 @@
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Accident.SafetyPersonnel.Name" Caption="Safety Personnel" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Accident.DateOfOccurrence" Caption="Date Of Occurrence" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Accident.DateOfFirstTreatment" Caption="Date Of First Treatment" />
+                                            <DxGridDataColumn MinWidth="200" DisplayFormat="dd MMM yyyy HH:mm:ss" FieldName="Accident.DateOfOccurrence" Caption="Date Of Occurrence" />
+                                            <DxGridDataColumn MinWidth="200" DisplayFormat="dd MMM yyyy HH:mm:ss" FieldName="Accident.DateOfFirstTreatment" Caption="Date Of First Treatment" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Accident.RibbonSpecialCase" Caption="Ribbon Special Case" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Accident.Sent" Caption="Sent" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Accident.EmployeeClass" Caption="Employee Class" />
@@ -263,13 +264,23 @@
 
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sent" ColSpanMd="12">
                                                             <MyDxComboBox Data="@SentType"
-                                                                          ReadOnly="!IsStatus(EnumStatusAccident.Draft)"
+                                                                          ReadOnly="@((!(IsStatus(EnumStatusAccident.Draft) || IsStatus(EnumStatusAccident.MedicalTreatment))))"
                                                                           NullText="Select Type..."
                                                                           @bind-Value="Accident.Sent">
                                                             </MyDxComboBox>
                                                             <ValidationMessage For="@(() => Accident.Sent)" />
                                                         </DxFormLayoutItem>
 
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Accident Location" ColSpanMd="12">
+                                                            <MyDxComboBox Data="@AccidentLocations"
+                                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                          NullText="Select Accident Location..."
+                                                                          SelectedItemChanged="@((string e)=>OnSelectAccidentLocation(e))"
+                                                                          ReadOnly="!IsStatus(EnumStatusAccident.Draft)"
+                                                                          @bind-Value="Accident.AccidentLocation">
+                                                            </MyDxComboBox>
+                                                            <ValidationMessage For="@(() => Accident.AccidentLocation)" />
+                                                        </DxFormLayoutItem>
                                                         @*     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Ribbon Special Case" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@GeneralConsultanService.RibbonSpecialCase" />
                                                 </DxFormLayoutItem> *@
@@ -288,6 +299,15 @@
                                                                           InputId="CbDoctoreName">
                                                             </MyDxComboBox>
                                                             <ValidationMessage For="@(() => GeneralConsultanService.PratitionerId)" />
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Safety Personnel Name" ColSpanMd="12">
+                                                            <MyDxComboBox Data="@Employees"
+                                                                          NullText="Select Safety Personnel Name..."
+                                                                          @bind-Value="@Accident.SafetyPersonnelId"
+                                                                          TextFieldName="Name"
+                                                                          ValueFieldName="Id">
+                                                            </MyDxComboBox>
+                                                            <ValidationMessage For="@(() => Accident.SafetyPersonnelId)" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Payment Method" ColSpanMd="12">
                                                             <MyDxComboBox Data="@Payments"
@@ -349,16 +369,6 @@
                                                                        NullText="Area Of Yard" />
                                                             <ValidationMessage For="@(() => Accident.AreaOfYard)" />
 
-                                                        </DxFormLayoutItem>
-
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Accident Location" ColSpanMd="12">
-                                                            <MyDxComboBox Data="@AccidentLocations"
-                                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                                          NullText="Select Accident Location..."
-                                                                          ReadOnly="!IsStatus(EnumStatusAccident.Draft)"
-                                                                          @bind-Value="Accident.AccidentLocation">
-                                                            </MyDxComboBox>
-                                                            <ValidationMessage For="@(() => Accident.AccidentLocation)" />
                                                         </DxFormLayoutItem>
 
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sick Leave" ColSpanMd="12">
@@ -596,40 +606,55 @@
                                                                                         <DxTextBox @bind-Text="@FormInputCPPTGeneralConsultan.Plan" NullText="Planning" />
                                                                                     </DxFormLayoutItem>
 
-                                                                                    @if (IsStatusGenSet(EnumStatusGeneralConsultantService.Physician))
-                                                                                    {
-                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis" ColSpanMd="12">
-                                                                                            <MyDxComboBox Data="@Diagnoses"
-                                                                                                          @bind-Value="@SelectedDiagnosis"
-                                                                                                          NullText="Select Diagnosis..."
-                                                                                                          EditFormat="{0} - {1}">
-                                                                                                <Columns>
-                                                                                                    <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Code)"
-                                                                                                                        Caption="Code" />
+                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis" ColSpanMd="12">
+                                                                                        <MyDxComboBox Data="@Diagnoses"
+                                                                                                      @bind-Value="@SelectedDiagnosis"
+                                                                                                      NullText="Select Diagnosis..."
+                                                                                                      EditFormat="{0} - {1}">
+                                                                                            <Columns>
+                                                                                                <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Code)"
+                                                                                                                    Caption="Code" />
 
-                                                                                                    <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Name)"
-                                                                                                                        Caption="Name" />
-                                                                                                </Columns>
-                                                                                            </MyDxComboBox>
-                                                                                        </DxFormLayoutItem>
-                                                                                    }
-                                                                                    else
-                                                                                    {
-                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis" ColSpanMd="12">
-                                                                                            <MyDxComboBox Data="@NursingDiagnoses"
-                                                                                                          @bind-Value="@SelectedNursingDiagnosis"
-                                                                                                          NullText="Select Diagnosis..."
-                                                                                                          EditFormat="{0} - {1}">
-                                                                                                <Columns>
-                                                                                                    <DxListEditorColumn FieldName="@nameof(NursingDiagnosesDto.Code)"
-                                                                                                                        Caption="Code" />
+                                                                                                <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Name)"
+                                                                                                                    Caption="Name" />
+                                                                                            </Columns>
+                                                                                        </MyDxComboBox>
+                                                                                    </DxFormLayoutItem>
 
-                                                                                                    <DxListEditorColumn FieldName="@nameof(NursingDiagnosesDto.Problem)"
-                                                                                                                        Caption="Problem" />
-                                                                                                </Columns>
-                                                                                            </MyDxComboBox>
-                                                                                        </DxFormLayoutItem>
-                                                                                    }
+                                                                                    @* @if (IsStatusGenSet(EnumStatusGeneralConsultantService.Physician))
+                                                                        {
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis" ColSpanMd="12">
+                                                                        <MyDxComboBox Data="@Diagnoses"
+                                                                        @bind-Value="@SelectedDiagnosis"
+                                                                        NullText="Select Diagnosis..."
+                                                                        EditFormat="{0} - {1}">
+                                                                        <Columns>
+                                                                        <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Code)"
+                                                                        Caption="Code" />
+
+                                                                        <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Name)"
+                                                                        Caption="Name" />
+                                                                        </Columns>
+                                                                        </MyDxComboBox>
+                                                                        </DxFormLayoutItem>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis" ColSpanMd="12">
+                                                                        <MyDxComboBox Data="@NursingDiagnoses"
+                                                                        @bind-Value="@SelectedNursingDiagnosis"
+                                                                        NullText="Select Diagnosis..."
+                                                                        EditFormat="{0} - {1}">
+                                                                        <Columns>
+                                                                        <DxListEditorColumn FieldName="@nameof(NursingDiagnosesDto.Code)"
+                                                                        Caption="Code" />
+
+                                                                        <DxListEditorColumn FieldName="@nameof(NursingDiagnosesDto.Problem)"
+                                                                        Caption="Problem" />
+                                                                        </Columns>
+                                                                        </MyDxComboBox>
+                                                                        </DxFormLayoutItem>
+                                                                        } *@
 
                                                                                 </DxFormLayout>
                                                                             </div>
