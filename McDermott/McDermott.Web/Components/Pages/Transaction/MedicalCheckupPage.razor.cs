@@ -1,5 +1,4 @@
 ﻿using DocumentFormat.OpenXml;
-using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -508,13 +507,13 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                         var b = new GeneralConsultanServiceDto
                         {
-                            PatientId = patient.Id,
+                            PatientId = patient == null ? null : patient.Id,
                             TypeRegistration = "MCU",
                             RegistrationDate = dateValue,
                             IsMcu = true,
                             TypeMedical = col2MCUType,
                             PratitionerId = phyId,
-                            ServiceId = ser.Id,
+                            ServiceId = ser == null ? null : ser.Id,
                             MedexType = col3Medex,
                             IsBatam = col4Candidate.Equals("Batam"),
                             IsOutsideBatam = col4Candidate.Equals("OutsideBatam"),
@@ -625,8 +624,47 @@ namespace McDermott.Web.Components.Pages.Transaction
                 StateHasChanged();
 
                 Grid?.SelectRow(0, true);
-                await JsRuntime.InvokeVoidAsync("initializeSignaturePad");
+                //await JsRuntime.InvokeVoidAsync("initializeSignaturePad");
             }
+        }
+
+        private string PdfBase64 { get; set; }
+
+        private List<IBrowserFile> BrowserFiles = [];
+
+        private async Task DownloadFile(string fileName)
+        {
+            if (GeneralConsultanService.Id != 0 && !string.IsNullOrWhiteSpace(fileName))
+            {
+                await Helper.DownloadFile(fileName, HttpContextAccessor, HttpClient, JsRuntime);
+            }
+        }
+
+        private async void SelectFiles(InputFileChangeEventArgs e)
+        {
+            BrowserFiles.Add(e.File);
+
+            GeneralConsultanService.McuExaminationDocs = e.File.Name;
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await e.File.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(memoryStream); // Batas ukuran file 10 MB
+                PdfBase64 = Convert.ToBase64String(memoryStream.ToArray());
+            }
+
+            StateHasChanged();
+            StateHasChanged();
+        }
+
+        private async Task SelectFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "file");
+        }
+
+        private void RemoveSelectedFile()
+        {
+            GeneralConsultanService.McuExaminationDocs = null;
+            PdfBase64 = null;
         }
 
         private async Task OnClickCancel()

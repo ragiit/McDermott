@@ -1,7 +1,7 @@
 ﻿@typeparam TItem
 
-<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" >
-    <DxToolbarItem Text="New" Visible="VisibleNew" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+    <DxToolbarItem Text="@BtnNewName" Visible="VisibleNew" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
     <DxToolbarItem Text="Edit" Visible="VisibleEdit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Items.Count > 0" />
     <DxToolbarItem Text="Delete" Visible="VisibleDelete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Items.Count > 0 && EnableDelete" />
     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
@@ -23,6 +23,7 @@
 </DxToolbar>
 
 @code {
+    [Parameter] public string BtnNewName { get; set; } = "New";
     [Parameter] public bool IsImport { get; set; } = true;
     [Parameter] public bool EnableDelete { get; set; } = true;
     [Parameter] public bool VisibleNew { get; set; } = true;

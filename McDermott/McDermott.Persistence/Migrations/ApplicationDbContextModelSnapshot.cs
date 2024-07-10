@@ -1940,6 +1940,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long>("HR")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("IsConfinedSpace")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsNormalRestingECG")
                         .HasColumnType("bit");
 

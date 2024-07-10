@@ -157,6 +157,9 @@ namespace McDermott.Application.Dtos.Config
         public virtual GenderDto? Gender { get; set; }
 
         [SetToNull]
+        public virtual Country? IdCardCountry { get; set; } // KTP Negara
+
+        [SetToNull]
         public virtual GroupDto? Group { get; set; }
 
         [SetToNull]
