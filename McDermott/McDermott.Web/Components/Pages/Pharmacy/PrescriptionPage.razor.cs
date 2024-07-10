@@ -426,9 +426,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
 
                 var stock = StockProducts
-                    .Where(s => s.ProductId == checkProduct.Id && s.SourceId == Pharmacy.PrescriptionLocationId)
-                    .Select(x => x.Qty)
-                    .FirstOrDefault();
+                    .Where(s => s.ProductId == checkProduct.Id && s.SourceId == Pharmacy.PrescriptionLocationId && s.Qty != 0).Sum(x => x.Qty);
 
                 if (stock == null || stock == 0)
                 {

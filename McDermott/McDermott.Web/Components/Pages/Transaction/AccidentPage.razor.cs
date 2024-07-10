@@ -98,10 +98,10 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 var gen = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanService.Id))).FirstOrDefault() ?? new();
                 var accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == gen.Id))).FirstOrDefault() ?? new();
-
+                isPrint = true;
                 var mergeFields = new Dictionary<string, string>
                 {
-                    {"%EmployeeName%", gen?.Patient?.Name.GetDefaultValue() ?? "-"},
+                    {"%EmployeeName%", gen?.Patient?.Name.GetDefaultValue() },
                     {"%EmployeeNIP%", gen?.Patient?.NIP?.GetDefaultValue() ?? "-"},
                     {"%EmployeeDepartment%", gen?.Patient?.Department?.Name.GetDefaultValue() ?? "-"},
                     {"%DateOfOccurence%", accident.DateOfOccurrence.GetValueOrDefault().ToString("dd MMM yyyy")},
@@ -116,9 +116,9 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 //await documentAPI.Fields.UpdateAsync(dateField);
 
-                DocumentContent = await DocumentProvider.GetDocumentAsync("AccidentForm.docx", mergeFields);
+                DocumentContent = await DocumentProvider.GetDocumentAsync("AccidentForms.docx", mergeFields);
 
-                isPrint = true;
+               
             }
             catch (Exception ex)
             {
