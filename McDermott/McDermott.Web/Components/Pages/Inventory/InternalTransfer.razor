@@ -32,7 +32,6 @@
                                         <MyGrid @ref="Grid"
                                                 Data="@(TransactionStocks.OrderBy<TransactionStockDto, EnumStatusInternalTransfer>(x => x.Status ?? EnumStatusInternalTransfer.Draft, new StatusComparer()).ToList())"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
-                                                EditModelSaving="OnSave"
                                                 DataItemDeleting="OnDelete"
                                                 FocusedRowChanged="Grid_FocusedRowChanged"
                                                 RowDoubleClick="OnRowDoubleClick"
@@ -157,18 +156,18 @@
                                         </div>
                                     </div>
                                 }
+                                @if (FormInternalTransfer.Id == 0 || FormInternalTransfer.Id == null ||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)
+                                {
+                                    <div class="card mb-3">
+                                        <div class="card-body">
 
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        @if (isActiveButton)
-                                        {
                                             <div class="col d-flex justify-content-end">
                                                 <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSave"></DxButton>
                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" CssClass="ml-1" Text="Discard" Click="onDiscard"></DxButton>
                                             </div>
-                                        }
+                                        </div>
                                     </div>
-                                </div>
+                                }
 
                             </div>
                             <div class="card">
@@ -192,7 +191,7 @@
                                                             NullText="Select Location Source..."
                                                             TextFieldName="NameAndParent"
                                                             ValueFieldName="Id"
-                                                            Enabled="@isActiveButton"
+                                                            ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
                                                             FilteringMode="@DataGridFilteringMode.Contains"
                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                             SelectedItemChanged="((LocationDto value)=>SelectedItemProduct(value))"
@@ -206,7 +205,7 @@
                                                             NullText=" Select Location Destinance..."
                                                             TextFieldName="NameAndParent"
                                                             ValueFieldName="Id"
-                                                            Enabled="@isActiveButton"
+                                                            ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
                                                             FilteringMode="@DataGridFilteringMode.Contains"
                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                             ShowValidationIcon="true"></DxComboBox>
@@ -214,19 +213,19 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Schendule Date" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxDateEdit @bind-Date="@FormInternalTransfer.SchenduleDate"
-                                                            Enabled="@isActiveButton"
+                                                            ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
                                                             ShowValidationIcon="true"
                                                             DisplayFormat="dd MMMM yyyy">
                                                 </DxDateEdit>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Reference" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxMemo @bind-Text="@FormInternalTransfer.Reference" NullText="Input Reference.."
-                                                        Enabled="@isActiveButton"
+                                                        ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                         ShowValidationIcon="true"></DxMemo>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Stock Request" ColSpanMd="12" CaptionCssClass="normal-caption">
-                                                <DxCheckBox @bind-Checked="@FormInternalTransfer.StockRequest"></DxCheckBox>
+                                                <DxCheckBox @bind-Checked="@FormInternalTransfer.StockRequest" ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"></DxCheckBox>
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
 
@@ -273,9 +272,9 @@
                                                             KeyboardNavigationEnabled="true">
                                                         <ToolbarTemplate>
                                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="isActiveButton" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0 && isActiveButton" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0 && isActiveButton" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
 
                                                             </DxToolbar>
                                                         </ToolbarTemplate>

@@ -11,6 +11,7 @@
         public long? QtyByDay { get; set; }
         public long? Day { get; set; }
         public long? TotalQty { get; set; }
+        public string? MedicamenName {  get; set; }
 
         public MedicamentGroup? MedicamentGroup { get; set; }
         public Pharmacy? Pharmacy { get; set; }
