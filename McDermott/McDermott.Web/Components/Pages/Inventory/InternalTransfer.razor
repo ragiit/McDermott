@@ -32,6 +32,7 @@
                                         <MyGrid @ref="Grid"
                                                 Data="@(TransactionStocks.OrderBy<TransactionStockDto, EnumStatusInternalTransfer>(x => x.Status ?? EnumStatusInternalTransfer.Draft, new StatusComparer()).ToList())"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
+                                                EditModelSaving="OnSave"
                                                 DataItemDeleting="OnDelete"
                                                 FocusedRowChanged="Grid_FocusedRowChanged"
                                                 RowDoubleClick="OnRowDoubleClick"
