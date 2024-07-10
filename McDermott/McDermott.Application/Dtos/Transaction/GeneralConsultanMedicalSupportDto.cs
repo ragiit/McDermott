@@ -257,6 +257,7 @@
             }
         }
 
+        public bool IsConfinedSpace { get; set; } = false;
         public long? PractitionerECGId { get; set; }
         public bool IsNormalRestingECG { get; set; } = false;
         public bool IsSinusRhythm { get; set; } = false;
@@ -276,6 +277,58 @@
         public string StatusName => Status.GetDisplayName();
         public long? LabTestId { get; set; }
 
+
+        #region Confined Space
+        public long? EmployeeId { get; set; }
+        public bool IsFirstTimeEnteringConfinedSpace { get; set; } = false;
+        public long EnteringConfinedSpaceCount { get; set; } = 0;
+        public bool IsDefectiveSenseOfSmell { get; set; } = false;
+        public bool IsAsthmaOrLungAilment { get; set; } = false;
+        public bool IsBackPainOrLimitationOfMobility { get; set; } = false;
+        public bool IsClaustrophobia { get; set; } = false;
+        public bool IsDiabetesOrHypoglycemia { get; set; } = false;
+        public bool IsEyesightProblem { get; set; } = false;
+        public bool IsFaintingSpellOrSeizureOrEpilepsy { get; set; } = false;
+        public bool IsHearingDisorder { get; set; } = false;
+        public bool IsHeartDiseaseOrDisorder { get; set; } = false;
+        public bool IsHighBloodPressure { get; set; } = false;
+        public bool IsLowerLimbsDeformity { get; set; } = false;
+        public bool IsMeniereDiseaseOrVertigo { get; set; } = false;
+        public string? RemarksMedicalHistory { get; set; }
+        public DateTime? DateMedialHistory { get; set; }
+        public long? SignatureEmployeeId { get; set; }
+        public byte[]? SignatureEmployeeImagesMedicalHistory { get; set; }
+
+        public long? Wt { get; set; }
+        public long? Bp { get; set; }
+        public long? Height { get; set; }
+        public long? Pulse { get; set; }
+        public long? ChestCircumference { get; set; }
+        public long? AbdomenCircumference { get; set; }
+        public long? RespiratoryRate { get; set; }
+        public long? Temperature { get; set; }
+
+        public string? Eye { get; set; }
+        public string? EarNoseThroat { get; set; }
+        public string? Cardiovascular { get; set; }
+        public string? Respiratory { get; set; }
+        public string? Abdomen { get; set; }
+        public string? Extremities { get; set; }
+        public string? Musculoskeletal { get; set; }
+        public string? Neurologic { get; set; }
+        public string? SpirometryTest { get; set; }
+        public string? RespiratoryFitTest { get; set; }
+        public long? Size { get; set; }
+        public string? Comment { get; set; }
+        public IEnumerable<string> Recommendeds { get; set; } = [];
+        public DateTime? DateEximinedbyDoctor { get; set; }
+        public byte[]? SignatureEximinedDoctor { get; set; }
+        public long? ExaminedPhysicianId { get; set; }
+        #endregion
+
+        public UserDto? Employee { get; set; }
+        public UserDto? ExaminedPhysician { get; set; }
+        public UserDto? SignatureEmployee { get; set; }
         public LabTestDto? LabTest { get; set; }
         public GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
         public UserDto? PractitionerLabEximination { get; set; }

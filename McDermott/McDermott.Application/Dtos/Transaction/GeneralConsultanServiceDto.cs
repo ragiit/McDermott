@@ -79,6 +79,9 @@ namespace McDermott.Application.Dtos.Transaction
                 }
             }
         }
+
+        public string? McuExaminationDocs { get; set; }
+
         public bool IsMcu { get; set; } = false;
 
         private bool _isOutsideBatam;

@@ -222,6 +222,12 @@
                                                         <ValidationMessage For="@(() => GeneralConsultanService.TypeRegistration)" />
                                                     </DxFormLayoutItem>
 
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
+                                                        <DxDateEdit @bind-Date="@GeneralConsultanService.RegistrationDate"
+                                                                    Mask="@DateTimeMask.ShortDate"
+                                                                    NullText="Select Registration Date">
+                                                        </DxDateEdit>
+                                                    </DxFormLayoutItem>
                                                 </DxFormLayout>
                                             </div>
 
@@ -276,12 +282,27 @@
                                                         </DxCheckBox>
                                                     </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
-                                                        <DxDateEdit @bind-Date="@GeneralConsultanService.RegistrationDate"
-                                                                    Mask="@DateTimeMask.ShortDate"
-                                                                    NullText="Select Registration Date">
-                                                        </DxDateEdit>
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Docs" ColSpanMd="12">
+                                                        <DxMaskedInput @bind-Value="@GeneralConsultanService.McuExaminationDocs"
+                                                                       ShowValidationIcon="true"
+                                                                       ReadOnly="true"
+                                                                       MaskMode="MaskMode.RegEx">
+                                                            <Buttons>
+                                                                <InputFile id="file" OnChange="@SelectFiles" multiple="false" style="display:none" />
+                                                                <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" />
+                                                                <DxEditorButton Click="() => DownloadFile(GeneralConsultanService.McuExaminationDocs)"
+                                                                                IconCssClass="fa-solid fa-download" />
+                                                                <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" />
+                                                            </Buttons>
+                                                        </DxMaskedInput>
                                                     </DxFormLayoutItem>
+
+                                                    @if (!string.IsNullOrEmpty(PdfBase64))
+                                                    {
+                                                        <DxFormLayoutItem ColSpanMd="12">
+                                                            <iframe src="@($"data:application/pdf;base64,{PdfBase64}")" style="width: 100%; height: 500px;" frameborder="0"></iframe>
+                                                        </DxFormLayoutItem>
+                                                    }
                                                 </DxFormLayout>
                                             </div>
                                         </div>
@@ -322,13 +343,13 @@ else
     <LoadingIndicatorLayout />
 }
 
-<div hidden>
+@* <div>
     <canvas id="signature-pad" width="1000" height="1000" style="border: 2px solid #000;"></canvas>
     <div>
         <button @onclick="ClearCanvas">Clear</button>
         <button @onclick="SaveCanvas">Save</button>
     </div>
-</div>
+</div> *@
 
 <script>
     window.initializeSignaturePad = () => {

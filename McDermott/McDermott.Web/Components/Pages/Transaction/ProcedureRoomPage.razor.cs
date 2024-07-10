@@ -49,13 +49,20 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<long> DeletedLabTestIds = [];
 
         private List<string> ResultValueTypes =
-          [
-              "Low",
-                "Normal",
-                "High",
-                "Positive",
-                "Negative",
-          ];
+        [
+            "Low",
+            "Normal",
+            "High",
+            "Positive",
+            "Negative",
+        ];
+
+        private IEnumerable<string> Recommends =
+        [
+            "FIT",
+            "UNFIT",
+            "REASSESS"
+        ];
 
         private bool IsAddOrUpdateOrDeleteLabResult = false;
         private bool Loading = false;
@@ -74,6 +81,9 @@ namespace McDermott.Web.Components.Pages.Transaction
         #endregion Properties
 
         #region LoadData
+
+        [SupplyParameterFromQuery]
+        public long genserv { get; set; }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -97,22 +107,31 @@ namespace McDermott.Web.Components.Pages.Transaction
                 var uri = new Uri(NavigationManager.Uri);
                 var queryDictionary = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
 
-                ShowForm = false;
                 GeneralConsultanService = new();
                 if (queryDictionary.TryGetValue("genserv", out var genSetValue))
                 {
-                    ShowForm = true;
+                    ShowForm = false;
+                    ToastService.ShowInfo(genserv.ToString());
                     GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == genSetValue.ToString().ToLong()))).FirstOrDefault() ?? new();
+                    ShowForm = true;
                 }
                 PanelVisible = false;
 
-                Grid?.SelectRow(0, true);
+                try
+                {
+                    if (ShowForm)
+                        Grid?.SelectRow(0, true);
+                }
+                catch { }
                 StateHasChanged();
             }
         }
 
+        private List<UserDto> Employees = [];
+
         private async Task LoadDataAsync()
         {
+            Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true && x.IsPatient == true));
             LabUoms = await Mediator.Send(new GetLabUomQuery());
             LabTests = await Mediator.Send(new GetLabTestQuery());
             Doctors = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
@@ -122,9 +141,47 @@ namespace McDermott.Web.Components.Pages.Transaction
             NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
         }
 
+        private void OnSelectEmployee(UserDto e)
+        {
+            if (e is null)
+            {
+                return;
+            }
+
+            GeneralConsultanMedicalSupport.Employee = Employees.FirstOrDefault(x => x.Id == e.Id);
+        }
+
         protected override async Task OnInitializedAsync()
         {
         }
+
+        public bool IsConfinedSpace { get; set; } = false;
+
+        private void OnConfinedSpaceChanged(bool value, bool isYesOption)
+        {
+            if (isYesOption)
+            {
+                IsConfinedSpace = value;
+                GeneralConsultanMedicalSupport.IsConfinedSpace = true;
+            }
+            else
+            {
+                GeneralConsultanMedicalSupport.IsConfinedSpace = value;
+                IsConfinedSpace = !value;
+            }
+        }
+
+        public class YesNoOptions
+        {
+            public string Text { get; set; }
+            public bool Value { get; set; }
+        }
+
+        private IEnumerable<YesNoOptions> Options = new[]
+      {
+        new YesNoOptions { Text = "Yes", Value = true },
+        new YesNoOptions { Text = "No", Value = false }
+    };
 
         private async Task LoadData()
         {
@@ -708,6 +765,15 @@ namespace McDermott.Web.Components.Pages.Transaction
         }
 
         private bool PertamaKali { get; set; } = false;
+
+        private void NewConfinedSpace()
+        {
+            ShowForm = true;
+            GeneralConsultanMedicalSupport = new()
+            {
+                IsConfinedSpace = true
+            };
+        }
 
         private async Task EditItem_Click()
         {

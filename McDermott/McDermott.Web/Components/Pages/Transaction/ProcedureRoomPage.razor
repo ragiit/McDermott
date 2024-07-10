@@ -30,31 +30,17 @@
                                             FocusedRowChanged="Grid_FocusedRowChanged"
                                             KeyFieldName="Id"
                                             RowDoubleClick="EditItem_Click">
-                                        @*    <ToolbarTemplate>
-                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanMedicalSupports.Count > 0" />
-                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && GeneralConsultanMedicalSupports.Count > 0" />
-                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                <Items>
-                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                </Items>
-                                </DxToolbarItem>
-                                </DxToolbar>
-                                </ToolbarTemplate> *@
-
                                         <ToolbarTemplate>
                                             <MyDxToolbarBase TItem="GeneralConsultanMedicalSupportDto"
                                                              Items="@GeneralConsultanMedicalSupports"
                                                              SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@NewConfinedSpace"
+                                                             BtnNewName="Create Confined Space"
                                                              EditItem_Click="@EditItem_Click"
                                                              DeleteItem_Click="@DeleteItem_Click"
                                                              Refresh_Click="@Refresh_Click"
                                                              IsImport="false"
-                                                             VisibleNew="false"
+                                                             VisibleNew="true"
                                                              Grid="Grid"
                                                              VisibleDelete="UserAccessCRUID.Delete"
                                                              VisibleEdit="UserAccessCRUID.Update" />
@@ -94,21 +80,551 @@
                                 </div>
                             }
 
-                            <div class="card">
-                                <div class="card-body">
+                            <div class="w-100">
+                                <div class="w-100">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <span class="fw-bolder">Personal Data</span>
+                                        </div>
+
+                                        <div class="card-body">
+                                            <div class="row">
+                                                @{
+                                                    var yearsWorked = "-";
+                                                    if (GeneralConsultanService.Patient is null)
+                                                    {
+                                                        GeneralConsultanService.Patient = new();
+                                                    }
+                                                    if (GeneralConsultanService.Patient.Department is null)
+                                                    {
+                                                        GeneralConsultanService.Patient.Department = new();
+                                                    }
+                                                    if (GeneralConsultanService.Patient.IdCardCountry is null)
+                                                    {
+                                                        GeneralConsultanService.Patient.IdCardCountry = new();
+                                                    }
+
+                                                    if (GeneralConsultanService.Patient.JoinDate is not null)
+                                                    {
+                                                        yearsWorked = $"{DateTime.Now.Year - GeneralConsultanService.Patient.JoinDate.GetValueOrDefault().Year} Years";
+                                                    }
+                                                }
+
+                                                @{
+                                                    var yearsWorked2 = "-";
+                                                    if (GeneralConsultanMedicalSupport.Employee is null)
+                                                    {
+                                                        GeneralConsultanMedicalSupport.Employee = new();
+                                                    }
+                                                    if (GeneralConsultanMedicalSupport.Employee.Department is null)
+                                                    {
+                                                        GeneralConsultanMedicalSupport.Employee.Department = new();
+                                                    }
+                                                    if (GeneralConsultanMedicalSupport.Employee.IdCardCountry is null)
+                                                    {
+                                                        GeneralConsultanMedicalSupport.Employee.IdCardCountry = new();
+                                                    }
+
+                                                    if (GeneralConsultanService.Patient.JoinDate is not null)
+                                                    {
+                                                        yearsWorked2 = $"{DateTime.Now.Year - GeneralConsultanMedicalSupport.Employee.JoinDate.GetValueOrDefault().Year} Years";
+                                                    }
+                                                }
+                                                @if (!GeneralConsultanMedicalSupport.IsConfinedSpace)
+                                                {
+
+                                                    <div class="col-md-6">
+                                                        <DxFormLayout>
+
+                                                            <DxFormLayoutItem Caption="Name" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyTextBox @bind-Text="@GeneralConsultanService.Patient.Name" ReadOnly
+                                                                           NullText="Patient Name" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="Dept." CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyTextBox @bind-Text="@GeneralConsultanService.Patient.Department.Name" ReadOnly
+                                                                           NullText="Dept." />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="Company" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyTextBox @bind-Text="@GeneralConsultanService.Patient.Department.Name" ReadOnly
+                                                                           NullText="Company" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <DxFormLayout>
+
+                                                            <DxFormLayoutItem Caption="Nationality" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyTextBox @bind-Text="@GeneralConsultanService.Patient.IdCardCountry.Name" ReadOnly
+                                                                           NullText="Nationality" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="Employee ID" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyTextBox @bind-Text="@GeneralConsultanService.Patient.NIP" ReadOnly
+                                                                           NullText="Employee ID" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="Years Worked" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyTextBox @bind-Text="@yearsWorked" ReadOnly
+                                                                           NullText="Years Worked" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-md-6">
+                                                        <DxFormLayout>
+                                                            <DxFormLayoutItem Caption="Name" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyTextBox @bind-Text="@GeneralConsultanService.Patient.Name" ReadOnly
+                                                                           NullText="Patient Name" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="Name" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxComboBox Data="@Employees"
+                                                                            @bind-Value="@GeneralConsultanMedicalSupport.EmployeeId"
+                                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                                            NullText="Select Name..."
+                                                                            TextFieldName="Name"
+                                                                            ValueFieldName="Id"
+                                                                            SelectedItemChanged="@((UserDto freq)=>OnSelectEmployee(freq))"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                            ShowValidationIcon="true" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="Dept." CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyTextBox @bind-Text="@GeneralConsultanMedicalSupport.Employee.Department.Name" ReadOnly
+                                                                           NullText="Dept." />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="Company" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyTextBox @bind-Text="@GeneralConsultanMedicalSupport.Employee.Department.Name" ReadOnly
+                                                                           NullText="Company" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <DxFormLayout>
+
+                                                            <DxFormLayoutItem Caption="Nationality" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyTextBox @bind-Text="@GeneralConsultanMedicalSupport.Employee.IdCardCountry.Name" ReadOnly
+                                                                           NullText="Nationality" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="Employee ID" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyTextBox @bind-Text="@GeneralConsultanMedicalSupport.Employee.NIP" ReadOnly
+                                                                           NullText="Employee ID" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="Years Worked" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyTextBox @bind-Text="@yearsWorked2" ReadOnly
+                                                                           NullText="Years Worked" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row justify-content-end mb-3">
+                                <div class="col-auto align-self-end">
+                                    <DxTabs>
+                                        <DxTab Text="Referral from GC" Enabled="@(GeneralConsultanMedicalSupport.IsConfinedSpace == false)"></DxTab>
+                                        <DxTab Text="Confined Space" Enabled="@GeneralConsultanMedicalSupport.IsConfinedSpace"></DxTab>
+                                    </DxTabs>
+                                </div>
+                            </div>
+
+                            @if (GeneralConsultanMedicalSupport.IsConfinedSpace)
+                            {
+                                <div class="w-100">
                                     <div class="w-100">
-                                        <DxFormLayout>
-                                            <DxFormLayoutGroup ColSpanMd="12">
-                                                <Items>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient" ColSpanMd="12">
-                                                        <p>@GeneralConsultanService?.Patient?.Name</p>
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
-                                                        <p>@GeneralConsultanService?.Patient?.NoRm</p>
-                                                    </DxFormLayoutItem>
-                                                </Items>
-                                            </DxFormLayoutGroup>
-                                        </DxFormLayout>
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <span class="fw-bolder">Medical History</span>
+                                            </div>
+
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <DxFormLayout>
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="First time entering confined space" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsFirstTimeEnteringConfinedSpace"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Visible="GeneralConsultanMedicalSupport.IsFirstTimeEnteringConfinedSpace" CaptionCssClass="normal-caption" Caption="Weight">
+                                                                <DxSpinEdit ShowValidationIcon="true"
+                                                                            MinValue="1" @bind-Value="@GeneralConsultanMedicalSupport.EnteringConfinedSpaceCount"
+                                                                            NullText="0"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Item 1 -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="1. Defective sense of smell" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsDefectiveSenseOfSmell"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Item 2 -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="2. Asthma or Lung Ailment" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsAsthmaOrLungAilment"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Item 3 -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="3. Back Pain or Limitation of Mobility" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsBackPainOrLimitationOfMobility"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Item 4 -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="4. Claustrophobia (fear of enclosure)" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsClaustrophobia"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Item 5 -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="5. Diabetes / Hypoglycemia" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsDiabetesOrHypoglycemia"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Item 6 -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="6. Eyesight Problem" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsEyesightProblem"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <DxFormLayout>
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12">
+
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Visible="GeneralConsultanMedicalSupport.IsFirstTimeEnteringConfinedSpace" CaptionCssClass="normal-caption">
+
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Item 7 -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="7. Fainting Spell/Seizure/Epilepsy" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsFaintingSpellOrSeizureOrEpilepsy"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Item 8 -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="8. Hearing Disorder" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsHearingDisorder"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Item 9 -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="9. Heart Disease or Disorder" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsHeartDiseaseOrDisorder"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Item 10 -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="10. High Blood Pressure" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsHighBloodPressure"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Item 11 -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="11. Lower Limbs Deformity" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsLowerLimbsDeformity"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Item 12 -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="12. Meniere's Disease or Vertigo" ColSpanMd="12">
+                                                                <DxRadioGroup Items="@Options"
+                                                                              TextFieldName="Text"
+                                                                              ValueFieldName="Value"
+                                                                              @bind-Value="@GeneralConsultanMedicalSupport.IsMeniereDiseaseOrVertigo"
+                                                                              Layout="@RadioGroupLayout.Horizontal" />
+                                                            </DxFormLayoutItem>
+
+                                                        </DxFormLayout>
+                                                    </div>
+
+                                                    <div class="col-md-12">
+                                                        <DxFormLayout>
+                                                            <DxFormLayoutItem Caption="Remarks on the above, if any, otherwise write NIL:" CaptionPosition="CaptionPosition.Vertical" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxMemo @bind-Text="GeneralConsultanMedicalSupport.RemarksMedicalHistory"
+                                                                        Rows="5"
+                                                                        TextAreaCssClass="w-100"
+                                                                        CssClass="w-100"
+                                                                        NullText="Remarks on the above, if any, otherwise write NIL" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <DxFormLayout>
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" CaptionPosition="CaptionPosition.Vertical" Caption="I declare that all the Information's above to be true to the best of my knowledge and belief" ColSpanMd="12">
+
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                                <DxDateEdit NullText="Date" @bind-Date="@GeneralConsultanMedicalSupport.DateMedialHistory" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4QBKRXhpZgAASUkqAAgAAAABAA4BAgAoAAAAGgAAAAAAAABXaGl0ZSBDYWxsIER1Y2sgLyBDYWxsZHVjayBvbiBHcmFzcy4gVUsu/+0AdlBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAABZHAJQAAp2eGxvbWVnYXY2HAJ4AChXaGl0ZSBDYWxsIER1Y2sgLyBDYWxsZHVjayBvbiBHcmFzcy4gVUsuHAJuABhHZXR0eSBJbWFnZXMvaVN0b2NrcGhvdG8A/+EFK2h0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8APD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyI+Cgk8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgoJCTxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1sbnM6SXB0YzR4bXBDb3JlPSJodHRwOi8vaXB0Yy5vcmcvc3RkL0lwdGM0eG1wQ29yZS8xLjAveG1sbnMvIiAgIHhtbG5zOkdldHR5SW1hZ2VzR0lGVD0iaHR0cDovL3htcC5nZXR0eWltYWdlcy5jb20vZ2lmdC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBsdXM9Imh0dHA6Ly9ucy51c2VwbHVzLm9yZy9sZGYveG1wLzEuMC8iICB4bWxuczppcHRjRXh0PSJodHRwOi8vaXB0Yy5vcmcvc3RkL0lwdGM0eG1wRXh0LzIwMDgtMDItMjkvIiB4bWxuczp4bXBSaWdodHM9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9yaWdodHMvIiBwaG90b3Nob3A6Q3JlZGl0PSJHZXR0eSBJbWFnZXMvaVN0b2NrcGhvdG8iIEdldHR5SW1hZ2VzR0lGVDpBc3NldElEPSI2OTU3MzM2MTQiIHhtcFJpZ2h0czpXZWJTdGF0ZW1lbnQ9Imh0dHBzOi8vd3d3LmdldHR5aW1hZ2VzLmNvbS9ldWxhP3V0bV9tZWRpdW09b3JnYW5pYyZhbXA7dXRtX3NvdXJjZT1nb29nbGUmYW1wO3V0bV9jYW1wYWlnbj1pcHRjdXJsIiA+CjxkYzpjcmVhdG9yPjxyZGY6U2VxPjxyZGY6bGk+dnhsb21lZ2F2NjwvcmRmOmxpPjwvcmRmOlNlcT48L2RjOmNyZWF0b3I+PGRjOmRlc2NyaXB0aW9uPjxyZGY6QWx0PjxyZGY6bGkgeG1sOmxhbmc9IngtZGVmYXVsdCI+V2hpdGUgQ2FsbCBEdWNrIC8gQ2FsbGR1Y2sgb24gR3Jhc3MuIFVLLjwvcmRmOmxpPjwvcmRmOkFsdD48L2RjOmRlc2NyaXB0aW9uPgo8cGx1czpMaWNlbnNvcj48cmRmOlNlcT48cmRmOmxpIHJkZjpwYXJzZVR5cGU9J1Jlc291cmNlJz48cGx1czpMaWNlbnNvclVSTD5odHRwczovL3d3dy5nZXR0eWltYWdlcy5jb20vZGV0YWlsLzY5NTczMzYxND91dG1fbWVkaXVtPW9yZ2FuaWMmYW1wO3V0bV9zb3VyY2U9Z29vZ2xlJmFtcDt1dG1fY2FtcGFpZ249aXB0Y3VybDwvcGx1czpMaWNlbnNvclVSTD48L3JkZjpsaT48L3JkZjpTZXE+PC9wbHVzOkxpY2Vuc29yPgoJCTwvcmRmOkRlc2NyaXB0aW9uPgoJPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KPD94cGFja2V0IGVuZD0idyI/Pgr/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAIUAyAMBIgACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAADAAIEBQYBB//EADoQAAIBAwIEAwUIAgEDBQAAAAECAwAEERIhBRMxQSJRYTJxgZGhBhQjQrHB0fBS4QcVYvEzNEOC0v/EABkBAAMBAQEAAAAAAAAAAAAAAAECAwAEBf/EACcRAAICAgEDBAEFAAAAAAAAAAABAhEDIRIEMUETIlFxYTJCUoGh/9oADAMBAAIRAxEAPwDKzTwm7trVZY2+7yoVWLwqxznr37HepXHSFk5o6MjIcHGM7/uaJanhaBVveFaSpL85oQQoG5YsNx0HrTeNJbyWzXEBN1bS4KhGHtAk4z8fpXnSvujnKGSUvKIYnHMA3AGMeZNNe78AED8xVOwC9T5n1qXw7hpu57dbe5U26HVcuyYdiSTjyPwParriY4TFcW0aCQTKC2VHh09fEeg8qVKPnbAVVja26n70F5MwP4gZ8Bwe4Pzq54bessMsFnC5abKOX3C431HuxwDj4VnorbN3M1o7ukr6kTpkeX7fGr/glpHb3tvd26GISsDImo4wRjGD33qikuxWEXYOLgXJjfUzcxyWVsYGKiwpcQHM5yoOnJ7VpOLSOY9ERCMuQ5J9g+VQLqFrqyCuNMhG7A9azSbGutIFb2yy3MUmkalG23nUuaMmfQAA2dmqDw2aW3dVkOrPh1Cra4i1TxTODoHUDYk1hk0kEk4Ny0+8uCHA3PnQ4mgjfQzYDD2h2q241dpFw0rFMusrsOtZm3snlhSW6uVhUnIJG7e4U0moML7E26tnubOb7yUUqQYim3bFUcyXLuYlnyVj1vk7sOwA71YSwzzzlA5EHRS3XFMlsIYPFBJiVR7VPzTAolULmXlNGyFZFGQrDBofD72PiEbJIArqcEVKt47u/u0gt4zdXDkgBBua0XCf+I+Kc9rm64ja2+o6uSqmQj3nYfLNOo32DdGVlV7OVHX2D1q1tbsh0JcBAc6QBufXzqz+132G4zY8NkmSNbyGMZZrfJdR56evyzXnVpNPMVSKY6f8qHuj2DaPW4bq25KSNIucdM1Be4SO4LtGFRj1rN2l4lvaqmkySf5E0DiHFLnl5k9nstRlsNmg4lxWKNNNuMyHoBVfPO0wRZX8R7VTxTO6GYbt29KPHNzQrsPGDvSuSWhJTJdy8ENnPreTnDSYiPyjv7qzX2gEF9wdLu3EPMjcayqnUR0696urxjKNGnJI61Ci4Ysdqw04zvg1SPU0qZJ5NlLYX8UHD1QoTOr9/KlU+34M8jM7KF8gaVTlLG2K5IkLf3EEX3dHEkSJgzPIV1k9wc7AVFsVn0GO1kYQajqL9ZdvaA8t+voK7JIzIity0TOcaRpA+dWzT2vDLYSqgmuSPApdQsa+mOp/Sn5JAumd4RLJZcNQ3CaZGDMVRdz5fGjm1HFZj96ZYH2zGTkv3BYD8w8s4386pEurm8jiS0aTnySFW1HIXAJ+WP3qTFxCN7iFZ9UcyuFcKOhBHb96hTjJy/Ir0y8MtvZRGKRHmnbBWR1wH8sdhihfe47xUW4l0w27guieF38iW88jtTJz99tZXMQRoGHNBI8YPsuD3Gxz61ScPy00rE4HVcnPfp9RRk6XIu5uOkafjEsIe04q0AuIrlApJbAV/PHnsaMl3aXFnriOg9AF7fConD7t7rg09kUjQwSE6gfEhbGDjtudvWqi2M9hxD7vOmpsgaf8vI0JWvchMl3ZcylLFwDkSnfLdDnyof8A1W7mnjtlgZzIdIIPWrF7SG5tSbgtlIiyHuuOo93WoFtIuStnlOoZ3PiPu8hT2OnQ632JyFeQdRnKp6ep+nvrl9bm9AkN1Irp7Pi2HwokFvBBK34jZO++9DukHPUw7E/I0jlTC5pOg1q19FAC0kcmTih88xu33lBgmope5jmKsMKN8inOJLsqynGrw79qzyO9CPJs2n2I4Z93jm4hDFiS52U+SD+T+grR399x2weyNpwmS/SaUJNy5QphX/Ig9aBwu4jtYIkXaNVCr8Ktm4rCEL6ht5V6KXGNFEXMMrGP8RNOOteCf8k8DXg/2vne2QR2l2onjC9AT7QHxBPxr0+74+l2pteHzB3wOZt7Kn96zH2x4LccYtobiJGaa11Aw6tRZTjdfl0rg6jrYRn6X+nQ+mnLC8kTzkSOFXQacw1N+Kx27UtQDcsLpKncGpEiKVMmwx2Pep8n4PP5SBwTLGhGknNJS24Uac70WOMLF4iN+lOl0eHLZ2xtQps1MdE7405GxzT2umZxzFGBUFwyZBznzo8UgAJ06kxua1AJULGZvFkKfKlQhIRuuwI2pUKG0Zm7JsrfSULrjl5J2Qk5B269/SupaSxw81SrbbYGev77VHE5W2a1I5rBsqCOw7fvXPvEiKUfVlxl9PavQpjUW3A7lOHXEU7hsltMinbY7bVKvVja/NzJDymDLoY7tk75wDjH99Koo5UWEOT41IAyOtX0l5CnB7W6ljeMmUHEUgABxjuDt+lSkmpI1bLexzcW33eNmS7QcwcwbHfGk+YOSPjQIeGcq5VlYPBMhdW/wwRqU/8Acv1286jcCvObeTSxQ4bknLtIXZhn2ewGTjtUiSdreUWVu+fGeYc7FumB7vrUM3bYGS+EaH4gYpAOTODDI3v6N8CF+VcvPDxG1llBaRNULEjoR0/eozXEaziCF8YGM+tWnGNEphuFiGbiIO2OiuPCf0+tJGT4mv2/Q4ykxSR7AnYGoEUTRoJNbag35e9cM8EYUMpJHTBqPY3U0ssrrkBW6HypW2I5WTLduWJNRyD1GakTTJMAYsLp2C47e+oiuHkY46Ht3okJwclQcdRQ9TVMF/Jxla4fCk6gM4HeuKshIxkHsPKpdtGGuNaOI9I1YNSpYuajPEAG6ZNA1Gm4TMXHKkQuPQU7i/DHVDJFHOM9NBqXwK3ychGOnbUOlacQGSDS4A28q9dxtHTE8fvJ5zdw3EeqO6ReXrQlSwyfaHfG/Wruz+1Mtumby2WVk7qdJoX2lgK8cuIl8Gygbemaqvu2W5bEAgfOvI6jFCc/cuxo9Tlxt8Xob9qZYeKXcXEbWyEB0finG7nsT/NVotxJAXyoOO9T7mV4rXTGxwSQO/SocscpGp1I1L0orWiM25PkyA9qUC6pMIetKGzhDamlyB0FTzHzGVcN4RjxCiGEiXRNGoHn5U3IUiNaNoZwVYEbA09OHyPGMMqsdivpUsQjJCHv8MUZI3GoEDJHhJPStyZrKsWVwHKMEwh7HrSqyLYDKV8R/MKVDk2ZGEktwguZWj1COTLSIdiM7GlJZ82EzLIEbrknqfWiTJO0783QocYKBvCwz51YwRwhH+8RyOrLh4tIOoeYGPqK9C6RW6KZlkmZJJAGULjwb5NS+LxluC8LjKnPiGnG+QcYqwkg1Q44dEzt4TCEGD5n3dtzUeW8kt3RTcrNeEnMqjUsJOMhT3O3Xt2qfJtp/AthLCBrMGKFWa6PVVPsDHT39/Si3H4NwE2M3lnv8Kbw5liWa4eTaOPB1fmY9B696HJMGcSR6QVXAIG5zUpy5dxXLQayhkFwWmCmLfO29XUCPccGk5R1SW04BB7I/wDsfWqKO4dSIwy6yN1PX41a8EkkhS6jML3X3lGjZIgdSHsdh570n6mGCv6HaEkZWVhlO/balJLFEVcKFdz270Th/wBmePXrgR2E8KDbXcfhD67n4CtJwz/jpjIG4lfhVBB0W4yfm3T5UI4ckuyESb8GfVxFG8rOmrpp/ep/C+E8Uvzrj4bcOnZymkH4nFemcK4Dw7hyqbS0RHH/AMjDU5/+xq4jUj195roj0X8mVWP5PL4Psvxp3zJYrGR7JMydPgakJ9k+JxuvMaNE15ID5OK9QSNTuVx8KBJEWk9AelVXSY18h9NEXhtjHEPZxVlygFxvTo0wOlExXSUMT9uOBS3Vt994embiIeNAN5E/kV5xPfMY8oniDb717vL2ry7/AJC4Alnef9RgwkE53UDYSd/n1+dcPVYf3r+yWSPlGXjlLK0gAKpuQBXGmLAPpLAjc022Xd2ycMMBQOuKHCHZwHDKucYzvXD2I2Tg6nQwBfY6ie1ITK76zkvnpjtQm5hLK2FiBw3/AHGuAAQ6kY9RsO1NRrJEt0gwuAo6Hw4zTJHIbWraVxuD2pkkfMeMsww2/urjokjPGFYqD1B60NhsexUHG5P5SOlKlbRmWblRqChUqq6uppVjbKgcOt5QYrMPcK6ayzABCexAzkeXUU2OzS2kVZJlmKNhIohqZv8A8/3ajyXAtraZBeyMBGWeKcMCegGD0FV8NxaiVIo8yRuPAmhU39Duf0NdVvwPYeW4nkjFuGEQ1lXRjliewJ8qrBwS5kn5gb8PA1Y2K/CrZLmBNbcv2AC3hL75x1z+1SzM92xjhbTEuMhjhmPl5YGR86HqPwZyt2UE8c6EhYJBbxeEK+xBPc+ZNE4eAQHlhChDuv7VcOx+9MlzqWAqMal6kGrCytraQ6A0cJl31PsAR037UjknoNJkjhdg8N3bC24RZKbkaopzGJGcYzszZ/1V5wO541dMTO4t7b8ukaW+AFTOE28lnw2SG6YFcmWLbeJsYOkjbf8AehW10ceI7967MeNqm2OrRobcKItndiPzOck0+OUBsZqrsLrnlkXoKtLay5j5aTSCegrqQSwS5286lwSauoqLFCsTYG/vqVEBkCsEl58OxriDemhvysKaJFVsE1gkhaTPigNMAcA0xpQTvQMOdz3rP/beJZ/s3fBgCY4jKM+a+L9qtZrkDPlVXfzpcW1wrjMbRsrBu4INTk000aStHkDySxmMpGNDLrDjvtXLV54pFZ4nZACwLdalsv3gFI3jZJAWQKc9sj4U2RJmjjM6gADwaDk7dvdXkv8AJxjIbkct2dczls4xkCiySMmhETSCMMT1qCZi0nKt0Yb5aRvzA+Qo0hIUOqnY4dj7Q364oKzLYbQJJWjTrnCHNEjSBcOgk5n5vd0NDQSnTIFDRDBzncsT9KKUZpzbmFlWOM5bc5H970KdhoHHLDHiXSoKncjIJPalQmijWBrXWweQ4wDsTtj9KVbaMr8GeSKYQ3DyEymVlRSDqOM5z7th86fbOstvOqqTIAVjBODGGGCR67H3Zp99fIsBeIhhKwLJqOkjBHh8vd6UOLkGNJGMmQRk9wBvj3e+u27RQXDrybmSxSsXPL9v/IZ7/OpizLJctGw1J+Yg9TjI/Qj5Vx/wyOTFpf20Ld0OR19KGoPgEY5ZRuZq7Hf+ahJ7FvYaOd7rBklaRRhgurGcd6t+Hl2ZJdWpRhiG3DAe+qdI5RyUWIBZDvIq7Dr/ABU61vgIJFlzGI2OAR17dP70pPILPRoOI2V3w94GcQlkIKttpqm4Y5tLstdtDNCnhDKQ1ZO2vHuCHZsI4Orft3BoiX5jiaMLiNjqDdAOw+ldWPqraUkOslnq/DU4epkaGNBkZOKJazKCw1d9s15fwv7RSWs4DucD6ir+Lj0ZcOpzn6V2rJFopZvhLkZNCF5okIO1ZlONEHo2PU7U6Ti0MmGzv6VnNDGlN/4x4gPSk92S4Pass1+h31AHtvR14lFjSzj35pHkCaJrwKQM/OmveBh7VZqfisKpp1/HNVk32gCOUjwR/lmpyyjJGpursliqN7zVXf36W9rLk5whOPPaqGTjmFPiJbO9UPEuIzvplYkQk+HI9rz+lQnmoXJJRRaxXKOojt8agu5XYjb+KjqyJE6uWkH5EAxp7fzUWN2SZ5tUQVtzg4Yt22p0cKzLIH8MrHA30+fSuRys5UHkhhFsTIugx6dOBgtvuc/WhqYWdgrapNJ1HG+AetNyOUEYPkjA1DoDjyO3epcawwQ6Y4kEr+HL/nHelD9EVWhmDNrYBSdlOxx3Purja2dZeawTRlS2xOegrhimidJYigiK+HQMHGe/u86OkzLZl3XJTGvGPAfOsAE0J5sbFM69wcYK/wA0qmSomIhzXAfZVfqudwc996VazVRiobCOWSWN8a2J5C9iOxB+GK7FbzQEThWMRYakHyPWrHhlvHwsTTT82aLIkjKtsxPfft6YqRcSi7R+UAiuQQEXbbJJz371dzGZCUXUsMtvES0cJL7LnQNgT7ulE/DlVFeN0kQgatPhxvnf31Y20EkaymNGZZckIndu23yoMdmwVEu3bTjAjU5ye/wAx/es22xaYC9YrbiNfDyxpG/1NU13K64bBEQY74xnzFaZbKcyTSPoMehSwY6skZ2H98qiXUMU6BDGF0sWjyMHfyPu+VGDSew8Sgk4grRsjZVCBgDA28qaLlpF+7gtpByfSre64RE/iSM8xwShHs4A+mSaz9zb3kJLGNl8Wxxt5/vV4KEjcSVLMVbOo+LdRpIA8utEt+IZyhOCPKqaSZg68xwSFx7W52riSqmS4cMcdTkGremx1ZqYOMTxDTr1J5GpKcckAOCQayCzudBDhVGc5PWnPeuN06HpnqKVwkVjt0atuMXD7s/wFdXiMpHjlAH+IOaztrdakHOYAn61KM0SqWL5/epNSui3BLuy7HEiRl5NP/atDN480irCpJ7AVQT3wjeFUAy7YIPYVZCd42iWJUDaiNQ21Y3OfoaDUhZUo8lsvbO0V5jDeM2or4yv5M7bY7jz9KlwwwGJYpTGwjBIMg1AZOB781D4Xcu6tJJ7DEso2wxGTv51OiLTZLseSWI2/f41zu72crtu2DijtVvFMgKjGWXGdXYAeQ3O9HSBuUxfliIHUHOTpOdiP0p8mlJy+lQrDTlN9L/xkfWu8l4oZW04AULgEDruSc7dh59aU3EdNbQJGjynV+EAdLbZz3oeiS6mhcKkxIwrhQQPI/MVxJHtkk51uI9aApzBp1eLp59/nT4SJJPwBIZkA0sibqPQeXpRGpHIwGm0ldYUNqfcHrvjtnamxluSFZgC2S7acDHQZ9T/ABSMzi4RJPxWDBkkxjf3dj1zQoiEnWBSGKrpxkMRnyyN9vdWoLSG8QcwxNCNWhF1A4yB7iffXaiyk3SSW0jjkE7Nv/f6aVN7fItA4LDCNChEsXMIVV2zqAIx59zjOPpRIIobdHhRVYxDBlznIHYeY6/pQmuRMCCQhwG8R2G3QHI9f90Rp4GRo7fDEDSdTgtgjYnHr+tM7YHILHfR2xcOrKZV9kjG24xUe4eSR0CafCdRUdMAdR2+NACi5lErya3yRqY7kZIx2399c+7s8juI3dNRBZn8WDnACjsP/NIkLsLNLORI8c8RYrnRgaTtkA46DpR7lljXmPgEuysq9BjHcn1+lCVEGXKthUyIzt8M1HmQFjLAeSQANJJOfPB89gKNaAwz+Ico5AAO4yA2OpH986gludKCyBEyfZbcAn/xUyO3DiOSSUK2MMwGwGNhj4Dp60y8crOJNKKdeFUoCT6kfH3bUTFRxOxSEyKis5fqzADG/SqkcLnnfCISACNYU4yN/wBK1aoGZTIAV1AZKAZx0zjriixq3gitQY3R8vqAGogj2v7jp0qscrj2GTMSeHSCTlkucrnKpn/dDe0uEXVjUAAcAbge74Vs+SsErq8IYuSCwGwHbHkBRzEFkjkyscoOMHfUexJ89j51RdQxoz2Z3iXDDLaWlzaJy30hJ4wPZbGQ2Pjg+uKhCK58AVSZMAqhHi3Ga19wwYz6l1xg5K+QPT5UaNgwWVEWWUHx6QMjAwN+3+6ms0oqqLZMqnLlRjpOEXbpDdcuTQGw42yh+Y2/3Wlt+DJPLkzKAxBQqd2A2x78j06e+paXEohYZwpy25G+M9fiabBO7EgDKM2pdC7KQNzk0JZJSD6/t4VodYrHNIYXypzhNtIx2P1yaPESyuArlXXBAJBAzq6Hr3+HnXEJlbIZl0kqSDqxjOAfLPXz+goCTmKQiJSqsd0XuT1yPfUnojosmnlkcEqwRAMBDtjOffnzp86ZEMkWXVd5FZzqO+wOdgPrVbLPJb6SsWpz4NB7k92oyTy8yDEhIHh1ZOQTsSd8/wDmhRuUR5uwulvu0kba+qPnJzuRkH+mjpNFJEZIGVCSCrMmkrk7jftjP0qDbT2UcRtlV0yuTpJ8RzsRnbPXI6HepUjpyRDAyicyazhQcfPqPlT0h04hpWOjmBw0yupGgAkdRnGPh8KrEYRTuI9WAWZsOCNWfr+xqVHPrjSWZ2C5YNqO3XCk06S6iTlozRPvhhk4wQDnHT0pa8CuSIsOqI5lIAfBBc4wBnOcfGlQpr3W55gKxxkCNlXDMDuN/wDVdrUTv4Kee4Mk3LcExk4IzucnHX4Zp41QPEkbYLSBSwGDsM5FKlVH3FG3l/K0mshCUwo1DOcCjw3DokrEljq2JPTelSrVpAZFnvZVvEVzqUpnAOPL+fpUx3MBKHxJ7JXpnfNcpVmtIHgnzulvMyCMFXzsDjHWobzb80qv/qbqBgE/0UqVK+4QUbyTTTvI+ShWTp1ORTVWMzudLDxY2bGN8UqVH4MTGkNrGSQHIRT5Z70N5SAwXwhmVceQwCcfOu0qWJvA23jklkkUy4UEjAHUYzvRS2mDQowniOkE4z3pUqZ90EVwxM6R7AKgy2kajnc7/KmW7u8xjL4RAwUADA8/nSpUJMw58aObjcLnGds+dGh/9pBI+GLRkttjI3ONvdXaVbxYCNNcyRyEdc5wT23B/eutLIssp1nwYjGNvPc+ewrtKsv0mGPMWhVsYZ5QC2o569vIelT4lDyJK2MywoWHzP6muUqK7BI89utujzKdRGQQw64J/mgX7cpooVUYVWwT260qVBisK/4qISMERBh6aQox9aVKlTrsE//Z" alt="Signature" style="margin: 0 10px; height: 50px; width: 150px;" />
+
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                                <DxComboBox Data="@Employees"
+                                                                            @bind-Value="@GeneralConsultanMedicalSupport.SignatureEmployeeId"
+                                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                                            NullText="Select Employee..."
+                                                                            TextFieldName="Name"
+                                                                            ValueFieldName="Id"
+                                                                            SelectedItemChanged="@((UserDto freq)=>OnSelectEmployee(freq))"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                            ShowValidationIcon="true" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <span class="fw-bolder">Physical Examination</span>
+                                            </div>
+
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <DxFormLayout>
+                                                            <!-- Weight -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weight" ColSpanMd="12">
+                                                                <DxSpinEdit ShowValidationIcon="true"
+                                                                            MinValue="1"
+                                                                            @bind-Value="@GeneralConsultanMedicalSupport.Wt"
+                                                                            NullText="0"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Blood Pressure -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="BP" ColSpanMd="12">
+                                                                <DxSpinEdit ShowValidationIcon="true"
+                                                                            MinValue="1"
+                                                                            @bind-Value="@GeneralConsultanMedicalSupport.Bp"
+                                                                            NullText="0"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Height -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Height" ColSpanMd="12">
+                                                                <DxSpinEdit ShowValidationIcon="true"
+                                                                            MinValue="1"
+                                                                            @bind-Value="@GeneralConsultanMedicalSupport.Height"
+                                                                            NullText="0"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Pulse -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pulse" ColSpanMd="12">
+                                                                <DxSpinEdit ShowValidationIcon="true"
+                                                                            MinValue="1"
+                                                                            @bind-Value="@GeneralConsultanMedicalSupport.Pulse"
+                                                                            NullText="0"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <DxFormLayout>
+                                                            <!-- Chest Circumference -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Chest Circumference" ColSpanMd="12">
+                                                                <DxSpinEdit ShowValidationIcon="true"
+                                                                            MinValue="1"
+                                                                            @bind-Value="@GeneralConsultanMedicalSupport.ChestCircumference"
+                                                                            NullText="0"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Abdomen Circumference -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Abd. Circumference" ColSpanMd="12">
+                                                                <DxSpinEdit ShowValidationIcon="true"
+                                                                            MinValue="1"
+                                                                            @bind-Value="@GeneralConsultanMedicalSupport.AbdomenCircumference"
+                                                                            NullText="0"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Respiratory Rate -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Respiratory Rate" ColSpanMd="12">
+                                                                <DxSpinEdit ShowValidationIcon="true"
+                                                                            MinValue="1"
+                                                                            @bind-Value="@GeneralConsultanMedicalSupport.RespiratoryRate"
+                                                                            NullText="0"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            </DxFormLayoutItem>
+
+                                                            <!-- Temperature -->
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Temperature" ColSpanMd="12">
+                                                                <DxSpinEdit ShowValidationIcon="true"
+                                                                            MinValue="1"
+                                                                            @bind-Value="@GeneralConsultanMedicalSupport.Temperature"
+                                                                            NullText="0"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+
+                                                    <div class="col-md-12 mt-3 justify-content-center align-items-center text-center ">
+                                                        <label class="center-label">PERTINENT P.E. FINDINGS</label>
+                                                    </div>
+
+                                                    <div class="col-md-12">
+                                                        <DxFormLayout>
+                                                            <DxFormLayoutItem Caption="EYE" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.Eye" NullText="EYE" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="EAR NOSE THROAT" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.EarNoseThroat" NullText="EAR NOSE THROAT" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="CARDIOVASKULAR" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.Cardiovascular" NullText="CARDIOVASKULAR" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="RESPIRATORY" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.Respiratory" NullText="RESPIRATORY" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="ABDOMEN" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.Abdomen" NullText="ABDOMEN" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="EXTREMITIES" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.Extremities" NullText="EXTREMITIES" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="MUSCULOSKELETAL" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.Musculoskeletal" NullText="MUSCULOSKELETAL" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="NEUROLOGIC" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.Neurologic" NullText="NEUROLOGIC" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="SPIROMETRY TEST" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.SpirometryTest" NullText="SPIROMETRY TEST" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="RESPIRATORY FIT TEST: Passed/Failed, Respiratory type" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                                <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.RespiratoryFitTest" NullText="Passed/Failed" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem ColSpanMd="6" CaptionCssClass="normal-caption" Caption="Size">
+                                                                <DxSpinEdit ShowValidationIcon="true"
+                                                                            MinValue="0" @bind-Value="@GeneralConsultanMedicalSupport.Size"
+                                                                            NullText="Size"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Comment/s">
+                                                                <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherDesc"
+                                                                        NullText="Comment/s..."
+                                                                        ShowValidationIcon="true"
+                                                                        Rows="1" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Reccomend">
+                                                                <DxTagBox Data="@Recommends"
+                                                                          NullText="FIT/UNFIT/REASSESS"
+                                                                          TData="string"
+                                                                          TValue="string"
+                                                                          AllowCustomTags="true"
+                                                                          @bind-Values="@GeneralConsultanMedicalSupport.Recommendeds"
+                                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                                <DxDateEdit NullText="Examined Date" @bind-Date="@GeneralConsultanMedicalSupport.DateEximinedbyDoctor" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4QBKRXhpZgAASUkqAAgAAAABAA4BAgAoAAAAGgAAAAAAAABXaGl0ZSBDYWxsIER1Y2sgLyBDYWxsZHVjayBvbiBHcmFzcy4gVUsu/+0AdlBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAABZHAJQAAp2eGxvbWVnYXY2HAJ4AChXaGl0ZSBDYWxsIER1Y2sgLyBDYWxsZHVjayBvbiBHcmFzcy4gVUsuHAJuABhHZXR0eSBJbWFnZXMvaVN0b2NrcGhvdG8A/+EFK2h0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8APD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyI+Cgk8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgoJCTxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1sbnM6SXB0YzR4bXBDb3JlPSJodHRwOi8vaXB0Yy5vcmcvc3RkL0lwdGM0eG1wQ29yZS8xLjAveG1sbnMvIiAgIHhtbG5zOkdldHR5SW1hZ2VzR0lGVD0iaHR0cDovL3htcC5nZXR0eWltYWdlcy5jb20vZ2lmdC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBsdXM9Imh0dHA6Ly9ucy51c2VwbHVzLm9yZy9sZGYveG1wLzEuMC8iICB4bWxuczppcHRjRXh0PSJodHRwOi8vaXB0Yy5vcmcvc3RkL0lwdGM0eG1wRXh0LzIwMDgtMDItMjkvIiB4bWxuczp4bXBSaWdodHM9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9yaWdodHMvIiBwaG90b3Nob3A6Q3JlZGl0PSJHZXR0eSBJbWFnZXMvaVN0b2NrcGhvdG8iIEdldHR5SW1hZ2VzR0lGVDpBc3NldElEPSI2OTU3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" alt="Signature" style="margin: 0 10px; height: 50px; width: 150px;" />
+
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="3">
+                                                                <DxComboBox Data="@Employees"
+                                                                            @bind-Value="@GeneralConsultanMedicalSupport.ExaminedPhysicianId"
+                                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                                            NullText="Examined By..."
+                                                                            TextFieldName="Name"
+                                                                            ValueFieldName="Id"
+                                                                            SelectedItemChanged="@((UserDto freq)=>OnSelectEmployee(freq))"
+                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                            ShowValidationIcon="true" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="fw-bolder">Medical Support</span>
+                                    </div>
+                                    <div class="w-100">
 
                                         <EditForm Model="@GeneralConsultanMedicalSupport" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
                                             <DataAnnotationsValidator />
@@ -372,11 +888,11 @@
                                                             </DxMaskedInput>
                                                         </DxFormLayoutItem>
                                                         @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Negative">
-                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.DrugNegative" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Positive">
-                                                <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.DrugPositive" />
-                                                </DxFormLayoutItem> *@
+                                            <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.DrugNegative" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Positive">
+                                            <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.DrugPositive" />
+                                            </DxFormLayoutItem> *@
 
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Amphetamines" ColSpanMd="12">
                                                             <Template>
@@ -763,7 +1279,7 @@
                                                     </Items>
                                                 </DxFormLayoutGroup>
                                             </DxFormLayout>
-                                            <div class="row justify-content-end">
+                                            <div class="row justify-content-end mr-1 mb-3">
                                                 <div class="col-auto align-self-end">
                                                     <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
                                                     <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="OnCancel"></DxButton>
@@ -772,7 +1288,7 @@
                                         </EditForm>
                                     </div>
                                 </div>
-                            </div>
+                            }
                         }
                     </div>
                 </div>

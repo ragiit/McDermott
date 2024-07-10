@@ -30,8 +30,10 @@
                         .Include(z => z.Pratitioner)
                         .Include(z => z.ClassType)
                         .Include(z => z.InsurancePolicy)
+                        .Include(z => z.Patient)
                         .Include(z => z.Patient!.Gender)
                         .Include(z => z.Patient.Department)
+                        .Include(z => z.Patient.IdCardCountry)
                         //.ThenInclude(z => z.Gender)
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
