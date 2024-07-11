@@ -120,19 +120,9 @@
                                         <div class="row justify-content-end mb-3">
                                             <div class="col-auto align-self-end">
                                                 <DxTabs RenderMode="TabsRenderMode.AllTabs">
-                                                    <DxTab Text="Draft" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Draft)"></DxTab>
-                                                    @if (Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy)
-                                                    {
-                                                        <DxTab Text="Pharmacy" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy)"></DxTab>
-                                                    }
-                                                    else if (Pharmacy.Status == EnumStatusPharmacy.Received)
-                                                    {
-                                                        <DxTab Text="Received" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Received)"></DxTab>
-                                                    }
-                                                    else
-                                                    {
-                                                        <DxTab Text="Received" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Received)"></DxTab>
-                                                    }
+                                                    <DxTab Text="Draft" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Draft)"></DxTab>                                                    
+                                                    <DxTab Text="Pharmacy" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy)"></DxTab>
+                                                    <DxTab Text="Received" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Received)"></DxTab>
                                                     <DxTab Text="Process" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Processed)"></DxTab>
                                                     <DxTab Text="Done" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Done)"></DxTab>
                                                     <DxTab Text="Cancel" Enabled="@(Pharmacy.Status == EnumStatusPharmacy.Cancel)"></DxTab>

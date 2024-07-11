@@ -530,7 +530,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 if (value is null)
                     return;
 
-                var medicamentGroup = MedicamentGroups.Where(x => x.Id == value.Id).FirstOrDefault();
+                var medicamentGroup = MedicamentGroupsConcoction.Where(x => x.Id == value.Id).FirstOrDefault();
                 Concoction.MedicamentName = medicamentGroup?.Name;
                 Concoction.UomId = medicamentGroup?.UoMId;
                 Concoction.DrugFromId = medicamentGroup?.FormDrugId;
@@ -947,7 +947,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         await Mediator.Send(new UpdateStockOutPrescriptionRequest(existingItem));
                     }
                 }
-
+                var a = Pharmacy;
                 isDetailPrescription = false;
                 await EditItemPharmacy_Click(null);
                 StateHasChanged();
@@ -1607,7 +1607,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             else
             {
                 Concoction.PharmacyId = Pharmacy.Id;
-                if (Concoction.Id != 0)
+                if (Concoction.Id == 0)
                 {
                     await Mediator.Send(new CreateConcoctionRequest(Concoction));
                 }
@@ -1652,7 +1652,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     }
                     else
                     {
-                        var q = SelectedDataItemsConcoctionLines[0].Adapt<ConcoctionLineDto>();
+                        var q = Cl;
                         update = ConcoctionLines.FirstOrDefault(x => x.Id == q.Id)!;
                         var index = ConcoctionLines.IndexOf(update);
                         ConcoctionLines[index] = ConcoctionLine;
