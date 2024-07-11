@@ -297,7 +297,8 @@
         public string? RemarksMedicalHistory { get; set; }
         public DateTime? DateMedialHistory { get; set; }
         public long? SignatureEmployeeId { get; set; }
-        public byte[]? SignatureEmployeeImagesMedicalHistory { get; set; }
+        public byte[]? SignatureEmployeeImagesMedicalHistory { get; set; } = [];
+        public string? SignatureEmployeeImagesMedicalHistoryBase64 => System.Text.Encoding.UTF8.GetString(SignatureEmployeeImagesMedicalHistory ?? []);
 
         public long? Wt { get; set; }
         public long? Bp { get; set; }
@@ -323,6 +324,7 @@
         public IEnumerable<string> Recommendeds { get; set; } = [];
         public DateTime? DateEximinedbyDoctor { get; set; }
         public byte[]? SignatureEximinedDoctor { get; set; }
+        public string? SignatureEximinedDoctorBase64 => System.Text.Encoding.UTF8.GetString(SignatureEximinedDoctor ?? []);
         public long? ExaminedPhysicianId { get; set; }
         #endregion
 

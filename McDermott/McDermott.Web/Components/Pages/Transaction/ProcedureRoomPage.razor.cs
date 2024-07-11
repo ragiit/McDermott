@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using DevExpress.Data.Filtering.Helpers;
+using SignaturePad;
+using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 
 namespace McDermott.Web.Components.Pages.Transaction
@@ -27,6 +29,12 @@ namespace McDermott.Web.Components.Pages.Transaction
         }
 
         #endregion UserLoginAndAccessRole
+
+        private SignaturePadOptions _options = new SignaturePadOptions
+        {
+            LineCap = LineCap.Round,
+            LineJoin = LineJoin.Round,
+        };
 
         #region Properties
 
@@ -191,7 +199,16 @@ namespace McDermott.Web.Components.Pages.Transaction
             GeneralConsultanService = new();
             GeneralConsultanMedicalSupport = new();
             SelectedDataItems = [];
-            GeneralConsultanMedicalSupports = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery());
+            var sets = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery());
+            foreach (var item in sets)
+            {
+                if (item.IsConfinedSpace)
+                {
+                    item.GeneralConsultanService = new();
+                    item.GeneralConsultanService.Patient = item.Employee;
+                }
+            }
+            GeneralConsultanMedicalSupports = sets;
             PanelVisible = false;
         }
 
@@ -474,6 +491,17 @@ namespace McDermott.Web.Components.Pages.Transaction
             try
             {
                 Loading = true;
+
+                if (GeneralConsultanMedicalSupport.IsConfinedSpace)
+                {
+                    if (GeneralConsultanMedicalSupport.Id == 0)
+                        GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                    else
+                        GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+
+                    Loading = false;
+                    return;
+                }
 
                 BrowserFiles.Distinct();
 
@@ -780,6 +808,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             ShowForm = true;
 
             GeneralConsultanMedicalSupport = SelectedDataItems[0].Adapt<GeneralConsultanMedicalSupportDto>();
+
+            //GeneralConsultanMedicalSupport.SignatureEmployeeImagesMedicalHistory = Encoding.UTF8.GetBytes($"data:image/png;base64, {GeneralConsultanMedicalSupport.SignatureEmployeeImagesMedicalHistoryBase64}");
+            //GeneralConsultanMedicalSupport.SignatureEximinedDoctor = Encoding.UTF8.GetBytes($"data:image/png;base64, {GeneralConsultanMedicalSupport.SignatureEximinedDoctorBase64}");
 
             var generalConsultanService = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanMedicalSupport.GeneralConsultanServiceId));
 

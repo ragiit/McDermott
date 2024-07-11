@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240711031221_AddedSignatureAndConfinedBase64")]
+    partial class AddedSignatureAndConfinedBase64
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -932,9 +935,6 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<long?>("DrugFormId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("MedicamenName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("MedicamentGroupId")
                         .HasColumnType("bigint");
@@ -1995,9 +1995,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsClaustrophobia")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsConfinedSpace")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDefectiveSenseOfSmell")

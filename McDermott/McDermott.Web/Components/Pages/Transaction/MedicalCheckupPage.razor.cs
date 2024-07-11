@@ -628,8 +628,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private string PdfBase64 { get; set; }
-
         private List<IBrowserFile> BrowserFiles = [];
 
         private async Task DownloadFile(string fileName)
@@ -649,7 +647,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             using (var memoryStream = new MemoryStream())
             {
                 await e.File.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(memoryStream); // Batas ukuran file 10 MB
-                PdfBase64 = Convert.ToBase64String(memoryStream.ToArray());
+                GeneralConsultanService.McuExaminationBase64 = Convert.ToBase64String(memoryStream.ToArray());
             }
 
             StateHasChanged();
@@ -664,7 +662,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private void RemoveSelectedFile()
         {
             GeneralConsultanService.McuExaminationDocs = null;
-            PdfBase64 = null;
+            GeneralConsultanService.McuExaminationBase64 = null;
         }
 
         private async Task OnClickCancel()
