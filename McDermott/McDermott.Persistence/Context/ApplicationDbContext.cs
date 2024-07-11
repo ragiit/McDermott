@@ -143,9 +143,11 @@ namespace McDermott.Persistence.Context
         #endregion Pharmacy
 
         #region MyRegion
+
         public DbSet<InventoryAdjusment> InventoryAdjusments { get; set; }
         public DbSet<InventoryAdjusmentDetail> InventoryAdjusmentDetails { get; set; }
-        #endregion
+
+        #endregion MyRegion
 
         #endregion DbSet
 
@@ -298,6 +300,11 @@ namespace McDermott.Persistence.Context
                   .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GeneralConsultanService>()
+                  .HasMany(m => m.GeneralConsultationLogs)
+                  .WithOne(c => c.GeneralConsultanService)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GeneralConsultanService>()
                 .HasMany(m => m.Accidents)
                 .WithOne(c => c.GeneralConsultanService)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -306,7 +313,6 @@ namespace McDermott.Persistence.Context
                 .HasMany(m => m.SickLeaves)
                 .WithOne(c => c.GeneralConsultans)
                 .OnDelete(DeleteBehavior.Cascade);
-
 
             modelBuilder.Entity<InsurancePolicy>()
                 .HasMany(m => m.BPJSIntegrations)
