@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+﻿using Microsoft.CodeAnalysis.Host.Mef;
+using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 
@@ -43,7 +44,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private int FocusedRowVisibleIndexMedicamentGroup { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedMedicamentGroupDetailDataItems { get; set; } = new ObservableRangeCollection<object>();
-
         private async Task SelectChangeItem(ProductDto product)
         {
             try
@@ -90,7 +90,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 ex.HandleException(ToastService);
             }
         }
-
         private async Task SelectChangeFrequency(DrugDosageDto datas)
         {
             var data = Frequencys.Where(f => f.Id == datas.Id).FirstOrDefault();
@@ -99,40 +98,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             FormMedicamenDetails.Days = data.Days.ToLong();
             FormMedicamenDetails.TotalQty = FormMedicamenDetails?.Dosage * FormMedicamenDetails?.QtyByDay;
         }
-
-        //private void Checkin(bool value)
-        //{
-        //    if (value == true)
-        //    {
-        //        Concotions = true;
-        //        MGForm.IsConcoction = true;
-        //    }
-        //    else
-        //    {
-        //        Concotions = false;
-        //        MGForm.IsConcoction = false;
-        //    }
-        //}
-
-        //private bool Checkin
-        //{
-        //    get => Checkins;
-        //    set
-        //    {
-        //        bool Checkins = value;
-        //        this.Checkins = value;
-        //        if (Checkins)
-        //        {
-        //            Concotions = true;
-        //            MGForm.IsConcoction = true;
-        //        }
-        //        else
-        //        {
-        //            Concotions = false;
-        //        }
-        //    }
-        //}
-
         private bool IsNumeric(string value)
         {
             return double.TryParse(value, out _);
@@ -160,6 +125,26 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     await GetUserInfo();
                 }
                 catch { }
+
+                await LoadData();
+                StateHasChanged();
+
+                try
+                {
+                    if (Grid is not null)
+                    {
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(1);
+                        await Grid.WaitForDataLoadAsync();
+                        Grid.ExpandGroupRow(2);
+                        StateHasChanged();
+
+                    }
+                }
+                catch { }
+
+                await LoadAsyncData();
+                StateHasChanged();
             }
         }
 
@@ -181,15 +166,25 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         protected override async Task OnInitializedAsync()
         {
-            try
-            {
-                await GetUserInfo();
-            }
-            catch { }
-
-            await LoadData();
+            PanelVisible = true;
         }
 
+        private async Task LoadAsyncData()
+        {
+            try
+            {
+                PanelVisible = true;
+                var user = await Mediator.Send(new GetUserQuery());
+                FormDrugs = await Mediator.Send(new GetFormDrugQuery());
+                UoMs = await Mediator.Send(new GetUomQuery());
+                ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
+                Frequencys = await Mediator.Send(new GetDrugDosageQuery());
+                Phy = [.. user.Where(x => x.IsPhysicion == true)];
+                Products = await Mediator.Send(new GetProductQuery());
+                PanelVisible = false;
+            }
+            catch { }
+        }
         private async Task LoadData()
         {
             PanelVisible = true;
@@ -197,14 +192,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             SelectedDataItems = new ObservableRangeCollection<object>();
             SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
             medicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery());
-            //TempMedicamentGroupDetails = await Mediator.Send(new GetMedicamentGroupDetailQuery());
-            var user = await Mediator.Send(new GetUserQuery());
-            FormDrugs = await Mediator.Send(new GetFormDrugQuery());
-            UoMs = await Mediator.Send(new GetUomQuery());
-            ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
-            Frequencys = await Mediator.Send(new GetDrugDosageQuery());
-            Phy = [.. user.Where(x => x.IsPhysicion == true)];
-            Products = await Mediator.Send(new GetProductQuery());
+            PanelVisible = false;
+        }
+
+        private async Task LoadMedicamentGroupDetail()
+        {
+            PanelVisible = true;
+            SelectedMedicamentGroupDetailDataItems =[];
+            medicamentGroupDetails = await Mediator.Send(new GetMedicamentGroupDetailQuery());
             PanelVisible = false;
         }
 
@@ -559,56 +554,61 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 MedicamentGroupDetailDto updates = new();
 
                 // Jika menambahkan medicament
-                if (IsAddMedicament)
+                if (MGForm.Id == 0)
                 {
-                    // Cek apakah medicament dengan MedicamentId yang sama sudah ada
-                    if (medicamentGroupDetails.Any(x => x.MedicamentId == FormMedicamenGroupDetailss.MedicamentId))
-                        return;
-
-                    // Ambil daftar ID komponen aktif yang dipilih
-                    var listActiveComponentIds = selectedActiveComponents?.Select(x => x.Id).ToList();
-
-                    // Jika ada komponen aktif yang dipilih, tambahkan ke FormMedicamenGroupDetails
-                    if (FormMedicamenGroupDetailss.ActiveComponentId != null)
-                        FormMedicamenGroupDetailss.ActiveComponentId.AddRange(listActiveComponentIds);
-                    else
-                        FormMedicamenGroupDetailss.ActiveComponentId = listActiveComponentIds;
-
-                    // Tambahkan FormMedicamenGroupDetails ke daftar medicamentGroupDetails
-                    medicamentGroupDetails.Add(FormMedicamenGroupDetailss);
-
-                    // Update nama komponen aktif untuk setiap item dalam daftar medicamentGroupDetails
-                    foreach (var detail in medicamentGroupDetails)
+                    try
                     {
-                        detail.FrequencyName = Frequencys.FirstOrDefault(f => f.Id == detail.FrequencyId)?.Frequency;
-                        detail.ActiveComponentName = string.Join(",", ActiveComponents
-                            .Where(a => detail!.ActiveComponentId!.Contains(a.Id))
-                            .Select(a => a.Name));
+                        // Cek apakah medicament dengan MedicamentId yang sama sudah ada
+                        if (medicamentGroupDetails.Any(x => x.MedicamentId == FormMedicamenGroupDetailss.MedicamentId))
+                            return;
+                        if (FormMedicamenGroupDetailss.Id == 0)
+                        {
+                            var listActiveComponentIds = selectedActiveComponents?.Select(x => x.Id).ToList();
+                            if (FormMedicamenGroupDetailss.ActiveComponentId != null)
+                                FormMedicamenGroupDetailss.ActiveComponentId.AddRange(listActiveComponentIds);
+                            else
+                                FormMedicamenGroupDetailss.ActiveComponentId = listActiveComponentIds;
+
+                            medicamentGroupDetails.Add(FormMedicamenGroupDetailss);
+
+                        }
+                        else
+                        {
+                            var d = SelectedMedicamentGroupDetailDataItems[0].Adapt<MedicamentGroupDetailDto>();
+                            updates = medicamentGroupDetails.FirstOrDefault(x => x.MedicamentId == d.MedicamentId)!;
+                            var index = medicamentGroupDetails.IndexOf(updates!);
+                            medicamentGroupDetails[index] = FormMedicamenGroupDetailss;
+                        }
+
+                        foreach (var detail in medicamentGroupDetails)
+                        {
+                            detail.FrequencyName = Frequencys.FirstOrDefault(f => f.Id == detail.FrequencyId)?.Frequency;
+                            detail.ActiveComponentName = string.Join(",", ActiveComponents
+                                .Where(a => detail!.ActiveComponentId!.Contains(a.Id))
+                                .Select(a => a.Name));
+                        }
+                        SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
+                        StateHasChanged();
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.HandleException(ToastService);
                     }
                 }
                 else
                 {
-                    var d = SelectedMedicamentGroupDetailDataItems[0].Adapt<MedicamentGroupDetailDto>();
-                    var cek = medicamentGroupDetails.FirstOrDefault(x => x.MedicamentId == FormMedicamenGroupDetailss.MedicamentId);
-                    if (cek is not null && d.MedicamentId != FormMedicamenGroupDetailss.MedicamentId)
-                        return;
-                    updates = medicamentGroupDetails.FirstOrDefault(x => x.MedicamentId == d.MedicamentId)!;
-
-                    var index = medicamentGroupDetails.IndexOf(updates!);
-
-                    medicamentGroupDetails[index] = FormMedicamenGroupDetailss;
-
-                    //Update save temp FrequencyName
-                    medicamentGroupDetails[index].FrequencyName = Frequencys.FirstOrDefault(f => f.Id == medicamentGroupDetails[index].FrequencyId)?.Frequency;
-
-                    //Update Save temp ActiveComponentName
-                    medicamentGroupDetails[index].ActiveComponentName = string.Join(",", ActiveComponents
-                        .Where(a => medicamentGroupDetails[index].ActiveComponentId.Contains(a.Id))
-                        .Select(a => a.Name));
+                    FormMedicamenGroupDetailss.MedicamentGroupId = MGForm.Id;
+                    if (FormMedicamenGroupDetailss.Id == 0)
+                    {
+                        await Mediator.Send(new CreateMedicamentGroupDetailRequest(FormMedicamenGroupDetailss));
+                    }
+                    else
+                    {
+                        await Mediator.Send(new UpdateMedicamentGroupDetailRequest(FormMedicamenGroupDetailss));
+                    }
+                    await LoadMedicamentGroupDetail();
                 }
 
-                // Bersihkan koleksi SelectedMedicamentGroupDetailDataItems
-                SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
             }
             catch (Exception ex)
             {

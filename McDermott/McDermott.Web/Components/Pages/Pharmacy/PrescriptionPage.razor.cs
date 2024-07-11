@@ -957,9 +957,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 ex.HandleException(ToastService);
             }
         }
-
-
-
         private async Task SaveStockOutLines()
         {
             try
@@ -1174,7 +1171,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task LoadDataConcoctions()
         {
-            IsLoading = true;
+            IsLoading = true;           
             SelectedDataItems = [];
             Concoctions = await Mediator.Send(new GetConcoctionQuery());
             IsLoading = false;
