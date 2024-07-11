@@ -81,6 +81,7 @@ namespace McDermott.Application.Dtos.Transaction
         }
 
         public string? McuExaminationDocs { get; set; }
+        public string? McuExaminationBase64 { get; set; }
 
         public bool IsMcu { get; set; } = false;
 

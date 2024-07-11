@@ -50,6 +50,8 @@
         public bool IsOutsideBatam { get; set; }
         public EnumStatusGeneralConsultantService Status { get; set; } = EnumStatusGeneralConsultantService.Planned;
         public EnumStatusMCU StatusMCU { get; set; } = EnumStatusMCU.Draft;
+        public string? McuExaminationDocs { get; set; }
+        public string? McuExaminationBase64 { get; set; }
 
         #region Clinical Assesment
 

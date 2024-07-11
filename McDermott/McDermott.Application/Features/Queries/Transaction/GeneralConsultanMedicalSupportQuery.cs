@@ -20,12 +20,11 @@
 
                 if (!_cache.TryGetValue(cacheKey, out List<GeneralConsultanMedicalSupport>? result))
                 {
-                    result = await _unitOfWork.Repository<GeneralConsultanMedicalSupport>().GetAsync(
-                        null,
-                        x => x
-                            .Include(z => z.GeneralConsultanService)
-                            .ThenInclude(z => z.Patient),
-                        cancellationToken);
+                    result = await _unitOfWork.Repository<GeneralConsultanMedicalSupport>().Entities
+                        .Include(z => z.GeneralConsultanService).ThenInclude(x => x.Patient)
+                        .Include(z => z.Employee)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }

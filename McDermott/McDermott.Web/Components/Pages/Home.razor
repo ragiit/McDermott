@@ -19,7 +19,7 @@
 
             <p>Welcome, @UserLogin.Name. @Greeting</p>
 
-            <DxButton Click="Clicktop" Text="oooooooooooo"></DxButton>
+            @* <DxButton Click="Clicktop" Text="oooooooooooo"></DxButton> *@
         </div>
     </div>
 }
@@ -74,7 +74,7 @@ else
 
     private async Task Clicktop()
     {
-        NavigationManager.NavigateTo($"https://teams.microsoft.com/l/call/0/0?users={mail}" );
+        NavigationManager.NavigateTo($"https://teams.microsoft.com/l/call/0/0?users={mail}");
     }
 
     private DashboardTemp Dashboard { get; set; } = new();
