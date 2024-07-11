@@ -338,7 +338,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
                 selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament != null && ChekMedicament.ActiveComponentId != null && ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
                 var aa = Pharmacy.PrescriptionLocationId;
-                var checkStock = StockProducts.Where(x => x.ProductId == product.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
+                var checkStock = StockProducts.Where(x => x.ProductId == product.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Sum(x => x.Qty);
                 ConcoctionLine.AvaliableQty = checkStock;
             }
             catch (Exception ex)
@@ -399,8 +399,15 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
             else
             {
-                var temp = (value / ConcoctionLine.MedicamentDosage) + (value % ConcoctionLine.MedicamentDosage != 0 ? 1 : 1);
-                ConcoctionLine.TotalQty = temp * Concoction.TotalQty;
+                if (ConcoctionLine.MedicamentDosage != 0)
+                {
+                    var temp = (value / ConcoctionLine.MedicamentDosage) + (value % ConcoctionLine.MedicamentDosage != 0 ? 1 : 1);
+                    ConcoctionLine.TotalQty = temp * Concoction.TotalQty;
+                }
+                else
+                {
+                    ToastService.ShowInfo("Medicament Dosage Not Null!");
+                }
             }
         }
 
@@ -533,7 +540,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var medicamentGroup = MedicamentGroupsConcoction.Where(x => x.Id == value.Id).FirstOrDefault();
                 Concoction.MedicamentName = medicamentGroup?.Name;
                 Concoction.UomId = medicamentGroup?.UoMId;
-                Concoction.DrugFromId = medicamentGroup?.FormDrugId;
+                Concoction.DrugFormId = medicamentGroup?.FormDrugId;
 
                 var a = await Mediator.Send(new GetMedicamentGroupDetailQuery());
                 var data = a.Where(x => x.MedicamentGroupId == value?.Id).ToList();
@@ -547,8 +554,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                     var stockProduct = StockProducts
                                     .Where(x => x.ProductId == checkProduct.Id && x.SourceId is not null && x.SourceId == Pharmacy.PrescriptionLocationId)
-                                    .Select(x => x.Qty)
-                                    .FirstOrDefault();
+                                    .Sum(x => x.Qty);
 
                     var medicamentData = Medicaments.FirstOrDefault(x => x.ProductId == checkProduct.Id);
                     if (medicamentData is null)
@@ -764,7 +770,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         }
         private async void ShowCutStock(long prescriptionId)
         {
-           
+
             PrescripId = prescriptionId;
             // Get the prescription by ID
             var prescription = Prescriptions.FirstOrDefault(x => x.Id == prescriptionId);
@@ -906,7 +912,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
             }
 
-            
+
         }
 
         private void HandleDiscard()
@@ -1036,7 +1042,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
         #endregion
-        
+
         private async Task LoadAsyncData()
         {
             try
@@ -1171,10 +1177,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task LoadDataConcoctions()
         {
-            IsLoading = true;           
+            PanelVisible = true;
             SelectedDataItems = [];
-            Concoctions = await Mediator.Send(new GetConcoctionQuery());
-            IsLoading = false;
+            Concoctions = await Mediator.Send(new GetConcoctionQuery(x=>x.PharmacyId == Pharmacy.Id));
+            PanelVisible = false;
         }
 
         private async Task LoadDataConcoction()
@@ -1580,7 +1586,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     if (Concoction.Id == 0)
                     {
                         Concoction.Id = Helper.RandomNumber;
-                        Concoction.MedicamentGroupName = MedicamentGroupsConcoction.Where(x => x.Id == Concoction.MedicamentGroupId).Select(x => x.Name).FirstOrDefault();
+                        if ( Concoction.MedicamentGroupId is not null)
+                        {
+                            Concoction.MedicamenName = MedicamentGroupsConcoction.Where(x => x.Id == Concoction.MedicamentGroupId).Select(x => x.Name).FirstOrDefault();
+                        }
+                        else
+                        {
+                            Concoction.MedicamenName = Concoction.MedicamentName;
+                        }
                         Concoction.UomName = Uoms.Where(x => x.Id == Concoction.UomId).Select(x => x.Name).FirstOrDefault();
                         Concoction.DrugDosageName = DrugDosages.Where(x => x.Id == Concoction.DrugDosageId).Select(x => x.Frequency).FirstOrDefault();
                         Concoctions.Add(Concoction);
@@ -1593,6 +1606,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         Concoctions[index] = Concoction;
                     }
 
+                    await EditItemPharmacy_Click(null);
                     StateHasChanged();
                     SelectedDataItemsConcoction = [];
                 }
@@ -1625,55 +1639,66 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 return;
 
             var Cl = (ConcoctionLineDto)e.EditModel;
+
+            // If Pharmacy.Id is 0, handle local updates
             if (Pharmacy.Id == 0)
             {
                 try
                 {
-                    ConcoctionLineDto update = new();
-
-                    var products = Medicaments.Where(x => x.ProductId == ConcoctionLine.ProductId).FirstOrDefault();
-                    if (products is not null)
+                    var a = ConcoctionLine;
+                    var product = Medicaments.FirstOrDefault(x => x.ProductId == ConcoctionLine.ProductId);
+                    if (product != null)
                     {
-                        Cl.MedicamentDosage = products.Dosage;
-                        Cl.ProductName = products.Product?.Name;
-                        Cl.Qty = products.Dosage;
-                        Cl.UomId = products.UomId;
-                        Cl.UomName = Uoms.Where(x => x.Id == ConcoctionLine.UomId).Select(x => x.Name).FirstOrDefault();
-                        Cl.ActiveComponentId = products.ActiveComponentId;
-                        Cl.ActiveComponentName = string.Join(",", ActiveComponents.Where(a => ConcoctionLine.ActiveComponentId is not null && ConcoctionLine.ActiveComponentId.Contains(a.Id)).Select(n => n.Name));
+                        Cl.MedicamentDosage = product.Dosage;
+                        Cl.ProductName = product.Product?.Name;
+                        Cl.Qty = product.Dosage != 0 ? product.Dosage : ConcoctionLine.Qty;
+                        Cl.UomId = product.UomId != null ? product.UomId : ConcoctionLine.UomId;
+                        Cl.UomName = Uoms.Where(x => x.Id == Cl.UomId).Select(x => x.Name).FirstOrDefault();
+                        Cl.ActiveComponentId = product.ActiveComponentId.Count != 0 ? product.ActiveComponentId : selectedActiveComponents?.Select(x => x.Id).ToList();
                     }
+
+                    Cl.ActiveComponentName = string.Join(",", ActiveComponents
+                        .Where(a => ConcoctionLine.ActiveComponentId?.Contains(a.Id) == true)
+                        .Select(n => n.Name));
+
                     if (Cl.Id == 0)
                     {
-                        Cl.Id = Helper.RandomNumber;
+                        Cl.Id = Helper.RandomNumber; // Assuming this generates a unique ID
                         ConcoctionLines.Add(Cl);
                     }
                     else
                     {
-                        var q = Cl;
-                        update = ConcoctionLines.FirstOrDefault(x => x.Id == q.Id)!;
-                        var index = ConcoctionLines.IndexOf(update);
-                        ConcoctionLines[index] = ConcoctionLine;
+                        var existingIndex = ConcoctionLines.FindIndex(x => x.Id == Cl.Id);
+                        if (existingIndex >= 0)
+                        {
+                            ConcoctionLines[existingIndex] = Cl;
+                        }
                     }
-                    SelectedDataItemsConcoctionLines = [];
+
+                    SelectedDataItemsConcoctionLines = []; // Reset selections
                 }
                 catch (Exception ex)
                 {
-                    ex.HandleException(ToastService);
+                    ex.HandleException(ToastService); // Assuming a custom error handling method
                 }
             }
+            // Otherwise, handle server updates
             else
             {
                 Cl.ConcoctionId = Concoction.Id;
+
                 if (Cl.Id == 0)
                 {
                     await Mediator.Send(new CreateConcoctionLineRequest(Cl));
                 }
                 else
                 {
-                    await Mediator.Send(new UpdateConcoctionLineRequest(ConcoctionLine));
+                    await Mediator.Send(new UpdateConcoctionLineRequest(Cl));
                 }
+
                 await LoadDataConcoctionLines();
             }
+
         }
 
         private async Task OnSaveStockOut(GridEditModelSavingEventArgs e)
@@ -2325,6 +2350,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             GridConcoction.ShowColumnChooser();
         }
+        private void ColumnChooserButtonConcoctionLine_Click()
+        {
+            GridConcoctionLines.ShowColumnChooser();
+        }
+
 
         private async Task ExportXlsxItem_Click()
         {
