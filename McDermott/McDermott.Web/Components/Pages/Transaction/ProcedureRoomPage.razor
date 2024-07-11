@@ -592,14 +592,21 @@
                                                                         Rows="1" />
                                                             </DxFormLayoutItem>
 
-                                                            <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Reccomend">
-                                                                <DxTagBox Data="@Recommends"
-                                                                          NullText="FIT/UNFIT/REASSESS"
-                                                                          TData="string"
-                                                                          TValue="string"
-                                                                          AllowCustomTags="true"
-                                                                          @bind-Values="@GeneralConsultanMedicalSupport.Recommendeds"
-                                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            @*  <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Reccomend">
+                                                <DxTagBox Data="@Recommends"
+                                                NullText="FIT/UNFIT/REASSESS"
+                                                TData="string"
+                                                TValue="string"
+                                                AllowCustomTags="true"
+                                                @bind-Values="@GeneralConsultanMedicalSupport.Recommendeds"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                </DxFormLayoutItem> *@
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Recommended" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@Recommends"
+                                                                              NullText="Select Recommended..."
+                                                                              @bind-Value="GeneralConsultanMedicalSupport.Recommended">
+                                                                </MyDxComboBox>
                                                             </DxFormLayoutItem>
                                                         </DxFormLayout>
                                                     </div>
@@ -614,7 +621,7 @@
                                                                 <SignaturePad.SignaturePad Class="border border-2 rounded-3" @bind-Value="GeneralConsultanMedicalSupport.SignatureEximinedDoctor" ClearButtonClass="btn btn-info" ShowClearButton="true" style="width: 100%" />
                                                             </DxFormLayoutItem>
 
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="3">
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6">
                                                                 <DxComboBox Data="@Employees"
                                                                             @bind-Value="@GeneralConsultanMedicalSupport.ExaminedPhysicianId"
                                                                             FilteringMode="@DataGridFilteringMode.Contains"

@@ -500,6 +500,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                         GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
 
                     Loading = false;
+
+                    ToastService.ShowSuccess("Save Successfully");
                     return;
                 }
 

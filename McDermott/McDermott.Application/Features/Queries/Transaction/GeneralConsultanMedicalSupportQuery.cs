@@ -21,8 +21,9 @@
                 if (!_cache.TryGetValue(cacheKey, out List<GeneralConsultanMedicalSupport>? result))
                 {
                     result = await _unitOfWork.Repository<GeneralConsultanMedicalSupport>().Entities
-                        .Include(z => z.GeneralConsultanService).ThenInclude(x => x.Patient)
                         .Include(z => z.Employee)
+                        .Include(z => z.GeneralConsultanService)
+                        .Include(z => z.GeneralConsultanService.Patient)
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
 

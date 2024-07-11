@@ -98,6 +98,8 @@ namespace McDermott.Application.Dtos.Config
         public bool? IsPharmacy { get; set; } = false;
         public bool? IsPatient { get; set; } = false;
         public bool? IsUser { get; set; } = false;
+        public bool IsMcu { get; set; } = false;
+        public bool IsHr { get; set; } = false;
         public bool IsSameDomicileAddress { get; set; } = true;
         public bool? IsDoctor { get; set; } = false;
         public bool? IsEmployeeRelation { get; set; } = false;

@@ -46,6 +46,152 @@ namespace McDermott.Web.Components.Pages.Transaction
         private string StagingText { get; set; } = EnumStatusMCU.HRCandidat.GetDisplayName();
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
+        private async Task CloseFollowUpClick()
+        {
+            IsFollowUp = false;
+        }
+
+        private bool IsFollowUp { get; set; } = false;
+        private bool IsLoadingFollowUp { get; set; } = false;
+        private InsurancePolicyDto SelectedInsurancePolicyFollowUp { get; set; } = new();
+        private GeneralConsultanServiceDto FollowUpGeneralConsultanService { get; set; } = new();
+        private List<InsurancePolicyDto> FollowUpInsurancePolicies { get; set; } = [];
+
+        private async Task SelectedItemPatientChangedFollowUp(UserDto e)
+        {
+            FollowUpGeneralConsultanService.InsurancePolicyId = null;
+            FollowUpInsurancePolicies.Clear();
+            FollowUpGeneralConsultanService.Patient = new();
+            SelectedInsurancePolicyFollowUp = new();
+
+            if (e is null)
+                return;
+
+            FollowUpGeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
+            FollowUpGeneralConsultanService.PatientId = e.Id;
+
+            FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && FollowUpGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == FollowUpGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
+        }
+
+        private List<string> Method = new List<string>
+        {
+            "MCU",
+            "Gas And Oil"
+        };
+
+        private class HomeStatusTemp
+        {
+            public string Code { get; set; } = string.Empty;
+            public string Name { get; set; } = string.Empty;
+        }
+
+        private List<HomeStatusTemp> _homeStatusTemps = [
+                    new()
+            {
+                Code = "1",
+                Name = "Meninggal",
+            },
+            new()
+            {
+                Code = "3",
+                Name = "Berobat Jalan",
+            },
+            new()
+            {
+                Code = "4",
+                Name = "Rujuk Vertikal",
+            },
+            new()
+            {
+                Code = "6",
+                Name = "Rujuk Horizontal",
+            },
+        ];
+
+        private void SelectedItemRegisTypeChangedFollowUp(String e)
+        {
+            if (e is null)
+            {
+                return;
+            }
+
+            if (e.Equals("Emergency"))
+            {
+                Method =
+                [
+                    "General",
+                    "Work Related Injury",
+                    "Road Accident Injury",
+                ];
+                FollowUpGeneralConsultanService.TypeMedical = Method[0];
+            }
+            else if (e.Equals("MCU"))
+            {
+                Method =
+                [
+                    "Annual MCU",
+                    "Pre Employment MCU",
+                    "Oil & Gas UK",
+                    "HIV & AIDS",
+                    "Covid19*",
+                    "Drug & Alcohol Test",
+                    "Maternity Checkup"
+                ];
+                FollowUpGeneralConsultanService.TypeMedical = Method[0];
+            }
+            else if (e.Equals("General Consultation"))
+                FollowUpGeneralConsultanService.TypeMedical = null;
+        }
+
+        private async Task HandleValidSubmitFollowUp()
+        {
+            IsLoadingFollowUp = true;
+            try
+            {
+                GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicyFollowUp == null || SelectedInsurancePolicyFollowUp.Id == 0 ? null : SelectedInsurancePolicyFollowUp.Id;
+                if (!FollowUpGeneralConsultanService.Payment!.Equals("Personal") && (SelectedInsurancePolicyFollowUp is null || SelectedInsurancePolicyFollowUp.Id == 0))
+                {
+                    IsLoadingFollowUp = false;
+                    ToastService.ShowInfoSubmittingForm();
+                    return;
+                }
+
+                if (FollowUpGeneralConsultanService.AppointmentDate is null)
+                {
+                    IsLoadingFollowUp = false;
+                    ToastService.ShowInfoSubmittingForm();
+                    return;
+                }
+
+                var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != FollowUpGeneralConsultanService.Id && x.ServiceId == FollowUpGeneralConsultanService.ServiceId && x.PatientId == FollowUpGeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+
+                if (patient.Count > 0)
+                {
+                    IsLoadingFollowUp = false;
+                    ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
+                    return;
+                }
+
+                FollowUpGeneralConsultanService.Status = EnumStatusGeneralConsultantService.Planned;
+
+                if (FollowUpGeneralConsultanService.Id == 0)
+                    await Mediator.Send(new CreateGeneralConsultanServiceRequest(FollowUpGeneralConsultanService));
+
+                ToastService.ShowSuccess("Successfully Follow Up Patient");
+                IsFollowUp = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            IsLoadingFollowUp = false;
+        }
+
+        private void HandleInvalidSubmit()
+        {
+            ToastService.ShowInfoSubmittingForm();
+        }
+
         private GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new()
         {
             TypeRegistration = "MCU",
@@ -132,6 +278,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
         }
 
+        private void OnReferToClick()
+        {
+            IsFollowUp = true;
+        }
+
         private async Task OnClickConfirm()
         {
             IsLoading = true;
@@ -181,7 +332,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                             break;
 
                         case EnumStatusMCU.EmployeeTest:
-                            GeneralConsultanService.StatusMCU = EnumStatusMCU.HRCandidat;
+                            GeneralConsultanService.StatusMCU = EnumStatusMCU.Result;
                             StagingText = EnumStatusMCU.Examination.GetDisplayName();
                             break;
 
@@ -335,8 +486,97 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
         }
 
+        private async Task SelectedItemServiceChangedFollowUp(ServiceDto e)
+        {
+            FollowUpGeneralConsultanService.ServiceId = null;
+
+            if (!Convert.ToBoolean(UserLogin.IsEmployee) && !Convert.ToBoolean(UserLogin.IsPatient) && Convert.ToBoolean(UserLogin.IsUser) && !Convert.ToBoolean(UserLogin.IsNurse) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
+            {
+                Physicions = await Mediator.Send(new GetUserQuery(x => x.Id == UserLogin.Id));
+
+                FollowUpGeneralConsultanService.PratitionerId = Physicions.Count > 0 ? Physicions[0].Id : null;
+            }
+            else
+            {
+                Physicions.Clear();
+
+                if (e is null)
+                {
+                    FollowUpGeneralConsultanService.PratitionerId = null;
+                    return;
+                }
+
+                Physicions = await Mediator.Send(new GetUserQuery(x => x.DoctorServiceIds != null && x.DoctorServiceIds.Contains(e.Id)));
+            }
+        }
+
+        private List<string> Payments = new List<string>
+        {
+            "Personal",
+            "Insurance",
+            "BPJS"
+        };
+
+        private BPJSIntegrationDto SelectedBPJSIntegrationFollowUp { get; set; } = new();
+
+        private async Task SelectedItemInsurancePolicyChangedFollowUp(InsurancePolicyDto result)
+        {
+            ToastService.ClearInfoToasts();
+            SelectedInsurancePolicyFollowUp = new();
+            FollowUpGeneralConsultanService.InsurancePolicyId = null;
+
+            SelectedBPJSIntegrationFollowUp = new();
+
+            if (result is null)
+                return;
+
+            SelectedInsurancePolicyFollowUp = result;
+
+            ToastService.ClearWarningToasts();
+
+            var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.Id))).FirstOrDefault();
+            if (bpjs is not null)
+            {
+                var count = GeneralConsultanServices.Where(x => x.PatientId == FollowUpGeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
+                if (!string.IsNullOrWhiteSpace(bpjs.KdProviderPstKdProvider))
+                {
+                    var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
+                    if (parameter is not null)
+                    {
+                        if (!Convert.ToBoolean(parameter.Value?.Equals(bpjs.KdProviderPstKdProvider)))
+                        {
+                            ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
+                        }
+                        else
+                        {
+                            SelectedBPJSIntegrationFollowUp = bpjs;
+                        }
+                    }
+                }
+                else
+                {
+                    ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
+                }
+            }
+        }
+
+        private async Task SelectedItemPaymentChangedFollowUp(string e)
+        {
+            FollowUpGeneralConsultanService.Payment = null;
+            FollowUpGeneralConsultanService.InsurancePolicyId = null;
+            SelectedInsurancePolicyFollowUp = new();
+
+            if (e is null)
+                return;
+
+            FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == FollowUpGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+        }
+
+        private List<ClassTypeDto> ClassTypes = [];
+
         private async Task LoadComboBox()
         {
+            ClassTypes = await Mediator.Send(new GetClassTypeQuery());
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
             Services = await Mediator.Send(new GetServiceQuery(x => x.IsMcu == true));
         }
@@ -516,7 +756,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                             ServiceId = ser == null ? null : ser.Id,
                             MedexType = col3Medex,
                             IsBatam = col4Candidate.Equals("Batam"),
-                            IsOutsideBatam = col4Candidate.Equals("OutsideBatam"),
+                            StatusMCU = col4Candidate.Equals("Batam") ? EnumStatusMCU.HRCandidat : EnumStatusMCU.EmployeeTest,
+                            IsOutsideBatam = col4Candidate.Equals("Outside Batam"),
                         };
 
                         if (!GeneralConsultanServices.Any(x => x.PatientId == b.PatientId &&
@@ -623,7 +864,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                 await LoadComboBox();
                 StateHasChanged();
 
-                Grid?.SelectRow(0, true);
+                try
+                {
+                    Grid?.SelectRow(0, true);
+                }
+                catch { }
                 //await JsRuntime.InvokeVoidAsync("initializeSignaturePad");
             }
         }

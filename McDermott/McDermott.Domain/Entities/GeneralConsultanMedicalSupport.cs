@@ -94,6 +94,7 @@ namespace McDermott.Domain.Entities
         public DateTime? DateEximinedbyDoctor { get; set; }
         public byte[]? SignatureEximinedDoctor { get; set; }
         public string? SignatureEximinedDoctorBase64 { get; set; }
+        public string? Recommended { get; set; }
         public long? ExaminedPhysicianId { get; set; }
         #endregion
 
@@ -110,6 +111,7 @@ namespace McDermott.Domain.Entities
 
         [SetToNull]
         public User? Employee { get; set; }
+
         [SetToNull]
         public LabTest? LabTest { get; set; }
 

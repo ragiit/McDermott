@@ -495,7 +495,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<AllergyDto> Allergies = [];
         private List<GeneralConsultanServiceDto> GeneralConsultanServices { get; set; } = [];
         private List<InsurancePolicyDto> InsurancePolicies { get; set; } = [];
-        private List<InsurancePolicyDto> FollowUpInsurancePolicies { get; set; } = [];
         private List<InsurancePolicyDto> ReferToInsurancePolicies { get; set; } = [];
         private List<AwarenessDto> Awareness { get; set; } = [];
         private List<AllergyDto> WeatherAllergies = [];
@@ -1117,6 +1116,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && ReferToGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == ReferToGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
         }
+
+        private List<InsurancePolicyDto> FollowUpInsurancePolicies { get; set; } = [];
 
         private async Task SelectedItemPatientChangedFollowUp(UserDto e)
         {
