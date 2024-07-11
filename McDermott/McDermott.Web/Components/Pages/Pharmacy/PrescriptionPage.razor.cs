@@ -1,4 +1,5 @@
-﻿using McDermott.Domain.Entities;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Domain.Entities;
 using McDermott.Persistence.Migrations;
 using Microsoft.Identity.Client.Extensions.Msal;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
@@ -763,6 +764,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         }
         private async void ShowCutStock(long prescriptionId)
         {
+           
             PrescripId = prescriptionId;
             // Get the prescription by ID
             var prescription = Prescriptions.FirstOrDefault(x => x.Id == prescriptionId);
@@ -903,6 +905,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     StockOutPrescriptions = dataStock;
                 }
             }
+
+            
         }
 
         private void HandleDiscard()
@@ -918,15 +922,32 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
-                var item_cutstock = new StockOutPrescriptionDto();
                 foreach (var item in StockOutPrescriptions)
                 {
-                    item_cutstock.CutStock = item.CutStock;
-                    item_cutstock.StockId = item.StockId;
-                    item_cutstock.PrescriptionId = item.PrescriptionId;
+                    // Create a DTO for the current item
+                    var item_cutstock = new StockOutPrescriptionDto
+                    {
+                        CutStock = item.CutStock,
+                        StockId = item.StockId,
+                        PrescriptionId = item.PrescriptionId
+                    };
 
-                    await Mediator.Send(new CreateStockOutPrescriptionRequest(item_cutstock));
+                    // Check if the item exists in the database
+                    var existingStockOut = await Mediator.Send(new GetStockOutPrescriptionQuery(x => x.StockId == item.StockId && x.PrescriptionId == item.PrescriptionId));
+
+                    if (!existingStockOut.Any()) // If the item does not exist
+                    {
+                        await Mediator.Send(new CreateStockOutPrescriptionRequest(item_cutstock));
+                    }
+                    else // If the item exists, update it
+                    {
+                        // Assuming you have a method to update existing data
+                        var existingItem = existingStockOut.First();
+                        existingItem.CutStock = item.CutStock;
+                        await Mediator.Send(new UpdateStockOutPrescriptionRequest(existingItem));
+                    }
                 }
+
                 isDetailPrescription = false;
                 await EditItemPharmacy_Click(null);
                 StateHasChanged();
@@ -936,6 +957,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 ex.HandleException(ToastService);
             }
         }
+
+
 
         private async Task SaveStockOutLines()
         {
@@ -1679,7 +1702,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
                 else
                 {
-                    var q = SelectedDataItemsStockOut[0].Adapt<StockOutPrescriptionDto>();
+                    var q = Sc;
                     update = StockOutPrescriptions.FirstOrDefault(x => x.Id == q.Id)!;
                     var index = StockOutPrescriptions.IndexOf(update);
                     StockOutPrescriptions[index] = FormStockOutPrescriptions;

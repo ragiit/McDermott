@@ -9,7 +9,7 @@ namespace McDermott.Domain.Entities
     public class TransactionStockProduct : BaseAuditableEntity
     {
         public long? StockProductId { get; set; }
-        public long? TransactionStockId { get; set; }
+        public long? TransactionStockId { get; set; }        
         public long? ProductId { get; set; }
         public long? QtyStock { get; set; }
 
@@ -21,5 +21,6 @@ namespace McDermott.Domain.Entities
 
         [SetToNull]
         public StockProduct? StockProduct { get; set; }
+        
     }
 }

@@ -437,7 +437,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                     if (item.Product?.TraceAbility == true)
                     {
-                        item.Batch = stockProduct?.Batch ?? "-";
+                        item.Batch = stockProduct?.Batch ;
                         item.ExpiredDate = stockProduct?.Expired;
                     }
                     else
@@ -615,8 +615,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task validation()
         {
             try
-            {
-                ToastService.ClearAll();
+            {                
                 var Stock = await Mediator.Send(new GetStockProductQuery());
                 var transactionProductStock = await Mediator.Send(new GetTransactionStockProductQuery());
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
@@ -630,19 +629,20 @@ namespace McDermott.Web.Components.Pages.Inventory
                     foreach (var a in checkTransactionProduct)
                     {
                         //check product stock OUT availability
-                        var checkedStockOut = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.SourceId).FirstOrDefault();
+                        var data_product = Products.Where(x => x.Id == a.ProductId).FirstOrDefault();
+                        var checkedStockOut = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.SourceId && x.Id == a.StockProductId).FirstOrDefault();
                         checkedStockOut.Qty = checkedStockOut.Qty - a.QtyStock;
                         await Mediator.Send(new UpdateStockProductRequest(checkedStockOut));
 
                         //check product stock IN availability
-                        var checkStockIn = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.DestinationId).FirstOrDefault();
+                        var checkStockIn = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.DestinationId && x.Id == a.StockProductId).FirstOrDefault();
                         if (checkStockIn is null)
                         {
                             FormStock.ProductId = a.ProductId;
                             FormStock.SourceId = getInternalTransfer.DestinationId;
                             FormStock.UomId = a?.Product?.UomId;
                             FormStock.Qty = a.QtyStock;
-                            if (TempFormInternalTransfer.TraceAvability == true && checkedStockOut.Batch != null && checkedStockOut.Expired != null)
+                            if (data_product.TraceAbility == true )
                             {
                                 FormStock.Batch = checkedStockOut?.Batch;
                                 FormStock.Expired = checkedStockOut?.Expired;
@@ -651,7 +651,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         }
                         else
                         {
-                            if (TempFormInternalTransfer.TraceAvability == true && checkedStockOut.Batch != null && checkedStockOut.Expired != null)
+                            if (data_product.TraceAbility == true )
                             {
                                 if (checkStockIn.Batch == null && checkStockIn.Expired == null)
                                 {
@@ -843,8 +843,17 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                     if (i.Id == 0)
                     {
-                        i.Id = Helper.RandomNumber;
-                        TempTransactionStocks.Add(i);
+                        var a = new TransactionStockProductDto();
+                        a.Id = Helper.RandomNumber;
+                        a.ProductName = i.ProductName;
+                        a.QtyStock = i.QtyStock;
+                        a.Batch = i.Batch;
+                        a.ExpiredDate = i.ExpiredDate;
+                        a.UomName = i.UomName;
+                        a.ProductId = i.ProductId;
+                        a.StockProductId = i.StockProductId;
+                        a.TransactionStockId = i.TransactionStockId;
+                        TempTransactionStocks.Add(a);
                     }
                     else
                     {
@@ -880,7 +889,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
-                if (FormValidationState == false)
+                if (FormInternalTransfer.SourceId is null)
                 {
                     return;
                 }

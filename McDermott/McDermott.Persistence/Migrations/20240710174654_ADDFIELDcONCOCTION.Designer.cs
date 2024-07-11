@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240710174654_ADDFIELDcONCOCTION")]
+    partial class ADDFIELDcONCOCTION
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1886,12 +1889,6 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("Abdomen")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("AbdomenCircumference")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("AlcoholEximinationAttachment")
                         .HasColumnType("nvarchar(max)");
 
@@ -1916,34 +1913,16 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool?>("BenzodiazepinesPositive")
                         .HasColumnType("bit");
 
-                    b.Property<long?>("Bp")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Cardiovascular")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("ChestCircumference")
-                        .HasColumnType("bigint");
-
                     b.Property<bool?>("CocaineMetabolitesNegative")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("CocaineMetabolitesPositive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateEximinedbyDoctor")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateMedialHistory")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DrugEximinationAttachment")
@@ -1961,74 +1940,11 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("ECGAttachment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EarNoseThroat")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("EmployeeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("EnteringConfinedSpaceCount")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ExaminedPhysicianId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Extremities")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Eye")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<long?>("GeneralConsultanServiceId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("HR")
                         .HasColumnType("bigint");
-
-                    b.Property<long?>("Height")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsAsthmaOrLungAilment")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsBackPainOrLimitationOfMobility")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsClaustrophobia")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsConfinedSpace")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDefectiveSenseOfSmell")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDiabetesOrHypoglycemia")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsEyesightProblem")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsFaintingSpellOrSeizureOrEpilepsy")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsFirstTimeEnteringConfinedSpace")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsHearingDisorder")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsHeartDiseaseOrDisorder")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsHighBloodPressure")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsLowerLimbsDeformity")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsMeniereDiseaseOrVertigo")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsNormalRestingECG")
                         .HasColumnType("bit");
@@ -2069,12 +1985,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool?>("MethamphetaminesPositive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Musculoskeletal")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Neurologic")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool?>("OpiatesNegative")
                         .HasColumnType("bit");
 
@@ -2108,50 +2018,10 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("PractitionerRadiologyEximinationId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("Pulse")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("RadiologyEximinationAttachment")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RadiologyEximinationName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Recommendeds")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RemarksMedicalHistory")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Respiratory")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RespiratoryFitTest")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("RespiratoryRate")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("SignatureEmployeeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<byte[]>("SignatureEmployeeImagesMedicalHistory")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("SignatureEmployeeImagesMedicalHistoryBase64")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("SignatureEximinedDoctor")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("SignatureEximinedDoctorBase64")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("Size")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("SpirometryTest")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Status")
@@ -2163,17 +2033,11 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool?>("THCCannabinoidMarijuanaPositive")
                         .HasColumnType("bit");
 
-                    b.Property<long?>("Temperature")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<long?>("Wt")
-                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -2291,12 +2155,6 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<long>("M")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("McuExaminationBase64")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("McuExaminationDocs")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MedexType")
                         .HasColumnType("nvarchar(max)");
