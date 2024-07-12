@@ -9,10 +9,10 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long? DrugDosageId { get; set; }
         public long? PrescribingDoctorId { get; set; }
         public long? MedicamentGroupId { get; set; }
-        public long? DrugFromId { get; set; }
+        public long? DrugFormId { get; set; }
         public long? UomId { get; set; }
         public string? MedicamentName { get; set; }
-        public string? MedicamentGroupName { get; set; }
+        public string? MedicamenName { get; set; }
         public string? UomName { get; set; }
         public string? DrugFormName { get; set; }
         public string? DrugDosageName { get; set; }

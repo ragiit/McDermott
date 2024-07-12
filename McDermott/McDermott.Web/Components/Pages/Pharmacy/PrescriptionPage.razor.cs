@@ -2088,6 +2088,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             PopUpConcoctionDetail = true;
             IsLoading = true;
             Concoction = (ConcoctionDto)grid.SelectedDataItem;
+            var data_concoctionLine = ConcoctionLines.Where(x => x.ConcoctionId == Concoction.Id).ToList();
+            foreach(var items in data_concoctionLine)
+            {
+                items.ActiveComponentName = string.Join(",", ActiveComponents.Where(x => items.ActiveComponentId.Contains(x.Id)).Select(z => z.Name)); 
+            }
+            
             IsLoading = false;
         }
 
