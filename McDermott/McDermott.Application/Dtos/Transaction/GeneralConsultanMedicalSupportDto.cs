@@ -322,6 +322,7 @@
         public long? Size { get; set; }
         public string? Comment { get; set; }
         public IEnumerable<string> Recommendeds { get; set; } = [];
+        public string? Recommended { get; set; }
         public DateTime? DateEximinedbyDoctor { get; set; }
         public byte[]? SignatureEximinedDoctor { get; set; }
         public string? SignatureEximinedDoctorBase64 => System.Text.Encoding.UTF8.GetString(SignatureEximinedDoctor ?? []);

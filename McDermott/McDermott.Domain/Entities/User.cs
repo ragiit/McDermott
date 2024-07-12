@@ -69,13 +69,15 @@
         public string? DoctorCode { get; set; }
         public string? EmployeeCode { get; set; }
         public long? DegreeId { get; set; }
-        public bool? IsEmployee { get; set; }
-        public bool? IsPatient { get; set; }
-        public bool? IsUser { get; set; }
-        public bool? IsDoctor { get; set; }
-        public bool? IsPhysicion { get; set; }
-        public bool? IsNurse { get; set; }
-        public bool? IsPharmacy { get; set; }
+        public bool IsEmployee { get; set; } = false;
+        public bool IsPatient { get; set; } = false;
+        public bool IsUser { get; set; } = false;
+        public bool IsDoctor { get; set; } = false;
+        public bool IsPhysicion { get; set; } = false;
+        public bool IsNurse { get; set; } = false;
+        public bool IsPharmacy { get; set; } = false;
+        public bool IsMcu { get; set; } = false;
+        public bool IsHr { get; set; } = false;
         public string PhysicanCode { get; set; } = string.Empty;
         public bool? IsEmployeeRelation { get; set; }
         public string? EmployeeType { get; set; }

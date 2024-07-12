@@ -59,6 +59,8 @@
                                             <DxGridDataColumn FieldName="IsPhysicion" MinWidth="200" Caption="Physicion" />
                                             <DxGridDataColumn FieldName="IsNurse" MinWidth="200" Caption="Nurse" />
                                             <DxGridDataColumn FieldName="IsPharmacy" MinWidth="200" Caption="Pharmacy" />
+                                            <DxGridDataColumn FieldName="IsMcu" MinWidth="200" Caption="MCU" />
+                                            <DxGridDataColumn FieldName="IsHr" MinWidth="200" Caption="HR" />
                                         </Columns>
                                     </MyGrid>
                                 </DxLoadingPanel>
@@ -365,6 +367,8 @@
                                                             <DxGridLayoutColumn />
                                                             <DxGridLayoutColumn />
                                                             <DxGridLayoutColumn />
+                                                            <DxGridLayoutColumn />
+                                                            <DxGridLayoutColumn />
                                                         </Columns>
                                                         <Items>
                                                             <DxGridLayoutItem Row="0" Column="0">
@@ -399,6 +403,20 @@
                                                                 <Template>
                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacy">
                                                                         <DxCheckBox @bind-Checked="@UserForm.IsPharmacy" />
+                                                                    </DxFormLayoutItem>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="0" Column="5" CssClass="layout-margin-l">
+                                                                <Template>
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="MCU">
+                                                                        <DxCheckBox @bind-Checked="@UserForm.IsMcu" />
+                                                                    </DxFormLayoutItem>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="0" Column="6" CssClass="layout-margin-l">
+                                                                <Template>
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="HR">
+                                                                        <DxCheckBox @bind-Checked="@UserForm.IsHr" />
                                                                     </DxFormLayoutItem>
                                                                 </Template>
                                                             </DxGridLayoutItem>

@@ -65,24 +65,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<SubSpesialisPCare> SubSpesialisPs = [];
         private List<RujukanFaskesKhususSpesialisPCare> RujukanSubSpesialis = [];
 
-        public class SpesialisRefrensiKhususPCare
-        {
-            [JsonProperty("kdKhusus")]
-            public string KdKhusus { get; set; }
-
-            [JsonProperty("nmKhusus")]
-            public string NmKhusus { get; set; }
-        }
-
-        public class SpesialisPCare
-        {
-            [JsonProperty("kdSpesialis")]
-            public string KdSpesialis { get; set; }
-
-            [JsonProperty("nmSpesialis")]
-            public string NmSpesialis { get; set; }
-        }
-
         private List<SickLeaveDto> dataSickLeaves = [];
         private List<UserDto> Users = [];
         public byte[]? DocumentContent;
@@ -179,51 +161,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 ex.HandleException(ToastService);
             }
-        }
-
-        public class RujukanFaskesKhususSpesialisPCare
-        {
-            [JsonProperty("kdppk")]
-            public string Kdppk { get; set; }
-
-            [JsonProperty("nmppk")]
-            public string Nmppk { get; set; }
-
-            [JsonProperty("alamatPpk")]
-            public string AlamatPpk { get; set; }
-
-            [JsonProperty("telpPpk")]
-            public string TelpPpk { get; set; }
-
-            [JsonProperty("kelas")]
-            public string Kelas { get; set; }
-
-            [JsonProperty("nmkc")]
-            public string Nmkc { get; set; }
-
-            [JsonProperty("distance")]
-            public double Distance { get; set; }
-
-            [JsonProperty("jadwal")]
-            public string Jadwal { get; set; }
-
-            [JsonProperty("jmlRujuk")]
-            public int JmlRujuk { get; set; }
-
-            [JsonProperty("kapasitas")]
-            public int Kapasitas { get; set; }
-
-            [JsonProperty("persentase")]
-            public int Persentase { get; set; }
-        }
-
-        public class SpesialisSaranaPCare
-        {
-            [JsonProperty("kdSarana")]
-            public string KdSarana { get; set; }
-
-            [JsonProperty("nmSarana")]
-            public string NmSarana { get; set; }
         }
 
         private async Task SelectedItemSpesialis(SpesialisPCare e)
@@ -443,18 +380,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        public class SubSpesialisPCare
-        {
-            [JsonProperty("kdSubSpesialis")]
-            public string KdSubSpesialis { get; set; }
-
-            [JsonProperty("nmSubSpesialis")]
-            public string NmSubSpesialis { get; set; }
-
-            [JsonProperty("kdPoliRujuk")]
-            public string KdPoliRujuk { get; set; }
-        }
-
         private async Task SendPcareGetSubSpesialis()
         {
             try
@@ -495,7 +420,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<AllergyDto> Allergies = [];
         private List<GeneralConsultanServiceDto> GeneralConsultanServices { get; set; } = [];
         private List<InsurancePolicyDto> InsurancePolicies { get; set; } = [];
-        private List<InsurancePolicyDto> FollowUpInsurancePolicies { get; set; } = [];
         private List<InsurancePolicyDto> ReferToInsurancePolicies { get; set; } = [];
         private List<AwarenessDto> Awareness { get; set; } = [];
         private List<AllergyDto> WeatherAllergies = [];
@@ -1117,6 +1041,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && ReferToGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == ReferToGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
         }
+
+        private List<InsurancePolicyDto> FollowUpInsurancePolicies { get; set; } = [];
 
         private async Task SelectedItemPatientChangedFollowUp(UserDto e)
         {

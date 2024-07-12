@@ -17,7 +17,7 @@ namespace McDermott.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -2117,6 +2117,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("RadiologyEximinationName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Recommended")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Recommendeds")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -2176,6 +2179,8 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("GeneralConsultanServiceId");
 
@@ -5219,28 +5224,34 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("IdCardZip")
                         .HasColumnType("bigint");
 
-                    b.Property<bool?>("IsDoctor")
+                    b.Property<bool>("IsDoctor")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsEmployee")
+                    b.Property<bool>("IsEmployee")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsEmployeeRelation")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsNurse")
+                    b.Property<bool>("IsHr")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsPatient")
+                    b.Property<bool>("IsMcu")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsPharmacy")
+                    b.Property<bool>("IsNurse")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsPhysicion")
+                    b.Property<bool>("IsPatient")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsUser")
+                    b.Property<bool>("IsPharmacy")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPhysicion")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUser")
                         .HasColumnType("bit");
 
                     b.Property<long?>("JobPositionId")
@@ -5829,6 +5840,11 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanMedicalSupport", b =>
                 {
+                    b.HasOne("McDermott.Domain.Entities.User", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
                         .WithMany("GeneralConsultanMedicalSupports")
                         .HasForeignKey("GeneralConsultanServiceId")
@@ -5868,6 +5884,8 @@ namespace McDermott.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("PractitionerRadiologyEximinationId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Employee");
 
                     b.Navigation("GeneralConsultanService");
 
@@ -5960,7 +5978,7 @@ namespace McDermott.Persistence.Migrations
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
                         .WithMany("GeneralConsultationLogs")
                         .HasForeignKey("GeneralConsultanServiceId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanMedicalSupport", "ProcedureRoom")
                         .WithMany()

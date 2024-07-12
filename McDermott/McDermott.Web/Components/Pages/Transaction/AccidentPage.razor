@@ -266,6 +266,7 @@
                                                             <MyDxComboBox Data="@SentType"
                                                                           ReadOnly="@((!(IsStatus(EnumStatusAccident.Draft) || IsStatus(EnumStatusAccident.MedicalTreatment))))"
                                                                           NullText="Select Type..."
+                                                                          SelectedItemChanged="@((string e)=>OnSelectSent(e))"
                                                                           @bind-Value="Accident.Sent">
                                                             </MyDxComboBox>
                                                             <ValidationMessage For="@(() => Accident.Sent)" />

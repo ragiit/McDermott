@@ -93,6 +93,9 @@ using (var scope = app.Services.CreateScope())
     {
         Log.Error("Error occurred while migrating the database.");
         Log.Error(ex.Message);
+        Log.Error(ex.InnerException?.Message ?? "");
+        Log.Error(ex.Source ?? "");
+        Log.Error(ex.StackTrace ?? "");
     }
     finally
     {

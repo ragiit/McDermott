@@ -117,8 +117,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                 //await documentAPI.Fields.UpdateAsync(dateField);
 
                 DocumentContent = await DocumentProvider.GetDocumentAsync("AccidentForms.docx", mergeFields);
-
-               
             }
             catch (Exception ex)
             {
@@ -170,6 +168,21 @@ namespace McDermott.Web.Components.Pages.Transaction
         };
 
         #region Nature of Injury
+
+        private void OnSelectSent(string e)
+        {
+            if (e is null)
+            {
+                return;
+            }
+
+            if (e.Equals("Hospital"))
+            {
+                StagingText = EnumStatusAccident.HospitalizationReferral;
+            }
+
+            //RefreshStagingText();
+        }
 
         private IEnumerable<string> NatureOfInjury1 { get; set; } = new List<string>
         {
@@ -762,7 +775,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                         }
                     }
 
-                    await Mediator.Send(new UpdateAccidentRequest(Accident));
+                    GeneralConsultanService = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+                    Accident = await Mediator.Send(new UpdateAccidentRequest(Accident));
 
                     RefreshStagingText();
                 }
