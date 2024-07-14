@@ -301,7 +301,7 @@
                                                             </MyDxComboBox>
                                                             <ValidationMessage For="@(() => GeneralConsultanService.PratitionerId)" />
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Safety Personnel Name" ColSpanMd="12">
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Safety Personnel Name" ColSpanMd="12">
                                                             <MyDxComboBox Data="@Employees"
                                                                           NullText="Select Safety Personnel Name..."
                                                                           @bind-Value="@Accident.SafetyPersonnelId"
@@ -556,8 +556,19 @@
                                                                                     <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Diastole" />
                                                                                 </DxFormLayoutItem>
 
-                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption=" " ColSpanMd="12">
+                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Upload" ColSpanMd="12">
+                                                                                    <DxMaskedInput @bind-Value="@GeneralConsultanService.AccidentExaminationDocs"
+                                                                                                   ShowValidationIcon="true"
+                                                                                                   ReadOnly="true"
+                                                                                                   MaskMode="MaskMode.RegEx">
+                                                                                        <Buttons>
+                                                                                            <InputFile id="file" OnChange="@SelectFiles" multiple="false" style="display:none" />
+                                                                                            <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" />
+                                                                                            <DxEditorButton Click="DownloadFile" IconCssClass="fa-solid fa-download" />
 
+                                                                                            <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" />
+                                                                                        </Buttons>
+                                                                                    </DxMaskedInput>
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CssClass="mt-3" CaptionCssClass="normal-caption" Caption="BMI State" ColSpanMd="12">
@@ -587,7 +598,7 @@
                                                                             <div class="col-md-12">
                                                                                 <DxFormLayout CssClass="w-100">
                                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="User" ColSpanMd="12">
-                                                                                        <label>@GeneralConsultanService.Patient.Name</label>
+                                                                                        <label>@UserLogin.Name</label>
                                                                                     </DxFormLayoutItem>
 
                                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Subjective" ColSpanMd="12">

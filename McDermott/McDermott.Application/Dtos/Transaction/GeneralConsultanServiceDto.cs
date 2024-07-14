@@ -66,6 +66,8 @@ namespace McDermott.Application.Dtos.Transaction
         public TimeSpan? WorkTo { get; set; }
         public bool IsAlertInformationSpecialCase { get; set; } = false;
 
+        [NotMapped]
+        public string IsBatamString => IsBatam ? "Batam" : "Outside Batam";
         private bool _isBatam = true;
         public bool IsBatam
         {
@@ -82,6 +84,8 @@ namespace McDermott.Application.Dtos.Transaction
 
         public string? McuExaminationDocs { get; set; }
         public string? McuExaminationBase64 { get; set; }
+        public string? AccidentExaminationDocs { get; set; }
+        public string? AccidentExaminationBase64 { get; set; }
 
         public bool IsMcu { get; set; } = false;
 

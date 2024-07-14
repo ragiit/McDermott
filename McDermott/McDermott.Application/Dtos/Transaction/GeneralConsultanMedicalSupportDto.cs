@@ -257,6 +257,7 @@
             }
         }
 
+        public string ConfinedSpaceString => IsConfinedSpace ? "Confined Space" : "Referral from GC";
         public bool IsConfinedSpace { get; set; } = false;
         public long? PractitionerECGId { get; set; }
         public bool IsNormalRestingECG { get; set; } = false;

@@ -52,6 +52,8 @@
         public EnumStatusMCU StatusMCU { get; set; } = EnumStatusMCU.Draft;
         public string? McuExaminationDocs { get; set; }
         public string? McuExaminationBase64 { get; set; }
+        public string? AccidentExaminationDocs { get; set; }
+        public string? AccidentExaminationBase64 { get; set; }
 
         #region Clinical Assesment
 

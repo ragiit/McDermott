@@ -66,6 +66,8 @@
                                             <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="MedexType" Caption="Medex Type" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="IsBatamString" Caption="Location" />
                                             <DxGridDataColumn MinWidth="200" FieldName="StatusMcuName" Caption="Status" />
                                         </Columns>
                                     </MyGrid>
@@ -602,7 +604,6 @@ else
     </div>
 </div> *@
 
-
 <DxPopup Context="P" HeaderText="Refer To" @bind-Visible="@IsReferTo" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Closing="CloseReferTo" Width="90%" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center">
     <BodyContentTemplate>
         <div class="popup-content">
@@ -645,6 +646,19 @@ else
                                             Text="Fetching Data...">
                                 <EditForm Model="@ReferToGeneralConsultanService" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmitFollowUp" OnInvalidSubmit="@HandleInvalidSubmit">
                                     <DataAnnotationsValidator />
+
+                                    <div class="card ">
+                                        <div class="card-body">
+                                            <div class="w-100">
+                                                <div class="row w-100">
+                                                    <div class="col-md-12 align-self-center">
+                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(() => IsReferTo = false)"></DxButton>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="w-100">
                                         <div class="w-100">
@@ -941,9 +955,6 @@ else
         </div>
     </BodyContentTemplate>
 </DxPopup>
-
-
-
 
 <script>
     window.initializeSignaturePad = () => {

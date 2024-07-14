@@ -150,22 +150,22 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsLoadingFollowUp = true;
             try
             {
-                GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicyFollowUp == null || SelectedInsurancePolicyFollowUp.Id == 0 ? null : SelectedInsurancePolicyFollowUp.Id;
-                if (!FollowUpGeneralConsultanService.Payment!.Equals("Personal") && (SelectedInsurancePolicyFollowUp is null || SelectedInsurancePolicyFollowUp.Id == 0))
+                ReferToGeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicyReferTo == null || SelectedInsurancePolicyReferTo.Id == 0 ? null : SelectedInsurancePolicyReferTo.Id;
+                if (!ReferToGeneralConsultanService.Payment!.Equals("Personal") && (SelectedInsurancePolicyReferTo is null || SelectedInsurancePolicyReferTo.Id == 0))
                 {
                     IsLoadingFollowUp = false;
                     ToastService.ShowInfoSubmittingForm();
                     return;
                 }
 
-                if (FollowUpGeneralConsultanService.AppointmentDate is null)
+                if (ReferToGeneralConsultanService.AppointmentDate is null)
                 {
                     IsLoadingFollowUp = false;
                     ToastService.ShowInfoSubmittingForm();
                     return;
                 }
 
-                var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != FollowUpGeneralConsultanService.Id && x.ServiceId == FollowUpGeneralConsultanService.ServiceId && x.PatientId == FollowUpGeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+                var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != ReferToGeneralConsultanService.Id && x.ServiceId == ReferToGeneralConsultanService.ServiceId && x.PatientId == ReferToGeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
 
                 if (patient.Count > 0)
                 {
@@ -174,12 +174,12 @@ namespace McDermott.Web.Components.Pages.Transaction
                     return;
                 }
 
-                FollowUpGeneralConsultanService.Status = EnumStatusGeneralConsultantService.Planned;
+                ReferToGeneralConsultanService.Status = EnumStatusGeneralConsultantService.Planned;
 
-                if (FollowUpGeneralConsultanService.Id == 0)
-                    await Mediator.Send(new CreateGeneralConsultanServiceRequest(FollowUpGeneralConsultanService));
+                if (ReferToGeneralConsultanService.Id == 0)
+                    await Mediator.Send(new CreateGeneralConsultanServiceRequest(ReferToGeneralConsultanService));
 
-                ToastService.ShowSuccess("Successfully Follow Up Patient");
+                ToastService.ShowSuccess("Successfully Refer Patient");
                 IsFollowUp = false;
             }
             catch (Exception ex)
@@ -850,7 +850,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                         case EnumStatusMCU.EmployeeTest:
                             GeneralConsultanService.StatusMCU = EnumStatusMCU.Result;
-                            StagingText = EnumStatusMCU.Examination.GetDisplayName();
+                            StagingText = EnumStatusMCU.Done.GetDisplayName();
                             break;
 
                         case EnumStatusMCU.HRCandidat:
@@ -1108,6 +1108,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task LoadData()
         {
             ShowForm = false;
+            IsLoading = true;
             GeneralConsultanService = new()
             {
                 TypeRegistration = "MCU",
@@ -1427,6 +1428,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (isError)
                 return;
 
+            BrowserFiles.Clear();
             BrowserFiles.Add(e.File);
 
             GeneralConsultanService.McuExaminationDocs = e.File.Name;

@@ -390,6 +390,13 @@
             return confirm('Apakah Anda yakin ingin mengirim email ini?');
         }
 
+        function downloadBase64File(base64Data, fileName) {
+            const link = document.createElement('a');
+            link.href = base64Data;
+            link.download = fileName;
+            link.click();
+        }
+
         function printDocument(base64String) {
             const byteCharacters = atob(base64String);
             const byteNumbers = new Array(byteCharacters.length);
