@@ -630,12 +630,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                     {
                         //check product stock OUT availability
                         var data_product = Products.Where(x => x.Id == a.ProductId).FirstOrDefault();
-                        var checkedStockOut = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.SourceId && x.Id == a.StockProductId).FirstOrDefault();
+                        var checkedStockOut = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.SourceId ).FirstOrDefault();
                         checkedStockOut.Qty = checkedStockOut.Qty - a.QtyStock;
                         await Mediator.Send(new UpdateStockProductRequest(checkedStockOut));
 
                         //check product stock IN availability
-                        var checkStockIn = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.DestinationId && x.Id == a.StockProductId).FirstOrDefault();
+                        var checkStockIn = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.DestinationId ).FirstOrDefault();
                         if (checkStockIn is null)
                         {
                             FormStock.ProductId = a.ProductId;

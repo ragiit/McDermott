@@ -3,6 +3,7 @@ using McDermott.Domain.Entities;
 using McDermott.Persistence.Migrations;
 using Microsoft.Identity.Client.Extensions.Msal;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionLineCommand;
@@ -770,6 +771,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         }
         private async Task ShowCutStock(long prescriptionId)
         {
+
+            await RefreshData();
+
             PanelVisible = true;
             PrescripId = prescriptionId;
             // Get the prescription by ID
@@ -913,6 +917,15 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
             PanelVisible = false;
 
+        }
+
+        private async Task RefreshData()
+        {
+            // Fetch the latest data from the server or database
+            Prescriptions = await Mediator.Send(new GetPrescriptionQuery());
+            Products = await Mediator.Send(new GetProductQuery());
+            StockProducts = await Mediator.Send(new GetStockProductQuery());
+            ConcoctionLines = await Mediator.Send(new GetConcoctionLineQuery());
         }
 
         private void HandleDiscard()
