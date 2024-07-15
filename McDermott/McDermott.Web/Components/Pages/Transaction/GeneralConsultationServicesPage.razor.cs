@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using McDermott.Extentions;
 using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 using MediatR;
+using DevExpress.Blazor.RichEdit;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -40,6 +41,8 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IReadOnlyList<object> SelectedDataItemsCPPT { get; set; } = [];
 
         private EnumStatusGeneralConsultantService StagingText { get; set; } = EnumStatusGeneralConsultantService.Confirmed;
+        private DxRichEdit richEdit;
+        private DevExpress.Blazor.RichEdit.Document documentAPI;
         private bool ShowForm { get; set; } = false;
         private bool PanelVisible { get; set; } = false;
         private bool IsDeletedConsultantService { get; set; } = false;
@@ -114,7 +117,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 string OppositeSex = "";
                 if (patienss.GenderId != null)
                 {
-                    Gender = patienss.Gender.Name == "Male" ? "MALE(L)" : "FEMALE(P)";
+                    Gender = patienss.Gender.Name == "Male" ? "MALE (L)" : "FEMALE (P)";
                     OppositeSex = patienss.Gender.Name == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
                 }
 
