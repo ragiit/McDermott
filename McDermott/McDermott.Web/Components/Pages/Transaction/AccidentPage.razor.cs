@@ -73,6 +73,82 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
+        private List<IBrowserFile> BrowserFiles = [];
+
+        private async void SelectFiles(InputFileChangeEventArgs e)
+        {
+            var file = e.File;
+            bool isError = false;
+
+            // Validate file size
+            if (file.Size > 10 * 1024 * 1024)
+            {
+                // Handle error: File too large
+                ToastService.ShowError("The file is too large. Maximum allowed size is 10 MB.");
+                isError = true;
+            }
+
+            // Validate file type
+            if (!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                // Handle error: File is not PDF
+                ToastService.ShowError("Invalid file type. Only PDF files are allowed.");
+                isError = true;
+            }
+
+            if (isError)
+                return;
+
+            BrowserFiles.Clear();
+            BrowserFiles.Add(e.File);
+
+            GeneralConsultanService.AccidentExaminationDocs = e.File.Name;
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await e.File.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(memoryStream); // Batas ukuran file 10 MB
+                GeneralConsultanService.AccidentExaminationBase64 = Convert.ToBase64String(memoryStream.ToArray());
+            }
+
+            StateHasChanged();
+        }
+
+        private async Task DownloadFile()
+        {
+            IsLoading = true;
+            try
+            {
+                if (GeneralConsultanService.Id != 0 && !string.IsNullOrWhiteSpace(GeneralConsultanService.AccidentExaminationBase64))
+                {
+                    // Contoh data base64
+                    var base64Data = $"data:application/pdf;base64,{GeneralConsultanService.AccidentExaminationBase64}";
+                    var fileNames = GeneralConsultanService.AccidentExaminationDocs;
+
+                    // Memanggil fungsi JavaScript untuk mengunduh file
+                    await JsRuntime.InvokeVoidAsync("downloadBase64File", base64Data, fileNames);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        private void RemoveSelectedFile()
+        {
+            GeneralConsultanService.AccidentExaminationDocs = null;
+            GeneralConsultanService.AccidentExaminationBase64 = null;
+        }
+
+        private async Task SelectFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "file");
+        }
+
         private void OnSelectAccidentLocation(string e)
         {
             if (e is null)
@@ -630,6 +706,12 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
             }
 
+            temps.Add(new GeneralConsultanCPPTDto
+            {
+                Id = new Random().Next(1, 9000000) + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Second,
+                Title = "Diagnosis",
+                Body = SelectedDiagnosis.Name,
+            });
             GeneralConsultanCPPTs.AddRange(temps);
 
             GridCppt.Reload();
@@ -942,6 +1024,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true && x.IsPatient == true));
             Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
             Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
+            Awareness = await Mediator.Send(new GetAwarenessQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());
         }
 
