@@ -768,9 +768,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
 
         }
-        private async void ShowCutStock(long prescriptionId)
+        private async Task ShowCutStock(long prescriptionId)
         {
-
+            PanelVisible = true;
             PrescripId = prescriptionId;
             // Get the prescription by ID
             var prescription = Prescriptions.FirstOrDefault(x => x.Id == prescriptionId);
@@ -911,7 +911,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     StockOutPrescriptions = dataStock;
                 }
             }
-
+            PanelVisible = false;
 
         }
 
