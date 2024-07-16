@@ -12,6 +12,7 @@ namespace McDermott.Domain.Entities
         public long? PrescriptionId { get; set; }
         public long? ConcoctionLineId { get; set; }
         public long? TransferId { get; set; }
+        public long? AdjustmentsId { get; set; }
         public long? ProductId { get; set; }
         public string? Reference { get; set; }
         public string? Batch { get; set; }
@@ -22,6 +23,8 @@ namespace McDermott.Domain.Entities
         public long? InStock {  get; set; }
         public long? OutStock { get; set; }
         public long? EndStock { get; set; }
+        public long? UomId { get; set; }
+        public bool? Validate { get; set; }
 
 
         public ReceivingStock? ReceivingStock { get; set; }
@@ -31,6 +34,8 @@ namespace McDermott.Domain.Entities
         public Product? Product { get; set; }
         public Location? Source {  get; set; }
         public Location? Destination { get; set; }
+        public Uom? Uom { get; set; }
+        public InventoryAdjusment? InventoryAdjusment { get; set; }
 
     }
 }

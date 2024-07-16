@@ -21,7 +21,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<TransferStockDetailDto> AllLogs = [];
         private List<ReceivingLogDto> Logs = [];
         private UserDto NameUser = new();
-       
+
         private ReceivingStockProductDto FormReceivingDetailStock = new();
         private ReceivingStockProductDto TempFormReceivingStockDetail = new();
         private ReceivingStockDto GetReceivingStock = new();
@@ -124,7 +124,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             PanelVisible = true;
             showForm = false;
-            ReceivingStocks = await Mediator.Send(new GetReceivingStockQuery());           
+            ReceivingStocks = await Mediator.Send(new GetReceivingStockQuery());
             PanelVisible = false;
         }
 
@@ -158,8 +158,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task CheckBatch(string value)
         {
             var checkData = TransactionStocks.Where(x => x.Batch == value).FirstOrDefault();
-            
-            if(checkData != null)
+
+            if (checkData != null)
             {
                 TempFormReceivingStockDetail.Batch = value;
                 TempFormReceivingStockDetail.ExpiredDate = checkData.ExpiredDate;
@@ -372,30 +372,44 @@ namespace McDermott.Web.Components.Pages.Inventory
                 var CheckReceivedProduct = receivedProductStock.Where(x => x.ReceivingStockId == GetReceivingStock.Id).ToList()!;
                 foreach (var a in CheckReceivedProduct)
                 {
+                    var cekInitialStock = new TransactionStockDto();
                     var x = Uoms.Where(x => x.Id == a?.Product?.PurchaseUomId).FirstOrDefault();
-                    var checkStok = Stocks.Where(x => x.ProductId == a.ProductId && x.SourceId == GetReceivingStock.DestinationId && x.Batch == a.Batch).FirstOrDefault();
-                    if (checkStok is null)
+                    if (a.Product.TraceAbility == true)
                     {
-                        FormStockProduct.SourceId = GetReceivingStock.DestinationId;
-                        FormStockProduct.ProductId = a.ProductId;
-                        FormStockProduct.UomId = a?.Product?.UomId;
-
-                        FormStockProduct.Batch = a?.Batch;
-                        FormStockProduct.Expired = a?.ExpiredDate;
-
-                        FormStockProduct.Qty = a.Qty * x.BiggerRatio.ToLong();
-                        await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
+                         cekInitialStock = TransactionStocks.Where(x => x.ReceivingId == FormReceivingStocks.Id && x.ProductId == a.ProductId && x.Batch == a.Batch).LastOrDefault();
                     }
-                    else
+                    FormTransactionStock.ReceivingId = FormReceivingStocks.Id;
+                    FormTransactionStock.ProductId = a.ProductId;
+                    FormTransactionStock.Batch = a.Batch;
+                    FormTransactionStock.ExpiredDate = a.ExpiredDate;
+                    if(cekInitialStock != null)
                     {
-                        checkStok.Expired = a.ExpiredDate;
-                        checkStok.Batch = a.Batch;
-
-                        var totalQty = a.Qty * x?.BiggerRatio?.ToLong();
-                        checkStok!.Qty = checkStok.Qty + a.Qty;
-
-                        await Mediator.Send(new UpdateStockProductRequest(checkStok));
+                        FormTransactionStock.InitialStock = cekInitialStock.EndStock;
                     }
+
+                    //var checkStok = Stocks.Where(x => x.ProductId == a.ProductId && x.SourceId == GetReceivingStock.DestinationId && x.Batch == a.Batch).FirstOrDefault();
+                    //if (checkStok is null)
+                    //{
+                    //    FormStockProduct.SourceId = GetReceivingStock.DestinationId;
+                    //    FormStockProduct.ProductId = a.ProductId;
+                    //    FormStockProduct.UomId = a?.Product?.UomId;
+
+                    //    FormStockProduct.Batch = a?.Batch;
+                    //    FormStockProduct.Expired = a?.ExpiredDate;
+
+                    //    FormStockProduct.Qty = a.Qty * x.BiggerRatio.ToLong();
+                    //    await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
+                    //}
+                    //else
+                    //{
+                    //    checkStok.Expired = a.ExpiredDate;
+                    //    checkStok.Batch = a.Batch;
+
+                    //    var totalQty = a.Qty * x?.BiggerRatio?.ToLong();
+                    //    checkStok!.Qty = checkStok.Qty + a.Qty;
+
+                    //    await Mediator.Send(new UpdateStockProductRequest(checkStok));
+                    //}
                 }
 
                 //Save Log..
@@ -633,7 +647,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 else
                 {
-                    var sdsds=await Mediator.Send(new UpdateReceivingStockProductRequest(r));
+                    var sdsds = await Mediator.Send(new UpdateReceivingStockProductRequest(r));
                     TempReceivingStockDetails.Clear();
                 }
                 await EditItem_Click(null);
