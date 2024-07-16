@@ -9,7 +9,7 @@
             {
                 PagerNavigationMode = PagerNavigationMode.InputBox;
                 EditorRenderMode = GridEditorRenderMode.Detached;
-                PageSize = 10;
+                PageSize = 100;
                 FilterMenuButtonDisplayMode = GridFilterMenuButtonDisplayMode.Always;
                 CustomizeDataRowEditor = @GridExtention.Grid_CustomizeDataRowEditor;
                 AllowSelectRowByClick = true;

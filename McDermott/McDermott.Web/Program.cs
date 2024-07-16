@@ -1,10 +1,14 @@
 
 using McDermott.Application.Extentions;
+using McDermott.Application.Features.Services;
+using McDermott.Application.Interfaces.Repositories;
 using McDermott.Persistence.Context;
 using McDermott.Persistence.Extensions;
 using McDermott.Web.Components;
 using McDermott.Web.Hubs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -18,6 +22,15 @@ builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplicationLayer();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPCareService, PCareService>();
+builder.Services.AddScoped<IDocumentProvider, DocumentProvider>();
+builder.Services.AddScoped<IFileExportService, FileExportService>(); 
+builder.Services.AddScoped<ProtectedSessionStorage>();
+builder.Services.AddScoped<CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddMemoryCache(); // Menambahkan layanan memory cache
+builder.Services.AddDistributedMemoryCache(); // Menambahkan layanan distributed memory cache (opsional, digunakan jika Anda memerlukan cache di beberapa instance server)
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
 builder.Services.AddBlazoredLocalStorage();
