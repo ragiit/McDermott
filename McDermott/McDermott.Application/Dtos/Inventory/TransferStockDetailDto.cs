@@ -7,21 +7,20 @@ using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Inventory
 {
-    public class TransactionStockDetailDto : IMapFrom<TransactionStockDetail>
+    public class TransferStockDetailDto : IMapFrom<TransferStockDetail>
     {
         public long Id { get; set; }
-        public long? TransactionStockId { get; set; }       
+        public long? TransferStockId { get; set; }       
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
         public EnumStatusInternalTransfer? Status { get; set; }
-        public string? TypeTransaction { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
 
         [SetToNull]
-        public virtual TransactionStockDto? TransactionStock { get; set; }
+        public virtual TransferStockDto? TransferStock { get; set; }
 
         [SetToNull]
         public virtual LocationDto? Source { get; set; }

@@ -29,7 +29,7 @@ namespace McDermott.Domain.Entities
         [SetToNull]
         public Uom? Uom { get; set; }
         [SetToNull]
-        public List<TransactionStock>? TransactionStocks { get; set; }
+        public List<TransferStock>? TransactionStocks { get; set; }
         [SetToNull]
         public List<ReceivingStockProduct>? ReceivingStockProduct { get; set; }
         [SetToNull]

@@ -24,6 +24,6 @@
         public virtual Company? Company { get; set; }
 
         [SetToNull]
-        public List<TransactionStockDetail>? TransactionStockDetail { get; set; }
+        public List<TransferStockDetail>? TransferStockDetail { get; set; }
     }
 }

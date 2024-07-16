@@ -86,7 +86,7 @@ namespace McDermott.Persistence.Context
 
         #endregion Patiente
 
-        #region Transaction
+        #region Transfer
 
         public DbSet<Accident> Accidents { get; set; }
         public DbSet<LabResultDetail> LabResultDetails { get; set; }
@@ -97,7 +97,7 @@ namespace McDermott.Persistence.Context
 
         public DbSet<GeneralConsultationLog> GeneralConsultationLogs { get; set; }
 
-        #endregion Transaction
+        #endregion Transfer
 
         #region Queue
 
@@ -133,8 +133,8 @@ namespace McDermott.Persistence.Context
         public DbSet<ReceivingStockProduct> ReceivingStockDetails { get; set; }
         public DbSet<ReceivingStock> ReceivingStocks { get; set; }
         public DbSet<ReceivingLog> ReceivingLogs { get; set; }
-        public DbSet<TransactionStock> TransactionStocks { get; set; }
-        public DbSet<TransactionStockDetail> TransactionStockDetails { get; set; }
+        public DbSet<TransferStock> TransferStocks { get; set; }
+        public DbSet<TransferStockDetail> TransferStockDetails { get; set; }
         public DbSet<PharmacyLog> PharmacyLogs { get; set; }
         public DbSet<SickLeave> SickLeaves { get; set; }
         public DbSet<StockOutPrescription> StockOutPrescriptions { get; set; }
@@ -204,9 +204,9 @@ namespace McDermott.Persistence.Context
                 .WithMany(x => x.StockOutPrescriptions)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<TransactionStockProduct>()
-                .HasOne(h => h.TransactionStock)
-                .WithMany(x => x.TransactionStockProduct)
+            modelBuilder.Entity<TransferStockProduct>()
+                .HasOne(h => h.TransferStock)
+                .WithMany(x => x.TransferStockProduct)
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<GeneralConsultantClinicalAssesment>()
@@ -214,14 +214,14 @@ namespace McDermott.Persistence.Context
                .WithMany(x => x.GeneralConsultantClinicalAssesments)
                .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<TransactionStockDetail>()
-                .HasOne(h => h.TransactionStock)
-                .WithMany(x => x.TransactionStockDetail)
+            modelBuilder.Entity<TransferStockDetail>()
+                .HasOne(h => h.TransferStock)
+                .WithMany(x => x.TransferStockDetail)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<TransactionStockDetail>()
+            modelBuilder.Entity<TransferStockDetail>()
                 .HasOne(h => h.Source)
-                .WithMany(x => x.TransactionStockDetail)
+                .WithMany(x => x.TransferStockDetail)
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Medicament>()

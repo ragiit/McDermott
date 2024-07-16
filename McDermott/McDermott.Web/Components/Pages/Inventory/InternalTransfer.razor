@@ -30,7 +30,7 @@
                                                     Text="Fetching Data...">
 
                                         <MyGrid @ref="Grid"
-                                                Data="@(TransactionStocks.OrderBy<TransactionStockDto, EnumStatusInternalTransfer>(x => x.Status ?? EnumStatusInternalTransfer.Draft, new StatusComparer()).ToList())"
+                                                Data="@(TransferStocks.OrderBy<TransferStockDto, EnumStatusInternalTransfer>(x => x.Status ?? EnumStatusInternalTransfer.Draft, new StatusComparer()).ToList())"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
                                                 DataItemDeleting="OnDelete"
                                                 FocusedRowChanged="Grid_FocusedRowChanged"
@@ -38,8 +38,8 @@
                                                 KeyFieldName="Id">
 
                                             <ToolbarTemplate>
-                                                <MyDxToolbarBase TItem="TransactionStockDto"
-                                                                 Items="@TransactionStocks"
+                                                <MyDxToolbarBase TItem="TransferStockDto"
+                                                                 Items="@TransferStocks"
                                                                  Grid="Grid"
                                                                  SelectedDataItems="@SelectedDataItems"
                                                                  NewItem_Click="@NewItem_Click"
@@ -61,7 +61,7 @@
                                                 <DxGridDataColumn FieldName="SchenduleDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
                                                 <DxGridDataColumn FieldName="Status" Caption="Status">
                                                     <CellDisplayTemplate>
-                                                        @((MarkupString)GetIssueStatusIconHtml((context.DataItem as TransactionStockDto).Status))
+                                                        @((MarkupString)GetIssueStatusIconHtml((context.DataItem as TransferStockDto).Status))
                                                     </CellDisplayTemplate>
                                                 </DxGridDataColumn>
                                             </Columns>
@@ -239,7 +239,7 @@
                                                 </CaptionTemplate>
                                                 <Items>
                                                     <DxGrid @ref="GridDetailTransferStock" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                            Data="TempTransactionStocks"
+                                                            Data="TempTransferStocks"
                                                             PageSize="10"
                                                             @bind-SelectedDataItems="@SelectedDataItemsDetail"
                                                             FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -273,8 +273,8 @@
                                                         <ToolbarTemplate>
                                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransactionStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransferStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransferStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
 
                                                             </DxToolbar>
                                                         </ToolbarTemplate>
@@ -288,7 +288,7 @@
                                                         </Columns>
                                                         <EditFormTemplate Context="EditFormContextt">
                                                             @{
-                                                                TempFormInternalTransfer = (TransactionStockProductDto)EditFormContextt.EditModel;
+                                                                TempFormInternalTransfer = (TransferStockProductDto)EditFormContextt.EditModel;
                                                             }
                                                             <DxFormLayout CssClass="mt w-100">
                                                                 <div class="col-md-4">
@@ -375,10 +375,10 @@
                                         @if (Logs.Count > 0)
                                         {
                                             <DxFormLayout>
-                                                <DxFormLayoutGroup ColSpanMd="12" Caption="Transaction Logs" AnimationType="LayoutAnimationType.Slide" Expanded="false" Decoration="FormLayoutGroupDecoration.Card" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start">
+                                                <DxFormLayoutGroup ColSpanMd="12" Caption="Transfer Logs" AnimationType="LayoutAnimationType.Slide" Expanded="false" Decoration="FormLayoutGroupDecoration.Card" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start">
                                                     <CaptionTemplate>
                                                         <div>
-                                                            <span class="text-center">Transaction Logs</span>
+                                                            <span class="text-center">Transfer Logs</span>
                                                         </div>
                                                     </CaptionTemplate>
                                                     <Items>
@@ -473,9 +473,6 @@
                                                                                                         Type
                                                                                                     </div>
 
-                                                                                                    <div class="col-md-11">
-                                                                                                        : @(item.TypeTransaction ?? "N/A")
-                                                                                                    </div>
                                                                                                 </div>
 
                                                                                                 <div class="row w-100">
@@ -499,7 +496,7 @@
                                                                                                 </div>
 
                                                                                                 @* Status: @((MarkupString)html) <br />
-                                                                            Type: @(item.TypeTransaction ?? "N/A") <br />
+                                                                            Type: @(item.TypeTransfer ?? "N/A") <br />
                                                                             From: @item.Source?.Name <br />
                                                                             To: @item.Destination?.Name <br /> *@
                                                                                             </div>

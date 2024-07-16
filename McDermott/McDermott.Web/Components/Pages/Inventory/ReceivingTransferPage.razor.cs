@@ -1,6 +1,6 @@
 ﻿using static McDermott.Application.Features.Commands.Inventory.ReceivingCommand;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
-using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
+using static McDermott.Application.Features.Commands.Inventory.TransferStockCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
 {
@@ -16,7 +16,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<ProductDto> Products = [];
         private List<StockProductDto> Stocks = [];
         private List<UomDto> Uoms = [];
-        private List<TransactionStockDetailDto> AllLogs = [];
+        private List<TransferStockDetailDto> AllLogs = [];
         private List<ReceivingLogDto> Logs = [];
         private UserDto NameUser = new();
        
@@ -442,13 +442,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                         .ToList();
                     await Mediator.Send(new DeleteReceivingStockPoductRequest(ids: ProductIdsToDelete));
 
-                    //Delete Data Transaction Detail (log)
+                    //Delete Data Transfer Detail (log)
 
                     DetailsIdsToDelete = ReceivingLogs
                         .Where(x => x.ReceivingId == receivingId)
                         .Select(x => x.Id)
                         .ToList();
-                    await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: DetailsIdsToDelete));
+                    await Mediator.Send(new DeleteTransferStockDetailRequest(ids: DetailsIdsToDelete));
 
                     //Delete Receiving Stock
 
@@ -465,13 +465,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                        .ToList();
                         await Mediator.Send(new DeleteReceivingStockPoductRequest(ids: ProductIdsToDelete));
 
-                        //Delete Data Transaction Detail (log)
+                        //Delete Data Transfer Detail (log)
 
                         DetailsIdsToDelete = ReceivingLogs
                             .Where(x => x.ReceivingId == Uid)
                             .Select(x => x.Id)
                             .ToList();
-                        await Mediator.Send(new DeleteTransactionStockDetailRequest(ids: DetailsIdsToDelete));
+                        await Mediator.Send(new DeleteTransferStockDetailRequest(ids: DetailsIdsToDelete));
                     }
                     //Delete list Id ReceivingStock
                     await Mediator.Send(new DeleteReceivingStockRequest(ids: id));
@@ -525,19 +525,19 @@ namespace McDermott.Web.Components.Pages.Inventory
                     var getReceiving = ReceivingStocks.Where(r => r.DestinationId == FormReceivingStocks.DestinationId).OrderByDescending(x => x.KodeReceiving).Select(x => x.KodeReceiving).FirstOrDefault();
                     if (getReceiving == null)
                     {
-                        var nextTransactionNumber = 1;
-                        FormReceivingStocks.KodeReceiving = $"WH-IN/{nextTransactionNumber.ToString("0000")}";
+                        var nextTransferNumber = 1;
+                        FormReceivingStocks.KodeReceiving = $"WH-IN/{nextTransferNumber.ToString("0000")}";
                     }
                     else
                     {
-                        var lastTransactionNumber = 0;
+                        var lastTransferNumber = 0;
                         if (getReceiving.Contains("WH-IN/"))
                         {
-                            var lastTransactionNumberStr = getReceiving.Split('/')[1];
-                            int.TryParse(lastTransactionNumberStr, out lastTransactionNumber);
+                            var lastTransferNumberStr = getReceiving.Split('/')[1];
+                            int.TryParse(lastTransferNumberStr, out lastTransferNumber);
                         }
-                        var nextTransactionNumber = lastTransactionNumber + 1;
-                        FormReceivingStocks.KodeReceiving = $"WH-IN/{nextTransactionNumber.ToString("0000")}";
+                        var nextTransferNumber = lastTransferNumber + 1;
+                        FormReceivingStocks.KodeReceiving = $"WH-IN/{nextTransferNumber.ToString("0000")}";
                     }
 
                     FormReceivingStocks.Status = EnumStatusReceiving.Draft;

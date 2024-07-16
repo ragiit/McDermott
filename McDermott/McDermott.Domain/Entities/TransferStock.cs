@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace McDermott.Domain.Entities
 {
-    public class TransactionStock : BaseAuditableEntity
+    public class TransferStock : BaseAuditableEntity
     {
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
@@ -23,9 +23,9 @@ namespace McDermott.Domain.Entities
         public Location? Destination { get; set; }
 
         [SetToNull]
-        public List<TransactionStockProduct>? TransactionStockProduct { get; set; }
+        public List<TransferStockProduct>? TransferStockProduct { get; set; }
 
         [SetToNull]
-        public List<TransactionStockDetail>? TransactionStockDetail { get; set; }
+        public List<TransferStockDetail>? TransferStockDetail { get; set; }
     }
 }

@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace McDermott.Domain.Entities
 {
-    public class TransactionStockProduct : BaseAuditableEntity
+    public class TransferStockProduct : BaseAuditableEntity
     {
         public long? StockProductId { get; set; }
-        public long? TransactionStockId { get; set; }        
+        public long? TransferStockId { get; set; }        
         public long? ProductId { get; set; }
         public long? QtyStock { get; set; }
 
         [SetToNull]
-        public TransactionStock? TransactionStock { get; set; }
+        public TransferStock? TransferStock { get; set; }
 
         [SetToNull]
         public Product? Product { get; set; }

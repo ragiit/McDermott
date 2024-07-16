@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Inventory
 {
-    public class TransactionStockDto : IMapFrom<TransactionStock>
+    public class TransferStockDto : IMapFrom<TransferStock>
     {
         public long Id { get; set; }
 

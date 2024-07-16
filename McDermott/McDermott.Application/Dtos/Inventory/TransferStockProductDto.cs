@@ -2,10 +2,10 @@
 
 namespace McDermott.Application.Dtos.Inventory
 {
-    public class TransactionStockProductDto : IMapFrom<TransactionStockProduct>
+    public class TransferStockProductDto : IMapFrom<TransferStockProduct>
     {
         public long Id { get; set; }
-        public long? TransactionStockId { get; set; }
+        public long? TransferStockId { get; set; }
         public long? StockId { get; set; }
 
         [Required(ErrorMessage = "Please Select Product Name...")]
@@ -26,7 +26,7 @@ namespace McDermott.Application.Dtos.Inventory
         public string? UomName { get; set; }
 
         [SetToNull]
-        public virtual TransactionStockDto? TransactionStock { get; set; }
+        public virtual TransferStockDto? TransferStock { get; set; }
 
         [SetToNull]
         public virtual StockProductDto? Stock { get; set; }
