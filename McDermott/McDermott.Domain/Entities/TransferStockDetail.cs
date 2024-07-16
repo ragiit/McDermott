@@ -8,8 +8,7 @@ namespace McDermott.Domain.Entities
 {
     public class TransferStockDetail : BaseAuditableEntity
     {
-        public long? TransferStockId { get; set; }
-        public long? ReceivingStockId { get; set; }
+        public long? TransferStockId { get; set; }        
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
         public string? StatusTransfer { get; set; }

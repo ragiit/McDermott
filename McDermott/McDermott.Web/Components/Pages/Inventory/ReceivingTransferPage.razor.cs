@@ -1,5 +1,6 @@
 ﻿using static McDermott.Application.Features.Commands.Inventory.ReceivingCommand;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransferStockCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
@@ -9,6 +10,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         #region Relation Data
 
         private List<ReceivingStockDto> ReceivingStocks = [];
+        private List<TransactionStockDto> TransactionStocks = [];
         private List<ReceivingStockProductDto> receivingStockDetails = [];
         private List<ReceivingStockProductDto> TempReceivingStockDetails = [];
         private List<ReceivingLogDto> ReceivingLogs = [];
@@ -26,6 +28,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private StockProductDto FormStockProduct = new();
         private ReceivingStockDto FormReceivingStocks = new();
         private ReceivingLogDto FormReceivingLog = new();
+        private TransactionStockDto FormTransactionStock = new();
 
         #endregion Relation Data
 
@@ -88,6 +91,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 Locations = await Mediator.Send(new GetLocationQuery());
                 Products = await Mediator.Send(new GetProductQuery());
                 Uoms = await Mediator.Send(new GetUomQuery());
+                TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                 Stocks = await Mediator.Send(new GetStockProductQuery());
                 var user_group = await Mediator.Send(new GetUserQuery());
                 NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
@@ -149,6 +153,17 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task LoadLogs()
         {
             Logs = await Mediator.Send(new GetReceivingLogQuery(x => x.ReceivingId == FormReceivingStocks.Id));
+        }
+
+        private async Task CheckBatch(string value)
+        {
+            var checkData = TransactionStocks.Where(x => x.Batch == value).FirstOrDefault();
+            
+            if(checkData != null)
+            {
+                TempFormReceivingStockDetail.Batch = value;
+                TempFormReceivingStockDetail.ExpiredDate = checkData.ExpiredDate;
+            }
         }
 
         private async Task HandleValidSubmit()
