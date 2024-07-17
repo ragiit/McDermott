@@ -10,11 +10,8 @@ namespace McDermott.Application.Dtos.Inventory
     {
         
         public long Id { get; set; }
-        public long? ReceivingId { get; set; }
-        public long? PrescriptionId { get; set; }
-        public long? ConcoctionLineId { get; set; }
-        public long? TransferId { get; set; }
-        public long? AdjustmentsId { get; set; }
+        public string? SourceTable { get; set; }
+        public long? SourcTableId { get; set; }
         public long? ProductId { get; set; }
         public string? Reference { get; set; }
         public string? Batch { get; set; }

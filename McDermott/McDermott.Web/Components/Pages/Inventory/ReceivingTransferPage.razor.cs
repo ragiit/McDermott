@@ -385,7 +385,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
 
                 //ReferenceKode
-                var cekReference = TransactionStocks.OrderByDescending(x => x.ReceivingId).Select(z => z.Reference).FirstOrDefault();
+                var cekReference = TransactionStocks.OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
                 int NextReferenceNumber = 1;
                 if (cekReference != null)
                 {
@@ -402,7 +402,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                     var x = Uoms.Where(x => x.Id == a?.Product?.PurchaseUomId).FirstOrDefault();
 
-                    FormTransactionStock.ReceivingId = FormReceivingStocks.Id;
+                    FormTransactionStock.SourcTableId = FormReceivingStocks.Id;
                     FormTransactionStock.ProductId = a.ProductId;
                     FormTransactionStock.Batch = a.Batch;
                     FormTransactionStock.ExpiredDate = a.ExpiredDate;
