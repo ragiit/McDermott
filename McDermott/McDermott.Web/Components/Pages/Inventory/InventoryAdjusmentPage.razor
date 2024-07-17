@@ -206,10 +206,10 @@
                                                             <Columns>
                                                                 <DxGridSelectionColumn Width="15px" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="Product.Name" Caption="Product" />
-                                                                <DxGridDataColumn MinWidth="200" FieldName="TransactionStock.InStock" Caption="Teoritical Qty" />
+                                                                <DxGridDataColumn MinWidth="200" FieldName="TeoriticalQty" Caption="Teoritical Qty" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="RealQty" Caption="Real Qty" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="Difference" Caption="Difference" />
-                                                                <DxGridDataColumn MinWidth="200" FieldName="TransactionStock.Batch" Caption="Lot Serial Number" />
+                                                                <DxGridDataColumn MinWidth="200" FieldName="Batch" Caption="Lot Serial Number" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="ExpiredDate" Caption="Expired Date" SortIndex="0" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="Product.Uom.Name" Caption="UoM" />
                                                             </Columns>
@@ -263,14 +263,12 @@
                                                                             <DxFormLayoutItem Caption="Batch" Visible="IsBatch" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                 <DxComboBox ShowValidationIcon="true" Data="@Batch"
                                                                                             NullText="Select Batch..."
-                                                                                            @bind-Value="@FormInventoryAdjusmentDetail.StockProductId"
-                                                                                            TextFieldName="Batch"
-                                                                                            ValueFieldName="Id"
-                                                                                            SelectedItemChanged="@((StockProductDto a)=> SelectedBatch(a))"
+                                                                                            @bind-Value="@FormInventoryAdjusmentDetail.Batch" 
+                                                                                            SelectedItemChanged="@((string a)=> SelectedBatch(a))"
                                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                             FilteringMode="@DataGridFilteringMode.Contains">
                                                                                 </DxComboBox>
-                                                                                <ValidationMessage For="@(() => FormInventoryAdjusmentDetail.StockProductId)" />
+                                                                                <ValidationMessage For="@(() => FormInventoryAdjusmentDetail.Batch)" />
 
                                                                             </DxFormLayoutItem>
 
