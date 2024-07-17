@@ -387,6 +387,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 var CheckReceivedProduct = receivedProductStock.Where(x => x.ReceivingStockId == GetReceivingStock.Id).ToList()!;
                 foreach (var a in CheckReceivedProduct)
                 {
+                    var Cek_Uom = Uoms.Where(x => x.Id == a.Product.UomId).FirstOrDefault();
 
                     var x = Uoms.Where(x => x.Id == a?.Product?.PurchaseUomId).FirstOrDefault();
 
@@ -395,8 +396,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormTransactionStock.Batch = a.Batch;
                     FormTransactionStock.ExpiredDate = a.ExpiredDate;
                     FormTransactionStock.Reference = referenceNumber;
-                    FormTransactionStock.InStock = a.Qty;
+                    FormTransactionStock.InStock = a.Qty * Cek_Uom.BiggerRatio.ToLong();
                     FormTransactionStock.SourceId = GetReceivingStock.DestinationId;
+                    FormTransactionStock.UomId = a.Product.UomId;
                     FormTransactionStock.Validate = true;
 
                     await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
