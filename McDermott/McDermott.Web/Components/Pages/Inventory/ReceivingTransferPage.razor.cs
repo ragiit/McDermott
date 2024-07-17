@@ -373,29 +373,34 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormReceivingStocks.Status = EnumStatusReceiving.Done;
                 GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
 
+                //ReferenceKode
+                var cekReference = TransactionStocks.OrderByDescending(x => x.ReceivingId).Select(z => z.Reference).FirstOrDefault();
+                int NextReferenceNumber = 1;
+                if (cekReference != null)
+                {
+                    int.TryParse(cekReference?.Substring("RCV#".Length), out NextReferenceNumber);
+                    NextReferenceNumber++;
+                }
+
+                string referenceNumber = $"RCV#{NextReferenceNumber:D3}";
+
                 var CheckReceivedProduct = receivedProductStock.Where(x => x.ReceivingStockId == GetReceivingStock.Id).ToList()!;
                 foreach (var a in CheckReceivedProduct)
                 {
-                    var cekInitialStock = new TransactionStockDto();
+
                     var x = Uoms.Where(x => x.Id == a?.Product?.PurchaseUomId).FirstOrDefault();
-                    if (a.Product.TraceAbility == true)
-                    {
-                         cekInitialStock = TransactionStocks.Where(x => x.ReceivingId == FormReceivingStocks.Id && x.ProductId == a.ProductId && x.Batch == a.Batch).LastOrDefault();
-                    }
+
                     FormTransactionStock.ReceivingId = FormReceivingStocks.Id;
                     FormTransactionStock.ProductId = a.ProductId;
                     FormTransactionStock.Batch = a.Batch;
                     FormTransactionStock.ExpiredDate = a.ExpiredDate;
-                    if(cekInitialStock != null)
-                    {
-                        FormTransactionStock.InitialStock = cekInitialStock.EndStock;
-                    }
+                    FormTransactionStock.Reference = referenceNumber;
                     FormTransactionStock.InStock = a.Qty;
                     FormTransactionStock.SourceId = GetReceivingStock.DestinationId;
                     FormTransactionStock.Validate = true;
 
                     await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
-                    
+
                 }
 
                 //Save Log..
@@ -564,7 +569,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         x.ReceivingStockId = GetReceivingStock.Id;
                         x.Id = 0;
                     });
-                    
+
                     await Mediator.Send(new CreateListReceivingStockProductRequest(TempReceivingStockDetails));
                     ToastService.ShowSuccess("Add Data Success...");
 

@@ -19,10 +19,8 @@ namespace McDermott.Domain.Entities
         public DateTime? ExpiredDate { get; set; }
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
-        public long? InitialStock { get; set; }
         public long? InStock {  get; set; }
         public long? OutStock { get; set; }
-        public long? EndStock { get; set; }
         public long? UomId { get; set; }
         public bool? Validate { get; set; }
 
