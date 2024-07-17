@@ -377,6 +377,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             var receivedProductStock = await Mediator.Send(new GetReceivingStockProductQuery());
             FormReceivingStocks = receivedStock.Where(x => x.Id == receivingId).FirstOrDefault()!;
             var data_TransactionStock = new TransactionStockDto();
+            List<TransactionStockDto> Tempdata_TransactionStock = new List<TransactionStockDto>();
 
             if (FormReceivingStocks is not null)
             {
@@ -411,30 +412,34 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormTransactionStock.UomId = a.Product.UomId;
                     FormTransactionStock.Validate = true;
 
-                   data_TransactionStock = await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
-
+                    var data_save = await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+                    Tempdata_TransactionStock.Add(data_save);
                 }
 
                 //Save Stock Product
                 await LoadAsyncData();
-                var cek_data_stockProduct = Stocks.Where(x => x.ProductId == data_TransactionStock.ProductId && x.DestinanceId == data_TransactionStock.DestinationId && x.Batch == data_TransactionStock.Batch).FirstOrDefault();
-                var inStock = TransactionStocks.Where(x => x.ProductId == data_TransactionStock.ProductId && x.DestinationId == data_TransactionStock.DestinationId && x.Batch == data_TransactionStock.Batch).Sum(x => x.InStock);
-                var outStock = TransactionStocks.Where(x => x.ProductId == data_TransactionStock.ProductId && x.DestinationId == data_TransactionStock.DestinationId && x.Batch == data_TransactionStock.Batch).Sum(x => x.OutStock);
-
-                FormStockProduct.ProductId = data_TransactionStock.ProductId;
-                FormStockProduct.DestinanceId = data_TransactionStock.DestinationId;
-                FormStockProduct.Batch = data_TransactionStock.Batch;
-                FormStockProduct.Expired = data_TransactionStock.ExpiredDate;
-                FormStockProduct.Qty = inStock - outStock;
-                if (cek_data_stockProduct  == null)
+                foreach (var data_item in Tempdata_TransactionStock)
                 {
-                    await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
-                }
-                else
-                {
-                    await Mediator.Send(new UpdateStockProductRequest(FormStockProduct));
-                }
+                    var cek_data_stockProduct = Stocks.Where(x => x.ProductId == data_item.ProductId && x.DestinanceId == data_item.DestinationId && x.Batch == data_item.Batch).FirstOrDefault();
+                    var inStock = TransactionStocks.Where(x => x.ProductId == data_item.ProductId && x.DestinationId == data_item.DestinationId && x.Batch == data_item.Batch).Sum(x => x.InStock);
+                    var outStock = TransactionStocks.Where(x => x.ProductId == data_item.ProductId && x.DestinationId == data_item.DestinationId && x.Batch == data_item.Batch).Sum(x => x.OutStock);
 
+                    FormStockProduct.ProductId = data_item.ProductId;
+                    FormStockProduct.DestinanceId = data_item.DestinationId;
+                    FormStockProduct.Batch = data_item.Batch;
+                    FormStockProduct.Expired = data_item.ExpiredDate;
+                    FormStockProduct.UomId = data_item.UomId;
+                    FormStockProduct.Qty = inStock - outStock;
+                    if (cek_data_stockProduct == null)
+                    {
+                        await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
+                    }
+                    else
+                    {
+                        FormStockProduct.Id = cek_data_stockProduct.Id;
+                        var cree= await Mediator.Send(new UpdateStockProductRequest(FormStockProduct));
+                    }
+                }
                 //Save Log..
 
                 FormReceivingLog.SourceId = GetReceivingStock.DestinationId;
