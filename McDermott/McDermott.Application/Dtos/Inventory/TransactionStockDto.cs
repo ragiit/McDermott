@@ -20,14 +20,10 @@ namespace McDermott.Application.Dtos.Inventory
         public long? DestinationId { get; set; }
         public long? UomId { get; set; }
         public bool Validate { get; set; } = false;
-        public long InStock { get; set; } = 0;
-        public long OutStock { get; set; } = 0;
+        public long Quantity { get; set; } = 0;
 
 
-        public virtual ReceivingStockDto? Receiving { get; set; }
-        public virtual PrescriptionDto? Prescription { get; set; }
-        public virtual ConcoctionLineDto? ConcoctionLine { get; set; }
-        public virtual TransferStockDto? Transfer { get; set; }
+        
         public virtual ProductDto? Product { get; set; }
         public virtual LocationDto? Source { get; set; }
         public virtual LocationDto? Destination { get; set; }

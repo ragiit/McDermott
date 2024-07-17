@@ -38,7 +38,7 @@ namespace McDermott.Application.Dtos.Inventory
 
         private string CalculateDifference()
         {
-            var difference = RealQty - (TransactionStock?.InStock ?? 0);
+            var difference = RealQty - (TransactionStock?.Quantity ?? 0);
             return difference switch
             {
                 > 0 => $"+{difference}",

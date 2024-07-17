@@ -21,11 +21,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
                 if (!_cache.TryGetValue(cacheKey, out List<TransactionStock>? result))
                 {
-                    result = await _unitOfWork.Repository<TransactionStock>().Entities
-                      .Include(x => x.Receiving)
-                      .Include(x => x.Prescription)
-                      .Include(x => x.ConcoctionLine)
-                      .Include(x => x.Transfer)
+                    result = await _unitOfWork.Repository<TransactionStock>().Entities                      
                       .Include(x => x.Product)
                       .Include(x => x.Source)
                       .Include(x => x.Destination)

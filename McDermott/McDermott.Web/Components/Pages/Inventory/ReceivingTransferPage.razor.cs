@@ -407,7 +407,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormTransactionStock.Batch = a.Batch;
                     FormTransactionStock.ExpiredDate = a.ExpiredDate;
                     FormTransactionStock.Reference = referenceNumber;
-                    FormTransactionStock.InStock = a.Qty * Cek_Uom.BiggerRatio.ToLong();
+                    FormTransactionStock.Quantity = a.Qty * Cek_Uom.BiggerRatio.ToLong();
                     FormTransactionStock.DestinationId = GetReceivingStock.DestinationId;
                     FormTransactionStock.UomId = a.Product.UomId;
                     FormTransactionStock.Validate = true;
@@ -421,15 +421,14 @@ namespace McDermott.Web.Components.Pages.Inventory
                 foreach (var data_item in Tempdata_TransactionStock)
                 {
                     var cek_data_stockProduct = Stocks.Where(x => x.ProductId == data_item.ProductId && x.DestinanceId == data_item.DestinationId && x.Batch == data_item.Batch).FirstOrDefault();
-                    var inStock = TransactionStocks.Where(x => x.ProductId == data_item.ProductId && x.DestinationId == data_item.DestinationId && x.Batch == data_item.Batch).Sum(x => x.InStock);
-                    var outStock = TransactionStocks.Where(x => x.ProductId == data_item.ProductId && x.DestinationId == data_item.DestinationId && x.Batch == data_item.Batch).Sum(x => x.OutStock);
+                    var inStock = TransactionStocks.Where(x => x.ProductId == data_item.ProductId && x.DestinationId == data_item.DestinationId && x.Batch == data_item.Batch).Sum(x => x.Quantity);
 
                     FormStockProduct.ProductId = data_item.ProductId;
                     FormStockProduct.DestinanceId = data_item.DestinationId;
                     FormStockProduct.Batch = data_item.Batch;
                     FormStockProduct.Expired = data_item.ExpiredDate;
                     FormStockProduct.UomId = data_item.UomId;
-                    FormStockProduct.Qty = inStock - outStock;
+                    FormStockProduct.Qty = inStock;
                     if (cek_data_stockProduct == null)
                     {
                         await Mediator.Send(new CreateStockProductRequest(FormStockProduct));

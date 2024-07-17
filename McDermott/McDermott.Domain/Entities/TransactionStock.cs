@@ -16,16 +16,11 @@ namespace McDermott.Domain.Entities
         public DateTime? ExpiredDate { get; set; }
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
-        public long? InStock {  get; set; }
-        public long? OutStock { get; set; }
+        public long? Quantity {  get; set; }
         public long? UomId { get; set; }
         public bool? Validate { get; set; }
 
 
-        public ReceivingStock? Receiving { get; set; }
-        public Prescription? Prescription { get; set; }
-        public ConcoctionLine? ConcoctionLine { get; set; }
-        public TransferStock? Transfer { get; set; }
         public Product? Product { get; set; }
         public Location? Source {  get; set; }
         public Location? Destination { get; set; }

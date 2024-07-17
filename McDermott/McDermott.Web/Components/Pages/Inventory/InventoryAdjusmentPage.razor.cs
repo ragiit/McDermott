@@ -491,7 +491,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if (FormInventoryAdjusmentDetail.StockProduct != null)
                 {
                     FormInventoryAdjusmentDetail.StockProductId = FormInventoryAdjusmentDetail.StockProduct.Id;
-                    FormInventoryAdjusmentDetail.TeoriticalQty = FormInventoryAdjusmentDetail.TransactionStock?.InStock ?? 0L;
+                    FormInventoryAdjusmentDetail.TeoriticalQty = FormInventoryAdjusmentDetail.TransactionStock?.Quantity ?? 0L;
                 }
 
                 StateHasChanged();
