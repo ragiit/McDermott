@@ -3021,6 +3021,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("StockProductId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("TransactionStockId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -3034,6 +3037,8 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("ProductId");
 
                     b.HasIndex("StockProductId");
+
+                    b.HasIndex("TransactionStockId");
 
                     b.ToTable("InventoryAdjusmentDetails");
                 });
@@ -6189,11 +6194,18 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("StockProductId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("McDermott.Domain.Entities.TransactionStock", "TransactionStock")
+                        .WithMany()
+                        .HasForeignKey("TransactionStockId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("InventoryAdjusment");
 
                     b.Navigation("Product");
 
                     b.Navigation("StockProduct");
+
+                    b.Navigation("TransactionStock");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.JobPosition", b =>

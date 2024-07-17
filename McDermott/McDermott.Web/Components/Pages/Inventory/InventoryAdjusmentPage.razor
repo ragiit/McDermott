@@ -206,9 +206,10 @@
                                                             <Columns>
                                                                 <DxGridSelectionColumn Width="15px" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="Product.Name" Caption="Product" />
-                                                                <DxGridDataColumn MinWidth="200" FieldName="StockProduct.Qty" Caption="Teoritical Qty" />
+                                                                <DxGridDataColumn MinWidth="200" FieldName="TransactionStock.InStock" Caption="Teoritical Qty" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="RealQty" Caption="Real Qty" />
-                                                                <DxGridDataColumn MinWidth="200" FieldName="StockProduct.Batch" Caption="Lot Serial Number" />
+                                                                <DxGridDataColumn MinWidth="200" FieldName="Difference" Caption="Difference" />
+                                                                <DxGridDataColumn MinWidth="200" FieldName="TransactionStock.Batch" Caption="Lot Serial Number" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="ExpiredDate" Caption="Expired Date" SortIndex="0" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="Product.Uom.Name" Caption="UoM" />
                                                             </Columns>
@@ -219,6 +220,7 @@
                                                                     {
                                                                         FormInventoryAdjusmentDetail = (InventoryAdjusmentDetailDto)EditFormContext.EditModel;
                                                                     }
+                                                                    var IsBatch = Products.FirstOrDefault(x => x.Id == FormInventoryAdjusmentDetail.ProductId)?.TraceAbility ?? false;
                                                                 }
                                                                 <div class="row w-100">
                                                                     <div class="col-md-6">
@@ -258,7 +260,7 @@
 
                                                                     <div class="col-md-6">
                                                                         <DxFormLayout CssClass="w-100">
-                                                                            <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                            <DxFormLayoutItem Caption="Batch" Visible="IsBatch" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                 <DxComboBox ShowValidationIcon="true" Data="@Batch"
                                                                                             NullText="Select Batch..."
                                                                                             @bind-Value="@FormInventoryAdjusmentDetail.StockProductId"
