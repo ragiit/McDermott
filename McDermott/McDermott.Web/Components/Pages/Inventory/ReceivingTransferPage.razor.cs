@@ -164,6 +164,10 @@ namespace McDermott.Web.Components.Pages.Inventory
                 TempFormReceivingStockDetail.Batch = value;
                 TempFormReceivingStockDetail.ExpiredDate = checkData.ExpiredDate;
             }
+            else
+            {
+                TempFormReceivingStockDetail.Batch = value;
+            }
         }
 
         private async Task HandleValidSubmit()
@@ -386,30 +390,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                     {
                         FormTransactionStock.InitialStock = cekInitialStock.EndStock;
                     }
+                    FormTransactionStock.InStock = a.Qty;
+                    FormTransactionStock.SourceId = GetReceivingStock.DestinationId;
+                    FormTransactionStock.Validate = true;
 
-                    //var checkStok = Stocks.Where(x => x.ProductId == a.ProductId && x.SourceId == GetReceivingStock.DestinationId && x.Batch == a.Batch).FirstOrDefault();
-                    //if (checkStok is null)
-                    //{
-                    //    FormStockProduct.SourceId = GetReceivingStock.DestinationId;
-                    //    FormStockProduct.ProductId = a.ProductId;
-                    //    FormStockProduct.UomId = a?.Product?.UomId;
-
-                    //    FormStockProduct.Batch = a?.Batch;
-                    //    FormStockProduct.Expired = a?.ExpiredDate;
-
-                    //    FormStockProduct.Qty = a.Qty * x.BiggerRatio.ToLong();
-                    //    await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
-                    //}
-                    //else
-                    //{
-                    //    checkStok.Expired = a.ExpiredDate;
-                    //    checkStok.Batch = a.Batch;
-
-                    //    var totalQty = a.Qty * x?.BiggerRatio?.ToLong();
-                    //    checkStok!.Qty = checkStok.Qty + a.Qty;
-
-                    //    await Mediator.Send(new UpdateStockProductRequest(checkStok));
-                    //}
+                    await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+                    
                 }
 
                 //Save Log..
@@ -578,6 +564,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         x.ReceivingStockId = GetReceivingStock.Id;
                         x.Id = 0;
                     });
+                    
                     await Mediator.Send(new CreateListReceivingStockProductRequest(TempReceivingStockDetails));
                     ToastService.ShowSuccess("Add Data Success...");
 
@@ -620,6 +607,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     if (r.Id == 0)
                     {
                         r.Id = Helper.RandomNumber;
+                        r.Batch = r.Batch;
                         TempReceivingStockDetails.Add(r);
                     }
                     else

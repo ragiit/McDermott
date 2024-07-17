@@ -83,7 +83,7 @@ app.UseSerilogRequestLogging();
 app.UseRouting();
 //app.UseAuthentication(); // Gunakan autentikasi
 //app.UseAuthorization();  // Gunakan otorisasi
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
