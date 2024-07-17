@@ -26,6 +26,7 @@
                         .Include(x => x.Product)
                         .ThenInclude(z => z.Uom)
                         .Include(x => x.StockProduct)
+                        .Include(x => x.TransactionStock)
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
 

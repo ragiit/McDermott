@@ -1,0 +1,17 @@
+﻿@page "/"
+
+@using DevExpress.Blazor
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+  
+<DxButton Text="awdawdawdawd"/>
+
+Welcome to your new app.
+
+<DxCalendar @bind-SelectedDate="@SelectedDate" />
+
+@code{
+    DateTime SelectedDate { get; set; } = DateTime.Now;
+}
