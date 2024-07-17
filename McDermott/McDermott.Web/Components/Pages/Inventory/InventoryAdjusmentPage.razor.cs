@@ -2,6 +2,7 @@
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
 {
@@ -650,6 +651,15 @@ namespace McDermott.Web.Components.Pages.Inventory
             FormInventoryAdjusmentDetail.TeoriticalQty = 0;
         }
 
+        private void UpdateFormInventoryAdjustmentDetail2(StockProductDto stockProduct, long qty)
+        {
+            if (stockProduct != null)
+            {
+                FormInventoryAdjusmentDetail.UomId = stockProduct.UomId;
+                FormInventoryAdjusmentDetail.TeoriticalQty = qty;
+                FormInventoryAdjusmentDetail.ExpiredDate = stockProduct.Expired;
+            }
+        }
         private void UpdateFormInventoryAdjustmentDetail(StockProductDto stockProduct)
         {
             if (stockProduct != null)
@@ -671,6 +681,33 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 FormInventoryAdjusmentDetail.ProductId = e.Id;
 
+                var stockProducts2 = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id && s.SourceId == InventoryAdjusment.LocationId));
+                if (e.TraceAbility)
+                {
+                    var batch = Batch.FirstOrDefault(z => z.Id == FormInventoryAdjusmentDetail.StockProductId)?.Batch ?? string.Empty;
+
+                    var s = await Mediator.Send(new GetTransactionStockQuery(x => x.ProductId == e.Id && x.Batch != null && x.Batch == batch));
+                    Batch = stockProducts2;
+
+                    var firstStockProduct = stockProducts2.FirstOrDefault(x => x.Batch == Batch.FirstOrDefault(z => z.Id == FormInventoryAdjusmentDetail.StockProductId)?.Batch);
+                    var inn = s.Select(x => x.InStock).Sum();
+                    var outt = s.Select(x => x.OutStock).Sum();
+                    var final = inn - outt;
+
+                    UpdateFormInventoryAdjustmentDetail2(firstStockProduct ?? new(), final);
+                }
+                else
+                {
+                    var s = await Mediator.Send(new GetTransactionStockQuery(x => x.ProductId == e.Id ));
+                    var inn = s.Select(x => x.InStock).Sum();
+                    var outt = s.Select(x => x.OutStock).Sum();
+                    var final = inn - outt;
+
+                    var firstStockProduct = stockProducts2.FirstOrDefault();
+                    UpdateFormInventoryAdjustmentDetail2(firstStockProduct ?? new(), final);
+                }
+
+                return;
                 var stockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == e.Id && s.SourceId == InventoryAdjusment.LocationId));
 
                 if (e.TraceAbility)
