@@ -7,7 +7,7 @@
 {
     <div class="wrapper">
 
-               <BaseHeaderPage Title="Product" OnClickBack="@(async () => await LoadData())" ShowBackButton="(!showForm && !StockProductView)" />
+        <BaseHeaderPage Title="Product" OnClickBack="@(async () => await LoadData())" ShowBackButton="showForm" />
 
 
         <section class="content">
@@ -17,60 +17,58 @@
                         @if (!showForm && !StockProductView)
                         {
                             <div class="card">
-                                <div class="card-body">
-                                    <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                    IsContentBlocked="true"
-                                                    ApplyBackgroundShading="true"
-                                                    IndicatorAreaVisible="true"
-                                                    Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                Data="Products"
-                                                PageSize="10"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                KeyFieldName="Id"
-                                                DataItemDeleting="OnDelete"
-                                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                                EditorRenderMode="GridEditorRenderMode.Detached"
-                                                PagerPosition="GridPagerPosition.Bottom"
-                                                AllowSelectRowByClick="true"
-                                                PageSizeSelectorVisible="true"
-                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                PageSizeSelectorAllRowsItemVisible="true"
-                                                PagerSwitchToInputBoxButtonCount="10"
-                                                FocusedRowEnabled="true"
-                                                PagerVisibleNumericButtonCount="10"
-                                                FocusedRowChanged="Grid_FocusedRowChanged"
-                                                ShowGroupPanel="true"
-                                                AutoExpandAllGroupRows="true"
-                                                CssClass="ch-480"
-                                                ShowFilterRow="true"
-                                                RowDoubleClick="OnRowDoubleClick"
-                                                TextWrapEnabled="false"
-                                                CustomizeElement="Grid_CustomizeElement"
-                                                ShowSearchBox="true"
-                                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                                KeyboardNavigationEnabled="true">
-                                            <ToolbarTemplate>
-                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItem_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Products.Count > 0" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Products.Count > 0" />
-                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="true"
+                                                Text="Fetching Data...">
+                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                            Data="Products"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            DataItemDeleting="OnDelete"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            AllowSelectRowByClick="true"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            FocusedRowEnabled="true"
+                                            PagerVisibleNumericButtonCount="10"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            CssClass="ch-480"
+                                            ShowFilterRow="true"
+                                            RowDoubleClick="OnRowDoubleClick"
+                                            TextWrapEnabled="false"
+                                            CustomizeElement="Grid_CustomizeElement"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItem_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Products.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Products.Count > 0" />
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
 
-                                                </DxToolbar>
-                                            </ToolbarTemplate>
-                                            <Columns>
-                                                <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn FieldName="Name" Caption="Product Name" SortIndex="0" />
-                                                <DxGridDataColumn FieldName="InternalReference" Caption="Internal Reference" />
-                                                <DxGridDataColumn FieldName="SalesPrice" Caption="Sales Price" />
-                                                <DxGridDataColumn FieldName="Qtys" Caption="Qty On Hand" />
-                                                <DxGridDataColumn FieldName="UomName" Caption="Unit Of Measure" />
-                                            </Columns>
-                                        </DxGrid>
-                                    </DxLoadingPanel>
-                                </div>
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="Name" Caption="Product Name" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="InternalReference" Caption="Internal Reference" />
+                                            <DxGridDataColumn FieldName="SalesPrice" Caption="Sales Price" />
+                                            <DxGridDataColumn FieldName="Qtys" Caption="Qty On Hand" />
+                                            <DxGridDataColumn FieldName="UomName" Caption="Unit Of Measure" />
+                                        </Columns>
+                                    </DxGrid>
+                                </DxLoadingPanel>
                             </div>
                         }
                         else if (showForm && !StockProductView)
@@ -294,7 +292,7 @@
                                                                     <DxTextBox @bind-Text="@FormProductDetails.Tax" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem Caption="Cost" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                   <DxMaskedInput @bind-Value="@FormProductDetails.Cost" Mask="@NumericMask.Currency" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true">
+                                                                    <DxMaskedInput @bind-Value="@FormProductDetails.Cost" Mask="@NumericMask.Currency" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true">
                                                                         <DxNumericMaskProperties Culture="Culture"></DxNumericMaskProperties>
                                                                     </DxMaskedInput>
                                                                 </DxFormLayoutItem>
