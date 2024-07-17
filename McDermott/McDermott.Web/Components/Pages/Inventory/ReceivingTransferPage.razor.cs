@@ -91,10 +91,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                 Locations = await Mediator.Send(new GetLocationQuery());
                 Products = await Mediator.Send(new GetProductQuery());
                 Uoms = await Mediator.Send(new GetUomQuery());
-                TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                 Stocks = await Mediator.Send(new GetStockProductQuery());
                 var user_group = await Mediator.Send(new GetUserQuery());
                 NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
+                StateHasChanged();
+
+                await LoadAsyncData();
                 StateHasChanged();
             }
         }
@@ -125,6 +127,13 @@ namespace McDermott.Web.Components.Pages.Inventory
             PanelVisible = true;
             showForm = false;
             ReceivingStocks = await Mediator.Send(new GetReceivingStockQuery());
+            PanelVisible = false;
+        }
+
+        private async Task LoadAsyncData()
+        {
+            PanelVisible = true;
+            TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
             PanelVisible = false;
         }
 
@@ -367,6 +376,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             var receivedStock = await Mediator.Send(new GetReceivingStockQuery());
             var receivedProductStock = await Mediator.Send(new GetReceivingStockProductQuery());
             FormReceivingStocks = receivedStock.Where(x => x.Id == receivingId).FirstOrDefault()!;
+            var data_TransactionStock = new TransactionStockDto();
 
             if (FormReceivingStocks is not null)
             {
@@ -397,12 +407,32 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormTransactionStock.ExpiredDate = a.ExpiredDate;
                     FormTransactionStock.Reference = referenceNumber;
                     FormTransactionStock.InStock = a.Qty * Cek_Uom.BiggerRatio.ToLong();
-                    FormTransactionStock.SourceId = GetReceivingStock.DestinationId;
+                    FormTransactionStock.DestinationId = GetReceivingStock.DestinationId;
                     FormTransactionStock.UomId = a.Product.UomId;
                     FormTransactionStock.Validate = true;
 
-                    await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+                   data_TransactionStock = await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
 
+                }
+
+                //Save Stock Product
+                await LoadAsyncData();
+                var cek_data_stockProduct = Stocks.Where(x => x.ProductId == data_TransactionStock.ProductId && x.DestinanceId == data_TransactionStock.DestinationId && x.Batch == data_TransactionStock.Batch).FirstOrDefault();
+                var inStock = TransactionStocks.Where(x => x.ProductId == data_TransactionStock.ProductId && x.DestinationId == data_TransactionStock.DestinationId && x.Batch == data_TransactionStock.Batch).Sum(x => x.InStock);
+                var outStock = TransactionStocks.Where(x => x.ProductId == data_TransactionStock.ProductId && x.DestinationId == data_TransactionStock.DestinationId && x.Batch == data_TransactionStock.Batch).Sum(x => x.OutStock);
+
+                FormStockProduct.ProductId = data_TransactionStock.ProductId;
+                FormStockProduct.DestinanceId = data_TransactionStock.DestinationId;
+                FormStockProduct.Batch = data_TransactionStock.Batch;
+                FormStockProduct.Expired = data_TransactionStock.ExpiredDate;
+                FormStockProduct.Qty = inStock - outStock;
+                if (cek_data_stockProduct  == null)
+                {
+                    await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateStockProductRequest(FormStockProduct));
                 }
 
                 //Save Log..

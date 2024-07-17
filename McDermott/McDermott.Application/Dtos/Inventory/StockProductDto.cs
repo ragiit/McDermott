@@ -13,18 +13,22 @@ namespace McDermott.Application.Dtos.Inventory
 
         [Required(ErrorMessage = "Please Select Product..")]
         public long? ProductId { get; set; }
+        public string? ProductName { get; set; }
 
         [Required(ErrorMessage = "Please input Quantity..")]
         public long Qty { get; set; } = 0;
 
         public long? UomId { get; set; }
+        public string? UomName { get; set; }
         public DateTime? Expired { get; set; }
 
         [Required(ErrorMessage = "Please Select Source Location..")]
         public long? SourceId { get; set; }
+        public string? SourceName { get; set; }
 
         [Required(ErrorMessage = "Please Select Destination Location..")]
         public long? DestinanceId { get; set; }
+        public string? DestinanceName { get; set; }
 
         public string? Batch { get; set; }
         public string? Referency { get; set; }
