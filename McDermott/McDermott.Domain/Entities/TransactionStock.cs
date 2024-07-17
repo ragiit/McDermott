@@ -27,10 +27,10 @@ namespace McDermott.Domain.Entities
         public bool? Validate { get; set; }
 
 
-        public ReceivingStock? ReceivingStock { get; set; }
+        public ReceivingStock? Receiving { get; set; }
         public Prescription? Prescription { get; set; }
         public ConcoctionLine? ConcoctionLine { get; set; }
-        public TransferStock? TransferStock { get; set; }
+        public TransferStock? Transfer { get; set; }
         public Product? Product { get; set; }
         public Location? Source {  get; set; }
         public Location? Destination { get; set; }

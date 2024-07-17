@@ -68,10 +68,10 @@ namespace McDermott.Application.Dtos.Inventory
             EndStock = InitialStock + InStock - OutStock;
         }
 
-        public virtual ReceivingStockDto? ReceivingStock { get; set; }
+        public virtual ReceivingStockDto? Receiving { get; set; }
         public virtual PrescriptionDto? Prescription { get; set; }
         public virtual ConcoctionLineDto? ConcoctionLine { get; set; }
-        public virtual TransferStockDto? TransferStock { get; set; }
+        public virtual TransferStockDto? Transfer { get; set; }
         public virtual ProductDto? Product { get; set; }
         public virtual LocationDto? Source { get; set; }
         public virtual LocationDto? Destination { get; set; }
