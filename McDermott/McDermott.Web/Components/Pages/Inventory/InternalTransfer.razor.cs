@@ -686,7 +686,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     }
 
                     FormInternalTransfer.Status = EnumStatusInternalTransfer.Done;
-                    await Mediator.Send(new UpdateTransferStockRequest(FormInternalTransfer));
+                    getInternalTransfer = await Mediator.Send(new UpdateTransferStockRequest(FormInternalTransfer));
 
                     //Save Log
                     FormInternalTransferDetail.TransferStockId = TransferId;

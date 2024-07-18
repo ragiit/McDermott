@@ -328,6 +328,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 await LoadLogs();
+
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -382,10 +384,10 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             await LoadAsyncData();
             await LoadData();
-            FormReceivingStocks = ReceivingStocks.Where(x => x.Id == receivingId).FirstOrDefault()!;            
+            FormReceivingStocks = ReceivingStocks.Where(x => x.Id == receivingId).FirstOrDefault()!;
 
             if (FormReceivingStocks is not null)
-            {                
+            {
                 //ReferenceKode
                 var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(ReceivingStock)).OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
                 int NextReferenceNumber = 1;
@@ -420,7 +422,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 //UpdateReceiving Stock
                 FormReceivingStocks.Status = EnumStatusReceiving.Process;
-                await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
+                GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
 
                 //Save Log..
 
@@ -447,7 +449,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             var data_TransactionStock = TransactionStocks.Where(x => x.SourceTable == nameof(ReceivingStock) && x.SourcTableId == receivingId).ToList();
 
-            foreach(var item in data_TransactionStock)
+            foreach (var item in data_TransactionStock)
             {
 
                 item.Validate = true;
@@ -456,7 +458,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             //UpdateReceiving Stock
             FormReceivingStocks.Status = EnumStatusReceiving.Done;
-            await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
+            GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
 
             //Save Log..
 
@@ -470,7 +472,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             isActiveButton = false;
             await EditItem_Click(GetReceivingStock);
             StateHasChanged();
-            
+
         }
         private async Task onCancel()
         {
