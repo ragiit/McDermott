@@ -391,8 +391,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             List<TransactionStockDto> Tempdata_TransactionStock = new List<TransactionStockDto>();
 
             if (FormReceivingStocks is not null)
-            {
-                
+            {                
                 //ReferenceKode
                 var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(ReceivingStock)).OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
                 int NextReferenceNumber = 1;
@@ -447,7 +446,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             FormReceivingStocks = ReceivingStocks.Where(x => x.Id == receivingId).FirstOrDefault()!;
 
-            var data_TransactionStock = TransactionStocks.Where(x => x.SourceTable == GetSourceTableName() && x.SourcTableId == receivingId).ToList();
+            var data_TransactionStock = TransactionStocks.Where(x => x.SourceTable == nameof(ReceivingStock) && x.SourcTableId == receivingId).ToList();
 
             foreach(var item in data_TransactionStock)
             {
@@ -457,7 +456,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
 
             //UpdateReceiving Stock
-            FormReceivingStocks.Status = EnumStatusReceiving.Process;
+            FormReceivingStocks.Status = EnumStatusReceiving.Done;
             await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
 
             //Save Log..
