@@ -347,7 +347,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         await Mediator.Send(new UpdateInventoryAdjusmentDetailRequest(inventoryAdjusmentDetail));
 
                     // Get the last reference code
-                    var cekReference = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourceTable == nameof(InventoryAdjusmentDetail))))
+                    var cekReference = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourceTable == nameof(InventoryAdjusment))))
                                         .OrderByDescending(x => x.SourcTableId)
                                         .Select(x => x.Reference)
                                         .FirstOrDefault();
@@ -367,7 +367,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     transactionStockDto.Validate = false;
                     transactionStockDto.Quantity = inventoryAdjusmentDetail.Difference;
                     transactionStockDto.SourcTableId = inventoryAdjusmentDetail.InventoryAdjusmentId;
-                    transactionStockDto.SourceTable = nameof(InventoryAdjusmentDetail);
+                    transactionStockDto.SourceTable = nameof(InventoryAdjusment);
 
                     await Mediator.Send(new CreateTransactionStockRequest(transactionStockDto));
 
@@ -486,6 +486,10 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ToastService.ShowInfo("Please select the Location first.");
                 return;
             }
+
+
+            Products = await Mediator.Send(new GetProductQuery());
+            AllProducts = Products.Select(x => x).ToList();
 
             FormInventoryAdjusmentDetail = new();
             TotalQty = 0;
@@ -777,7 +781,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if (e.TraceAbility)
                 {
                     var s = await Mediator.Send(new GetTransactionStockQuery(x => x.ProductId == e.Id && x.Batch != null && x.Batch == FormInventoryAdjusmentDetail.Batch));
-                    Batch = stockProducts2?.Select(x => x.Batch)?.ToList() ?? new List<string>();
+                    Batch = stockProducts2?.Select(x => x.Batch)?.ToList() ?? [];
                     Batch = Batch.Distinct().ToList();
 
                     var firstStockProduct = stockProducts2.Where(x => x.Batch == FormInventoryAdjusmentDetail.Batch);

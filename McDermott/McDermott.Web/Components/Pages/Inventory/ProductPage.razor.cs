@@ -207,7 +207,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                 foreach (var product in Products)
                 {
-                    var Qty = TransactionStocks.Where(s => s.ProductId == product.Id).Sum(x => x.Quantity);
+                    var Qty = TransactionStocks.Where(s => s.ProductId == product.Id && s.Validate==true).Sum(x => x.Quantity);
                     product.Qtys = Qty;
                 }
 
@@ -294,6 +294,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 showForm = true;
                 PanelVisible = true;
+                StockProductView = false;
                 smartButtonShow = true;
 
                 // Inisialisasi data produk
@@ -331,7 +332,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 // Kelola informasi stok
-                TotalQty = TransactionStocks.Where(x => x.ProductId == products.Id).Sum(z => z.Quantity);
+                TotalQty = TransactionStocks.Where(x => x.ProductId == products.Id && x.Validate==true).Sum(z => z.Quantity);
 
                 // Ambil nama satuan ukur
                 NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;
@@ -580,6 +581,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 await LoadData();
                 // Inisialisasi
                 showForm = false;
+                StockProductView = false;
                 PanelVisible = true;
                 StockProductView = true;
 
@@ -588,7 +590,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if (SelectedDataItems.Count == 0)
                 {
                     // Jika tidak ada item yang dipilih, gunakan produk yang sedang dipertimbangkan
-                    StockProducts = TransactionStocks.Where(x => x.ProductId == getProduct.Id)
+                    StockProducts = TransactionStocks.Where(x => x.ProductId == getProduct.Id && x.Validate == true)
                         .GroupBy(z => new { z.ProductId, z.Batch, z.DestinationId })
                         .Select(y => new StockProductDto
                         {
@@ -617,7 +619,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 else
                 {
                     // Jika ada item yang dipilih, gunakan produk yang dipilih
-                    StockProducts = TransactionStocks.Where(x => x.ProductId == SelectedDataItems[0].Adapt<ProductDto>().Id)
+                    StockProducts = TransactionStocks.Where(x => x.ProductId == SelectedDataItems[0].Adapt<ProductDto>().Id && x.Validate == true)
                         .GroupBy(z => new { z.ProductId, z.Batch, z.DestinationId })
                         .Select(y => new StockProductDto
                         {
@@ -702,7 +704,8 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task Back_Click()
         {
-            await LoadData();
+            //await LoadData();
+            await EditItem_Click();
         }
 
         private async Task onDeleteStock(GridDataItemDeletingEventArgs e)
