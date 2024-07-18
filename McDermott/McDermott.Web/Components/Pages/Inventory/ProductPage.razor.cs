@@ -1,4 +1,5 @@
 ﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 
@@ -20,6 +21,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<DrugDosageDto> Frequencys = [];
         private List<LocationDto> Locations = [];
         private List<StockProductDto> StockProducts = [];
+        private List<TransactionStockDto> TransactionStocks = [];
+        private TransactionStockDto FormTransactionStocks = new();
         private ProductDetailDto FormProductDetails = new();
         private ProductDto FormProducts = new();
         private StockProductDto FormStockProduct = new();
@@ -130,8 +133,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                 try
                 {
                     await GetUserInfo();
+                    StateHasChanged();
                 }
                 catch { }
+
+                await LoadData();
+                StateHasChanged();
 
                 try
                 {
@@ -165,8 +172,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         protected override async Task OnInitializedAsync()
         {
-            await GetUserInfo();
-            await LoadData();
+            PanelVisible = true;
         }
 
         private async Task LoadData()
@@ -198,12 +204,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                 Locations = await Mediator.Send(new GetLocationQuery());
 
                 // Mengambil data stok produk dan menghitung jumlahnya
-                StockProducts = await Mediator.Send(new GetStockProductQuery());
+                TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                 foreach (var product in Products)
                 {
-                    var stockIn = StockProducts.Where(s => s.ProductId == product.Id).Sum(x => x.Qty);
-                    var stockOut = StockProducts.Where(s => s.ProductId == product.Id && s.StatusTransaction == "OUT").Sum(x => x.Qty);
-                    product.Qtys = stockIn;
+                    var Qty = TransactionStocks.Where(s => s.ProductId == product.Id).Sum(x => x.Quantity);                    
+                    product.Qtys = Qty;
                 }
 
                 // Menyembunyikan panel setelah selesai
@@ -573,6 +578,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
+                await LoadData();
                 // Inisialisasi
                 showForm = false;
                 PanelVisible = true;

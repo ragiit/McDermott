@@ -34,7 +34,6 @@ namespace McDermott.Web.Components.Pages.Inventory
         #endregion Relation Data
 
         #region Variable Static
-
         private IGrid? Grid { get; set; }
         private IGrid? GridProduct { get; set; }
         private bool PanelVisible { get; set; } = false;
@@ -293,7 +292,6 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         #region Click Button
 
-        // Grid
         private async Task NewItem_Click()
         {
             showForm = true;
@@ -337,7 +335,6 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
         }
 
-
         private async Task DeleteItem_Click()
         {
         }
@@ -372,7 +369,6 @@ namespace McDermott.Web.Components.Pages.Inventory
         }
 
         #endregion Click Button
-
         private string GetSourceTableName()
         {
             var tableName = typeof(ReceivingStockDto)
@@ -439,11 +435,12 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
         }
         #endregion
-        #region Validation
 
+        #region Validation
         private async Task onValidation()
         {
-
+            await LoadAsyncData();
+            await LoadData();
             FormReceivingStocks = ReceivingStocks.Where(x => x.Id == receivingId).FirstOrDefault()!;
 
             var data_TransactionStock = TransactionStocks.Where(x => x.SourceTable == nameof(ReceivingStock) && x.SourcTableId == receivingId).ToList();
@@ -471,9 +468,8 @@ namespace McDermott.Web.Components.Pages.Inventory
             isActiveButton = false;
 
             StateHasChanged();
-            await LoadData();
+            
         }
-
         private async Task onCancel()
         {
             var receivedStock = await Mediator.Send(new GetReceivingStockQuery());
@@ -497,11 +493,9 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             await Mediator.Send(new CreateReceivingLogRequest(FormReceivingLog));
         }
-
         #endregion Validation
 
         #region Function Delete
-
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -563,7 +557,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
-
         private async Task OnDelete_Detail(GridDataItemDeletingEventArgs e)
         {
             try
@@ -586,11 +579,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
-
         #endregion Function Delete
 
         #region Function Save
-
         private async Task OnSave()
         {
             try
@@ -654,7 +645,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
-
         private async Task OnSave_Detail(GridEditModelSavingEventArgs e)
         {
             if (e is null)
@@ -705,7 +695,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                 await EditItem_Click(null);
             }
         }
-
         #endregion Function Save
     }
 }
