@@ -237,10 +237,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                     ToastService.ShowWarning("The selected product does not have stock in all batches!!");
 
                 if (product.TraceAbility)
-                {
-                    TempFormInternalTransfer.Batch = listbatch.FirstOrDefault(x => x.DestinationId == FormInternalTransfer.SourceId)?.Batch;
-                    TempFormInternalTransfer.ExpiredDate = listbatch.FirstOrDefault(x => x.DestinationId == FormInternalTransfer.SourceId)?.ExpiredDate;
-                    TempFormInternalTransfer.CurrentStock = 0;
+                {                   
+                        TempFormInternalTransfer.Batch = listbatch.FirstOrDefault(x => x.DestinationId == FormInternalTransfer.SourceId)?.Batch;
+                        TempFormInternalTransfer.ExpiredDate = listbatch.FirstOrDefault(x => x.DestinationId == FormInternalTransfer.SourceId)?.ExpiredDate;
+                        TempFormInternalTransfer.CurrentStock = 0;
+                                        
                 }
                 else
                 {
@@ -426,6 +427,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormInternalTransfer = p ?? SelectedDataItems[0].Adapt<TransferStockDto>();
                 isActiveButton = FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft;
                 TransferId = FormInternalTransfer.Id;
+                getInternalTransfer = FormInternalTransfer;
 
                 TransferStockProducts = await Mediator.Send(new GetTransferStockProductQuery(x => x.TransferStockId == FormInternalTransfer.Id));
                 TempTransferStocks = TransferStockProducts.ToList();
@@ -517,15 +519,41 @@ namespace McDermott.Web.Components.Pages.Inventory
                     }
 
                     string referenceNumber = $"ITR#{NextReferenceNumber:D3}";
-                    var checkTranferProduct = TransferStockLogs.Where(x => x.TransferStockId == getInternalTransfer.Id).ToList()!;
-                    foreach(var items in checkTranferProduct)
+                    var checkTranferProduct = TransferStockProducts.Where(x => x.TransferStockId == getInternalTransfer.Id).ToList()!;
+                    foreach (var items in checkTranferProduct)
                     {
+                        var Cek_Uom = Uoms.Where(x => x.Id == items.Product?.UomId).FirstOrDefault();
+
                         // out 
                         FormTransactionStocks.SourceTable = nameof(TransferStock);
                         FormTransactionStocks.SourcTableId = getInternalTransfer.Id;
-                        FormTransactionStocks.SourceId = items.SourceId;
-                        FormTransactionStocks.DestinationId = items.DestinationId;
-                        //FormTransactionStocks.Batch = items.
+                        FormTransactionStocks.SourceId = getInternalTransfer.SourceId;
+                        FormTransactionStocks.DestinationId = getInternalTransfer.DestinationId;
+                        FormTransactionStocks.Batch = items.Batch;
+                        FormTransactionStocks.ExpiredDate = items.ExpiredDate;
+                        FormTransactionStocks.Reference = referenceNumber;
+                        FormTransactionStocks.Quantity = -(items.QtyStock * Cek_Uom?.BiggerRatio?.ToLong()) ?? 0;
+                        FormTransactionStocks.UomId = items.Product?.UomId;
+                        FormTransactionStocks.Validate = false;
+
+                        await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStocks));
+
+
+                        //In
+
+                        FormTransactionStocks.SourceTable = nameof(TransferStock);
+                        FormTransactionStocks.SourcTableId = getInternalTransfer.Id;
+                        FormTransactionStocks.SourceId = getInternalTransfer.SourceId;
+                        FormTransactionStocks.DestinationId = getInternalTransfer.DestinationId;
+                        FormTransactionStocks.Batch = items.Batch;
+                        FormTransactionStocks.ExpiredDate = items.ExpiredDate;
+                        FormTransactionStocks.Reference = referenceNumber;
+                        FormTransactionStocks.Quantity = items.QtyStock * Cek_Uom?.BiggerRatio?.ToLong() ?? 0;
+                        FormTransactionStocks.UomId = items.Product?.UomId;
+                        FormTransactionStocks.Validate = false;
+
+                        await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStocks));
+
                     }
 
                     //Save Status InternalTransfer
@@ -641,56 +669,24 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
-                var Stock = await Mediator.Send(new GetStockProductQuery());
-                var TransferProductStock = await Mediator.Send(new GetTransferStockProductQuery());
-                TransferStocks = await Mediator.Send(new GetTransferStockQuery());
+                await LoadData();
+                await LoadAsyncData();
                 FormInternalTransfer = TransferStocks.Where(x => x.Id == TransferId).FirstOrDefault()!;
+                var data_TransactionStock = TransactionStocks.Where(x => x.SourceTable == nameof(TransferStock) && x.SourcTableId == TransferId).ToList();
                 if (FormInternalTransfer is not null)
                 {
-                    FormInternalTransfer.Status = EnumStatusInternalTransfer.Done;
-                    getInternalTransfer = await Mediator.Send(new UpdateTransferStockRequest(FormInternalTransfer));
-
-                    var checkTransferProduct = TransferProductStock.Where(x => x.TransferStockId == getInternalTransfer.Id).ToList();
-                    foreach (var a in checkTransferProduct)
+                    foreach (var item in data_TransactionStock)
                     {
-                        //check product stock OUT availability
-                        var data_product = Products.Where(x => x.Id == a.ProductId).FirstOrDefault();
-                        var checkedStockOut = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.SourceId).FirstOrDefault();
-                        checkedStockOut.Qty = checkedStockOut.Qty - a.QtyStock;
-                        await Mediator.Send(new UpdateStockProductRequest(checkedStockOut));
 
-                        //check product stock IN availability
-                        var checkStockIn = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.DestinationId).FirstOrDefault();
-                        if (checkStockIn is null)
-                        {
-                            FormStock.ProductId = a.ProductId;
-                            FormStock.SourceId = getInternalTransfer.DestinationId;
-                            FormStock.UomId = a?.Product?.UomId;
-                            FormStock.Qty = a.QtyStock;
-                            if (data_product.TraceAbility == true)
-                            {
-                                FormStock.Batch = checkedStockOut?.Batch;
-                                FormStock.Expired = checkedStockOut?.Expired;
-                            }
-                            await Mediator.Send(new CreateStockProductRequest(FormStock));
-                        }
-                        else
-                        {
-                            if (data_product.TraceAbility == true)
-                            {
-                                if (checkStockIn.Batch == null && checkStockIn.Expired == null)
-                                {
-                                    checkStockIn.Batch = checkedStockOut?.Batch;
-                                    checkStockIn.Expired = checkedStockOut?.Expired;
-                                }
-                            }
-                            checkStockIn!.Qty = checkStockIn.Qty + a.QtyStock;
-                            await Mediator.Send(new UpdateStockProductRequest(checkStockIn));
-                        }
+                        item.Validate = true;
+                        var aa = await Mediator.Send(new UpdateTransactionStockRequest(item));
                     }
 
+                    FormInternalTransfer.Status = EnumStatusInternalTransfer.Done;
+                    await Mediator.Send(new UpdateTransferStockRequest(FormInternalTransfer));
+
                     //Save Log
-                    FormInternalTransferDetail.TransferStockId = getInternalTransfer.Id;
+                    FormInternalTransferDetail.TransferStockId = TransferId;
                     FormInternalTransferDetail.SourceId = getInternalTransfer.SourceId;
                     FormInternalTransferDetail.DestinationId = getInternalTransfer.DestinationId;
                     FormInternalTransferDetail.Status = EnumStatusInternalTransfer.Done;

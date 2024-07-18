@@ -308,7 +308,8 @@
                                                                                     Data="@Batch"
                                                                                     NullText="Select Batch..."
                                                                                     @bind-Value="@TempFormInternalTransfer.Batch"
-                                                                                    TextFieldName="Batch"
+                                                                                    
+                                                                                    ValueFieldName="Batch"
                                                                                     Enabled="@TempFormInternalTransfer.TraceAvability"
                                                                                     SelectedItemChanged="@((TransactionStockDto a)=> SelectedBatch(a))"
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -347,7 +348,7 @@
                                                                                     DisplayFormat="dd MMMM yyyy"
                                                                                     ReadOnly
                                                                                     Enabled="@TempFormInternalTransfer.TraceAvability"
-                                                                                    @bind-Date="@SelectedBatchExpired"
+                                                                                    @bind-Date="@TempFormInternalTransfer.ExpiredDate"
                                                                                     NullText="Expired Date">
                                                                         </DxDateEdit>
                                                                     </DxFormLayoutItem>
@@ -465,14 +466,7 @@
                                                                                                         : @((MarkupString)html)
                                                                                                     </div>
                                                                                                 </div>
-
-                                                                                                <div class="row w-100">
-                                                                                                    <div class="col-md-1">
-                                                                                                        Type
-                                                                                                    </div>
-
-                                                                                                </div>
-
+                                                                                                    
                                                                                                 <div class="row w-100">
                                                                                                     <div class="col-md-1">
                                                                                                         From
