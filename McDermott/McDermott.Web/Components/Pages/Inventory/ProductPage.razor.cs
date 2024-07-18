@@ -294,6 +294,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 showForm = true;
                 PanelVisible = true;
+                StockProductView = false;
                 smartButtonShow = true;
 
                 // Inisialisasi data produk
@@ -581,6 +582,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 await LoadData();
                 // Inisialisasi
                 showForm = false;
+                StockProductView = false;
                 PanelVisible = true;
                 StockProductView = true;
 
@@ -674,7 +676,8 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task Back_Click()
         {
-            await LoadData();
+            //await LoadData();
+            await EditItem_Click();
         }
 
         private async Task onDeleteStock(GridDataItemDeletingEventArgs e)
