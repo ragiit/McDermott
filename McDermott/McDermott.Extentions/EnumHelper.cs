@@ -148,17 +148,14 @@ namespace McDermott.Application.Extentions
             [Display(Name = "draft")]
             Draft = 0,
 
-            [Display(Name = "waiting")]
-            Waiting = 1,
-
-            [Display(Name = "ready")]
-            Ready = 2,
+            [Display(Name = "process")]
+            Process = 1,
 
             [Display(Name = "done")]
-            Done = 3,
+            Done = 2,
 
             [Display(Name = "cancel")]
-            Cancel = 4,
+            Cancel = 3,
         }
 
         public enum EnumStatusPharmacy

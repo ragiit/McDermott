@@ -102,6 +102,7 @@
                                     <div class="col-auto align-self-end">
                                         <DxTabs RenderMode="TabsRenderMode.AllTabs">
                                             <DxTab Text="Draft" Enabled="@(FormReceivingStocks.Status == EnumStatusReceiving.Draft)"></DxTab>
+                                            <DxTab Text="Process" Enabled="@(FormReceivingStocks.Status == EnumStatusReceiving.Process)"></DxTab>
                                             <DxTab Text="Done" Enabled="@(FormReceivingStocks.Status == EnumStatusReceiving.Done)"></DxTab>
                                             <DxTab Text="Cancel" Enabled="@(FormReceivingStocks.Status == EnumStatusReceiving.Cancel)"></DxTab>
                                         </DxTabs>
@@ -111,6 +112,15 @@
                                 <div class="row justify-content-start mb-3">
                                     <div class="col-12 align-self-start">
                                         @if (FormReceivingStocks.Status == EnumStatusReceiving.Draft)
+                                        {
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <DxButton Text="Process" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onProcess"></DxButton>
+                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (FormReceivingStocks.Status == EnumStatusReceiving.Process)
                                         {
                                             <div class="card">
                                                 <div class="card-body">
@@ -347,14 +357,9 @@
                                                                                                         title = "Draft";
                                                                                                         break;
 
-                                                                                                    case EnumStatusReceiving.Waiting:
+                                                                                                    case EnumStatusReceiving.Process:
                                                                                                         priorityClass = "warning";
                                                                                                         title = "Waiting";
-                                                                                                        break;
-
-                                                                                                    case EnumStatusReceiving.Ready:
-                                                                                                        priorityClass = "primary";
-                                                                                                        title = "Ready";
                                                                                                         break;
 
                                                                                                     case EnumStatusReceiving.Done:

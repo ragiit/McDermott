@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.ReceivingCommand;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using static McDermott.Application.Features.Commands.Inventory.ReceivingCommand;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransferStockCommand;
@@ -87,11 +88,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 catch { }
 
-                receivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery());
                 Locations = await Mediator.Send(new GetLocationQuery());
                 Products = await Mediator.Send(new GetProductQuery());
                 Uoms = await Mediator.Send(new GetUomQuery());
-                Stocks = await Mediator.Send(new GetStockProductQuery());
                 var user_group = await Mediator.Send(new GetUserQuery());
                 NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
                 StateHasChanged();
@@ -134,6 +133,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             PanelVisible = true;
             TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+            Stocks = await Mediator.Send(new GetStockProductQuery());
+            receivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery());
             PanelVisible = false;
         }
 
@@ -208,6 +209,10 @@ namespace McDermott.Web.Components.Pages.Inventory
                 case EnumStatusReceiving.Draft:
                     priorityClass = "info";
                     title = "Draft";
+                    break;
+                case EnumStatusReceiving.Process:
+                    priorityClass = "warning";
+                    title = "Process";
                     break;
 
                 case EnumStatusReceiving.Done:
@@ -368,14 +373,20 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         #endregion Click Button
 
-        #region Validation
-
-        private async Task onValidation()
+        private string GetSourceTableName()
         {
-            var Stock = await Mediator.Send(new GetStockProductQuery());
-            var receivedStock = await Mediator.Send(new GetReceivingStockQuery());
-            var receivedProductStock = await Mediator.Send(new GetReceivingStockProductQuery());
-            FormReceivingStocks = receivedStock.Where(x => x.Id == receivingId).FirstOrDefault()!;
+            var tableName = typeof(ReceivingStockDto)
+                .GetCustomAttribute<TableAttribute>()
+                ?.Name;
+            return tableName ?? "ReceivingStocks";
+        }
+
+        #region Process
+        private async Task onProcess()
+        {
+            await LoadAsyncData();
+            await LoadData();
+            FormReceivingStocks = ReceivingStocks.Where(x => x.Id == receivingId).FirstOrDefault()!;
             var data_TransactionStock = new TransactionStockDto();
             List<TransactionStockDto> Tempdata_TransactionStock = new List<TransactionStockDto>();
 
@@ -385,7 +396,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
 
                 //ReferenceKode
-                var cekReference = TransactionStocks.OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
+                var cekReference = TransactionStocks.Where(x => x.SourceTable == GetSourceTableName()).OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
                 int NextReferenceNumber = 1;
                 if (cekReference != null)
                 {
@@ -395,13 +406,14 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 string referenceNumber = $"RCV#{NextReferenceNumber:D3}";
 
-                var CheckReceivedProduct = receivedProductStock.Where(x => x.ReceivingStockId == GetReceivingStock.Id).ToList()!;
+                var CheckReceivedProduct = receivingStockDetails.Where(x => x.ReceivingStockId == GetReceivingStock.Id).ToList()!;
                 foreach (var a in CheckReceivedProduct)
                 {
                     var Cek_Uom = Uoms.Where(x => x.Id == a.Product.UomId).FirstOrDefault();
 
                     var x = Uoms.Where(x => x.Id == a?.Product?.PurchaseUomId).FirstOrDefault();
 
+                    FormTransactionStock.SourceTable = GetSourceTableName();
                     FormTransactionStock.SourcTableId = FormReceivingStocks.Id;
                     FormTransactionStock.ProductId = a.ProductId;
                     FormTransactionStock.Batch = a.Batch;
@@ -410,46 +422,53 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormTransactionStock.Quantity = a.Qty * Cek_Uom.BiggerRatio.ToLong();
                     FormTransactionStock.DestinationId = GetReceivingStock.DestinationId;
                     FormTransactionStock.UomId = a.Product.UomId;
-                    FormTransactionStock.Validate = true;
+                    FormTransactionStock.Validate = false;
 
-                    var data_save = await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
-                    Tempdata_TransactionStock.Add(data_save);
+                    await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
                 }
 
-                //Save Stock Product
-                await LoadAsyncData();
-                foreach (var data_item in Tempdata_TransactionStock)
-                {
-                    var cek_data_stockProduct = Stocks.Where(x => x.ProductId == data_item.ProductId && x.DestinanceId == data_item.DestinationId && x.Batch == data_item.Batch).FirstOrDefault();
-                    var inStock = TransactionStocks.Where(x => x.ProductId == data_item.ProductId && x.DestinationId == data_item.DestinationId && x.Batch == data_item.Batch).Sum(x => x.Quantity);
+                //UpdateReceiving Stock
+                FormReceivingStocks.Status = EnumStatusReceiving.Process;
+                await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
 
-                    FormStockProduct.ProductId = data_item.ProductId;
-                    FormStockProduct.DestinanceId = data_item.DestinationId;
-                    FormStockProduct.Batch = data_item.Batch;
-                    FormStockProduct.Expired = data_item.ExpiredDate;
-                    FormStockProduct.UomId = data_item.UomId;
-                    FormStockProduct.Qty = inStock;
-                    if (cek_data_stockProduct == null)
-                    {
-                        await Mediator.Send(new CreateStockProductRequest(FormStockProduct));
-                    }
-                    else
-                    {
-                        FormStockProduct.Id = cek_data_stockProduct.Id;
-                        var cree= await Mediator.Send(new UpdateStockProductRequest(FormStockProduct));
-                    }
-                }
                 //Save Log..
 
-                FormReceivingLog.SourceId = GetReceivingStock.DestinationId;
+                FormReceivingLog.SourceId = FormReceivingStocks.DestinationId;
                 FormReceivingLog.UserById = NameUser.Id;
-                FormReceivingLog.ReceivingId = GetReceivingStock.Id;
-                FormReceivingLog.Status = GetReceivingStock.Status;
+                FormReceivingLog.ReceivingId = FormReceivingStocks.Id;
+                FormReceivingLog.Status = EnumStatusReceiving.Process;
 
                 await Mediator.Send(new CreateReceivingLogRequest(FormReceivingLog));
-
-                isActiveButton = false;
             }
+        }
+        #endregion
+        #region Validation
+
+        private async Task onValidation()
+        {
+
+            FormReceivingStocks = ReceivingStocks.Where(x => x.Id == receivingId).FirstOrDefault()!;
+
+            var data_TransactionStock = TransactionStocks.Where(x => x.SourceTable == GetSourceTableName() && x.SourcTableId == receivingId).ToList();
+
+            foreach(var item in data_TransactionStock)
+            {
+
+                item.Validate = true;
+                var aa = await Mediator.Send(new UpdateTransactionStockRequest(item));
+            }
+
+            //Save Log..
+
+            FormReceivingLog.SourceId = GetReceivingStock.DestinationId;
+            FormReceivingLog.UserById = NameUser.Id;
+            FormReceivingLog.ReceivingId = GetReceivingStock.Id;
+            FormReceivingLog.Status = GetReceivingStock.Status;
+
+            await Mediator.Send(new CreateReceivingLogRequest(FormReceivingLog));
+
+            isActiveButton = false;
+
             StateHasChanged();
             await LoadData();
         }
@@ -465,6 +484,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormReceivingStocks.Status = EnumStatusReceiving.Cancel;
                 GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
             }
+
+            //Update Receiving Stock
+
 
             //Save Log
             FormReceivingLog.SourceId = GetReceivingStock.DestinationId;

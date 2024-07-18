@@ -8,6 +8,8 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<GetTransactionStockQuery, List<TransactionStockDto>>,
         IRequestHandler<CreateTransactionStockRequest, TransactionStockDto>,
         IRequestHandler<CreateListTransactionStockRequest, List<TransactionStockDto>>,
+        IRequestHandler<UpdateTransactionStockRequest, TransactionStockDto>,
+        IRequestHandler<UpdateListTransactionStockRequest, List<TransactionStockDto>>,
         IRequestHandler<DeleteTransactionStockRequest, bool>
     {
         public async Task<List<TransactionStockDto>> Handle(GetTransactionStockQuery request, CancellationToken cancellationToken)
@@ -84,6 +86,46 @@ namespace McDermott.Application.Features.Queries.Inventory
         }
 
         #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<TransactionStockDto> Handle(UpdateTransactionStockRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<TransactionStock>().UpdateAsync(request.TransactionStockDto.Adapt<TransactionStock>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetTransactionStockQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<TransactionStockDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<TransactionStockDto>> Handle(UpdateListTransactionStockRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<TransactionStock>().UpdateAsync(request.TransactionStockDto.Adapt<List<TransactionStock>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetTransactionStockQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<TransactionStockDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
 
         #region DELETE
 

@@ -30,6 +30,20 @@ namespace McDermott.Application.Features.Commands.Inventory
         }
         #endregion
 
+        #region Update
+
+        public class UpdateTransactionStockRequest(TransactionStockDto transactionStockDto) : IRequest<TransactionStockDto>
+        {
+            public TransactionStockDto TransactionStockDto { get; set; } = transactionStockDto;
+        }
+
+        public class UpdateListTransactionStockRequest(List<TransactionStockDto> TransactionStockDto) : IRequest<List<TransactionStockDto>>
+        {
+            public List<TransactionStockDto> TransactionStockDto { get; set; } = TransactionStockDto;
+        }
+
+        #endregion Update
+
         #region DELETE
         public class DeleteTransactionStockRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
