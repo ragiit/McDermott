@@ -2369,7 +2369,13 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("RegistrationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("RiskOfFallingDetail")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ScheduleTime")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScrinningTriageScale")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SerialNo")
@@ -4123,6 +4129,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("BpjsClassificationId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("Brand")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long?>("CompanyId")
                         .HasColumnType("bigint");
 
@@ -4135,14 +4144,26 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("EquipmentCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EquipmentCondition")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("HospitalType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InternalReference")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("LastCalibrationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("NextCalibrationDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<long?>("ProductCategoryId")
                         .HasColumnType("bigint");
@@ -4169,6 +4190,9 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("YearOfPurchase")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
