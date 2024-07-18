@@ -430,6 +430,10 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormReceivingLog.Status = EnumStatusReceiving.Process;
 
                 await Mediator.Send(new CreateReceivingLogRequest(FormReceivingLog));
+
+
+                await EditItem_Click(GetReceivingStock);
+                StateHasChanged();
             }
         }
         #endregion
@@ -464,7 +468,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             await Mediator.Send(new CreateReceivingLogRequest(FormReceivingLog));
 
             isActiveButton = false;
-
+            await EditItem_Click(GetReceivingStock);
             StateHasChanged();
             
         }

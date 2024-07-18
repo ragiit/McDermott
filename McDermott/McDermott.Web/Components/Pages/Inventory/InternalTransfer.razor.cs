@@ -127,7 +127,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task LoadAsyncData()
         {
-            StockProducts = await Mediator.Send(new GetStockProductQuery());
+            TransferStockProducts = await Mediator.Send(new GetTransferStockProductQuery());
             TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
             Locations = await Mediator.Send(new GetLocationQuery());
             Products = await Mediator.Send(new GetProductQuery());
@@ -568,6 +568,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormInternalTransferDetail.Status = EnumStatusInternalTransfer.Ready;
 
                 await Mediator.Send(new CreateTransferStockLogRequest(FormInternalTransferDetail));
+
+                await EditItem_Click(getInternalTransfer);
+                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -693,7 +696,8 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                     await Mediator.Send(new CreateTransferStockLogRequest(FormInternalTransferDetail));
 
-                    await LoadLogs();
+                    await EditItem_Click(getInternalTransfer);
+                    StateHasChanged();
                 }
                 else
                 {
