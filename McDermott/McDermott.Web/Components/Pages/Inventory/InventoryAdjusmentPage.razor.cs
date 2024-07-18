@@ -346,24 +346,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                     else
                         await Mediator.Send(new UpdateInventoryAdjusmentDetailRequest(inventoryAdjusmentDetail));
 
-                    // Get the last reference code
-                    var cekReference = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourceTable == nameof(InventoryAdjusment))))
-                                        .OrderByDescending(x => x.SourcTableId)
-                                        .Select(x => x.Reference)
-                                        .FirstOrDefault();
+                  
 
-                    int NextReferenceNumber = 1;
-                    if (cekReference != null)
-                    {
-                        int.TryParse(cekReference?.Substring("ADJ#".Length), out NextReferenceNumber);
-                        NextReferenceNumber++;
-                    }
-
-                    string referenceNumber = $"ADJ#{NextReferenceNumber:D3}";
+                  
 
                     // Map InventoryAdjusmentDetail to TransactionStockDto using Mapster
                     var transactionStockDto = inventoryAdjusmentDetail.Adapt<TransactionStockDto>();
-                    transactionStockDto.Reference = referenceNumber;
+
                     transactionStockDto.Validate = false;
                     transactionStockDto.Quantity = inventoryAdjusmentDetail.Difference;
                     transactionStockDto.SourcTableId = inventoryAdjusmentDetail.InventoryAdjusmentId;
@@ -537,8 +526,11 @@ namespace McDermott.Web.Components.Pages.Inventory
             await LoadData();
         }
 
+        private bool IsLoadingConfirm { get; set; } = false;
         private async Task OnClickConfirm()
         {
+            IsLoadingConfirm = true;
+
             //switch (StagingText)
             //{
             //    case "Start Inventory":
@@ -579,63 +571,97 @@ namespace McDermott.Web.Components.Pages.Inventory
             //    default:
             //        break;
             //}
-
-            switch (StagingText)
+            try
             {
-                case "Start Inventory":
-                    InventoryAdjusment.Status = EnumStatusInventoryAdjustment.InProgress;
-                    StagingText = EnumStatusInventoryAdjustment.Invalidate.GetDisplayName();
-                    break;
 
-                case "In-Progress":
-                    InventoryAdjusment.Status = EnumStatusInventoryAdjustment.Invalidate;
-                    StagingText = EnumStatusInventoryAdjustment.Invalidate.GetDisplayName();
-                    break;
-
-                case "Invalidate":
-                    InventoryAdjusment.Status = EnumStatusInventoryAdjustment.Invalidate;
-                    break;
-
-                default:
-                    return;
-            }
-
-            await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
-
-            if (StagingText == EnumStatusInventoryAdjustment.Invalidate.GetDisplayName())
-            {
-                var stockProductsToUpdate = new List<TransactionStockDto>();
-                var adjustmentDetailsToUpdate = new List<InventoryAdjusmentDetailDto>();
-
-                foreach (var detail in InventoryAdjusmentDetails)
+                switch (StagingText)
                 {
-                    var stockProduct = (await Mediator.Send(new GetTransactionStockQuery(s => s.Id == detail.TransactionStockId))).FirstOrDefault();
+                    case "Start Inventory":
+                        InventoryAdjusment.Status = EnumStatusInventoryAdjustment.InProgress;
+                        StagingText = EnumStatusInventoryAdjustment.Invalidate.GetDisplayName();
+                        break;
 
-                    if (stockProduct != null)
-                    {
-                        //detail.TeoriticalQty = detail.RealQty;
-                        //stockProduct.Qty = detail.RealQty;
-                        //stockProductsToUpdate.Add(stockProduct);
-                    }
+                    case "In-Progress":
+                        InventoryAdjusment.Status = EnumStatusInventoryAdjustment.Invalidate;
+                        StagingText = EnumStatusInventoryAdjustment.Invalidate.GetDisplayName();
+                        break;
 
-                    adjustmentDetailsToUpdate.Add(detail);
+                    case "Invalidate":
+                        InventoryAdjusment.Status = EnumStatusInventoryAdjustment.Invalidate;
+                        break;
+
+                    default:
+                        return;
                 }
 
-                //foreach (var stockProduct in stockProductsToUpdate)
-                //{
-                //    await Mediator.Send(new UpdateStockProductRequest(stockProduct));
-                //}
+                await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
 
-                //foreach (var detail in adjustmentDetailsToUpdate)
-                //{
-                //    await Mediator.Send(new UpdateInventoryAdjusmentDetailRequest(detail));
-                //}
+                if (StagingText == EnumStatusInventoryAdjustment.Invalidate.GetDisplayName())
+                {
 
-                //await Mediator.Send(new UpdateListStockProductRequest(stockProductsToUpdate));
-                //await Mediator.Send(new UpdateListTransactionStockRequest());
-                await Mediator.Send(new UpdateListInventoryAdjusmentDetailRequest(adjustmentDetailsToUpdate));
+                    var trx = await Mediator.Send(new GetTransactionStockQuery(x => x.SourceTable == nameof(InventoryAdjusment) && x.SourcTableId == InventoryAdjusment.Id));
+                    // Get the last reference code
+                    var cekReference = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourceTable == nameof(InventoryAdjusment))))
+                                        .OrderByDescending(x => x.SourcTableId)
+                                        .Select(x => x.Reference)
+                                        .FirstOrDefault();
+                    int NextReferenceNumber = 1;
+                    if (cekReference != null)
+                    {
+                        int.TryParse(cekReference?.Substring("ADJ#".Length), out NextReferenceNumber);
+                        NextReferenceNumber++;
+                    }
 
-                await LoadInventoryAdjustmentDetails();
+                    string referenceNumber = $"ADJ#{NextReferenceNumber:D3}";
+                    foreach (var item in trx)
+                    { 
+                        item.Reference = referenceNumber;
+                        item.Validate = true;
+                        await Mediator.Send(new UpdateTransactionStockRequest(item));
+                    }
+
+                    return;
+                    var stockProductsToUpdate = new List<TransactionStockDto>();
+                    var adjustmentDetailsToUpdate = new List<InventoryAdjusmentDetailDto>();
+
+                    foreach (var detail in InventoryAdjusmentDetails)
+                    {
+                        var stockProduct = (await Mediator.Send(new GetTransactionStockQuery(s => s.Id == detail.TransactionStockId))).FirstOrDefault();
+
+                        if (stockProduct != null)
+                        {
+                            //detail.TeoriticalQty = detail.RealQty;
+                            //stockProduct.Qty = detail.RealQty;
+                            //stockProductsToUpdate.Add(stockProduct);
+                        }
+
+                        adjustmentDetailsToUpdate.Add(detail);
+                    }
+
+                    //foreach (var stockProduct in stockProductsToUpdate)
+                    //{
+                    //    await Mediator.Send(new UpdateStockProductRequest(stockProduct));
+                    //}
+
+                    //foreach (var detail in adjustmentDetailsToUpdate)
+                    //{ 
+                    //    await Mediator.Send(new UpdateInventoryAdjusmentDetailRequest(detail));
+                    //}
+
+                    //await Mediator.Send(new UpdateListStockProductRequest(stockProductsToUpdate));
+                    //await Mediator.Send(new UpdateListTransactionStockRequest());
+                    //await Mediator.Send(new UpdateListInventoryAdjusmentDetailRequest(adjustmentDetailsToUpdate));
+
+                    await LoadInventoryAdjustmentDetails();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                IsLoadingConfirm = false;
             }
         }
 

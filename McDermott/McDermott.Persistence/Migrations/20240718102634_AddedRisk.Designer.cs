@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240718102634_AddedRisk")]
+    partial class AddedRisk
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -5033,7 +5036,7 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("TransferStocks");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.TransferStockLog", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.TransferStockDetail", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -5074,7 +5077,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("TransferStockId");
 
-                    b.ToTable("TransferStockLogs");
+                    b.ToTable("TransferStockDetails");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.TransferStockProduct", b =>
@@ -5086,9 +5089,6 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("Batch")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -5099,6 +5099,9 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<long?>("QtyStock")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("StockProductId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("TransferStockId")
@@ -5113,6 +5116,8 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("StockProductId");
 
                     b.HasIndex("TransferStockId");
 
@@ -6859,19 +6864,19 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Source");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.TransferStockLog", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.TransferStockDetail", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.Location", "Destination")
                         .WithMany()
                         .HasForeignKey("DestinationId");
 
                     b.HasOne("McDermott.Domain.Entities.Location", "Source")
-                        .WithMany("TransferStockLog")
+                        .WithMany("TransferStockDetail")
                         .HasForeignKey("SourceId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("McDermott.Domain.Entities.TransferStock", "TransferStock")
-                        .WithMany("TransferStockLog")
+                        .WithMany("TransferStockDetail")
                         .HasForeignKey("TransferStockId")
                         .OnDelete(DeleteBehavior.SetNull);
 
@@ -6889,12 +6894,19 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("McDermott.Domain.Entities.StockProduct", "StockProduct")
+                        .WithMany()
+                        .HasForeignKey("StockProductId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("McDermott.Domain.Entities.TransferStock", "TransferStock")
                         .WithMany("TransferStockProduct")
                         .HasForeignKey("TransferStockId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Product");
+
+                    b.Navigation("StockProduct");
 
                     b.Navigation("TransferStock");
                 });
@@ -7196,7 +7208,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.Navigation("ReorderingRules");
 
-                    b.Navigation("TransferStockLog");
+                    b.Navigation("TransferStockDetail");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Medicament", b =>
@@ -7270,7 +7282,7 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.TransferStock", b =>
                 {
-                    b.Navigation("TransferStockLog");
+                    b.Navigation("TransferStockDetail");
 
                     b.Navigation("TransferStockProduct");
                 });

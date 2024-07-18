@@ -15,6 +15,12 @@
         public string? Tax { get; set; }
         public string? Cost { get; set; }
         public string? InternalReference { get; set; }
+        public string? Brand { get; set; }
+        public string? EquipmentCode { get; set; }
+        public DateTime? YearOfPurchase { get; set; }
+        public DateTime? LastCalibrationDate { get; set; }
+        public DateTime? NextCalibrationDate { get; set; }
+        public string? EquipmentCondition { get; set; }
 
         [SetToNull]
         public BpjsClassification? BpjsClassification { get; set; }

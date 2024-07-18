@@ -561,8 +561,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     await Mediator.Send(new DeleteLabResultDetailRequest(ids: DeletedLabTestIds));
 
-                    LabResultDetails.ForEach(x => x.Id = 0);
-
+                    LabResultDetails.ForEach(x =>
+                    {
+                        x.Id = 0;
+                        x.GeneralConsultanMedicalSupportId = GeneralConsultanMedicalSupport.Id;
+                    });
                     await Mediator.Send(new CreateListLabResultDetailRequest(LabResultDetails));
 
                     LabResultDetails.Clear();

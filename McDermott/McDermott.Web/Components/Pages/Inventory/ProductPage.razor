@@ -144,7 +144,7 @@
                                                                     </DxFormLayoutItem>
                                                                     <DxFormLayoutItem Caption="Dosage" CaptionCssClass=" normal-caption" ColSpanMd="12">
                                                                         <Template>
-                                                                            <DxGridLayout>
+                                                                            <DxGridLayout ColumnSpacing="8px">
                                                                                 <Rows>
                                                                                     <DxGridLayoutRow />
                                                                                 </Rows>
@@ -245,6 +245,64 @@
                                                                                 SelectedItemChanged="@((string city) => SelectedItemChanged(city))"
                                                                                 FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
                                                                 </DxFormLayoutItem>
+
+                                                                @* Ini Untuk Medical Equipment *@
+                                                                <DxFormLayoutItem Caption="Brand" Visible="@(FormProductDetails.HospitalType is not null && FormProductDetails.HospitalType.Equals("Medical Equipment"))" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                    <MyTextBox @bind-Text="FormProductDetails.Brand"
+                                                                               NullText="Brand" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption="Equipment Code" Visible="@(FormProductDetails.HospitalType is not null && FormProductDetails.HospitalType.Equals("Medical Equipment"))" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                    <MyTextBox @bind-Text="FormProductDetails.EquipmentCode"
+                                                                               NullText="Equipment Code" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Visible="@(FormProductDetails.HospitalType is not null && FormProductDetails.HospitalType.Equals("Medical Equipment"))" Caption="Year Of Purchase" ColSpanMd="12">
+                                                                    <DxDateEdit @bind-Date="@FormProductDetails.YearOfPurchase"
+                                                                                Mask="@DateTimeMask.ShortDate"
+                                                                                NullText="Year Of Purchase">
+                                                                    </DxDateEdit>
+                                                                </DxFormLayoutItem> 
+
+                                                                <DxFormLayoutItem Caption="Last Calibration Date" Visible="@(FormProductDetails.HospitalType is not null && FormProductDetails.HospitalType.Equals("Medical Equipment"))" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                    <Template>
+                                                                        <DxGridLayout ColumnSpacing="8px">
+                                                                            <Rows>
+                                                                                <DxGridLayoutRow />
+                                                                            </Rows>
+                                                                            <Columns>
+                                                                                <DxGridLayoutColumn />
+                                                                                <DxGridLayoutColumn />
+                                                                            </Columns>
+                                                                            <Items>
+                                                                                <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption" ColumnSpan="1">
+                                                                                    <Template>
+                                                                                        <DxDateEdit @bind-Date="@FormProductDetails.LastCalibrationDate"
+                                                                                                    Mask="@DateTimeMask.ShortDate"
+                                                                                                    NullText="Year Of Purchase">
+                                                                                        </DxDateEdit>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption" ColumnSpan="6">
+                                                                                    <Template>
+                                                                                        <DxDateEdit @bind-Date="@FormProductDetails.NextCalibrationDate"
+                                                                                                    Mask="@DateTimeMask.ShortDate"
+                                                                                                    NullText="Next Calibration Date">
+                                                                                        </DxDateEdit>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                            </Items>
+                                                                        </DxGridLayout>
+                                                                    </Template>
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Visible="@(FormProductDetails.HospitalType is not null && FormProductDetails.HospitalType.Equals("Medical Equipment"))" Caption="Equipment Condition" ColSpanMd="12">
+                                                                    <MyDxComboBox Data="@EquipmentConditions"
+                                                                                  NullText="Equipment Condition..."
+                                                                                  @bind-Value="@FormProductDetails.EquipmentCondition">
+                                                                    </MyDxComboBox>
+                                                                </DxFormLayoutItem>
+
                                                                 <DxFormLayoutItem Caption="BPJS Classification" CaptionCssClass=" normal-caption" ColSpanMd="12">
                                                                     <DxComboBox Data="@BpjsClassifications"
                                                                                 @bind-Value="@FormProductDetails.BpjsClassificationId"

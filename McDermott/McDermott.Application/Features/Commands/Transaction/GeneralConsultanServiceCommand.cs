@@ -33,6 +33,12 @@
             public GeneralConsultanServiceDto GeneralConsultanServiceDto { get; set; } = GeneralConsultanServiceDto;
         }
 
+        public class UpdateStatusGeneralConsultanServiceRequest(EnumStatusGeneralConsultantService status, long id) : IRequest<GeneralConsultanServiceDto>
+        {
+            public long Id { get; set; } = id;
+            public EnumStatusGeneralConsultantService Status { get; set; } = status;
+        }
+
         public class UpdateListGeneralConsultanServiceRequest(List<GeneralConsultanServiceDto> GeneralConsultanServiceDtos) : IRequest<List<GeneralConsultanServiceDto>>
         {
             public List<GeneralConsultanServiceDto> GeneralConsultanServiceDtos { get; set; } = GeneralConsultanServiceDtos;

@@ -10,7 +10,9 @@ namespace McDermott.Persistence.Repositories
     {
         private readonly ApplicationDbContext _dbContext;
         private Hashtable _repositories;
-        private bool disposed;
+        private bool disposed; 
+        private bool _disposed;
+
 
         public UnitOfWork(ApplicationDbContext dbContext)
         {
@@ -67,32 +69,54 @@ namespace McDermott.Persistence.Repositories
         {
             throw new NotImplementedException();
         }
-
+         
         public void Dispose()
         {
-            try
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error");
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposed)
+            if (!_disposed)
             {
                 if (disposing)
                 {
-                    //dispose managed resources
-                    _dbContext.Dispose();
+                    // Dispose managed resources
+                    _dbContext?.Dispose();
                 }
+
+                // Dispose unmanaged resources
+                _disposed = true;
             }
-            //dispose unmanaged resources
-            disposed = true;
         }
+
+        //protected virtual void Dispose(bool disposing)
+        //{
+        //    if (!_disposed)
+        //    {
+        //        if (disposing)
+        //        {
+        //            // Dispose managed resources
+        //            _dbContext?.Dispose();
+        //        }
+
+        //        // Dispose unmanaged resources
+        //        _disposed = true;
+        //    }
+        //}
+        //protected virtual void Dispose(bool disposing)
+        //{
+        //    if (disposed)
+        //    {
+        //        if (disposing)
+        //        {
+        //            //dispose managed resources
+        //            _dbContext.Dispose();
+        //        }
+        //    }
+        //    //dispose unmanaged resources
+        //    disposed = true;
+        //}
     }
 }

@@ -61,6 +61,13 @@ namespace McDermott.Web.Components.Pages.Inventory
             "Storable Product"
         };
 
+        private List<string> EquipmentConditions =
+            [
+                "Good",
+                "Partially Damaged",
+                "Broken"
+            ];
+
         private List<string> HospitalProducts = new List<string>
         {
             "Medicament",
@@ -207,7 +214,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                 foreach (var product in Products)
                 {
-                    var Qty = TransactionStocks.Where(s => s.ProductId == product.Id && s.Validate==true).Sum(x => x.Quantity);
+                    var Qty = TransactionStocks.Where(s => s.ProductId == product.Id && s.Validate == true).Sum(x => x.Quantity);
                     product.Qtys = Qty;
                 }
 
@@ -332,7 +339,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 // Kelola informasi stok
-                TotalQty = TransactionStocks.Where(x => x.ProductId == products.Id && x.Validate==true).Sum(z => z.Quantity);
+                TotalQty = TransactionStocks.Where(x => x.ProductId == products.Id && x.Validate == true).Sum(z => z.Quantity);
 
                 // Ambil nama satuan ukur
                 NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;
@@ -497,6 +504,12 @@ namespace McDermott.Web.Components.Pages.Inventory
             FormProducts.Cost = FormProductDetails.Cost;
             FormProducts.InternalReference = FormProductDetails.InternalReference;
             FormProducts.TraceAbility = FormProductDetails.TraceAbility;
+            FormProducts.Brand = FormProductDetails.Brand;
+            FormProducts.EquipmentCode = FormProductDetails.EquipmentCode;
+            FormProducts.YearOfPurchase = FormProductDetails.YearOfPurchase;
+            FormProducts.LastCalibrationDate = FormProductDetails.LastCalibrationDate;
+            FormProducts.NextCalibrationDate = FormProductDetails.NextCalibrationDate;
+            FormProducts.EquipmentCondition = FormProductDetails.EquipmentCondition;
         }
 
         private void SetFormMedicamentDetails()
@@ -628,11 +641,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                             DestinanceId = y.Key.DestinationId,
                             DestinanceName = y.First()?.Destination?.Name ?? "-",
                             UomId = y.First().UomId,
-                            UomName = y.First()?.Uom?.Name ??"-",
+                            UomName = y.First()?.Uom?.Name ?? "-",
                             Expired = y.First().ExpiredDate,
-                            ProductName = y.First()?.Product?.Name ??"-",
-                            Qty = y.Sum(item=>item.Quantity)
-                            
+                            ProductName = y.First()?.Product?.Name ?? "-",
+                            Qty = y.Sum(item => item.Quantity)
+
 
                         }).ToList();
                     NameProduct = SelectedDataItems[0].Adapt<ProductDto>().Name;

@@ -133,6 +133,9 @@ namespace McDermott.Application.Dtos.Transaction
 
 
         #region Clinical Assesment
+        public string? ScrinningTriageScale { get; set; }
+        public string? RiskOfFalling { get; set; }
+        public string? RiskOfFallingDetail { get; set; }
         public double _Weight { get; set; }
 
         public double Weight
