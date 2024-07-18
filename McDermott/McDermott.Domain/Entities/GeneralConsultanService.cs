@@ -55,10 +55,10 @@
         public string? AccidentExaminationDocs { get; set; }
         public string? AccidentExaminationBase64 { get; set; }
 
-        #region Clinical Assesment
-
-        public double Weight { get; set; }
-
+        #region Clinical Assesment 
+        public string? ScrinningTriageScale { get; set; }
+        public string? RiskOfFallingDetail { get; set; }
+        public double Weight { get; set; } 
         public double Height { get; set; }
         public long RR { get; set; }
         public long Temp { get; set; }

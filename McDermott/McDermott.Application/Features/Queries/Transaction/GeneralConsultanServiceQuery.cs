@@ -1,10 +1,14 @@
-﻿namespace McDermott.Application.Features.Queries.Transaction
+﻿
+using Microsoft.EntityFrameworkCore;
+
+namespace McDermott.Application.Features.Queries.Transaction
 {
     public class GeneralConsultanServiceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetGeneralConsultanServiceQuery, List<GeneralConsultanServiceDto>>,
         IRequestHandler<CreateGeneralConsultanServiceRequest, GeneralConsultanServiceDto>,
         IRequestHandler<CreateListGeneralConsultanServiceRequest, List<GeneralConsultanServiceDto>>,
         IRequestHandler<UpdateGeneralConsultanServiceRequest, GeneralConsultanServiceDto>,
+        IRequestHandler<UpdateStatusGeneralConsultanServiceRequest, GeneralConsultanServiceDto>,
         IRequestHandler<DeleteGeneralConsultanServiceRequest, bool>,
         IRequestHandler<GetGeneralConsultationLogQuery, List<GeneralConsultanlogDto>>,
         IRequestHandler<CreateGeneralConsultationLogRequest, GeneralConsultanlogDto>,
@@ -96,6 +100,26 @@
         #endregion CREATE
 
         #region Update
+
+        public async Task<GeneralConsultanServiceDto> Handle(UpdateStatusGeneralConsultanServiceRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<GeneralConsultanService>().Entities.FirstOrDefaultAsync(x => x.Id == request.Id) ?? new();
+                
+                result.Status = request.Status;
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGeneralConsultanServiceQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<GeneralConsultanServiceDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
         public async Task<GeneralConsultanServiceDto> Handle(UpdateGeneralConsultanServiceRequest request, CancellationToken cancellationToken)
         {
@@ -275,6 +299,7 @@
                 throw;
             }
         }
+
 
         #endregion Delete
     }
