@@ -12,9 +12,8 @@ namespace McDermott.Application.Dtos.Inventory
         [Required]
         public long? ProductId { get; set; }
 
-        [NotMapped]
-        public long TeoriticalQty { get; set; }
-
+        public long TeoriticalQty { get; set; } = 0;
+        public string? Batch { get; set; }
         [NotMapped]
         public long? UomId { get; set; }
 
@@ -26,27 +25,26 @@ namespace McDermott.Application.Dtos.Inventory
         public long RealQty { get; set; }
 
         // Gunakan Lazy untuk properti Difference
-        private readonly Lazy<string> _difference;
+        private readonly Lazy<long> _difference;
 
         public InventoryAdjusmentDetailDto()
         {
-            _difference = new Lazy<string>(CalculateDifference);
+            _difference = new Lazy<long>(CalculateDifference);
         }
 
         [NotMapped]
-        public string Difference => _difference.Value;
+        public long Difference => _difference.Value;
 
-        private string CalculateDifference()
+        private long CalculateDifference()
         {
-            var difference = RealQty - (TransactionStock?.Quantity ?? 0);
-            return difference switch
-            {
-                > 0 => $"+{difference}",
-                < 0 => $"{difference}",
-                _ => "0"
-            };
+            return RealQty - TeoriticalQty;
+            //return difference switch
+            //{
+            //    > 0 => $"+{difference}",
+            //    < 0 => $"{difference}",
+            //    _ => "0"
+            //};
         }
-
 
         public InventoryAdjusmentDto? InventoryAdjusment { get; set; }
         public ProductDto? Product { get; set; }
