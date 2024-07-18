@@ -705,7 +705,10 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task Back_Click()
         {
             //await LoadData();
-            await EditItem_Click();
+            //await EditItem_Click(null);
+            var data_product = await Mediator.Send(new GetProductQuery(x => x.Id == getProduct.Id));
+
+            await EditItem_Click(getProduct);
         }
 
         private async Task onDeleteStock(GridDataItemDeletingEventArgs e)

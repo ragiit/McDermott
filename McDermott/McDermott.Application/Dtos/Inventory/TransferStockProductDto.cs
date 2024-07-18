@@ -6,11 +6,10 @@ namespace McDermott.Application.Dtos.Inventory
     {
         public long Id { get; set; }
         public long? TransferStockId { get; set; }
-        public long? StockId { get; set; }
+       
 
         [Required(ErrorMessage = "Please Select Product Name...")]
         public long? ProductId { get; set; }
-        public long? StockProductId { get; set; }
 
         [Required(ErrorMessage = "Please Input Stock Quantity...")]
         public long QtyStock { get; set; } = 0;
@@ -29,12 +28,8 @@ namespace McDermott.Application.Dtos.Inventory
         public virtual TransferStockDto? TransferStock { get; set; }
 
         [SetToNull]
-        public virtual StockProductDto? Stock { get; set; }
-
-        [SetToNull]
         public virtual ProductDto? Product { get; set; }
 
-        [SetToNull]
-        public StockProduct? StockProduct { get; set; }
+       
     }
 }

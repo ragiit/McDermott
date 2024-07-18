@@ -31,9 +31,9 @@ namespace McDermott.Application.Features.Commands.Inventory
 
         #region GET Detail
 
-        public class GetTransferStockDetailQuery(Expression<Func<TransferStockDetail, bool>>? predicate = null, bool removeCache = false) : IRequest<List<TransferStockDetailDto>>
+        public class GetTransferStockLogQuery(Expression<Func<TransferStockLog, bool>>? predicate = null, bool removeCache = false) : IRequest<List<TransferStockLogDto>>
         {
-            public Expression<Func<TransferStockDetail, bool>> Predicate { get; } = predicate!;
+            public Expression<Func<TransferStockLog, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
 
@@ -69,14 +69,14 @@ namespace McDermott.Application.Features.Commands.Inventory
 
         #region CREATE Detail
 
-        public class CreateTransferStockDetailRequest(TransferStockDetailDto TransferStockDetailDto) : IRequest<TransferStockDetailDto>
+        public class CreateTransferStockLogRequest(TransferStockLogDto TransferStockLogDto) : IRequest<TransferStockLogDto>
         {
-            public TransferStockDetailDto TransferStockDetailDto { get; set; } = TransferStockDetailDto;
+            public TransferStockLogDto TransferStockLogDto { get; set; } = TransferStockLogDto;
         }
 
-        public class CreateListTransferStockDetailRequest(List<TransferStockDetailDto> TransferStockDetailDtos) : IRequest<List<TransferStockDetailDto>>
+        public class CreateListTransferStockLogRequest(List<TransferStockLogDto> TransferStockLogDtos) : IRequest<List<TransferStockLogDto>>
         {
-            public List<TransferStockDetailDto> TransferStockDetailDtos { get; set; } = TransferStockDetailDtos;
+            public List<TransferStockLogDto> TransferStockLogDtos { get; set; } = TransferStockLogDtos;
         }
 
         #endregion CREATE Detail
@@ -111,14 +111,14 @@ namespace McDermott.Application.Features.Commands.Inventory
 
         #region Update Detail
 
-        public class UpdateTransferStockDetailRequest(TransferStockDetailDto TransferStockDetailDto) : IRequest<TransferStockDetailDto>
+        public class UpdateTransferStockLogRequest(TransferStockLogDto TransferStockLogDto) : IRequest<TransferStockLogDto>
         {
-            public TransferStockDetailDto TransferStockDetailDto { get; set; } = TransferStockDetailDto;
+            public TransferStockLogDto TransferStockLogDto { get; set; } = TransferStockLogDto;
         }
 
-        public class UpdateListTransferStockDetailRequest(List<TransferStockDetailDto> TransferStockDetailDtos) : IRequest<List<TransferStockDetailDto>>
+        public class UpdateListTransferStockLogRequest(List<TransferStockLogDto> TransferStockLogDtos) : IRequest<List<TransferStockLogDto>>
         {
-            public List<TransferStockDetailDto> TransferStockDetailDtos { get; set; } = TransferStockDetailDtos;
+            public List<TransferStockLogDto> TransferStockLogDtos { get; set; } = TransferStockLogDtos;
         }
 
         #endregion Update Detail
@@ -145,7 +145,7 @@ namespace McDermott.Application.Features.Commands.Inventory
 
         #region DELETE Detail
 
-        public class DeleteTransferStockDetailRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        public class DeleteTransferStockLogRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
             public long Id { get; set; } = id ?? 0;
             public List<long> Ids { get; set; } = ids ?? [];

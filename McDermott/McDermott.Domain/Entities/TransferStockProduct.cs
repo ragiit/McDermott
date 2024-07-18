@@ -8,7 +8,7 @@ namespace McDermott.Domain.Entities
 {
     public class TransferStockProduct : BaseAuditableEntity
     {
-        public long? StockProductId { get; set; }
+        public string? Batch { get; set; }
         public long? TransferStockId { get; set; }        
         public long? ProductId { get; set; }
         public long? QtyStock { get; set; }
@@ -18,9 +18,6 @@ namespace McDermott.Domain.Entities
 
         [SetToNull]
         public Product? Product { get; set; }
-
-        [SetToNull]
-        public StockProduct? StockProduct { get; set; }
         
     }
 }

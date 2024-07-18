@@ -15,12 +15,12 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<UpdateTransferStockProductRequest, TransferStockProductDto>,
         IRequestHandler<UpdateListTransferStockProductRequest, List<TransferStockProductDto>>,
         IRequestHandler<DeleteTransferStockProductRequest, bool>,
-        IRequestHandler<GetTransferStockDetailQuery, List<TransferStockDetailDto>>,
-        IRequestHandler<CreateTransferStockDetailRequest, TransferStockDetailDto>,
-        IRequestHandler<CreateListTransferStockDetailRequest, List<TransferStockDetailDto>>,
-        IRequestHandler<UpdateTransferStockDetailRequest, TransferStockDetailDto>,
-        IRequestHandler<UpdateListTransferStockDetailRequest, List<TransferStockDetailDto>>,
-        IRequestHandler<DeleteTransferStockDetailRequest, bool>
+        IRequestHandler<GetTransferStockLogQuery, List<TransferStockLogDto>>,
+        IRequestHandler<CreateTransferStockLogRequest, TransferStockLogDto>,
+        IRequestHandler<CreateListTransferStockLogRequest, List<TransferStockLogDto>>,
+        IRequestHandler<UpdateTransferStockLogRequest, TransferStockLogDto>,
+        IRequestHandler<UpdateListTransferStockLogRequest, List<TransferStockLogDto>>,
+        IRequestHandler<DeleteTransferStockLogRequest, bool>
         
     {
         #region GET
@@ -100,18 +100,18 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #region GET Detail
 
-        public async Task<List<TransferStockDetailDto>> Handle(GetTransferStockDetailQuery request, CancellationToken cancellationToken)
+        public async Task<List<TransferStockLogDto>> Handle(GetTransferStockLogQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetTransferStockDetailQuery_";
+                string cacheKey = $"GetTransferStockLogQuery_";
 
                 if (request.RemoveCache)
                     _cache.Remove(cacheKey);
 
-                if (!_cache.TryGetValue(cacheKey, out List<TransferStockDetail>? result))
+                if (!_cache.TryGetValue(cacheKey, out List<TransferStockLog>? result))
                 {
-                    result = await _unitOfWork.Repository<TransferStockDetail>().Entities
+                    result = await _unitOfWork.Repository<TransferStockLog>().Entities
                       .Include(x => x.TransferStock)
                       .Include(x => x.Source)
                       .Include(x => x.Destination)
@@ -126,7 +126,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (request.Predicate is not null)
                     result = [.. result.AsQueryable().Where(request.Predicate)];
 
-                return result.ToList().Adapt<List<TransferStockDetailDto>>();
+                return result.ToList().Adapt<List<TransferStockLogDto>>();
             }
             catch (Exception)
             {
@@ -218,17 +218,17 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #region CREATE Detail
 
-        public async Task<TransferStockDetailDto> Handle(CreateTransferStockDetailRequest request, CancellationToken cancellationToken)
+        public async Task<TransferStockLogDto> Handle(CreateTransferStockLogRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<TransferStockDetail>().AddAsync(request.TransferStockDetailDto.Adapt<TransferStockDetail>());
+                var result = await _unitOfWork.Repository<TransferStockLog>().AddAsync(request.TransferStockLogDto.Adapt<TransferStockLog>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetTransferStockDetailQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetTransferStockLogQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<TransferStockDetailDto>();
+                return result.Adapt<TransferStockLogDto>();
             }
             catch (Exception)
             {
@@ -236,17 +236,17 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        public async Task<List<TransferStockDetailDto>> Handle(CreateListTransferStockDetailRequest request, CancellationToken cancellationToken)
+        public async Task<List<TransferStockLogDto>> Handle(CreateListTransferStockLogRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<TransferStockDetail>().AddAsync(request.TransferStockDetailDtos.Adapt<List<TransferStockDetail>>());
+                var result = await _unitOfWork.Repository<TransferStockLog>().AddAsync(request.TransferStockLogDtos.Adapt<List<TransferStockLog>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetTransferStockDetailQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetTransferStockLogQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<List<TransferStockDetailDto>>();
+                return result.Adapt<List<TransferStockLogDto>>();
             }
             catch (Exception)
             {
@@ -338,17 +338,17 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #region UPDATE Detail
 
-        public async Task<TransferStockDetailDto> Handle(UpdateTransferStockDetailRequest request, CancellationToken cancellationToken)
+        public async Task<TransferStockLogDto> Handle(UpdateTransferStockLogRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<TransferStockDetail>().UpdateAsync(request.TransferStockDetailDto.Adapt<TransferStockDetail>());
+                var result = await _unitOfWork.Repository<TransferStockLog>().UpdateAsync(request.TransferStockLogDto.Adapt<TransferStockLog>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetTransferStockDetailQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetTransferStockLogQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<TransferStockDetailDto>();
+                return result.Adapt<TransferStockLogDto>();
             }
             catch (Exception)
             {
@@ -356,17 +356,17 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        public async Task<List<TransferStockDetailDto>> Handle(UpdateListTransferStockDetailRequest request, CancellationToken cancellationToken)
+        public async Task<List<TransferStockLogDto>> Handle(UpdateListTransferStockLogRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<TransferStockDetail>().UpdateAsync(request.TransferStockDetailDtos.Adapt<List<TransferStockDetail>>());
+                var result = await _unitOfWork.Repository<TransferStockLog>().UpdateAsync(request.TransferStockLogDtos.Adapt<List<TransferStockLog>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetTransferStockDetailQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetTransferStockLogQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<List<TransferStockDetailDto>>();
+                return result.Adapt<List<TransferStockLogDto>>();
             }
             catch (Exception)
             {
@@ -438,23 +438,23 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #region DELETE Detail
 
-        public async Task<bool> Handle(DeleteTransferStockDetailRequest request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteTransferStockLogRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (request.Id > 0)
                 {
-                    await _unitOfWork.Repository<TransferStockDetail>().DeleteAsync(request.Id);
+                    await _unitOfWork.Repository<TransferStockLog>().DeleteAsync(request.Id);
                 }
 
                 if (request.Ids.Count > 0)
                 {
-                    await _unitOfWork.Repository<TransferStockDetail>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                    await _unitOfWork.Repository<TransferStockLog>().DeleteAsync(x => request.Ids.Contains(x.Id));
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetTransferStockDetailQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetTransferStockLogQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }

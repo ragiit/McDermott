@@ -1,6 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Domain.Entities;
-using McDermott.Persistence.Migrations;
 using Microsoft.Identity.Client.Extensions.Msal;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using static McDermott.Application.Features.Commands.Inventory.ProductCommand;

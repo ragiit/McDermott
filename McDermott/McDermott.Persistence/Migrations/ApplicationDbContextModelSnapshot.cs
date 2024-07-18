@@ -5009,7 +5009,7 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("TransferStocks");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.TransferStockDetail", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.TransferStockLog", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -5050,7 +5050,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("TransferStockId");
 
-                    b.ToTable("TransferStockDetails");
+                    b.ToTable("TransferStockLogs");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.TransferStockProduct", b =>
@@ -5062,6 +5062,9 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("Batch")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -5072,9 +5075,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<long?>("QtyStock")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("StockProductId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("TransferStockId")
@@ -5089,8 +5089,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("StockProductId");
 
                     b.HasIndex("TransferStockId");
 
@@ -6837,19 +6835,19 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Source");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.TransferStockDetail", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.TransferStockLog", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.Location", "Destination")
                         .WithMany()
                         .HasForeignKey("DestinationId");
 
                     b.HasOne("McDermott.Domain.Entities.Location", "Source")
-                        .WithMany("TransferStockDetail")
+                        .WithMany("TransferStockLog")
                         .HasForeignKey("SourceId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("McDermott.Domain.Entities.TransferStock", "TransferStock")
-                        .WithMany("TransferStockDetail")
+                        .WithMany("TransferStockLog")
                         .HasForeignKey("TransferStockId")
                         .OnDelete(DeleteBehavior.SetNull);
 
@@ -6867,19 +6865,12 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.StockProduct", "StockProduct")
-                        .WithMany()
-                        .HasForeignKey("StockProductId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.TransferStock", "TransferStock")
                         .WithMany("TransferStockProduct")
                         .HasForeignKey("TransferStockId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Product");
-
-                    b.Navigation("StockProduct");
 
                     b.Navigation("TransferStock");
                 });
@@ -7181,7 +7172,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.Navigation("ReorderingRules");
 
-                    b.Navigation("TransferStockDetail");
+                    b.Navigation("TransferStockLog");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Medicament", b =>
@@ -7255,7 +7246,7 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.TransferStock", b =>
                 {
-                    b.Navigation("TransferStockDetail");
+                    b.Navigation("TransferStockLog");
 
                     b.Navigation("TransferStockProduct");
                 });

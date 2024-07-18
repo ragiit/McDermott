@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace McDermott.Domain.Entities
 {
-    public class TransferStockDetail : BaseAuditableEntity
+    public class TransferStockLog : BaseAuditableEntity
     {
         public long? TransferStockId { get; set; }        
         public long? SourceId { get; set; }

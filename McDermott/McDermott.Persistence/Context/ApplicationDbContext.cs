@@ -134,7 +134,7 @@ namespace McDermott.Persistence.Context
         public DbSet<ReceivingStock> ReceivingStocks { get; set; }
         public DbSet<ReceivingLog> ReceivingLogs { get; set; }
         public DbSet<TransferStock> TransferStocks { get; set; }
-        public DbSet<TransferStockDetail> TransferStockDetails { get; set; }
+        public DbSet<TransferStockLog> TransferStockLogs { get; set; }
         public DbSet<PharmacyLog> PharmacyLogs { get; set; }
         public DbSet<SickLeave> SickLeaves { get; set; }
         public DbSet<StockOutPrescription> StockOutPrescriptions { get; set; }
@@ -215,14 +215,14 @@ namespace McDermott.Persistence.Context
                .WithMany(x => x.GeneralConsultantClinicalAssesments)
                .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<TransferStockDetail>()
+            modelBuilder.Entity<TransferStockLog>()
                 .HasOne(h => h.TransferStock)
-                .WithMany(x => x.TransferStockDetail)
+                .WithMany(x => x.TransferStockLog)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<TransferStockDetail>()
+            modelBuilder.Entity<TransferStockLog>()
                 .HasOne(h => h.Source)
-                .WithMany(x => x.TransferStockDetail)
+                .WithMany(x => x.TransferStockLog)
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Medicament>()

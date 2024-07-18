@@ -6,11 +6,48 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace McDermott.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialAdd : Migration
+    public partial class AddInitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Allergies",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    KdAllergy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NmAllergy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Allergies", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Awarenesses",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    KdSadar = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NmSadar = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Awarenesses", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "BpjsClassifications",
                 columns: table => new
@@ -259,9 +296,10 @@ namespace McDermott.Persistence.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsBPJS = table.Column<bool>(type: "bit", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsBPJSKesehatan = table.Column<bool>(type: "bit", nullable: false),
+                    IsBPJSTK = table.Column<bool>(type: "bit", nullable: false),
                     AdminFee = table.Column<long>(type: "bigint", nullable: true),
                     Presentase = table.Column<long>(type: "bigint", nullable: true),
                     AdminFeeMax = table.Column<long>(type: "bigint", nullable: true),
@@ -395,6 +433,7 @@ namespace McDermott.Persistence.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CostingMethod = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InventoryValuation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -405,23 +444,6 @@ namespace McDermott.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductCategories", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -488,6 +510,7 @@ namespace McDermott.Persistence.Migrations
                     Quota = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsPatient = table.Column<bool>(type: "bit", nullable: false),
                     IsKiosk = table.Column<bool>(type: "bit", nullable: false),
+                    IsMcu = table.Column<bool>(type: "bit", nullable: false),
                     ServicedId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -538,6 +561,24 @@ namespace McDermott.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Specialities", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SystemParameters",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Key = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SystemParameters", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -623,6 +664,8 @@ namespace McDermott.Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DrugRouteId = table.Column<long>(type: "bigint", nullable: true),
                     Frequency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TotalQtyPerDay = table.Column<float>(type: "real", nullable: false),
+                    Days = table.Column<float>(type: "real", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -681,14 +724,9 @@ namespace McDermott.Persistence.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SampleTypeId = table.Column<long>(type: "bigint", nullable: true),
-                    LabUomId = table.Column<long>(type: "bigint", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ResultType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Parameter = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NormalRangeMale = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NormalRangeFemale = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ResultValueType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Remark = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -698,17 +736,11 @@ namespace McDermott.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_LabTests", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_LabTests_LabUoms_LabUomId",
-                        column: x => x.LabUomId,
-                        principalTable: "LabUoms",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_LabTests_SampleTypes_SampleTypeId",
                         column: x => x.SampleTypeId,
                         principalTable: "SampleTypes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -745,7 +777,6 @@ namespace McDermott.Persistence.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UomCategoryId = table.Column<long>(type: "bigint", nullable: true),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Multiple = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BiggerRatio = table.Column<float>(type: "real", nullable: true),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     RoundingPrecision = table.Column<float>(type: "real", nullable: true),
@@ -790,6 +821,43 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LabTestDetails",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LabTestId = table.Column<long>(type: "bigint", nullable: true),
+                    LabUomId = table.Column<long>(type: "bigint", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResultType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Parameter = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalRangeMale = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalRangeFemale = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResultValueType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Remark = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LabTestDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LabTestDetails_LabTests_LabTestId",
+                        column: x => x.LabTestId,
+                        principalTable: "LabTests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LabTestDetails_LabUoms_LabUomId",
+                        column: x => x.LabUomId,
+                        principalTable: "LabUoms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DoctorScheduleDetails",
                 columns: table => new
                 {
@@ -816,56 +884,6 @@ namespace McDermott.Persistence.Migrations
                         principalTable: "DoctorSchedules",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Medicaments",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductId = table.Column<long>(type: "bigint", nullable: true),
-                    SignaId = table.Column<long>(type: "bigint", nullable: true),
-                    RouteId = table.Column<long>(type: "bigint", nullable: true),
-                    UomId = table.Column<long>(type: "bigint", nullable: true),
-                    ActiveComponentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PregnancyWarning = table.Column<bool>(type: "bit", nullable: true),
-                    Cronies = table.Column<bool>(type: "bit", nullable: true),
-                    MontlyMax = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Form = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Dosage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Medicaments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Medicaments_DrugRoutes_RouteId",
-                        column: x => x.RouteId,
-                        principalTable: "DrugRoutes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_Medicaments_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_Medicaments_Signas_SignaId",
-                        column: x => x.SignaId,
-                        principalTable: "Signas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_Medicaments_Uoms_UomId",
-                        column: x => x.UomId,
-                        principalTable: "Uoms",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -992,96 +1010,6 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ActiveComponents",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UomId = table.Column<long>(type: "bigint", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AmountOfComponent = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MedicamentId = table.Column<long>(type: "bigint", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ActiveComponents", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ActiveComponents_Medicaments_MedicamentId",
-                        column: x => x.MedicamentId,
-                        principalTable: "Medicaments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ActiveComponents_Uoms_UomId",
-                        column: x => x.UomId,
-                        principalTable: "Uoms",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GeneralInformations",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductId = table.Column<long>(type: "bigint", nullable: true),
-                    BpjsClassificationId = table.Column<long>(type: "bigint", nullable: true),
-                    UomId = table.Column<long>(type: "bigint", nullable: true),
-                    ProductCategoryId = table.Column<long>(type: "bigint", nullable: true),
-                    CompanyId = table.Column<long>(type: "bigint", nullable: true),
-                    PurchaseUom = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProductType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    InputType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SalesPrice = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Tax = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Cost = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    InternalReference = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GeneralInformations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_GeneralInformations_BpjsClassifications_BpjsClassificationId",
-                        column: x => x.BpjsClassificationId,
-                        principalTable: "BpjsClassifications",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_GeneralInformations_Companies_CompanyId",
-                        column: x => x.CompanyId,
-                        principalTable: "Companies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_GeneralInformations_ProductCategories_ProductCategoryId",
-                        column: x => x.ProductCategoryId,
-                        principalTable: "ProductCategories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_GeneralInformations_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_GeneralInformations_Uoms_UomId",
-                        column: x => x.UomId,
-                        principalTable: "Uoms",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Locations",
                 columns: table => new
                 {
@@ -1109,6 +1037,65 @@ namespace McDermott.Persistence.Migrations
                         name: "FK_Locations_Locations_ParentLocationId",
                         column: x => x.ParentLocationId,
                         principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Products",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BpjsClassificationId = table.Column<long>(type: "bigint", nullable: true),
+                    UomId = table.Column<long>(type: "bigint", nullable: true),
+                    ProductCategoryId = table.Column<long>(type: "bigint", nullable: true),
+                    CompanyId = table.Column<long>(type: "bigint", nullable: true),
+                    PurchaseUomId = table.Column<long>(type: "bigint", nullable: true),
+                    TraceAbility = table.Column<bool>(type: "bit", nullable: false),
+                    ProductType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HospitalType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SalesPrice = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Tax = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Cost = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    InternalReference = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Products_BpjsClassifications_BpjsClassificationId",
+                        column: x => x.BpjsClassificationId,
+                        principalTable: "BpjsClassifications",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Products_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Products_ProductCategories_ProductCategoryId",
+                        column: x => x.ProductCategoryId,
+                        principalTable: "ProductCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Products_Uoms_PurchaseUomId",
+                        column: x => x.PurchaseUomId,
+                        principalTable: "Uoms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Products_Uoms_UomId",
+                        column: x => x.UomId,
+                        principalTable: "Uoms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1178,6 +1165,67 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InventoryAdjusments",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LocationId = table.Column<long>(type: "bigint", nullable: true),
+                    CompanyId = table.Column<long>(type: "bigint", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InventoryAdjusments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InventoryAdjusments_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_InventoryAdjusments_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReceivingStocks",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DestinationId = table.Column<long>(type: "bigint", nullable: true),
+                    SchenduleDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    KodeReceiving = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NumberPurchase = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Reference = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReceivingStocks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReceivingStocks_Locations_DestinationId",
+                        column: x => x.DestinationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ReorderingRules",
                 columns: table => new
                 {
@@ -1211,6 +1259,122 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Medicaments",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<long>(type: "bigint", nullable: true),
+                    FrequencyId = table.Column<long>(type: "bigint", nullable: true),
+                    RouteId = table.Column<long>(type: "bigint", nullable: true),
+                    FormId = table.Column<long>(type: "bigint", nullable: true),
+                    UomId = table.Column<long>(type: "bigint", nullable: true),
+                    ActiveComponentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PregnancyWarning = table.Column<bool>(type: "bit", nullable: true),
+                    Pharmacologi = table.Column<bool>(type: "bit", nullable: true),
+                    Weather = table.Column<bool>(type: "bit", nullable: true),
+                    Food = table.Column<bool>(type: "bit", nullable: true),
+                    Cronies = table.Column<bool>(type: "bit", nullable: true),
+                    MontlyMax = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Dosage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SignaId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Medicaments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Medicaments_DrugDosages_FrequencyId",
+                        column: x => x.FrequencyId,
+                        principalTable: "DrugDosages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Medicaments_DrugRoutes_RouteId",
+                        column: x => x.RouteId,
+                        principalTable: "DrugRoutes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Medicaments_FormDrugs_FormId",
+                        column: x => x.FormId,
+                        principalTable: "FormDrugs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Medicaments_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Medicaments_Signas_SignaId",
+                        column: x => x.SignaId,
+                        principalTable: "Signas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Medicaments_Uoms_UomId",
+                        column: x => x.UomId,
+                        principalTable: "Uoms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StockProducts",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<long>(type: "bigint", nullable: true),
+                    Qty = table.Column<long>(type: "bigint", nullable: true),
+                    SourceId = table.Column<long>(type: "bigint", nullable: true),
+                    DestinanceId = table.Column<long>(type: "bigint", nullable: true),
+                    UomId = table.Column<long>(type: "bigint", nullable: true),
+                    StatusTransaction = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Batch = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Referency = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Expired = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockProducts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StockProducts_Locations_DestinanceId",
+                        column: x => x.DestinanceId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_StockProducts_Locations_SourceId",
+                        column: x => x.SourceId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_StockProducts_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_StockProducts_Uoms_UomId",
+                        column: x => x.UomId,
+                        principalTable: "Uoms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BuildingLocations",
                 columns: table => new
                 {
@@ -1236,6 +1400,571 @@ namespace McDermott.Persistence.Migrations
                         name: "FK_BuildingLocations_Locations_LocationId",
                         column: x => x.LocationId,
                         principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransactionStocks",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SourceTable = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SourcTableId = table.Column<long>(type: "bigint", nullable: true),
+                    ProductId = table.Column<long>(type: "bigint", nullable: true),
+                    Reference = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Batch = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExpiredDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    SourceId = table.Column<long>(type: "bigint", nullable: true),
+                    DestinationId = table.Column<long>(type: "bigint", nullable: true),
+                    Quantity = table.Column<long>(type: "bigint", nullable: true),
+                    UomId = table.Column<long>(type: "bigint", nullable: true),
+                    Validate = table.Column<bool>(type: "bit", nullable: true),
+                    InventoryAdjusmentId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransactionStocks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TransactionStocks_InventoryAdjusments_InventoryAdjusmentId",
+                        column: x => x.InventoryAdjusmentId,
+                        principalTable: "InventoryAdjusments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TransactionStocks_Locations_DestinationId",
+                        column: x => x.DestinationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TransactionStocks_Locations_SourceId",
+                        column: x => x.SourceId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TransactionStocks_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TransactionStocks_Uoms_UomId",
+                        column: x => x.UomId,
+                        principalTable: "Uoms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReceivingStockDetails",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ReceivingStockId = table.Column<long>(type: "bigint", nullable: true),
+                    ProductId = table.Column<long>(type: "bigint", nullable: true),
+                    Qty = table.Column<long>(type: "bigint", nullable: true),
+                    Batch = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExpiredDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    StockId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReceivingStockDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReceivingStockDetails_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_ReceivingStockDetails_ReceivingStocks_ReceivingStockId",
+                        column: x => x.ReceivingStockId,
+                        principalTable: "ReceivingStocks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ReceivingStockDetails_StockProducts_StockId",
+                        column: x => x.StockId,
+                        principalTable: "StockProducts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransferStocks",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SourceId = table.Column<long>(type: "bigint", nullable: true),
+                    DestinationId = table.Column<long>(type: "bigint", nullable: true),
+                    SchenduleDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    KodeTransaksi = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    Reference = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StockRequest = table.Column<bool>(type: "bit", nullable: true),
+                    StockProductId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransferStocks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TransferStocks_Locations_DestinationId",
+                        column: x => x.DestinationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TransferStocks_Locations_SourceId",
+                        column: x => x.SourceId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TransferStocks_StockProducts_StockProductId",
+                        column: x => x.StockProductId,
+                        principalTable: "StockProducts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InventoryAdjusmentDetails",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StockProductId = table.Column<long>(type: "bigint", nullable: true),
+                    TransactionStockId = table.Column<long>(type: "bigint", nullable: true),
+                    InventoryAdjusmentId = table.Column<long>(type: "bigint", nullable: false),
+                    ProductId = table.Column<long>(type: "bigint", nullable: true),
+                    ExpiredDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TeoriticalQty = table.Column<long>(type: "bigint", nullable: false),
+                    Batch = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RealQty = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InventoryAdjusmentDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InventoryAdjusmentDetails_InventoryAdjusments_InventoryAdjusmentId",
+                        column: x => x.InventoryAdjusmentId,
+                        principalTable: "InventoryAdjusments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_InventoryAdjusmentDetails_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_InventoryAdjusmentDetails_StockProducts_StockProductId",
+                        column: x => x.StockProductId,
+                        principalTable: "StockProducts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_InventoryAdjusmentDetails_TransactionStocks_TransactionStockId",
+                        column: x => x.TransactionStockId,
+                        principalTable: "TransactionStocks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransferStockLogs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TransferStockId = table.Column<long>(type: "bigint", nullable: true),
+                    SourceId = table.Column<long>(type: "bigint", nullable: true),
+                    DestinationId = table.Column<long>(type: "bigint", nullable: true),
+                    StatusTransfer = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransferStockLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TransferStockLogs_Locations_DestinationId",
+                        column: x => x.DestinationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_TransferStockLogs_Locations_SourceId",
+                        column: x => x.SourceId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_TransferStockLogs_TransferStocks_TransferStockId",
+                        column: x => x.TransferStockId,
+                        principalTable: "TransferStocks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransferStockProduct",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Batch = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransferStockId = table.Column<long>(type: "bigint", nullable: true),
+                    ProductId = table.Column<long>(type: "bigint", nullable: true),
+                    QtyStock = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransferStockProduct", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TransferStockProduct_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TransferStockProduct_TransferStocks_TransferStockId",
+                        column: x => x.TransferStockId,
+                        principalTable: "TransferStocks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Accidents",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GeneralConsultanServiceId = table.Column<long>(type: "bigint", nullable: false),
+                    SafetyPersonnelId = table.Column<long>(type: "bigint", nullable: false),
+                    DateOfOccurrence = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateOfFirstTreatment = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RibbonSpecialCase = table.Column<bool>(type: "bit", nullable: false),
+                    Sent = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeClass = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EstimatedDisability = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AreaOfYard = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    EmployeeDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AccidentLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury3 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury5 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury6 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury7 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury8 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury9 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury10 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury11 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury12 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury13 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedEmployeeCauseOfInjury14 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EmployeeCauseOfInjury1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury9 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury10 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury11 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury12 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury13 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeCauseOfInjury14 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SelectedNatureOfInjury1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedNatureOfInjury2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedNatureOfInjury3 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedNatureOfInjury4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedNatureOfInjury5 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedNatureOfInjury6 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedNatureOfInjury7 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedNatureOfInjury8 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NatureOfInjury1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NatureOfInjury2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NatureOfInjury3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NatureOfInjury4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NatureOfInjury5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NatureOfInjury6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NatureOfInjury7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NatureOfInjury8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SelectedPartOfBody1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedPartOfBody2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedPartOfBody3 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedPartOfBody4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedPartOfBody5 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedPartOfBody6 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedPartOfBody7 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedPartOfBody8 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedPartOfBody9 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedPartOfBody10 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedPartOfBody11 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedPartOfBody12 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PartOfBody1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartOfBody2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartOfBody3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartOfBody4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartOfBody5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartOfBody6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartOfBody7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartOfBody8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartOfBody9 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartOfBody10 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartOfBody11 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartOfBody12 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SelectedTreatment1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedTreatment2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedTreatment3 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedTreatment4 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedTreatment5 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedTreatment6 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedTreatment7 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Treatment1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Treatment2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Treatment3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Treatment4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Treatment5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Treatment6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Treatment7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeId = table.Column<long>(type: "bigint", nullable: true),
+                    DepartmentId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Accidents", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ActiveComponentMedicamentGroupDetail",
+                columns: table => new
+                {
+                    ActiveComponentId = table.Column<long>(type: "bigint", nullable: false),
+                    MedicamentGroupDetailsId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ActiveComponentMedicamentGroupDetail", x => new { x.ActiveComponentId, x.MedicamentGroupDetailsId });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ActiveComponents",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UomId = table.Column<long>(type: "bigint", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AmountOfComponent = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcoctionLineId = table.Column<long>(type: "bigint", nullable: true),
+                    MedicamentId = table.Column<long>(type: "bigint", nullable: true),
+                    PrescriptionId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ActiveComponents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ActiveComponents_Medicaments_MedicamentId",
+                        column: x => x.MedicamentId,
+                        principalTable: "Medicaments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ActiveComponents_Uoms_UomId",
+                        column: x => x.UomId,
+                        principalTable: "Uoms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BPJSIntegrations",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    InsurancePolicyId = table.Column<long>(type: "bigint", nullable: true),
+                    NoKartu = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Nama = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HubunganKeluarga = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Sex = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TglLahir = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TglMulaiAktif = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TglAkhirBerlaku = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    GolDarah = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NoHP = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NoKTP = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PstProl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PstPrb = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Aktif = table.Column<bool>(type: "bit", nullable: false),
+                    KetAktif = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Tunggakan = table.Column<int>(type: "int", nullable: false),
+                    KdProviderPstKdProvider = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    KdProviderPstNmProvider = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    KdProviderGigiKdProvider = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    KdProviderGigiNmProvider = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    JnsKelasNama = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    JnsKelasKode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    JnsPesertaNama = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    JnsPesertaKode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AsuransiKdAsuransi = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AsuransiNmAsuransi = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AsuransiNoAsuransi = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AsuransiCob = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BPJSIntegrations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ConcoctionLines",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ConcoctionId = table.Column<long>(type: "bigint", nullable: true),
+                    ProductId = table.Column<long>(type: "bigint", nullable: true),
+                    ActiveComponentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UomId = table.Column<long>(type: "bigint", nullable: true),
+                    MedicamentDosage = table.Column<long>(type: "bigint", nullable: true),
+                    MedicamentUnitOfDosage = table.Column<long>(type: "bigint", nullable: true),
+                    Qty = table.Column<long>(type: "bigint", nullable: true),
+                    TotalQty = table.Column<long>(type: "bigint", nullable: true),
+                    AvaliableQty = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ConcoctionLines", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ConcoctionLines_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ConcoctionLines_Uoms_UomId",
+                        column: x => x.UomId,
+                        principalTable: "Uoms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StockOutLines",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LinesId = table.Column<long>(type: "bigint", nullable: true),
+                    StockId = table.Column<long>(type: "bigint", nullable: true),
+                    CutStock = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockOutLines", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StockOutLines_ConcoctionLines_LinesId",
+                        column: x => x.LinesId,
+                        principalTable: "ConcoctionLines",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_StockOutLines_StockProducts_StockId",
+                        column: x => x.StockId,
+                        principalTable: "StockProducts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Concoctions",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PharmacyId = table.Column<long>(type: "bigint", nullable: true),
+                    MedicamentGroupId = table.Column<long>(type: "bigint", nullable: true),
+                    PractitionerId = table.Column<long>(type: "bigint", nullable: true),
+                    DrugFormId = table.Column<long>(type: "bigint", nullable: true),
+                    UomId = table.Column<long>(type: "bigint", nullable: true),
+                    Qty = table.Column<long>(type: "bigint", nullable: true),
+                    QtyByDay = table.Column<long>(type: "bigint", nullable: true),
+                    Day = table.Column<long>(type: "bigint", nullable: true),
+                    TotalQty = table.Column<long>(type: "bigint", nullable: true),
+                    MedicamenName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Concoctions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Concoctions_FormDrugs_DrugFormId",
+                        column: x => x.DrugFormId,
+                        principalTable: "FormDrugs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Concoctions_Uoms_UomId",
+                        column: x => x.UomId,
+                        principalTable: "Uoms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1454,21 +2183,27 @@ namespace McDermott.Persistence.Migrations
                     DoctorCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EmployeeCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DegreeId = table.Column<long>(type: "bigint", nullable: true),
-                    IsEmployee = table.Column<bool>(type: "bit", nullable: true),
-                    IsPatient = table.Column<bool>(type: "bit", nullable: true),
-                    IsUser = table.Column<bool>(type: "bit", nullable: true),
-                    IsDoctor = table.Column<bool>(type: "bit", nullable: true),
-                    IsPhysicion = table.Column<bool>(type: "bit", nullable: true),
-                    IsNurse = table.Column<bool>(type: "bit", nullable: true),
+                    IsEmployee = table.Column<bool>(type: "bit", nullable: false),
+                    IsPatient = table.Column<bool>(type: "bit", nullable: false),
+                    IsUser = table.Column<bool>(type: "bit", nullable: false),
+                    IsDoctor = table.Column<bool>(type: "bit", nullable: false),
+                    IsPhysicion = table.Column<bool>(type: "bit", nullable: false),
+                    IsNurse = table.Column<bool>(type: "bit", nullable: false),
+                    IsPharmacy = table.Column<bool>(type: "bit", nullable: false),
+                    IsMcu = table.Column<bool>(type: "bit", nullable: false),
+                    IsHr = table.Column<bool>(type: "bit", nullable: false),
+                    PhysicanCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsEmployeeRelation = table.Column<bool>(type: "bit", nullable: true),
                     EmployeeType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EmployeeStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     JoinDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    NIP = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Legacy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SAP = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Oracle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NIP = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Legacy = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    SAP = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Oracle = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     DoctorServiceIds = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PatientAllergyIds = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SupervisorId = table.Column<long>(type: "bigint", nullable: true),
                     EmailTemplateId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1571,6 +2306,12 @@ namespace McDermott.Persistence.Migrations
                         name: "FK_Users_Specialities_SpecialityId",
                         column: x => x.SpecialityId,
                         principalTable: "Specialities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Users_Users_SupervisorId",
+                        column: x => x.SupervisorId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1736,8 +2477,11 @@ namespace McDermott.Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     Farmacology = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FarmacologiCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Weather = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WeatherCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Food = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FoodCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -1751,7 +2495,7 @@ namespace McDermott.Persistence.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1787,6 +2531,44 @@ namespace McDermott.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_PatientFamilyRelations_Users_PatientId",
                         column: x => x.PatientId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReceivingLogs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ReceivingId = table.Column<long>(type: "bigint", nullable: true),
+                    SourceId = table.Column<long>(type: "bigint", nullable: true),
+                    UserById = table.Column<long>(type: "bigint", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReceivingLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReceivingLogs_Locations_SourceId",
+                        column: x => x.SourceId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ReceivingLogs_ReceivingStocks_ReceivingId",
+                        column: x => x.ReceivingId,
+                        principalTable: "ReceivingStocks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ReceivingLogs_Users_UserById",
+                        column: x => x.UserById,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -1849,17 +2631,17 @@ namespace McDermott.Persistence.Migrations
                     MedicamentId = table.Column<long>(type: "bigint", nullable: true),
                     ActiveComponentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SignaId = table.Column<long>(type: "bigint", nullable: true),
-                    RegimentOfUseId = table.Column<long>(type: "bigint", nullable: true),
+                    FrequencyId = table.Column<long>(type: "bigint", nullable: true),
+                    UnitOfDosageId = table.Column<long>(type: "bigint", nullable: true),
+                    Dosage = table.Column<long>(type: "bigint", nullable: true),
+                    QtyByDay = table.Column<long>(type: "bigint", nullable: true),
+                    Days = table.Column<long>(type: "bigint", nullable: true),
+                    TotalQty = table.Column<long>(type: "bigint", nullable: true),
                     AllowSubtitation = table.Column<bool>(type: "bit", nullable: true),
                     MedicaneUnitDosage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MedicaneDosage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Dosage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    QtyByDay = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Days = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TotalQty = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MedicaneName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UoMId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -1869,21 +2651,91 @@ namespace McDermott.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_MedicamentGroupDetails", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_MedicamentGroupDetails_DrugDosages_FrequencyId",
+                        column: x => x.FrequencyId,
+                        principalTable: "DrugDosages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_MedicamentGroupDetails_MedicamentGroups_MedicamentGroupId",
                         column: x => x.MedicamentGroupId,
                         principalTable: "MedicamentGroups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MedicamentGroupDetails_Medicaments_MedicamentId",
+                        name: "FK_MedicamentGroupDetails_Products_MedicamentId",
                         column: x => x.MedicamentId,
-                        principalTable: "Medicaments",
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MedicamentGroupDetails_Uoms_UoMId",
-                        column: x => x.UoMId,
+                        name: "FK_MedicamentGroupDetails_Signas_SignaId",
+                        column: x => x.SignaId,
+                        principalTable: "Signas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MedicamentGroupDetails_Uoms_UnitOfDosageId",
+                        column: x => x.UnitOfDosageId,
                         principalTable: "Uoms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Pharmacies",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PatientId = table.Column<long>(type: "bigint", nullable: true),
+                    PractitionerId = table.Column<long>(type: "bigint", nullable: true),
+                    PrescriptionLocationId = table.Column<long>(type: "bigint", nullable: true),
+                    MedicamentGroupId = table.Column<long>(type: "bigint", nullable: true),
+                    ServiceId = table.Column<long>(type: "bigint", nullable: true),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReceiptDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsWeather = table.Column<bool>(type: "bit", nullable: false),
+                    IsFarmacologi = table.Column<bool>(type: "bit", nullable: false),
+                    IsFood = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    LocationId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pharmacies", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Pharmacies_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Pharmacies_MedicamentGroups_MedicamentGroupId",
+                        column: x => x.MedicamentGroupId,
+                        principalTable: "MedicamentGroups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Pharmacies_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Pharmacies_Users_PatientId",
+                        column: x => x.PatientId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Pharmacies_Users_PractitionerId",
+                        column: x => x.PractitionerId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1896,29 +2748,72 @@ namespace McDermott.Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     KioskQueueId = table.Column<long>(type: "bigint", nullable: true),
                     PatientId = table.Column<long>(type: "bigint", nullable: true),
-                    InsuranceId = table.Column<long>(type: "bigint", nullable: true),
                     InsurancePolicyId = table.Column<long>(type: "bigint", nullable: true),
                     ServiceId = table.Column<long>(type: "bigint", nullable: true),
                     PratitionerId = table.Column<long>(type: "bigint", nullable: true),
                     ClassTypeId = table.Column<long>(type: "bigint", nullable: true),
-                    StagingStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Method = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AdmissionQueue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Payment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NoRM = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IdentityNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BirthDay = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TypeRegistration = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HomeStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TypeMedical = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ScheduleTime = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsAlertInformationSpecialCase = table.Column<bool>(type: "bit", nullable: false),
                     IsSickLeave = table.Column<bool>(type: "bit", nullable: false),
+                    IsMaternityLeave = table.Column<bool>(type: "bit", nullable: false),
                     StartDateSickLeave = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDateSickLeave = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    StartMaternityLeave = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndMaternityLeave = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    AppoimentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AppointmentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     WorkFrom = table.Column<TimeSpan>(type: "time", nullable: true),
                     WorkTo = table.Column<TimeSpan>(type: "time", nullable: true),
+                    SerialNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReferVerticalKhususCategoryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReferVerticalKhususCategoryCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReferVerticalSpesialisParentSpesialisName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReferVerticalSpesialisParentSpesialisCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReferVerticalSpesialisParentSubSpesialisName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReferVerticalSpesialisParentSubSpesialisCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReferReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsSarana = table.Column<bool>(type: "bit", nullable: true),
+                    ReferVerticalSpesialisSaranaName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReferVerticalSpesialisSaranaCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PPKRujukanName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PPKRujukanCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReferDateVisit = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    MedexType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsMcu = table.Column<bool>(type: "bit", nullable: false),
+                    IsBatam = table.Column<bool>(type: "bit", nullable: false),
+                    IsOutsideBatam = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    StatusMCU = table.Column<int>(type: "int", nullable: false),
+                    McuExaminationDocs = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    McuExaminationBase64 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AccidentExaminationDocs = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AccidentExaminationBase64 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Weight = table.Column<double>(type: "float", nullable: false),
+                    Height = table.Column<double>(type: "float", nullable: false),
+                    RR = table.Column<long>(type: "bigint", nullable: false),
+                    Temp = table.Column<long>(type: "bigint", nullable: false),
+                    HR = table.Column<long>(type: "bigint", nullable: false),
+                    PainScale = table.Column<long>(type: "bigint", nullable: false),
+                    Systolic = table.Column<long>(type: "bigint", nullable: false),
+                    DiastolicBP = table.Column<long>(type: "bigint", nullable: false),
+                    SpO2 = table.Column<long>(type: "bigint", nullable: false),
+                    Sistole = table.Column<long>(type: "bigint", nullable: false),
+                    Diastole = table.Column<long>(type: "bigint", nullable: false),
+                    WaistCircumference = table.Column<long>(type: "bigint", nullable: false),
+                    BMIIndex = table.Column<double>(type: "float", nullable: false),
+                    BMIIndexString = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BMIState = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClinicVisitTypes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AwarenessId = table.Column<long>(type: "bigint", nullable: true),
+                    E = table.Column<long>(type: "bigint", nullable: false),
+                    V = table.Column<long>(type: "bigint", nullable: false),
+                    M = table.Column<long>(type: "bigint", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -1927,6 +2822,12 @@ namespace McDermott.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_GeneralConsultanServices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultanServices_Awarenesses_AwarenessId",
+                        column: x => x.AwarenessId,
+                        principalTable: "Awarenesses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_GeneralConsultanServices_ClassTypes_ClassTypeId",
                         column: x => x.ClassTypeId,
@@ -1937,12 +2838,6 @@ namespace McDermott.Persistence.Migrations
                         name: "FK_GeneralConsultanServices_InsurancePolicies_InsurancePolicyId",
                         column: x => x.InsurancePolicyId,
                         principalTable: "InsurancePolicies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_GeneralConsultanServices_Insurances_InsuranceId",
-                        column: x => x.InsuranceId,
-                        principalTable: "Insurances",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1967,6 +2862,110 @@ namespace McDermott.Persistence.Migrations
                         name: "FK_GeneralConsultanServices_Users_PratitionerId",
                         column: x => x.PratitionerId,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PharmacyLogs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PharmacyId = table.Column<long>(type: "bigint", nullable: true),
+                    UserById = table.Column<long>(type: "bigint", nullable: true),
+                    status = table.Column<int>(type: "int", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PharmacyLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PharmacyLogs_Pharmacies_PharmacyId",
+                        column: x => x.PharmacyId,
+                        principalTable: "Pharmacies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PharmacyLogs_Users_UserById",
+                        column: x => x.UserById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Prescriptions",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PharmacyId = table.Column<long>(type: "bigint", nullable: false),
+                    DrugFromId = table.Column<long>(type: "bigint", nullable: true),
+                    DrugRouteId = table.Column<long>(type: "bigint", nullable: true),
+                    DrugDosageId = table.Column<long>(type: "bigint", nullable: true),
+                    ProductId = table.Column<long>(type: "bigint", nullable: true),
+                    UomId = table.Column<long>(type: "bigint", nullable: true),
+                    ActiveComponentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DosageFrequency = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Stock = table.Column<long>(type: "bigint", nullable: true),
+                    Dosage = table.Column<long>(type: "bigint", nullable: true),
+                    GivenAmount = table.Column<long>(type: "bigint", nullable: true),
+                    PriceUnit = table.Column<long>(type: "bigint", nullable: true),
+                    DrugFormId = table.Column<long>(type: "bigint", nullable: true),
+                    SignaId = table.Column<long>(type: "bigint", nullable: true),
+                    MedicamentGroupId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Prescriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_DrugDosages_DrugDosageId",
+                        column: x => x.DrugDosageId,
+                        principalTable: "DrugDosages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_DrugRoutes_DrugRouteId",
+                        column: x => x.DrugRouteId,
+                        principalTable: "DrugRoutes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_FormDrugs_DrugFormId",
+                        column: x => x.DrugFormId,
+                        principalTable: "FormDrugs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_MedicamentGroups_MedicamentGroupId",
+                        column: x => x.MedicamentGroupId,
+                        principalTable: "MedicamentGroups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_Pharmacies_PharmacyId",
+                        column: x => x.PharmacyId,
+                        principalTable: "Pharmacies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_Signas_SignaId",
+                        column: x => x.SignaId,
+                        principalTable: "Signas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -2022,16 +3021,80 @@ namespace McDermott.Persistence.Migrations
                     DrugEximinationAttachment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DrugNegative = table.Column<bool>(type: "bit", nullable: true),
                     DrugPositive = table.Column<bool>(type: "bit", nullable: true),
+                    AmphetaminesNegative = table.Column<bool>(type: "bit", nullable: true),
+                    AmphetaminesPositive = table.Column<bool>(type: "bit", nullable: true),
+                    BenzodiazepinesNegative = table.Column<bool>(type: "bit", nullable: true),
+                    BenzodiazepinesPositive = table.Column<bool>(type: "bit", nullable: true),
+                    CocaineMetabolitesNegative = table.Column<bool>(type: "bit", nullable: true),
+                    CocaineMetabolitesPositive = table.Column<bool>(type: "bit", nullable: true),
+                    OpiatesNegative = table.Column<bool>(type: "bit", nullable: true),
+                    OpiatesPositive = table.Column<bool>(type: "bit", nullable: true),
+                    MethamphetaminesNegative = table.Column<bool>(type: "bit", nullable: true),
+                    MethamphetaminesPositive = table.Column<bool>(type: "bit", nullable: true),
+                    THCCannabinoidMarijuanaNegative = table.Column<bool>(type: "bit", nullable: true),
+                    THCCannabinoidMarijuanaPositive = table.Column<bool>(type: "bit", nullable: true),
+                    OtherExaminationAttachment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ECGAttachment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsOtherExaminationECG = table.Column<bool>(type: "bit", nullable: false),
+                    OtherExaminationTypeECG = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OtherExaminationRemarkECG = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PractitionerECGId = table.Column<long>(type: "bigint", nullable: true),
                     IsNormalRestingECG = table.Column<bool>(type: "bit", nullable: false),
                     IsSinusRhythm = table.Column<bool>(type: "bit", nullable: false),
                     IsSinusBradycardia = table.Column<bool>(type: "bit", nullable: false),
                     IsSinusTachycardia = table.Column<bool>(type: "bit", nullable: false),
-                    IsVentriculatExtraSystole = table.Column<bool>(type: "bit", nullable: false),
-                    IsSupraventricularExtraSystole = table.Column<bool>(type: "bit", nullable: false),
+                    EmployeeId = table.Column<long>(type: "bigint", nullable: true),
+                    IsFirstTimeEnteringConfinedSpace = table.Column<bool>(type: "bit", nullable: false),
+                    EnteringConfinedSpaceCount = table.Column<long>(type: "bigint", nullable: false),
+                    IsDefectiveSenseOfSmell = table.Column<bool>(type: "bit", nullable: false),
+                    IsAsthmaOrLungAilment = table.Column<bool>(type: "bit", nullable: false),
+                    IsBackPainOrLimitationOfMobility = table.Column<bool>(type: "bit", nullable: false),
+                    IsClaustrophobia = table.Column<bool>(type: "bit", nullable: false),
+                    IsDiabetesOrHypoglycemia = table.Column<bool>(type: "bit", nullable: false),
+                    IsEyesightProblem = table.Column<bool>(type: "bit", nullable: false),
+                    IsFaintingSpellOrSeizureOrEpilepsy = table.Column<bool>(type: "bit", nullable: false),
+                    IsHearingDisorder = table.Column<bool>(type: "bit", nullable: false),
+                    IsHeartDiseaseOrDisorder = table.Column<bool>(type: "bit", nullable: false),
+                    IsHighBloodPressure = table.Column<bool>(type: "bit", nullable: false),
+                    IsLowerLimbsDeformity = table.Column<bool>(type: "bit", nullable: false),
+                    IsMeniereDiseaseOrVertigo = table.Column<bool>(type: "bit", nullable: false),
+                    RemarksMedicalHistory = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DateMedialHistory = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    SignatureEmployeeId = table.Column<long>(type: "bigint", nullable: true),
+                    SignatureEmployeeImagesMedicalHistory = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    SignatureEmployeeImagesMedicalHistoryBase64 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Wt = table.Column<long>(type: "bigint", nullable: true),
+                    Bp = table.Column<long>(type: "bigint", nullable: true),
+                    Height = table.Column<long>(type: "bigint", nullable: true),
+                    Pulse = table.Column<long>(type: "bigint", nullable: true),
+                    ChestCircumference = table.Column<long>(type: "bigint", nullable: true),
+                    AbdomenCircumference = table.Column<long>(type: "bigint", nullable: true),
+                    RespiratoryRate = table.Column<long>(type: "bigint", nullable: true),
+                    Temperature = table.Column<long>(type: "bigint", nullable: true),
+                    IsConfinedSpace = table.Column<bool>(type: "bit", nullable: false),
+                    Eye = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EarNoseThroat = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Cardiovascular = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Respiratory = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Abdomen = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Extremities = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Musculoskeletal = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Neurologic = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SpirometryTest = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RespiratoryFitTest = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Size = table.Column<long>(type: "bigint", nullable: true),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Recommendeds = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DateEximinedbyDoctor = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    SignatureEximinedDoctor = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    SignatureEximinedDoctorBase64 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Recommended = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExaminedPhysicianId = table.Column<long>(type: "bigint", nullable: true),
+                    HR = table.Column<long>(type: "bigint", nullable: false),
                     IsOtherECG = table.Column<bool>(type: "bit", nullable: false),
                     OtherDesc = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    LabTestId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -2047,9 +3110,21 @@ namespace McDermott.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GeneralConsultanMedicalSupports_LabTests_LabResulLabExaminationtId",
+                        name: "FK_GeneralConsultanMedicalSupports_LabTestDetails_LabResulLabExaminationtId",
                         column: x => x.LabResulLabExaminationtId,
+                        principalTable: "LabTestDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultanMedicalSupports_LabTests_LabTestId",
+                        column: x => x.LabTestId,
                         principalTable: "LabTests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultanMedicalSupports_Users_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -2096,13 +3171,18 @@ namespace McDermott.Persistence.Migrations
                     RR = table.Column<long>(type: "bigint", nullable: false),
                     Temp = table.Column<long>(type: "bigint", nullable: false),
                     HR = table.Column<long>(type: "bigint", nullable: false),
-                    RBS = table.Column<long>(type: "bigint", nullable: false),
+                    PainScale = table.Column<long>(type: "bigint", nullable: false),
                     Systolic = table.Column<long>(type: "bigint", nullable: false),
                     DiastolicBP = table.Column<long>(type: "bigint", nullable: false),
                     SpO2 = table.Column<long>(type: "bigint", nullable: false),
+                    Sistole = table.Column<long>(type: "bigint", nullable: false),
+                    Diastole = table.Column<long>(type: "bigint", nullable: false),
+                    WaistCircumference = table.Column<long>(type: "bigint", nullable: false),
                     BMIIndex = table.Column<double>(type: "float", nullable: false),
                     BMIIndexString = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BMIState = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClinicVisitTypes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AwarenessId = table.Column<long>(type: "bigint", nullable: true),
                     E = table.Column<long>(type: "bigint", nullable: false),
                     V = table.Column<long>(type: "bigint", nullable: false),
                     M = table.Column<long>(type: "bigint", nullable: false),
@@ -2115,11 +3195,111 @@ namespace McDermott.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_GeneralConsultantClinicalAssesments", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_GeneralConsultantClinicalAssesments_Awarenesses_AwarenessId",
+                        column: x => x.AwarenessId,
+                        principalTable: "Awarenesses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
                         name: "FK_GeneralConsultantClinicalAssesments_GeneralConsultanServices_GeneralConsultanServiceId",
                         column: x => x.GeneralConsultanServiceId,
                         principalTable: "GeneralConsultanServices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SickLeaves",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GeneralConsultansId = table.Column<long>(type: "bigint", nullable: true),
+                    TypeLeave = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SickLeaves", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SickLeaves_GeneralConsultanServices_GeneralConsultansId",
+                        column: x => x.GeneralConsultansId,
+                        principalTable: "GeneralConsultanServices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StockOutPrescriptions",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PrescriptionId = table.Column<long>(type: "bigint", nullable: true),
+                    StockId = table.Column<long>(type: "bigint", nullable: true),
+                    CutStock = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockOutPrescriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StockOutPrescriptions_Prescriptions_PrescriptionId",
+                        column: x => x.PrescriptionId,
+                        principalTable: "Prescriptions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_StockOutPrescriptions_StockProducts_StockId",
+                        column: x => x.StockId,
+                        principalTable: "StockProducts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GeneralConsultationLogs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GeneralConsultanServiceId = table.Column<long>(type: "bigint", nullable: true),
+                    ProcedureRoomId = table.Column<long>(type: "bigint", nullable: true),
+                    UserById = table.Column<long>(type: "bigint", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GeneralConsultationLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultationLogs_GeneralConsultanMedicalSupports_ProcedureRoomId",
+                        column: x => x.ProcedureRoomId,
+                        principalTable: "GeneralConsultanMedicalSupports",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultationLogs_GeneralConsultanServices_GeneralConsultanServiceId",
+                        column: x => x.GeneralConsultanServiceId,
+                        principalTable: "GeneralConsultanServices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultationLogs_Users_UserById",
+                        column: x => x.UserById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -2129,9 +3309,13 @@ namespace McDermott.Persistence.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GeneralConsultanMedicalSupportId = table.Column<long>(type: "bigint", nullable: false),
-                    LabTestId = table.Column<long>(type: "bigint", nullable: true),
+                    Parameter = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalRange = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LabUomId = table.Column<long>(type: "bigint", nullable: true),
                     Result = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ResultType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResultValueType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Remark = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -2147,23 +3331,62 @@ namespace McDermott.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_LabResultDetails_LabTests_LabTestId",
-                        column: x => x.LabTestId,
-                        principalTable: "LabTests",
+                        name: "FK_LabResultDetails_LabUoms_LabUomId",
+                        column: x => x.LabUomId,
+                        principalTable: "LabUoms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
-           
+            migrationBuilder.CreateIndex(
+                name: "IX_Accidents_DepartmentId",
+                table: "Accidents",
+                column: "DepartmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Accidents_EmployeeId",
+                table: "Accidents",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Accidents_GeneralConsultanServiceId",
+                table: "Accidents",
+                column: "GeneralConsultanServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Accidents_SafetyPersonnelId",
+                table: "Accidents",
+                column: "SafetyPersonnelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ActiveComponentMedicamentGroupDetail_MedicamentGroupDetailsId",
+                table: "ActiveComponentMedicamentGroupDetail",
+                column: "MedicamentGroupDetailsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ActiveComponents_ConcoctionLineId",
+                table: "ActiveComponents",
+                column: "ConcoctionLineId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_ActiveComponents_MedicamentId",
                 table: "ActiveComponents",
                 column: "MedicamentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ActiveComponents_PrescriptionId",
+                table: "ActiveComponents",
+                column: "PrescriptionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ActiveComponents_UomId",
                 table: "ActiveComponents",
                 column: "UomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BPJSIntegrations_InsurancePolicyId",
+                table: "BPJSIntegrations",
+                column: "InsurancePolicyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BuildingLocations_BuildingId",
@@ -2199,6 +3422,46 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_Companies_ProvinceId",
                 table: "Companies",
                 column: "ProvinceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ConcoctionLines_ConcoctionId",
+                table: "ConcoctionLines",
+                column: "ConcoctionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ConcoctionLines_ProductId",
+                table: "ConcoctionLines",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ConcoctionLines_UomId",
+                table: "ConcoctionLines",
+                column: "UomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Concoctions_DrugFormId",
+                table: "Concoctions",
+                column: "DrugFormId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Concoctions_MedicamentGroupId",
+                table: "Concoctions",
+                column: "MedicamentGroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Concoctions_PharmacyId",
+                table: "Concoctions",
+                column: "PharmacyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Concoctions_PractitionerId",
+                table: "Concoctions",
+                column: "PractitionerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Concoctions_UomId",
+                table: "Concoctions",
+                column: "UomId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Counters_PhysicianId",
@@ -2291,6 +3554,11 @@ namespace McDermott.Persistence.Migrations
                 column: "GeneralConsultanServiceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultanMedicalSupports_EmployeeId",
+                table: "GeneralConsultanMedicalSupports",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GeneralConsultanMedicalSupports_GeneralConsultanServiceId",
                 table: "GeneralConsultanMedicalSupports",
                 column: "GeneralConsultanServiceId");
@@ -2299,6 +3567,11 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_GeneralConsultanMedicalSupports_LabResulLabExaminationtId",
                 table: "GeneralConsultanMedicalSupports",
                 column: "LabResulLabExaminationtId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultanMedicalSupports_LabTestId",
+                table: "GeneralConsultanMedicalSupports",
+                column: "LabTestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GeneralConsultanMedicalSupports_PractitionerAlcoholEximinationId",
@@ -2326,14 +3599,14 @@ namespace McDermott.Persistence.Migrations
                 column: "PractitionerRadiologyEximinationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultanServices_AwarenessId",
+                table: "GeneralConsultanServices",
+                column: "AwarenessId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GeneralConsultanServices_ClassTypeId",
                 table: "GeneralConsultanServices",
                 column: "ClassTypeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GeneralConsultanServices_InsuranceId",
-                table: "GeneralConsultanServices",
-                column: "InsuranceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GeneralConsultanServices_InsurancePolicyId",
@@ -2361,34 +3634,29 @@ namespace McDermott.Persistence.Migrations
                 column: "ServiceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultantClinicalAssesments_AwarenessId",
+                table: "GeneralConsultantClinicalAssesments",
+                column: "AwarenessId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GeneralConsultantClinicalAssesments_GeneralConsultanServiceId",
                 table: "GeneralConsultantClinicalAssesments",
                 column: "GeneralConsultanServiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GeneralInformations_BpjsClassificationId",
-                table: "GeneralInformations",
-                column: "BpjsClassificationId");
+                name: "IX_GeneralConsultationLogs_GeneralConsultanServiceId",
+                table: "GeneralConsultationLogs",
+                column: "GeneralConsultanServiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GeneralInformations_CompanyId",
-                table: "GeneralInformations",
-                column: "CompanyId");
+                name: "IX_GeneralConsultationLogs_ProcedureRoomId",
+                table: "GeneralConsultationLogs",
+                column: "ProcedureRoomId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GeneralInformations_ProductCategoryId",
-                table: "GeneralInformations",
-                column: "ProductCategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GeneralInformations_ProductId",
-                table: "GeneralInformations",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GeneralInformations_UomId",
-                table: "GeneralInformations",
-                column: "UomId");
+                name: "IX_GeneralConsultationLogs_UserById",
+                table: "GeneralConsultationLogs",
+                column: "UserById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GroupMenus_GroupId",
@@ -2421,9 +3689,46 @@ namespace McDermott.Persistence.Migrations
                 column: "InsuranceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_InsurancePolicies_NoCard",
+                table: "InsurancePolicies",
+                column: "NoCard",
+                unique: true,
+                filter: "[NoCard] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InsurancePolicies_UserId",
                 table: "InsurancePolicies",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InventoryAdjusmentDetails_InventoryAdjusmentId",
+                table: "InventoryAdjusmentDetails",
+                column: "InventoryAdjusmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InventoryAdjusmentDetails_ProductId",
+                table: "InventoryAdjusmentDetails",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InventoryAdjusmentDetails_StockProductId",
+                table: "InventoryAdjusmentDetails",
+                column: "StockProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InventoryAdjusmentDetails_TransactionStockId",
+                table: "InventoryAdjusmentDetails",
+                column: "TransactionStockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InventoryAdjusments_CompanyId",
+                table: "InventoryAdjusments",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InventoryAdjusments_LocationId",
+                table: "InventoryAdjusments",
+                column: "LocationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JobPositions_DepartmentId",
@@ -2471,13 +3776,18 @@ namespace McDermott.Persistence.Migrations
                 column: "GeneralConsultanMedicalSupportId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LabResultDetails_LabTestId",
+                name: "IX_LabResultDetails_LabUomId",
                 table: "LabResultDetails",
+                column: "LabUomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LabTestDetails_LabTestId",
+                table: "LabTestDetails",
                 column: "LabTestId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LabTests_LabUomId",
-                table: "LabTests",
+                name: "IX_LabTestDetails_LabUomId",
+                table: "LabTestDetails",
                 column: "LabUomId");
 
             migrationBuilder.CreateIndex(
@@ -2496,6 +3806,11 @@ namespace McDermott.Persistence.Migrations
                 column: "ParentLocationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MedicamentGroupDetails_FrequencyId",
+                table: "MedicamentGroupDetails",
+                column: "FrequencyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MedicamentGroupDetails_MedicamentGroupId",
                 table: "MedicamentGroupDetails",
                 column: "MedicamentGroupId");
@@ -2506,9 +3821,14 @@ namespace McDermott.Persistence.Migrations
                 column: "MedicamentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MedicamentGroupDetails_UoMId",
+                name: "IX_MedicamentGroupDetails_SignaId",
                 table: "MedicamentGroupDetails",
-                column: "UoMId");
+                column: "SignaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MedicamentGroupDetails_UnitOfDosageId",
+                table: "MedicamentGroupDetails",
+                column: "UnitOfDosageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MedicamentGroups_FormDrugId",
@@ -2524,6 +3844,16 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_MedicamentGroups_UoMId",
                 table: "MedicamentGroups",
                 column: "UoMId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Medicaments_FormId",
+                table: "Medicaments",
+                column: "FormId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Medicaments_FrequencyId",
+                table: "Medicaments",
+                column: "FrequencyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Medicaments_ProductId",
@@ -2566,9 +3896,139 @@ namespace McDermott.Persistence.Migrations
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Pharmacies_LocationId",
+                table: "Pharmacies",
+                column: "LocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pharmacies_MedicamentGroupId",
+                table: "Pharmacies",
+                column: "MedicamentGroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pharmacies_PatientId",
+                table: "Pharmacies",
+                column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pharmacies_PractitionerId",
+                table: "Pharmacies",
+                column: "PractitionerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pharmacies_ServiceId",
+                table: "Pharmacies",
+                column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PharmacyLogs_PharmacyId",
+                table: "PharmacyLogs",
+                column: "PharmacyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PharmacyLogs_UserById",
+                table: "PharmacyLogs",
+                column: "UserById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prescriptions_DrugDosageId",
+                table: "Prescriptions",
+                column: "DrugDosageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prescriptions_DrugFormId",
+                table: "Prescriptions",
+                column: "DrugFormId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prescriptions_DrugRouteId",
+                table: "Prescriptions",
+                column: "DrugRouteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prescriptions_MedicamentGroupId",
+                table: "Prescriptions",
+                column: "MedicamentGroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prescriptions_PharmacyId",
+                table: "Prescriptions",
+                column: "PharmacyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prescriptions_ProductId",
+                table: "Prescriptions",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prescriptions_SignaId",
+                table: "Prescriptions",
+                column: "SignaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_BpjsClassificationId",
+                table: "Products",
+                column: "BpjsClassificationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_CompanyId",
+                table: "Products",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_ProductCategoryId",
+                table: "Products",
+                column: "ProductCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_PurchaseUomId",
+                table: "Products",
+                column: "PurchaseUomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_UomId",
+                table: "Products",
+                column: "UomId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Provinces_CountryId",
                 table: "Provinces",
                 column: "CountryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReceivingLogs_ReceivingId",
+                table: "ReceivingLogs",
+                column: "ReceivingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReceivingLogs_SourceId",
+                table: "ReceivingLogs",
+                column: "SourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReceivingLogs_UserById",
+                table: "ReceivingLogs",
+                column: "UserById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReceivingStockDetails_ProductId",
+                table: "ReceivingStockDetails",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReceivingStockDetails_ReceivingStockId",
+                table: "ReceivingStockDetails",
+                column: "ReceivingStockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReceivingStockDetails_StockId",
+                table: "ReceivingStockDetails",
+                column: "StockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReceivingStocks_DestinationId",
+                table: "ReceivingStocks",
+                column: "DestinationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReorderingRules_CompanyId",
@@ -2584,6 +4044,118 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_Services_ServicedId",
                 table: "Services",
                 column: "ServicedId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SickLeaves_GeneralConsultansId",
+                table: "SickLeaves",
+                column: "GeneralConsultansId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockOutLines_LinesId",
+                table: "StockOutLines",
+                column: "LinesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockOutLines_StockId",
+                table: "StockOutLines",
+                column: "StockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockOutPrescriptions_PrescriptionId",
+                table: "StockOutPrescriptions",
+                column: "PrescriptionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockOutPrescriptions_StockId",
+                table: "StockOutPrescriptions",
+                column: "StockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockProducts_DestinanceId",
+                table: "StockProducts",
+                column: "DestinanceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockProducts_ProductId",
+                table: "StockProducts",
+                column: "ProductId",
+                unique: true,
+                filter: "[ProductId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockProducts_SourceId",
+                table: "StockProducts",
+                column: "SourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockProducts_UomId",
+                table: "StockProducts",
+                column: "UomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionStocks_DestinationId",
+                table: "TransactionStocks",
+                column: "DestinationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionStocks_InventoryAdjusmentId",
+                table: "TransactionStocks",
+                column: "InventoryAdjusmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionStocks_ProductId",
+                table: "TransactionStocks",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionStocks_SourceId",
+                table: "TransactionStocks",
+                column: "SourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionStocks_UomId",
+                table: "TransactionStocks",
+                column: "UomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransferStockLogs_DestinationId",
+                table: "TransferStockLogs",
+                column: "DestinationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransferStockLogs_SourceId",
+                table: "TransferStockLogs",
+                column: "SourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransferStockLogs_TransferStockId",
+                table: "TransferStockLogs",
+                column: "TransferStockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransferStockProduct_ProductId",
+                table: "TransferStockProduct",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransferStockProduct_TransferStockId",
+                table: "TransferStockProduct",
+                column: "TransferStockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransferStocks_DestinationId",
+                table: "TransferStocks",
+                column: "DestinationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransferStocks_SourceId",
+                table: "TransferStocks",
+                column: "SourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransferStocks_StockProductId",
+                table: "TransferStocks",
+                column: "StockProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Uoms_UomCategoryId",
@@ -2671,14 +4243,47 @@ namespace McDermott.Persistence.Migrations
                 column: "JobPositionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_Legacy",
+                table: "Users",
+                column: "Legacy",
+                unique: true,
+                filter: "[Legacy] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_NIP",
+                table: "Users",
+                column: "NIP",
+                unique: true,
+                filter: "[NIP] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Oracle",
+                table: "Users",
+                column: "Oracle",
+                unique: true,
+                filter: "[Oracle] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_ReligionId",
                 table: "Users",
                 column: "ReligionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_SAP",
+                table: "Users",
+                column: "SAP",
+                unique: true,
+                filter: "[SAP] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_SpecialityId",
                 table: "Users",
                 column: "SpecialityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_SupervisorId",
+                table: "Users",
+                column: "SupervisorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Villages_CityId",
@@ -2701,7 +4306,109 @@ namespace McDermott.Persistence.Migrations
                 table: "Villages",
                 column: "ProvinceId");
 
-           
+            migrationBuilder.AddForeignKey(
+                name: "FK_Accidents_Departments_DepartmentId",
+                table: "Accidents",
+                column: "DepartmentId",
+                principalTable: "Departments",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Accidents_GeneralConsultanServices_GeneralConsultanServiceId",
+                table: "Accidents",
+                column: "GeneralConsultanServiceId",
+                principalTable: "GeneralConsultanServices",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Accidents_Users_EmployeeId",
+                table: "Accidents",
+                column: "EmployeeId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Accidents_Users_SafetyPersonnelId",
+                table: "Accidents",
+                column: "SafetyPersonnelId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ActiveComponentMedicamentGroupDetail_ActiveComponents_ActiveComponentId",
+                table: "ActiveComponentMedicamentGroupDetail",
+                column: "ActiveComponentId",
+                principalTable: "ActiveComponents",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ActiveComponentMedicamentGroupDetail_MedicamentGroupDetails_MedicamentGroupDetailsId",
+                table: "ActiveComponentMedicamentGroupDetail",
+                column: "MedicamentGroupDetailsId",
+                principalTable: "MedicamentGroupDetails",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ActiveComponents_ConcoctionLines_ConcoctionLineId",
+                table: "ActiveComponents",
+                column: "ConcoctionLineId",
+                principalTable: "ConcoctionLines",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ActiveComponents_Prescriptions_PrescriptionId",
+                table: "ActiveComponents",
+                column: "PrescriptionId",
+                principalTable: "Prescriptions",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_BPJSIntegrations_InsurancePolicies_InsurancePolicyId",
+                table: "BPJSIntegrations",
+                column: "InsurancePolicyId",
+                principalTable: "InsurancePolicies",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ConcoctionLines_Concoctions_ConcoctionId",
+                table: "ConcoctionLines",
+                column: "ConcoctionId",
+                principalTable: "Concoctions",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Concoctions_MedicamentGroups_MedicamentGroupId",
+                table: "Concoctions",
+                column: "MedicamentGroupId",
+                principalTable: "MedicamentGroups",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Concoctions_Pharmacies_PharmacyId",
+                table: "Concoctions",
+                column: "PharmacyId",
+                principalTable: "Pharmacies",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Concoctions_Users_PractitionerId",
+                table: "Concoctions",
+                column: "PractitionerId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Counters_Users_PhysicianId",
@@ -2740,70 +4447,29 @@ namespace McDermott.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Cities_Provinces_ProvinceId",
-                table: "Cities");
+                name: "FK_JobPositions_Departments_DepartmentId",
+                table: "JobPositions");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Companies_Provinces_ProvinceId",
-                table: "Companies");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Districts_Provinces_ProvinceId",
-                table: "Districts");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Users_Provinces_DomicileProvinceId",
+                name: "FK_Users_Departments_DepartmentId",
                 table: "Users");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Users_Provinces_IdCardProvinceId",
-                table: "Users");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Villages_Provinces_ProvinceId",
-                table: "Villages");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Companies_Cities_CityId",
-                table: "Companies");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Districts_Cities_CityId",
-                table: "Districts");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Users_Cities_DomicileCityId",
-                table: "Users");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Users_Cities_IdCardCityId",
-                table: "Users");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Villages_Cities_CityId",
-                table: "Villages");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Companies_Countries_CountryId",
-                table: "Companies");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Users_Countries_DomicileCountryId",
-                table: "Users");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Users_Countries_IdCardCountryId",
-                table: "Users");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Departments_Users_ManagerId",
-                table: "Departments");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_EmailTemplates_Users_ById",
                 table: "EmailTemplates");
 
-            
+            migrationBuilder.DropTable(
+                name: "Accidents");
+
+            migrationBuilder.DropTable(
+                name: "ActiveComponentMedicamentGroupDetail");
+
+            migrationBuilder.DropTable(
+                name: "Allergies");
+
+            migrationBuilder.DropTable(
+                name: "BPJSIntegrations");
+
             migrationBuilder.DropTable(
                 name: "BuildingLocations");
 
@@ -2823,9 +4489,6 @@ namespace McDermott.Persistence.Migrations
                 name: "DoctorScheduleSlots");
 
             migrationBuilder.DropTable(
-                name: "DrugDosages");
-
-            migrationBuilder.DropTable(
                 name: "EmailSettings");
 
             migrationBuilder.DropTable(
@@ -2835,10 +4498,13 @@ namespace McDermott.Persistence.Migrations
                 name: "GeneralConsultantClinicalAssesments");
 
             migrationBuilder.DropTable(
-                name: "GeneralInformations");
+                name: "GeneralConsultationLogs");
 
             migrationBuilder.DropTable(
                 name: "GroupMenus");
+
+            migrationBuilder.DropTable(
+                name: "InventoryAdjusmentDetails");
 
             migrationBuilder.DropTable(
                 name: "KioskConfigs");
@@ -2859,10 +4525,37 @@ namespace McDermott.Persistence.Migrations
                 name: "PatientFamilyRelations");
 
             migrationBuilder.DropTable(
+                name: "PharmacyLogs");
+
+            migrationBuilder.DropTable(
                 name: "Procedures");
 
             migrationBuilder.DropTable(
+                name: "ReceivingLogs");
+
+            migrationBuilder.DropTable(
+                name: "ReceivingStockDetails");
+
+            migrationBuilder.DropTable(
                 name: "ReorderingRules");
+
+            migrationBuilder.DropTable(
+                name: "SickLeaves");
+
+            migrationBuilder.DropTable(
+                name: "StockOutLines");
+
+            migrationBuilder.DropTable(
+                name: "StockOutPrescriptions");
+
+            migrationBuilder.DropTable(
+                name: "SystemParameters");
+
+            migrationBuilder.DropTable(
+                name: "TransferStockLogs");
+
+            migrationBuilder.DropTable(
+                name: "TransferStockProduct");
 
             migrationBuilder.DropTable(
                 name: "ActiveComponents");
@@ -2886,13 +4579,10 @@ namespace McDermott.Persistence.Migrations
                 name: "DoctorSchedules");
 
             migrationBuilder.DropTable(
-                name: "BpjsClassifications");
-
-            migrationBuilder.DropTable(
-                name: "ProductCategories");
-
-            migrationBuilder.DropTable(
                 name: "Menus");
+
+            migrationBuilder.DropTable(
+                name: "TransactionStocks");
 
             migrationBuilder.DropTable(
                 name: "GeneralConsultanMedicalSupports");
@@ -2901,37 +4591,46 @@ namespace McDermott.Persistence.Migrations
                 name: "Families");
 
             migrationBuilder.DropTable(
-                name: "Locations");
+                name: "ReceivingStocks");
 
             migrationBuilder.DropTable(
-                name: "MedicamentGroups");
+                name: "TransferStocks");
+
+            migrationBuilder.DropTable(
+                name: "ConcoctionLines");
 
             migrationBuilder.DropTable(
                 name: "Medicaments");
 
             migrationBuilder.DropTable(
+                name: "Prescriptions");
+
+            migrationBuilder.DropTable(
                 name: "HealthCenters");
+
+            migrationBuilder.DropTable(
+                name: "InventoryAdjusments");
 
             migrationBuilder.DropTable(
                 name: "GeneralConsultanServices");
 
             migrationBuilder.DropTable(
-                name: "LabTests");
+                name: "LabTestDetails");
 
             migrationBuilder.DropTable(
-                name: "FormDrugs");
+                name: "StockProducts");
 
             migrationBuilder.DropTable(
-                name: "DrugRoutes");
+                name: "Concoctions");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "DrugDosages");
 
             migrationBuilder.DropTable(
                 name: "Signas");
 
             migrationBuilder.DropTable(
-                name: "Uoms");
+                name: "Awarenesses");
 
             migrationBuilder.DropTable(
                 name: "InsurancePolicies");
@@ -2940,13 +4639,19 @@ namespace McDermott.Persistence.Migrations
                 name: "KioskQueues");
 
             migrationBuilder.DropTable(
+                name: "LabTests");
+
+            migrationBuilder.DropTable(
                 name: "LabUoms");
 
             migrationBuilder.DropTable(
-                name: "SampleTypes");
+                name: "Products");
 
             migrationBuilder.DropTable(
-                name: "UomCategories");
+                name: "Pharmacies");
+
+            migrationBuilder.DropTable(
+                name: "DrugRoutes");
 
             migrationBuilder.DropTable(
                 name: "Insurances");
@@ -2958,16 +4663,37 @@ namespace McDermott.Persistence.Migrations
                 name: "Kiosks");
 
             migrationBuilder.DropTable(
+                name: "SampleTypes");
+
+            migrationBuilder.DropTable(
+                name: "BpjsClassifications");
+
+            migrationBuilder.DropTable(
+                name: "ProductCategories");
+
+            migrationBuilder.DropTable(
+                name: "Locations");
+
+            migrationBuilder.DropTable(
+                name: "MedicamentGroups");
+
+            migrationBuilder.DropTable(
                 name: "Services");
 
             migrationBuilder.DropTable(
-                name: "Provinces");
+                name: "FormDrugs");
 
             migrationBuilder.DropTable(
-                name: "Cities");
+                name: "Uoms");
 
             migrationBuilder.DropTable(
-                name: "Countries");
+                name: "UomCategories");
+
+            migrationBuilder.DropTable(
+                name: "Departments");
+
+            migrationBuilder.DropTable(
+                name: "Companies");
 
             migrationBuilder.DropTable(
                 name: "Users");
@@ -2997,13 +4723,16 @@ namespace McDermott.Persistence.Migrations
                 name: "Villages");
 
             migrationBuilder.DropTable(
-                name: "Departments");
-
-            migrationBuilder.DropTable(
                 name: "Districts");
 
             migrationBuilder.DropTable(
-                name: "Companies");
+                name: "Cities");
+
+            migrationBuilder.DropTable(
+                name: "Provinces");
+
+            migrationBuilder.DropTable(
+                name: "Countries");
         }
     }
 }

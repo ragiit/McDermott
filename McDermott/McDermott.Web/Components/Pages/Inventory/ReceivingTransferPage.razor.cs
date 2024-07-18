@@ -19,7 +19,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<ProductDto> Products = [];
         private List<StockProductDto> Stocks = [];
         private List<UomDto> Uoms = [];
-        private List<TransferStockDetailDto> AllLogs = [];
+        private List<TransferStockLogDto> AllLogs = [];
         private List<ReceivingLogDto> Logs = [];
         private UserDto NameUser = new();
 
@@ -519,7 +519,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         .Where(x => x.ReceivingId == receivingId)
                         .Select(x => x.Id)
                         .ToList();
-                    await Mediator.Send(new DeleteTransferStockDetailRequest(ids: DetailsIdsToDelete));
+                    await Mediator.Send(new DeleteTransferStockLogRequest(ids: DetailsIdsToDelete));
 
                     //Delete Receiving Stock
 
@@ -542,7 +542,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                             .Where(x => x.ReceivingId == Uid)
                             .Select(x => x.Id)
                             .ToList();
-                        await Mediator.Send(new DeleteTransferStockDetailRequest(ids: DetailsIdsToDelete));
+                        await Mediator.Send(new DeleteTransferStockLogRequest(ids: DetailsIdsToDelete));
                     }
                     //Delete list Id ReceivingStock
                     await Mediator.Send(new DeleteReceivingStockRequest(ids: id));
