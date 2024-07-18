@@ -591,14 +591,14 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     // Jika tidak ada item yang dipilih, gunakan produk yang sedang dipertimbangkan
                     StockProducts = TransactionStocks.Where(x => x.ProductId == getProduct.Id && x.Validate == true)
-                        .GroupBy(z => new { z.ProductId, z.Batch, z.DestinationId })
+                        .GroupBy(z => new { z.ProductId, z.Batch, z.DestinationId, z.UomId })
                         .Select(y => new StockProductDto
                         {
                             ProductId = y.Key.ProductId,
                             Batch = y.Key.Batch ?? "-",
                             DestinanceId = y.Key.DestinationId,
                             DestinanceName = y.First()?.Destination?.Name ?? "-",
-                            UomId = y.First().UomId,
+                            UomId = y.Key.UomId,
                             UomName = y.First()?.Uom?.Name ?? "-",
                             Expired = y.First().ExpiredDate,
                             ProductName = y.First()?.Product?.Name ?? "-",

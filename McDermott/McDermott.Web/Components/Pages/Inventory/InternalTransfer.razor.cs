@@ -1,4 +1,6 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransferStockCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
@@ -13,6 +15,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<TransferStockDetailDto> Logs = [];
         private List<TransferStockProductDto> TransferStockProducts = [];
         private List<TransferStockDetailDto> TransferStockDetails = [];
+        private List<TransactionStockDto> TransactionStocks = [];
         private List<StockProductDto> StockProducts = [];
         private List<LocationDto> Locations = [];
         private List<ProductDto> Products = [];
@@ -22,6 +25,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private TransferStockDto getInternalTransfer = new();
         private TransferStockProductDto TempFormInternalTransfer = new();
         private TransferStockDetailDto FormInternalTransferDetail = new();
+        private TransactionStockDto FormTransactionStocks = new();
         private StockProductDto FormStock = new();
         private UserDto NameUser = new();
 
@@ -124,6 +128,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task LoadAsyncData()
         {
             StockProducts = await Mediator.Send(new GetStockProductQuery());
+            TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
             Locations = await Mediator.Send(new GetLocationQuery());
             Products = await Mediator.Send(new GetProductQuery());
             Uoms = await Mediator.Send(new GetUomQuery());
@@ -137,9 +142,6 @@ namespace McDermott.Web.Components.Pages.Inventory
             try
             {
                 PanelVisible = true;
-                TransferStocks = await Mediator.Send(new GetTransferStockQuery());
-                PanelVisible = false;
-
                 showForm = false;
                 showFormDetail = false;
                 TransferStocks = await Mediator.Send(new GetTransferStockQuery());
@@ -159,7 +161,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             PanelVisible = false;
         }
 
-        private List<StockProductDto> Batch = [];
+        private List<TransactionStockDto> Batch = [];
         private DateTime? SelectedBatchExpired { get; set; }
 
         public class StatusComparer : IComparer<EnumStatusInternalTransfer>
@@ -175,39 +177,39 @@ namespace McDermott.Web.Components.Pages.Inventory
                 return indexX.CompareTo(indexY);
             }
         }
-        private async Task SelectedBatch(StockProductDto stockProduct)
+        private async Task SelectedBatch(TransactionStockDto stockProduct)
         {
             SelectedBatchExpired = null;
 
-            if (stockProduct is not null)
-            {
-                SelectedBatchExpired = stockProduct.Expired;
+            //if (stockProduct is not null)
+            //{
+            //    SelectedBatchExpired = stockProduct.Expired;
 
-                //current Stock
-                var _currentStock = StockProducts.Where(x => x.SourceId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch).FirstOrDefault();
-                if (_currentStock is not null)
-                {
-                    if (_currentStock.Qty > 0)
-                    {
-                        TempFormInternalTransfer.StockProductId= stockProduct.Id;
-                        TempFormInternalTransfer.Batch = stockProduct.Batch;
-                        TempFormInternalTransfer.ExpiredDate = stockProduct.Expired;
-                        TempFormInternalTransfer.CurrentStock = _currentStock.Qty;
-                    }
-                    else
-                    {
-                        ToastService.ClearCustomToasts();
-                        ToastService.ShowWarning("Empty Stock!.. ");
-                    }
-                }
-            }
+            //    //current Stock
+            //    var _currentStock = StockProducts.Where(x => x.SourceId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch).FirstOrDefault();
+            //    if (_currentStock is not null)
+            //    {
+            //        if (_currentStock.Qty > 0)
+            //        {
+            //            TempFormInternalTransfer.StockProductId = stockProduct.Id;
+            //            TempFormInternalTransfer.Batch = stockProduct.Batch;
+            //            TempFormInternalTransfer.ExpiredDate = stockProduct.Expired;
+            //            TempFormInternalTransfer.CurrentStock = _currentStock.Qty;
+            //        }
+            //        else
+            //        {
+            //            ToastService.ClearCustomToasts();
+            //            ToastService.ShowWarning("Empty Stock!.. ");
+            //        }
+            //    }
+            //}
         }
 
         private async Task SelectedItemProduct(LocationDto value)
         {
             try
             {
-                filteredProducts = Products.Where(p => StockProducts.Any(sp => sp.ProductId == p.Id && sp.SourceId == value.Id)).ToList();
+                filteredProducts = Products.Where(p => TransactionStocks.Any(sp => sp.ProductId == p.Id && sp.SourceId == value.Id)).ToList();
             }
             catch (Exception ex)
             {
@@ -224,28 +226,27 @@ namespace McDermott.Web.Components.Pages.Inventory
                 TempFormInternalTransfer.TraceAvability = data.TraceAbility;
                 var uomName = Uoms.Where(u => u.Id == data?.UomId).Select(x => x.Name).FirstOrDefault();
                 TempFormInternalTransfer.UomName = uomName;
-                var StockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == product.Id && s.SourceId == FormInternalTransfer.SourceId &&  s.Qty != 0));
-
+                List<TransactionStockDto> listbatch = TransactionStocks.Where(s=>s.ProductId == product.Id).ToList();
                 TempFormInternalTransfer.TraceAvability = product.TraceAbility;
 
                 Batch.Clear();
                 if (StockProducts is not null)
-                    Batch = StockProducts;
+                    Batch = listbatch;
                 else
                     ToastService.ShowWarning("The selected product does not have stock in all batches!!");
 
-                if (product.TraceAbility)
-                {
-                    TempFormInternalTransfer.Batch = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Batch ;
-                    TempFormInternalTransfer.ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Expired;
-                    TempFormInternalTransfer.CurrentStock = 0;
-                }
-                else
-                {
-                    TempFormInternalTransfer.Batch = "-";
-                    TempFormInternalTransfer.ExpiredDate = null;
-                    TempFormInternalTransfer.CurrentStock = StockProducts.Where(x => x.SourceId == FormInternalTransfer.SourceId && x.ProductId == product.Id).Select(x => x.Qty).FirstOrDefault();
-                }
+                //if (product.TraceAbility)
+                //{
+                //    TempFormInternalTransfer.Batch = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Batch;
+                //    TempFormInternalTransfer.ExpiredDate = StockProducts.FirstOrDefault(x => x.SourceId == FormInternalTransfer.SourceId)?.Expired;
+                //    TempFormInternalTransfer.CurrentStock = 0;
+                //}
+                //else
+                //{
+                //    TempFormInternalTransfer.Batch = "-";
+                //    TempFormInternalTransfer.ExpiredDate = null;
+                //    TempFormInternalTransfer.CurrentStock = StockProducts?.Where(x => x.SourceId == FormInternalTransfer.SourceId && x.ProductId == product.Id).Select(x => x.Qty).FirstOrDefault();
+                //}
             }
         }
 
@@ -406,7 +407,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 //Products.Clear();
                 headerDetail = "Add product Transfer Internal";
                 await GridDetailTransferStock.StartEditNewRowAsync();
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
@@ -437,7 +439,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                     if (item.Product?.TraceAbility == true)
                     {
-                        item.Batch = stockProduct?.Batch ;
+                        item.Batch = stockProduct?.Batch;
                         item.ExpiredDate = stockProduct?.Expired;
                     }
                     else
@@ -500,10 +502,32 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
-                TransferStocks = await Mediator.Send(new GetTransferStockQuery());
+                await LoadAsyncData();
+                await LoadData();
                 FormInternalTransfer = TransferStocks.Where(x => x.Id == TransferId).FirstOrDefault()!;
                 if (FormInternalTransfer is not null)
                 {
+                    var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(TransferStock)).OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
+                    int NextReferenceNumber = 1;
+                    if (cekReference != null)
+                    {
+                        int.TryParse(cekReference?.Substring("ITR#".Length), out NextReferenceNumber);
+                        NextReferenceNumber++;
+                    }
+
+                    string referenceNumber = $"ITR#{NextReferenceNumber:D3}";
+                    var checkTranferProduct = TransferStockDetails.Where(x => x.TransferStockId == getInternalTransfer.Id).ToList()!;
+                    foreach(var items in checkTranferProduct)
+                    {
+                        // out 
+                        FormTransactionStocks.SourceTable = nameof(TransferStock);
+                        FormTransactionStocks.SourcTableId = getInternalTransfer.Id;
+                        FormTransactionStocks.SourceId = items.SourceId;
+                        FormTransactionStocks.DestinationId = items.DestinationId;
+                        //FormTransactionStocks.Batch = items.
+                    }
+
+                    //Save Status InternalTransfer
                     FormInternalTransfer.Status = EnumStatusInternalTransfer.Ready;
                     getInternalTransfer = await Mediator.Send(new UpdateTransferStockRequest(FormInternalTransfer));
                 }
@@ -615,7 +639,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task validation()
         {
             try
-            {                
+            {
                 var Stock = await Mediator.Send(new GetStockProductQuery());
                 var TransferProductStock = await Mediator.Send(new GetTransferStockProductQuery());
                 TransferStocks = await Mediator.Send(new GetTransferStockQuery());
@@ -630,19 +654,19 @@ namespace McDermott.Web.Components.Pages.Inventory
                     {
                         //check product stock OUT availability
                         var data_product = Products.Where(x => x.Id == a.ProductId).FirstOrDefault();
-                        var checkedStockOut = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.SourceId ).FirstOrDefault();
+                        var checkedStockOut = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.SourceId).FirstOrDefault();
                         checkedStockOut.Qty = checkedStockOut.Qty - a.QtyStock;
                         await Mediator.Send(new UpdateStockProductRequest(checkedStockOut));
 
                         //check product stock IN availability
-                        var checkStockIn = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.DestinationId ).FirstOrDefault();
+                        var checkStockIn = Stock.Where(x => x.ProductId == a.ProductId && x.SourceId == getInternalTransfer.DestinationId).FirstOrDefault();
                         if (checkStockIn is null)
                         {
                             FormStock.ProductId = a.ProductId;
                             FormStock.SourceId = getInternalTransfer.DestinationId;
                             FormStock.UomId = a?.Product?.UomId;
                             FormStock.Qty = a.QtyStock;
-                            if (data_product.TraceAbility == true )
+                            if (data_product.TraceAbility == true)
                             {
                                 FormStock.Batch = checkedStockOut?.Batch;
                                 FormStock.Expired = checkedStockOut?.Expired;
@@ -651,7 +675,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         }
                         else
                         {
-                            if (data_product.TraceAbility == true )
+                            if (data_product.TraceAbility == true)
                             {
                                 if (checkStockIn.Batch == null && checkStockIn.Expired == null)
                                 {

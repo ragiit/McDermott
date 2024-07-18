@@ -382,9 +382,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             await LoadAsyncData();
             await LoadData();
-            FormReceivingStocks = ReceivingStocks.Where(x => x.Id == receivingId).FirstOrDefault()!;
-            var data_TransactionStock = new TransactionStockDto();
-            List<TransactionStockDto> Tempdata_TransactionStock = new List<TransactionStockDto>();
+            FormReceivingStocks = ReceivingStocks.Where(x => x.Id == receivingId).FirstOrDefault()!;            
 
             if (FormReceivingStocks is not null)
             {                
