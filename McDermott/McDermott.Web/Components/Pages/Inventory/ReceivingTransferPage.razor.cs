@@ -392,11 +392,9 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             if (FormReceivingStocks is not null)
             {
-                FormReceivingStocks.Status = EnumStatusReceiving.Done;
-                GetReceivingStock = await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
-
+                
                 //ReferenceKode
-                var cekReference = TransactionStocks.Where(x => x.SourceTable == GetSourceTableName()).OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
+                var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(ReceivingStock)).OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
                 int NextReferenceNumber = 1;
                 if (cekReference != null)
                 {
@@ -413,7 +411,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                     var x = Uoms.Where(x => x.Id == a?.Product?.PurchaseUomId).FirstOrDefault();
 
-                    FormTransactionStock.SourceTable = GetSourceTableName();
+                    FormTransactionStock.SourceTable = nameof(ReceivingStock);
                     FormTransactionStock.SourcTableId = FormReceivingStocks.Id;
                     FormTransactionStock.ProductId = a.ProductId;
                     FormTransactionStock.Batch = a.Batch;
@@ -458,12 +456,16 @@ namespace McDermott.Web.Components.Pages.Inventory
                 var aa = await Mediator.Send(new UpdateTransactionStockRequest(item));
             }
 
+            //UpdateReceiving Stock
+            FormReceivingStocks.Status = EnumStatusReceiving.Process;
+            await Mediator.Send(new UpdateReceivingStockRequest(FormReceivingStocks));
+
             //Save Log..
 
-            FormReceivingLog.SourceId = GetReceivingStock.DestinationId;
+            FormReceivingLog.SourceId = FormReceivingStocks.DestinationId;
             FormReceivingLog.UserById = NameUser.Id;
-            FormReceivingLog.ReceivingId = GetReceivingStock.Id;
-            FormReceivingLog.Status = GetReceivingStock.Status;
+            FormReceivingLog.ReceivingId = FormReceivingStocks.Id;
+            FormReceivingLog.Status = EnumStatusReceiving.Done;
 
             await Mediator.Send(new CreateReceivingLogRequest(FormReceivingLog));
 
