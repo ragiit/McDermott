@@ -207,7 +207,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                 foreach (var product in Products)
                 {
-                    var Qty = TransactionStocks.Where(s => s.ProductId == product.Id).Sum(x => x.Quantity);                    
+                    var Qty = TransactionStocks.Where(s => s.ProductId == product.Id).Sum(x => x.Quantity);
                     product.Qtys = Qty;
                 }
 
@@ -298,6 +298,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 // Inisialisasi data produk
                 var products = p ?? SelectedDataItems[0].Adapt<ProductDto>();
+                getProduct = products;
                 FormProductDetails = products.Adapt<ProductDetailDto>();
 
                 // Jika produk adalah "Medicament", isi detail tambahan
@@ -330,9 +331,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 // Kelola informasi stok
-                var stockIN = StockProducts.Where(s => s.ProductId == products.Id).ToList();
-                var stockOUT = StockProducts.Where(s => s.ProductId == products.Id && s.StatusTransaction == "OUT").ToList();
-                TotalQty = stockIN.Sum(x => x.Qty);
+                TotalQty = TransactionStocks.Where(x => x.ProductId == products.Id).Sum(z => z.Quantity);
 
                 // Ambil nama satuan ukur
                 NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;
@@ -585,12 +584,26 @@ namespace McDermott.Web.Components.Pages.Inventory
                 StockProductView = true;
 
                 // Mengambil data stok produk
-                StockProducts = await Mediator.Send(new GetStockProductQuery());
 
                 if (SelectedDataItems.Count == 0)
                 {
                     // Jika tidak ada item yang dipilih, gunakan produk yang sedang dipertimbangkan
-                    StockProducts = StockProducts.Where(x => x.ProductId == getProduct.Id).ToList();
+                    StockProducts = TransactionStocks.Where(x => x.ProductId == getProduct.Id)
+                        .GroupBy(z => new { z.ProductId, z.Batch, z.DestinationId })
+                        .Select(y => new StockProductDto
+                        {
+                            ProductId = y.Key.ProductId,
+                            Batch = y.Key.Batch ?? "-",
+                            DestinanceId = y.Key.DestinationId,
+                            DestinanceName = y.First()?.Destination?.Name ?? "-",
+                            UomId = y.First().UomId,
+                            UomName = y.First()?.Uom?.Name ?? "-",
+                            Expired = y.First().ExpiredDate,
+                            ProductName = y.First()?.Product?.Name ?? "-",
+                            Qty = y.Sum(item => item.Quantity)
+
+
+                        }).ToList();
                     if (getProduct.TraceAbility == true)
                     {
                         FieldHideStock = true;
@@ -604,7 +617,22 @@ namespace McDermott.Web.Components.Pages.Inventory
                 else
                 {
                     // Jika ada item yang dipilih, gunakan produk yang dipilih
-                    StockProducts = StockProducts.Where(x => x.ProductId == SelectedDataItems[0].Adapt<ProductDto>().Id).ToList();
+                    StockProducts = TransactionStocks.Where(x => x.ProductId == SelectedDataItems[0].Adapt<ProductDto>().Id)
+                        .GroupBy(z => new { z.ProductId, z.Batch, z.DestinationId })
+                        .Select(y => new StockProductDto
+                        {
+                            ProductId = y.Key.ProductId,
+                            Batch = y.Key.Batch ?? "-",
+                            DestinanceId = y.Key.DestinationId,
+                            DestinanceName = y.First()?.Destination?.Name ?? "-",
+                            UomId = y.First().UomId,
+                            UomName = y.First()?.Uom?.Name ??"-",
+                            Expired = y.First().ExpiredDate,
+                            ProductName = y.First()?.Product?.Name ??"-",
+                            Qty = y.Sum(item=>item.Quantity)
+                            
+
+                        }).ToList();
                     NameProduct = SelectedDataItems[0].Adapt<ProductDto>().Name;
                     if (SelectedDataItems[0].Adapt<ProductDto>().TraceAbility == true)
                     {
