@@ -240,7 +240,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {                   
                         TempFormInternalTransfer.Batch = listbatch.FirstOrDefault(x => x.DestinationId == FormInternalTransfer.SourceId)?.Batch;
                         TempFormInternalTransfer.ExpiredDate = listbatch.FirstOrDefault(x => x.DestinationId == FormInternalTransfer.SourceId)?.ExpiredDate;
-                        TempFormInternalTransfer.CurrentStock = 0;
+                        TempFormInternalTransfer.CurrentStock = listbatch?.Where(x => x.DestinationId == FormInternalTransfer.SourceId && x.ProductId == product.Id && x.Batch == TempFormInternalTransfer.Batch).Sum(x => x.Quantity) ?? 0; ;
                                         
                 }
                 else
