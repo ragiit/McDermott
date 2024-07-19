@@ -692,6 +692,38 @@ namespace McDermott.Web.Components.Pages.Inventory
             if (FormInventoryAdjusmentDetail.ProductId is not null)
             {
                 // Retrieve stock products matching the given criteria
+                //var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
+                //    s.ProductId == FormInventoryAdjusmentDetail.ProductId &&
+                //    s.LocationId == InventoryAdjusment.LocationId &&
+                //    s.Validate == true
+                //));
+
+                //// Find the first matching product
+                //var matchedProduct = stockProducts.FirstOrDefault(x =>
+                //    x.LocationId == InventoryAdjusment.LocationId &&
+                //    x.ProductId == FormInventoryAdjusmentDetail.ProductId &&
+                //    x.Batch == FormInventoryAdjusmentDetail.Batch
+                //);
+
+                //// Set UomId and ExpiredDate from the matched product
+                //FormInventoryAdjusmentDetail.UomId = matchedProduct?.UomId;
+                //FormInventoryAdjusmentDetail.ExpiredDate = matchedProduct?.ExpiredDate;
+
+                //// Retrieve all valid stock products for the given ProductId and LocationId
+                //var validProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
+                //    s.ProductId == FormInventoryAdjusmentDetail.ProductId &&
+                //    s.Validate == true &&
+                //    s.LocationId == InventoryAdjusment.LocationId
+                //));
+
+                //// Retrieve stock products with matching batch and validation
+                //var batchProducts = await Mediator.Send(new GetTransactionStockQuery(x =>
+                //    x.ProductId == FormInventoryAdjusmentDetail.ProductId &&
+                //    x.Batch != null &&
+                //    x.Batch == stockProduct &&
+                //    x.Validate == true
+                //));
+
                 var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
                     s.ProductId == FormInventoryAdjusmentDetail.ProductId &&
                     s.LocationId == InventoryAdjusment.LocationId &&
@@ -709,23 +741,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormInventoryAdjusmentDetail.UomId = matchedProduct?.UomId;
                 FormInventoryAdjusmentDetail.ExpiredDate = matchedProduct?.ExpiredDate;
 
-                // Retrieve all valid stock products for the given ProductId and LocationId
-                var validProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
-                    s.ProductId == FormInventoryAdjusmentDetail.ProductId &&
-                    s.Validate == true &&
-                    s.LocationId == InventoryAdjusment.LocationId
-                ));
-
-                // Retrieve stock products with matching batch and validation
-                var batchProducts = await Mediator.Send(new GetTransactionStockQuery(x =>
-                    x.ProductId == FormInventoryAdjusmentDetail.ProductId &&
-                    x.Batch != null &&
-                    x.Batch == stockProduct &&
-                    x.Validate == true
-                ));
+                var aa = await Mediator.Send(new GetTransactionStockQuery(x => x.Validate == true && x.ProductId == FormInventoryAdjusmentDetail.ProductId
+                && x.LocationId == InventoryAdjusment.LocationId && x.Batch == FormInventoryAdjusmentDetail.Batch));
 
                 // Calculate the sum of quantities for batch products
-                FormInventoryAdjusmentDetail.TeoriticalQty = batchProducts.Sum(x => x.Quantity);
+                FormInventoryAdjusmentDetail.TeoriticalQty = aa.Sum(x => x.Quantity);
             }
 
             //FormInventoryAdjusmentDetail.TransactionStockId = null;
