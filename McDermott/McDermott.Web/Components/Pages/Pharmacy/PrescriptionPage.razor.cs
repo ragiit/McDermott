@@ -1027,6 +1027,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 //current Stock
                 var _currentStock = TransactionStocks.Where(x => x.LocationId == Pharmacy.PrescriptionLocationId && x.ProductId == value.ProductId && x.Batch == value.Batch).FirstOrDefault();
+                var Qty = TransactionStocks.Where(x => x.LocationId == Pharmacy.PrescriptionLocationId && x.ProductId == value.ProductId && x.Batch == value.Batch).Sum(x=>x.Quantity);
+
                 if (_currentStock is not null)
                 {
                     if (_currentStock.Quantity > 0)
@@ -1034,7 +1036,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         FormStockOutPrescriptions.TransactionStockId = value.Id;
                         FormStockOutPrescriptions.Batch = value.Batch;
                         FormStockOutPrescriptions.ExpiredDate = value.ExpiredDate;
-                        FormStockOutPrescriptions.CurrentStock = _currentStock.Quantity;
+                        FormStockOutPrescriptions.CurrentStock = Qty;
                     }
                     else
                     {
