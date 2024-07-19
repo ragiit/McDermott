@@ -262,7 +262,7 @@
                                                                                 Mask="@DateTimeMask.ShortDate"
                                                                                 NullText="Year Of Purchase">
                                                                     </DxDateEdit>
-                                                                </DxFormLayoutItem> 
+                                                                </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem Caption="Last Calibration Date" Visible="@(FormProductDetails.HospitalType is not null && FormProductDetails.HospitalType.Equals("Medical Equipment"))" CaptionCssClass=" normal-caption" ColSpanMd="12">
                                                                     <Template>
@@ -367,10 +367,16 @@
                                                                 <DxFormLayoutItem Caption="Internal Reference" CaptionCssClass=" normal-caption" ColSpanMd="12">
                                                                     <DxMemo @bind-Text="@FormProductDetails.InternalReference"
                                                                             NullText="Internal Reference.."
-                                                                            CssClass="cw-480"
                                                                             ShowValidationIcon="true" />
                                                                 </DxFormLayoutItem>
-
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medicine Type" ColSpanMd="12">
+                                                                    <DxCheckBox CssClass="normal-caption" @bind-Checked="@FormProductDetails.IsTopicalMedication">
+                                                                        <div class="normal-caption">Topical Medication</div>
+                                                                    </DxCheckBox>
+                                                                    <DxCheckBox @bind-Checked="@(FormProductDetails.IsOralMedication)">
+                                                                        <div class="normal-caption">Oral Medication</div>
+                                                                    </DxCheckBox>
+                                                                </DxFormLayoutItem>
                                                             </DxFormLayout>
                                                         </div>
                                                     </div>
@@ -400,34 +406,11 @@
                                                 ApplyBackgroundShading="true"
                                                 IndicatorAreaVisible="true"
                                                 Text="Fetching Data...">
-                                    <DxGrid @ref="GridStock"
-                                            PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="StockProducts"
-                                            PageSize="10"
-                                            @bind-SelectedDataItems="@SelectedDataItemsStock"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                    <MyGrid @ref="GridStock" 
+                                            Data="StockProducts" 
                                             KeyFieldName="Id"
-                                            DataItemDeleting="onDeleteStock"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            EditorRenderMode="GridEditorRenderMode.Detached"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            AllowSelectRowByClick="true"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            CssClass="ch-480"
-                                            ShowFilterRow="true"
-                                            TextWrapEnabled="false"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
+                                            DataItemDeleting="onDeleteStock" 
+                                            AllowSelectRowByClick="false">
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                 <DxToolbarItem BeginGroup="true" Text="Back To Product" Click="Back_Click" IconCssClass="fa-solid fa-arrow-left" />
@@ -436,7 +419,7 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="DestinanceName" Caption="Location" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="DestinanceName" Caption="Location" GroupIndex="0" />
                                             @if (FieldHideStock == true)
                                             {
                                                 <DxGridDataColumn FieldName="Batch" Caption="Batch" />
@@ -449,7 +432,7 @@
                                                 <DxGridDataColumn FieldName="Expired" Caption="Expired Date" DisplayFormat="dd MMMM yyyy" />
                                             }
                                         </Columns>
-                                    </DxGrid>
+                                    </MyGrid>
                                 </DxLoadingPanel>
                             </div>
                         }

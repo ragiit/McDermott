@@ -162,8 +162,8 @@
         }
 
         /* .dxbl-btn-standalone.dxbl-btn-primary {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            border-radius: 13px !important;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    border-radius: 13px !important;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
 
         .rounded-button .dxbl-toolbar-item {
             border-radius: 50px;
@@ -216,6 +216,7 @@
     <script src="_content/Blazored.TextEditor/quill-blot-formatter.min.js"></script>
     <script src="_content/Blazored.TextEditor/Blazored-BlazorQuill.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script>
         // Fixed
         function downloadFileFromStream(fileName, streamReference) {
@@ -384,10 +385,93 @@
             printWindow.focus();
             printWindow.print();
             printWindow.close();
+        } 
+        
+        function printJS2(contentToPrint) {
+            // Create a Blob object with the HTML content
+            var blob = new Blob([contentToPrint], { type: 'application/pdf' });
+
+            // Create a link element
+            var link = document.createElement('a');
+
+            // Create a URL for the Blob and set it as the href attribute
+            link.href = URL.createObjectURL(blob);
+
+            // Set the download attribute with a filename
+            link.download = 'document.pdf';
+
+            // Append the link to the body (required for Firefox)
+            document.body.appendChild(link);
+
+            // Trigger a click on the link to start the download
+            link.click();
+
+            // Remove the link from the document
+            document.body.removeChild(link);
+        }
+
+        async function generatePdf22(content) {
+            const { jsPDF } = window.jspdf;
+
+            // Buat dokumen PDF
+            const doc = new jsPDF({
+                orientation: 'portrait', // Anda bisa mengatur 'landscape' jika perlu
+                unit: 'mm',
+                format: 'a4' // Format default, akan diubah nanti
+            });
+
+            // Buat elemen sementara untuk menghitung ukuran konten
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.visibility = 'hidden';
+            tempDiv.style.width = '100%';
+            tempDiv.innerHTML = content;
+            document.body.appendChild(tempDiv);
+
+            // Hitung tinggi konten
+            const contentHeight = tempDiv.offsetHeight;
+
+            // Hapus elemen sementara
+            document.body.removeChild(tempDiv);
+
+            // Set ukuran halaman PDF berdasarkan tinggi konten
+            const pageHeight = Math.max(contentHeight, 297); // Minimal A4 height in mm
+            doc.internal.pageSize.height = pageHeight;
+
+            // Tambahkan HTML ke dokumen PDF
+            doc.html(tempDiv, {
+                callback: function (doc) {
+                    doc.save("report.pdf");
+                },
+                x: 10,
+                y: 10
+            });
         }
 
         function confirmSendEmail() {
             return confirm('Apakah Anda yakin ingin mengirim email ini?');
+        }
+        function generatePdf(content) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Tambahkan HTML ke dokumen PDF
+            doc.html(content, {
+                callback: function (doc) {
+                    doc.save("report.pdf");
+                },
+                x: 10,
+                y: 10
+            });
+        }
+
+        function downloadFileNew(url, filename) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function downloadBase64File(base64Data, fileName) {

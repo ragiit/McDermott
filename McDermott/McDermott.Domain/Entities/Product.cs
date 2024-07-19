@@ -21,6 +21,8 @@
         public DateTime? LastCalibrationDate { get; set; }
         public DateTime? NextCalibrationDate { get; set; }
         public string? EquipmentCondition { get; set; }
+        public bool IsTopicalMedication { get; set; }
+        public bool IsOralMedication { get; set; }
 
         [SetToNull]
         public BpjsClassification? BpjsClassification { get; set; }
