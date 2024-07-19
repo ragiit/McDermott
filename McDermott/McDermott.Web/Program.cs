@@ -1,4 +1,6 @@
 
+using DinkToPdf.Contracts;
+using DinkToPdf;
 using McDermott.Application.Extentions;
 using McDermott.Application.Features.Services;
 using McDermott.Application.Interfaces.Repositories;
@@ -22,6 +24,7 @@ builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplicationLayer();
+builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPCareService, PCareService>();
 builder.Services.AddScoped<IDocumentProvider, DocumentProvider>();

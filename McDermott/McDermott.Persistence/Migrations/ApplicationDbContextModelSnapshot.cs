@@ -4156,6 +4156,12 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("InternalReference")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsOralMedication")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsTopicalMedication")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("LastCalibrationDate")
                         .HasColumnType("datetime2");
 

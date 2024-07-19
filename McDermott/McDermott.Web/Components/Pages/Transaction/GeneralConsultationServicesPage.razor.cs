@@ -1211,6 +1211,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task SaveAllergyData()
         {
+            return;
             if (SelectedFoodAllergies.Count() > 0)
                 GeneralConsultanService.IsFood = true;
             if (SelectedWeatherAllergies.Count() > 0)
@@ -1969,24 +1970,25 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                         if (GeneralConsultanService.IsPharmacology || GeneralConsultanService.IsFood || GeneralConsultanService.IsWeather)
                         {
-                            var ids = new List<long>();
-                            ids.AddRange(SelectedPharmacologyAllergies.Select(x => x.Id).ToList());
-                            ids.AddRange(SelectedWeatherAllergies.Select(x => x.Id).ToList());
-                            ids.AddRange(SelectedFoodAllergies.Select(x => x.Id).ToList());
+                            await SaveAllergyData();
+                            //var ids = new List<long>();
+                            //ids.AddRange(SelectedPharmacologyAllergies.Select(x => x.Id).ToList());
+                            //ids.AddRange(SelectedWeatherAllergies.Select(x => x.Id).ToList());
+                            //ids.AddRange(SelectedFoodAllergies.Select(x => x.Id).ToList());
 
-                            var u = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId);
-                            if (u is not null)
-                            {
-                                u.PatientAllergyIds = ids;
-                                await Mediator.Send(new UpdateUserRequest(u));
-                            }
+                            //var u = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId);
+                            //if (u is not null)
+                            //{
+                            //    u.PatientAllergyIds = ids;
+                            //    await Mediator.Send(new UpdateUserRequest(u));
+                            //}
 
-                            PatientAllergy.UserId = GeneralConsultanService.PatientId.GetValueOrDefault();
+                            //PatientAllergy.UserId = GeneralConsultanService.PatientId.GetValueOrDefault();
 
-                            if (PatientAllergy.Id == 0)
-                                PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
-                            else
-                                PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
+                            //if (PatientAllergy.Id == 0)
+                            //    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
+                            //else
+                            //    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
                         }
 
                         IsLoading = false;
