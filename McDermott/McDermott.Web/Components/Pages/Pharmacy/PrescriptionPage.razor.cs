@@ -803,9 +803,23 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             // Filter stock products based on specific conditions
             StockOutProducts = TransactionStocks
-                .Where(x => x.ProductId == prescription.ProductId && x.LocationId == Pharmacy.PrescriptionLocationId && x.Quantity != 0)
-                .OrderBy(x => x.ExpiredDate)
-                .ToList();
+                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId)
+                    .OrderBy(x=>x.ExpiredDate)
+                    .GroupBy(s => s.Batch)                    
+                    .Select(g => new TransactionStockDto
+                    {
+                        ProductId = product.Id,
+                        Batch = g.Key,
+                        ExpiredDate = g.First().ExpiredDate,
+                        Quantity = g.Sum(x => x.Quantity),
+                        LocationId = Pharmacy.PrescriptionLocationId
+                    }).ToList();
+
+
+            //StockOutProducts = TransactionStocks
+            //    .Where(x => x.ProductId == prescription.ProductId && x.LocationId == Pharmacy.PrescriptionLocationId && x.Quantity != 0)
+            //    .OrderBy(x => x.ExpiredDate)
+            //    .ToList();
 
             // Fetch stock out prescription data
             var listDataStockCut = await Mediator.Send(new GetStockOutPrescriptionQuery());
