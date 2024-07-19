@@ -503,6 +503,8 @@ namespace McDermott.Web.Components.Pages.Inventory
             FormProducts.Tax = FormProductDetails.Tax;
             FormProducts.Cost = FormProductDetails.Cost;
             FormProducts.InternalReference = FormProductDetails.InternalReference;
+            FormProducts.IsOralMedication = FormProductDetails.IsOralMedication;
+            FormProducts.IsTopicalMedication = FormProductDetails.IsTopicalMedication;
             FormProducts.TraceAbility = FormProductDetails.TraceAbility;
             FormProducts.Brand = FormProductDetails.Brand;
             FormProducts.EquipmentCode = FormProductDetails.EquipmentCode;
