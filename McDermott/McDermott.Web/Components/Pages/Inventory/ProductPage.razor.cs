@@ -603,7 +603,10 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if (SelectedDataItems.Count == 0)
                 {
                     // Jika tidak ada item yang dipilih, gunakan produk yang sedang dipertimbangkan
-                    StockProducts = TransactionStocks.Where(x => x.ProductId == getProduct.Id && x.Validate == true)
+                    
+                    if (getProduct.TraceAbility == true)
+                    {
+                        StockProducts = TransactionStocks.Where(x => x.ProductId == getProduct.Id && x.Validate == true)
                         .GroupBy(z => new { z.ProductId, z.Batch, z.LocationId, z.UomId })
                         .Select(y => new StockProductDto
                         {
@@ -619,12 +622,25 @@ namespace McDermott.Web.Components.Pages.Inventory
 
 
                         }).ToList();
-                    if (getProduct.TraceAbility == true)
-                    {
+
                         FieldHideStock = true;
                     }
                     else
                     {
+                        StockProducts = TransactionStocks.Where(x => x.ProductId == getProduct.Id && x.Validate == true)
+                        .GroupBy(z => new { z.ProductId, z.LocationId, z.UomId })
+                        .Select(y => new StockProductDto
+                        {
+                            ProductId = y.Key.ProductId,
+                            DestinanceId = y.Key.LocationId,
+                            DestinanceName = y.First()?.Location?.Name ?? "-",
+                            UomId = y.Key.UomId,
+                            UomName = y.First()?.Uom?.Name ?? "-",
+                            ProductName = y.First()?.Product?.Name ?? "-",
+                            Qty = y.Sum(item => item.Quantity)
+
+
+                        }).ToList();
                         FieldHideStock = false;
                     }
                     NameProduct = getProduct.Name;
