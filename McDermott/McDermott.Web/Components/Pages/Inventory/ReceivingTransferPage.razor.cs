@@ -413,7 +413,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     FormTransactionStock.ExpiredDate = a.ExpiredDate;
                     FormTransactionStock.Reference = referenceNumber;
                     FormTransactionStock.Quantity = a.Qty * Cek_Uom?.BiggerRatio?.ToLong() ?? 0;
-                    FormTransactionStock.DestinationId = GetReceivingStock.DestinationId;
+                    FormTransactionStock.LocationId = GetReceivingStock.DestinationId;
                     FormTransactionStock.UomId = a.Product?.UomId;
                     FormTransactionStock.Validate = false;
 

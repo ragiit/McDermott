@@ -4,6 +4,7 @@ using Microsoft.Identity.Client.Extensions.Msal;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionLineCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
@@ -119,8 +120,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<DrugFormDto> DrugForms { get; set; } = [];
         private List<ActiveComponentDto> ActiveComponentt { get; set; } = [];
         private List<DrugRouteDto> DrugRoutes { get; set; } = [];
-        private List<StockProductDto> StockProducts { get; set; } = [];
-        private List<StockProductDto> StockOutProducts { get; set; } = [];
+        private List<TransactionStockDto> TransactionStocks { get; set; } = [];
+        private List<TransactionStockDto> StockOutProducts { get; set; } = [];
         private List<ActiveComponentDto> ActiveComponents { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponentPrescriptions { get; set; } = [];
@@ -293,7 +294,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 if (value == 0)
                     return;
 
-                var checkStock = StockProducts.Where(x => x.ProductId == Prescription.ProductId && x.SourceId == Pharmacy.PrescriptionLocationId && x.Qty != 0).Sum(x => x.Qty)!;
+                var checkStock = TransactionStocks.Where(x => x.ProductId == Prescription.ProductId && x.LocationId == Pharmacy.PrescriptionLocationId && x.Quantity != 0).Sum(x => x.Quantity)!;
                 if (value > checkStock)
                 {
                     ToastService.ShowInfo($"Total Stock is less than the requested quantity");
@@ -338,7 +339,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
                 selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament != null && ChekMedicament.ActiveComponentId != null && ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
                 var aa = Pharmacy.PrescriptionLocationId;
-                var checkStock = StockProducts.Where(x => x.ProductId == product.Id && x.SourceId == Pharmacy.PrescriptionLocationId).Sum(x => x.Qty);
+                var checkStock = TransactionStocks.Where(x => x.ProductId == product.Id && x.LocationId == Pharmacy.PrescriptionLocationId).Sum(x => x.Quantity);
                 ConcoctionLine.AvaliableQty = checkStock;
             }
             catch (Exception ex)
@@ -433,8 +434,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     continue; // Skip if product is not found
                 }
 
-                var stock = StockProducts
-                    .Where(s => s.ProductId == checkProduct.Id && s.SourceId == Pharmacy.PrescriptionLocationId && s.Qty != 0).Sum(x => x.Qty);
+                var stock = TransactionStocks
+                    .Where(s => s.ProductId == checkProduct.Id && s.LocationId == Pharmacy.PrescriptionLocationId && s.Quantity != 0).Sum(x => x.Quantity);
 
                 if (stock == null || stock == 0)
                 {
@@ -510,7 +511,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 Prescription.DrugRouteId = checkMedicament?.RouteId;
                 selectedActiveComponentPrescriptions = ActiveComponents.Where(z => checkMedicament.ActiveComponentId is not null && checkMedicament.ActiveComponentId.Contains(z.Id)).ToList();
 
-                var checkStock = StockProducts.Where(x => x.ProductId == value.Id && x.SourceId == Pharmacy.PrescriptionLocationId && x.Qty != 0).Sum(x => x.Qty);
+                var checkStock = TransactionStocks.Where(x => x.ProductId == value.Id && x.LocationId == Pharmacy.PrescriptionLocationId && x.Quantity != 0).Sum(x => x.Quantity);
                 if (checkStock == null || checkStock == 0)
                 {
                     Prescription.Stock = 0;
@@ -552,9 +553,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     if (checkProduct == null)
                         return;
 
-                    var stockProduct = StockProducts
-                                    .Where(x => x.ProductId == checkProduct.Id && x.SourceId is not null && x.SourceId == Pharmacy.PrescriptionLocationId)
-                                    .Sum(x => x.Qty);
+                    var stockProduct = TransactionStocks
+                                    .Where(x => x.ProductId == checkProduct.Id && x.LocationId is not null && x.LocationId == Pharmacy.PrescriptionLocationId)
+                                    .Sum(x => x.Quantity);
 
                     var medicamentData = Medicaments.FirstOrDefault(x => x.ProductId == checkProduct.Id);
                     if (medicamentData is null)
@@ -651,9 +652,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             isDetailLines = true;
 
             // Filter stock products based on specific conditions
-            StockOutProducts = StockProducts
-                .Where(x => x.ProductId == concoctionLines.ProductId && x.SourceId == Pharmacy.PrescriptionLocationId && x.Qty != 0)
-                .OrderBy(x => x.Expired)
+            StockOutProducts = TransactionStocks
+                .Where(x => x.ProductId == concoctionLines.ProductId && x.LocationId == Pharmacy.PrescriptionLocationId && x.Quantity != 0)
+                .OrderBy(x => x.ExpiredDate)
                 .ToList();
 
             // Fetch stock out prescription data
@@ -675,21 +676,21 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         var newStockOutLines = new StockOutLinesDto
                         {
                             Id = Helper.RandomNumber,
-                            StockId = item.Id,
                             LinesId = concoctionLines.Id,
+                            TransactionStockId = item.Id,
                             Batch = item.Batch,
-                            Expired = item.Expired,
-                            CurrentStock = item.Qty
+                            ExpiredDate = item.ExpiredDate,
+                            CurrentStock = item.Quantity
                         };
 
                         if (currentStockInput == 0)
                         {
-                            newStockOutLines.CutStock = item.Qty > concoctionLines.TotalQty ? concoctionLines.TotalQty : item.Qty;
+                            newStockOutLines.CutStock = item.Quantity > concoctionLines.TotalQty ? concoctionLines.TotalQty : item.Quantity;
                         }
                         else
                         {
                             long remainingNeeded = concoctionLines.TotalQty - currentStockInput;
-                            newStockOutLines.CutStock = item.Qty >= remainingNeeded ? remainingNeeded : item.Qty;
+                            newStockOutLines.CutStock = item.Quantity >= remainingNeeded ? remainingNeeded : item.Quantity;
                         }
 
                         currentStockInput += newStockOutLines.CutStock;
@@ -703,12 +704,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     // Updating batch and expired values from StockOutProducts
                     foreach (var stock in dataStock)
                     {
-                        var stockProduct = StockOutProducts.FirstOrDefault(x => x.Id == stock.StockId);
+                        var stockProduct = TransactionStocks.FirstOrDefault(x => x.Id == stock.TransactionStockId);
                         if (stockProduct != null)
                         {
+                            stock.TransactionStockId = stockProduct.Id;
                             stock.Batch = stockProduct.Batch;
-                            stock.Expired = stockProduct.Expired;
-                            stock.CurrentStock = stockProduct.Qty;
+                            stock.ExpiredDate = stockProduct.ExpiredDate;
+                            stock.CurrentStock = stockProduct.Quantity;
                         }
                     }
                     StockOutLines = dataStock;
@@ -731,19 +733,21 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         var newStockOutLines = new StockOutLinesDto
                         {
                             Id = Helper.RandomNumber,
-                            StockId = item.Id,
                             LinesId = concoctionLines.Id,
-                            CurrentStock = item.Qty
+                            TransactionStockId = item.Id,
+                            Batch = item.Batch,
+                            ExpiredDate = item.ExpiredDate,
+                            CurrentStock = item.Quantity
                         };
 
                         if (currentStockInput == 0)
                         {
-                            newStockOutLines.CutStock = item.Qty > concoctionLines.TotalQty ? concoctionLines.TotalQty : item.Qty;
+                            newStockOutLines.CutStock = item.Quantity > concoctionLines.TotalQty ? concoctionLines.TotalQty : item.Quantity;
                         }
                         else
                         {
                             long remainingNeeded = concoctionLines.TotalQty - currentStockInput;
-                            newStockOutLines.CutStock = item.Qty >= remainingNeeded ? remainingNeeded : item.Qty;
+                            newStockOutLines.CutStock = item.Quantity >= remainingNeeded ? remainingNeeded : item.Quantity;
                         }
 
                         currentStockInput += newStockOutLines.CutStock;
@@ -757,10 +761,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     // Updating batch and expired values from StockOutProducts
                     foreach (var stock in dataStock)
                     {
-                        var stockProduct = StockOutProducts.FirstOrDefault(x => x.Id == stock.StockId);
+                        var stockProduct = StockOutProducts.FirstOrDefault(x => x.Id == stock.TransactionStockId);
                         if (stockProduct != null)
                         {
-                            stock.CurrentStock = stockProduct.Qty;
+                            stock.CurrentStock = stockProduct.Quantity;
                         }
                     }
                     StockOutLines = dataStock;
@@ -798,9 +802,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
 
             // Filter stock products based on specific conditions
-            StockOutProducts = StockProducts
-                .Where(x => x.ProductId == prescription.ProductId && x.SourceId == Pharmacy.PrescriptionLocationId && x.Qty != 0)
-                .OrderBy(x => x.Expired)
+            StockOutProducts = TransactionStocks
+                .Where(x => x.ProductId == prescription.ProductId && x.LocationId == Pharmacy.PrescriptionLocationId && x.Quantity != 0)
+                .OrderBy(x => x.ExpiredDate)
                 .ToList();
 
             // Fetch stock out prescription data
@@ -823,21 +827,21 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         var newStockOutPrescription = new StockOutPrescriptionDto
                         {
                             Id = Helper.RandomNumber,
-                            StockId = item.Id,
                             PrescriptionId = prescription.Id,
+                            TransactionStockId = item.Id,
                             Batch = item.Batch,
-                            Expired = item.Expired,
-                            CurrentStock = item.Qty
+                            ExpiredDate = item.ExpiredDate,
+                            CurrentStock = item.Quantity
                         };
 
                         if (currentStockInput == 0)
                         {
-                            newStockOutPrescription.CutStock = item.Qty > prescription.GivenAmount ? prescription.GivenAmount : item.Qty;
+                            newStockOutPrescription.CutStock = item.Quantity > prescription.GivenAmount ? prescription.GivenAmount : item.Quantity;
                         }
                         else
                         {
                             long remainingNeeded = prescription.GivenAmount - currentStockInput;
-                            newStockOutPrescription.CutStock = item.Qty >= remainingNeeded ? remainingNeeded : item.Qty;
+                            newStockOutPrescription.CutStock = item.Quantity >= remainingNeeded ? remainingNeeded : item.Quantity;
                         }
 
                         currentStockInput += newStockOutPrescription.CutStock;
@@ -851,12 +855,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     // Updating batch and expired values from StockOutProducts
                     foreach (var stock in dataStock)
                     {
-                        var stockProduct = StockOutProducts.FirstOrDefault(x => x.Id == stock.StockId);
+                        var stockProduct = TransactionStocks.FirstOrDefault(x => x.Id == stock.TransactionStockId);
                         if (stockProduct != null)
                         {
+                            stock.TransactionStockId = stockProduct.Id;
                             stock.Batch = stockProduct.Batch;
-                            stock.Expired = stockProduct.Expired;
-                            stock.CurrentStock = stockProduct.Qty;
+                            stock.ExpiredDate = stockProduct.ExpiredDate;
+                            stock.CurrentStock = stockProduct.Quantity;
                         }
                     }
                     StockOutPrescriptions = dataStock;
@@ -879,19 +884,19 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         var newStockOutPrescription = new StockOutPrescriptionDto
                         {
                             Id = Helper.RandomNumber,
-                            StockId = item.Id,
+                            TransactionStockId = item.Id,
                             PrescriptionId = prescription.Id,
-                            CurrentStock = item.Qty
+                            CurrentStock = item.Quantity
                         };
 
                         if (currentStockInput == 0)
                         {
-                            newStockOutPrescription.CutStock = item.Qty > prescription.GivenAmount ? prescription.GivenAmount : item.Qty;
+                            newStockOutPrescription.CutStock = item.Quantity > prescription.GivenAmount ? prescription.GivenAmount : item.Quantity;
                         }
                         else
                         {
                             long remainingNeeded = prescription.GivenAmount - currentStockInput;
-                            newStockOutPrescription.CutStock = item.Qty >= remainingNeeded ? remainingNeeded : item.Qty;
+                            newStockOutPrescription.CutStock = item.Quantity >= remainingNeeded ? remainingNeeded : item.Quantity;
                         }
 
                         currentStockInput += newStockOutPrescription.CutStock;
@@ -905,10 +910,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     // Updating batch and expired values from StockOutProducts
                     foreach (var stock in dataStock)
                     {
-                        var stockProduct = StockOutProducts.FirstOrDefault(x => x.Id == stock.StockId);
+                        var stockProduct = TransactionStocks.FirstOrDefault(x => x.Id == stock.TransactionStockId);
                         if (stockProduct != null)
                         {
-                            stock.CurrentStock = stockProduct.Qty;
+                            stock.CurrentStock = stockProduct.Quantity;
                         }
                     }
                     StockOutPrescriptions = dataStock;
@@ -923,7 +928,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             // Fetch the latest data from the server or database
             Prescriptions = await Mediator.Send(new GetPrescriptionQuery());
             Products = await Mediator.Send(new GetProductQuery());
-            StockProducts = await Mediator.Send(new GetStockProductQuery());
+            TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
             ConcoctionLines = await Mediator.Send(new GetConcoctionLineQuery());
         }
 
@@ -946,12 +951,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     var item_cutstock = new StockOutPrescriptionDto
                     {
                         CutStock = item.CutStock,
-                        StockId = item.StockId,
+                        TransactionStockId = item.TransactionStockId,
                         PrescriptionId = item.PrescriptionId
                     };
 
                     // Check if the item exists in the database
-                    var existingStockOut = await Mediator.Send(new GetStockOutPrescriptionQuery(x => x.StockId == item.StockId && x.PrescriptionId == item.PrescriptionId));
+                    var existingStockOut = await Mediator.Send(new GetStockOutPrescriptionQuery(x => x.TransactionStockId == item.TransactionStockId && x.PrescriptionId == item.PrescriptionId));
 
                     if (!existingStockOut.Any()) // If the item does not exist
                     {
@@ -983,7 +988,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 foreach (var item in StockOutLines)
                 {
                     item_cutstock.CutStock = item.CutStock;
-                    item_cutstock.StockId = item.StockId;
+                    item_cutstock.TransactionStockId = item.TransactionStockId;
                     item_cutstock.LinesId = item.LinesId;
 
                     await Mediator.Send(new CreateStockOutLinesRequest(item_cutstock));
@@ -998,24 +1003,24 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
         private DateTime? SelectedBatchExpired { get; set; }
-        private async Task ChangeOutStock(StockProductDto value)
+        private async Task ChangeOutStock(TransactionStockDto value)
         {
             SelectedBatchExpired = null;
 
             if (value is not null)
             {
-                SelectedBatchExpired = value.Expired;
+                SelectedBatchExpired = value.ExpiredDate;
 
                 //current Stock
-                var _currentStock = StockProducts.Where(x => x.SourceId == Pharmacy.PrescriptionLocationId && x.ProductId == value.ProductId && x.Batch == value.Batch).FirstOrDefault();
+                var _currentStock = TransactionStocks.Where(x => x.LocationId == Pharmacy.PrescriptionLocationId && x.ProductId == value.ProductId && x.Batch == value.Batch).FirstOrDefault();
                 if (_currentStock is not null)
                 {
-                    if (_currentStock.Qty > 0)
+                    if (_currentStock.Quantity > 0)
                     {
-                        FormStockOutPrescriptions.StockId = value.Id;
+                        FormStockOutPrescriptions.TransactionStockId = value.Id;
                         FormStockOutPrescriptions.Batch = value.Batch;
-                        FormStockOutPrescriptions.Expired = value.Expired;
-                        FormStockOutPrescriptions.CurrentStock = _currentStock.Qty;
+                        FormStockOutPrescriptions.ExpiredDate = value.ExpiredDate;
+                        FormStockOutPrescriptions.CurrentStock = _currentStock.Quantity;
                     }
                     else
                     {
@@ -1026,24 +1031,24 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        private async Task ChangeOutStockLines(StockProductDto value)
+        private async Task ChangeOutStockLines(TransactionStockDto value)
         {
             SelectedBatchExpired = null;
 
             if (value is not null)
             {
-                SelectedBatchExpired = value.Expired;
+                SelectedBatchExpired = value.ExpiredDate;
 
                 //current Stock
-                var _currentStock = StockProducts.Where(x => x.SourceId == Pharmacy.PrescriptionLocationId && x.ProductId == value.ProductId && x.Batch == value.Batch).FirstOrDefault();
+                var _currentStock = TransactionStocks.Where(x => x.LocationId == Pharmacy.PrescriptionLocationId && x.ProductId == value.ProductId && x.Batch == value.Batch).FirstOrDefault();
                 if (_currentStock is not null)
                 {
-                    if (_currentStock.Qty > 0)
+                    if (_currentStock.Quantity > 0)
                     {
-                        FormStockOutLines.StockId = value.Id;
+                        FormStockOutLines.TransactionStockId = value.Id;
                         FormStockOutLines.Batch = value.Batch;
-                        FormStockOutLines.Expired = value.Expired;
-                        FormStockOutLines.CurrentStock = _currentStock.Qty;
+                        FormStockOutLines.ExpiredDate = value.ExpiredDate;
+                        FormStockOutLines.CurrentStock = _currentStock.Quantity;
                     }
                     else
                     {
@@ -1073,7 +1078,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 Signas = await Mediator.Send(new GetSignaQuery());
                 DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
                 Uoms = await Mediator.Send(new GetUomQuery());
-                StockProducts = await Mediator.Send(new GetStockProductQuery());
+                TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                 Medicaments = await Mediator.Send(new GetMedicamentQuery());
                 ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
                 Pharmacies = await Mediator.Send(new GetPharmacyQuery());
@@ -1996,7 +2001,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             if (!traceAvailability)
             {
                 var data_products = Prescriptions.Where(x => x.Id == PrescripId).Select(x => x.ProductId).FirstOrDefault();
-                var Qty_stock = StockProducts.Where(x => x.ProductId == data_products && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
+                var Qty_stock = TransactionStocks.Where(x => x.ProductId == data_products && x.LocationId == Pharmacy.PrescriptionLocationId).Select(x => x.Quantity).FirstOrDefault();
                 FormStockOutLines.CurrentStock = Qty_stock;
             }
             await GridStockOut.StartEditNewRowAsync();
@@ -2007,7 +2012,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             if (!traceAvailability)
             {
                 var data_products = ConcoctionLines.Where(x => x.Id == Lines_Id).Select(x => x.ProductId).FirstOrDefault();
-                var Qty_stock = StockProducts.Where(x => x.ProductId == data_products && x.SourceId == Pharmacy.PrescriptionLocationId).Select(x => x.Qty).FirstOrDefault();
+                var Qty_stock = TransactionStocks.Where(x => x.ProductId == data_products && x.LocationId == Pharmacy.PrescriptionLocationId).Select(x => x.Quantity).FirstOrDefault();
                 FormStockOutLines.CurrentStock = Qty_stock;
             }
             await GridStockOutLines.StartEditNewRowAsync();
@@ -2220,7 +2225,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 foreach (var prescription in prescriptions)
                 {
-                    var stockProduct = StockProducts.Where(x => x.ProductId == prescription.ProductId && x.SourceId == pharmacyData.PrescriptionLocationId).ToList();
+                    var stockProduct = TransactionStocks.Where(x => x.ProductId == prescription.ProductId && x.LocationId == pharmacyData.PrescriptionLocationId).ToList();
                     if (stockProduct == null)
                     {
                         continue;
@@ -2229,14 +2234,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     var stockOutData = StockOutPrescriptions.Where(x => x.PrescriptionId == prescription.Id).ToList();
                     foreach (var stockOut in stockOutData)
                     {
-                        var stock = StockProducts.FirstOrDefault(x => x.Id == stockOut.StockId);
+                        var stock = TransactionStocks.FirstOrDefault(x => x.Id == stockOut.TransactionStockId);
                         if (stock == null)
                         {
                             continue;
                         }
 
-                        stock.Qty -= stockOut.CutStock;
-                        await Mediator.Send(new UpdateStockProductRequest(stock));
+                        stock.Quantity -= stockOut.CutStock;
+                        //await Mediator.Send(new UpdateStockProductRequest(stock));
                     }
                 }
                 #endregion
@@ -2250,7 +2255,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 foreach (var line in data_lines)
                 {
-                    var stockProduct = StockProducts.Where(x => x.ProductId == line.ProductId && x.SourceId == pharmacyData.PrescriptionLocationId).ToList();
+                    var stockProduct = TransactionStocks.Where(x => x.ProductId == line.ProductId && x.LocationId == pharmacyData.PrescriptionLocationId).ToList();
                     if (stockProduct == null)
                     {
                         continue;
@@ -2259,13 +2264,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     var StockOutData = StockOutLines.Where(x => x.LinesId == line.Id).ToList();
                     foreach (var stockOut in StockOutData)
                     {
-                        var stock = StockProducts.FirstOrDefault(x => x.Id == stockOut.StockId);
+                        var stock = TransactionStocks.FirstOrDefault(x => x.Id == stockOut.TransactionStockId);
                         if (stock == null)
                         {
                             continue;
                         }
-                        stock.Qty -= stockOut.CutStock;
-                        await Mediator.Send(new UpdateStockProductRequest(stock));
+                        stock.Quantity -= stockOut.CutStock;
+                        //await Mediator.Send(new UpdateStockProductRequest(stock));
                     }
 
                 }

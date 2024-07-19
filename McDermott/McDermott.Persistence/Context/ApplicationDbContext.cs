@@ -198,12 +198,17 @@ namespace McDermott.Persistence.Context
             modelBuilder.Entity<StockOutPrescription>()
                 .HasOne(h => h.Prescription)
                 .WithMany(x => x.StockOutPrescription)
-                .OnDelete(DeleteBehavior.SetNull);
-
+                .OnDelete(DeleteBehavior.SetNull);   
+            
             modelBuilder.Entity<StockOutPrescription>()
-                .HasOne(h => h.Stock)
-                .WithMany(x => x.StockOutPrescriptions)
-                .OnDelete(DeleteBehavior.SetNull);
+                .HasOne(h => h.TransactionStock)
+                .WithMany(x => x.StockOutPrescription)
+                .OnDelete(DeleteBehavior.SetNull);   
+            
+            modelBuilder.Entity<StockOutLines>()
+                .HasOne(h => h.TransactionStock)
+                .WithMany(x => x.StockOutLines)
+                .OnDelete(DeleteBehavior.SetNull);          
 
             modelBuilder.Entity<TransferStockProduct>()
                 .HasOne(h => h.TransferStock)

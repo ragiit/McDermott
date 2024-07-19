@@ -14,18 +14,18 @@ namespace McDermott.Domain.Entities
         public string? Reference { get; set; }
         public string? Batch { get; set; }
         public DateTime? ExpiredDate { get; set; }
-        public long? SourceId { get; set; }
-        public long? DestinationId { get; set; }
+        public long? LocationId { get; set; }
         public long? Quantity {  get; set; }
         public long? UomId { get; set; }
         public bool? Validate { get; set; }
 
 
         public Product? Product { get; set; }
-        public Location? Source {  get; set; }
-        public Location? Destination { get; set; }
+        public Location? Location {  get; set; }
         public Uom? Uom { get; set; }
         public InventoryAdjusment? InventoryAdjusment { get; set; }
+        public List<StockOutLines>? StockOutLines { get; set; }
+        public List<StockOutPrescription>? StockOutPrescription { get; set; }
 
     }
 }

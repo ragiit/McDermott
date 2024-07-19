@@ -187,7 +187,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                     result = await _unitOfWork.Repository<StockOutPrescription>().Entities
                        .AsNoTracking()
                        .Include(x => x.Prescription)
-                       .Include(x => x.Stock)
+                       .Include(x => x.TransactionStock)
                        
                        .ToListAsync(cancellationToken);
 

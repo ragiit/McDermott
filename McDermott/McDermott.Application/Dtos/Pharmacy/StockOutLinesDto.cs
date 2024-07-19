@@ -11,15 +11,16 @@ namespace McDermott.Application.Dtos.Pharmacy
     {
         public long Id { get; set; }
         public long? LinesId { get; set; }
-        public long? StockId { get; set; }
+        public long? TransactionStockId { get; set; }
+        [Required(ErrorMessage = "Input Stock Not Null!!")]
         public long CutStock { get; set; } = 0;
         public long? CurrentStock { get; set; }
         public string? Batch { get; set; }
-        public DateTime? Expired { get; set; }
+        public DateTime? ExpiredDate { get; set; }
 
         [SetToNull]
         public virtual ConcoctionLineDto? Lines { get; set; }
         [SetToNull]
-        public virtual StockProductDto? Stock { get; set; }
+        public virtual TransactionStockDto? TransactionStock { get; set; }
     }
 }

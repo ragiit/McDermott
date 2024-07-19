@@ -415,7 +415,7 @@
                                                                                     <DxButton RenderStyle="ButtonRenderStyle.Success"
                                                                                               Attributes="@(new Dictionary<string, object> {  ["title"] = "Select Batch" })"
                                                                                               IconCssClass="fa-solid fa-clipboard-list"
-                                                                                              Enabled="@(NameUser.IsPharmacy == true && (Pharmacy.Status == EnumStatusPharmacy.Processed||Pharmacy.Status == EnumStatusPharmacy.Done))"
+                                                                                              Enabled="@(NameUser.IsPharmacy == true && (Pharmacy.Status == EnumStatusPharmacy.Received||Pharmacy.Status == EnumStatusPharmacy.Done))"
                                                                                               Click="@(()=>ShowCutStock((context.DataItem as PrescriptionDto).Id))"
                                                                                               CssClass="me-1" />
                                                                                 </CellDisplayTemplate>
@@ -941,7 +941,7 @@ else
                                   <DxButton RenderStyle="ButtonRenderStyle.Success"
                                         Attributes="@(new Dictionary<string, object> {  ["title"] = "Select Batch" })"
                                         IconCssClass="fa-solid fa-clipboard-list"
-                                        Enabled="@(NameUser.IsPharmacy == true && (Pharmacy.Status == EnumStatusPharmacy.Processed||Pharmacy.Status == EnumStatusPharmacy.Done))"
+                                        Enabled="@(NameUser.IsPharmacy == true && (Pharmacy.Status == EnumStatusPharmacy.Received||Pharmacy.Status == EnumStatusPharmacy.Done))"
                                         Click="@(()=>ShowCutStockLines((context.DataItem as ConcoctionLineDto).Id))"
                                         CssClass="me-1" />
                                 </CellDisplayTemplate>
@@ -1102,9 +1102,9 @@ else
                 KeyboardNavigationEnabled="true">
             <ToolbarTemplate>
                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOut_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed)" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOut_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && IsPopUpForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOut_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received)" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOut_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && IsPopUpForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
                 </DxToolbar>
             </ToolbarTemplate>
             <Columns>
@@ -1134,19 +1134,19 @@ else
                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                 Data="@StockOutProducts"
                                                 NullText="Select Batch..."
-                                                @bind-Value="@FormStockOutPrescriptions.StockId"
-                                                SelectedItemChanged="@((StockProductDto value)=> ChangeOutStock(value))"
+                                                @bind-Value="@FormStockOutPrescriptions.TransactionStockId"
+                                                SelectedItemChanged="@((TransactionStockDto value)=> ChangeOutStock(value))"
                                                 TextFieldName="Batch"
                                                 ValueFieldName="Id">
                                        
                                     </DxComboBox>
-                                    <ValidationMessage For="@(()=> FormStockOutPrescriptions.StockId)" />
+                                    <ValidationMessage For="@(()=> FormStockOutPrescriptions.TransactionStockId)" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                     <DxDateEdit ShowValidationIcon="true"
                                                 DisplayFormat="dd MMMM yyyy"
                                                 ReadOnly
-                                                @bind-Date="@FormStockOutPrescriptions.Expired"
+                                                @bind-Date="@FormStockOutPrescriptions.ExpiredDate"
                                                 NullText="Expired Date">
                                     </DxDateEdit>
                                 </DxFormLayoutItem>
@@ -1175,7 +1175,7 @@ else
     </DxLoadingPanel>
     </div>
     <div class="card-footer"> 
-         @if (NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed)
+         @if (NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received)
          {
             <div class="row  justify-content-end">
                 <div class="col-auto align-self-end">
@@ -1229,9 +1229,9 @@ else
                 KeyboardNavigationEnabled="true">
             <ToolbarTemplate>
                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOutLines_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed)" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOutLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOutLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && IsPopUpForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOutLines_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received)" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOutLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOutLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && IsPopUpForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
                 </DxToolbar>
             </ToolbarTemplate>
             <Columns>
@@ -1261,19 +1261,19 @@ else
                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                 Data="@StockOutProducts"
                                                 NullText="Select Batch..."
-                                                @bind-Value="@FormStockOutLines.StockId"
-                                                SelectedItemChanged="@((StockProductDto value)=> ChangeOutStockLines(value))"
+                                                @bind-Value="@FormStockOutLines.TransactionStockId"
+                                                SelectedItemChanged="@((TransactionStockDto value)=> ChangeOutStockLines(value))"
                                                 TextFieldName="Batch"
                                                 ValueFieldName="Id">
                                        
                                     </DxComboBox>
-                                    <ValidationMessage For="@(()=> FormStockOutPrescriptions.StockId)" />
+                                    <ValidationMessage For="@(()=> FormStockOutPrescriptions.TransactionStockId)" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                     <DxDateEdit ShowValidationIcon="true"
                                                 DisplayFormat="dd MMMM yyyy"
                                                 ReadOnly
-                                                @bind-Date="@FormStockOutLines.Expired"
+                                                @bind-Date="@FormStockOutLines.ExpiredDate"
                                                 NullText="Expired Date">
                                     </DxDateEdit>
                                 </DxFormLayoutItem>
@@ -1302,7 +1302,7 @@ else
     </DxLoadingPanel>
     </div>
     <div class="card-footer"> 
-         @if (NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Processed)
+         @if (NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received)
          {
             <div class="row justify-content-end">
                 <div class="col-auto align-self-end">

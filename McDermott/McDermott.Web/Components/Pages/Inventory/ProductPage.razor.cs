@@ -604,13 +604,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     // Jika tidak ada item yang dipilih, gunakan produk yang sedang dipertimbangkan
                     StockProducts = TransactionStocks.Where(x => x.ProductId == getProduct.Id && x.Validate == true)
-                        .GroupBy(z => new { z.ProductId, z.Batch, z.DestinationId, z.UomId })
+                        .GroupBy(z => new { z.ProductId, z.Batch, z.LocationId, z.UomId })
                         .Select(y => new StockProductDto
                         {
                             ProductId = y.Key.ProductId,
                             Batch = y.Key.Batch ?? "-",
-                            DestinanceId = y.Key.DestinationId,
-                            DestinanceName = y.First()?.Destination?.Name ?? "-",
+                            DestinanceId = y.Key.LocationId,
+                            DestinanceName = y.First()?.Location?.Name ?? "-",
                             UomId = y.Key.UomId,
                             UomName = y.First()?.Uom?.Name ?? "-",
                             Expired = y.First().ExpiredDate,
@@ -633,13 +633,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     // Jika ada item yang dipilih, gunakan produk yang dipilih
                     StockProducts = TransactionStocks.Where(x => x.ProductId == SelectedDataItems[0].Adapt<ProductDto>().Id && x.Validate == true)
-                        .GroupBy(z => new { z.ProductId, z.Batch, z.DestinationId })
+                        .GroupBy(z => new { z.ProductId, z.Batch, z.LocationId })
                         .Select(y => new StockProductDto
                         {
                             ProductId = y.Key.ProductId,
                             Batch = y.Key.Batch ?? "-",
-                            DestinanceId = y.Key.DestinationId,
-                            DestinanceName = y.First()?.Destination?.Name ?? "-",
+                            DestinanceId = y.Key.LocationId,
+                            DestinanceName = y.First()?.Location?.Name ?? "-",
                             UomId = y.First().UomId,
                             UomName = y.First()?.Uom?.Name ?? "-",
                             Expired = y.First().ExpiredDate,

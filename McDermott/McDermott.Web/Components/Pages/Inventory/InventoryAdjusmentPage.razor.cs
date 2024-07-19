@@ -292,7 +292,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 return;
             }
 
-            var st = await Mediator.Send(new GetTransactionStockQuery(x => x.SourceId == e.Id));
+            var st = await Mediator.Send(new GetTransactionStockQuery(x => x.LocationId == e.Id));
 
             Products = AllProducts.Where(x => st.Select(s => s.ProductId).Contains(x.Id)).ToList();
         }
@@ -698,13 +698,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                 // Retrieve stock products matching the given criteria
                 var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
                     s.ProductId == FormInventoryAdjusmentDetail.ProductId &&
-                    s.DestinationId == InventoryAdjusment.LocationId &&
+                    s.LocationId == InventoryAdjusment.LocationId &&
                     s.Validate == true
                 ));
 
                 // Find the first matching product
                 var matchedProduct = stockProducts.FirstOrDefault(x =>
-                    x.DestinationId == InventoryAdjusment.LocationId &&
+                    x.LocationId == InventoryAdjusment.LocationId &&
                     x.ProductId == FormInventoryAdjusmentDetail.ProductId &&
                     x.Batch == FormInventoryAdjusmentDetail.Batch
                 );
@@ -717,7 +717,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 var validProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
                     s.ProductId == FormInventoryAdjusmentDetail.ProductId &&
                     s.Validate == true &&
-                    s.DestinationId == InventoryAdjusment.LocationId
+                    s.LocationId == InventoryAdjusment.LocationId
                 ));
 
                 // Retrieve stock products with matching batch and validation
@@ -803,7 +803,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 FormInventoryAdjusmentDetail.ProductId = e.Id;
 
-                var stockProducts2 = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.DestinationId == InventoryAdjusment.LocationId));
+                var stockProducts2 = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.LocationId == InventoryAdjusment.LocationId));
                 if (e.TraceAbility)
                 {
                     var s = await Mediator.Send(new GetTransactionStockQuery(x => x.ProductId == e.Id && x.Batch != null && x.Batch == FormInventoryAdjusmentDetail.Batch));
@@ -819,7 +819,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 else
                 {
-                    var s = (await Mediator.Send(new GetTransactionStockQuery(x => x.ProductId == e.Id && x.DestinationId == InventoryAdjusment.LocationId)));
+                    var s = (await Mediator.Send(new GetTransactionStockQuery(x => x.ProductId == e.Id && x.LocationId == InventoryAdjusment.LocationId)));
                     //var inn = s.Select(x => x.InStock).Sum();
                     //var outt = s.Select(x => x.OutStock).Sum();
                     //var final = inn - outt;
@@ -830,7 +830,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 return;
-                var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.SourceId == InventoryAdjusment.LocationId));
+                var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.LocationId == InventoryAdjusment.LocationId));
 
                 //if (e.TraceAbility)
                 //{

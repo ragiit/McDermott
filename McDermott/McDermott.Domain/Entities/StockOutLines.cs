@@ -9,12 +9,12 @@ namespace McDermott.Domain.Entities
     public class StockOutLines:BaseAuditableEntity
     {
         public long? LinesId { get; set; }
-        public long? StockId { get; set; }
+        public long? TransactionStockId { get; set; }
         public long? CutStock { get; set; }
 
         [SetToNull]
         public ConcoctionLine? Lines { get; set; }
         [SetToNull]
-        public StockProduct? Stock { get; set; }
+        public TransactionStock? TransactionStock { get; set; }
     }
 }

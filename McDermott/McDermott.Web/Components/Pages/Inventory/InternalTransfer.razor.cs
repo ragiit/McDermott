@@ -186,8 +186,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 SelectedBatchExpired = stockProduct.ExpiredDate;
 
                 //    //current Stock
-                var _currentStock = TransactionStocks.Where(x => x.DestinationId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch).FirstOrDefault();
-                var Qty = TransactionStocks.Where(x => x.DestinationId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch).Sum(x=>x.Quantity);
+                var _currentStock = TransactionStocks.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch).FirstOrDefault();
+                var Qty = TransactionStocks.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch).Sum(x=>x.Quantity);
                 if (_currentStock is not null)
                 {
                     if (Qty > 0)
@@ -210,7 +210,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
-                filteredProducts = Products.Where(p => TransactionStocks.Any(sp => sp.ProductId == p.Id && sp.DestinationId == value.Id)).ToList();
+                filteredProducts = Products.Where(p => TransactionStocks.Any(sp => sp.ProductId == p.Id && sp.LocationId == value.Id)).ToList();
             }
             catch (Exception ex)
             {
@@ -238,16 +238,16 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 if (product.TraceAbility)
                 {                   
-                        TempFormInternalTransfer.Batch = listbatch.FirstOrDefault(x => x.DestinationId == FormInternalTransfer.SourceId)?.Batch;
-                        TempFormInternalTransfer.ExpiredDate = listbatch.FirstOrDefault(x => x.DestinationId == FormInternalTransfer.SourceId)?.ExpiredDate;
-                        TempFormInternalTransfer.CurrentStock = listbatch?.Where(x => x.DestinationId == FormInternalTransfer.SourceId && x.ProductId == product.Id && x.Batch == TempFormInternalTransfer.Batch).Sum(x => x.Quantity) ?? 0; ;
+                        TempFormInternalTransfer.Batch = listbatch.FirstOrDefault(x => x.LocationId == FormInternalTransfer.SourceId)?.Batch;
+                        TempFormInternalTransfer.ExpiredDate = listbatch.FirstOrDefault(x => x.LocationId == FormInternalTransfer.SourceId)?.ExpiredDate;
+                        TempFormInternalTransfer.CurrentStock = listbatch?.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == product.Id && x.Batch == TempFormInternalTransfer.Batch).Sum(x => x.Quantity) ?? 0; ;
                                         
                 }
                 else
                 {
                     TempFormInternalTransfer.Batch = "-";
                     TempFormInternalTransfer.ExpiredDate = null;
-                    TempFormInternalTransfer.CurrentStock = listbatch?.Where(x => x.DestinationId == FormInternalTransfer.SourceId && x.ProductId == product.Id).Sum(x=>x.Quantity) ?? 0;
+                    TempFormInternalTransfer.CurrentStock = listbatch?.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == product.Id).Sum(x=>x.Quantity) ?? 0;
                 }
             }
         }
@@ -527,8 +527,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         // out 
                         FormTransactionStocks.SourceTable = nameof(TransferStock);
                         FormTransactionStocks.SourcTableId = getInternalTransfer.Id;
-                        FormTransactionStocks.SourceId = getInternalTransfer.SourceId;
-                        FormTransactionStocks.DestinationId = getInternalTransfer.DestinationId;
+                        FormTransactionStocks.LocationId = getInternalTransfer.SourceId;
                         FormTransactionStocks.Batch = items.Batch;
                         FormTransactionStocks.ExpiredDate = items.ExpiredDate;
                         FormTransactionStocks.Reference = referenceNumber;
@@ -543,8 +542,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                         FormTransactionStocks.SourceTable = nameof(TransferStock);
                         FormTransactionStocks.SourcTableId = getInternalTransfer.Id;
-                        FormTransactionStocks.SourceId = getInternalTransfer.SourceId;
-                        FormTransactionStocks.DestinationId = getInternalTransfer.DestinationId;
+                        FormTransactionStocks.LocationId = getInternalTransfer.DestinationId;
                         FormTransactionStocks.Batch = items.Batch;
                         FormTransactionStocks.ExpiredDate = items.ExpiredDate;
                         FormTransactionStocks.Reference = referenceNumber;
