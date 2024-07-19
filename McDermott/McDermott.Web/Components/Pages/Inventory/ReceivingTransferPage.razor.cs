@@ -590,7 +590,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
-                if (FormValidationState == false)
+                if (TempReceivingStockDetails.Count<=0)
 
                     return;
 

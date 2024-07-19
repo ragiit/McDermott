@@ -11,20 +11,20 @@
 </style>
 
 <div class="wrapper">
-   @*  <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Good Receipt</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
-                        <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/inventory/receiving-transfer">Good Receipt</a></li>
-                    </ol>
-                </div>
-            </div>
-        </div>
+    @*  <section class="content-header">
+    <div class="container-fluid">
+    <div class="row mb-2">
+    <div class="col-sm-6">
+    <h1>Good Receipt</h1>
+    </div>
+    <div class="col-sm-6">
+    <ol class="breadcrumb float-sm-right">
+    <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
+    <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/inventory/receiving-transfer">Good Receipt</a></li>
+    </ol>
+    </div>
+    </div>
+    </div>
     </section> *@
 
     <BaseHeaderPage Title="Good Receipt" OnClickBack="@(async () => await LoadData())" ShowBackButton="showForm" />
@@ -36,70 +36,70 @@
                 <div class="col">
                     @if (!showForm)
                     {
-                        <div class="card"> 
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="true"
-                                                Text="Fetching Data...">
-                                    <DxGrid @ref="Grid"
-                                            PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="ReceivingStocks"
-                                            PageSize="10"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            DataItemDeleting="OnDelete"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            EditorRenderMode="GridEditorRenderMode.Detached"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            AllowSelectRowByClick="true"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            CssClass="ch-480"
-                                            ShowFilterRow="true"
-                                            RowDoubleClick="OnRowDoubleClick"
-                                            TextWrapEnabled="false"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
-                                        <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItem_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 && isActiveButton" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 && isActiveButton" />
-                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                            </DxToolbar>
-                                        </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Name" />
-                                            <DxGridDataColumn FieldName="SchenduleDate" Caption="Schendule Date" DisplayFormat="dd MMMM yyyy" />
-                                            <DxGridDataColumn FieldName="NumberPurchase" Caption="Purchase Number" />
-                                            <DxGridDataColumn FieldName="Status" Caption="Status">
-                                                <CellDisplayTemplate>
-                                                    @GetIssueStatusIconHtml((context.DataItem as ReceivingStockDto).Status)
-                                                </CellDisplayTemplate>
-                                            </DxGridDataColumn>
-                                        </Columns>
-                                    </DxGrid>
-                                </DxLoadingPanel> 
+                        <div class="card">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="true"
+                                            Text="Fetching Data...">
+                                <DxGrid @ref="Grid"
+                                        PagerNavigationMode="PagerNavigationMode.InputBox"
+                                        Data="ReceivingStocks"
+                                        PageSize="10"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                        KeyFieldName="Id"
+                                        DataItemDeleting="OnDelete"
+                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                        EditorRenderMode="GridEditorRenderMode.Detached"
+                                        PagerPosition="GridPagerPosition.Bottom"
+                                        AllowSelectRowByClick="true"
+                                        PageSizeSelectorVisible="true"
+                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                        PageSizeSelectorAllRowsItemVisible="true"
+                                        PagerSwitchToInputBoxButtonCount="10"
+                                        FocusedRowEnabled="true"
+                                        PagerVisibleNumericButtonCount="10"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        ShowGroupPanel="true"
+                                        AutoExpandAllGroupRows="true"
+                                        CssClass="ch-480"
+                                        ShowFilterRow="true"
+                                        RowDoubleClick="OnRowDoubleClick"
+                                        TextWrapEnabled="false"
+                                        CustomizeElement="Grid_CustomizeElement"
+                                        ShowSearchBox="true"
+                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                        KeyboardNavigationEnabled="true">
+                                    <ToolbarTemplate>
+                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItem_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 && isActiveButton" />
+                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 && isActiveButton" />
+                                            <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                        </DxToolbar>
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Name" />
+                                        <DxGridDataColumn FieldName="SchenduleDate" Caption="Schendule Date" DisplayFormat="dd MMMM yyyy" />
+                                        <DxGridDataColumn FieldName="NumberPurchase" Caption="Purchase Number" />
+                                        <DxGridDataColumn FieldName="Status" Caption="Status">
+                                            <CellDisplayTemplate>
+                                                @GetIssueStatusIconHtml((context.DataItem as ReceivingStockDto).Status)
+                                            </CellDisplayTemplate>
+                                        </DxGridDataColumn>
+                                    </Columns>
+                                </DxGrid>
+                            </DxLoadingPanel>
                         </div>
                     }
                     else
                     {
                         //Button
-                        @if (FormReceivingStocks.Id != 0)
-                        {
-                            <div class="sticky">
+                        <div class="sticky">
+                            @if (FormReceivingStocks.Id != 0)
+                            {
                                 <div class="row justify-content-end mb-3">
                                     <div class="col-auto align-self-end">
                                         <DxTabs RenderMode="TabsRenderMode.AllTabs">
@@ -131,10 +131,22 @@
                                                 </div>
                                             </div>
                                         }
+
                                     </div>
                                 </div>
-                            </div>
-                        }
+                            }
+                            @if (FormReceivingStocks.Id == 0 || FormReceivingStocks.Id == null || FormReceivingStocks.Status == EnumStatusReceiving.Draft)
+                            {
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="col d-flex justify-content-end">
+                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="onDiscard"></DxButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
 
                         <div class="card">
                             <div class="card-header">
@@ -284,30 +296,26 @@
                                                             </DxFormLayout>
                                                         }
 
-                                                        @if (isActiveButton)
-                                                        {
-                                                            <div class="row justify-content-end mt-3">
-                                                                <div class="col-auto align-self-end">
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Confirm" SubmitFormOnClick="true"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridProduct.CancelEditAsync())"></DxButton>
-                                                                </div>
-                                                            </div>
-                                                        }
+                                                        @* @if (isActiveButton)
+                                                    {
+                                                    <div class="row justify-content-end mt-3">
+                                                    <div class="col-auto align-self-end">
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Confirm" SubmitFormOnClick="true"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridProduct.CancelEditAsync())"></DxButton>
+                                                    </div>
+                                                    </div>
+                                                    } *@
+
+                                                        <DxFormLayoutItem ColSpanMd="12">
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Confirm" SubmitFormOnClick="true"></DxButton>
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridProduct.CancelEditAsync())"></DxButton>
+                                                        </DxFormLayoutItem>
                                                     </EditFormTemplate>
                                                 </DxGrid>
                                             </Items>
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>
                                     <hr />
-                                    @if (isActiveButton)
-                                    {
-                                        <DxFormLayout class="mt">
-                                            <div class="col d-flex justify-content-end">
-                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="onDiscard"></DxButton>
-                                            </div>
-                                        </DxFormLayout>
-                                    }
 
                                     @if (Logs.Count > 0)
                                     {
