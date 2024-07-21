@@ -123,6 +123,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private List<TransactionStockDto> TransactionStocks { get; set; } = [];
         private List<TransactionStockDto> StockOutProducts { get; set; } = [];
         private List<ActiveComponentDto> ActiveComponents { get; set; } = [];
+        private TransactionStockDto FormTransactionStock { get; set; } = new();
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponentPrescriptions { get; set; } = [];
 
@@ -652,10 +653,24 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             isDetailLines = true;
 
             // Filter stock products based on specific conditions
+
             StockOutProducts = TransactionStocks
-                .Where(x => x.ProductId == concoctionLines.ProductId && x.LocationId == Pharmacy.PrescriptionLocationId && x.Quantity != 0)
-                .OrderBy(x => x.ExpiredDate)
-                .ToList();
+                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId)
+                    .OrderBy(x => x.ExpiredDate)
+                    .GroupBy(s => s.Batch)
+                    .Select(g => new TransactionStockDto
+                    {
+                        ProductId = product.Id,
+                        Batch = g.Key,
+                        ExpiredDate = g.First().ExpiredDate,
+                        Quantity = g.Sum(x => x.Quantity),
+                        LocationId = Pharmacy.PrescriptionLocationId
+                    }).ToList();
+
+            //StockOutProducts = TransactionStocks
+            //    .Where(x => x.ProductId == concoctionLines.ProductId && x.LocationId == Pharmacy.PrescriptionLocationId && x.Quantity != 0)
+            //    .OrderBy(x => x.ExpiredDate)
+            //    .ToList();
 
             // Fetch stock out prescription data
             var listDataStockCut = await Mediator.Send(new GetStockOutLineQuery());
@@ -804,8 +819,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             // Filter stock products based on specific conditions
             StockOutProducts = TransactionStocks
                     .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId)
-                    .OrderBy(x=>x.ExpiredDate)
-                    .GroupBy(s => s.Batch)                    
+                    .OrderBy(x => x.ExpiredDate)
+                    .GroupBy(s => s.Batch)
                     .Select(g => new TransactionStockDto
                     {
                         ProductId = product.Id,
@@ -1027,7 +1042,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 //current Stock
                 var _currentStock = TransactionStocks.Where(x => x.LocationId == Pharmacy.PrescriptionLocationId && x.ProductId == value.ProductId && x.Batch == value.Batch).FirstOrDefault();
-                var Qty = TransactionStocks.Where(x => x.LocationId == Pharmacy.PrescriptionLocationId && x.ProductId == value.ProductId && x.Batch == value.Batch).Sum(x=>x.Quantity);
+                var Qty = TransactionStocks.Where(x => x.LocationId == Pharmacy.PrescriptionLocationId && x.ProductId == value.ProductId && x.Batch == value.Batch).Sum(x => x.Quantity);
 
                 if (_currentStock is not null)
                 {
@@ -1057,6 +1072,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 //current Stock
                 var _currentStock = TransactionStocks.Where(x => x.LocationId == Pharmacy.PrescriptionLocationId && x.ProductId == value.ProductId && x.Batch == value.Batch).FirstOrDefault();
+                var Qty = TransactionStocks.Where(x => x.LocationId == Pharmacy.PrescriptionLocationId && x.ProductId == value.ProductId && x.Batch == value.Batch).Sum(x => x.Quantity);
                 if (_currentStock is not null)
                 {
                     if (_currentStock.Quantity > 0)
@@ -1064,7 +1080,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         FormStockOutLines.TransactionStockId = value.Id;
                         FormStockOutLines.Batch = value.Batch;
                         FormStockOutLines.ExpiredDate = value.ExpiredDate;
-                        FormStockOutLines.CurrentStock = _currentStock.Quantity;
+                        FormStockOutLines.CurrentStock = Qty;
                     }
                     else
                     {
@@ -1212,7 +1228,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            Concoctions = await Mediator.Send(new GetConcoctionQuery(x=>x.PharmacyId == Pharmacy.Id));
+            Concoctions = await Mediator.Send(new GetConcoctionQuery(x => x.PharmacyId == Pharmacy.Id));
             PanelVisible = false;
         }
 
@@ -1619,7 +1635,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     if (Concoction.Id == 0)
                     {
                         Concoction.Id = Helper.RandomNumber;
-                        if ( Concoction.MedicamentGroupId is not null)
+                        if (Concoction.MedicamentGroupId is not null)
                         {
                             Concoction.MedicamenName = MedicamentGroupsConcoction.Where(x => x.Id == Concoction.MedicamentGroupId).Select(x => x.Name).FirstOrDefault();
                         }
@@ -2014,23 +2030,53 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task NewItemStockOut_Click()
         {
             selectedActiveComponents = [];
+            var data_products = Prescriptions.Where(x => x.Id == PrescripId).Select(x => x.ProductId).FirstOrDefault();
             if (!traceAvailability)
             {
-                var data_products = Prescriptions.Where(x => x.Id == PrescripId).Select(x => x.ProductId).FirstOrDefault();
                 var Qty_stock = TransactionStocks.Where(x => x.ProductId == data_products && x.LocationId == Pharmacy.PrescriptionLocationId).Select(x => x.Quantity).FirstOrDefault();
                 FormStockOutLines.CurrentStock = Qty_stock;
             }
+            var groupedBatch = TransactionStocks
+                    .Where(s => s.ProductId == data_products && s.LocationId == Pharmacy.PrescriptionLocationId)
+                    .GroupBy(s => s.Batch)
+                    .Select(g => new TransactionStockDto
+                    {
+                        Id = g.First().Id,
+                        ProductId = data_products,
+                        Batch = g.Key,
+                        ExpiredDate = g.First().ExpiredDate,
+                        Quantity = g.Sum(x => x.Quantity),
+                        LocationId = Pharmacy.PrescriptionLocationId
+                    }).ToList();
+
+            StockOutProducts = groupedBatch;
+
             await GridStockOut.StartEditNewRowAsync();
         }
         private async Task NewItemStockOutLines_Click()
         {
             selectedActiveComponents = [];
+            var data_products = ConcoctionLines.Where(x => x.Id == Lines_Id).Select(x => x.ProductId).FirstOrDefault();
             if (!traceAvailability)
             {
-                var data_products = ConcoctionLines.Where(x => x.Id == Lines_Id).Select(x => x.ProductId).FirstOrDefault();
                 var Qty_stock = TransactionStocks.Where(x => x.ProductId == data_products && x.LocationId == Pharmacy.PrescriptionLocationId).Select(x => x.Quantity).FirstOrDefault();
                 FormStockOutLines.CurrentStock = Qty_stock;
             }
+
+            var groupedBatch = TransactionStocks
+                    .Where(s => s.ProductId == data_products && s.LocationId == Pharmacy.PrescriptionLocationId)
+                    .GroupBy(s => s.Batch)
+                    .Select(g => new TransactionStockDto
+                    {
+                        Id = g.First().Id,
+                        ProductId = data_products,
+                        Batch = g.Key,
+                        ExpiredDate = g.First().ExpiredDate,
+                        Quantity = g.Sum(x => x.Quantity),
+                        LocationId = Pharmacy.PrescriptionLocationId
+                    }).ToList();
+
+            StockOutProducts = groupedBatch;
             await GridStockOutLines.StartEditNewRowAsync();
         }
 
@@ -2122,11 +2168,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             IsLoading = true;
             Concoction = (ConcoctionDto)grid.SelectedDataItem;
             var data_concoctionLine = ConcoctionLines.Where(x => x.ConcoctionId == Concoction.Id).ToList();
-            foreach(var items in data_concoctionLine)
+            foreach (var items in data_concoctionLine)
             {
-                items.ActiveComponentName = string.Join(",", ActiveComponents.Where(x => items.ActiveComponentId.Contains(x.Id)).Select(z => z.Name)); 
+                items.ActiveComponentName = string.Join(",", ActiveComponents.Where(x => items.ActiveComponentId.Contains(x.Id)).Select(z => z.Name));
             }
-            
+
             IsLoading = false;
         }
 
@@ -2139,12 +2185,55 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task EditItemStockOut_Click(IGrid context)
         {
             var selected = (StockOutPrescriptionDto)context.SelectedDataItem;
+
+            var data_products = Prescriptions.Where(x => x.Id == PrescripId).Select(x => x.ProductId).FirstOrDefault();
+            if (!traceAvailability)
+            {
+                var Qty_stock = TransactionStocks.Where(x => x.ProductId == data_products && x.LocationId == Pharmacy.PrescriptionLocationId).Select(x => x.Quantity).FirstOrDefault();
+                FormStockOutLines.CurrentStock = Qty_stock;
+            }
+            var groupedBatch = TransactionStocks
+                    .Where(s => s.ProductId == data_products && s.LocationId == Pharmacy.PrescriptionLocationId)
+                    .GroupBy(s => s.Batch)
+                    .Select(g => new TransactionStockDto
+                    {
+                        Id = g.First().Id,
+                        ProductId = data_products,
+                        Batch = g.Key,
+                        ExpiredDate = g.First().ExpiredDate,
+                        Quantity = g.Sum(x => x.Quantity),
+                        LocationId = Pharmacy.PrescriptionLocationId
+                    }).ToList();
+
+            StockOutProducts = groupedBatch;
+
             await GridStockOut.StartEditRowAsync(FocusedRowVisibleIndexStockOut);
         }
 
         private async Task EditItemStockOutLines_Click(IGrid context)
         {
             var selected = (StockOutLinesDto)context.SelectedDataItem;
+
+            var data_products = Prescriptions.Where(x => x.Id == PrescripId).Select(x => x.ProductId).FirstOrDefault();
+            if (!traceAvailability)
+            {
+                var Qty_stock = TransactionStocks.Where(x => x.ProductId == data_products && x.LocationId == Pharmacy.PrescriptionLocationId).Select(x => x.Quantity).FirstOrDefault();
+                FormStockOutLines.CurrentStock = Qty_stock;
+            }
+            var groupedBatch = TransactionStocks
+                    .Where(s => s.ProductId == data_products && s.LocationId == Pharmacy.PrescriptionLocationId)
+                    .GroupBy(s => s.Batch)
+                    .Select(g => new TransactionStockDto
+                    {
+                        Id = g.First().Id,
+                        ProductId = data_products,
+                        Batch = g.Key,
+                        ExpiredDate = g.First().ExpiredDate,
+                        Quantity = g.Sum(x => x.Quantity),
+                        LocationId = Pharmacy.PrescriptionLocationId
+                    }).ToList();
+
+            StockOutProducts = groupedBatch;
             await GridStockOutLines.StartEditRowAsync(FocusedRowVisibleIndexStockOut);
         }
         #endregion function Edit Click
@@ -2208,6 +2297,71 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         public async void Received()
         {
             var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
+
+            if (Prescriptions.Count > 0)
+            {
+                var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(Prescription))
+                    .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
+                int NextReferenceNumber = 1;
+                if (cekReference != null)
+                {
+                    int.TryParse(cekReference?.Substring("PHP#".Length), out NextReferenceNumber);
+                    NextReferenceNumber++;
+                }
+                string referenceNumber = $"PHP#{NextReferenceNumber:D3}";
+
+                foreach (var item in Prescriptions)
+                {
+                    var check_CutStock = StockOutPrescriptions.Where(x => x.PrescriptionId == item.Id).ToList();
+                    foreach (var items in check_CutStock)
+                    {
+                        FormTransactionStock.ProductId = items?.Prescription?.ProductId;
+                        FormTransactionStock.SourceTable = nameof(Prescription);
+                        FormTransactionStock.SourcTableId = items?.PrescriptionId;
+                        FormTransactionStock.LocationId = items?.Prescription?.Pharmacy?.PrescriptionLocationId;
+                        FormTransactionStock.ExpiredDate = items?.ExpiredDate;
+                        FormTransactionStock.Batch = items?.Batch;
+                        FormTransactionStock.Quantity = items?.CutStock ?? 0;
+                        FormTransactionStock.Reference = referenceNumber;
+                        FormTransactionStock.UomId = items?.Prescription?.Product?.UomId;
+                        FormTransactionStock.Validate = false;
+                        await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+                    }
+                }
+            }
+
+            if (ConcoctionLines.Count > 0)
+            {
+                var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(ConcoctionLine))
+                    .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
+                int NextReferenceNumber = 1;
+                if (cekReference != null)
+                {
+                    int.TryParse(cekReference?.Substring("PHCL#".Length), out NextReferenceNumber);
+                    NextReferenceNumber++;
+                }
+                string referenceNumber = $"PHCL#{NextReferenceNumber:D3}";
+
+                foreach (var item in ConcoctionLines)
+                {
+                    var check_CutStock = StockOutLines.Where(x => x.LinesId == item.Id).ToList();
+                    var concoction_data = Concoctions.Where(x => x.Id == Lines_Id).FirstOrDefault();
+                    foreach (var items in check_CutStock)
+                    {
+                        FormTransactionStock.ProductId = items?.Lines?.ProductId;
+                        FormTransactionStock.SourceTable = nameof(ConcoctionLine);
+                        FormTransactionStock.SourcTableId = items?.LinesId;
+                        FormTransactionStock.LocationId = concoction_data?.Pharmacy?.PrescriptionLocationId;
+                        FormTransactionStock.ExpiredDate = items?.ExpiredDate;
+                        FormTransactionStock.Batch = items?.Batch;
+                        FormTransactionStock.Quantity = items?.CutStock ?? 0;
+                        FormTransactionStock.Reference = referenceNumber;
+                        FormTransactionStock.UomId = items?.Lines?.Product?.UomId;
+                        FormTransactionStock.Validate = false;
+                        await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+                    }
+                }
+            }
             Pharmacy.Status = EnumStatusPharmacy.Processed;
             var updates = await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
@@ -2224,6 +2378,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
+
                 StockOutPrescriptions = await Mediator.Send(new GetStockOutPrescriptionQuery());
                 StockOutLines = await Mediator.Send(new GetStockOutLineQuery());
                 var pharmacyData = Pharmacies.FirstOrDefault(x => x.Id == Pharmacy.Id);

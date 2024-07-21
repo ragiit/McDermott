@@ -1107,8 +1107,7 @@ else
                     <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && IsPopUpForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
                 </DxToolbar>
             </ToolbarTemplate>
-            <Columns>
-                <DxGridSelectionColumn Width="15px" />
+            <Columns>                
                         @if (traceAvailability == true)
                         {
                             <DxGridDataColumn MinWidth="200" FieldName="Batch" Caption="Batch" SortIndex="0" />
@@ -1235,13 +1234,12 @@ else
                 </DxToolbar>
             </ToolbarTemplate>
             <Columns>
-                <DxGridSelectionColumn Width="15px" />
                         @if (traceAvailability == true)
                         {
                             <DxGridDataColumn MinWidth="200" FieldName="Batch" Caption="Batch" SortIndex="0" />
                             <DxGridDataColumn MinWidth="200" FieldName="ExpiredDate" Caption="Expired Date" DisplayFormat="dd MMMM yyyy"/>
                         }
-                        <DxGridDataColumn MinWidth="200" FieldName="CurrentStock" Caption="Current Stock" />
+                <DxGridDataColumn MinWidth="200" FieldName="CurrentStock" Caption="Current Stock" />
                 <DxGridDataColumn MinWidth="200" FieldName="CutStock" Caption="Input Stock"  />
 
             </Columns>
