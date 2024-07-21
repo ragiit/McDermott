@@ -51,7 +51,7 @@
                                                         Text="Fetching Data...">
                                             <DxGrid @ref="Grid"
                                                     PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                    Data="Pharmacies"
+                                                    Data="@(Pharmacies.OrderBy<PharmacyDto, EnumStatusPharmacy>(x => x.Status ?? EnumStatusPharmacy.Draft, new StatusComparer()).ToList())"
                                                     PageSize="10"
                                                     @bind-SelectedDataItems="@SelectedDataItems"
                                                     FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"

@@ -288,6 +288,20 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             "BPJS"
         };
 
+        public class StatusComparer : IComparer<EnumStatusPharmacy>
+        {
+            private static readonly List<EnumStatusPharmacy> StatusOrder = new List<EnumStatusPharmacy> { EnumStatusPharmacy.Draft, EnumStatusPharmacy.SendToPharmacy, EnumStatusPharmacy.Received, EnumStatusPharmacy.Processed, EnumStatusPharmacy.Done, EnumStatusPharmacy.Cancel };
+
+            public int Compare(EnumStatusPharmacy x, EnumStatusPharmacy y)
+            {
+                int indexX = StatusOrder.IndexOf(x);
+                int indexY = StatusOrder.IndexOf(y);
+
+                // Compare the indices
+                return indexX.CompareTo(indexY);
+            }
+        }
+
         private void checkStock(long value)
         {
             try
@@ -795,7 +809,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             PanelVisible = true;
             PrescripId = prescriptionId;
             // Get the prescription by ID
-            var prescription = Prescriptions.FirstOrDefault(x => x.Id == prescriptionId);
+            var prescription = Prescriptions.FirstOrDefault(x => x.Id == prescriptionId && x.PharmacyId == Pharmacy.Id);
             if (prescription == null)
             {
                 // Handle case where the prescription is not found
@@ -955,10 +969,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task RefreshData()
         {
             // Fetch the latest data from the server or database
-            Prescriptions = await Mediator.Send(new GetPrescriptionQuery());
+            Prescriptions = await Mediator.Send(new GetPrescriptionQuery(x=>x.PharmacyId== Pharmacy.Id));
+            Concoctions = await Mediator.Send(new GetConcoctionQuery());
+            var concoctionId = Concoctions.Where(x => x.PharmacyId == Pharmacy.Id).FirstOrDefault();
             Products = await Mediator.Send(new GetProductQuery());
             TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-            ConcoctionLines = await Mediator.Send(new GetConcoctionLineQuery());
+            ConcoctionLines = await Mediator.Send(new GetConcoctionLineQuery(x=>x.ConcoctionId == concoctionId.Id));
         }
 
         private void HandleDiscard()
@@ -1784,20 +1800,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 ex.HandleException(ToastService);
             }
-            //}
-            //else
-            //{
-            //    Sc.PrescriptionId = Prescription.Id;
-            //    if (Sc.Id == 0)
-            //    {
-            //        await Mediator.Send(new CreateStockOutPrescriptionRequest(Sc));
-            //    }
-            //    else
-            //    {
-            //        await Mediator.Send(new UpdateStockOutPrescriptionRequest(FormStockOutPrescriptions));
-            //    }
-            //    await LoadDataStockOut();
-            //}
+            
         }
 
         private async Task OnSaveStockOutLines(GridEditModelSavingEventArgs e)
@@ -2378,6 +2381,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
+                await LoadAsyncData();
+                await LoadData();
 
                 StockOutPrescriptions = await Mediator.Send(new GetStockOutPrescriptionQuery());
                 StockOutLines = await Mediator.Send(new GetStockOutLineQuery());
@@ -2396,24 +2401,29 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 foreach (var prescription in prescriptions)
                 {
-                    var stockProduct = TransactionStocks.Where(x => x.ProductId == prescription.ProductId && x.LocationId == pharmacyData.PrescriptionLocationId).ToList();
+                    var stockProduct = TransactionStocks.Where(x => x.SourceTable == nameof(Prescription) && x.SourcTableId == prescription.Id).ToList();
                     if (stockProduct == null)
                     {
                         continue;
                     }
 
-                    var stockOutData = StockOutPrescriptions.Where(x => x.PrescriptionId == prescription.Id).ToList();
-                    foreach (var stockOut in stockOutData)
+                    foreach(var items in stockProduct)
                     {
-                        var stock = TransactionStocks.FirstOrDefault(x => x.Id == stockOut.TransactionStockId);
-                        if (stock == null)
-                        {
-                            continue;
-                        }
-
-                        stock.Quantity -= stockOut.CutStock;
-                        //await Mediator.Send(new UpdateStockProductRequest(stock));
+                        items.Validate = true;
+                        var aas = await Mediator.Send(new UpdateTransactionStockRequest(items));
                     }
+                    //var stockOutData = StockOutPrescriptions.Where(x => x.PrescriptionId == prescription.Id).ToList();
+                    //foreach (var stockOut in stockOutData)
+                    //{
+                    //    var stock = TransactionStocks.FirstOrDefault(x => x.Id == stockOut.TransactionStockId);
+                    //    if (stock == null)
+                    //    {
+                    //        continue;
+                    //    }
+
+                    //    stock.Quantity -= stockOut.CutStock;
+                    //    //await Mediator.Send(new UpdateStockProductRequest(stock));
+                    //}
                 }
                 #endregion
                 #region ConcoctionLine CutStock
@@ -2426,22 +2436,16 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 foreach (var line in data_lines)
                 {
-                    var stockProduct = TransactionStocks.Where(x => x.ProductId == line.ProductId && x.LocationId == pharmacyData.PrescriptionLocationId).ToList();
+                    var stockProduct = TransactionStocks.Where(x => x.SourceTable == nameof(ConcoctionLine) && x.SourcTableId == line.Id).ToList();
                     if (stockProduct == null)
                     {
                         continue;
                     }
 
-                    var StockOutData = StockOutLines.Where(x => x.LinesId == line.Id).ToList();
-                    foreach (var stockOut in StockOutData)
+                    foreach(var items in stockProduct)
                     {
-                        var stock = TransactionStocks.FirstOrDefault(x => x.Id == stockOut.TransactionStockId);
-                        if (stock == null)
-                        {
-                            continue;
-                        }
-                        stock.Quantity -= stockOut.CutStock;
-                        //await Mediator.Send(new UpdateStockProductRequest(stock));
+                        items.Validate = true;
+                        var asa = Mediator.Send(new UpdateTransactionStockRequest(items));
                     }
 
                 }
