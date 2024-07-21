@@ -345,16 +345,19 @@ namespace McDermott.Web.Components.Pages.Inventory
                         await Mediator.Send(new CreateInventoryAdjusmentDetailRequest(inventoryAdjusmentDetail));
                     else
                         await Mediator.Send(new UpdateInventoryAdjusmentDetailRequest(inventoryAdjusmentDetail));
-                     
-                    // Map InventoryAdjusmentDetail to TransactionStockDto using Mapster
-                    var transactionStockDto = inventoryAdjusmentDetail.Adapt<TransactionStockDto>();
-                    transactionStockDto.LocationId = InventoryAdjusment.LocationId;
-                    transactionStockDto.Validate = false;
-                    transactionStockDto.Quantity = inventoryAdjusmentDetail.Difference;
-                    transactionStockDto.SourcTableId = inventoryAdjusmentDetail.InventoryAdjusmentId;
-                    transactionStockDto.SourceTable = nameof(InventoryAdjusment);
+                    
+                    if (inventoryAdjusmentDetail.Difference != 0)
+                    {
+                        // Map InventoryAdjusmentDetail to TransactionStockDto using Mapster
+                        var transactionStockDto = inventoryAdjusmentDetail.Adapt<TransactionStockDto>();
+                        transactionStockDto.LocationId = InventoryAdjusment.LocationId;
+                        transactionStockDto.Validate = false;
+                        transactionStockDto.Quantity = inventoryAdjusmentDetail.Difference;
+                        transactionStockDto.SourcTableId = inventoryAdjusmentDetail.InventoryAdjusmentId;
+                        transactionStockDto.SourceTable = nameof(InventoryAdjusment);
 
-                    await Mediator.Send(new CreateTransactionStockRequest(transactionStockDto));
+                        await Mediator.Send(new CreateTransactionStockRequest(transactionStockDto));
+                    } 
 
                     await LoadInventoryAdjustmentDetails();
                 }
