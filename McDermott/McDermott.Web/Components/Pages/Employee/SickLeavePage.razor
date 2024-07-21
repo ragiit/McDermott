@@ -4,59 +4,24 @@
 @rendermode InteractiveServer
 
 <div class="wrapper">
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Sick Leave Management</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item" @onclick="LoadData"><a href="/employee/sick-leave">Sick Leave Mangement</a></li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </section>
+    <BaseHeaderPage Title="Sick Leave" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
     <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col">
-                    <div class="card">
-                        <div class="card-body">
+                    <div class="card"> 
                             <DxLoadingPanel @bind-Visible="IsLoading"
                                             IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                             IsContentBlocked="true"
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
-                                <DxGrid @ref="@Grid"
+                                <MyGrid @ref="@Grid"
                                         Data="@SickLeaves"
-                                        PagerNavigationMode="PagerNavigationMode.InputBox"
-                                        PageSize="10"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        AllowSelectRowByClick="true"
-                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                        KeyFieldName="Id"
-                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                        FocusedRowEnabled="true"
-                                        PopupEditFormCssClass="pw-800"
-                                        PagerPosition="GridPagerPosition.Bottom"
-                                        PageSizeSelectorVisible="true"
-                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        PageSizeSelectorAllRowsItemVisible="true"
-                                        PagerSwitchToInputBoxButtonCount="10"
-                                        PagerVisibleNumericButtonCount="10"
-                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                        ShowGroupPanel="true"
-                                        CustomizeElement="GridExtention.Grid_CustomizeElement"
-                                        AutoExpandAllGroupRows="true"
-                                        ShowFilterRow="true"
-                                        ShowSearchBox="true"
-                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                        KeyboardNavigationEnabled="true">
+                                        @bind-SelectedDataItems="@SelectedDataItems" 
+                                        FocusedRowChanged="Grid_FocusedRowChanged" >
+
                                     <ToolbarTemplate>
                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
                                             <DxToolbarItem Text="Send Email" RenderStyle="ButtonRenderStyle.Primary" CssClass="w-100" Click="ConfirmAndSendEmail" IconCssClass="fa-solid fa-envelope-circle-check" Enabled="SelectedDataItems.Count > 0 && SickLeaves.Count > 0 && Employee" />
@@ -85,6 +50,7 @@
                                         <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.NoRM" Caption="NO RM" />
                                         <DxGridDataColumn MinWidth="150" FieldName="TypeLeave" Caption="Type" />
                                         <DxGridDataColumn MinWidth="150" FieldName="YesOrNoEmployee" Caption="IsEmployee" />
+
                                         @if (TypeLeaves == "SickLeave")
                                         {
                                             <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.StartDateSickLeave" Caption="Start Date Leave" DisplayFormat="dd MMMM yyyy" />
@@ -99,9 +65,8 @@
                                         <DxGridDataColumn MinWidth="200" FieldName="Diagnosis" Caption="Diagnosis" />
                                         <DxGridDataColumn MinWidth="130" FieldName="Status" Caption="Status" />
                                     </Columns>
-                                </DxGrid>
-                            </DxLoadingPanel>
-                        </div>
+                                </MyGrid>
+                            </DxLoadingPanel> 
                     </div>
                 </div>
             </div>
