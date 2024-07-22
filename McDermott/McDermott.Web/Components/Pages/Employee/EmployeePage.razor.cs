@@ -1,10 +1,12 @@
 ﻿using System.Linq.Expressions;
+using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
 namespace McDermott.Web.Components.Pages.Employee
 {
     public partial class EmployeePage
     {
         private List<UserDto> Users = [];
+        private List<OccupationalDto> Occupationals = [];
         public List<CityDto> Cities = [];
         public List<CountryDto> Countries = [];
         public List<ProvinceDto> Provinces = [];
@@ -111,6 +113,7 @@ namespace McDermott.Web.Components.Pages.Employee
             Genders = await Mediator.Send(new GetGenderQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());
             JobPositions = await Mediator.Send(new GetJobPositionQuery());
+            Occupationals = await Mediator.Send(new GetOccupationalQuery());
 
             await GetUserInfo();
             await LoadData();

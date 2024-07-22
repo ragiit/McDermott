@@ -360,6 +360,13 @@ namespace McDermott.Web.Components.Pages.Patient
                 if (!FormValidationState)
                     return;
 
+                var a = Users.FirstOrDefault(x => x.NoId == UserForm.NoId && x.Id != UserForm.Id);
+                if (a != null)
+                {
+                    ToastService.ShowInfo("The Identity Number already exist");
+                    return;
+                }
+
                 UserForm.IsPatient = true;
                 UserForm.PatientAllergyIds = new List<long>();
 

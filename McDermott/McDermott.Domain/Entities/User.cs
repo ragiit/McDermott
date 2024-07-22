@@ -91,11 +91,14 @@
         public List<long>? DoctorServiceIds { get; set; }
         public List<long>? PatientAllergyIds { get; set; }
         public long? SupervisorId { get; set; }
+        public long? OccupationalId { get; set; }
 
         #region Relation
 
         [SetToNull]
         public User? Supervisor { get; set; }
+        [SetToNull]
+        public Occupational? Occupational { get; set; } 
 
         [SetToNull]
         public virtual Group? Group { get; set; }

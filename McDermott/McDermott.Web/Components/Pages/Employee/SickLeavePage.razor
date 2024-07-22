@@ -3,6 +3,8 @@
 @page "/employee/sick-leave/PrintToLeave/{Id:long}"
 @rendermode InteractiveServer
 
+<PageTitle>@Helper.APP_NAME - Sick Leave</PageTitle>
+
 <div class="wrapper">
     <BaseHeaderPage Title="Sick Leave" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
@@ -10,63 +12,62 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col">
-                    <div class="card"> 
-                            <DxLoadingPanel @bind-Visible="IsLoading"
-                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                            IsContentBlocked="true"
-                                            ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="false"
-                                            Text="Fetching Data...">
-                                <MyGrid @ref="@Grid"
-                                        Data="@SickLeaves"
-                                        @bind-SelectedDataItems="@SelectedDataItems" 
-                                        FocusedRowChanged="Grid_FocusedRowChanged" >
+                    <div class="card">
+                        <DxLoadingPanel @bind-Visible="IsLoading"
+                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                        IsContentBlocked="true"
+                                        ApplyBackgroundShading="true"
+                                        IndicatorAreaVisible="false"
+                                        Text="Fetching Data...">
+                            <MyGrid @ref="@Grid"
+                                    Data="@SickLeaves"
+                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                    FocusedRowChanged="Grid_FocusedRowChanged">
 
-                                    <ToolbarTemplate>
-                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                            <DxToolbarItem Text="Send Email" RenderStyle="ButtonRenderStyle.Primary" CssClass="w-100" Click="ConfirmAndSendEmail" IconCssClass="fa-solid fa-envelope-circle-check" Enabled="SelectedDataItems.Count > 0 && SickLeaves.Count > 0 && Employee" />
-                                        </DxToolbar>
-                                    </ToolbarTemplate>
-                                    
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="10px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
-                                            <CellDisplayTemplate>
-                                                <DxButton RenderStyle="ButtonRenderStyle.Success"
-                                                          Attributes="@(new Dictionary<string, object> {  ["title"] = "Print" })"
-                                                          IconCssClass="fa-solid fa-print"
-                                                          Click="@(()=>PrintToLeave((context.DataItem as SickLeaveDto).GeneralConsultans.PatientId))"
-                                                          CssClass="me-1" />
+                                <ToolbarTemplate>
+                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                        <DxToolbarItem Text="Send Email" RenderStyle="ButtonRenderStyle.Primary" CssClass="w-100" Click="ConfirmAndSendEmail" IconCssClass="fa-solid fa-envelope-circle-check" Enabled="SelectedDataItems.Count > 0 && SickLeaves.Count > 0 && Employee" />
+                                    </DxToolbar>
+                                </ToolbarTemplate>
 
-                                               @*  <DxButton RenderStyle="ButtonRenderStyle.Primary"
-                                                          Attributes="@(new Dictionary<string, object> {  ["title"] = "Send To Email" })"
-                                                          IconCssClass="fa-solid fa-paper-plane"
-                                                          Click="@(()=>SendToEmail((context.DataItem as SickLeaveDto).PatientId))"
-                                                          IconPosition="ButtonIconPosition.AfterText" /> *@
-                                            </CellDisplayTemplate>
-                                            <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
-                                        </DxGridDataColumn>
-                                        <DxGridDataColumn MinWidth="200" FieldName="GeneralConsultans.Patient.Name" Caption="Patient Name" />
-                                        <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.NoRM" Caption="NO RM" />
-                                        <DxGridDataColumn MinWidth="150" FieldName="TypeLeave" Caption="Type" />
-                                        <DxGridDataColumn MinWidth="150" FieldName="YesOrNoEmployee" Caption="IsEmployee" />
+                                <Columns>
+                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="10px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                                        <CellDisplayTemplate>
+                                            <DxButton RenderStyle="ButtonRenderStyle.Success"
+                                                      Attributes="@(new Dictionary<string, object> {  ["title"] = "Print" })"
+                                                      IconCssClass="fa-solid fa-print"
+                                                      Click="@(()=>PrintToLeave((context.DataItem as SickLeaveDto).GeneralConsultans.PatientId))"
+                                                      CssClass="me-1" />
 
-                                        @if (TypeLeaves == "SickLeave")
-                                        {
-                                            <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.StartDateSickLeave" Caption="Start Date Leave" DisplayFormat="dd MMMM yyyy" />
-                                            <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.EndDateSickLeave" Caption="End Date Leave" DisplayFormat="dd MMMM yyyy" />
-                                        }
-                                        else if (TypeLeaves == "Maternity")
-                                        {
-                                            <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.StartMaternityLeave" Caption="Start Date Leave" DisplayFormat="dd MMMM yyyy" />
-                                            <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.EndMaternityLeave" Caption="End Date Leave" DisplayFormat="dd MMMM yyyy" />
+                                            @*  <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                            Attributes="@(new Dictionary<string, object> {  ["title"] = "Send To Email" })"
+                                            IconCssClass="fa-solid fa-paper-plane"
+                                            Click="@(()=>SendToEmail((context.DataItem as SickLeaveDto).PatientId))"
+                                            IconPosition="ButtonIconPosition.AfterText" /> *@
+                                        </CellDisplayTemplate>
+                                        <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
+                                    </DxGridDataColumn>
+                                    <DxGridDataColumn MinWidth="200" FieldName="GeneralConsultans.Patient.Name" Caption="Patient Name" />
+                                    <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.NoRM" Caption="NO RM" />
+                                    <DxGridDataColumn MinWidth="150" FieldName="TypeLeave" Caption="Type" />
 
-                                        }
-                                        <DxGridDataColumn MinWidth="200" FieldName="Diagnosis" Caption="Diagnosis" />
-                                        <DxGridDataColumn MinWidth="130" FieldName="Status" Caption="Status" />
-                                    </Columns>
-                                </MyGrid>
-                            </DxLoadingPanel> 
+                                    @if (TypeLeaves == "SickLeave")
+                                    {
+                                        <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.StartDateSickLeave" Caption="Start Date Leave" DisplayFormat="dd MMMM yyyy" />
+                                        <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.EndDateSickLeave" Caption="End Date Leave" DisplayFormat="dd MMMM yyyy" />
+                                    }
+                                    else if (TypeLeaves == "Maternity")
+                                    {
+                                        <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.StartMaternityLeave" Caption="Start Date Leave" DisplayFormat="dd MMMM yyyy" />
+                                        <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.EndMaternityLeave" Caption="End Date Leave" DisplayFormat="dd MMMM yyyy" />
+
+                                    }
+                                    <DxGridDataColumn MinWidth="200" FieldName="Diagnosis" Caption="Diagnosis" />
+                                    <DxGridDataColumn MinWidth="130" FieldName="Status" Caption="Status" />
+                                </Columns>
+                            </MyGrid>
+                        </DxLoadingPanel>
                     </div>
                 </div>
             </div>
@@ -86,10 +87,10 @@
     <BodyContentTemplate>
         <div class="text-wrap">
             <p class="fw-4">Are you sure you want to send this email? </p>
-           </div>
+        </div>
     </BodyContentTemplate>
     <FooterContentTemplate Context="Context">
-        <DxButton Enabled="!IsLoading" CssClass="popup-button my-1 ms-2" Click="SendToEmail" RenderStyle="ButtonRenderStyle.Primary" Text="Yes" SubmitFormOnClick="true"/>
-        <DxButton CssClass="popup-button my-1 ms-2" Click="Cancel" RenderStyle="ButtonRenderStyle.Danger" Text="No"  />
+        <DxButton Enabled="!IsLoading" CssClass="popup-button my-1 ms-2" Click="SendToEmail" RenderStyle="ButtonRenderStyle.Primary" Text="Yes" SubmitFormOnClick="true" />
+        <DxButton CssClass="popup-button my-1 ms-2" Click="Cancel" RenderStyle="ButtonRenderStyle.Danger" Text="No" />
     </FooterContentTemplate>
 </DxPopup>

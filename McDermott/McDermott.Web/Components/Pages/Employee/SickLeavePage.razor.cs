@@ -118,13 +118,12 @@ namespace McDermott.Web.Components.Pages.Employee
 
                     var cek = generalConsultans.Where(x => x.Id == item.GeneralConsultansId).FirstOrDefault();
                     item.PhycisianName = Users.Where(x => x.Id == cek.PratitionerId).Select(x => x.Name).FirstOrDefault();
-                    item.isEmployee = Users.Where(x=>x.Id == cek.PatientId).Select(x=>x.IsEmployee).FirstOrDefault();
+                    item.isEmployee = Users.Where(x => x.Id == cek.PatientId).Select(x => x.IsEmployee).FirstOrDefault();
 
                     if (item.isEmployee == true)
                     {
                         item.YesOrNoEmployee = "Yes";
                     }
-                    
                 }
                 IsLoading = false;
             }
@@ -137,20 +136,7 @@ namespace McDermott.Web.Components.Pages.Employee
         #endregion async Data
 
         #region Grid Configuration
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
+ 
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;

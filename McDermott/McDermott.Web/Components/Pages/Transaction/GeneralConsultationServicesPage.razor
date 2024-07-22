@@ -687,6 +687,201 @@
                                         </div>
                                     </div>
 
+                                    <div class="w-100">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <span class="fw-bolder">History</span>
+                                            </div>
+
+                                            <div class="card-body">
+                                                <div class="w-100">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <span class="fw-bolder">Allergy Data</span>
+                                                        </div>
+
+                                                        <div class="card-body">
+                                                            <DxFormLayout CssClass="w-100">
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="12">
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-1">
+                                                                            <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsWeather" />
+                                                                        </div>
+                                                                        <div class="col-md-11">
+                                                                            @if (PatientAllergy.Weather is not null || GeneralConsultanService.IsWeather)
+                                                                            {
+                                                                                <DxTagBox Data="@WeatherAllergies"
+                                                                                          NullText="Select Allergy..."
+                                                                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
+                                                                                          @bind-Values="@SelectedWeatherAllergies"
+                                                                                          EditFormat="{1}"
+                                                                                          InputId="tbMultiColumn">
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                                                                                                        Caption="Code"
+                                                                                                        Width="100px" />
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                                        Caption="Name" />
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                                                                                                        Caption="Type" />
+                                                                                </DxTagBox>
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacology" ColSpanMd="12">
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-1">
+                                                                            <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsPharmacology" />
+                                                                        </div>
+                                                                        <div class="col">
+                                                                            @if (PatientAllergy.Farmacology is not null || GeneralConsultanService.IsPharmacology)
+                                                                            {
+                                                                                <DxTagBox Data="@PharmacologyAllergies"
+                                                                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
+                                                                                          NullText="Select Allergy..."
+                                                                                          @bind-Values="@SelectedPharmacologyAllergies"
+                                                                                          EditFormat="{1}"
+                                                                                          InputId="tbMultiColumn">
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                                                                                                        Caption="Code"
+                                                                                                        Width="100px" />
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                                        Caption="Name" />
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                                                                                                        Caption="Type" />
+                                                                                </DxTagBox>
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="12">
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-1">
+                                                                            <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsFood" />
+                                                                        </div>
+                                                                        <div class="col-md-11">
+                                                                            @if (PatientAllergy.Food is not null || GeneralConsultanService.IsFood)
+                                                                            {
+                                                                                <DxTagBox Data="@FoodAllergies"
+                                                                                          NullText="Select Allergy..."
+                                                                                          @bind-Values="@SelectedFoodAllergies"
+                                                                                          EditFormat="{1}"
+                                                                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
+                                                                                          InputId="tbMultiColumn">
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                                                                                                        Caption="Code"
+                                                                                                        Width="100px" />
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                                        Caption="Name" />
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                                                                                                        Caption="Type" />
+                                                                                </DxTagBox>
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                </DxFormLayoutItem>
+
+                                                            </DxFormLayout>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="w-100 mt-2">
+                                                    <div class="row w-100">
+                                                        <div class="col-md-6">
+                                                            <DxFormLayout CssClass="w-100">
+                                                                <DxFormLayoutItem Caption="Family Medical History" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                    <Template>
+                                                                        <DxGridLayout ColumnSpacing="8px">
+                                                                            <Rows>
+                                                                                <DxGridLayoutRow />
+                                                                            </Rows>
+                                                                            <Columns>
+                                                                                <DxGridLayoutColumn />
+                                                                                <DxGridLayoutColumn />
+                                                                            </Columns>
+                                                                            <Items>
+                                                                                <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption" ColumnSpan="1">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox 
+                                                                                                      Data="@YesNoOptions"
+                                                                                                      NullText="Yes/No"
+                                                                                                      @bind-Value="@GeneralConsultanService.IsFamilyMedicalHistory">
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="0" Visible="@(GeneralConsultanService.IsFamilyMedicalHistory == "Yes")" Column="1" CssClass=" normal-caption " ColumnSpan="12">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@RiwayatPenyakitKeluarga"
+                                                                                                      NullText="Select Family Medical History..."
+                                                                                                      @bind-Value="@GeneralConsultanService.FamilyMedicalHistory">
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                            </Items>
+                                                                        </DxGridLayout>
+                                                                    </Template>
+                                                                </DxFormLayoutItem>
+
+                                                                          <DxFormLayoutItem Caption=" " Visible="@(GeneralConsultanService.FamilyMedicalHistory is not null && GeneralConsultanService.FamilyMedicalHistory.Equals("Other"))" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                    <MyTextBox @bind-Text="@GeneralConsultanService.FamilyMedicalHistoryOther"
+                                                                               NullText="Family MedicalHistory Other" />
+                                                                </DxFormLayoutItem>
+
+
+                                                                <DxFormLayoutItem Caption="Medication History" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                    <Template>
+                                                                        <DxGridLayout ColumnSpacing="8px">
+                                                                            <Rows>
+                                                                                <DxGridLayoutRow />
+                                                                            </Rows>
+                                                                            <Columns>
+                                                                                <DxGridLayoutColumn />
+                                                                                <DxGridLayoutColumn />
+                                                                            </Columns>
+                                                                            <Items>
+                                                                                <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption" ColumnSpan="1">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox 
+                                                                                                      Data="@YesNoOptions"
+                                                                                                      NullText="Yes/No"
+                                                                                                      @bind-Value="@GeneralConsultanService.IsMedicationHistory">
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Visible="@(GeneralConsultanService.IsMedicationHistory == "Yes")" Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="12">
+                                                                                    <Template>
+                                                                                        <MyTextBox @bind-Text="@GeneralConsultanService.MedicationHistory"  
+                                                                                                   NullText="Medication History" />
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                            </Items>
+                                                                        </DxGridLayout>
+                                                                    </Template>
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption="Past Medical History" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                       <MyTextBox @bind-Text="@GeneralConsultanService.PastMedicalHistory" 
+                                                                                                   NullText="Past Medical History" />
+                                                                </DxFormLayoutItem>
+
+
+                                                                @*       <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Riwayat Penyakit Keluarga" ColSpanMd="12">
+                                                        <MyDxComboBox ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" Data="@InformationFrom"
+                                                        NullText="Select Riwayat Penyakit Keluarga..."
+                                                        @bind-Value="@GeneralConsultanService.InformationFrom">
+                                                        </MyDxComboBox>
+                                                        </DxFormLayoutItem> *@
+                                                            </DxFormLayout>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     @if (IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Waiting) || IsStatus(EnumStatusGeneralConsultantService.Physician) || IsStatus(EnumStatusGeneralConsultantService.Finished) || IsStatus(EnumStatusGeneralConsultantService.Canceled))
                                     {
                                         <div class="w-100">
@@ -704,6 +899,14 @@
                                                                         <div class="row w-100">
                                                                             <div class="col-md-6">
                                                                                 <DxFormLayout CssClass="w-100">
+                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Information From" ColSpanMd="12">
+                                                                                        <MyDxComboBox ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))"
+                                                                                                      Data="@InformationFrom"
+                                                                                                      NullText="Select Information From..."
+                                                                                                      @bind-Value="@GeneralConsultanService.InformationFrom">
+                                                                                        </MyDxComboBox>
+                                                                                    </DxFormLayoutItem>
+
                                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Clinic Visit Types" ColSpanMd="12">
                                                                                         <MyDxComboBox ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" Data="@ClinicVisitTypes"
                                                                                                       NullText="Select Clinic Visit Type..."
@@ -741,8 +944,24 @@
 
                                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Scrinning Triage Scale" ColSpanMd="12">
                                                                                         <MyDxComboBox Data="@Colors"
+                                                                                                      Context="oeee"
                                                                                                       NullText="Scrinning Triage Scale..."
                                                                                                       @bind-Value="@GeneralConsultanService.ScrinningTriageScale">
+                                                                                            <ItemTemplate>
+                                                                                                @{
+                                                                                                    var item = oeee as string;
+                                                                                                }
+                                                                                                <div style="display: flex; align-items: center;">
+                                                                                                    <div style="width: 15px; height: 15px; background-color: @(item?.ToLower()); margin-right: 10px;"></div>
+                                                                                                    <span>@item</span>
+                                                                                                </div>
+                                                                                            </ItemTemplate>
+                                                                                            <EditBoxTemplate>
+                                                                                                <div style="display: flex; align-items: center;">
+                                                                                                    <div style="width: 15px; height: 15px; background-color: @(GeneralConsultanService.ScrinningTriageScale?.ToLower()); margin-right: 10px;"></div>
+                                                                                                    <span>@GeneralConsultanService.ScrinningTriageScale</span>
+                                                                                                </div>
+                                                                                            </EditBoxTemplate>
                                                                                         </MyDxComboBox>
                                                                                     </DxFormLayoutItem>
 
