@@ -420,9 +420,10 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 showFormDetail = true;
                 IsAddTransfer = true;
-                TempFormInternalTransfer = new();
-                //Products.Clear();
+                TempFormInternalTransfer = new();                
                 headerDetail = "Add product Transfer Internal";
+                var location = Locations.FirstOrDefault(x => x.Id == getInternalTransfer.SourceId);
+                await SelectedItemProduct(location);
                 await GridDetailTransferStock.StartEditNewRowAsync();
             }
             catch (Exception ex)

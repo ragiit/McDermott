@@ -64,7 +64,7 @@
                                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                         @* <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" Enabled="!ShowForm" /> *@
                                                         <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Detail" Click="()=>EditItemPharmacy_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && !showForm" />
-                                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && !showForm" />
+                                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0" />
                                                         <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" Enabled="!showForm" />
                                                         <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" Enabled="!showForm" />
                                                         <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export" Enabled="!showForm">
@@ -114,11 +114,11 @@
                                     <div class="sticky">
                                         <div class="card">
                                             <div class="card-body">
-                                                <div class="row justify-content-start mb-3">
+                                                <div class="row">
                                                     <div class="col-auto align-self-start">
                                                         
                                                         @if (Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))
-                                                    {
+                                                        {
                                                           
                                                                 <DxButton Text="Send To Pharmacy" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="SendToPharmacy"></DxButton>
                                                                 <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
@@ -145,6 +145,7 @@
                                                         }
                                                         
                                                     </div>
+                                                    <div class= "col-auto align-self-center"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1105,7 +1106,7 @@ else
                                     @if (traceAvailability == true)
                                     {
                                         <div class="col-6">
-                                            <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                  <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                     <DxComboBox ShowValidationIcon="true"
                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                 Data="@StockOutProducts"
