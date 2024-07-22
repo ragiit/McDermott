@@ -51,7 +51,7 @@
                                                         Text="Fetching Data...">
                                             <DxGrid @ref="Grid"
                                                     PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                    Data="@(Pharmacies.OrderBy<PharmacyDto, EnumStatusPharmacy>(x => x.Status ?? EnumStatusPharmacy.Draft, new StatusComparer()).ToList())"
+                                                    Data="@(Pharmacies.OrderBy<PharmacyDto, EnumStatusPharmacy>(x => x.Status ?? EnumStatusPharmacy.Draft, new StatusComparer()).ThenByDescending(x=>x.CreatedDate).ToList())"
                                                     PageSize="10"
                                                     @bind-SelectedDataItems="@SelectedDataItems"
                                                     FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
@@ -96,7 +96,7 @@
 
                                                 <Columns>
                                                     <DxGridSelectionColumn Width="15px" />
-                                                    <DxGridDataColumn MinWidth="200" FieldName="ReceiptDate" Caption="Prescription DisplayFormat="dd MMMM yyyy"/>
+                                                    <DxGridDataColumn MinWidth="200" FieldName="ReceiptDate" Caption="Prescription" DisplayFormat="dd MMMM yyyy"/>
                                                     <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
                                                     <DxGridDataColumn MinWidth="200" FieldName="Practitioner.Name" Caption="Prescribing Doctor" />
                                                     <DxGridDataColumn MinWidth="200" FieldName="Status" Caption="Status">

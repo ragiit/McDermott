@@ -992,6 +992,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 foreach (var item in StockOutPrescriptions)
                 {
+                    if(item.TransactionStockId == 0)
+                    {
+
+                    }
                     // Create a DTO for the current item
                     var item_cutstock = new StockOutPrescriptionDto
                     {
