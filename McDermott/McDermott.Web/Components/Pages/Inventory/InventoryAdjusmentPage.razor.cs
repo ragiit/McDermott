@@ -105,11 +105,20 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 if (SelectedDataItems is null || SelectedDataItems.Count == 1)
                 {
+                    //var id = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourcTableId == ((InventoryAdjusmentDto)e.DataItem).Id && x.SourceTable == nameof(InventoryAdjusment)))).FirstOrDefault() ?? new();
+                    //await Mediator.Send(new DeleteTransactionStockRequest(id.Id));
                     await Mediator.Send(new DeleteInventoryAdjusmentRequest(((InventoryAdjusmentDto)e.DataItem).Id));
                 }
                 else
                 {
-                    await Mediator.Send(new DeleteInventoryAdjusmentRequest(ids: SelectedDataItems.Adapt<List<InventoryAdjusmentDto>>().Select(x => x.Id).ToList()));
+                    var ids = SelectedDataItems.Adapt<List<InventoryAdjusmentDto>>().Select(x => x.Id).ToList();
+                    //foreach (var id in ids)
+                    //{
+                    //    var idd = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourcTableId == ((InventoryAdjusmentDto)e.DataItem).Id && x.SourceTable == nameof(InventoryAdjusment)))).FirstOrDefault() ?? new();
+                    //    await Mediator.Send(new DeleteTransactionStockRequest(idd.Id));
+                    //}
+
+                    await Mediator.Send(new DeleteInventoryAdjusmentRequest(ids: ids));
                 }
 
                 await LoadData();
@@ -397,11 +406,21 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     if (SelectedDetailDataItems is null || SelectedDetailDataItems.Count == 1)
                     {
+                        var id = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourcTableId == ((InventoryAdjusmentDetailDto)e.DataItem).Id && x.SourceTable == nameof(InventoryAdjusment)))).FirstOrDefault() ?? new();
+                        await Mediator.Send(new DeleteTransactionStockRequest(id.Id));
                         await Mediator.Send(new DeleteInventoryAdjusmentDetailRequest(((InventoryAdjusmentDetailDto)e.DataItem).Id));
                     }
                     else
                     {
                         var a = SelectedDetailDataItems.Adapt<List<InventoryAdjusmentDetailDto>>();
+                         
+                        foreach (var id in a)
+                        {
+                            var idd = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourcTableId == ((InventoryAdjusmentDto)e.DataItem).Id && x.SourceTable == nameof(InventoryAdjusment)))).FirstOrDefault() ?? new();
+                            await Mediator.Send(new DeleteTransactionStockRequest(idd.Id));
+                        }
+
+
                         await Mediator.Send(new DeleteInventoryAdjusmentDetailRequest(ids: a.Select(x => x.Id).ToList()));
                     }
                     SelectedDetailDataItems = [];

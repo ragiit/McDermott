@@ -365,7 +365,7 @@
 
                                         <DxFormLayoutGroup Caption="Employee" ColSpanMd="12">
 
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Supervisor" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Supervisor" ColSpanMd="6">
                                                 <MyDxComboBox Data="@(Users.Where(x => x.Id != UserForm.Id).AsEnumerable())"
                                                               NullText="Select Supervisor..."
                                                               TextFieldName="Name"
@@ -373,6 +373,16 @@
                                                               @bind-Value="UserForm.SupervisorId">
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(() => UserForm.SupervisorId)" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Occupational" ColSpanMd="6">
+                                                <MyDxComboBox Data="@Occupationals"
+                                                              NullText="Select Occupational..."
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              @bind-Value="UserForm.OccupationalId">
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(() => UserForm.OccupationalId)" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Job Position">

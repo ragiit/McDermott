@@ -212,7 +212,14 @@ namespace McDermott.Application.Dtos.Transaction
 
         public string BMIState { get; set; } = "-";
         public string ClinicVisitTypes { get; set; } = "Sick";
+        public string? InformationFrom { get; set; }  
         public long? AwarenessId { get; set; }
+        public string? IsFamilyMedicalHistory { get; set; } 
+        public string? FamilyMedicalHistory { get; set; }
+        public string? FamilyMedicalHistoryOther { get; set; }
+        public string? IsMedicationHistory { get; set; } 
+        public string? MedicationHistory { get; set; } 
+        public string? PastMedicalHistory { get; set; }  
 
         public long E { get; set; } = 4;
         public long V { get; set; } = 5;

@@ -148,6 +148,7 @@ namespace McDermott.Application.Dtos.Config
         public List<long>? DoctorServiceIds { get; set; } = [];
         public List<long> PatientAllergyIds { get; set; } = new List<long>();
         public long? SupervisorId { get; set; }  // ID Supervisor
+        public long? OccupationalId { get; set; }  // ID Supervisor
 
         [SetToNull]
         public UserDto? Supervisor { get; set; }  // Referensi ke Supervisor
@@ -169,6 +170,8 @@ namespace McDermott.Application.Dtos.Config
 
         [SetToNull]
         public virtual DepartmentDto? Department { get; set; }
+        [SetToNull]
+        public virtual OccupationalDto? Occupational { get; set; }  
 
         [SetToNull]
         public virtual PatientAllergyDto PatientAllergy { get; set; } = new();

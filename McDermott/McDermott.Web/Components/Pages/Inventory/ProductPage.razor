@@ -132,6 +132,30 @@
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                     FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
                                                                     </DxFormLayoutItem>
+
+                                                                    @* <DxFormLayoutItem Caption="Drug Form" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                        <DxComboBox Data="@colors" Context="contexta" @bind-Value="@selectedColor" TextFieldName="Name" ValueFieldName="Color">
+                                                                            <ItemTemplate>
+                                                                                @{
+                                                                                    var item = contexta as ColorItem;
+                                                                                }
+                                                                                <div style="display: flex; align-items: center;">
+                                                                                    <div style="width: 15px; height: 15px; background-color: @(item?.Color); margin-right: 10px;"></div>
+                                                                                    <span>@item?.Name</span>
+                                                                                </div>
+                                                                            </ItemTemplate>
+                                                                            <EditBoxTemplate>
+                                                                                @{
+                                                                                    var selectedItem = colors.FirstOrDefault(c => c.Color == selectedColor);
+                                                                                }
+                                                                                <div style="display: flex; align-items: center;">
+                                                                                    <div style="width: 15px; height: 15px; background-color: @(selectedItem?.Color); margin-right: 10px;"></div>
+                                                                                    <span>@selectedItem?.Name</span>
+                                                                                </div>
+                                                                            </EditBoxTemplate>
+                                                                        </DxComboBox>
+                                                                    </DxFormLayoutItem> *@
+
                                                                     <DxFormLayoutItem Caption="Route" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                         <DxComboBox Data="@DrugRoutes"
                                                                                     @bind-Value="@FormProductDetails.RouteId"
@@ -208,6 +232,14 @@
                                                                     <DxFormLayoutItem Caption="Pregnancy Warning" CaptionCssClass=" normal-caption" ColSpanMd="12">
                                                                         <DxCheckBox @bind-Checked="@FormProductDetails.PregnancyWarning" />
                                                                     </DxFormLayoutItem>
+                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medicine Type" ColSpanMd="12">
+                                                                    <DxCheckBox CssClass="normal-caption" @bind-Checked="@FormProductDetails.IsTopicalMedication">
+                                                                        <div class="normal-caption">Topical Medication</div>
+                                                                    </DxCheckBox>
+                                                                    <DxCheckBox @bind-Checked="@(FormProductDetails.IsOralMedication)">
+                                                                        <div class="normal-caption">Oral Medication</div>
+                                                                    </DxCheckBox>
+                                                                </DxFormLayoutItem> 
                                                                 </DxFormLayout>
                                                             </div>
                                                             @* <DxFormLayout CssClass="mt-1">
@@ -313,26 +345,23 @@
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                 FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
                                                                 </DxFormLayoutItem>
-                                                                <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                    <DxComboBox Data="@Uoms"
-                                                                                @bind-Value="@FormProductDetails.UomId"
-                                                                                NullText="Select Unit Of Measure..."
-                                                                                TextFieldName="Name"
-                                                                                ValueFieldName="Id"
-                                                                                ShowValidationIcon="true"
-                                                                                SelectedItemChanged="@((UomDto uomId)=>SelectedChangeUoM(uomId))"
-                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
+                                                                <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
+                                                                    <MyDxComboBox Data="@Uoms"
+                                                                                  @bind-Value="@FormProductDetails.UomId"
+                                                                                  NullText="Select Unit Of Measure..."
+                                                                                  TextFieldName="Name"
+                                                                                  ValueFieldName="Id"
+                                                                                  SelectedItemChanged="@((UomDto uomId)=>SelectedChangeUoM(uomId))" />
+                                                                    <ValidationMessage For="@(()=> FormProductDetails.UomId)"   />
                                                                 </DxFormLayoutItem>
-                                                                <DxFormLayoutItem Caption="Purchase UoM" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                    <DxComboBox Data="@Uoms"
-                                                                                @bind-Value="@FormProductDetails.PurchaseUomId"
-                                                                                NullText="Select Purchase UoM..."
-                                                                                TextFieldName="Name"
-                                                                                ValueFieldName="Id"
-                                                                                ShowValidationIcon="true"
-                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
+                                                                <DxFormLayoutItem Caption="Purchase UoM" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
+                                                                    <MyDxComboBox Data="@Uoms"
+                                                                                  @bind-Value="@FormProductDetails.PurchaseUomId"
+                                                                                  NullText="Select Purchase UoM..."
+                                                                                  TextFieldName="Name"
+                                                                                  ValueFieldName="Id" />
+
+                                                                    <ValidationMessage For="@(()=> FormProductDetails.PurchaseUomId)"   />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem Caption="Batch & Expired" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                     <DxCheckBox @bind-Checked="@FormProductDetails.TraceAbility"></DxCheckBox>
@@ -369,14 +398,7 @@
                                                                             NullText="Internal Reference.."
                                                                             ShowValidationIcon="true" />
                                                                 </DxFormLayoutItem>
-                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medicine Type" ColSpanMd="12">
-                                                                    <DxCheckBox CssClass="normal-caption" @bind-Checked="@FormProductDetails.IsTopicalMedication">
-                                                                        <div class="normal-caption">Topical Medication</div>
-                                                                    </DxCheckBox>
-                                                                    <DxCheckBox @bind-Checked="@(FormProductDetails.IsOralMedication)">
-                                                                        <div class="normal-caption">Oral Medication</div>
-                                                                    </DxCheckBox>
-                                                                </DxFormLayoutItem>
+                                                               
                                                             </DxFormLayout>
                                                         </div>
                                                     </div>
@@ -406,10 +428,10 @@
                                                 ApplyBackgroundShading="true"
                                                 IndicatorAreaVisible="true"
                                                 Text="Fetching Data...">
-                                    <MyGrid @ref="GridStock" 
-                                            Data="StockProducts" 
+                                    <MyGrid @ref="GridStock"
+                                            Data="StockProducts"
                                             KeyFieldName="Id"
-                                            DataItemDeleting="onDeleteStock" 
+                                            DataItemDeleting="onDeleteStock"
                                             AllowSelectRowByClick="false">
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
@@ -513,3 +535,7 @@ else
         </DxFormLayout>
     </EditForm>
 </DxPopup>
+
+@code {
+
+}

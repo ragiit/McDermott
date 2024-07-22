@@ -7,6 +7,7 @@ using McDermott.Extentions;
 using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 using MediatR;
 using DevExpress.Blazor.RichEdit;
+using static McDermott.Web.Components.Pages.Transaction.ProcedureRoomPage;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -103,15 +104,35 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Risiko sedang 7-11",
             "Risiko Tinggi >= 12"
         ];
+        private List<string> InformationFrom =
+        [
+            "Auto Anamnesa",
+            "Allo Anamnesa"
+        ];
+        private List<string> YesNoOptions =
+       [
+           "Yes",
+            "No"
+       ];
         private List<string> Morse =
         [
             "Risiko rendah 0-24",
             "Risiko sedang 25-44",
             "Risiko Tinggi >= 45"
         ];
+        private List<string> RiwayatPenyakitKeluarga =
+        [
+            "DM",
+            "Hipertensi",
+            "Cancer",
+            "Jantung",
+            "TBC",
+            "Anemia",
+            "Other",
+        ]; 
         private List<string> Geriati =
        [
-           "Risiko rendah 0-3", 
+           "Risiko rendah 0-3",
             "Risiko Tinggi >= 4"
        ];
 
@@ -2078,7 +2099,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                 await LoadComboBox();
                 StateHasChanged();
 
-                //Grid?.SelectRow(0, true);
+                try
+                {
+                    Grid?.SelectRow(0, true);
+                }
+                catch
+                {
+
+                }
             }
         }
 
@@ -2133,8 +2161,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             ShowForm = false;
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "General Consultation" || x.TypeRegistration == "Emergency"));
             statusMcuData = GetStatusMcuCounts(GeneralConsultanServices);
-            if (GeneralConsultanServices.FirstOrDefault() != null)
-                SelectedDataItems = new List<object> { GeneralConsultanServices.FirstOrDefault() };
+            //if (GeneralConsultanServices.FirstOrDefault() != null)
+            //    SelectedDataItems = new List<object> { GeneralConsultanServices.FirstOrDefault() };
             PanelVisible = false;
         }
 

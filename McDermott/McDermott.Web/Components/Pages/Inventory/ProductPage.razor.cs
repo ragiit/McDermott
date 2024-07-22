@@ -7,6 +7,21 @@ namespace McDermott.Web.Components.Pages.Inventory
 {
     public partial class ProductPage
     {
+
+        private List<ColorItem> colors =
+            [ new ColorItem { Name = "Red", Color = "red" },
+            new ColorItem { Name = "Green", Color = "green" },
+            new ColorItem { Name = "Blue", Color = "blue" }
+            ];
+        private string selectedColor;
+
+
+        public class ColorItem
+        {
+            public string Name { get; set; }
+            public string Color { get; set; }
+        }
+
         #region Relation Data
 
         private List<ProductDto> Products = [];
@@ -96,7 +111,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             if (UomId != null)
             {
-                var UoMId = Uoms.Where(u => u.Id == UomId.Id).FirstOrDefault();
+                var UoMId = Uoms.Where(u => u.Id == UomId.Id).FirstOrDefault() ?? new();
                 FormProductDetails.PurchaseUomId = UoMId.Id;
             }
         }
@@ -239,8 +254,9 @@ namespace McDermott.Web.Components.Pages.Inventory
             IsLoading = false;
         }
 
-        private async Task HandleInvalidSubmit()
+        private void HandleInvalidSubmit()
         {
+            ToastService.ShowInfoSubmittingForm();
             showForm = true;
             FormValidationState = false;
         }
@@ -286,8 +302,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ProductType = ProductTypes[2],
                 HospitalType = HospitalProducts[0],
                 SalesPrice = 100,
-                Tax = "11%"
+                Tax = "11%",
+                UomId = Uoms.FirstOrDefault(x => x.Name == "Unit")?.Id ?? 0
             };
+
+            SelectedChangeUoM(Uoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
         }
 
         private async Task Refresh_Click()
@@ -343,6 +362,13 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 // Ambil nama satuan ukur
                 NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;
+
+                if (FormProductDetails.UomId == 0)
+                {
+                    FormProductDetails.UomId = Uoms.FirstOrDefault(x => x.Name == "Unit")?.Id ?? 0;
+
+                    SelectedChangeUoM(Uoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
+                }
 
                 // Atur visibilitas panel
                 PanelVisible = false;
@@ -462,7 +488,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 if (FormProductDetails?.Name == null)
                 {
-                    await HandleInvalidSubmit();
+                    HandleInvalidSubmit();
                     return;
                 }
 
@@ -521,6 +547,8 @@ namespace McDermott.Web.Components.Pages.Inventory
             FormMedicaments.FormId = FormProductDetails.FormId;
             FormMedicaments.RouteId = FormProductDetails.RouteId;
             FormMedicaments.Dosage = FormProductDetails.Dosage;
+            FormProducts.IsOralMedication = FormProductDetails.IsOralMedication;
+            FormProducts.IsTopicalMedication = FormProductDetails.IsTopicalMedication;
             FormMedicaments.UomId = FormProductDetails.UomMId;
             FormMedicaments.Cronies = FormProductDetails.Cronies;
             FormMedicaments.MontlyMax = FormProductDetails.MontlyMax;
@@ -605,7 +633,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 if (SelectedDataItems.Count == 0)
                 {
                     // Jika tidak ada item yang dipilih, gunakan produk yang sedang dipertimbangkan
-                    
+
                     if (getProduct.TraceAbility == true)
                     {
                         StockProducts = TransactionStocks.Where(x => x.ProductId == getProduct.Id && x.Validate == true)

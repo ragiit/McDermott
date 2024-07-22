@@ -1,4 +1,5 @@
 ﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -76,6 +77,7 @@ namespace McDermott.Web.Components.Pages.Config
         public List<CityDto> Cities = [];
         public List<DistrictDto> Districts = [];
         public List<VillageDto> Villages = [];
+        private List<OccupationalDto> Occupationals = [];
         public List<GroupDto> Groups = [];
         public List<ReligionDto> Religions = [];
         public List<GenderDto> Genders = [];
@@ -190,12 +192,21 @@ namespace McDermott.Web.Components.Pages.Config
             Genders = await Mediator.Send(new GetGenderQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());
             JobPositions = await Mediator.Send(new GetJobPositionQuery());
+            Occupationals = await Mediator.Send(new GetOccupationalQuery());
         }
 
         private async Task OnSave()
         {
             if (!FormValidationState)
                 return;
+
+            var a = Users.FirstOrDefault(x => x.NoId == UserForm.NoId && x.Id != UserForm.Id);
+            if (a != null)
+            {
+                ToastService.ShowInfo("The Identity Number already exist");
+                return;
+            }
+
 
             if (Convert.ToBoolean(UserForm.IsPatient))
             {
@@ -252,8 +263,8 @@ namespace McDermott.Web.Components.Pages.Config
                 {
                     await JsRuntime.InvokeVoidAsync("deleteCookie", CookieHelper.USER_INFO);
 
-                    var a = (CustomAuthenticationStateProvider)CustomAuth;
-                    await a.UpdateAuthState(string.Empty);
+                    var aa = (CustomAuthenticationStateProvider)CustomAuth;
+                    await aa.UpdateAuthState(string.Empty);
 
                     await JsRuntime.InvokeVoidAsync("setCookie", CookieHelper.USER_INFO, Helper.Encrypt(JsonConvert.SerializeObject(result)), 2);
                 }

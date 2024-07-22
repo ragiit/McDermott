@@ -76,6 +76,11 @@
 
         public string BMIState { get; set; } = "-";
         public string ClinicVisitTypes { get; set; } = "Sick";
+        //public string? InformationFrom { get; set; }
+        //public bool IsFamilyMedicalHistory { get; set; } = false;
+        //public string? FamilyMedicalHistory { get; set; }
+        //public bool IsMedicationHistory { get; set; } = false;
+        //public string? PastMedicalHistory { get; set; }
         public long? AwarenessId { get; set; }
 
         public long E { get; set; } = 4;
