@@ -354,7 +354,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
                 selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament != null && ChekMedicament.ActiveComponentId != null && ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
                 var aa = Pharmacy.PrescriptionLocationId;
-                var checkStock = TransactionStocks.Where(x => x.ProductId == product.Id && x.LocationId == Pharmacy.PrescriptionLocationId).Sum(x => x.Quantity);
+                var checkStock = TransactionStocks.Where(x => x.ProductId == product.Id && x.LocationId == Pharmacy.PrescriptionLocationId && x.Validate== true).Sum(x => x.Quantity);
                 ConcoctionLine.AvaliableQty = checkStock;
             }
             catch (Exception ex)
