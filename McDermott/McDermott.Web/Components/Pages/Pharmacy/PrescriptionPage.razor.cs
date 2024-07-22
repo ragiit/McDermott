@@ -992,15 +992,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 foreach (var item in StockOutPrescriptions)
                 {
-                    if(item.TransactionStockId == 0)
-                    {
-
-                    }
+                    
                     // Create a DTO for the current item
                     var item_cutstock = new StockOutPrescriptionDto
                     {
                         CutStock = item.CutStock,
-                        TransactionStockId = item.TransactionStockId,
                         PrescriptionId = item.PrescriptionId
                     };
 
@@ -1037,7 +1033,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 foreach (var item in StockOutLines)
                 {
                     item_cutstock.CutStock = item.CutStock;
-                    item_cutstock.TransactionStockId = item.TransactionStockId;
                     item_cutstock.LinesId = item.LinesId;
 
                     await Mediator.Send(new CreateStockOutLinesRequest(item_cutstock));
@@ -2332,7 +2327,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         FormTransactionStock.Reference = referenceNumber;
                         FormTransactionStock.UomId = items?.Prescription?.Product?.UomId;
                         FormTransactionStock.Validate = false;
-                        await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+                        var datas = await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+
+
+                        items.TransactionStockId = datas.Id;
+                        await Mediator.Send(new UpdateStockOutPrescriptionRequest(items));
+                        
                     }
                 }
             }
@@ -2365,7 +2365,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         FormTransactionStock.Reference = referenceNumber;
                         FormTransactionStock.UomId = items?.Lines?.Product?.UomId;
                         FormTransactionStock.Validate = false;
-                        await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+                        var datas = await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+
+                        items.TransactionStockId = datas.Id;
+                        await Mediator.Send(new UpdateStockOutLinesRequest(items));
                     }
                 }
             }
