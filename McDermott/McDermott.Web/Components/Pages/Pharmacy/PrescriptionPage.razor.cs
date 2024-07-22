@@ -669,7 +669,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             // Filter stock products based on specific conditions
 
             StockOutProducts = TransactionStocks
-                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId)
+                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId && s.Validate == true)
                     .OrderBy(x => x.ExpiredDate)
                     .GroupBy(s => s.Batch)
                     .Select(g => new TransactionStockDto
@@ -832,7 +832,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             // Filter stock products based on specific conditions
             StockOutProducts = TransactionStocks
-                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId)
+                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId && s.Validate == true)
                     .OrderBy(x => x.ExpiredDate)
                     .GroupBy(s => s.Batch)
                     .Select(g => new TransactionStockDto

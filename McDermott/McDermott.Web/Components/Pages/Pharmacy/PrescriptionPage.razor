@@ -111,50 +111,50 @@
                                             </div>
                                         </div>
                                     <div class="sticky">
-                                        <div class="row justify-content-start mb-3">
-                                                <div class="col-12 align-self-start">
-                                        @if (Pharmacy.Id != 0)
-                                        {
-                                            
-                                                    @if (Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))
-                                                    {
-                                                        <div class="card">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="row justify-content-start mb-3">
+                                                    <div class="col-auto align-self-start">
+                                                        @if (Pharmacy.Id != 0)
+                                                        {
+                                                          <div class="card">
                                                             <div class="card-body">
                                                                 <DxButton Text="Send To Pharmacy" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="SendToPharmacy"></DxButton>
                                                                 <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                             </div>
-                                                        </div>
-                                                    }
-                                                    else if (Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy && NameUser.IsPharmacy == true)
-                                                    {
-                                                        <div class="card">
+                                                          </div>
+                                                        }
+                                                        else if (Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy && NameUser.IsPharmacy == true)
+                                                        {
+                                                          <div class="card">
                                                             <div class="card-body">
-                                                                <DxButton Text="Received" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Pharmacied"></DxButton>
-                                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                               <DxButton Text="Received" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Pharmacied"></DxButton>
+                                                               <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                             </div>
-                                                        </div>
-                                                    }
-                                                    else if (Pharmacy.Status == EnumStatusPharmacy.Received && NameUser.IsPharmacy == true)
-                                                    {
-                                                        <div class="card">
+                                                          </div>
+                                                        }
+                                                        else if (Pharmacy.Status == EnumStatusPharmacy.Received && NameUser.IsPharmacy == true)
+                                                        {
+                                                          <div class="card">
                                                             <div class="card-body">
-                                                                <DxButton Text="Process" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Received"></DxButton>
-                                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                              <DxButton Text="Process" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Received"></DxButton>
+                                                              <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                             </div>
-                                                        </div>
-                                                    }
-                                                    else if (Pharmacy.Status == EnumStatusPharmacy.Processed && NameUser.IsPharmacy == true)
-                                                    {
-                                                        <div class="card">
-                                                            <div class="card-body">
-                                                                <DxButton Text="Done" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="ValidateAsync"></DxButton>
-                                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
-                                                            </div>
-                                                        </div>
-                                                    }                                               
-                                        }
-                                         </div>
+                                                          </div>
+                                                        }
+                                                        else if (Pharmacy.Status == EnumStatusPharmacy.Processed && NameUser.IsPharmacy == true)
+                                                                    {
+                                                                        <div class="card">
+                                                                            <div class="card-body">
+                                                                                <DxButton Text="Done" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="ValidateAsync"></DxButton>
+                                                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                                            </div>
+                                                                        </div>
+                                                                    }
+                                                    </div>
+                                                </div>
                                             </div>
+                                        </div>
                                     </div>
                                     <EditForm Model="@Pharmacy" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
                                         <DataAnnotationsValidator />
@@ -591,17 +591,16 @@
                                                     </DxTabs>
                                                 </div>
                                             </div>
-                                            <div class="card-footer">
+                                            @* <div class="card-footer">
                                                 @if (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)
                                                 {
                                                     <div class="row justify-content-end">
                                                         <div class="col-auto align-self-end">
-                                                            <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnDiscard" SubmitFormOnClick="true"></DxButton>
+                                                            
                                                         </div>
                                                     </div>
                                                 }
-                                            </div>
+                                            </div> *@
                                         </div>
 
                                         @if (Logs.Count > 0)
