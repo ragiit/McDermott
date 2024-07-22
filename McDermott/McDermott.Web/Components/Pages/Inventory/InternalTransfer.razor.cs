@@ -186,8 +186,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 SelectedBatchExpired = stockProduct.ExpiredDate;
 
                 //    //current Stock
-                var _currentStock = TransactionStocks.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch).FirstOrDefault();
-                var Qty = TransactionStocks.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch).Sum(x => x.Quantity);
+                var _currentStock = TransactionStocks.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch && x.Validate == true).FirstOrDefault();
+                var Qty = TransactionStocks.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch && x.Validate == true).Sum(x => x.Quantity);
                 if (_currentStock is not null)
                 {
                     if (Qty > 0)
@@ -255,7 +255,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     TempFormInternalTransfer.Batch = listbatch.FirstOrDefault(x => x.LocationId == FormInternalTransfer.SourceId)?.Batch;
                     TempFormInternalTransfer.ExpiredDate = listbatch.FirstOrDefault(x => x.LocationId == FormInternalTransfer.SourceId)?.ExpiredDate;
-                    TempFormInternalTransfer.CurrentStock = listbatch?.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == product.Id && x.Batch == TempFormInternalTransfer.Batch).Sum(x => x.Quantity) ?? 0; ;
+                    TempFormInternalTransfer.CurrentStock = listbatch?.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == product.Id && x.Batch == TempFormInternalTransfer.Batch && x.Validate == true).Sum(x => x.Quantity) ?? 0; ;
 
                 }
                 else
