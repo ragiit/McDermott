@@ -526,7 +526,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 Prescription.DrugRouteId = checkMedicament?.RouteId;
                 selectedActiveComponentPrescriptions = ActiveComponents.Where(z => checkMedicament.ActiveComponentId is not null && checkMedicament.ActiveComponentId.Contains(z.Id)).ToList();
 
-                var checkStock = TransactionStocks.Where(x => x.ProductId == value.Id && x.LocationId == Pharmacy.PrescriptionLocationId && x.Quantity != 0).Sum(x => x.Quantity);
+                var checkStock = TransactionStocks.Where(x => x.ProductId == value.Id && x.LocationId == Pharmacy.PrescriptionLocationId && x.Quantity != 0 && x.Validate == true).Sum(x => x.Quantity);
                 if (checkStock == null || checkStock == 0)
                 {
                     Prescription.Stock = 0;
@@ -569,7 +569,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         return;
 
                     var stockProduct = TransactionStocks
-                                    .Where(x => x.ProductId == checkProduct.Id && x.LocationId is not null && x.LocationId == Pharmacy.PrescriptionLocationId)
+                                    .Where(x => x.ProductId == checkProduct.Id && x.LocationId is not null && x.LocationId == Pharmacy.PrescriptionLocationId && x.Validate == true)
                                     .Sum(x => x.Quantity);
 
                     var medicamentData = Medicaments.FirstOrDefault(x => x.ProductId == checkProduct.Id);
