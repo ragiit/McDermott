@@ -84,7 +84,7 @@
                                                         <DxTab Text="Request" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Request)"></DxTab>
                                                     }
                                                     <DxTab Text="Approve Request" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.ApproveRequest)"></DxTab>
-                                                    <DxTab Text="Waiting" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Waiting)"></DxTab>
+                                                    @* <DxTab Text="Waiting" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Waiting)"></DxTab> *@
                                                 }
                                                 <DxTab Text="Ready" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)"></DxTab>
                                                 <DxTab Text="Done" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Done)"></DxTab>

@@ -2,7 +2,7 @@
 @page "/pharmacy/prescription/{Id:long}"
 @rendermode InteractiveServer
 
-@if (!IsPopUpForm)
+@if (!showForm)
 {
     <PageTitle>McHealthCare - Insurance Policy</PageTitle>
 }
@@ -10,25 +10,9 @@
 @if (IsAccess)
 {
     <div class="wrapper">
-        @if (!IsPopUpForm)
-        {
-            <section class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1>Prescription</h1>
-                        </div>
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/">Home</a></li>
-                                <li class="breadcrumb-item"><a href="/pharmacy/prescription">Pharmacy</a></li>
-                                <li class="breadcrumb-item" @onclick="LoadDataPharmacy"><a href="/pharmacy/prescription">Prescription</a></li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        }
+       
+         <BaseHeaderPage Title="Product" OnClickBack="@(async () => await LoadData())" ShowBackButton="showForm" />
+
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -39,10 +23,9 @@
                         }
                         else
                         {
-                            @if (!ShowForm)
+                            @if (!onShowForm)
                             {
-                                <div class="card">
-                                    <div class="card-body">
+                                <div class="card">                                    
                                         <DxLoadingPanel @bind-Visible="PanelVisible"
                                                         IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                                         IsContentBlocked="true"
@@ -79,12 +62,12 @@
 
                                                 <ToolbarTemplate>
                                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                        @* <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" Enabled="!IsPopUpForm" /> *@
-                                                        <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Detail" Click="()=>EditItemPharmacy_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && !IsPopUpForm" />
-                                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && !IsPopUpForm" />
-                                                        <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" Enabled="!IsPopUpForm" />
-                                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" Enabled="!IsPopUpForm" />
-                                                        <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export" Enabled="!IsPopUpForm">
+                                                        @* <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" Enabled="!ShowForm" /> *@
+                                                        <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Detail" Click="()=>EditItemPharmacy_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && !showForm" />
+                                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && !showForm" />
+                                                        <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" Enabled="!showForm" />
+                                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" Enabled="!showForm" />
+                                                        <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export" Enabled="!showForm">
                                                             <Items>
                                                                 <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
                                                                 <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
@@ -106,8 +89,7 @@
                                                     </DxGridDataColumn>
                                                 </Columns>
                                             </DxGrid>
-                                        </DxLoadingPanel>
-                                    </div>
+                                        </DxLoadingPanel>                                    
                                 </div>
                             }
                             else
@@ -116,7 +98,6 @@
                                                 IsContentBlocked="true"
                                                 CssClass="w-100"
                                                 ApplyBackgroundShading="true">
-                                    <div class="sticky">
                                         <div class="row justify-content-end mb-3">
                                             <div class="col-auto align-self-end">
                                                 <DxTabs RenderMode="TabsRenderMode.AllTabs">
@@ -129,10 +110,12 @@
                                                 </DxTabs>
                                             </div>
                                         </div>
+                                    <div class="sticky">
+                                        <div class="row justify-content-start mb-3">
+                                                <div class="col-12 align-self-start">
                                         @if (Pharmacy.Id != 0)
                                         {
-                                            <div class="row justify-content-start mb-3">
-                                                <div class="col-12 align-self-start">
+                                            
                                                     @if (Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))
                                                     {
                                                         <div class="card">
@@ -168,10 +151,10 @@
                                                                 <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                             </div>
                                                         </div>
-                                                    }
-                                                </div>
-                                            </div>
+                                                    }                                               
                                         }
+                                         </div>
+                                            </div>
                                     </div>
                                     <EditForm Model="@Pharmacy" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
                                         <DataAnnotationsValidator />
@@ -1104,7 +1087,7 @@ else
                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOut_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received)" />
                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOut_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && IsPopUpForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && showForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
                 </DxToolbar>
             </ToolbarTemplate>
             <Columns>                
@@ -1230,7 +1213,7 @@ else
                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOutLines_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received)" />
                     <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOutLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOutLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && IsPopUpForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOutLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && showForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
                 </DxToolbar>
             </ToolbarTemplate>
             <Columns>

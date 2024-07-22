@@ -147,7 +147,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private IReadOnlyList<object> SelectedDataItemsStockOut { get; set; } = [];
 
         [Parameter]
-        public bool IsPopUpForm { get; set; } = false;
+        public bool showForm { get; set; } = false;
 
         [Parameter]
         public UserDto User { get; set; } = new()
@@ -159,7 +159,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private bool IsLoading { get; set; } = false;
         private bool isView { get; set; } = false;
         private bool isActive { get; set; } = true;
-        private bool ShowForm { get; set; } = false;
+        private bool onShowForm { get; set; } = false;
         private bool isActiveButton { get; set; } = false;
         private bool PopUpConcoctionDetail { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
@@ -230,7 +230,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             if (generalConsultantService.Count == 0 || generalConsultantService is null)
                 return;
 
-            ShowForm = true;
+            onShowForm = true;
             isActiveButton = true;
             Pharmacy.Status = EnumStatusPharmacy.Draft;
 
@@ -1219,7 +1219,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
-                ShowForm = false;
+                onShowForm = false;
                 IsLoading = true;
                 SelectedDataItems = [];
                 SelectedDataItemsConcoction = [];
@@ -2000,7 +2000,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task NewItem_Click()
         {
-            ShowForm = true;
+            onShowForm = true;
             header = "Add Data Pharmacy";
             Pharmacy = new();
             Concoctions.Clear();
@@ -2091,7 +2091,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             try
             {
-                ShowForm = true;
+                onShowForm = true;
                 header = "Data Pharmacy";
                 PanelVisible = true;
                 PharmacyDto? p = null;
@@ -2150,7 +2150,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private void EditItem_Click()
         {
-            ShowForm = true;
+            onShowForm = true;
             Pharmacy = new();
             SelectedDataItemsPrescriptionLines = [];
             Prescriptions = [];
