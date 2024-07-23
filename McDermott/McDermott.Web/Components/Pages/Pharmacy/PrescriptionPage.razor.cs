@@ -2667,9 +2667,19 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             FocusedRowVisibleIndexPrescriptionLines = args.VisibleIndex;
         }
 
+        private bool IsDeletedPharmacy { get; set; }
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
+
+            try
+            {
+                if ((PharmacyDto)args.DataItem is null)
+                    return;
+
+                IsDeletedPharmacy = !((PharmacyDto)args.DataItem)!.Status!.Equals(EnumStatusPharmacy.Done);
+            }
+            catch { }
         }
 
         private void GridFocusedRowVisibleIndexPrescriptionConcoction_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
