@@ -16,7 +16,7 @@ using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
-    public partial class PrescriptionPage 
+    public partial class PrescriptionPage
     {
         #region UserLoginAndAccessRole
 
@@ -354,7 +354,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
                 selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament != null && ChekMedicament.ActiveComponentId != null && ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
                 var aa = Pharmacy.PrescriptionLocationId;
-                var checkStock = TransactionStocks.Where(x => x.ProductId == product.Id && x.LocationId == Pharmacy.PrescriptionLocationId && x.Validate== true).Sum(x => x.Quantity);
+                var checkStock = TransactionStocks.Where(x => x.ProductId == product.Id && x.LocationId == Pharmacy.PrescriptionLocationId && x.Validate == true).Sum(x => x.Quantity);
                 ConcoctionLine.AvaliableQty = checkStock;
             }
             catch (Exception ex)
@@ -969,12 +969,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task RefreshData()
         {
             // Fetch the latest data from the server or database
-            Prescriptions = await Mediator.Send(new GetPrescriptionQuery(x=>x.PharmacyId== Pharmacy.Id));
+            Prescriptions = await Mediator.Send(new GetPrescriptionQuery(x => x.PharmacyId == Pharmacy.Id));
             Concoctions = await Mediator.Send(new GetConcoctionQuery());
             var concoctionId = Concoctions.Where(x => x.PharmacyId == Pharmacy.Id).FirstOrDefault();
             Products = await Mediator.Send(new GetProductQuery());
             TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-            ConcoctionLines = await Mediator.Send(new GetConcoctionLineQuery(x=>x.ConcoctionId == concoctionId.Id));
+            ConcoctionLines = await Mediator.Send(new GetConcoctionLineQuery(x => x.ConcoctionId == concoctionId.Id));
         }
 
         private void HandleDiscard()
@@ -992,11 +992,42 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 foreach (var item in StockOutPrescriptions)
                 {
-                    
+                    if (item.TransactionStockId == 0 || item.TransactionStockId is null)
+                    {
+                        var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(Prescription))
+                            .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
+                        int NextReferenceNumber = 1;
+                        if (cekReference != null)
+                        {
+                            int.TryParse(cekReference?.Substring("PHP#".Length), out NextReferenceNumber);
+                            NextReferenceNumber++;
+                        }
+                        string referenceNumber = $"PHP#{NextReferenceNumber:D3}";
+
+                        var prescription = Prescriptions.Where(x => x.Id == item.PrescriptionId).FirstOrDefault();
+                        var productd = Products.Where(x => x.Id == prescription.ProductId).FirstOrDefault();
+
+                        FormTransactionStock.ProductId = productd?.Id;
+                        FormTransactionStock.SourceTable = nameof(Prescription);
+                        FormTransactionStock.SourcTableId = prescription?.Id;
+                        FormTransactionStock.LocationId = prescription?.Pharmacy?.PrescriptionLocationId;
+                        FormTransactionStock.ExpiredDate = item?.ExpiredDate;
+                        FormTransactionStock.Batch = item?.Batch;
+                        FormTransactionStock.Quantity = -(item?.CutStock) ?? 0;
+                        FormTransactionStock.Reference = referenceNumber;
+                        FormTransactionStock.UomId = productd?.UomId;
+                        FormTransactionStock.Validate = false;
+                        var datas = await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+
+                        item.TransactionStockId = datas.Id;
+
+                    }
+
                     // Create a DTO for the current item
                     var item_cutstock = new StockOutPrescriptionDto
                     {
                         CutStock = item.CutStock,
+                        TransactionStockId = item.TransactionStockId,
                         PrescriptionId = item.PrescriptionId
                     };
 
@@ -1015,9 +1046,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         await Mediator.Send(new UpdateStockOutPrescriptionRequest(existingItem));
                     }
                 }
-                var a = Pharmacy;
                 isDetailPrescription = false;
-                await EditItemPharmacy_Click(null);
+                await EditItemPharmacy_Click(Pharmacy);
                 StateHasChanged();
             }
             catch (Exception ex)
@@ -1029,16 +1059,60 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
-                var item_cutstock = new StockOutLinesDto();
                 foreach (var item in StockOutLines)
                 {
-                    item_cutstock.CutStock = item.CutStock;
-                    item_cutstock.LinesId = item.LinesId;
 
-                    await Mediator.Send(new CreateStockOutLinesRequest(item_cutstock));
+                    var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(ConcoctionLine))
+                        .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
+                    int NextReferenceNumber = 1;
+                    if (cekReference != null)
+                    {
+                        int.TryParse(cekReference?.Substring("PHCL#".Length), out NextReferenceNumber);
+                        NextReferenceNumber++;
+                    }
+                    string referenceNumber = $"PHCL#{NextReferenceNumber:D3}";
+
+                    var check_CutStock = ConcoctionLines.Where(x => x.Id == item.LinesId).FirstOrDefault();
+                    var concoction_data = Concoctions.Where(x => x.Id == check_CutStock?.ConcoctionId).FirstOrDefault();
+
+                    FormTransactionStock.ProductId = check_CutStock?.Product?.Id;
+                    FormTransactionStock.SourceTable = nameof(ConcoctionLine);
+                    FormTransactionStock.SourcTableId = check_CutStock?.Id;
+                    FormTransactionStock.LocationId = concoction_data?.Pharmacy?.PrescriptionLocationId;
+                    FormTransactionStock.ExpiredDate = item?.ExpiredDate;
+                    FormTransactionStock.Batch = item?.Batch;
+                    FormTransactionStock.Quantity = -(item?.CutStock) ?? 0;
+                    FormTransactionStock.Reference = referenceNumber;
+                    FormTransactionStock.UomId = check_CutStock?.Product?.UomId;
+                    FormTransactionStock.Validate = false;
+                    var datas = await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+
+                    item.TransactionStockId = datas.Id;
+
+
+                    var item_lines = new StockOutLinesDto
+                    {
+                        CutStock = item.CutStock,
+                        TransactionStockId = item.TransactionStockId,
+                        LinesId = item.LinesId
+                    };
+
+                    var existingStock = await Mediator.Send(new GetStockOutLineQuery(x => x.TransactionStockId == item.TransactionStockId && x.LinesId == item.LinesId));
+
+                    if (!existingStock.Any())
+                    {
+                        await Mediator.Send(new CreateStockOutLinesRequest(item_lines));
+                    }
+                    else
+                    {
+                        var existingItem = existingStock.First();
+                        existingItem.CutStock = item.CutStock;
+                        await Mediator.Send(new UpdateStockOutLinesRequest(existingItem));
+                    }
+
                 }
                 isDetailLines = false;
-                await EditItemPharmacy_Click(null);
+                await EditItemPharmacy_Click(Pharmacy);
                 StateHasChanged();
             }
             catch (Exception ex)
@@ -1799,7 +1873,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 ex.HandleException(ToastService);
             }
-            
+
         }
 
         private async Task OnSaveStockOutLines(GridEditModelSavingEventArgs e)
@@ -2201,7 +2275,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 FormStockOutLines.CurrentStock = Qty_stock;
             }
             var groupedBatch = TransactionStocks
-                    .Where(s => s.ProductId == data_products && s.LocationId == Pharmacy.PrescriptionLocationId && s.Id ==selected.TransactionStockId)
+                    .Where(s => s.ProductId == data_products && s.LocationId == Pharmacy.PrescriptionLocationId && s.Id == selected.TransactionStockId)
                     .GroupBy(s => s.Batch)
                     .Select(g => new TransactionStockDto
                     {
@@ -2278,79 +2352,79 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
 
-            if (Prescriptions.Count > 0)
-            {
-                var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(Prescription))
-                    .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
-                int NextReferenceNumber = 1;
-                if (cekReference != null)
-                {
-                    int.TryParse(cekReference?.Substring("PHP#".Length), out NextReferenceNumber);
-                    NextReferenceNumber++;
-                }
-                string referenceNumber = $"PHP#{NextReferenceNumber:D3}";
+            //if (Prescriptions.Count > 0)
+            //{
+            //    var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(Prescription))
+            //        .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
+            //    int NextReferenceNumber = 1;
+            //    if (cekReference != null)
+            //    {
+            //        int.TryParse(cekReference?.Substring("PHP#".Length), out NextReferenceNumber);
+            //        NextReferenceNumber++;
+            //    }
+            //    string referenceNumber = $"PHP#{NextReferenceNumber:D3}";
 
-                foreach (var item in Prescriptions)
-                {
-                    var check_CutStock = StockOutPrescriptions.Where(x => x.PrescriptionId == item.Id).ToList();
-                    var productd = Products.Where(x => x.Id == item.ProductId).FirstOrDefault();
-                    foreach (var items in check_CutStock)
-                    {
-                        FormTransactionStock.ProductId = productd?.Id;
-                        FormTransactionStock.SourceTable = nameof(Prescription);
-                        FormTransactionStock.SourcTableId = items?.PrescriptionId;
-                        FormTransactionStock.LocationId = checkData?.PrescriptionLocationId;
-                        FormTransactionStock.ExpiredDate = items?.ExpiredDate;
-                        FormTransactionStock.Batch = items?.Batch;
-                        FormTransactionStock.Quantity = items?.CutStock ?? 0;
-                        FormTransactionStock.Reference = referenceNumber;
-                        FormTransactionStock.UomId = productd?.UomId;
-                        FormTransactionStock.Validate = false;
-                        var datas = await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+            //    foreach (var item in Prescriptions)
+            //    {
+            //        var check_CutStock = StockOutPrescriptions.Where(x => x.PrescriptionId == item.Id).ToList();
+            //        var productd = Products.Where(x => x.Id == item.ProductId).FirstOrDefault();
+            //        foreach (var items in check_CutStock)
+            //        {
+            //            FormTransactionStock.ProductId = productd?.Id;
+            //            FormTransactionStock.SourceTable = nameof(Prescription);
+            //            FormTransactionStock.SourcTableId = items?.PrescriptionId;
+            //            FormTransactionStock.LocationId = checkData?.PrescriptionLocationId;
+            //            FormTransactionStock.ExpiredDate = items?.ExpiredDate;
+            //            FormTransactionStock.Batch = items?.Batch;
+            //            FormTransactionStock.Quantity = -(items?.CutStock) ?? 0;
+            //            FormTransactionStock.Reference = referenceNumber;
+            //            FormTransactionStock.UomId = productd?.UomId;
+            //            FormTransactionStock.Validate = false;
+            //            var datas = await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
 
 
-                        items.TransactionStockId = datas.Id;
-                        await Mediator.Send(new UpdateStockOutPrescriptionRequest(items));
-                        
-                    }
-                }
-            }
+            //            items.TransactionStockId = datas.Id;
+            //            await Mediator.Send(new UpdateStockOutPrescriptionRequest(items));
 
-            if (ConcoctionLines.Count > 0)
-            {
-                var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(ConcoctionLine))
-                    .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
-                int NextReferenceNumber = 1;
-                if (cekReference != null)
-                {
-                    int.TryParse(cekReference?.Substring("PHCL#".Length), out NextReferenceNumber);
-                    NextReferenceNumber++;
-                }
-                string referenceNumber = $"PHCL#{NextReferenceNumber:D3}";
+            //        }
+            //    }
+            //}
 
-                foreach (var item in ConcoctionLines)
-                {
-                    var check_CutStock = StockOutLines.Where(x => x.LinesId == item.Id).ToList();
-                    var concoction_data = Concoctions.Where(x => x.Id == Lines_Id).FirstOrDefault();
-                    foreach (var items in check_CutStock)
-                    {
-                        FormTransactionStock.ProductId = items?.Lines?.ProductId;
-                        FormTransactionStock.SourceTable = nameof(ConcoctionLine);
-                        FormTransactionStock.SourcTableId = items?.LinesId;
-                        FormTransactionStock.LocationId = concoction_data?.Pharmacy?.PrescriptionLocationId;
-                        FormTransactionStock.ExpiredDate = items?.ExpiredDate;
-                        FormTransactionStock.Batch = items?.Batch;
-                        FormTransactionStock.Quantity = items?.CutStock ?? 0;
-                        FormTransactionStock.Reference = referenceNumber;
-                        FormTransactionStock.UomId = items?.Lines?.Product?.UomId;
-                        FormTransactionStock.Validate = false;
-                        var datas = await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+            //if (ConcoctionLines.Count > 0)
+            //{
+            //    var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(ConcoctionLine))
+            //        .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
+            //    int NextReferenceNumber = 1;
+            //    if (cekReference != null)
+            //    {
+            //        int.TryParse(cekReference?.Substring("PHCL#".Length), out NextReferenceNumber);
+            //        NextReferenceNumber++;
+            //    }
+            //    string referenceNumber = $"PHCL#{NextReferenceNumber:D3}";
 
-                        items.TransactionStockId = datas.Id;
-                        await Mediator.Send(new UpdateStockOutLinesRequest(items));
-                    }
-                }
-            }
+            //    foreach (var item in ConcoctionLines)
+            //    {
+            //        var check_CutStock = StockOutLines.Where(x => x.LinesId == item.Id).ToList();
+            //        var concoction_data = Concoctions.Where(x => x.Id == Lines_Id).FirstOrDefault();
+            //        foreach (var items in check_CutStock)
+            //        {
+            //            FormTransactionStock.ProductId = items?.Lines?.ProductId;
+            //            FormTransactionStock.SourceTable = nameof(ConcoctionLine);
+            //            FormTransactionStock.SourcTableId = items?.LinesId;
+            //            FormTransactionStock.LocationId = concoction_data?.Pharmacy?.PrescriptionLocationId;
+            //            FormTransactionStock.ExpiredDate = items?.ExpiredDate;
+            //            FormTransactionStock.Batch = items?.Batch;
+            //            FormTransactionStock.Quantity = items?.CutStock ?? 0;
+            //            FormTransactionStock.Reference = referenceNumber;
+            //            FormTransactionStock.UomId = items?.Lines?.Product?.UomId;
+            //            FormTransactionStock.Validate = false;
+            //            var datas = await Mediator.Send(new CreateTransactionStockRequest(FormTransactionStock));
+
+            //            items.TransactionStockId = datas.Id;
+            //            await Mediator.Send(new UpdateStockOutLinesRequest(items));
+            //        }
+            //    }
+            //}
             Pharmacy.Status = EnumStatusPharmacy.Processed;
             var updates = await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
@@ -2393,7 +2467,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         continue;
                     }
 
-                    foreach(var items in stockProduct)
+                    foreach (var items in stockProduct)
                     {
                         items.Validate = true;
                         var aas = await Mediator.Send(new UpdateTransactionStockRequest(items));
@@ -2428,7 +2502,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         continue;
                     }
 
-                    foreach(var items in stockProduct)
+                    foreach (var items in stockProduct)
                     {
                         items.Validate = true;
                         var asa = Mediator.Send(new UpdateTransactionStockRequest(items));
