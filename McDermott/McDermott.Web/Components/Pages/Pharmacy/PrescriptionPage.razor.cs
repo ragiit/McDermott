@@ -554,7 +554,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     return;
 
                 var medicamentGroup = MedicamentGroupsConcoction.Where(x => x.Id == value.Id).FirstOrDefault();
-                Concoction.MedicamentName = medicamentGroup?.Name;
+                Concoction.MedicamenName = medicamentGroup?.Name;
                 Concoction.UomId = medicamentGroup?.UoMId;
                 Concoction.DrugFormId = medicamentGroup?.FormDrugId;
 
@@ -1730,7 +1730,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         }
                         else
                         {
-                            Concoction.MedicamenName = Concoction.MedicamentName;
+                            Concoction.MedicamenName = Concoction.MedicamenName;
                         }
                         Concoction.UomName = Uoms.Where(x => x.Id == Concoction.UomId).Select(x => x.Name).FirstOrDefault();
                         Concoction.DrugDosageName = DrugDosages.Where(x => x.Id == Concoction.DrugDosageId).Select(x => x.Frequency).FirstOrDefault();
@@ -1744,7 +1744,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         Concoctions[index] = Concoction;
                     }
 
-                    await EditItemPharmacy_Click();
+                    //await EditItemPharmacy_Click();
                     StateHasChanged();
                     SelectedDataItemsConcoction = [];
                 }

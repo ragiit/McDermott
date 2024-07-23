@@ -11,7 +11,7 @@ namespace McDermott.Domain.Entities
         public long? TransferStockId { get; set; }        
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
-        public string? StatusTransfer { get; set; }
+        public string? Status { get; set; }
 
         [SetToNull]
         public TransferStock? TransferStock { get; set; }
