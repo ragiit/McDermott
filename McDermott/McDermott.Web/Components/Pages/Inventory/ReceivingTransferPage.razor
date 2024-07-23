@@ -283,13 +283,13 @@
                                                         {
                                                             <DxFormLayout CssClass="w-100 mt">
                                                                 <div class="col-md-6">
-                                                                    <DxFormLayoutItem Caption="Select Serial Number/LoT" CaptionCssClass="normal-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
+                                                                    <DxFormLayoutItem Caption="Select Serial Number/LoT" CaptionCssClass="normal-caption required-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
                                                                         <DxTextBox Text="@TempFormReceivingStockDetail.Batch" TextExpression="@(()=>TempFormReceivingStockDetail.Batch)" TextChanged="@((string value)=>CheckBatch(value))" NullText="Select Serial Number/LoT" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                    ShowValidationIcon="true"></DxTextBox>
                                                                     </DxFormLayoutItem>
                                                                 </div>
                                                                 <div class="col-md-6">
-                                                                    <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
+                                                                    <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption required-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
                                                                         <DxDateEdit @bind-Date="@TempFormReceivingStockDetail.ExpiredDate" DisplayFormat="dd MMMM yyyy" Format="d"></DxDateEdit>
                                                                     </DxFormLayoutItem>
                                                                 </div>

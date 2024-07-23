@@ -456,13 +456,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                     var product = Products.FirstOrDefault(x => x.Id == item.ProductId);
                     item.UomName = Uoms.FirstOrDefault(u => u.Id == product?.UomId)?.Name;
 
-                    var stockProducts = await Mediator.Send(new GetStockProductQuery(s => s.ProductId == item.ProductId && s.SourceId == FormInternalTransfer.SourceId));
+                    var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == item.ProductId && s.LocationId == FormInternalTransfer.SourceId && s.SourceTable==nameof(TransferStock) && s.SourcTableId == FormInternalTransfer.Id));
                     var stockProduct = stockProducts.FirstOrDefault();
 
                     if (item.Product?.TraceAbility == true)
                     {
                         item.Batch = stockProduct?.Batch;
-                        item.ExpiredDate = stockProduct?.Expired;
+                        item.ExpiredDate = stockProduct?.ExpiredDate;
                     }
                     else
                     {

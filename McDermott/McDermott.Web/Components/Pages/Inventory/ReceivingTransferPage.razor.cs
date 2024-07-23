@@ -660,6 +660,14 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 try
                 {
+                    if(r.TraceAbility == true)
+                    {
+                        if(r.Batch == null || r.ExpiredDate == null)
+                        {
+                            return;
+                        }
+                    }
+
                     ReceivingStockProductDto updates = new();
 
                     if (r.Id == 0)
