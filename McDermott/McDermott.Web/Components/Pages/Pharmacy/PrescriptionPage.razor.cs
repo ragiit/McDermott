@@ -16,7 +16,7 @@ using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
-    public partial class PrescriptionPage
+    public partial class PrescriptionPage 
     {
         #region UserLoginAndAccessRole
 

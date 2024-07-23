@@ -186,7 +186,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 SelectedBatchExpired = stockProduct.ExpiredDate;
 
                 //    //current Stock
-                var _currentStock = TransactionStocks.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch && x.Validate == true).FirstOrDefault();
+                var _currentStock = TransactionStocks.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch).FirstOrDefault();
                 var Qty = TransactionStocks.Where(x => x.LocationId == FormInternalTransfer.SourceId && x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == stockProduct.Batch && x.Validate == true).Sum(x => x.Quantity);
                 if (_currentStock is not null)
                 {
@@ -422,8 +422,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                 IsAddTransfer = true;
                 TempFormInternalTransfer = new();                
                 headerDetail = "Add product Transfer Internal";
-                var location = Locations.FirstOrDefault(x => x.Id == getInternalTransfer.SourceId);
-                await SelectedItemProduct(location);
+                var location = Locations.FirstOrDefault(x => x.Id == FormInternalTransfer.SourceId);
+                if (location is null)
+                {
+                    await SelectedItemProduct(location);
+                }
                 await GridDetailTransferStock.StartEditNewRowAsync();
             }
             catch (Exception ex)
