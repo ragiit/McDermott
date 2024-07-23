@@ -654,6 +654,8 @@ namespace McDermott.Web.Components.Pages.Inventory
             if (e is null)
                 return;
 
+           
+
             var r = (ReceivingStockProductDto)e.EditModel;
 
             if (FormReceivingStocks.Id == 0)

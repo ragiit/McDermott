@@ -240,9 +240,13 @@
                                                     <EditFormTemplate Context="EditFormContextt">
                                                         @{
                                                             TempFormReceivingStockDetail = (ReceivingStockProductDto)EditFormContextt.EditModel;
+                                                            bool a = true;
+                                                            if (TempFormReceivingStockDetail.TraceAbility && TempFormReceivingStockDetail.ExpiredDate is null)
+                                                            {
+                                                                a = false;
+                                                            }
                                                         }
-                                                        <DxFormLayout CssClass="w-100 mt">
-
+                                                        <DxFormLayout CssClass="w-100 mt"> 
                                                             <div class="col-md-6">
                                                                 <DxFormLayoutItem Caption="Product Name" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                     <DxComboBox Data="@Products"
@@ -307,7 +311,7 @@
                                                     } *@
 
                                                         <DxFormLayoutItem ColSpanMd="12">
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Confirm" SubmitFormOnClick="true"></DxButton>
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Enabled="@a" Text="Confirm" SubmitFormOnClick="true"></DxButton>
                                                             <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridProduct.CancelEditAsync())"></DxButton>
                                                         </DxFormLayoutItem>
                                                     </EditFormTemplate>
