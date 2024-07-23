@@ -430,6 +430,7 @@
                                                 Text="Fetching Data...">
                                     <MyGrid @ref="GridStock"
                                             Data="StockProducts"
+                                            FocusedRowEnabled="false"
                                             KeyFieldName="Id"
                                             DataItemDeleting="onDeleteStock"
                                             AllowSelectRowByClick="false">
@@ -439,8 +440,7 @@
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshStock_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
+                                        <Columns> 
                                             <DxGridDataColumn FieldName="DestinanceName" Caption="Location" GroupIndex="0" />
                                             @if (FieldHideStock == true)
                                             {

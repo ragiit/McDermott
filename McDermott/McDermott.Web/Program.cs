@@ -18,6 +18,21 @@ DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddServerSideBlazor();
+builder.Services.AddControllers(); // Menambahkan layanan Controllers
+builder.Services.AddControllersWithViews();
+// Configure HttpClient with BaseAddress
+//builder.Services.AddHttpClient("ServerAPI", client =>
+//{
+//    // Replace "https://localhost:5001/" with your actual base URL
+//    client.BaseAddress = new Uri("https://localhost:5001/");
+//    // Or you can use a configuration setting
+//    // client.BaseAddress = new Uri(builder.Configuration["ServerAPI:BaseUrl"]);
+//});
+builder.Services.AddHttpClient("ServerAPI", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ServerAPI:BaseUrl"] ?? "http://localhost:5001/");
+});
 // Add services to the container.
 builder.WebHost.UseUrls("http://*:5001");
 builder.Services.AddAuthenticationCore();
@@ -88,9 +103,9 @@ app.UseRouting();
 //app.UseAuthorization();  // Gunakan otorisasi
 //app.UseHttpsRedirection();
 
+app.MapControllers();
 app.UseStaticFiles();
 app.UseAntiforgery();
-
 app.MapHub<RealTimeHub>("/realTimeHub");
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();

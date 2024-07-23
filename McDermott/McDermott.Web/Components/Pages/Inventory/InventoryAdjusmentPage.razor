@@ -51,7 +51,7 @@
                                             <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Date" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Company.Name" Caption="Company" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Location.Name" Caption="Location" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Location.NameAndParent" Caption="Location" />
                                             <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" />
                                         </Columns>
 
@@ -68,17 +68,29 @@
                                         <DxTab Text="@EnumStatusInventoryAdjustment.Draft.GetDisplayName()" Enabled="@IsStatus(EnumStatusInventoryAdjustment.Draft)"></DxTab>
                                         <DxTab Text="@EnumStatusInventoryAdjustment.InProgress.GetDisplayName()" Enabled="@IsStatus(EnumStatusInventoryAdjustment.InProgress)"></DxTab>
                                         <DxTab Text="@EnumStatusInventoryAdjustment.Invalidate.GetDisplayName()" Enabled="@IsStatus(EnumStatusInventoryAdjustment.Invalidate)"></DxTab>
+                                        <DxTab Text="@EnumStatusInventoryAdjustment.Cancel.GetDisplayName()" Enabled="@IsStatus(EnumStatusInventoryAdjustment.Cancel)"></DxTab> 
+
                                     </DxTabs>
                                 </div>
                             </div>
 
-                            @if (InventoryAdjusment.Id != 0 && !InventoryAdjusment.Status.Equals(EnumStatusInventoryAdjustment.Invalidate))
+                            @if (InventoryAdjusment.Id != 0 && !(InventoryAdjusment.Status.Equals(EnumStatusInventoryAdjustment.Invalidate) || InventoryAdjusment.Status.Equals(EnumStatusInventoryAdjustment.Cancel)))
                             {
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="w-100">
                                             <div class="col align-self-center">
-                                                <DxButton IconCssClass="fa-solid fa-check" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
+
+                                                <DxButton IconCssClass="fa-solid fa-check" 
+                                                Text="@StagingText" Click="OnClickConfirm" 
+                                                RenderStyle="ButtonRenderStyle.Primary"></DxButton>
+
+                                                <DxButton 
+                                                          IconCssClass="fa-solid fa-xmark"
+                                                          Text="Cancel"
+                                                          Click="OnCancelStatus"
+                                                          RenderStyle="ButtonRenderStyle.Danger">
+                                                </DxButton>
                                             </div>
                                         </div>
                                     </div>

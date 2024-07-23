@@ -7,6 +7,8 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using static McDermott.Web.Components.Pages.Transaction.GeneralConsultanServicePage
 @inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
 
 @inject CustomAuthenticationStateProvider CustomAuth
 
@@ -20,10 +22,23 @@
             <h1><label>Home</label></h1>
 
             <p>Welcome, @UserLogin.Name. @Greeting</p>
-
+@* 
             <DxButton Click="Clicktop" Text="Hayoo Tebakk"></DxButton>
-            <canvas id="pdfCanvas" style="display: none;"></canvas>
+            <canvas id="pdfCanvas" style="display: none;"></canvas> *@
 
+          @*   <input type="text" @bind="filePath" placeholder="Enter file path" />
+            <button @onclick="DownloadFile">Download File</button>
+
+            <DxGrid Data="@Data"
+                    TextWrapEnabled="false"
+                    ShowGroupPanel="true"
+                    AutoExpandAllGroupRows="true"
+                    ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                    VirtualScrollingEnabled="true">
+                <Columns>
+                    <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                </Columns>
+            </DxGrid> *@
         </div>
     </div>
 }
@@ -33,6 +48,34 @@ else
 }
 
 @code {
+    private string filePath { get; set; } = "Slip_Registration.pdf";
+    object Data { get; set; }
+
+    private async Task DownloadFile()
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            // Handle empty file path case (e.g., show an error message)
+            return;
+        }
+
+        var client = ClientFactory.CreateClient("ServerAPI");
+        var response = await client.GetAsync($"api/file/download?filePath={Uri.EscapeDataString(filePath)}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var fileName = response.Content.Headers.ContentDisposition?.FileNameStar ?? Path.GetFileName(filePath);
+            var fileBytes = await response.Content.ReadAsByteArrayAsync();
+            var base64File = Convert.ToBase64String(fileBytes);
+
+            await JsRuntime.InvokeVoidAsync("downloadFileFromStreamApi", fileName, base64File);
+        }
+        else
+        {
+            // Handle error case (e.g., file not found)
+        }
+    }
+
     private string mail { get; set; } = "argipurwanto0@gmil.com";
     private IGrid Grid { get; set; }
     private bool PanelVisible { get; set; } = false;
@@ -80,15 +123,15 @@ else
         try
         {
 
-              var queueNumber = "123";
-        var NamePatient = "John Doe";
-        var ServiceKiosk = "Poliklinik Umum";
-        var nameBPJS = "BPJS Kesehatan";
-        var noBPJS = "987654321";
-        var TypeNumber = "Antrian";
-        var numbers = "456";
+            var queueNumber = "123";
+            var NamePatient = "John Doe";
+            var ServiceKiosk = "Poliklinik Umum";
+            var nameBPJS = "BPJS Kesehatan";
+            var noBPJS = "987654321";
+            var TypeNumber = "Antrian";
+            var numbers = "456";
 
-        // HTML untuk dokumen cetak
+            // HTML untuk dokumen cetak
             bool isBlueBackground = true; // Atur kondisi boolean sesuai kebutuhan
             var backgroundColor = isBlueBackground ? "lightblue" : "white";
 
@@ -170,68 +213,68 @@ else
 
         </html>";
 
-        // Panggil JavaScript Interop untuk memicu pencetakan
+            // Panggil JavaScript Interop untuk memicu pencetakan
             await JsRuntime.InvokeVoidAsync("printJS", contentToPrint);
 
 
-            
-        //     var report = new ClinicReport
-        //     {
-        //         Date = DateTime.Now,
-        //         Name = "John Doe",
-        //         IsOnceADay = true,
-        //         EarDrops = false,
-        //         EyeDrops = true,
-        //         Ointment = false
-        //     };
 
-        // var htmlContent = $@"
-        //     <html>
-        //         <head>
-        //             <style>
-        //                 .border {{
-        //                     border: 1px solid black;
-        //                     padding: 10px;
-        //                     width: 50%;
-        //                     margin: auto;
-        //                 }}
-        //                 .title {{
-        //                     text-align: center;
-        //                     font-weight: bold;
-        //                 }}
-        //             </style>
-        //         </head>
-        //         <body>
-        //             <div class='border'>
-        //                 <div class='title'>PT. McDERMOTT INDONESIA</div>
-        //                 <div class='title'>BASE CLINIC</div>
-        //                 <p>Nama : {report.Name}</p> 
-        //                 <p>Obat Luar</p>
-        //             </div>
-        //         </body>
-        //     </html>";
+            //     var report = new ClinicReport
+            //     {
+            //         Date = DateTime.Now,
+            //         Name = "John Doe",
+            //         IsOnceADay = true,
+            //         EarDrops = false,
+            //         EyeDrops = true,
+            //         Ointment = false
+            //     };
 
-        // var converter = new SynchronizedConverter(new PdfTools());
-        // var pdf = new HtmlToPdfDocument()
-        //     {
-        //         GlobalSettings = {
-        //         Orientation =  DinkToPdf.Orientation.Portrait,
-        //         PaperSize = PaperKind.A4
-        //     },
-        //         Objects = {
-        //         new ObjectSettings() {
-        //             HtmlContent = htmlContent,
-        //             WebSettings = { DefaultEncoding = "utf-8" }
-        //         }
-        //     }
-        //     };
+            // var htmlContent = $@"
+            //     <html>
+            //         <head>
+            //             <style>
+            //                 .border {{
+            //                     border: 1px solid black;
+            //                     padding: 10px;
+            //                     width: 50%;
+            //                     margin: auto;
+            //                 }}
+            //                 .title {{
+            //                     text-align: center;
+            //                     font-weight: bold;
+            //                 }}
+            //             </style>
+            //         </head>
+            //         <body>
+            //             <div class='border'>
+            //                 <div class='title'>PT. McDERMOTT INDONESIA</div>
+            //                 <div class='title'>BASE CLINIC</div>
+            //                 <p>Nama : {report.Name}</p> 
+            //                 <p>Obat Luar</p>
+            //             </div>
+            //         </body>
+            //     </html>";
 
-        // var pdfBytes = converter.Convert(pdf);
+            // var converter = new SynchronizedConverter(new PdfTools());
+            // var pdf = new HtmlToPdfDocument()
+            //     {
+            //         GlobalSettings = {
+            //         Orientation =  DinkToPdf.Orientation.Portrait,
+            //         PaperSize = PaperKind.A4
+            //     },
+            //         Objects = {
+            //         new ObjectSettings() {
+            //             HtmlContent = htmlContent,
+            //             WebSettings = { DefaultEncoding = "utf-8" }
+            //         }
+            //     }
+            //     };
 
-        // var base64String = Convert.ToBase64String(pdfBytes);
-        // var fileUrl = $"data:application/pdf;base64,{base64String}";
+            // var pdfBytes = converter.Convert(pdf);
 
-        // await JsRuntime.InvokeVoidAsync("downloadFileNew", fileUrl, "report.pdf");
+            // var base64String = Convert.ToBase64String(pdfBytes);
+            // var fileUrl = $"data:application/pdf;base64,{base64String}";
+
+            // await JsRuntime.InvokeVoidAsync("downloadFileNew", fileUrl, "report.pdf");
 
         }
         catch (Exception ex)
@@ -252,7 +295,7 @@ else
 
     private async Task Clicktop()
     {
-      await  GeneratePdf();
+        await  GeneratePdf();
         // NavigationManager.NavigateTo($"https://teams.microsoft.com/l/call/0/0?users={mail}");
     }
 
@@ -349,10 +392,31 @@ else
             ex.HandleException(ToastService);
         }
     }
-
+    public class DataResponse<T>
+    {
+        public List<T> Data { get; set; }
+    }
     protected override async Task OnInitializedAsync()
     {
         PanelVisible = true;
+        // var client = ClientFactory.CreateClient("ServerAPI");
+        // var response = await client.GetAsync($"api/file/yeay");
+
+        // if (response.IsSuccessStatusCode)
+        // {
+        //     // Read the JSON response as a string
+        //     var jsonString = await response.Content.ReadAsStringAsync();
+
+        //     // Deserialize JSON into a DataResponse<District> object
+        //     var dataResponse = JsonConvert.DeserializeObject<DataResponse<District>>(jsonString);
+
+        //     // Extract the list of districts
+        //     Data = dataResponse?.Data ?? new List<District>();
+        // }
+        // else
+        // {
+        //     // Handle error case (e.g., file not found)
+        // }
 
         // var aaa = await PcareService.SendPCareService($"poli/fktp/0/10", HttpMethod.Get);
         // var aaab = await PcareService.SendPCareService($"provider/0/10", HttpMethod.Get);

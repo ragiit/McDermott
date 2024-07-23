@@ -306,12 +306,29 @@ namespace McDermott.Web.Components.Pages.Inventory
             Products = AllProducts.Where(x => st.Select(s => s.ProductId).Contains(x.Id)).ToList();
         }
 
+        private async Task OnCancelStatus()
+        {
+            PanelVisible = true;
+            InventoryAdjusment.Status = EnumStatusInventoryAdjustment.Cancel;
+            StagingText = EnumStatusInventoryAdjustment.Cancel.GetDisplayName();
+
+            InventoryAdjusment =  await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+            PanelVisible = false;
+        }
+
         private async Task SaveInventoryAdjusmentDetail(GridEditModelSavingEventArgs e)
         {
             try
             {
                 if (e is null)
                     return;
+
+                var IsBatch = Products.FirstOrDefault(x => x.Id == FormInventoryAdjusmentDetail.ProductId)?.TraceAbility ?? false;
+                if (IsBatch && string.IsNullOrWhiteSpace(FormInventoryAdjusmentDetail.Batch))
+                {
+                    ToastService.ShowInfo("Please select Batch");
+                    return;
+                }
 
                 var inventoryAdjusmentDetail = FormInventoryAdjusmentDetail;
                 var inventoryAdjusmentDetailA = (InventoryAdjusmentDetailDto)e.EditModel;
@@ -354,7 +371,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         await Mediator.Send(new CreateInventoryAdjusmentDetailRequest(inventoryAdjusmentDetail));
                     else
                         await Mediator.Send(new UpdateInventoryAdjusmentDetailRequest(inventoryAdjusmentDetail));
-                    
+
                     if (inventoryAdjusmentDetail.Difference != 0)
                     {
                         // Map InventoryAdjusmentDetail to TransactionStockDto using Mapster
@@ -366,7 +383,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         transactionStockDto.SourceTable = nameof(InventoryAdjusment);
 
                         await Mediator.Send(new CreateTransactionStockRequest(transactionStockDto));
-                    } 
+                    }
 
                     await LoadInventoryAdjustmentDetails();
                 }
@@ -413,7 +430,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     else
                     {
                         var a = SelectedDetailDataItems.Adapt<List<InventoryAdjusmentDetailDto>>();
-                         
+
                         foreach (var id in a)
                         {
                             var idd = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourcTableId == ((InventoryAdjusmentDto)e.DataItem).Id && x.SourceTable == nameof(InventoryAdjusment)))).FirstOrDefault() ?? new();
@@ -632,7 +649,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                     string referenceNumber = $"ADJ#{NextReferenceNumber:D3}";
                     foreach (var item in trx)
-                    { 
+                    {
                         item.Reference = referenceNumber;
                         item.Validate = true;
                         await Mediator.Send(new UpdateTransactionStockRequest(item));
@@ -833,7 +850,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task OnSelectProduct(ProductDto e)
         {
             try
-            {  
+            {
                 Batch.Clear();
                 ResetFormInventoryAdjustmentDetail();
 

@@ -28,6 +28,9 @@ namespace McDermott.Application.Extentions
             [Display(Name = "In-Progress")]
             InProgress = 2,
 
+            [Display(Name = "Canceled")]
+            Cancel = 3,
+
             [Display(Name = "Invalidate")]
             Invalidate = 0,
         }

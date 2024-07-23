@@ -69,12 +69,12 @@ namespace McDermott.Web.Components.Pages.Inventory
         private string? NameUom { get; set; }
         private CultureInfo Culture = CultureInfo.GetCultureInfo("id-ID");
 
-        private List<string> ProductTypes = new List<string>
-        {
+        private List<string> ProductTypes =
+        [
             "Consumable",
             "Service",
             "Storable Product"
-        };
+        ];
 
         private List<string> EquipmentConditions =
             [
