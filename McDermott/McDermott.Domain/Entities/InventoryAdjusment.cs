@@ -5,6 +5,7 @@
         public long? LocationId { get; set; }
         public long? CompanyId { get; set; }
         public string Name { get; set; } = string.Empty;
+        public string Reference { get; set; } = string.Empty;
         public DateTime Date { get; set; }
         public EnumStatusInventoryAdjustment Status { get; set; }
 
