@@ -110,42 +110,47 @@
                                                 </DxTabs>
                                             </div>
                                         </div>
-                                        @if(Pharmacy.Id != 0){
+
+                                   
+
+                                        @if(Pharmacy.Id != 0 ){
                                         <div class="sticky">
                                             <div class="card">
                                                 <div class="card-body">
                                                     <div class="row">
                                                         <div class="col-auto align-self-start">
                                                         
-                                                            @if (Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))
-                                                            {
+                                                            @* @if (Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))
+                                                            { *@
                                                           
-                                                                    <DxButton Text="Send To Pharmacy" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="SendToPharmacy"></DxButton>
+                                                                    <DxButton Text="Send To Pharmacy" Visible="@(Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="SendToPharmacy"></DxButton>
                                                                     <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                            
-                                                            }
+                                                           @*  }
                                                             else if (Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy && NameUser.IsPharmacy == true)
-                                                            {
+                                                            { *@
                                                           
-                                                                   <DxButton Text="Received" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Pharmacied"></DxButton>
+                                                                   <DxButton Text="Received" Visible=@(Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy && NameUser.IsPharmacy == true) RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Pharmacied"></DxButton>
                                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                             
-                                                            }
+                                                           @*  }
                                                             else if (Pharmacy.Status == EnumStatusPharmacy.Received && NameUser.IsPharmacy == true)
-                                                            {
+                                                            { *@
                                                           
-                                                                  <DxButton Text="Process" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Received"></DxButton>
+                                                                  <DxButton Text="Process" Visible="@(Pharmacy.Status == EnumStatusPharmacy.Received && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Received"></DxButton>
                                                                   <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                            
-                                                            }
+                                                            @* }
                                                             else if (Pharmacy.Status == EnumStatusPharmacy.Processed && NameUser.IsPharmacy == true)
-                                                            {
-                                                              <DxButton Text="Done" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="ValidateAsync"></DxButton>
+                                                            { *@
+                                                              <DxButton Text="Done" Visible="@(Pharmacy.Status == EnumStatusPharmacy.Processed && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="ValidateAsync"></DxButton>
                                                               <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>                                                                          
-                                                            }
+                                                            @* } *@
                                                         
                                                         </div>
-                                                        <div class= "col-auto align-self-center"></div>
+                                                        <div class= "col-auto align-self-end">
+                                                            hahahahahahaha
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

@@ -923,6 +923,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     foreach (var item in StockOutProducts)
                     {
                         if (currentStockInput >= prescription.GivenAmount) break;
+                        if (item.Quantity <= 0) continue;
 
                         var newStockOutPrescription = new StockOutPrescriptionDto
                         {
