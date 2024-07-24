@@ -111,45 +111,45 @@
                                             </div>
                                         </div>
                                         @if(Pharmacy.Id != 0){
-                                    <div class="sticky">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-auto align-self-start">
+                                        <div class="sticky">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-auto align-self-start">
                                                         
-                                                        @if (Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))
-                                                        {
+                                                            @if (Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))
+                                                            {
                                                           
-                                                                <DxButton Text="Send To Pharmacy" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="SendToPharmacy"></DxButton>
-                                                                <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                                    <DxButton Text="Send To Pharmacy" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="SendToPharmacy"></DxButton>
+                                                                    <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                            
-                                                        }
-                                                        else if (Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy && NameUser.IsPharmacy == true)
-                                                        {
+                                                            }
+                                                            else if (Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy && NameUser.IsPharmacy == true)
+                                                            {
                                                           
-                                                               <DxButton Text="Received" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Pharmacied"></DxButton>
-                                                               <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                                   <DxButton Text="Received" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Pharmacied"></DxButton>
+                                                                   <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                             
-                                                        }
-                                                        else if (Pharmacy.Status == EnumStatusPharmacy.Received && NameUser.IsPharmacy == true)
-                                                        {
+                                                            }
+                                                            else if (Pharmacy.Status == EnumStatusPharmacy.Received && NameUser.IsPharmacy == true)
+                                                            {
                                                           
-                                                              <DxButton Text="Process" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Received"></DxButton>
-                                                              <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                                  <DxButton Text="Process" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Received"></DxButton>
+                                                                  <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                            
-                                                        }
-                                                        else if (Pharmacy.Status == EnumStatusPharmacy.Processed && NameUser.IsPharmacy == true)
-                                                        {
-                                                          <DxButton Text="Done" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="ValidateAsync"></DxButton>
-                                                          <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>                                                                          
-                                                        }
+                                                            }
+                                                            else if (Pharmacy.Status == EnumStatusPharmacy.Processed && NameUser.IsPharmacy == true)
+                                                            {
+                                                              <DxButton Text="Done" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="ValidateAsync"></DxButton>
+                                                              <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>                                                                          
+                                                            }
                                                         
+                                                        </div>
+                                                        <div class= "col-auto align-self-center"></div>
                                                     </div>
-                                                    <div class= "col-auto align-self-center"></div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
                                         }
                                     <EditForm Model="@Pharmacy" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
                                         <DataAnnotationsValidator />
@@ -1156,8 +1156,7 @@ else
          {
             <div class="row  justify-content-end">
                 <div class="col-auto align-self-end">
-                    <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="SaveStockOut"></DxButton>
-                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="HandleDiscard"></DxButton>
+                    <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Confirm" SubmitFormOnClick="true" Click="SaveStockOut"></DxButton>
                 </div>
             </div>
         }
@@ -1282,8 +1281,7 @@ else
          {
             <div class="row justify-content-end">
                 <div class="col-auto align-self-end">
-                    <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="SaveStockOutLines"></DxButton>
-                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="HandleDiscardLines"></DxButton>
+                    <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Confirm" SubmitFormOnClick="true" Click="SaveStockOutLines"></DxButton>
                 </div>
             </div>
         }

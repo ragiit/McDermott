@@ -1745,8 +1745,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     }
 
                     //await EditItemPharmacy_Click();
-                    StateHasChanged();
                     SelectedDataItemsConcoction = [];
+                    StateHasChanged();
                 }
                 catch (Exception ex)
                 {
@@ -1868,6 +1868,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     StockOutPrescriptions[index] = FormStockOutPrescriptions;
                 }
                 SelectedDataItemsStockOut = [];
+                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -1904,6 +1905,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     StockOutLines[index] = FormStockOutLines;
                 }
                 SelectedDataItemsStockOut = [];
+                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -2218,7 +2220,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
             finally
             {
-                IsLoading = false;
+                PanelVisible = false;
             }
         }
 
@@ -2435,6 +2437,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
 
             await EditItemPharmacy_Click(updates);
+            StateHasChanged();
         }
 
         public async Task ValidateAsync()
@@ -2443,6 +2446,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 await LoadAsyncData();
                 await LoadData();
+                await RefreshData();
 
                 StockOutPrescriptions = await Mediator.Send(new GetStockOutPrescriptionQuery());
                 StockOutLines = await Mediator.Send(new GetStockOutLineQuery());
@@ -2454,60 +2458,42 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 #region Prescription CutStock
                 var prescriptions = Prescriptions.Where(x => x.PharmacyId == pharmacyData.Id).ToList();
-                if (prescriptions == null || prescriptions.Count == 0)
+                if (prescriptions.Count > 0)
                 {
-                    return;
-                }
-
-                foreach (var prescription in prescriptions)
-                {
-                    var stockProduct = TransactionStocks.Where(x => x.SourceTable == nameof(Prescription) && x.SourcTableId == prescription.Id).ToList();
-                    if (stockProduct == null)
+                    foreach (var prescription in prescriptions)
                     {
-                        continue;
+                        var stockProducts = TransactionStocks.Where(x => x.SourceTable == nameof(Prescription) && x.SourcTableId == prescription.Id).ToList();
+                        if (stockProducts.Count > 0)
+                        {
+                            foreach (var item in stockProducts)
+                            {
+                                item.Validate = true;
+                                await Mediator.Send(new UpdateTransactionStockRequest(item));
+                            }
+                        }
                     }
-
-                    foreach (var items in stockProduct)
-                    {
-                        items.Validate = true;
-                        var aas = await Mediator.Send(new UpdateTransactionStockRequest(items));
-                    }
-                    //var stockOutData = StockOutPrescriptions.Where(x => x.PrescriptionId == prescription.Id).ToList();
-                    //foreach (var stockOut in stockOutData)
-                    //{
-                    //    var stock = TransactionStocks.FirstOrDefault(x => x.Id == stockOut.TransactionStockId);
-                    //    if (stock == null)
-                    //    {
-                    //        continue;
-                    //    }
-
-                    //    stock.Quantity -= stockOut.CutStock;
-                    //    //await Mediator.Send(new UpdateStockProductRequest(stock));
-                    //}
                 }
                 #endregion
                 #region ConcoctionLine CutStock
-                var data_concoctions = Concoctions.FirstOrDefault(x => x.PharmacyId == pharmacyData.Id);
-                var data_lines = ConcoctionLines.Where(x => x.ConcoctionId == data_concoctions?.Id).ToList();
-                if (data_lines == null)
+                var dataConcoction = Concoctions.FirstOrDefault(x => x.PharmacyId == pharmacyData?.Id);
+                if (dataConcoction != null)
                 {
-                    return;
-                }
-
-                foreach (var line in data_lines)
-                {
-                    var stockProduct = TransactionStocks.Where(x => x.SourceTable == nameof(ConcoctionLine) && x.SourcTableId == line.Id).ToList();
-                    if (stockProduct == null)
+                    var dataLines = ConcoctionLines.Where(x => x.ConcoctionId == dataConcoction.Id).ToList();
+                    if (dataLines.Count > 0)
                     {
-                        continue;
+                        foreach (var line in dataLines)
+                        {
+                            var stockProducts = TransactionStocks.Where(x => x.SourceTable == nameof(ConcoctionLine) && x.SourcTableId == line.Id).ToList();
+                            if (stockProducts.Count > 0)
+                            {
+                                foreach (var item in stockProducts)
+                                {
+                                    item.Validate = true;
+                                    await Mediator.Send(new UpdateTransactionStockRequest(item));
+                                }
+                            }
+                        }
                     }
-
-                    foreach (var items in stockProduct)
-                    {
-                        items.Validate = true;
-                        var asa = Mediator.Send(new UpdateTransactionStockRequest(items));
-                    }
-
                 }
                 #endregion
                 Pharmacy.Status = EnumStatusPharmacy.Done;
@@ -2522,6 +2508,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 await Mediator.Send(new CreatePharmacyLogRequest(pharmacyLog));
                 await EditItemPharmacy_Click(updatedPharmacy);
+                StateHasChanged();
             }
             catch (Exception ex)
             {

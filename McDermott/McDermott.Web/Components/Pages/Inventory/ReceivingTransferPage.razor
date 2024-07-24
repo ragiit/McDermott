@@ -290,11 +290,13 @@
                                                                     <DxFormLayoutItem Caption="Select Serial Number/LoT" CaptionCssClass="normal-caption required-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
                                                                         <DxTextBox Text="@TempFormReceivingStockDetail.Batch" TextExpression="@(()=>TempFormReceivingStockDetail.Batch)" TextChanged="@((string value)=>CheckBatch(value))" NullText="Select Serial Number/LoT" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                    ShowValidationIcon="true"></DxTextBox>
+                                                                        <ValidationMessage For="@(()=>TempFormReceivingStockDetail.Batch)"></ValidationMessage>
                                                                     </DxFormLayoutItem>
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption required-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
                                                                         <DxDateEdit @bind-Date="@TempFormReceivingStockDetail.ExpiredDate" DisplayFormat="dd MMMM yyyy" Format="d"></DxDateEdit>
+                                                                        <ValidationMessage For="@(()=>TempFormReceivingStockDetail.ExpiredDate)"></ValidationMessage>
                                                                     </DxFormLayoutItem>
                                                                 </div>
                                                             </DxFormLayout>

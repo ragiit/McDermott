@@ -641,8 +641,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 ToastService.ClearSuccessToasts();
-                StateHasChanged();
                 await EditItem_Click(GetReceivingStock);
+                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -707,6 +707,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     TempReceivingStockDetails.Clear();
                 }
                 await EditItem_Click(null);
+                StateHasChanged();
             }
         }
         #endregion Function Save

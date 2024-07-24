@@ -38,6 +38,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 {
                     result = await _unitOfWork.Repository<Concoction>().Entities
                        .AsNoTracking()
+                       .Include(x=>x.Pharmacy)
                        .Include(x => x.MedicamentGroup)
                        .Include(x => x.Practitioner)
                        .Include(x => x.DruForm)

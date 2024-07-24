@@ -513,6 +513,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormInternalTransferDetail.Status = EnumStatusInternalTransfer.Request;
 
                 await Mediator.Send(new CreateTransferStockLogRequest(FormInternalTransferDetail));
+                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -992,6 +993,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 await EditItem_Click(getInternalTransfer);
+                StateHasChanged();
             }
             catch (Exception ex)
             {
