@@ -116,3 +116,7 @@
     font-weight: 900;
     src: url('/fonts/Roboto-BlackItalic.ttf') format('truetype');
 }
+
+h1:focus {
+    outline: none;
+}
