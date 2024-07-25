@@ -54,6 +54,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private string StagingText { get; set; } = "Start Inventory";
         private bool PanelVisible { get; set; } = true;
         private bool FormValidationState { get; set; } = true;
+        private bool ActiveButton { get; set; } = false;
         private bool ShowForm { get; set; } = false;
 
         private int FocusedRowVisibleIndex { get; set; }
@@ -409,7 +410,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                                 ExpiredDate = inventoryAdjusmentDetail.ExpiredDate,
                                 LocationId = InventoryAdjusment.LocationId,
                                 Quantity = inventoryAdjusmentDetail.Difference,
-                                UomId = inventoryAdjusmentDetail.UomId,
+                                UomId = FormInventoryAdjusmentDetail.UomId,
                                 Validate = false,
                                 SourceTable = nameof(InventoryAdjusment),
                                 SourcTableId = inventoryAdjusmentDetail.Id,

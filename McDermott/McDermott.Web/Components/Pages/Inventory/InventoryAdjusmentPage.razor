@@ -48,8 +48,8 @@
 
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Date" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Date" SortIndex="0" SortOrder="GridColumnSortOrder.Descending" DisplayFormat="dd MMMM yyyy" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Company.Name" Caption="Company" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Location.NameAndParent" Caption="Location" />
                                             <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" />
@@ -180,6 +180,7 @@
                                                                     @bind-SelectedDataItems="@SelectedDetailDataItems"
                                                                     EditModelSaving="SaveInventoryAdjusmentDetail"
                                                                     DataItemDeleting="OnDeleteInventoryAdjusmentDetail"
+                                                                    EditFormButtonsVisible="false"
                                                                     FocusedRowChanged="GridDetail_FocusedRowChanged"
                                                                     KeyFieldName="Id">
 
@@ -211,32 +212,42 @@
                                                                     <DxGridDataColumn FieldName="Product.Uom.Name" Caption="UoM" />
                                                                 </Columns>
                                                                 <EditFormTemplate Context="EditFormContext">
-                                                                    @{
-                                                                        var aaa = EditFormContext;
+                                                                    @{ 
                                                                         if (EditFormContext.DataItem is null)
                                                                         {
                                                                             FormInventoryAdjusmentDetail = (InventoryAdjusmentDetailDto)EditFormContext.EditModel;
                                                                         }
                                                                         var IsBatch = Products.FirstOrDefault(x => x.Id == FormInventoryAdjusmentDetail.ProductId)?.TraceAbility ?? false;
+
+                                                                        ActiveButton = FormInventoryAdjusmentDetail.ProductId is null ||
+                                                                        string.IsNullOrWhiteSpace(FormInventoryAdjusmentDetail.Batch) && IsBatch ||
+                                                                        FormInventoryAdjusmentDetail.ExpiredDate is null ||
+                                                                        FormInventoryAdjusmentDetail.UomId is null;
+
+                                                                        if (ActiveButton)
+                                                                        {
+                                                                            ToastService.ClearInfoToasts();
+                                                                            ToastService.ShowInfoSubmittingForm();
+                                                                        }
                                                                     }
                                                                     <div class="row w-100">
                                                                         <DxFormLayout CssClass="w-100">
                                                                             <div class="col-md-4">
-                                                                                <DxFormLayoutItem Caption="Product"  CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                <DxFormLayoutItem Caption="Product" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                     <DxComboBox Data="@Products"
                                                                                                 @bind-Value="@FormInventoryAdjusmentDetail.ProductId"
                                                                                                 FilteringMode="@DataGridFilteringMode.Contains"
                                                                                                 NullText="Select Product..."
                                                                                                 TextFieldName="Name"
                                                                                                 ReadOnly="@(FormInventoryAdjusmentDetail.Id != 0)"
-                                                                                                ValueFieldName="Id" 
+                                                                                                ValueFieldName="Id"
                                                                                                 SelectedItemChanged="@(async (ProductDto freq) => await OnSelectProduct(freq))"
                                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                                 ShowValidationIcon="true" />
                                                                                     <ValidationMessage For="@(()=> FormInventoryAdjusmentDetail.ProductId)"   />
                                                                                 </DxFormLayoutItem>
 
-                                                                                <DxFormLayoutItem Caption="Batch" Enabled="FormInventoryAdjusmentDetail.Id == 0" Visible="IsBatch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                <DxFormLayoutItem Caption="Batch" Enabled="FormInventoryAdjusmentDetail.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                     <MyDxComboBox Data="@Batch"
                                                                                                   ReadOnly="@(FormInventoryAdjusmentDetail.Id != 0)"
                                                                                                   NullText="Select Batch..."
@@ -253,7 +264,7 @@
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Teoritical Qty" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                     <DxSpinEdit ShowValidationIcon="true"
                                                                                                 ReadOnly
-                                                                                                MinValue="0" 
+                                                                                                MinValue="0"
                                                                                                 @bind-Value="@FormInventoryAdjusmentDetail.TeoriticalQty"
                                                                                                 NullText="Teoritical Qty"
                                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
@@ -262,7 +273,7 @@
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Real Qty" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                     <DxSpinEdit ShowValidationIcon="true"
-                                                                                                MinValue="0" 
+                                                                                                MinValue="0"
                                                                                                 @bind-Value="@FormInventoryAdjusmentDetail.RealQty"
                                                                                                 NullText="Real Qty"
                                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
@@ -271,7 +282,7 @@
                                                                             </div>
 
                                                                             <div class="col-md-4">
-                                                                                <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                     <DxDateEdit ShowValidationIcon="true"
                                                                                                 ReadOnly="@(FormInventoryAdjusmentDetail.Id != 0)"
                                                                                                 @bind-Date="@FormInventoryAdjusmentDetail.ExpiredDate"
@@ -279,7 +290,7 @@
                                                                                     </DxDateEdit>
                                                                                 </DxFormLayoutItem>
 
-                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="UoM" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="UoM" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                     <DxComboBox ShowValidationIcon="true" Data="@Uoms"
                                                                                                 NullText="UoM"
                                                                                                 ReadOnly="@(FormInventoryAdjusmentDetail.Id != 0)"
@@ -293,6 +304,12 @@
                                                                                 </DxFormLayoutItem>
                                                                             </div>
                                                                         </DxFormLayout>
+
+                                                                        <DxFormLayoutItem ColSpanMd="12">
+                                                                            <DxButton Enabled="@(!ActiveButton)" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridDetail.CancelEditAsync())"></DxButton>
+                                                                        </DxFormLayoutItem>
+
                                                                         @*  <div class="col-md-6">
                                                                 <DxFormLayout CssClass="w-100">
                                                                 <div class="col-md-4">

@@ -1,4 +1,4 @@
-﻿ 
+﻿
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,17 +16,26 @@
     <title>Cuba - Premium Admin Template</title>
 
 
-   
+
     <HeadOutlet @rendermode="RenderModeForPage" />
 </head>
 
 <body>
-    <Routes @rendermode="RenderModeForPage" /> 
+    <Routes @rendermode="RenderModeForPage" />
+
+    @if (HttpContext.Request.Path.StartsWithSegments("/Account"))
+    {
+        <script src="../_framework/blazor.web.js"></script>
+    }
+    else
+    {
+        <script src="_framework/blazor.web.js"></script>
+    }
 </body>
 
 </html>
 
-@code { 
+@code {
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
 
