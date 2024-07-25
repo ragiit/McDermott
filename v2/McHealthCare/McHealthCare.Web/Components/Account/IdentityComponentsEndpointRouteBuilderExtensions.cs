@@ -1,6 +1,6 @@
+using McHealthCare.Domain.Entities;
 using McHealthCare.Web.Components.Account.Pages;
 using McHealthCare.Web.Components.Account.Pages.Manage;
-using McHealthCare.Web.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;

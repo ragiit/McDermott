@@ -1,4 +1,5 @@
-using McHealthCare.Web.Data;
+using McHealthCare.Domain.Entities;
+
 using Microsoft.AspNetCore.Identity;
 
 namespace McHealthCare.Web.Components.Account

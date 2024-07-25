@@ -3,7 +3,7 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
-@using McHealthCare.Web.Data
+@using McHealthCare.Domain.Entities
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject ILogger<Login> Logger
@@ -12,7 +12,136 @@
 
 <PageTitle>Log in</PageTitle>
 
-<h1>Log in</h1>
+<!-- login page start-->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 p-0">
+            <div class="login-card login-dark">
+                <div>
+                    @* <div><a class="logo text-start" href="index.html"><img class="img-fluid for-light" src="../images/mcdermott_logo.png" alt="looginpage"><img class="img-fluid for-dark" src="../assets/images/logo/logo_dark.png" alt="looginpage"></a></div> *@
+                    <div class="login-main">
+                        <EditForm Model="Input" OnValidSubmit="LoginUser" FormName="LoginForm" class="theme-form">
+                            <img src="../images/mcdermott_logo.png" alt="Login Image" class="img-fluid mb-3 mx-auto d-block" style="max-width: 150px;">
+
+                            <h4>Sign in to account</h4>
+                            <p>Enter your email & password to login</p>
+                            <div class="form-group">
+                                <label class="col-form-label">Email Address</label>
+                                @*    <InputText class="form-control" @bind-Value="Input.Email" type="email" required placeholder="Test@gmail.com" />
+                                <ValidationMessage For="@(() => Input.Email)" /> *@
+                                <InputText class="form-control" @bind-Value="Input.Email" type="email" required="" placeholder="Test@gmail.com" />
+                                <ValidationMessage For="@(() => Input.Email)" />
+                            </div>
+                            <div class="form-group">
+                                <label class="col-form-label">Password</label>
+                                <div class="form-input position-relative">
+                                    <InputText id="passwordInput" class="form-control" @bind-Value="Input.Password" type="password" required placeholder="*********" />
+                                    <ValidationMessage For="@(() => Input.Password)" />
+                                </div>
+                            </div>
+                            <div class="form-group mb-0">
+                             @*    <div class="checkbox p-0">
+                                    <input id="checkbox1" type="checkbox">
+                                    <label class="text-muted" for="checkbox1">Remember password</label>
+                                </div><a class="link" href="forget-password.html">Forgot password?</a> *@
+                                <div class="text-end mt-3">
+                                    <button class="btn btn-primary btn-block w-100" type="submit">Sign in</button>
+                                </div>
+                            </div>
+                          @*   <h6 class="text-muted mt-4 or">Or Sign in with</h6>
+                            <div class="social mt-4">
+                                <div class="btn-showcase"><a class="btn btn-light" href="https://www.linkedin.com/login" target="_blank"><i class="txt-linkedin" data-feather="linkedin"></i> LinkedIn </a><a class="btn btn-light" href="https://twitter.com/login?lang=en" target="_blank"><i class="txt-twitter" data-feather="twitter"></i>twitter</a><a class="btn btn-light" href="https://www.facebook.com/" target="_blank"><i class="txt-fb" data-feather="facebook"></i>facebook</a></div>
+                            </div>
+                            <p class="mt-4 mb-0 text-center">Don't have account?<a class="ms-2" href="sign-up.html">Create Account</a></p> *@
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- latest jquery-->
+    <script src="../assets/js/jquery.min.js"></script>
+    <!-- Bootstrap js-->
+    <script src="../assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <!-- feather icon js-->
+    <script src="../assets/js/icons/feather-icon/feather.min.js"></script>
+    <script src="../assets/js/icons/feather-icon/feather-icon.js"></script>
+    <!-- scrollbar js-->
+    <!-- Sidebar jquery-->
+    <script src="../assets/js/config.js"></script>
+    <!-- Plugins JS start-->
+    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+    <!-- Plugins JS Ends-->
+    <!-- Theme js-->
+    <script src="../assets/js/script.js"></script>
+    @* <script>
+    $(document).on('click', '#error', function (e) {
+    if ($('.email').val() == '' || $('.pwd').val() == '') {
+    swal(
+    "Error!", "Sorry, looks like some data are not filled, please try again !", "error"
+    )
+    }
+    });
+    </script> *@
+</div>
+
+<!-- login page start-->
+@* <div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-7 order-1"><img class="bg-img-cover bg-center" src="../images/mcdermott_logo.png" alt="looginpage"></div>
+
+        <div class="col-xl-5 p-0">
+            <div class="login-card login-dark">
+                <div>
+
+                    <div class="login-main">
+                        <EditForm Model="Input" OnValidSubmit="LoginUser" FormName="LoginForm" class="theme-form">
+                            <h4>Sign in to account</h4>
+                            <p>Enter your email & password to login</p>
+                            <div class="form-group">
+                                <label class="col-form-label">Email Address</label>
+                                <InputText class="form-control" @bind-Value="Input.Email" type="email" required placeholder="Test@gmail.com" />
+                                <ValidationMessage For="@(() => Input.Email)" />
+                            </div>
+                            <div class="form-group">
+                                <label class="col-form-label">Password</label>
+                                <div class="form-input position-relative">
+                                    <InputText class="form-control" @bind-Value="Input.Password" type="password" required placeholder="*********" />
+                                </div>
+                            </div>
+                            <div class="form-group mb-0">
+                                <div class="checkbox p-0">
+                                    <input id="checkbox1" type="checkbox">
+                                    <label class="text-muted" for="checkbox1">Remember password</label>
+                                </div><a class="link" href="forget-password.html">Forgot password?</a>
+                                <div class="text-end mt-3">
+                                    <button class="btn btn-primary btn-block w-100" type="submit">Sign in</button>
+                                </div>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- latest jquery-->
+    <script src="/assets/js/jquery.min.js"></script>
+    <!-- Bootstrap js-->
+    <script src="/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <!-- feather icon js-->
+    <script src="/assets/js/icons/feather-icon/feather.min.js"></script>
+    <script src="/assets/js/icons/feather-icon/feather-icon.js"></script>
+    <!-- scrollbar js-->
+    <!-- Sidebar jquery-->
+    <script src="/assets/js/config.js"></script>
+    <!-- Plugins JS start-->
+    <!-- Plugins JS Ends-->
+    <!-- Theme js-->
+    <script src="/assets/js/script.js"></script>
+</div> *@
+
+
+@* <h1>Log in</h1>
 <div class="row">
     <div class="col-md-4">
         <section>
@@ -62,7 +191,7 @@
             <ExternalLoginPicker />
         </section>
     </div>
-</div>
+</div> *@
 
 @code {
     private string? errorMessage;
@@ -75,7 +204,13 @@
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
-
+    private bool isPasswordVisible = false; // Track password visibility
+    private string passwordInputType => isPasswordVisible ? "text" : "password"; // Determine input type
+    private void TogglePasswordVisibility()
+    {
+        // Toggle password visibility state
+        isPasswordVisible = !isPasswordVisible;
+    }
     protected override async Task OnInitializedAsync()
     {
         if (HttpMethods.IsGet(HttpContext.Request.Method))
@@ -89,7 +224,7 @@
     {
         // This doesn't count login failures towards account lockout
         // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, false, lockoutOnFailure: false);
         if (result.Succeeded)
         {
             Logger.LogInformation("User logged in.");
@@ -99,7 +234,7 @@
         {
             RedirectManager.RedirectTo(
                 "Account/LoginWith2fa",
-                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = false });
         }
         else if (result.IsLockedOut)
         {
@@ -112,7 +247,7 @@
         }
     }
 
-    private sealed class InputModel
+    private class InputModel
     {
         [Required]
         [EmailAddress]
@@ -122,7 +257,7 @@
         [DataType(DataType.Password)]
         public string Password { get; set; } = "";
 
-        [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
+        // [Display(Name = "Remember me?")]
+        // public bool RememberMe { get; set; }
     }
 }
