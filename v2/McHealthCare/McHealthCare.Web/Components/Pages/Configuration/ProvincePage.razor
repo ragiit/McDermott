@@ -1,0 +1,79 @@
+﻿@page "/config/province"
+
+<PageTitle>McHealthCare - Provinces</PageTitle>
+
+<div class="wrapper">
+    <BaseHeaderPage Title="Country" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+         
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
+                    <DxLoadingPanel @bind-Visible="PanelVisible"
+                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                    IsContentBlocked="true"
+                                    ApplyBackgroundShading="true"
+                                    IndicatorAreaVisible="false"
+                                    Text="Fetching Data...">
+                        <MyDxGrid @ref="Grid"
+                                  Data="Provinces"
+                                  @bind-SelectedDataItems="@SelectedDataItems"
+                                  EditModelSaving="OnSave"
+                                  DataItemDeleting="OnDelete"
+                                  FocusedRowChanged="@((GridFocusedRowChangedEventArgs args) => FocusedRowVisibleIndex = args.VisibleIndex)"
+                                  KeyFieldName="Id">
+
+                            <ToolbarTemplate>
+                                <MyDxToolbarBase TItem="ProvinceDto"
+                                                 Items="@Provinces"
+                                                 Grid="Grid"
+                                                 SelectedDataItems="@SelectedDataItems"
+                                                 NewItem_Click="@(async () => await Grid.StartEditNewRowAsync())"
+                                                 EditItem_Click="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
+                                                 DeleteItem_Click="@(() => Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex))"
+                                                 Refresh_Click="@(async () => await LoadData())"
+                                                 IsImport="true"
+                                                 ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))"
+                                                 ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "province_template.xlsx", ExportFileDatas))" />
+                            </ToolbarTemplate>
+
+                            <Columns>
+                                <DxGridSelectionColumn Width="15px" />
+                                <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                <DxGridDataColumn MinWidth="200" FieldName="Code" />
+                                <DxGridDataColumn MinWidth="200" FieldName="Country.Name" Caption="Country" />
+                            </Columns>
+                            <EditFormTemplate Context="EditFormContext">
+                                @{
+                                    var a = (ProvinceDto)EditFormContext.EditModel;
+                                }
+                                <DxFormLayout CssClass="w-100">
+                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                        <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                        <ValidationMessage For="@(()=> a.Name)"   />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
+                                        <DxTextBox @bind-Text="@a.Code" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Code" />
+                                        <ValidationMessage For="@(()=> a.Code)"   />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">
+                                        <MyDxComboBox Data="@Countries"
+                                                      NullText="Select Country..."
+                                                      @bind-Value="@a.CountryId"
+                                                      TextFieldName="Name"
+                                                      ValueFieldName="Id">
+                                        </MyDxComboBox>
+                                        <ValidationMessage For="@(()=>a.CountryId)" />
+                                    </DxFormLayoutItem>
+                                </DxFormLayout>
+                            </EditFormTemplate>
+                        </MyDxGrid>
+                    </DxLoadingPanel>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

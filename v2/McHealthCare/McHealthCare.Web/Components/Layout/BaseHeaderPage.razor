@@ -1,0 +1,22 @@
+﻿<div class="container-fluid sticky">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-6">
+                <h4>
+                    @if (ShowBackButton)
+                    {
+                        <i @onclick="OnClickBack" class="fa-solid fa-arrow-left fa-sm mr-3 mt-1" role="button"></i>
+                    }
+
+                    @Title
+                </h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public bool ShowBackButton { get; set; }
+    [Parameter] public EventCallback OnClickBack { get; set; }
+}

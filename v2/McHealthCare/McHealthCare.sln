@@ -9,13 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.Web", "McHealt
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{408F27B2-3CD4-4EF1-8610-16E937C88AA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McHealthCare.Domain", "McHealthCare.Domain\McHealthCare.Domain.csproj", "{6B58287D-6497-4E7A-899B-9C8A762CA86D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.Domain", "McHealthCare.Domain\McHealthCare.Domain.csproj", "{6B58287D-6497-4E7A-899B-9C8A762CA86D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{8E3B7F35-3AE7-4600-8EB1-ADE89F75570E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McHealthCare.Persistence", "McHealthCare.Infrastructure\McHealthCare.Persistence.csproj", "{589989FF-3E26-4D4E-8202-E39B59EBE6BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.Persistence", "McHealthCare.Infrastructure\McHealthCare.Persistence.csproj", "{589989FF-3E26-4D4E-8202-E39B59EBE6BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McHealthCare.Application", "McHealthCare.Application\McHealthCare.Application.csproj", "{1BD84DA6-66B5-4B75-BFF4-DBDA1D3FB58C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.Application", "McHealthCare.Application\McHealthCare.Application.csproj", "{1BD84DA6-66B5-4B75-BFF4-DBDA1D3FB58C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

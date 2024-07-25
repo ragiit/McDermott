@@ -8,6 +8,8 @@ using McHealthCare.Context;
 using McHealthCare.Domain.Entities;
 using McHealthCare.Application.Extentions;
 using McHealthCare.Persistence.Extentions;
+using Blazored.Toast;
+using McHealthCare.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +17,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddScoped<IFileExportService, FileExportService>();
 builder.Services.AddApplicationLayer();
 builder.Services.AddPersistenceLayer(builder.Configuration);
 
+builder.Services.AddBlazoredToast();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
@@ -44,6 +48,9 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
 
 var app = builder.Build();
+
+//app.UseMiddleware<SessionExpirationMiddleware>();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -93,3 +100,19 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+public class SessionExpirationMiddleware(RequestDelegate next)
+{
+    public async Task InvokeAsync(HttpContext context)
+    {
+        if (!context.User.Identity.IsAuthenticated)
+        {
+            // If the user is not authenticated, redirect to the login page
+            context.Response.Redirect("/Account/Login");
+        }
+        else
+        {
+            await next(context);
+        }
+    }
+}

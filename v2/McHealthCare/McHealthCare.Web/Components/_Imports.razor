@@ -1,5 +1,6 @@
 ﻿@using System.Net.Http
-@using System.Net.Http.Json
+@using System.Net.Http.Json 
+@using MediatR
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
@@ -10,3 +11,14 @@
 @using McHealthCare.Web
 @using McHealthCare.Web.Components
 @using DevExpress.Blazor
+@using McHealthCare.Web.Extentions.Razor
+@using Blazored.Toast.Services
+@using McHealthCare.Application.Services
+@using McHealthCare.Web.Extentions.CS
+@using McHealthCare.Web.Components.Layout
+@using McHealthCare.Application.Dtos.Configuration
+
+@inject IToastService ToastService
+@inject IJSRuntime JsRuntime
+@inject IMediator Mediator
+@inject IFileExportService FileExportService

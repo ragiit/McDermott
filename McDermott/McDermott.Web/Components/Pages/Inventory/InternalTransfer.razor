@@ -117,7 +117,7 @@
                                                 </div>
 
                                                 <div class="col-auto align-self-start">
-                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Visible="@(FormInternalTransfer.Id == 0 || FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSave"></DxButton>
                                                     <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" CssClass="ml-1" Text="Discard" Click="onDiscard"></DxButton>
                                                 </div>
                                             </div>
