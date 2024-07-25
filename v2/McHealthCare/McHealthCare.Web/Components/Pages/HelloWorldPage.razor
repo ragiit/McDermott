@@ -97,11 +97,15 @@
 
                 var headerNames = new List<string>() { "Code", "Name" };
 
-                if (Enumerable.Range(1, ws.Dimension.End.Column)
-                    .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+               try
                 {
-                    return;
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                   .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        return;
+                    }
                 }
+                catch {}
 
                 var countries = new List<CountryDto>();
 

@@ -78,6 +78,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private void OnSelectRiskOfFalling(string e)
         {
             RiskOfFallingDetail.Clear();
+            GeneralConsultanService.RiskOfFallingDetail = null;
             if (e is null)
             {
                 return;
@@ -129,7 +130,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             "TBC",
             "Anemia",
             "Other",
-        ]; 
+        ];
         private List<string> Geriati =
        [
            "Risiko rendah 0-3",
@@ -318,8 +319,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
 
                     var prev = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x
-                        => x.PatientId == GeneralConsultanService.PatientId && x.Id < GeneralConsultanService.Id)))
-                        .OrderByDescending(x => x.Id)
+                        => x.PatientId == GeneralConsultanService.PatientId && x.Id < GeneralConsultanService.Id && x.Status == EnumStatusGeneralConsultantService.Finished)))
+                        .OrderBy(x => x.CreatedDate)
                         .FirstOrDefault() ?? new();
 
                     GeneralConsultanService.Height = prev?.Height ?? 0;
@@ -1232,36 +1233,44 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task SaveAllergyData()
         {
-            return;
-            if (SelectedFoodAllergies.Count() > 0)
-                GeneralConsultanService.IsFood = true;
-            if (SelectedWeatherAllergies.Count() > 0)
-                GeneralConsultanService.IsWeather = true;
-            if (SelectedPharmacologyAllergies.Count() > 0)
-                GeneralConsultanService.IsPharmacology = true;
-
-            //if (SelectedPharmacologyAllergies.Count() > 0 || SelectedWeatherAllergies.Count() > 0 || SelectedFoodAllergies.Count() > 0)
-            //{
-            var ids = new List<long>();
-            ids.AddRange(SelectedPharmacologyAllergies.Select(x => x.Id).ToList());
-            ids.AddRange(SelectedWeatherAllergies.Select(x => x.Id).ToList());
-            ids.AddRange(SelectedFoodAllergies.Select(x => x.Id).ToList());
-
-            //var u = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId);
-            var u = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
-            if (u is not null)
+            try
             {
-                u.PatientAllergyIds = ids;
-                await Mediator.Send(new UpdateUserRequest(u));
+                if (SelectedFoodAllergies.Count() > 0)
+                    GeneralConsultanService.IsFood = true;
+                if (SelectedWeatherAllergies.Count() > 0)
+                    GeneralConsultanService.IsWeather = true;
+                if (SelectedPharmacologyAllergies.Count() > 0)
+                    GeneralConsultanService.IsPharmacology = true;
+
+                //if (SelectedPharmacologyAllergies.Count() > 0 || SelectedWeatherAllergies.Count() > 0 || SelectedFoodAllergies.Count() > 0)
+                //{
+                var ids = new List<long>();
+                ids.AddRange(SelectedPharmacologyAllergies.Select(x => x.Id).ToList());
+                ids.AddRange(SelectedWeatherAllergies.Select(x => x.Id).ToList());
+                ids.AddRange(SelectedFoodAllergies.Select(x => x.Id).ToList());
+
+                //var u = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId);
+                var u = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
+                if (u is not null)
+                {
+                    u.PatientAllergyIds = ids;
+                    await Mediator.Send(new UpdateUserRequest(u));
+                }
+
+
+                // Ga Kepake
+                //PatientAllergy.UserId = GeneralConsultanService.PatientId.GetValueOrDefault();
+
+                //if (PatientAllergy.Id == 0)
+                //    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
+                //else
+                //    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
+
             }
-
-            PatientAllergy.UserId = GeneralConsultanService.PatientId.GetValueOrDefault();
-
-            if (PatientAllergy.Id == 0)
-                PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
-            else
-                PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
-            //}
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         public class PendaftaranRequest

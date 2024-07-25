@@ -56,7 +56,8 @@
         public string? AccidentExaminationBase64 { get; set; }
 
         #region Clinical Assesment 
-        public string? ScrinningTriageScale { get; set; }
+        public string? ScrinningTriageScale { get; set; } 
+        public string? RiskOfFalling { get; set; }
         public string? RiskOfFallingDetail { get; set; }
         public double Weight { get; set; } 
         public double Height { get; set; }
@@ -76,7 +77,7 @@
 
         public string BMIState { get; set; } = "-";
         public string ClinicVisitTypes { get; set; } = "Sick";
-        //public string? InformationFrom { get; set; }
+        public string? InformationFrom { get; set; }
         //public bool IsFamilyMedicalHistory { get; set; } = false;
         //public string? FamilyMedicalHistory { get; set; }
         //public bool IsMedicationHistory { get; set; } = false;
