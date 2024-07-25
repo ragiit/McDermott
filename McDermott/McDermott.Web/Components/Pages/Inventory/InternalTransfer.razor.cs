@@ -208,8 +208,10 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task SelectedItemProduct(LocationDto value)
         {
+            
             try
             {
+               
                 filteredProducts = Products.Where(p => TransactionStocks.Any(sp => sp.ProductId == p.Id && sp.LocationId == value.Id)).ToList();
             }
             catch (Exception ex)
@@ -416,6 +418,12 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task NewItemDetail_Click()
         {
+            if(FormInternalTransfer.SourceId == 0 || FormInternalTransfer.SourceId == null)
+            {
+                ToastService.ClearAll();
+                ToastService.ShowInfo("Source Location Not Null");
+                return;
+            }
             try
             {
                 showFormDetail = true;
@@ -423,7 +431,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 TempFormInternalTransfer = new();                
                 headerDetail = "Add product Transfer Internal";
                 var location = Locations.FirstOrDefault(x => x.Id == FormInternalTransfer.SourceId);
-                if (location is null)
+                if (location is not null)
                 {
                     await SelectedItemProduct(location);
                 }

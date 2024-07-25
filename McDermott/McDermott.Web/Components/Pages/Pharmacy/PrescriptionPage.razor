@@ -110,29 +110,33 @@
                                                 </DxTabs>
                                             </div>
                                         </div>
+                                                                        
 
-                                   
-
-                                        @if(Pharmacy.Id != 0 ){
-                                        <div class="sticky">
+                                       @if(Pharmacy.Status != EnumStatusPharmacy.Done && Pharmacy.Status != EnumStatusPharmacy.Cancel)
+                                       {
+                                           <div class="sticky">
                                             <div class="card">
                                                 <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="col-4 align-self-start">                                                        
-                                                              <DxButton Text="Send To Pharmacy" Visible="@(Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="SendToPharmacy"></DxButton>
+                                                    <div class="row justify-content-between">
+                                                        <div class="col-auto align-self-start">                                                        
+                                                              <DxButton Text="Send To Pharmacy" Visible="@(Pharmacy.Id != 0 && Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="SendToPharmacy"></DxButton>
                                                               <DxButton Text="Received" Visible=@(Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy && NameUser.IsPharmacy == true) RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Pharmacied"></DxButton>
                                                               <DxButton Text="Process" Visible="@(Pharmacy.Status == EnumStatusPharmacy.Received && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Received"></DxButton>
                                                               <DxButton Text="Done" Visible="@(Pharmacy.Status == EnumStatusPharmacy.Processed && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="ValidateAsync"></DxButton>
-                                                              <DxButton Text="Cancel" Visible="@(Pharmacy.Id != 0)" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>                                                                          
-                                                        </div>
-                                                        <div class= "col-auto align-self-end">
-                                                            hahahahahahaha
+                                                              <DxButton Text="Cancel" Visible="@(Pharmacy.Id != 0 && NameUser.IsDoctor != false)" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>                                                                          
+                                                        </div>                                                        
+                                                   
+                                                        <div class="col-auto align-self-end">
+                                                            <DxButton Visible ="@((Pharmacy.Status == EnumStatusPharmacy.Draft && NameUser.IsDoctor == true)||(Pharmacy.Id == 0 && NameUser.IsDoctor == true))" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSavePharmacy"></DxButton>
+                                                            <DxButton Visible ="@((Pharmacy.Status == EnumStatusPharmacy.Draft && NameUser.IsDoctor == true)||(Pharmacy.Id == 0 && NameUser.IsDoctor == true))" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnDiscard" SubmitFormOnClick="true"></DxButton>
+
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        }
+                                       }
+
                                     <EditForm Model="@Pharmacy" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
                                         <DataAnnotationsValidator />
                                         <div class="card">
@@ -321,7 +325,7 @@
                                                     <hr />
 
                                                     <DxTabs>
-                                                        <DxTabPage Text="Prescription Lines">
+                                                        <DxTabPage Text="Prescription">
                                                             <DxLoadingPanel @bind-Visible="PanelVisible"
                                                                             IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                                                             IsContentBlocked="true"
@@ -508,7 +512,7 @@
                                                             </DxLoadingPanel>
                                                         </DxTabPage>
 
-                                                        <DxTabPage Text="Prescription Concoction">
+                                                        <DxTabPage Text="Concoction">
                                                             <DxLoadingPanel @bind-Visible="PanelVisible"
                                                                             IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                                                             IsContentBlocked="true"
@@ -568,17 +572,7 @@
                                                     </DxTabs>
                                                 </div>
                                             </div>
-                                             <div class="card-footer">
-                                                @if (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)
-                                                {
-                                                    <div class="row justify-content-end">
-                                                        <div class="col-auto align-self-end">
-                                                            <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnDiscard" SubmitFormOnClick="true"></DxButton>
-                                                        </div>
-                                                    </div>
-                                                }
-                                            </div>
+                                             
                                         </div>
 
                                         @if (Logs.Count > 0)
@@ -707,7 +701,6 @@
                                             </DxFormLayout>
                                         }
                                     </EditForm>
-
                                 </DxLoadingPanel>
                             }
                         }

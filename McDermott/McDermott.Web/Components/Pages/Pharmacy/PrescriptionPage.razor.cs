@@ -1987,6 +1987,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
+                if(Prescriptions.Count <=0  || Concoctions.Count<=0)
+                {
+                    ToastService.ShowInfo("Prescription or Concoction is not Null");
+                    return;
+                }
                 var data_pharmacy = new PharmacyDto();
                 var data_concoctions = new List<ConcoctionDto>();
                 if (Pharmacy.Id == 0)
@@ -2086,11 +2091,23 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task NewItemPrescriptionLines_Click()
         {
+            if (Pharmacy.PrescriptionLocationId == 0 || Pharmacy.PrescriptionLocationId == null)
+            {
+                ToastService.ClearCustomToasts();
+                ToastService.ShowInfo("Location is Not Null");
+                return;
+            }
             await GridPrescriptionLines.StartEditNewRowAsync();
         }
 
         private void NewItemConcoction_Click()
         {
+            if(Pharmacy.PrescriptionLocationId == 0 || Pharmacy.PrescriptionLocationId == null)
+            {
+                ToastService.ClearCustomToasts();
+                ToastService.ShowInfo("Location is Not Null");
+                return;
+            }
             PopUpConcoctionDetail = true;
             Concoction = new();
             Concoction.Qty = 1;

@@ -70,104 +70,63 @@
                         }
                         else
                         {
-                            <div class="sticky">
-                                @if (FormInternalTransfer.Id != 0)
-                                {
-                                    <div class="row justify-content-end mb-3">
-                                        <div class="col-auto align-self-end">
-                                            <DxTabs RenderMode="TabsRenderMode.AllTabs">
-                                                <DxTab Text="Draft" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)"></DxTab>
-                                                @if (FormInternalTransfer.StockRequest == true)
+                            @if (FormInternalTransfer.Id != 0)
+                            {
+                                <div class="row justify-content-end mb-3">
+                                    <div class="col-auto align-self-end">
+                                        <DxTabs RenderMode="TabsRenderMode.AllTabs">
+                                            <DxTab Text="Draft" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)"></DxTab>
+                                            @if (FormInternalTransfer.StockRequest == true)
+                                            {
+                                                @if (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null)
                                                 {
-                                                    @if (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null)
-                                                    {
-                                                        <DxTab Text="Request" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Request)"></DxTab>
-                                                    }
-                                                    <DxTab Text="Approve Request" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.ApproveRequest)"></DxTab>
-                                                    @* <DxTab Text="Waiting" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Waiting)"></DxTab> *@
+                                                    <DxTab Text="Request" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Request)"></DxTab>
                                                 }
-                                                <DxTab Text="Ready" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)"></DxTab>
-                                                <DxTab Text="Done" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Done)"></DxTab>
-                                                <DxTab Text="Cancel" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Cancel)"></DxTab>
-                                            </DxTabs>
-                                        </div>
+                                                <DxTab Text="Approve Request" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.ApproveRequest)"></DxTab>
+                                                @* <DxTab Text="Waiting" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Waiting)"></DxTab> *@
+                                            }
+                                            <DxTab Text="Ready" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)"></DxTab>
+                                            <DxTab Text="Done" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Done)"></DxTab>
+                                            <DxTab Text="Cancel" Enabled="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Cancel)"></DxTab>
+                                        </DxTabs>
                                     </div>
-                                    <div class="row justify-content-start mb-3">
-                                        <div class="col-12 align-self-start">
+                                </div>
+                            }
 
-                                            @if (FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)
-                                            {
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        @if (FormInternalTransfer.StockRequest == true)
-                                                        {
-                                                            @if (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null)
-                                                            {
-                                                                <DxButton Text="Request" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-clipboard-check" Click="Request"></DxButton>
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                            <DxButton Text="Ready" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Ready"></DxButton>
-                                                        }
-
-                                                        <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
-                                                    </div>
-                                                </div>
-                                            }
-                                            else if (FormInternalTransfer.Status == EnumStatusInternalTransfer.Request && NameUser.IsPharmacy == true)
-                                            {
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <DxButton Text="Approve Request" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Approv_Check"></DxButton>
-                                                        <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
-                                                    </div>
-                                                </div>
-                                            }
-                                            else if (FormInternalTransfer.Status == EnumStatusInternalTransfer.ApproveRequest && NameUser.IsPharmacy == true)
-                                            {
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <DxButton Text="Ready" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Ready"></DxButton>
-                                                        <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
-                                                    </div>
-                                                </div>
-                                            }
-                                            else if (FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)
-                                            {
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <DxButton Text="Validate" RenderStyle="ButtonRenderStyle.Primary" Click="validation" IconCssClass="fa-solid fa-check"></DxButton>
-                                                        <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
-                                                    </div>
-                                                </div>
-                                            }
-                                            else if (FormInternalTransfer.Status == EnumStatusInternalTransfer.Waiting)
-                                            {
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <DxButton Text="Check Availability" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-circle-check" Click="Request"></DxButton>
-                                                    </div>
-                                                </div>
-                                            }
-
-                                        </div>
-                                    </div>
-                                }
-                                @if (FormInternalTransfer.Id == 0 || FormInternalTransfer.Id == null || FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)
-                                {
-                                    <div class="card mb-3">
+                            @if (FormInternalTransfer.Status != EnumStatusInternalTransfer.Done && FormInternalTransfer.Status != EnumStatusInternalTransfer.Cancel)
+                            {
+                                <div class="sticky">
+                                    <div class="card">
                                         <div class="card-body">
+                                            <div class="row justify-content-between">
+                                                <div class="col-auto align-self-start">
+                                                    @if (FormInternalTransfer.StockRequest == true)
+                                                    {
+                                                        <DxButton Text="Request" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-clipboard-check" Click="Request"></DxButton>
+                                                        <DxButton Text="Approve Request" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Request && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Approv_Check"></DxButton>
+                                                        <DxButton Text="Ready" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.ApproveRequest && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Ready"></DxButton>
+                                                        <DxButton Text="Validate" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Primary" Click="validation" IconCssClass="fa-solid fa-check"></DxButton>
+                                                    }
+                                                    else
+                                                    {
+                                                        <DxButton Text="Ready" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Ready"></DxButton>
+                                                        <DxButton Text="Validate" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Primary" Click="validation" IconCssClass="fa-solid fa-check"></DxButton>
+                                                    }
+                                                    <DxButton Text="Cancel" Visible="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Done && FormInternalTransfer.Status != EnumStatusInternalTransfer.Cancel )" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
 
-                                            <div class="col d-flex justify-content-end">
-                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSave"></DxButton>
-                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" CssClass="ml-1" Text="Discard" Click="onDiscard"></DxButton>
+                                                </div>
+
+                                                <div class="col-auto align-self-start">
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft)" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" CssClass="ml-1" Text="Discard" Click="onDiscard"></DxButton>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                }
+                                </div>
+                            }
 
-                            </div>
+
                             <div class="card">
                                 <div class="card-header">
                                     <span class="fw-bolder">@header</span>
@@ -183,7 +142,7 @@
                                                     <h3 class="fw-bolder">@FormInternalTransfer.KodeTransaksi</h3>
                                                 </DxFormLayoutItem>
                                             }
-                                            <DxFormLayoutItem Caption="Source Location" CssClass="mt-2" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxFormLayoutItem Caption="Source Location" CssClass="mt-2" CaptionCssClass="normal-caption required-caption" ColSpanMd="12">
                                                 <DxComboBox Data="@Locations"
                                                             @bind-Value="@FormInternalTransfer.SourceId"
                                                             NullText="Select Location Source..."
@@ -197,7 +156,7 @@
                                                 <ValidationMessage For="@(()=>FormInternalTransfer.SourceId)"></ValidationMessage>
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem Caption="Destination Location" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxFormLayoutItem Caption="Destination Location" CaptionCssClass="normal-caption required-caption" ColSpanMd="12">
                                                 <DxComboBox Data="@Locations"
                                                             @bind-Value="@FormInternalTransfer.DestinationId"
                                                             NullText=" Select Location Destinance..."
@@ -209,7 +168,7 @@
                                                             ShowValidationIcon="true"></DxComboBox>
                                                 <ValidationMessage For="@(()=>FormInternalTransfer.DestinationId)"></ValidationMessage>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Schendule Date" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxFormLayoutItem Caption="Schendule Date" CaptionCssClass="normal-caption " ColSpanMd="12">
                                                 <DxDateEdit @bind-Date="@FormInternalTransfer.SchenduleDate"
                                                             ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
                                                             ShowValidationIcon="true"
@@ -309,7 +268,7 @@
                                                                                     NullText="Select Batch..."
                                                                                     @bind-Value="@TempFormInternalTransfer.Batch"
                                                                                     TextFieldName="Batch"
-                                                                                    ValueFieldName="Batch"                                                                                    
+                                                                                    ValueFieldName="Batch"
                                                                                     Enabled="@TempFormInternalTransfer.TraceAvability"
                                                                                     SelectedItemChanged="@((TransactionStockDto a)=> SelectedBatch(a))"
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -466,7 +425,7 @@
                                                                                                         : @((MarkupString)html)
                                                                                                     </div>
                                                                                                 </div>
-                                                                                                    
+
                                                                                                 <div class="row w-100">
                                                                                                     <div class="col-md-1">
                                                                                                         From
