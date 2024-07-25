@@ -3,9 +3,11 @@
     public partial class CountryPage
     {
         #region Variables
+
         private bool PanelVisible { get; set; } = true;
 
         private List<CountryDto> Countries = [];
+
         private List<ExportFileData> ExportFileDatas =
         [
             new()
@@ -23,7 +25,8 @@
         private int FocusedRowVisibleIndex { get; set; }
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        #endregion
+
+        #endregion Variables
 
         protected override async Task OnInitializedAsync()
         {
@@ -39,7 +42,6 @@
                     Grid.SelectRow(0, true);
                     StateHasChanged();
                 }
-
                 catch { }
             }
         }
@@ -53,14 +55,13 @@
                 SelectedDataItems = [];
                 try
                 {
-                    Grid?.SelectRow(0, true); 
+                    Grid?.SelectRow(0, true);
                 }
                 catch { }
                 PanelVisible = false;
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -168,6 +169,5 @@
             }
             PanelVisible = false;
         }
-
     }
 }

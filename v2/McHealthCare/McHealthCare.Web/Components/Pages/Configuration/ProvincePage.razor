@@ -23,6 +23,7 @@
                                   @bind-SelectedDataItems="@SelectedDataItems"
                                   EditModelSaving="OnSave"
                                   DataItemDeleting="OnDelete"
+                                  RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
                                   FocusedRowChanged="@((GridFocusedRowChangedEventArgs args) => FocusedRowVisibleIndex = args.VisibleIndex)"
                                   KeyFieldName="Id">
 

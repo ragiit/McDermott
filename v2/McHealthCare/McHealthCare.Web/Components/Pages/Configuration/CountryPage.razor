@@ -21,6 +21,7 @@
                         <MyDxGrid @ref="Grid"
                                   Data="Countries"
                                   @bind-SelectedDataItems="@SelectedDataItems"
+                                  RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
                                   EditModelSaving="OnSave"
                                   DataItemDeleting="OnDelete"
                                   FocusedRowChanged="@((GridFocusedRowChangedEventArgs args) => FocusedRowVisibleIndex = args.VisibleIndex)"
@@ -66,4 +67,4 @@
             </div>
         </div>
     </div>
-</div> 
+</div>
