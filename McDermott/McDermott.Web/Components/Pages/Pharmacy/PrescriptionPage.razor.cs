@@ -2287,7 +2287,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItemConcoctionLines_Click(IGrid context)
         {
-            //var selected = (ConcoctionLineDto)context.SelectedDataItem;
+            var selected = (ConcoctionLineDto)context.SelectedDataItem;
             await GridConcoctionLines.StartEditRowAsync(FocusedRowVisibleIndexConcoctionLines);
         }
 

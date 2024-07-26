@@ -1084,7 +1084,7 @@ else
                                   <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                     <DxComboBox ShowValidationIcon="true"
                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                Data="@Batch"
+                                                Data="@StockOutProducts"
                                                 NullText="Select Batch..."
                                                 @bind-Value="@FormStockOutPrescriptions.TransactionStockId"
                                                 SelectedItemChanged="@((TransactionStockDto value)=> ChangeOutStock(value))"
