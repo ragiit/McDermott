@@ -95,7 +95,7 @@ else
     app.UseDeveloperExceptionPage();
 }
 
-app.UsePathBase("/McDermott");
+//app.UsePathBase("/McDermott");
 app.UseMiddleware<AuthorizationMiddleware>();
 
 app.UseSerilogRequestLogging();
