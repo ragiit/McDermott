@@ -95,6 +95,7 @@ else
     app.UseDeveloperExceptionPage();
 }
 
+app.UsePathBase("/McDermott");
 app.UseMiddleware<AuthorizationMiddleware>();
 
 app.UseSerilogRequestLogging();
@@ -116,9 +117,9 @@ using (var scope = app.Services.CreateScope())
     try
     {
         Log.Information("=== ===");
-        Log.Information("=== Starting Migrate the database. ===");
-        var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate();
+        //Log.Information("=== Starting Migrate the database. ===");
+        //var context = services.GetRequiredService<ApplicationDbContext>();
+        //context.Database.Migrate();
     }
     catch (Exception ex)
     {
