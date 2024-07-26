@@ -669,7 +669,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             // Filter stock products based on specific conditions
 
             StockOutProducts = TransactionStocks
-                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId && s.Validate == true)
+                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId )
                     .OrderBy(x => x.ExpiredDate)
                     .GroupBy(s => s.Batch)
                     .Select(g => new TransactionStockDto
@@ -832,7 +832,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             // Filter stock products based on specific conditions
             StockOutProducts = TransactionStocks
-                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId && s.Validate == true)
+                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId )
                     .OrderBy(x => x.ExpiredDate)
                     .GroupBy(s => s.Batch)
                     .Select(g => new TransactionStockDto
@@ -1987,7 +1987,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
-                if(Prescriptions.Count <=0  || Concoctions.Count<=0)
+                if(Prescriptions.Count <=0  && Concoctions.Count<=0)
                 {
                     ToastService.ShowInfo("Prescription or Concoction is not Null");
                     return;
@@ -2132,23 +2132,36 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var Qty_stock = TransactionStocks.Where(x => x.ProductId == data_products && x.LocationId == Pharmacy.PrescriptionLocationId).Select(x => x.Quantity).FirstOrDefault();
                 FormStockOutLines.CurrentStock = Qty_stock;
             }
+            //var groupedBatch = TransactionStocks
+            //        .Where(s => s.ProductId == data_products && s.LocationId == Pharmacy.PrescriptionLocationId)
+            //        .GroupBy(s => s.Batch)
+            //        .Select(g => new TransactionStockDto
+            //        {
+            //            Id = g.First().Id,
+            //            ProductId = data_products,
+            //            Batch = g.Key,
+            //            ExpiredDate = g.First().ExpiredDate,
+            //            Quantity = g.Sum(x => x.Quantity),
+            //            LocationId = Pharmacy.PrescriptionLocationId
+            //        }).ToList();
+
             var groupedBatch = TransactionStocks
-                    .Where(s => s.ProductId == data_products && s.LocationId == Pharmacy.PrescriptionLocationId)
-                    .GroupBy(s => s.Batch)
-                    .Select(g => new TransactionStockDto
-                    {
-                        Id = g.First().Id,
-                        ProductId = data_products,
-                        Batch = g.Key,
-                        ExpiredDate = g.First().ExpiredDate,
-                        Quantity = g.Sum(x => x.Quantity),
-                        LocationId = Pharmacy.PrescriptionLocationId
-                    }).ToList();
+                   .Where(s => s.ProductId == data_products && s.LocationId == Pharmacy.PrescriptionLocationId)
+                   .GroupBy(s => s.Batch)
+                   .Select(g => new TransactionStockDto
+                   {
+                       ProductId = data_products,
+                       Batch = g.Key,
+                       ExpiredDate = g.First().ExpiredDate,
+                       Quantity = g.Sum(x => x.Quantity),
+                       LocationId = Pharmacy.PrescriptionLocationId
+                   }).ToList();
 
             StockOutProducts = groupedBatch;
 
             await GridStockOut.StartEditNewRowAsync();
         }
+
         private async Task NewItemStockOutLines_Click()
         {
             selectedActiveComponents = [];
@@ -2280,7 +2293,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItemStockOut_Click(IGrid context)
         {
-            var selected = (StockOutPrescriptionDto)context.SelectedDataItem;
+            //var selected = (StockOutPrescriptionDto)context.SelectedDataItem;
             await GridStockOut.StartEditRowAsync(FocusedRowVisibleIndexStockOut);
         }
 
