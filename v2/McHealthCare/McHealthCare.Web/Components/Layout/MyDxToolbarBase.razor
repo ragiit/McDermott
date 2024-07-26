@@ -1,0 +1,69 @@
+﻿@typeparam TItem
+
+<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+    <DxToolbarItem Text="@BtnNewName" Visible="VisibleNew" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+    <DxToolbarItem Text="Edit" Visible="VisibleEdit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Items.Count > 0" />
+    <DxToolbarItem Text="Delete" Visible="VisibleDelete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Items.Count > 0 && EnableDelete" />
+    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+    <DxToolbarItem Text="Column Chooser" Click="(() => Grid.ShowColumnChooser())" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+        <Items>
+            <DxToolbarItem Text="To CSV" Click="(() => ExportCsvItem_Click(Grid))" />
+            <DxToolbarItem Text="To XLSX" Click="(() => ExportXlsxItem_Click(Grid))" />
+            <DxToolbarItem Text="To XLS" Click="(() => ExportXlsItem_Click(Grid))" />
+        </Items>
+    </DxToolbarItem>
+    <DxToolbarItem Visible="IsImport" Text="Import" IconCssClass="fa-solid fa-file-import">
+        <Items>
+            <DxToolbarItem Text="Template" Click="ExportToExcel" />
+            <DxToolbarItem Text="Import" Click="ImportFile" />
+        </Items>
+    </DxToolbarItem>
+
+</DxToolbar>
+
+@code {
+    public async Task ExportXlsxItem_Click(IGrid grid)
+    {
+        await grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+    }
+
+    public async Task ExportXlsItem_Click(IGrid grid)
+    {
+        await grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
+            {
+                ExportSelectedRowsOnly = true,
+            });
+    }
+
+    public async Task ExportCsvItem_Click(IGrid grid)
+    {
+        await grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
+            {
+                ExportSelectedRowsOnly = true,
+            });
+    }
+
+    [Parameter] public string BtnNewName { get; set; } = "New";
+    [Parameter] public bool IsImport { get; set; } = true;
+    [Parameter] public bool EnableDelete { get; set; } = true;
+    [Parameter] public bool VisibleNew { get; set; } = true;
+    [Parameter] public bool VisibleEdit { get; set; } = true;
+    [Parameter] public bool VisibleDelete { get; set; } = true;
+    [Parameter] public bool VisibleDashboard { get; set; } = false;
+    [Parameter] public bool VisibleList { get; set; } = false;
+    [Parameter] public IGrid Grid { get; set; }
+    [Parameter] public List<TItem> Items { get; set; } = [];
+    [Parameter] public IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+    [Parameter] public EventCallback Dashboard_Click { get; set; }
+    [Parameter] public EventCallback List_Click { get; set; }
+    [Parameter] public EventCallback NewItem_Click { get; set; }
+    [Parameter] public EventCallback EditItem_Click { get; set; }
+    [Parameter] public EventCallback DeleteItem_Click { get; set; }
+    [Parameter] public EventCallback Refresh_Click { get; set; }
+    [Parameter] public EventCallback ExportToExcel { get; set; }
+    [Parameter] public EventCallback ImportFile { get; set; }
+}

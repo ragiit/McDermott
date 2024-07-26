@@ -17,6 +17,7 @@ namespace McHealthCare.Persistence.Extentions
         public static void AddPersistenceLayer(this IServiceCollection services, IConfiguration configuration)
         {
             //services.AddMappings();
+            services.AddHttpContextAccessor();
             services.AddDbContext(configuration);
             services.AddRepositories();
         }

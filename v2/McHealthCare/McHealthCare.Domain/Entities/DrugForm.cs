@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace McHealthCare.Domain.Entities
 {
-    internal class Class1
+    public class DrugForm :BaseAuditableEntity
     {
+        public string? Code { get; set; }
+        public string? Name { get; set; }
     }
 }

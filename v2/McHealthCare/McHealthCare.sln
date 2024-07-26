@@ -9,13 +9,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.Web", "McHealt
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{408F27B2-3CD4-4EF1-8610-16E937C88AA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McHealthCare.Domain", "McHealthCare.Domain\McHealthCare.Domain.csproj", "{6B58287D-6497-4E7A-899B-9C8A762CA86D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.Domain", "McHealthCare.Domain\McHealthCare.Domain.csproj", "{6B58287D-6497-4E7A-899B-9C8A762CA86D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{8E3B7F35-3AE7-4600-8EB1-ADE89F75570E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McHealthCare.Persistence", "McHealthCare.Infrastructure\McHealthCare.Persistence.csproj", "{589989FF-3E26-4D4E-8202-E39B59EBE6BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.Persistence", "McHealthCare.Infrastructure\McHealthCare.Persistence.csproj", "{589989FF-3E26-4D4E-8202-E39B59EBE6BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McHealthCare.Application", "McHealthCare.Application\McHealthCare.Application.csproj", "{1BD84DA6-66B5-4B75-BFF4-DBDA1D3FB58C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.Application", "McHealthCare.Application\McHealthCare.Application.csproj", "{1BD84DA6-66B5-4B75-BFF4-DBDA1D3FB58C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McHealthCare.Extentions", "McHealthCare.Extentions\McHealthCare.Extentions.csproj", "{263D70EA-33D4-491A-9479-15A55FEF6A87}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{1BD84DA6-66B5-4B75-BFF4-DBDA1D3FB58C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BD84DA6-66B5-4B75-BFF4-DBDA1D3FB58C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BD84DA6-66B5-4B75-BFF4-DBDA1D3FB58C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{263D70EA-33D4-491A-9479-15A55FEF6A87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{263D70EA-33D4-491A-9479-15A55FEF6A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{263D70EA-33D4-491A-9479-15A55FEF6A87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{263D70EA-33D4-491A-9479-15A55FEF6A87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{6B58287D-6497-4E7A-899B-9C8A762CA86D} = {408F27B2-3CD4-4EF1-8610-16E937C88AA3}
 		{589989FF-3E26-4D4E-8202-E39B59EBE6BF} = {8E3B7F35-3AE7-4600-8EB1-ADE89F75570E}
 		{1BD84DA6-66B5-4B75-BFF4-DBDA1D3FB58C} = {408F27B2-3CD4-4EF1-8610-16E937C88AA3}
+		{263D70EA-33D4-491A-9479-15A55FEF6A87} = {408F27B2-3CD4-4EF1-8610-16E937C88AA3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A351E0E-A756-4B7F-AD35-2AB10D5F9937}

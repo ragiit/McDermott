@@ -10,5 +10,7 @@ namespace McHealthCare.Domain.Entities
 
         [StringLength(5)]
         public string Code { get; set; } = string.Empty;
+
+        public virtual List<Province>? Provinces { get; set; }
     }
 }
