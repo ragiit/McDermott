@@ -155,6 +155,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Name = "-"
         };
 
+        private List<string> Batch = [];
         private bool PanelVisible { get; set; } = false;
         private bool IsLoading { get; set; } = false;
         private bool isView { get; set; } = false;
@@ -2307,20 +2308,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var Qty_stock = TransactionStocks.Where(x => x.ProductId == data_products && x.LocationId == Pharmacy.PrescriptionLocationId).Select(x => x.Quantity).FirstOrDefault();
                 FormStockOutLines.CurrentStock = Qty_stock;
             }
-            var groupedBatch = TransactionStocks
-                    .Where(s => s.ProductId == data_products && s.LocationId == Pharmacy.PrescriptionLocationId && s.Id == selected.TransactionStockId)
-                    .GroupBy(s => s.Batch)
-                    .Select(g => new TransactionStockDto
-                    {
-                        Id = g.First().Id,
-                        ProductId = data_products,
-                        Batch = g.Key,
-                        ExpiredDate = g.First().ExpiredDate,
-                        Quantity = g.Sum(x => x.Quantity),
-                        LocationId = Pharmacy.PrescriptionLocationId
-                    }).ToList();
-
-            StockOutProducts = groupedBatch;
+            await ShowCutStock(PrescripId);
             await GridStockOutLines.StartEditRowAsync(FocusedRowVisibleIndexStockOut);
         }
         #endregion function Edit Click
