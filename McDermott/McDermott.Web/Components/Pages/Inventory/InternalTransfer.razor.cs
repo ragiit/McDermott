@@ -1,4 +1,5 @@
-﻿using McDermott.Domain.Entities;
+﻿using DocumentFormat.OpenXml.InkML;
+using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransferStockCommand;
@@ -398,7 +399,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task OnRowDoubleClickDetail(GridRowClickEventArgs e)
         {
-            EditItemDetail_Click();
+            EditItemDetail_Click(null);
         }
 
         #endregion Grid
@@ -503,7 +504,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 var product = Products.FirstOrDefault(x => x.Id == item.ProductId);
                 item.UomName = Uoms.FirstOrDefault(u => u.Id == product?.UomId)?.Name;
 
-                var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == item.ProductId && s.LocationId == sourceLocationId && s.SourceTable == nameof(TransferStock) && s.SourcTableId == FormInternalTransfer.Id));
+                var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == item.ProductId && s.LocationId == sourceLocationId && s.SourceTable == nameof(TransferStock)));
                 var stockProduct = stockProducts.FirstOrDefault();
 
                 if (item.Product?.TraceAbility == true)
@@ -523,14 +524,28 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             Logs = await Mediator.Send(new GetTransferStockLogQuery(x => x.TransferStockId == FormInternalTransfer.Id));
         }
-
-        private async Task EditItemDetail_Click()
+        List<TransactionStockDto> matchingItems = new List<TransactionStockDto>();
+        private async Task EditItemDetail_Click(IGrid Context)
         {
-            showFormDetail = true;
-            IsAddTransfer = false;
-            var aaa = SelectedDataItems.Adapt<TransferStockProductDto>();
+            if (Context.SelectedDataItem != null)
+            {
+                TempFormInternalTransfer = Context.SelectedDataItem.Adapt<TransferStockProductDto>();
+                var location = Locations.Where(x => x.Id == TempFormInternalTransfer?.TransferStock?.SourceId).FirstOrDefault();
+                var iproduct = Products.Where(x => x.Id == TempFormInternalTransfer.ProductId).FirstOrDefault();
+                await SelectedItemProduct(location);
+                await SelectedItemProduct(iproduct);
 
-            await GridDetailTransferStock.StartEditRowAsync(FocusedRowVisibleIndexDetail);
+
+                 matchingItems = TransactionStocks.Where(x => x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == TempFormInternalTransfer.Batch).ToList();
+
+
+                TempFormInternalTransfer.CurrentStock = matchingItems.Sum(x => x.Quantity);
+
+
+
+                await GridDetailTransferStock.StartEditRowAsync(FocusedRowVisibleIndexDetail);
+            }
+            StateHasChanged();
         }
 
         private async Task Request()
@@ -662,65 +677,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
-        //private async Task ToDoCheck()
-        //{
-        //    ToastService.ClearAll();
 
-        //    List<bool> allMatched = new List<bool>();
-
-        //    var asyncData = await Mediator.Send(new GetTransferStockProductQuery(x => x.TransferStockId == TransferId));
-        //    if (asyncData.Count > 0)
-        //    {
-        //        foreach (var item in asyncData)
-        //        {
-        //            var StockSent = asyncData.Where(t => t.TransferStock is not null && t.TransferStock.SourceId == item.TransferStock!.SourceId && t.ProductId == item.ProductId).FirstOrDefault();
-        //            var warehouse_stock = StockProducts.Where(sp => sp.SourceId == item?.TransferStock?.SourceId && sp.ProductId == item?.ProductId).FirstOrDefault();
-        //            if (warehouse_stock is not null && StockSent is not null)
-        //            {
-        //                if (StockSent.QtyStock <= warehouse_stock.Qty)
-        //                {
-        //                    allMatched.Add(true);
-        //                }
-        //                else
-        //                {
-        //                    allMatched.Add(false);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                allMatched.Add(false);
-        //            }
-        //        }
-
-        //        bool HasValueFalse = allMatched.Any(x => x == false);
-        //        var datas = await Mediator.Send(new GetTransferStockQuery());
-        //        FormInternalTransfer = datas.Where(x => x.Id == TransferId).FirstOrDefault()!;
-        //        if (HasValueFalse)
-        //        {
-        //            FormInternalTransfer.Status = EnumStatusInternalTransfer.Waiting;
-        //            ToastService.ShowError("Pastikan Stock Disemua Produk Terpenuhi!..");
-        //        }
-        //        else
-        //        {
-        //            FormInternalTransfer.Status = EnumStatusInternalTransfer.Ready;
-        //            ToastService.ShowSuccess(" Stock Disemua Produk Terpenuhi..");
-        //        }
-        //        getInternalTransfer = await Mediator.Send(new UpdateTransferStockRequest(FormInternalTransfer));
-
-        //        FormInternalTransferDetail.TransferStockId = getInternalTransfer.Id;
-        //        FormInternalTransferDetail.SourceId = getInternalTransfer.SourceId;
-        //        FormInternalTransferDetail.DestinationId = getInternalTransfer.DestinationId;
-        //        FormInternalTransferDetail.Status = getInternalTransfer.Status;
-
-        //        await Mediator.Send(new CreateTransferStockLogRequest(FormInternalTransferDetail));
-
-        //        await EditItem_Click(getInternalTransfer);
-        //    }
-        //    else
-        //    {
-        //        ToastService.ShowError("Product Data Not Found!!..");
-        //    }
-        //}
 
         private async Task onDiscard()
         {
@@ -930,6 +887,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         a.Id = Helper.RandomNumber;
                         a.ProductName = i.ProductName;
                         a.QtyStock = i.QtyStock;
+                        a.CurrentStock = i.CurrentStock;
                         a.Batch = i.Batch;
                         a.ExpiredDate = i.ExpiredDate;
                         a.UomName = i.UomName;

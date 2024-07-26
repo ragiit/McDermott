@@ -230,7 +230,7 @@
                                                         <ToolbarTemplate>
                                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                                 <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransferStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="async () => await EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransferStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
                                                                 <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransferStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
 
                                                             </DxToolbar>
@@ -246,6 +246,8 @@
                                                         <EditFormTemplate Context="EditFormContextt">
                                                             @{
                                                                 TempFormInternalTransfer = (TransferStockProductDto)EditFormContextt.EditModel;
+                                                                matchingItems = TransactionStocks.Where(x => x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == TempFormInternalTransfer.Batch).ToList();
+                                                                TempFormInternalTransfer.CurrentStock = matchingItems.Sum(x => x.Quantity);
                                                             }
                                                             <DxFormLayout CssClass="mt w-100">
                                                                 <div class="col-md-4">
@@ -269,6 +271,7 @@
                                                                                     @bind-Value="@TempFormInternalTransfer.Batch"
                                                                                     TextFieldName="Batch"
                                                                                     ValueFieldName="Batch"
+                                                                                    ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
                                                                                     Enabled="@TempFormInternalTransfer.TraceAvability"
                                                                                     SelectedItemChanged="@((TransactionStockDto a)=> SelectedBatch(a))"
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -287,13 +290,14 @@
                                                                                     ShowSpinButtons="false"
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                     ShowValidationIcon="true"></DxSpinEdit>
-                                                                        <ValidationMessage For="@(()=>TempFormInternalTransfer.QtyStock)"></ValidationMessage>
+                                                                        <ValidationMessage For="@(()=>TempFormInternalTransfer.CurrentStock)"></ValidationMessage>
                                                                     </DxFormLayoutItem>
                                                                     <DxFormLayoutItem Caption="Stock Shipped" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                         <DxSpinEdit Value="TempFormInternalTransfer.QtyStock"
                                                                                     ValueExpression="@(()=>TempFormInternalTransfer.QtyStock)"
                                                                                     NullText="Input Stock To Be Sent..."
                                                                                     MinValue="0"
+                                                                                    ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
                                                                                     ValueChanged="@((long value)=>checkStock(value))"
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                     ShowValidationIcon="true"></DxSpinEdit>
