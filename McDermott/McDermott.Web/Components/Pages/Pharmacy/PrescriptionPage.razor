@@ -1016,7 +1016,7 @@ else
 @* PopUp Detail Prescription *@
 
 <DxPopup @bind-Visible="@isDetailPrescription" HeaderCssClass="fw-bold" HeaderText="Input Detail Stock "
-         HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
+         HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center" ShowCloseButton = "false"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
 <div class="card">
     <div class="card-body">
@@ -1084,15 +1084,13 @@ else
                                   <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                     <DxComboBox ShowValidationIcon="true"
                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                Data="@StockOutProducts"
+                                                Data="@Batch"
                                                 NullText="Select Batch..."
-                                                @bind-Value="@FormStockOutPrescriptions.TransactionStockId"
-                                                SelectedItemChanged="@((TransactionStockDto value)=> ChangeOutStock(value))"
-                                                TextFieldName="Batch"
-                                                ValueFieldName="Id">
+                                                @bind-Value="@FormStockOutPrescriptions.Batch"
+                                                SelectedItemChanged="@((string value)=> ChangeOutStock(value))">
                                        
                                     </DxComboBox>
-                                    <ValidationMessage For="@(()=> FormStockOutPrescriptions.TransactionStockId)" />
+                                   
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                     <DxDateEdit ShowValidationIcon="true"
@@ -1132,6 +1130,7 @@ else
             <div class="row  justify-content-end">
                 <div class="col-auto align-self-end">
                     <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Confirm" SubmitFormOnClick="true" Click="SaveStockOut"></DxButton>
+                    <DxButton  RenderStyle="ButtonRenderStyle.Light" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Cancel" SubmitFormOnClick="true" Click="cancelCutStock"></DxButton>
                 </div>
             </div>
         }
@@ -1141,7 +1140,7 @@ else
 
 @* PopUp Detail ConcoctionLine *@
   <DxPopup @bind-Visible="@isDetailLines" HeaderCssClass="fw-bold" HeaderText="Input Detail Stock "
-         HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
+         HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center" ShowCloseButton ="false"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
 <div class="card">
     <div class="card-body">
@@ -1210,12 +1209,11 @@ else
                                     <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                     <DxComboBox ShowValidationIcon="true"
                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                Data="@StockOutProducts"
+                                                Data="@Batch"
                                                 NullText="Select Batch..."
                                                 @bind-Value="@FormStockOutLines.TransactionStockId"
-                                                SelectedItemChanged="@((TransactionStockDto value)=> ChangeOutStockLines(value))"
-                                                TextFieldName="Batch"
-                                                ValueFieldName="Id">
+                                                SelectedItemChanged="@((string value)=> ChangeOutStockLines(value))"
+                                                >
                                        
                                     </DxComboBox>
                                     <ValidationMessage For="@(()=> FormStockOutPrescriptions.TransactionStockId)" />

@@ -17,6 +17,7 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long CutStock { get; set; } = 0;
         public long? CurrentStock { get; set; }
         public string? Batch { get; set; }
+        public long? uomId { get; set; }
         public DateTime? ExpiredDate { get; set; }
 
         [SetToNull]
