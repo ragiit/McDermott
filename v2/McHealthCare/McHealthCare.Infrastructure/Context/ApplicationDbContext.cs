@@ -15,22 +15,8 @@ namespace McHealthCare.Context
 
         public DbSet<City> Cities { get; set; }
         public DbSet<Country> Countries { get; set; }
-        public DbSet<District> Districts { get; set; }
-        public DbSet<Gender> Genders { get; set; }
         public DbSet<Province> Provinces { get; set; }
-        public DbSet<Religion> Religions { get; set; }
         public DbSet<Village> Villages { get; set; }
-        public DbSet<Company> Companies { get; set; }
-        public DbSet<Degree> Degrees { get; set; }
-        public DbSet<Department> Departments { get; set; }
-        public DbSet<JobPosition> JobPositions { get; set; }
-        public DbSet<Speciality> Specialties { get; set; }
-        public DbSet<Occupational> Occupations { get; set; }
-        public DbSet<Menu> Menus { get; set; }
-        public DbSet<Group> Groups { get; set; }
-        public DbSet<GroupMenu> GroupMenus { get; set; }
-        public DbSet<EmailSetting> EmailSettings { get; set; }
-        public DbSet<EmailTemplate> EmailTemplates { get; set; }
 
         #endregion Configuration
 
