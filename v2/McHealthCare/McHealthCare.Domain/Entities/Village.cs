@@ -13,13 +13,8 @@
         [StringLength(10)]
         public string? PostalCode { get; set; }
 
-        
         public virtual Province? Province { get; set; }
 
-        
         public virtual City? City { get; set; }
-
-        
-        public virtual District? District { get; set; }
     }
 }

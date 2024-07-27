@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McHealthCare.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240725143624_A")]
-    partial class A
+    [Migration("20240727094535_iii")]
+    partial class iii
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,6 +37,9 @@ namespace McHealthCare.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -49,6 +52,9 @@ namespace McHealthCare.Persistence.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("MartialStatus")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -66,6 +72,9 @@ namespace McHealthCare.Persistence.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("PlaceOfBirth")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -88,6 +97,40 @@ namespace McHealthCare.Persistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.City", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("ProvinceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProvinceId");
+
+                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Country", b =>
@@ -122,6 +165,66 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Countries");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Doctor", b =>
+                {
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("SipExp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SipFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("StrExp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("StrFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StrNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ApplicationUserId");
+
+                    b.ToTable("Doctors");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Employee", b =>
+                {
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Legacy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Oracle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SAP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ApplicationUserId");
+
+                    b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Patient", b =>
+                {
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("NoRm")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ApplicationUserId");
+
+                    b.ToTable("Patients");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Province", b =>
@@ -161,6 +264,52 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasIndex("CountryId");
 
                     b.ToTable("Provinces");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Village", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("CityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DistrictId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("PostalCode")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<Guid>("ProvinceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("ProvinceId");
+
+                    b.ToTable("Villages");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -296,15 +445,78 @@ namespace McHealthCare.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.City", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Province");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Doctor", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.ApplicationUser", "ApplicationUser")
+                        .WithOne("Doctor")
+                        .HasForeignKey("McHealthCare.Domain.Entities.Doctor", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Employee", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.ApplicationUser", "ApplicationUser")
+                        .WithOne("Employee")
+                        .HasForeignKey("McHealthCare.Domain.Entities.Employee", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Patient", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.ApplicationUser", "ApplicationUser")
+                        .WithOne("Patient")
+                        .HasForeignKey("McHealthCare.Domain.Entities.Patient", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Province", b =>
                 {
                     b.HasOne("McHealthCare.Domain.Entities.Country", "Country")
                         .WithMany("Provinces")
                         .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Village", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.City", "City")
+                        .WithMany("Villages")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("McHealthCare.Domain.Entities.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("Province");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -312,7 +524,7 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -321,7 +533,7 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasOne("McHealthCare.Domain.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -330,7 +542,7 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasOne("McHealthCare.Domain.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -339,13 +551,13 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("McHealthCare.Domain.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -354,8 +566,22 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasOne("McHealthCare.Domain.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.ApplicationUser", b =>
+                {
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.City", b =>
+                {
+                    b.Navigation("Villages");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Country", b =>

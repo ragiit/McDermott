@@ -263,7 +263,10 @@
                         <div class="media profile-media">
                             <img class="b-r-10" src="assets/images/dashboard/profile.png" alt="">
                             <div class="media-body">
-                                <span>Emay Walter</span>
+                                <AuthorizeView>
+                                    <span>@context.User.Identity?.Name!</span>
+                                </AuthorizeView> 
+                                @* <span>Emay Walter</span> *@
                                 <p class="mb-0">Admin <i class="middle fa fa-angle-down"></i></p>
                             </div>
                         </div>
