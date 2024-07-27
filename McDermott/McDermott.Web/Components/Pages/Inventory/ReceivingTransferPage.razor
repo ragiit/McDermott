@@ -96,7 +96,7 @@
                                 </div>
                             </div>
                         }
-                        @if (FormReceivingStocks.Status == EnumStatusReceiving.Done && FormReceivingStocks.Status == EnumStatusReceiving.Cancel)
+                        @if (FormReceivingStocks.Status != EnumStatusReceiving.Done && FormReceivingStocks.Status != EnumStatusReceiving.Cancel)
                         {
                             <div class="sticky">
                                 <div class="card">
