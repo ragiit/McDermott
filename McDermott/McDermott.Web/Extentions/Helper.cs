@@ -1,4 +1,5 @@
-﻿using McDermott.Application.Dtos;
+﻿using DevExpress.Utils.Filtering.Internal;
+using McDermott.Application.Dtos;
 using McDermott.Application.Features.Services;
 using Serilog;
 
@@ -6,6 +7,7 @@ namespace McDermott.Web.Extentions
 {
     public static class Helper
     {
+        public static string DefaultFormatDate => "dd MMMM yyyy";
         public class AllergyType
         {
             public string Code { get; set; } = string.Empty;

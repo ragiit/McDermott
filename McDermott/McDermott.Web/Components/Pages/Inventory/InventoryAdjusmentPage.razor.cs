@@ -587,6 +587,9 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task EditItemDetail_Click(IGrid context)
         {
+            if (!IsStatus(EnumStatusInventoryAdjustment.InProgress))
+                return;
+
             await GridDetail.StartEditRowAsync(FocusedRowDetailVisibleIndex);
 
             var aa = Uoms;

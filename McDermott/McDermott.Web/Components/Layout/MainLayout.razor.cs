@@ -31,7 +31,7 @@ namespace McDermott.Web.Components.Layout
             var a = (CustomAuthenticationStateProvider)CustomAuth;
             await a.UpdateAuthState(string.Empty);
 
-            NavigationManager.NavigateTo("/login", true);
+            NavigationManager.NavigateTo("login", true);
         }
 
         private string searchQuery = "";
