@@ -460,7 +460,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     }
                     // Hapus produk yang dipilih
                     await Mediator.Send(new DeleteProductRequest(ids: SelectedDataItems.Adapt<List<ProductDto>>().Select(x => x.Id).ToList()));
-                    ToastService.ShowError("Success Delete Data Product..");
+                    ToastService.ShowSuccess("Success Delete Data Product..");
                 }
 
                 await LoadData();

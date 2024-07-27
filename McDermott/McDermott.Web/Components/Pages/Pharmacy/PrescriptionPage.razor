@@ -1016,7 +1016,7 @@ else
 @* PopUp Detail Prescription *@
 
 <DxPopup @bind-Visible="@isDetailPrescription" HeaderCssClass="fw-bold" HeaderText="Input Detail Stock "
-         HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center" ShowCloseButton = "false"
+         HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center" ShowCloseButton = "true" Closed="cancelCutStock"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
 <div class="card">
     <div class="card-body">
@@ -1130,7 +1130,7 @@ else
             <div class="row  justify-content-end">
                 <div class="col-auto align-self-end">
                     <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Confirm" SubmitFormOnClick="true" Click="SaveStockOut"></DxButton>
-                    <DxButton  RenderStyle="ButtonRenderStyle.Light" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Cancel" SubmitFormOnClick="true" Click="cancelCutStock"></DxButton>
+                    @* <DxButton  RenderStyle="ButtonRenderStyle.Light" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Cancel" SubmitFormOnClick="true" Click="cancelCutStock"></DxButton> *@
                 </div>
             </div>
         }
@@ -1140,7 +1140,7 @@ else
 
 @* PopUp Detail ConcoctionLine *@
   <DxPopup @bind-Visible="@isDetailLines" HeaderCssClass="fw-bold" HeaderText="Input Detail Stock "
-         HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center" ShowCloseButton ="false"
+         HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center" ShowCloseButton = "true" Closed="cancelCutStock"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
 <div class="card">
     <div class="card-body">

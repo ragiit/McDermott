@@ -11,22 +11,7 @@
 </style>
 
 <div class="wrapper">
-    @*  <section class="content-header">
-    <div class="container-fluid">
-    <div class="row mb-2">
-    <div class="col-sm-6">
-    <h1>Good Receipt</h1>
-    </div>
-    <div class="col-sm-6">
-    <ol class="breadcrumb float-sm-right">
-    <li class="breadcrumb-item"><a class="no-underline" href="/">Home</a></li>
-    <li class="breadcrumb-item" @onclick="LoadData"><a class="no-underline" href="/inventory/receiving-transfer">Good Receipt</a></li>
-    </ol>
-    </div>
-    </div>
-    </div>
-    </section> *@
-
+    
     <BaseHeaderPage Title="Goods Receipt" OnClickBack="@(async () => await LoadData())" ShowBackButton="showForm" />
 
 
@@ -75,7 +60,7 @@
                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                             <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
                                             <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItem_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 && isActiveButton" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 && isActiveButton" />
+                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 && FormReceivingStocks.Status == EnumStatusReceiving.Draft" />
                                             <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                         </DxToolbar>
                                     </ToolbarTemplate>

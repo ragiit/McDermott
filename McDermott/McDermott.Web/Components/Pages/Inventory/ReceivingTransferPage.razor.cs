@@ -124,15 +124,15 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             PanelVisible = true;
             showForm = false;
-            ReceivingStocks = await Mediator.Send(new GetReceivingStockQuery());
+            await LoadAsyncData();
             PanelVisible = false;
         }
 
         private async Task LoadAsyncData()
         {
             PanelVisible = true;
+            ReceivingStocks = await Mediator.Send(new GetReceivingStockQuery());
             TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-            Stocks = await Mediator.Send(new GetStockProductQuery());
             receivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery());
             PanelVisible = false;
         }
@@ -383,7 +383,6 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task onProcess()
         {
             await LoadAsyncData();
-            await LoadData();
             FormReceivingStocks = ReceivingStocks.Where(x => x.Id == receivingId).FirstOrDefault()!;
 
             if (FormReceivingStocks is not null)
@@ -444,7 +443,6 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task onValidation()
         {
             await LoadAsyncData();
-            await LoadData();
             FormReceivingStocks = ReceivingStocks.Where(x => x.Id == receivingId).FirstOrDefault()!;
 
             var data_TransactionStock = TransactionStocks.Where(x => x.SourceTable == nameof(ReceivingStock) && x.SourcTableId == receivingId).ToList();
@@ -574,9 +572,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 else
                 {
-                    TempReceivingStockDetails.RemoveAll(x => data.Select(z => z.ReceivingStockId).Contains(x.ReceivingStockId));
+                    var id = data.Select(x => x.Id).FirstOrDefault();
+                    TempReceivingStockDetails.RemoveAll(x => data.Select(z => z.Id).Contains(x.Id));
+                    await Mediator.Send(new DeleteReceivingStockPoductRequest(id));
                 }
                 SelectedDataItemsDetail = new ObservableRangeCollection<object>();
+                StateHasChanged();
             }
             catch (Exception ex)
             {
