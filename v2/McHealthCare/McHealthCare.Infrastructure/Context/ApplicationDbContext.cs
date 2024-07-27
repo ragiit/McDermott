@@ -17,6 +17,9 @@ namespace McHealthCare.Context
         public DbSet<Country> Countries { get; set; }
         public DbSet<Province> Provinces { get; set; }
         public DbSet<Village> Villages { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Doctor> Doctors { get; set; }
+        public DbSet<Patient> Patients { get; set; }
 
         #endregion Configuration
 

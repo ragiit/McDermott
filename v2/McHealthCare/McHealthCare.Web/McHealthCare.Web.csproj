@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Components\Pages\_Imports.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DevExpress.Blazor" Version="23.2.6" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
@@ -20,6 +24,18 @@
   <ItemGroup>
     <ProjectReference Include="..\McHealthCare.Application\McHealthCare.Application.csproj" />
     <ProjectReference Include="..\McHealthCare.Infrastructure\McHealthCare.Persistence.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Pages\_Imports.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\Pages\_Imports.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Components\Pages\_Imports.razor" />
   </ItemGroup>
 
 

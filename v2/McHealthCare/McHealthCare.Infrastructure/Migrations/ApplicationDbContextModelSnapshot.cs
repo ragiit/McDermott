@@ -34,6 +34,9 @@ namespace McHealthCare.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -46,6 +49,9 @@ namespace McHealthCare.Persistence.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("MartialStatus")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -63,6 +69,9 @@ namespace McHealthCare.Persistence.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("PlaceOfBirth")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -153,6 +162,66 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Countries");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Doctor", b =>
+                {
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("SipExp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SipFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("StrExp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("StrFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StrNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ApplicationUserId");
+
+                    b.ToTable("Doctors");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Employee", b =>
+                {
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Legacy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Oracle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SAP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ApplicationUserId");
+
+                    b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Patient", b =>
+                {
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("NoRm")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ApplicationUserId");
+
+                    b.ToTable("Patients");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Province", b =>
@@ -384,6 +453,39 @@ namespace McHealthCare.Persistence.Migrations
                     b.Navigation("Province");
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Doctor", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.ApplicationUser", "ApplicationUser")
+                        .WithOne("Doctor")
+                        .HasForeignKey("McHealthCare.Domain.Entities.Doctor", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Employee", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.ApplicationUser", "ApplicationUser")
+                        .WithOne("Employee")
+                        .HasForeignKey("McHealthCare.Domain.Entities.Employee", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Patient", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.ApplicationUser", "ApplicationUser")
+                        .WithOne("Patient")
+                        .HasForeignKey("McHealthCare.Domain.Entities.Patient", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Province", b =>
                 {
                     b.HasOne("McHealthCare.Domain.Entities.Country", "Country")
@@ -463,6 +565,15 @@ namespace McHealthCare.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.ApplicationUser", b =>
+                {
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.City", b =>
