@@ -74,7 +74,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (!_cache.TryGetValue(cacheKey, out List<TransferStockProduct>? result))
                 {
                     result = await _unitOfWork.Repository<TransferStockProduct>().Entities
-
                       .Include(x => x.Product)
                       .Include(x => x.TransferStock)
                       .AsNoTracking()

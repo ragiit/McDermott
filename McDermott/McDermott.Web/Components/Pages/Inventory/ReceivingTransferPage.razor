@@ -27,42 +27,27 @@
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="true"
                                             Text="Fetching Data...">
-                                <DxGrid @ref="Grid"
-                                        PagerNavigationMode="PagerNavigationMode.InputBox"
-                                        Data="ReceivingStocks"
-                                        PageSize="10"
+                                <MyGrid @ref="Grid"
+                                        Data="@(ReceivingStocks.OrderBy<ReceivingStockDto, EnumStatusReceiving>(x => x.Status ?? EnumStatusReceiving.Draft, new StatusComparer()).ToList())"
                                         @bind-SelectedDataItems="@SelectedDataItems"
-                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                        KeyFieldName="Id"
                                         DataItemDeleting="OnDelete"
-                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                        EditorRenderMode="GridEditorRenderMode.Detached"
-                                        PagerPosition="GridPagerPosition.Bottom"
-                                        AllowSelectRowByClick="true"
-                                        PageSizeSelectorVisible="true"
-                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        PageSizeSelectorAllRowsItemVisible="true"
-                                        PagerSwitchToInputBoxButtonCount="10"
-                                        FocusedRowEnabled="true"
-                                        PagerVisibleNumericButtonCount="10"
                                         FocusedRowChanged="Grid_FocusedRowChanged"
-                                        ShowGroupPanel="true"
-                                        AutoExpandAllGroupRows="true"
-                                        CssClass="ch-480"
-                                        ShowFilterRow="true"
                                         RowDoubleClick="OnRowDoubleClick"
-                                        TextWrapEnabled="false"
-                                        CustomizeElement="Grid_CustomizeElement"
-                                        ShowSearchBox="true"
-                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                        KeyboardNavigationEnabled="true">
-                                    <ToolbarTemplate>
-                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItem_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 && ReceivingStocks.Count > 0 " />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && ReceivingStocks.Count > 0 && FormReceivingStocks.Status == EnumStatusReceiving.Draft" />
-                                            <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                        </DxToolbar>
+                                        KeyFieldName="Id">
+                                    <ToolbarTemplate>                                       
+                                        <MyDxToolbarBase TItem="ReceivingStockDto"
+                                                         Items="@ReceivingStocks"
+                                                         Grid="Grid"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@(async () => await EditItem_Click(null))"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="false"
+                                                         EnableDelete="isActiveButton"
+                                                         VisibleNew="UserAccessCRUID.Create"
+                                                         VisibleEdit="UserAccessCRUID.Update"
+                                                         VisibleDelete="UserAccessCRUID.Delete" />
                                     </ToolbarTemplate>
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
@@ -75,7 +60,7 @@
                                             </CellDisplayTemplate>
                                         </DxGridDataColumn>
                                     </Columns>
-                                </DxGrid>
+                                </MyGrid>
                             </DxLoadingPanel>
                         </div>
                     }
@@ -101,7 +86,7 @@
                             <div class="sticky">
                                 <div class="card">
                                     <div class="card-body">
-                                        <div class="row justify-content-start mb-3">
+                                        <div class="row justify-content-between">
                                             <div class="col-auto align-self-start">
                                                 <DxButton Text="Process" Visible="@(FormReceivingStocks.Id != 0 && FormReceivingStocks.Status == EnumStatusReceiving.Draft)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onProcess"></DxButton>
                                                 <DxButton Text="Cancel" Visible="@(FormReceivingStocks.Id != 0 && FormReceivingStocks.Status == EnumStatusReceiving.Draft)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
@@ -192,9 +177,9 @@
                                                         KeyboardNavigationEnabled="true">
                                                     <ToolbarTemplate>
                                                         <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="isActiveButton" />
-                                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempReceivingStockDetails.Count > 0 && isActiveButton" />
-                                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempReceivingStockDetails.Count > 0 && isActiveButton" />
+                                                            <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="FormReceivingStocks.Id == 0 || FormReceivingStocks.Status == EnumStatusReceiving.Draft" />
+                                                            <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click=" EditItemDetail_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempReceivingStockDetails.Count > 0 && FormReceivingStocks.Id >0 && FormReceivingStocks.Status == EnumStatusReceiving.Draft" />
+                                                            <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempReceivingStockDetails.Count > 0 && FormReceivingStocks.Id >0 && FormReceivingStocks.Status == EnumStatusReceiving.Draft" />
 
                                                         </DxToolbar>
                                                     </ToolbarTemplate>
@@ -210,11 +195,7 @@
                                                     <EditFormTemplate Context="EditFormContextt">
                                                         @{
                                                             TempFormReceivingStockDetail = (ReceivingStockProductDto)EditFormContextt.EditModel;
-                                                            bool a = true;
-                                                            if (TempFormReceivingStockDetail.TraceAbility && TempFormReceivingStockDetail.ExpiredDate is null)
-                                                            {
-                                                                a = false;
-                                                            }
+                                                            
                                                         }
                                                         <DxFormLayout CssClass="w-100 mt">
                                                             <div class="col-md-6">
@@ -253,28 +234,34 @@
                                                                 </DxFormLayoutItem>
                                                             </div>
                                                         </DxFormLayout>
-                                                        @if (TempFormReceivingStockDetail.TraceAbility == true)
-                                                        {
+                                                        
                                                             <DxFormLayout CssClass="w-100 mt">
                                                                 <div class="col-md-6">
                                                                     <DxFormLayoutItem Caption="Select Serial Number/LoT" CaptionCssClass="normal-caption required-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
-                                                                        <DxTextBox Text="@TempFormReceivingStockDetail.Batch" TextExpression="@(()=>TempFormReceivingStockDetail.Batch)" TextChanged="@((string value)=>CheckBatch(value))" NullText="Select Serial Number/LoT" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                        <DxTextBox Text="@TempFormReceivingStockDetail.Batch" 
+                                                                        TextExpression="@(()=>TempFormReceivingStockDetail.Batch)" 
+                                                                        TextChanged="@((string value)=>CheckBatch(value))" 
+                                                                        NullText="Select Serial Number/LoT"
+                                                                               ReadOnly="@(TempFormReceivingStockDetail.TraceAbility == false || (FormReceivingStocks.Id != 0 && FormReceivingStocks.Status != EnumStatusReceiving.Draft))"
+                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                    ShowValidationIcon="true"></DxTextBox>
                                                                         <ValidationMessage For="@(()=>TempFormReceivingStockDetail.Batch)"></ValidationMessage>
                                                                     </DxFormLayoutItem>
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption required-caption" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
-                                                                        <DxDateEdit @bind-Date="@TempFormReceivingStockDetail.ExpiredDate" DisplayFormat="dd MMMM yyyy" Format="d"></DxDateEdit>
+                                                                        <DxDateEdit @bind-Date="@TempFormReceivingStockDetail.ExpiredDate" 
+                                                                        DisplayFormat="dd MMMM yyyy"
+                                                                                ReadOnly="@(TempFormReceivingStockDetail.TraceAbility ==false || (FormReceivingStocks.Id != 0 && FormReceivingStocks.Status != EnumStatusReceiving.Draft))"
+                                                                        Format="d"></DxDateEdit>
                                                                         <ValidationMessage For="@(()=>TempFormReceivingStockDetail.ExpiredDate)"></ValidationMessage>
                                                                     </DxFormLayoutItem>
                                                                 </div>
                                                             </DxFormLayout>
-                                                        }
-
+                                                        
 
                                                         <DxFormLayoutItem ColSpanMd="12">
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Enabled="@a" Text="Confirm" SubmitFormOnClick="true"></DxButton>
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Confirm" SubmitFormOnClick="true"></DxButton>
                                                             <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridProduct.CancelEditAsync())"></DxButton>
                                                         </DxFormLayoutItem>
                                                     </EditFormTemplate>

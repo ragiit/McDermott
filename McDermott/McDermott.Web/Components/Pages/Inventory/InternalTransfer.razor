@@ -151,7 +151,7 @@
                                                             ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
                                                             FilteringMode="@DataGridFilteringMode.Contains"
                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                            SelectedItemChanged="((LocationDto value)=>SelectedItemProduct(value))"
+                                                            SelectedItemChanged="((LocationDto value)=>SelectedProductByLocation(value))"
                                                             ShowValidationIcon="true"></DxComboBox>
                                                 <ValidationMessage For="@(()=>FormInternalTransfer.SourceId)"></ValidationMessage>
                                             </DxFormLayoutItem>
@@ -246,20 +246,18 @@
                                                         <EditFormTemplate Context="EditFormContextt">
                                                             @{
                                                                 TempFormInternalTransfer = (TransferStockProductDto)EditFormContextt.EditModel;
-                                                                matchingItems = TransactionStocks.Where(x => x.ProductId == TempFormInternalTransfer.ProductId && x.Batch == TempFormInternalTransfer.Batch).ToList();
-                                                                TempFormInternalTransfer.CurrentStock = matchingItems.Sum(x => x.Quantity);
-                                                            }
+                                                            } 
                                                             <DxFormLayout CssClass="mt w-100">
                                                                 <div class="col-md-4">
                                                                     <DxFormLayoutItem Caption="Product Name" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                        <DxComboBox Data="@filteredProducts"
+                                                                        <DxComboBox Data="@Products"
                                                                                     @bind-Value="@TempFormInternalTransfer.ProductId"
                                                                                     NullText="Select Product.."
                                                                                     TextFieldName="Name"
                                                                                     ValueFieldName="Id"
                                                                                     FilteringMode="@DataGridFilteringMode.Contains"
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                    SelectedItemChanged="@((ProductDto product)=> SelectedItemProduct(product))"
+                                                                                    SelectedItemChanged="@((ProductDto product)=> SelectedItemByProduct(product))"
                                                                                     ShowValidationIcon="true"></DxComboBox>
                                                                         <ValidationMessage For="@(()=>TempFormInternalTransfer.ProductId)"></ValidationMessage>
                                                                     </DxFormLayoutItem>
@@ -268,12 +266,9 @@
                                                                         <DxComboBox ShowValidationIcon="true"
                                                                                     Data="@Batch"
                                                                                     NullText="Select Batch..."
-                                                                                    @bind-Value="@TempFormInternalTransfer.Batch"
-                                                                                    TextFieldName="Batch"
-                                                                                    ValueFieldName="Batch"
-                                                                                    ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
-                                                                                    Enabled="@TempFormInternalTransfer.TraceAvability"
-                                                                                    SelectedItemChanged="@((TransactionStockDto a)=> SelectedBatch(a))"
+                                                                                    @bind-Value="@TempFormInternalTransfer.Batch"                                                                                    
+                                                                                    ReadOnly="@(TempFormInternalTransfer.TraceAvability ==false || (FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft))"                                                                                    
+                                                                                    SelectedItemChanged="@((string value)=> SelectedBatch(value))"
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                     FilteringMode="@DataGridFilteringMode.Contains">
                                                                         </DxComboBox>
@@ -283,7 +278,7 @@
                                                                 </div>
                                                                 <div class="col-md-4">
                                                                     <DxFormLayoutItem Caption="Current Stock " CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                        <DxSpinEdit @bind-Value="@TempFormInternalTransfer.CurrentStock"
+                                                                        <DxSpinEdit @bind-Value="@currentStocks"
                                                                                     NullText="Input Stock To Be Sent..."
                                                                                     MinValue="0"
                                                                                     ReadOnly
