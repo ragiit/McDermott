@@ -687,7 +687,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                         var temps = new List<InventoryAdjusmentDetailDto>();
                         foreach (var o in Products)
                         {
-                            var sp = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == o.Id && s.LocationId == InventoryAdjusment.LocationId));
+                            var sp = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == o.Id && s.LocationId == InventoryAdjusment.LocationId && s.Validate == true));
 
                             if (o.TraceAbility)
                             {
@@ -736,6 +736,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                                 Reference = InventoryAdjusment.Reference,
                                 Batch = item.Batch,
                                 ExpiredDate = item.ExpiredDate,
+                                //Quantity = item.TeoriticalQty,
                                 LocationId = InventoryAdjusment.LocationId,
                                 UomId = Products.FirstOrDefault(x => item.ProductId == x.Id)?.UomId,
                                 Validate = false
