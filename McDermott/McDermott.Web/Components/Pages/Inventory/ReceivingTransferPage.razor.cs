@@ -345,8 +345,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                 
                 showForm = true;
                 PanelVisible = true;
-
-                // Set header
                 header = "Edit Data";
 
                 // Ensure SelectedDataItems is not null or empty before accessing
@@ -370,11 +368,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 //FormReceivingStocks = p ?? SelectedDataItems[0].Adapt<ReceivingStockDto>();
                 receivingId = FormReceivingStocks.Id;
                 GetReceivingStock = FormReceivingStocks;
-
-                // Filter and update receiving stock details
-                receivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery(x => x.ReceivingStockId == FormReceivingStocks.Id));
-                TempReceivingStockDetails = receivingStockDetails.ToList();
-
+                               
                 // Pre-load Uoms and Products (if not already loaded)
                 if (Uoms == null || Uoms.Count == 0)
                 {
@@ -386,6 +380,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                     Products = await Mediator.Send(new GetProductQuery());
                 }
 
+                // Filter and update receiving stock details
+                receivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery(x => x.ReceivingStockId == FormReceivingStocks.Id));
+                TempReceivingStockDetails = receivingStockDetails.ToList();
 
                 await UpdateProductDetailsAsync(TempReceivingStockDetails, FormReceivingStocks.DestinationId);
 
@@ -443,10 +440,10 @@ namespace McDermott.Web.Components.Pages.Inventory
             await GridProduct!.StartEditNewRowAsync();
         }
 
-        private async Task EditItemDetail_Click()
+        private async Task EditItemDetail_Click(IGrid context)
         {
-            await GridProduct!.StartEditRowAsync(FocusedRowVisibleIndex);
-            IsAddReceived = false;
+            await GridProduct.StartEditRowAsync(FocusedRowVisibleIndex);
+            StateHasChanged();
         }
 
         private async Task DeleteItemDetail_Click()

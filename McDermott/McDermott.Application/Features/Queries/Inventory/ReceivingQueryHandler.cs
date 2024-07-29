@@ -40,18 +40,14 @@ namespace McDermott.Application.Features.Queries.Inventory
                 {
                     result = await _unitOfWork.Repository<ReceivingStockProduct>().Entities
                       .Include(x => x.Product)
-                      .Include(x => x.Product.PurchaseUom)
-                      .Include(x => x.Product.Uom)
-                      .Include(x => x.Stock)
-                      .Include(x => x.Stock.Source)
-                      .Include(x => x.Stock.Destinance)
+                      .Include(x=>x.ReceivingStock)
                       .AsNoTracking()
                       .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
 
-                result ??= [];
+                result ??= new List<ReceivingStockProduct>(); ;
 
                 if (request.Predicate is not null)
                     result = [.. result.AsQueryable().Where(request.Predicate)];
