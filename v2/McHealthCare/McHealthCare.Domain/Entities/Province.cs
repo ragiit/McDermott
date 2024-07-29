@@ -1,9 +1,11 @@
 ﻿using McHealthCare.Domain.Common;
+using McHealthCare.Domain.Common.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace McHealthCare.Domain.Entities
 {
-    public class Province : BaseAuditableEntity
+    public class Province : BaseAuditableEntity, INotifiable
     {
         public Guid CountryId { get; set; }
 
@@ -14,5 +16,10 @@ namespace McHealthCare.Domain.Entities
         public string Code { get; set; } = string.Empty;
 
         public virtual Country? Country { get; set; }
+
+        [NotMapped]
+        public string Type => "Province";
+        [NotMapped]
+        public object Data => this;
     }
 }

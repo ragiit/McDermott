@@ -16,7 +16,7 @@ namespace McHealthCare.Persistence.Extentions
     {
         public static void AddPersistenceLayer(this IServiceCollection services, IConfiguration configuration)
         {
-            //services.AddMappings();
+            // Optional: Add mappings or other services here
             services.AddHttpContextAccessor();
             services.AddDbContext(configuration);
             services.AddRepositories();
@@ -31,7 +31,9 @@ namespace McHealthCare.Persistence.Extentions
         {
             //var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-            var connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
+             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 

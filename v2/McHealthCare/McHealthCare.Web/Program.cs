@@ -10,16 +10,24 @@ using McHealthCare.Application.Extentions;
 using McHealthCare.Persistence.Extentions;
 using Blazored.Toast;
 using McHealthCare.Application.Services;
+using Microsoft.AspNetCore.SignalR;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddPersistenceLayer(builder.Configuration);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options =>
+    {
+        options.PayloadSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.PayloadSerializerOptions.WriteIndented = true; // optional
+    });
 builder.Services.AddScoped<IFileExportService, FileExportService>();
 builder.Services.AddApplicationLayer();
-builder.Services.AddPersistenceLayer(builder.Configuration);
 
 builder.Services.AddBlazoredToast();
 builder.Services.AddCascadingAuthenticationState();
@@ -47,6 +55,8 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
 
+builder.Services.AddCors();
+
 var app = builder.Build();
 
 //app.UseMiddleware<SessionExpirationMiddleware>();
@@ -64,13 +74,21 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+app.UseCors(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
+app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// Konfigurasi middleware lainnya
+app.UseRouting();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.MapHub<NotificationHub>("notificationHub");
+
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
@@ -116,3 +134,5 @@ public class SessionExpirationMiddleware(RequestDelegate next)
         }
     }
 }
+
+ 

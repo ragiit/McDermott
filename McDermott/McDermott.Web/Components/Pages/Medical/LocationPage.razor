@@ -1,129 +1,122 @@
 ﻿@page "/inventory/location"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Master Data Location</PageTitle>
+<PageTitle>McHealthCare - Locations</PageTitle>
 
 @if (IsAccess)
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Location" />
+        <BaseHeaderPage Title="Locations" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
                         <div class="card">
-                            <div class="card-body">
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
-                                                Text="Fetching Data...">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
 
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="Locations"
-                                            PageSize="10"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            EditModelSaving="OnSave"
-                                            DataItemDeleting="OnDelete"
-                                            EditorRenderMode="GridEditorRenderMode.Detached"
-                                            EditMode="GridEditMode.PopupEditForm"
-                                            PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            AllowSelectRowByClick="true"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            ShowFilterRow="true"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
-                                        <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Locations.Count > 0" />
-                                                <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Locations.Count > 0" />
-                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                            </DxToolbar>
-                                        </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="NameAndParent" Caption="Name" SortIndex="0" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Type" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Company.Name" Caption="Company" />
-                                        </Columns>
-                                        <EditFormTemplate Context="EditFormContext">
-                                            @{
-                                                var a = (LocationDto)EditFormContext.EditModel;
-                                                a.Type = Types[0];
-                                                a.CompanyId = Companies[0].Id;
-                                            }
-                                            <DxFormLayout CssClass="w-100">
+                                <MyGrid @ref="Grid"  
+                                        Data="Locations"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        KeyFieldName="Id"
+                                        EditModelSaving="OnSave"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        DataItemDeleting="OnDelete">
 
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
-                                                    <ValidationMessage For="@(()=> a.Name)"   />
-                                                </DxFormLayoutItem>
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parent Location" ColSpanMd="12">
-                                                    <DxComboBox ShowValidationIcon="true"
-                                                                Data="@ParentLocations"
-                                                                NullText="Select Parent Location..."
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="@a.ParentLocationId"
-                                                                TextFieldName="Name"
-                                                                ValueFieldName="Id">
-                                                    </DxComboBox>
-                                                    <ValidationMessage For="@(()=> a.ParentLocationId)"   />
-                                                </DxFormLayoutItem>
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="LocationDto"
+                                                         Items="@Locations"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="false"
+                                                         Grid="Grid" 
+                                                         VisibleNew="UserAccessCRUID.Create"
+                                                         VisibleEdit="UserAccessCRUID.Update"
+                                                         VisibleDelete="UserAccessCRUID.Delete" />
+                                    </ToolbarTemplate>
+                                 @*    <ToolbarTemplate>
+                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                            <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                            <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Locations.Count > 0" />
+                                            <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Locations.Count > 0" />
+                                            <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                            <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                <Items>
+                                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                </Items>
+                                            </DxToolbarItem>
+                                        </DxToolbar>
+                                    </ToolbarTemplate> *@
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="NameAndParent" Caption="Name" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Type" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Company.Name" Caption="Company" />
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (LocationDto)EditFormContext.EditModel;
+                                            a.Type = Types[0];
+                                            a.CompanyId = Companies[0].Id;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
 
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Type" ColSpanMd="12">
-                                                    <DxComboBox FilteringMode="@DataGridFilteringMode.Contains"
-                                                                Data="@Types" @bind-Value="@a.Type"
-                                                                NullText="Select Types..."
-                                                                ShowValidationIcon="true" />
-                                                    <ValidationMessage For="@(()=>a.Type)"   />
-                                                </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                <ValidationMessage For="@(()=> a.Name)"   />
+                                            </DxFormLayoutItem>
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Company" ColSpanMd="12">
-                                                    <DxComboBox ShowValidationIcon="true"
-                                                                Data="@Companies"
-                                                                NullText="Select Company..."
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="@a.CompanyId"
-                                                                TextFieldName="Name"
-                                                                ValueFieldName="Id">
-                                                    </DxComboBox>
-                                                    <ValidationMessage For="@(()=> a.CompanyId)"   />
-                                                </DxFormLayoutItem>
-                                            </DxFormLayout>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parent Location" ColSpanMd="12">
+                                                <DxComboBox ShowValidationIcon="true"
+                                                            Data="@ParentLocations"
+                                                            NullText="Select Parent Location..."
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                            @bind-Value="@a.ParentLocationId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id">
+                                                </DxComboBox>
+                                                <ValidationMessage For="@(()=> a.ParentLocationId)"   />
+                                            </DxFormLayoutItem>
 
-                                        </EditFormTemplate>
-                                    </DxGrid>
-                                </DxLoadingPanel>
-                            </div>
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Type" ColSpanMd="12">
+                                                <DxComboBox FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@Types" @bind-Value="@a.Type"
+                                                            NullText="Select Types..."
+                                                            ShowValidationIcon="true" />
+                                                <ValidationMessage For="@(()=>a.Type)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Company" ColSpanMd="12">
+                                                <DxComboBox ShowValidationIcon="true"
+                                                            Data="@Companies"
+                                                            NullText="Select Company..."
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                            @bind-Value="@a.CompanyId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id">
+                                                </DxComboBox>
+                                                <ValidationMessage For="@(()=> a.CompanyId)"   />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+
+                                    </EditFormTemplate>
+                                </MyGrid>
+                            </DxLoadingPanel>
                         </div>
                     </div>
                 </div>
@@ -133,9 +126,6 @@
 }
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Location" />
 
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <LoadingIndicatorLayout />
 }

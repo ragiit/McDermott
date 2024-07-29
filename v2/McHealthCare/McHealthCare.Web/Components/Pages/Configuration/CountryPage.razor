@@ -1,10 +1,10 @@
-﻿@page "/config/country"
+﻿@page "/config/countries"
 
-<PageTitle>McHealthCare - Country</PageTitle>
+<PageTitle>McHealthCare - Countries</PageTitle>
 
 <div class="wrapper">
 
-    <BaseHeaderPage Title="Country" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+    <BaseHeaderPage Title="Countries" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
     <div class="container-fluid">
         <div class="row">
@@ -38,7 +38,7 @@
                                                  Refresh_Click="@(async () => await LoadData())"
                                                  IsImport="true"
                                                  ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))"
-                                                 ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "country_template.xlsx", ExportFileDatas))" />
+                                                 ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "Countries_template.xlsx", ExportFileDatas))" />
                             </ToolbarTemplate>
 
                             <Columns>

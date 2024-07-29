@@ -1,13 +1,17 @@
 ﻿using Mapster;
 using McHealthCare.Application.Dtos.Configuration;
+using McHealthCare.Application.Extentions;
 using McHealthCare.Application.Interfaces;
 using McHealthCare.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
 using System.Threading;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.CountryCommand;
+using static McHealthCare.Extentions.EnumHelper;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 {
@@ -21,7 +25,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         public sealed record DeleteCountryRequest(Guid? Id = null, List<Guid>? Ids = null) : IRequest<bool>;
     }
 
-    public sealed class CountryQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache) :
+    public sealed class CountryQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService) :
         IRequestHandler<GetCountryQuery, List<CountryDto>>,
         IRequestHandler<CreateCountryRequest, CountryDto>,
         IRequestHandler<CreateListCountryRequest, List<CountryDto>>,
@@ -29,6 +33,8 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         IRequestHandler<UpdateListCountryRequest, List<CountryDto>>,
         IRequestHandler<DeleteCountryRequest, bool>
     {
+
+        private string CacheKey = "GetCountryQuery_";
 
         private async Task<(CountryDto, List<CountryDto>)> Result(Country? result = null, List<Country>? results = null, bool ReturnNewData = false, CancellationToken cancellationToken = default)
         {
@@ -53,15 +59,16 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         #region GET
 
         public async Task<List<CountryDto>> Handle(GetCountryQuery request, CancellationToken cancellationToken)
-        {
-            string cacheKey = $"GetCountryQuery_";
+        { 
             if (request.RemoveCache)
-                cache.Remove(cacheKey);
+                cache.Remove(CacheKey);
 
-            if (!cache.TryGetValue(cacheKey, out List<Country>? result))
+            List<Country> result = [];
+
+            if (!cache.TryGetValue(CacheKey, out result))
             {
                 result = await unitOfWork.Repository<Country>().Entities.ToListAsync(cancellationToken);
-                cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }
 
             if (request.Predicate is not null)
@@ -79,7 +86,13 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             var req = request.CountryDto.Adapt<CreateUpdateCountryDto>();
             var result = await unitOfWork.Repository<Country>().AddAsync(req.Adapt<Country>());
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            cache.Remove("GetCountryQuery_");
+            cache.Remove(CacheKey);
+
+            await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
+            {
+                Type = EnumTypeReceiveData.Create,
+                Data = result
+            });
 
             return (await Result(result: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item1;
         }
@@ -89,7 +102,13 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             var req = request.CountryDtos.Adapt<List<CreateUpdateCountryDto>>();
             var result = await unitOfWork.Repository<Country>().AddAsync(req.Adapt<List<Country>>());
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            cache.Remove("GetCountryQuery_");
+            cache.Remove(CacheKey);
+
+            await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
+            {
+                Type = EnumTypeReceiveData.Create,
+                Data = result
+            });
 
             return (await Result(results: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item2;
         }
@@ -103,7 +122,14 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             var req = request.CountryDto.Adapt<CreateUpdateCountryDto>();
             var result = await unitOfWork.Repository<Country>().UpdateAsync(req.Adapt<Country>());
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            cache.Remove("GetCountryQuery_");
+
+            await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
+            {
+                Type = EnumTypeReceiveData.Update,
+                Data = result
+            });
+
+            cache.Remove(CacheKey);
 
             return (await Result(result: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item1;
 
@@ -114,7 +140,14 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             var req = request.CountryDtos.Adapt<CreateUpdateCountryDto>();
             var result = await unitOfWork.Repository<Country>().UpdateAsync(req.Adapt<List<Country>>());
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            cache.Remove("GetCountryQuery_");
+            cache.Remove(CacheKey);
+
+            await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
+            {
+                Type =  EnumTypeReceiveData.Update,
+                Data = result
+            });
+
 
             return (await Result(results: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item2;
         }
@@ -125,18 +158,39 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
         public async Task<bool> Handle(DeleteCountryRequest request, CancellationToken cancellationToken)
         {
+            List<Country> deletedCountries = [];
+
             if (request.Id.HasValue)
             {
-                await unitOfWork.Repository<Country>().DeleteAsync(request.Id.GetValueOrDefault());
+                var country = await unitOfWork.Repository<Country>().Entities.FirstOrDefaultAsync(x => x.Id == request.Id.GetValueOrDefault());
+                if (country != null)
+                {
+                    deletedCountries.Add(country);
+                    await unitOfWork.Repository<Country>().DeleteAsync(request.Id.GetValueOrDefault());
+                }
             }
 
             if (request.Ids?.Count > 0)
             {
+                deletedCountries.AddRange(await unitOfWork.Repository<Country>().Entities
+                    .Where(x => request.Ids.Contains(x.Id))
+                    .ToListAsync(cancellationToken));
+
                 await unitOfWork.Repository<Country>().DeleteAsync(x => request.Ids.Contains(x.Id));
             }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            cache.Remove("GetCountryQuery_");
+            cache.Remove(CacheKey);
+
+            if (deletedCountries.Count > 0)
+            {
+                await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
+                {
+                    Type = EnumTypeReceiveData.Delete,
+                    Data = deletedCountries,
+                }); 
+            }
+
             return true;
         }
 

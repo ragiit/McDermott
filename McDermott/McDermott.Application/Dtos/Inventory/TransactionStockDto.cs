@@ -20,9 +20,9 @@ namespace McDermott.Application.Dtos.Inventory
         public long? UomId { get; set; }
         public bool Validate { get; set; } = false;
         public long Quantity { get; set; } = 0;
+        public DateTime? CreatedDate { get; set; } = null;
 
 
-        
         public virtual ProductDto? Product { get; set; }
         public virtual LocationDto? Location { get; set; }
         public virtual Uom? Uom { get; set; }
