@@ -120,10 +120,18 @@
                                                     <div class="row justify-content-between">
                                                         <div class="col-auto align-self-start">                                                        
                                                               <DxButton Text="Send To Pharmacy" Visible="@(Pharmacy.Id != 0 && Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-clipboard-check" Click="SendToPharmacy"></DxButton>
-                                                              <DxButton Text="Received" Visible=@(Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy && NameUser.IsPharmacy == true) RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Pharmacied"></DxButton>
+                                                              <DxButton Text="Cancel" Visible="@(Pharmacy.Id != 0 && Pharmacy.Status == EnumStatusPharmacy.Draft && (NameUser.IsPharmacy == false || NameUser.IsPharmacy is null))" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>                                                                          
+
+                                                              <DxButton Text="Received" Visible="@(Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Pharmacied"></DxButton>
+                                                              <DxButton Text="Cancel" Visible="@(Pharmacy.Status == EnumStatusPharmacy.SendToPharmacy && NameUser.IsPharmacy == true)" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>                                                                          
+
+                                                              
                                                               <DxButton Text="Process" Visible="@(Pharmacy.Status == EnumStatusPharmacy.Received && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="Received"></DxButton>
+                                                              <DxButton Text="Cancel" Visible="@(Pharmacy.Status == EnumStatusPharmacy.Received && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>                                                                          
+
+
                                                               <DxButton Text="Done" Visible="@(Pharmacy.Status == EnumStatusPharmacy.Processed && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="ValidateAsync"></DxButton>
-                                                              <DxButton Text="Cancel" Visible="@(Pharmacy.Id != 0 && NameUser.IsDoctor != false)" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>                                                                          
+                                                              <DxButton Text="Cancel" Visible="@(Pharmacy.Status == EnumStatusPharmacy.Processed && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>                                                                          
                                                         </div>                                                        
                                                    
                                                         <div class="col-auto align-self-end">
@@ -890,7 +898,7 @@ else
                              </DxGridDataColumn>
                              }
                             <DxGridDataColumn FieldName="ProductName" Caption="Medicine Name" SortIndex="0" />
-                            <DxGridDataColumn FieldName="ActiveComponentName" Caption="Active Component" />
+                            <DxGridDataColumn Visible="false" FieldName="ActiveComponentName" Caption="Active Component" />
                             <DxGridDataColumn FieldName="MedicamentDosage" Caption="MedicineDosage" Visible="false"/>
                             <DxGridDataColumn FieldName="Qty" Caption="Dosage" />
                             <DxGridDataColumn FieldName="UomName" Caption="Unit Of Dosage" />
