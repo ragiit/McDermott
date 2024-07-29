@@ -106,7 +106,7 @@
                                                     <div class="w-100 row">
                                                         <div class="col align-self-center">
                                                             <DxButton IconCssClass="fa-solid fa-check"
-                                                                      Text="@StagingText" Click="OnClickConfirm"
+                                                                      Text="@StagingText" Click="(() => OnClickConfirm(false))"
                                                                       RenderStyle="ButtonRenderStyle.Primary"></DxButton>
 
                                                             <DxButton IconCssClass="fa-solid fa-xmark"
@@ -361,4 +361,36 @@
 else
 {
     <LoadingIndicatorLayout />
-} 
+}
+
+
+@* <DxPopup Visible="ShowConfirmation" HeaderText="@("Invalidate Opname - " + InventoryAdjusment.Reference)" CloseOnOutsideClick="false" CloseOnEscape="false" ShowFooter="true" ShowCloseButton="false" Width="300" MinWidth="100">
+    <bodycontenttemplate>
+        <div class="text-wrap">
+            <p class="fw-4">are you sure you want to send this email? </p>
+        </div>
+    </bodycontenttemplate>
+    <footercontenttemplate context="context">
+        <dxbutton enabled="!isloading" cssclass="popup-button my-1 ms-2" click="sendtoemail" renderstyle="buttonrenderstyle.primary" text="yes" submitformonclick="true" />
+        <dxbutton cssclass="popup-button my-1 ms-2" click="cancel" renderstyle="buttonrenderstyle.danger" text="no" />
+    </footercontenttemplate>
+</DxPopup> *@
+
+<DxPopup Visible="ShowConfirmation"
+         HeaderText="Validation Required"
+         CloseOnOutsideClick="false"
+         CloseOnEscape="false"
+         ShowFooter="true"
+         ShowCloseButton="false"
+         Width="350"
+         MinWidth="100">
+    <BodyContentTemplate>
+        <div class="text-wrap">
+            <p class="fw-4">There are items with a real quantity of 0. Do you want to continue?</p>
+        </div>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <DxButton Enabled="true" CssClass="popup-button my-1 ms-2" Click="OnConfirmYes" RenderStyle="ButtonRenderStyle.Primary" Text="Yes" />
+        <DxButton CssClass="popup-button my-1 ms-2" Click="OnConfirmNo" RenderStyle="ButtonRenderStyle.Danger" Text="No" />
+    </FooterContentTemplate>
+</DxPopup>

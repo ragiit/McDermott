@@ -1,9 +1,9 @@
-﻿@page "/config/province"
+﻿@page "/config/provinces"
 
 <PageTitle>McHealthCare - Provinces</PageTitle>
 
 <div class="wrapper">
-    <BaseHeaderPage Title="Country" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+    <BaseHeaderPage Title="Provinces" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
 
     <div class="container-fluid">
@@ -38,7 +38,7 @@
                                                  Refresh_Click="@(async () => await LoadData())"
                                                  IsImport="true"
                                                  ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))"
-                                                 ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "province_template.xlsx", ExportFileDatas))" />
+                                                 ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "Provinces_template.xlsx", ExportFileDatas))" />
                             </ToolbarTemplate>
 
                             <Columns>

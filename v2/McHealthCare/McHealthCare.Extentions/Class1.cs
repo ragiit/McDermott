@@ -19,6 +19,18 @@ namespace McHealthCare.Extentions
                             ?.GetName() ?? enumValue.ToString();
         }
 
+        public enum EnumTypeReceiveData
+        {
+            [Display(Name = "Create")]
+            Create = 1,
+
+            [Display(Name = "Update")]
+            Update = 2,
+
+            [Display(Name = "Delete")]
+            Delete = 3, 
+        }
+
         public enum EnumStatusInventoryAdjustment
         {
             [Display(Name = "Draft")]

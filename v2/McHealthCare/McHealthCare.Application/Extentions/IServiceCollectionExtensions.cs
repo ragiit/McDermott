@@ -13,8 +13,11 @@ namespace McHealthCare.Application.Extentions
         public static void AddApplicationLayer(this IServiceCollection services)
         {
             services.AddMediator();
-            services.AddMemoryCache();  // Menambahkan MemoryCache
+            services.AddMemoryCache();  // Menambahkan MemoryCache// Register DataService
+            //services.AddScoped<DataService>();
         }
+
+        
 
         private static void AddMediator(this IServiceCollection services)
         {

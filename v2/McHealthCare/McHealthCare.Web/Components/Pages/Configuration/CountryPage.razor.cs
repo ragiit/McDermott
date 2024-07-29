@@ -1,11 +1,15 @@
-﻿namespace McHealthCare.Web.Components.Pages.Configuration
+﻿using McHealthCare.Application.Extentions;
+using Microsoft.AspNetCore.SignalR.Client;
+using static McHealthCare.Extentions.EnumHelper;
+
+namespace McHealthCare.Web.Components.Pages.Configuration
 {
-    public partial class CountryPage
+    public partial class CountryPage : IAsyncDisposable
     {
         #region Variables
 
         private bool PanelVisible { get; set; } = true;
-
+        private HubConnection? hubConnection;
         private List<CountryDto> Countries = [];
 
         private List<ExportFileData> ExportFileDatas =
@@ -28,8 +32,60 @@
 
         #endregion Variables
 
+        private bool asd()
+        {
+            ToastService.ShowInfo("aowjdaowkdoawkdaw");
+
+            return false;
+        }
+
         protected override async Task OnInitializedAsync()
         {
+            var aa = NavigationManager.ToAbsoluteUri("/notificationHub");
+            hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"))
+            .Build();
+
+            hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
+            {
+                await LoadData(); 
+                await InvokeAsync(StateHasChanged);
+            });
+
+
+            //hubConnection.On<string, CountryDto>("ReceiveCreateNotification", (type, country) =>
+            //{
+            //    if (type == "Country")
+            //    {
+            //        Countries.Add(country);
+            //        InvokeAsync(StateHasChanged);
+            //    }
+            //});
+
+            //hubConnection.On<string, CountryDto>("ReceiveUpdateNotification", (type, country) =>
+            //{
+            //    if (type == "Country")
+            //    {
+            //        var index = Countries.FindIndex(c => c.Id == country.Id);
+            //        if (index >= 0)
+            //        {
+            //            Countries[index] = country;
+            //            InvokeAsync(StateHasChanged);
+            //        }
+            //    }
+            //});
+
+            //hubConnection.On<string, CountryDto>("ReceiveDeleteNotification", (type, country) =>
+            //{
+            //    if (type == "Country")
+            //    {
+            //        Countries.RemoveAll(c => c.Id == country.Id);
+            //        InvokeAsync(StateHasChanged);
+            //    }
+            //});
+
+            await hubConnection.StartAsync();
+
             await LoadData();
         }
 
@@ -51,7 +107,9 @@
             try
             {
                 PanelVisible = true;
-                Countries = await Mediator.Send(new GetCountryQuery());
+                Countries.Clear();
+                var countries = await Mediator.Send(new GetCountryQuery());
+                Countries = countries;
                 SelectedDataItems = [];
                 try
                 {
@@ -60,8 +118,9 @@
                 catch { }
                 PanelVisible = false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                var a = ex;
                 throw;
             }
         }
@@ -168,6 +227,14 @@
                 }
             }
             PanelVisible = false;
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            //if (hubConnection is not null)
+            //{
+            //    await hubConnection.DisposeAsync();
+            //}
         }
     }
 }
