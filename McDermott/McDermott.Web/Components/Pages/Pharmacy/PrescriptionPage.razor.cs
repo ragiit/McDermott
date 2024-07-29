@@ -2340,6 +2340,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
+
+                PanelVisible = true;
                 var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
                 Pharmacy.Status = EnumStatusPharmacy.SendToPharmacy;
                 await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
@@ -2349,6 +2351,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 PharmaciesLog.status = EnumStatusPharmacy.SendToPharmacy;
 
                 await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
+
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -2358,6 +2362,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         public async void Pharmacied()
         {
+            PanelVisible = true;
             var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
             Pharmacy.Status = EnumStatusPharmacy.Received;
             await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
@@ -2367,9 +2372,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             PharmaciesLog.status = EnumStatusPharmacy.Received;
 
             await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
+
+            PanelVisible = false;
         }
         public async void Received()
         {
+
+            PanelVisible = true;
             var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
 
             //if (Prescriptions.Count > 0)
@@ -2454,6 +2463,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
 
+            PanelVisible = false;
+
             await EditItemPharmacy_Click(updates);
             StateHasChanged();
         }
@@ -2462,6 +2473,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
+
+                PanelVisible = true;
                 await LoadAsyncData();
                 await LoadData();
                 await RefreshData();
@@ -2525,6 +2538,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 };
 
                 await Mediator.Send(new CreatePharmacyLogRequest(pharmacyLog));
+
+                PanelVisible = false;
+
                 await EditItemPharmacy_Click(updatedPharmacy);
                 StateHasChanged();
             }

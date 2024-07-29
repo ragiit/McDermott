@@ -89,7 +89,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 catch { }
 
-                
+
                 var user_group = await Mediator.Send(new GetUserQuery());
                 NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
                 StateHasChanged();
@@ -130,7 +130,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task LoadAsyncData()
         {
-            
+
             ReceivingStocks = await Mediator.Send(new GetReceivingStockQuery());
             TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
             Locations = await Mediator.Send(new GetLocationQuery());
@@ -168,7 +168,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                     TempFormReceivingStockDetail.ProductName = productName.Name;
                     TempFormReceivingStockDetail.TraceAbility = productName.TraceAbility;
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
@@ -312,7 +313,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
 
-           
+
         }
 
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)
@@ -342,13 +343,13 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
-                
+
                 showForm = true;
                 PanelVisible = true;
                 header = "Edit Data";
 
                 // Ensure SelectedDataItems is not null or empty before accessing
-                
+
                 if (p != null)
                 {
                     FormReceivingStocks = p;
@@ -368,7 +369,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 //FormReceivingStocks = p ?? SelectedDataItems[0].Adapt<ReceivingStockDto>();
                 receivingId = FormReceivingStocks.Id;
                 GetReceivingStock = FormReceivingStocks;
-                               
+
                 // Pre-load Uoms and Products (if not already loaded)
                 if (Uoms == null || Uoms.Count == 0)
                 {
@@ -399,7 +400,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
         }
 
-         private async Task UpdateProductDetailsAsync(List<ReceivingStockProductDto> items, long? sourceLocationId)
+        private async Task UpdateProductDetailsAsync(List<ReceivingStockProductDto> items, long? sourceLocationId)
         {
             foreach (var item in items)
             {
@@ -444,6 +445,10 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task EditItemDetail_Click(IGrid context)
         {
             await GridProduct.StartEditRowAsync(FocusedRowVisibleIndex);
+            var traceavibility = context.SelectedDataItem.Adapt<ReceivingStockProductDto>();
+            if(traceavibility?.Product?.TraceAbility == true){
+                TempFormReceivingStockDetail.TraceAbility = true;
+            }
             StateHasChanged();
         }
 
@@ -469,6 +474,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         #region Process
         private async Task onProcess()
         {
+            PanelVisible = true;
             await LoadAsyncData();
             FormReceivingStocks = ReceivingStocks.Where(x => x.Id == receivingId).FirstOrDefault()!;
 
@@ -519,6 +525,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 await Mediator.Send(new CreateReceivingLogRequest(FormReceivingLog));
 
+                PanelVisible = true;
 
                 await EditItem_Click(GetReceivingStock);
                 StateHasChanged();
@@ -529,6 +536,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         #region Validation
         private async Task onValidation()
         {
+            PanelVisible = true;
             await LoadAsyncData();
             FormReceivingStocks = ReceivingStocks.Where(x => x.Id == receivingId).FirstOrDefault()!;
 
@@ -557,7 +565,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             isActiveButton = false;
             await EditItem_Click(GetReceivingStock);
             StateHasChanged();
-
+            PanelVisible = false;
         }
         private async Task onCancel()
         {
@@ -682,7 +690,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
-                if (TempReceivingStockDetails.Count<=0)
+                if (TempReceivingStockDetails.Count <= 0)
 
                     return;
 
@@ -753,10 +761,11 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 try
                 {
-                    if(r.TraceAbility == true)
+                    if (r.TraceAbility == true)
                     {
-                        if(r.Batch == null || r.ExpiredDate == null)
+                        if (r.Batch == null || r.ExpiredDate == null)
                         {
+
                             return;
                         }
                     }
@@ -789,9 +798,9 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 r.ReceivingStockId = FormReceivingStocks.Id;
                 if (r.Id == 0)
-                    await Mediator.Send(new CreateReceivingStockProductRequest(r));               
-                else               
-                     await Mediator.Send(new UpdateReceivingStockProductRequest(r));                                 
+                    await Mediator.Send(new CreateReceivingStockProductRequest(r));
+                else
+                    await Mediator.Send(new UpdateReceivingStockProductRequest(r));
                 await EditItem_Click(GetReceivingStock);
                 StateHasChanged();
             }

@@ -253,6 +253,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 TempFormInternalTransfer.ProductId = e.Id;
                 TempFormInternalTransfer.TraceAvability = e.TraceAbility;
+                
 
                 var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.LocationId == FormInternalTransfer.SourceId));
                 if (e.TraceAbility)
@@ -585,6 +586,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
+                PanelVisible = true;
                 TransferStocks = await Mediator.Send(new GetTransferStockQuery());
                 FormInternalTransfer = TransferStocks.Where(x => x.Id == TransferId).FirstOrDefault()!;
                 if (FormInternalTransfer is not null)
@@ -600,7 +602,10 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormInternalTransferDetail.Status = EnumStatusInternalTransfer.Request;
 
                 await Mediator.Send(new CreateTransferStockLogRequest(FormInternalTransferDetail));
+
+                PanelVisible = false;
                 StateHasChanged();
+
             }
             catch (Exception ex)
             {
@@ -612,6 +617,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
+
+                PanelVisible = true;
                 await LoadAsyncData();
                 FormInternalTransfer = TransferStocks.Where(x => x.Id == TransferId).FirstOrDefault()!;
                 if (FormInternalTransfer is not null)
@@ -675,6 +682,8 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                 await Mediator.Send(new CreateTransferStockLogRequest(FormInternalTransferDetail));
 
+                PanelVisible = false;
+
                 await EditItem_Click(getInternalTransfer);
                 StateHasChanged();
             }
@@ -688,6 +697,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
+
+                PanelVisible = true;
                 TransferStocks = await Mediator.Send(new GetTransferStockQuery());
                 FormInternalTransfer = TransferStocks.Where(x => x.Id == TransferId).FirstOrDefault()!;
                 if (FormInternalTransfer is not null)
@@ -703,6 +714,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 FormInternalTransferDetail.Status = EnumStatusInternalTransfer.ApproveRequest;
 
                 await Mediator.Send(new CreateTransferStockLogRequest(FormInternalTransferDetail));
+
+                PanelVisible = false;
+                StateHasChanged();
             }
             catch (Exception ex)
             {
