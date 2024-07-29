@@ -645,6 +645,20 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private long PrescripId { get; set; } = 0;
         private long Lines_Id { get; set; } = 0;
 
+        private async Task cancelCutStock()
+        {
+            isDetailPrescription = false;
+            SelectedDataItemsStockOut = [];
+            await EditItemPharmacy_Click(Pharmacy);
+            StateHasChanged();
+        }
+        private async Task cancelCutStockLines()
+        {
+            isDetailLines = false;
+            SelectedDataItemsStockOut = [];
+            await EditItemPharmacy_Click(Pharmacy);
+            StateHasChanged();
+        }
         private async Task ShowCutStockLines(long LinesId)
         {
             await RefreshData();
@@ -802,18 +816,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 }
             }
             PanelVisible = false;
-        }
-        private async Task cancelCutStock()
-        {
-            isDetailPrescription = false;
-            await EditItemPharmacy_Click(Pharmacy);
-            StateHasChanged();
-        }
-        private async Task cancelCutStockLines()
-        {
-            isDetailLines = false;
-            await EditItemPharmacy_Click(Pharmacy);
-            StateHasChanged();
         }
         private async Task ShowCutStock(long prescriptionId)
         {
@@ -1180,7 +1182,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             if (value is not null)
             {
-                var line = (await Mediator.Send(new GetConcoctionLineQuery())).FirstOrDefault() ?? new();
+                var line = (await Mediator.Send(new GetConcoctionLineQuery(x=>x.Id == Lines_Id))).FirstOrDefault()!;
                 FormStockOutLines.Batch = value;
 
                 var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
@@ -1491,7 +1493,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private string? Prescription_Name { get; set; }
 
         List<PrescriptionDto> Prescriptions_Data = new List<PrescriptionDto>();
-        private async Task OnDeletePrescriptionLines(GridDataItemDeletingEventArgs e)
+        private void OnDeletePrescriptionLines(GridDataItemDeletingEventArgs e)
         {
             var data = SelectedDataItemsPrescriptionLines.Adapt<List<PrescriptionDto>>();
             if (Pharmacy.Id == 0)
@@ -1536,7 +1538,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private string? Concoction_Name { get; set; }
         List<ConcoctionDto> Concoction_data = new List<ConcoctionDto>();
-        private async Task OnDeleteConcoction(GridDataItemDeletingEventArgs e)
+        private void OnDeleteConcoction(GridDataItemDeletingEventArgs e)
         {
             var data = SelectedDataItemsConcoction.Adapt<List<ConcoctionDto>>();
             if (Pharmacy.Id == 0)
@@ -1574,7 +1576,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private string? ConcoctionLine_Name { get; set; }
         List<ConcoctionLineDto> ConcoctionLine_Data = new List<ConcoctionLineDto>();
-        private async Task OnDeleteConcoctionLine(GridDataItemDeletingEventArgs e)
+        private void OnDeleteConcoctionLine(GridDataItemDeletingEventArgs e)
         {
             var data = SelectedDataItemsConcoctionLines.Adapt<List<ConcoctionLineDto>>();
             if (Pharmacy.Id == 0)
@@ -1613,7 +1615,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         List<StockOutPrescriptionDto> StockOut_data = new List<StockOutPrescriptionDto>();
         private string? StockCutLines_Name { get; set; }
         List<StockOutLinesDto> StockOutLines_data = new List<StockOutLinesDto>();
-        private async Task OnDeleteStockCutPrescription(GridDataItemDeletingEventArgs e)
+        private  void OnDeleteStockCutPrescription(GridDataItemDeletingEventArgs e)
         {
             var data = SelectedDataItemsStockOut.Adapt<List<StockOutPrescriptionDto>>();
             if (Pharmacy.Id == 0)
@@ -1648,7 +1650,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        private async Task OnDeleteStockCutLines(GridDataItemDeletingEventArgs e)
+        private void OnDeleteStockCutLines(GridDataItemDeletingEventArgs e)
         {
             var data = SelectedDataItemsStockOut.Adapt<List<StockOutLinesDto>>();
             if (Pharmacy.Id == 0)

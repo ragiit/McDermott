@@ -1131,13 +1131,13 @@ else
          HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center" ShowCloseButton = "true" Closed="cancelCutStockLines"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
 <div class="card">
-    <div class="card-body">
     <DxLoadingPanel @bind-Visible="PanelVisible"
                     IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                     IsContentBlocked="true"
                     ApplyBackgroundShading="true"
                     IndicatorAreaVisible="false"
                     Text="Fetching Data...">
+    <div class="card-body">
         <DxGrid @ref="GridStockOutLines"
                 PagerNavigationMode="PagerNavigationMode.InputBox"
                 Data="StockOutLines"
@@ -1199,7 +1199,7 @@ else
                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                 Data="@Batch"
                                                 NullText="Select Batch..."
-                                                @bind-Value="@FormStockOutLines.TransactionStockId"
+                                                @bind-Value="@FormStockOutLines.Batch"
                                                 SelectedItemChanged="@((string value)=> ChangeOutStockLines(value))"
                                                 >
                                        
@@ -1236,7 +1236,7 @@ else
                 </div>
             </EditFormTemplate>
         </DxGrid>
-    </DxLoadingPanel>
+    
     </div>
     <div class="card-footer"> 
          @if (NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received)
@@ -1247,7 +1247,8 @@ else
                 </div>
             </div>
         }
-    </div
+    </div>
+    </DxLoadingPanel>
     </div>
 </DxPopup>
  
