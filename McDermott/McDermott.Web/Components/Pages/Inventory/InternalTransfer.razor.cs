@@ -263,7 +263,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                     var firstStockProduct = stockProducts.Where(x => x.Batch == TempFormInternalTransfer.Batch);
 
-                    UpdateFormProductDetail(firstStockProduct.FirstOrDefault() ?? new(), firstStockProduct.Sum(x => x.Quantity));
+                    UpdateFormProductDetail(firstStockProduct.FirstOrDefault() ?? new(), firstStockProduct.Sum(x => x.Quantity), e);
                 }
                 else
                 {
@@ -271,7 +271,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                     var firstStockProduct = stockProducts.FirstOrDefault();
                     TempFormInternalTransfer.TransactionStockId = firstStockProduct?.Id ?? null;
-                    UpdateFormProductDetail(firstStockProduct ?? new(), s.Sum(x => x.Quantity));
+                    UpdateFormProductDetail(firstStockProduct ?? new(), s.Sum(x => x.Quantity), e);
                 }
 
                 return;
@@ -292,11 +292,12 @@ namespace McDermott.Web.Components.Pages.Inventory
             TempFormInternalTransfer.Batch = null;
         }
 
-        private void UpdateFormProductDetail(TransactionStockDto stockProduct, long qty)
+        private void UpdateFormProductDetail(TransactionStockDto stockProduct, long qty, ProductDto items)
         {
             if (stockProduct != null)
             {
-                TempFormInternalTransfer.UomId = stockProduct.UomId;
+                TempFormInternalTransfer.UomId = items.UomId;
+                TempFormInternalTransfer.UomName = items.Uom.Name;
                 currentStocks = qty;
                 TempFormInternalTransfer.ExpiredDate = stockProduct.ExpiredDate;
             }
@@ -565,9 +566,17 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 TempFormInternalTransfer = context.SelectedDataItem.Adapt<TransferStockProductDto>();
 
-                await SelectedBatch(TempFormInternalTransfer.Batch);
+                    var prod = Products.FirstOrDefault(x => x.Id == TempFormInternalTransfer.ProductId);
+                if (prod.TraceAbility == true)
+                {
+                    await SelectedBatch(TempFormInternalTransfer.Batch);
+                }
+                else
+                {
+                    await SelectedItemByProduct(prod);
+                    
+                }
 
-                
             }
                 StateHasChanged();
         }
@@ -710,6 +719,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
+                PanelVisible = true;
                 await LoadAsyncData();
                 FormInternalTransfer = TransferStocks.Where(x => x.Id == TransferId).FirstOrDefault()!;
                 var data_TransactionStock = TransactionStocks.Where(x => x.SourceTable == nameof(TransferStock) && x.SourcTableId == TransferId).ToList();
@@ -740,6 +750,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     ToastService.ShowError("Data Is Not Found!..");
                 }
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -781,7 +792,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task DeleteItemDetail_Click()
         {
-            GridDetailTransferStock!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+            GridDetailTransferStock.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
         private async Task Refresh_Click()

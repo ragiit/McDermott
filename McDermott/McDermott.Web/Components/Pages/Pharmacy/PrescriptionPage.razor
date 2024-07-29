@@ -1140,7 +1140,7 @@ else
 
 @* PopUp Detail ConcoctionLine *@
   <DxPopup @bind-Visible="@isDetailLines" HeaderCssClass="fw-bold" HeaderText="Input Detail Stock "
-         HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center" ShowCloseButton = "true" Closed="cancelCutStock"
+         HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center" ShowCloseButton = "true" Closed="cancelCutStockLines"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" CloseOnOutsideClick="false" Width="auto">
 <div class="card">
     <div class="card-body">
@@ -1169,7 +1169,7 @@ else
                 PagerSwitchToInputBoxButtonCount="10"
                 FocusedRowEnabled="true"
                 PagerVisibleNumericButtonCount="10"
-                FocusedRowChanged=" GridFocusedRowVisibleIndexStockOut_FocusedRowChanged"
+                FocusedRowChanged=" GridFocusedRowVisibleIndexStockOutLines_FocusedRowChanged"
                 ShowGroupPanel="true"
                 AutoExpandAllGroupRows="true"
                 ShowFilterRow="true"

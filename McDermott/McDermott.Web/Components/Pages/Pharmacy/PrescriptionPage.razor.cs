@@ -168,6 +168,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private int FocusedRowVisibleIndexPrescriptionConcoction { get; set; }
         private int FocusedRowVisibleIndexConcoctionLines { get; set; }
         private int FocusedRowVisibleIndexStockOut { get; set; }
+        private int FocusedRowVisibleIndexStockOutLines { get; set; }
         private string header { get; set; } = string.Empty;
 
         public MarkupString GetIssueStatusIconHtml(EnumStatusPharmacy? status)
@@ -647,7 +648,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private async Task ShowCutStockLines(long LinesId)
         {
             await RefreshData();
-
+            PanelVisible = true;
             Lines_Id = LinesId;
             //Get the ConcoctionLines by ID
             var concoctionLines = ConcoctionLines.FirstOrDefault(x => x.Id == LinesId);
@@ -672,7 +673,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             // Filter stock products based on specific conditions
 
             StockOutProducts = TransactionStocks
-                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId)
+                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId && s.Quantity>0)
                     .OrderBy(x => x.ExpiredDate)
                     .GroupBy(s => s.Batch)
                     .Select(g => new TransactionStockDto
@@ -684,11 +685,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         LocationId = Pharmacy.PrescriptionLocationId
                     }).ToList();
 
-            //StockOutProducts = TransactionStocks
-            //    .Where(x => x.ProductId == concoctionLines.ProductId && x.LocationId == Pharmacy.PrescriptionLocationId && x.Quantity != 0)
-            //    .OrderBy(x => x.ExpiredDate)
-            //    .ToList();
-
+           
             // Fetch stock out prescription data
             var listDataStockCut = await Mediator.Send(new GetStockOutLineQuery());
 
@@ -736,13 +733,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     // Updating batch and expired values from StockOutProducts
                     foreach (var stock in dataStock)
                     {
+                        var qtys = StockOutProducts.Sum(x => x.Quantity);
                         var stockProduct = TransactionStocks.FirstOrDefault(x => x.Id == stock.TransactionStockId);
                         if (stockProduct != null)
                         {
                             stock.TransactionStockId = stockProduct.Id;
                             stock.Batch = stockProduct.Batch;
                             stock.ExpiredDate = stockProduct.ExpiredDate;
-                            stock.CurrentStock = stockProduct.Quantity;
+                            stock.CurrentStock = qtys;
                         }
                     }
                     StockOutLines = dataStock;
@@ -760,7 +758,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                     foreach (var item in StockOutProducts)
                     {
-                        if (currentStockInput >= ConcoctionLine.TotalQty) break;
+                        if (currentStockInput >= concoctionLines.TotalQty) break;
 
                         var newStockOutLines = new StockOutLinesDto
                         {
@@ -793,21 +791,29 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     // Updating batch and expired values from StockOutProducts
                     foreach (var stock in dataStock)
                     {
+                        var qtys = StockOutProducts.Sum(x => x.Quantity);
                         var stockProduct = StockOutProducts.FirstOrDefault(x => x.Id == stock.TransactionStockId);
                         if (stockProduct != null)
                         {
-                            stock.CurrentStock = stockProduct.Quantity;
+                            stock.CurrentStock = qtys;
                         }
                     }
                     StockOutLines = dataStock;
                 }
             }
-
+            PanelVisible = false;
         }
         private async Task cancelCutStock()
         {
             isDetailPrescription = false;
             await EditItemPharmacy_Click(Pharmacy);
+            StateHasChanged();
+        }
+        private async Task cancelCutStockLines()
+        {
+            isDetailLines = false;
+            await EditItemPharmacy_Click(Pharmacy);
+            StateHasChanged();
         }
         private async Task ShowCutStock(long prescriptionId)
         {
@@ -840,7 +846,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             // Filter stock products based on specific conditions
             StockOutProducts = TransactionStocks
-                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId)
+                    .Where(s => s.ProductId == product.Id && s.LocationId == Pharmacy.PrescriptionLocationId && s.Quantity>0)
                     .OrderBy(x => x.ExpiredDate)
                     .GroupBy(s => s.Batch)
                     .Select(g => new TransactionStockDto
@@ -906,13 +912,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     // Updating batch and expired values from StockOutProducts
                     foreach (var stock in dataStock)
                     {
+                        var qtys = StockOutProducts.Sum(x => x.Quantity);
                         var stockProduct = TransactionStocks.FirstOrDefault(x => x.Id == stock.TransactionStockId);
                         if (stockProduct != null)
                         {
                             stock.TransactionStockId = stockProduct.Id;
                             stock.Batch = stockProduct.Batch;
                             stock.ExpiredDate = stockProduct.ExpiredDate;
-                            stock.CurrentStock = stockProduct.Quantity;
+                            stock.CurrentStock = qtys;
                         }
                     }
                     StockOutPrescriptions = dataStock;
@@ -962,10 +969,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     // Updating batch and expired values from StockOutProducts
                     foreach (var stock in dataStock)
                     {
+                        var qtys = StockOutProducts.Sum(x => x.Quantity);
                         var stockProduct = TransactionStocks.FirstOrDefault(x => x.Id == stock.TransactionStockId);
                         if (stockProduct != null)
                         {
-                            stock.CurrentStock = stockProduct.Quantity;
+                            stock.CurrentStock = qtys;
                         }
                     }
                     StockOutPrescriptions = dataStock;
@@ -2298,7 +2306,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItemStockOutLines_Click(IGrid context)
         {
-            await GridStockOutLines.StartEditRowAsync(FocusedRowVisibleIndexStockOut);
+            await GridStockOutLines.StartEditRowAsync(FocusedRowVisibleIndexStockOutLines);
         }
         #endregion function Edit Click
 
@@ -2562,7 +2570,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         }
         private void DeleteItemStockOutLines_Click()
         {
-            GridStockOutLines.ShowRowDeleteConfirmation(FocusedRowVisibleIndexStockOut);
+            GridStockOutLines.ShowRowDeleteConfirmation(FocusedRowVisibleIndexStockOutLines);
         }
 
         private void DeleteItemPrescriptionLines_Click()
@@ -2690,6 +2698,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private void GridFocusedRowVisibleIndexStockOut_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndexStockOut = args.VisibleIndex;
+        }
+        private void GridFocusedRowVisibleIndexStockOutLines_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndexStockOutLines = args.VisibleIndex;
         }
 
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)

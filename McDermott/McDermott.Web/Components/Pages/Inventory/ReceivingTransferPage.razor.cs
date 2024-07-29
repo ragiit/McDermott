@@ -405,6 +405,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 var product = Products.FirstOrDefault(x => x.Id == item.ProductId);
                 item.UomName = Uoms.FirstOrDefault(u => u.Id == product?.UomId)?.Name;
+                item.PurchaseName = Uoms.FirstOrDefault(u => u.Id == product?.PurchaseUomId)?.Name;
 
                 var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == item.ProductId && s.LocationId == sourceLocationId && s.SourceTable == nameof(TransferStock)));
                 var stockProduct = stockProducts.FirstOrDefault();
