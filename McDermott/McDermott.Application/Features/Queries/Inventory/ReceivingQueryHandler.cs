@@ -146,7 +146,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetReceivingStockProductQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetReceivingStockProductQuery_"); // Ganti dengan key yang sesuai 
 
                 return result.Adapt<ReceivingStockProductDto>();
             }
@@ -267,6 +267,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetReceivingStockDetailQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetReceivingStockProductQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<ReceivingStockProductDto>();
             }
