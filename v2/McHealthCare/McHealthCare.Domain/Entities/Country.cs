@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace McHealthCare.Domain.Entities
 {
-    public class Country : BaseAuditableEntity, INotifiable
+    public class Country : BaseAuditableEntity 
     {
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
@@ -13,11 +13,6 @@ namespace McHealthCare.Domain.Entities
         [StringLength(5)]
         public string Code { get; set; } = string.Empty;
 
-        public virtual List<Province>? Provinces { get; set; }
-
-        [NotMapped]
-        public string Type => "Country";
-        [NotMapped]
-        public object Data => this;
+        public virtual List<Province>? Provinces { get; set; } 
     }
 }

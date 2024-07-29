@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace McHealthCare.Domain.Entities
 {
-    public partial class City : BaseAuditableEntity, INotifiable
+    public partial class City : BaseAuditableEntity 
     {
         public Guid ProvinceId { get; set; }
 
@@ -14,10 +14,6 @@ namespace McHealthCare.Domain.Entities
         public virtual Province? Province { get; set; }
 
         public virtual List<Village>? Villages { get; set; }
-
-        [NotMapped]
-        public string Type => "City";
-        [NotMapped] 
-        public object Data => this;
+         
     }
 }
