@@ -407,7 +407,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private void ChangeTotalQtyMedicament(long value)
         {
-            if (value == null)
+            if (value == 0)
                 return;
 
             ConcoctionLine.Qty = value;
@@ -454,7 +454,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var stock = TransactionStocks
                     .Where(s => s.ProductId == checkProduct.Id && s.LocationId == Pharmacy.PrescriptionLocationId && s.Quantity != 0).Sum(x => x.Quantity);
 
-                if (stock == null || stock == 0)
+                if (stock == 0)
                 {
                     stock = 0;
                     ToastService.ClearCustomToasts();
@@ -529,7 +529,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 selectedActiveComponentPrescriptions = ActiveComponents.Where(z => checkMedicament.ActiveComponentId is not null && checkMedicament.ActiveComponentId.Contains(z.Id)).ToList();
 
                 var checkStock = TransactionStocks.Where(x => x.ProductId == value.Id && x.LocationId == Pharmacy.PrescriptionLocationId && x.Quantity != 0 && x.Validate == true).Sum(x => x.Quantity);
-                if (checkStock == null || checkStock == 0)
+                if ( checkStock == 0)
                 {
                     Prescription.Stock = 0;
                     ToastService.ShowWarning($"The {value.Name} product is out of stock, or choose another product!!");
@@ -608,7 +608,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         var temp = (newConcoctionLine.Qty / newConcoctionLine.MedicamentDosage) + (newConcoctionLine.Qty % newConcoctionLine.MedicamentDosage != 0 ? 1 : 0);
                         newConcoctionLine.TotalQty = temp * Concoction.TotalQty;
                     }
-                    if (stockProduct == null)
+                    if (stockProduct == 0)
                     {
                         newConcoctionLine.AvaliableQty = 0;
                     }
@@ -1145,7 +1145,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             if (value is not null)
             {
-                var presc = (await Mediator.Send(new GetPrescriptionQuery(x => x.Id == PrescripId))).FirstOrDefault();
+                var presc = (await Mediator.Send(new GetPrescriptionQuery(x => x.Id == PrescripId))).FirstOrDefault()!;
                 FormStockOutPrescriptions.Batch = value;
                 //current Stock
                 var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
@@ -1156,13 +1156,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 // Find the first matching product
                 var matchedProduct = stockProducts.FirstOrDefault(x =>
                     x.LocationId == Pharmacy.PrescriptionLocationId &&
-                    x.ProductId == presc.ProductId &&
+                    x.ProductId == presc?.ProductId &&
                     x.Batch == FormStockOutPrescriptions.Batch
                 );
 
 
 
-                FormStockOutPrescriptions.ExpiredDate = matchedProduct.ExpiredDate;
+                FormStockOutPrescriptions.ExpiredDate = matchedProduct?.ExpiredDate ??  new();
 
 
                 var aa = await Mediator.Send(new GetTransactionStockQuery(x => x.Validate == true && x.ProductId == presc.ProductId
@@ -1180,7 +1180,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             if (value is not null)
             {
-                var line = (await Mediator.Send(new GetConcoctionLineQuery())).FirstOrDefault();
+                var line = (await Mediator.Send(new GetConcoctionLineQuery())).FirstOrDefault() ?? new();
                 FormStockOutLines.Batch = value;
 
                 var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
@@ -1195,7 +1195,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     x.Batch == FormStockOutLines.Batch
                 );
 
-                FormStockOutLines.ExpiredDate = matchedProduct.ExpiredDate;
+                FormStockOutLines.ExpiredDate = matchedProduct?.ExpiredDate ?? new();
 
                 var aa = await Mediator.Send(new GetTransactionStockQuery(x => x.Validate == true && x.ProductId == line.ProductId
                 && x.LocationId == Pharmacy.PrescriptionLocationId && x.Batch == FormStockOutLines.Batch));
@@ -2205,9 +2205,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
             try
             {
+                PanelVisible = true;
                 onShowForm = true;
                 header = "Data Pharmacy";
-                PanelVisible = true;
                 PharmacyDto? p = null;
 
                 // Check if SelectedDataItems has at least one item

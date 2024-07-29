@@ -656,16 +656,6 @@
                                                                                                     string html = $"<span class='badge text-white bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span>";
                                                                                                 }
 
-                                                                                                @* <div class="row w-100">
-                                                                        <div class="col-md-1">
-                                                                        Patient
-                                                                        </div>
-
-                                                                        <div class="col-md-11">
-                                                                        :  @Pharmacy.Patient.Name
-
-                                                                        </div>
-                                                                        </div> *@
                                                                                                 <div class="row w-100">
                                                                                                     <div class="col-md-1">
                                                                                                         Status
@@ -677,10 +667,7 @@
                                                                                                 </div>
 
 
-                                                                                                @* Status: @((MarkupString)html) <br />
-                                                                        Type: @(item.TypeTransaction ?? "N/A") <br />
-                                                                        From: @item.Source?.Name <br />
-                                                                        To: @item.Destination?.Name <br /> *@
+                                                                                               
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
@@ -710,6 +697,7 @@
             </div>
         </section>
     </div>
+    
 }
 else
 {
