@@ -112,11 +112,11 @@
                                                         {
                                                             <DxTab Text="@EnumStatusAccident.MedicalTreatment.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.MedicalTreatment)"></DxTab>
                                                         }
-                                                        @if (Accident.Sent.Equals("Hospital"))
+                                                        @if (Accident.Sent is not null && Accident.Sent.Equals("Hospital"))
                                                         {
                                                             <DxTab Text="@EnumStatusAccident.HospitalizationReferral.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.HospitalizationReferral)"></DxTab>
                                                         }
-                                                        @if (GeneralConsultanService.Payment.Equals("BPJS"))
+                                                        @if (GeneralConsultanService.Payment is not null &&  GeneralConsultanService.Payment.Equals("BPJS"))
                                                         {
                                                             <DxTab Text="@EnumStatusAccident.PatientControlMonitoring.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.PatientControlMonitoring)"></DxTab>
                                                         }

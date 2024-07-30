@@ -9,6 +9,7 @@ namespace McHealthCare.Application.Dtos.Configuration
         public Guid Id { get; set; }
         public Guid? ParentId { get; set; }
         [StringLength(200)]
+        [Required]
         public string Name { get; set; } = string.Empty;
         public string? Icon { get; set; }
         public long Sequence { get; set; } = 0;
@@ -23,7 +24,6 @@ namespace McHealthCare.Application.Dtos.Configuration
         public Guid Id { get; set; }
         public Guid? ParentId { get; set; }
         [StringLength(200)]
-        [Required]
         public string Name { get; set; } = string.Empty;
         public string? Icon { get; set; }
         public long Sequence { get; set; } = 0;

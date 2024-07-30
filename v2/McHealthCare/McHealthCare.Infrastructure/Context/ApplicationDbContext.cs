@@ -36,6 +36,11 @@ namespace McHealthCare.Context
             {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
+
+            modelBuilder.Entity<Group>()
+                 .HasMany(m => m.GroupMenus)
+                 .WithOne(c => c.Group)
+                 .OnDelete(DeleteBehavior.Cascade);
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

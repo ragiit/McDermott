@@ -5,6 +5,7 @@ namespace McHealthCare.Domain.Entities
     // Add profile data for application users by adding properties to the ApplicationUser class
     public class ApplicationUser : IdentityUser
     {
+        public Guid? GroupId { get; set; }  
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; } 
         public DateTime? DateOfBirth { get; set; }

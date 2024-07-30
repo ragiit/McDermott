@@ -1,28 +1,38 @@
 ﻿using McHealthCare.Application.Extentions;
 using Microsoft.AspNetCore.SignalR.Client;
-using static McHealthCare.Extentions.EnumHelper;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using static McHealthCare.Application.Features.CommandsQueries.Configuration.MenuCommand;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
 {
-    public partial class CountryPage : IAsyncDisposable
+    public partial class MenuPage : IAsyncDisposable
     {
         #region Variables
 
         private bool PanelVisible { get; set; } = true;
         private HubConnection? hubConnection;
-        private List<CountryDto> Countries = [];
+        private List<MenuDto> Menus = [];
+        private List<MenuDto> ParentMenuDto = [];
 
         private List<ExportFileData> ExportFileDatas =
         [
             new()
             {
-                Column = "Code",
+                Column = "Name",
                 Notes = "Mandatory"
             },
             new()
             {
-                Column = "Name",
+                Column = "Parent"
+            },
+            new()
+            {
+                Column = "Sequence",
                 Notes = "Mandatory"
+            },
+            new()
+            {
+                Column = "URL"
             }
         ];
 
@@ -48,7 +58,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
             hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
             {
-                await LoadData(); 
+                await LoadData();
             });
 
             await hubConnection.StartAsync();
@@ -74,9 +84,9 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             try
             {
                 PanelVisible = true;
-                Countries.Clear(); 
-                Countries = await Mediator.Send(new GetCountryQuery());
-                //SelectedDataItems = [];
+                Menus = await Mediator.Send(new GetMenuQuery());
+                ParentMenuDto = Menus.Where(x => x.ParentId == Guid.Empty || x.ParentId == null).ToList();
+                SelectedDataItems = [];
                 try
                 {
                     Grid?.SelectRow(0, true);
@@ -86,7 +96,8 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
             catch (Exception ex)
             {
-                ToastService.ShowError(ex.Message);
+                var a = ex;
+                throw;
             }
         }
 
@@ -97,12 +108,12 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteCountryRequest(((CountryDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteMenuRequest(((MenuDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<CountryDto>>();
-                    await Mediator.Send(new DeleteCountryRequest(Ids: a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<MenuDto>>();
+                    await Mediator.Send(new DeleteMenuRequest(Ids: a.Select(x => x.Id).ToList()));
                 }
                 SelectedDataItems = [];
                 await LoadData();
@@ -121,15 +132,15 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             PanelVisible = true;
             try
             {
-                var editModel = (CountryDto)e.EditModel;
+                var editModel = (MenuDto)e.EditModel;
 
                 if (string.IsNullOrWhiteSpace(editModel.Name))
                     return;
 
                 if (editModel.Id == Guid.Empty)
-                    await Mediator.Send(new CreateCountryRequest(editModel));
+                    await Mediator.Send(new CreateMenuRequest(editModel));
                 else
-                    await Mediator.Send(new UpdateCountryRequest(editModel));
+                    await Mediator.Send(new UpdateMenuRequest(editModel));
 
                 await LoadData();
             }
@@ -157,30 +168,63 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Code", "Name" };
+                    var headerNames = ExportFileDatas.Select(x => x.Column).ToList();
 
-                    if (Enumerable.Range(1, ws.Dimension.End.Column)
-                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    if (ws == null)
                     {
-                        ToastService.ShowInfo("The header must match with the template.");
+                        ToastService.ShowInfo("The Excel file does not contain any worksheets.");
+                        return;
+                    }
+                      
+                    if (ws.Dimension == null || ws.Dimension.End.Row < 1)
+                    {
+                        ToastService.ShowInfo("The worksheet is empty.");
                         return;
                     }
 
-                    var countries = new List<CountryDto>();
+                    var actualHeaders = Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Select(i => ws.Cells[1, i]?.Value?.ToString()?.Trim())
+                        .ToList();
+
+                    if (actualHeaders.Count != headerNames.Count)
+                    {
+                        ToastService.ShowInfo("The number of headers does not match the template.");
+                        return;
+                    }
+
+                    var Menus = new List<MenuDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var country = new CountryDto
+                        bool IsValid = true; 
+                        var a = this.Menus.FirstOrDefault(x => x.Name == ws.Cells[row, 2].Value?.ToString()?.Trim())?.Id ?? Guid.Empty;
+
+                        if (ws.Cells[row, 2].Value?.ToString()?.Trim() is not null)
                         {
-                            Code = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
-                            Name = ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty,
+                            if (a == Guid.Empty)
+                            {
+                                ToastService.ShowErrorImport(row, 1, ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty);
+                                IsValid = false;
+                            }
+
+                        }
+
+                        if (!IsValid)
+                            continue;
+                         
+                        var Menu = new MenuDto
+                        {
+                            ParentId = a == Guid.Empty ? null : a,
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
+                            Sequence = Convert.ToInt64(ws.Cells[row, 3].Value?.ToString()?.Trim()),
+                            Url = ws.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty, 
                         };
 
-                        if (!Countries.Any(x => x.Name.Trim().ToLower() == country?.Name?.Trim().ToLower() && x.Code.Trim().ToLower() == country?.Code?.Trim().ToLower()))
-                            countries.Add(country);
+                        if (!this.Menus.Any(x => x.Name.Trim().ToLower() == Menu?.Name?.Trim().ToLower() && x.ParentId == Menu.ParentId && x.Sequence == Menu.Sequence && x.Url == Menu.Url))
+                            Menus.Add(Menu);
                     }
 
-                    await Mediator.Send(new CreateListCountryRequest(countries));
+                    await Mediator.Send(new CreateListMenuRequest(Menus));
 
                     await LoadData();
 
@@ -190,8 +234,11 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 {
                     ToastService.ShowError(ex.Message);
                 }
+                finally
+                { 
+                    PanelVisible = false;
+                }
             }
-            PanelVisible = false;
         }
 
         public async ValueTask DisposeAsync()
@@ -202,4 +249,5 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
         }
     }
+
 }

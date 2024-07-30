@@ -12,6 +12,7 @@ namespace McHealthCare.Application.Dtos.Configuration
         public Guid CountryId { get; set; }
 
         [StringLength(200)]
+        [Required]
         public string Name { get; set; } = string.Empty;
 
         [StringLength(5)]
@@ -25,7 +26,7 @@ namespace McHealthCare.Application.Dtos.Configuration
         public Guid Id { get; set; }
 
         [Required]
-        public Guid CountryId { get; set; }
+        public Guid? CountryId { get; set; }
 
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;

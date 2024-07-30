@@ -13,6 +13,8 @@ using McHealthCare.Application.Services;
 using Microsoft.AspNetCore.SignalR;
 using System.Text.Json.Serialization;
 
+DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddPersistenceLayer(builder.Configuration);
