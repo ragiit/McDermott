@@ -104,10 +104,10 @@
 
                                                         <DxButton Text="Approve Request" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Request && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Approv_Check"></DxButton>
                                                         <DxButton Text="Cancel" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Request && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
-                                                        
+
                                                         <DxButton Text="Ready" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.ApproveRequest && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Ready"></DxButton>
                                                         <DxButton Text="Cancel" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.ApproveRequest && NameUser.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
-                                                        
+
                                                         <DxButton Text="Validate" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Primary" Click="validation" IconCssClass="fa-solid fa-check"></DxButton>
                                                         <DxButton Text="Cancel" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
                                                     }
@@ -119,7 +119,7 @@
                                                         <DxButton Text="Validate" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Primary" Click="validation" IconCssClass="fa-solid fa-check"></DxButton>
                                                         <DxButton Text="Cancel" Visible="@(FormInternalTransfer.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
                                                     }
-                                                    
+
 
                                                 </div>
 
@@ -258,6 +258,17 @@
                                                             <EditFormTemplate Context="EditFormContextt">
                                                                 @{
                                                                     TempFormInternalTransfer = (TransferStockProductDto)EditFormContextt.EditModel;
+                                                                    if(TempFormInternalTransfer.Product.TraceAbility == true)
+                                                                    {
+                                                                        TempFormInternalTransfer.TraceAvability = true;
+                                                                    }else if(TempFormInternalTransfer.Product.TraceAbility == false)
+                                                                    {
+                                                                        TempFormInternalTransfer.TraceAvability= false;
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        TempFormInternalTransfer.TraceAvability = false;
+                                                                    }
                                                                 }
                                                                 <DxFormLayout CssClass="mt w-100">
                                                                     <div class="col-md-4">
@@ -273,23 +284,7 @@
                                                                                         ShowValidationIcon="true"></DxComboBox>
                                                                             <ValidationMessage For="@(()=>TempFormInternalTransfer.ProductId)"></ValidationMessage>
                                                                         </DxFormLayoutItem>
-
-                                                                        <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                            <DxComboBox ShowValidationIcon="true"
-                                                                                        Data="@Batch"
-                                                                                        NullText="Select Batch..."
-                                                                                        @bind-Value="@TempFormInternalTransfer.Batch"
-                                                                                        ReadOnly="@(TempFormInternalTransfer.TraceAvability == false && (FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft))"
-                                                                                        SelectedItemChanged="@((string value)=> SelectedBatch(value))"
-                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                        FilteringMode="@DataGridFilteringMode.Contains">
-                                                                            </DxComboBox>
-                                                                            <ValidationMessage For="@(() => TempFormInternalTransfer.Batch)" />
-                                                                        </DxFormLayoutItem>
-
-                                                                    </div>
-                                                                    <div class="col-md-4">
-                                                                        <DxFormLayoutItem Caption="Current Stock " CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                         <DxFormLayoutItem Caption="Current Stock " CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                             <DxSpinEdit @bind-Value="@currentStocks"
                                                                                         NullText="Input Stock To Be Sent..."
                                                                                         MinValue="0"
@@ -298,6 +293,18 @@
                                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                         ShowValidationIcon="true"></DxSpinEdit>
                                                                             <ValidationMessage For="@(()=>TempFormInternalTransfer.CurrentStock)"></ValidationMessage>
+                                                                        </DxFormLayoutItem>
+
+                                                                    </div>
+                                                                </DxFormLayout>
+                                                                <DxFormLayout CssClass="mt w-100">
+                                                                    <div class="col-md-4">                                                                       
+                                                                        <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                            <DxTextBox @bind-Text="@TempFormInternalTransfer.UomName"
+                                                                                       NullText="Unit Of Measure"
+                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                       ReadOnly
+                                                                                       ShowValidationIcon="true"></DxTextBox>
                                                                         </DxFormLayoutItem>
                                                                         <DxFormLayoutItem Caption="Stock Shipped" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                             <DxSpinEdit Value="TempFormInternalTransfer.QtyStock"
@@ -310,26 +317,36 @@
                                                                                         ShowValidationIcon="true"></DxSpinEdit>
                                                                             <ValidationMessage For="@(()=>TempFormInternalTransfer.QtyStock)"></ValidationMessage>
                                                                         </DxFormLayoutItem>
-
-                                                                    </div>
-                                                                    <div class="col-md-4">
-                                                                        <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                            <DxDateEdit ShowValidationIcon="true"
-                                                                                        DisplayFormat="dd MMMM yyyy"
-                                                                                        ReadOnly="@(TempFormInternalTransfer.TraceAvability == false && (FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft))" Enabled="@TempFormInternalTransfer.TraceAvability"
-                                                                                        @bind-Date="@TempFormInternalTransfer.ExpiredDate"
-                                                                                        NullText="Expired Date">
-                                                                            </DxDateEdit>
-                                                                        </DxFormLayoutItem>
-                                                                        <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                            <DxTextBox @bind-Text="@TempFormInternalTransfer.UomName"
-                                                                                       NullText="Unit Of Measure"
-                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                       ReadOnly
-                                                                                       ShowValidationIcon="true"></DxTextBox>
-                                                                        </DxFormLayoutItem>
                                                                     </div>
                                                                 </DxFormLayout>
+                                                                @if (TempFormInternalTransfer.TraceAvability == true)
+                                                                {
+                                                                    <DxFormLayout CssClass="mt w-100">
+                                                                        <div class="col-md-4">                                                                        
+                                                                            <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                <DxComboBox ShowValidationIcon="true"
+                                                                                Data="@Batch"
+                                                                                NullText="Select Batch..."
+                                                                                @bind-Value="@TempFormInternalTransfer.Batch"
+                                                                                ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
+                                                                                SelectedItemChanged="@((string value)=> SelectedBatch(value))"
+                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                FilteringMode="@DataGridFilteringMode.Contains">
+                                                                                </DxComboBox>
+                                                                                <ValidationMessage For="@(() => TempFormInternalTransfer.Batch)" />
+                                                                            </DxFormLayoutItem>
+                                                                            <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                <DxDateEdit ShowValidationIcon="true"
+                                                                                DisplayFormat="dd MMMM yyyy"
+                                                                                ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
+                                                                                @bind-Date="@TempFormInternalTransfer.ExpiredDate"
+                                                                                NullText="Expired Date">
+                                                                                </DxDateEdit>
+                                                                            </DxFormLayoutItem>
+
+                                                                        </div>
+                                                                    </DxFormLayout>
+                                                                }
                                                                 <DxFormLayoutItem ColSpanMd="12">
                                                                     <DxButton Enabled="@ActiveButton" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Confirm" SubmitFormOnClick="true"></DxButton>
                                                                     <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(()=>GridDetailTransferStock.CancelEditAsync())"></DxButton>
