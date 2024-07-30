@@ -20,6 +20,9 @@ namespace McHealthCare.Context
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Patient> Patients { get; set; }
+        public DbSet<Menu> Menus { get; set; }
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<GroupMenu> GroupMenus { get; set; }
 
         #endregion Configuration
 

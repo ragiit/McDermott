@@ -49,40 +49,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
             {
                 await LoadData(); 
-                await InvokeAsync(StateHasChanged);
             });
-
-
-            //hubConnection.On<string, CountryDto>("ReceiveCreateNotification", (type, country) =>
-            //{
-            //    if (type == "Country")
-            //    {
-            //        Countries.Add(country);
-            //        InvokeAsync(StateHasChanged);
-            //    }
-            //});
-
-            //hubConnection.On<string, CountryDto>("ReceiveUpdateNotification", (type, country) =>
-            //{
-            //    if (type == "Country")
-            //    {
-            //        var index = Countries.FindIndex(c => c.Id == country.Id);
-            //        if (index >= 0)
-            //        {
-            //            Countries[index] = country;
-            //            InvokeAsync(StateHasChanged);
-            //        }
-            //    }
-            //});
-
-            //hubConnection.On<string, CountryDto>("ReceiveDeleteNotification", (type, country) =>
-            //{
-            //    if (type == "Country")
-            //    {
-            //        Countries.RemoveAll(c => c.Id == country.Id);
-            //        InvokeAsync(StateHasChanged);
-            //    }
-            //});
 
             await hubConnection.StartAsync();
 

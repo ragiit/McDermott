@@ -1,13 +1,16 @@
 ﻿using Mapster;
 using McHealthCare.Application.Dtos.Configuration;
+using McHealthCare.Application.Extentions;
 using McHealthCare.Application.Interfaces;
 using McHealthCare.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.Linq.Expressions;
 using System.Threading;
-using static McHealthCare.Application.Features.CommandsQueries.Configuration.ProvinceCommand;
+using static McHealthCare.Application.Features.CommandsQueries.Configuration.ProvinceCommand; 
+using static McHealthCare.Extentions.EnumHelper;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 {
@@ -21,7 +24,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         public sealed record DeleteProvinceRequest(Guid? Id = null, List<Guid>? Ids = null) : IRequest<bool>;
     }
 
-    public sealed class ProvinceQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache) :
+    public sealed class ProvinceQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService) :
         IRequestHandler<GetProvinceQuery, List<ProvinceDto>>,
         IRequestHandler<CreateProvinceRequest, ProvinceDto>,
         IRequestHandler<CreateListProvinceRequest, List<ProvinceDto>>,
@@ -30,6 +33,8 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         IRequestHandler<DeleteProvinceRequest, bool>
     {
 
+        private string CacheKey = "GetProvinceQuery_";
+
         private async Task<(ProvinceDto, List<ProvinceDto>)> Result(Province? result = null, List<Province>? results = null, bool ReturnNewData = false, CancellationToken cancellationToken = default)
         {
             if (result is not null)
@@ -37,23 +42,18 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                 if (!ReturnNewData)
                     return (result.Adapt<ProvinceDto>(), []);
                 else
-                    return ((await unitOfWork.Repository<Province>()
-                        .Entities
+                    return ((await unitOfWork.Repository<Province>().Entities
                         .Include(x => x.Country)
-                        .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken))
-                        .Adapt<ProvinceDto>(), []);
+                        .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<ProvinceDto>(), []);
             }
             else if (results is not null)
             {
                 if (!ReturnNewData)
                     return (new(), results.Adapt<List<ProvinceDto>>());
                 else
-                    return (new(), (await unitOfWork.Repository<Province>()
-                        .Entities
+                    return (new(), (await unitOfWork.Repository<Province>().Entities
                         .Include(x => x.Country)
-                        .FirstOrDefaultAsync(x => results.Select(z => z.Id)
-                        .Contains(x.Id), cancellationToken: cancellationToken))
-                        .Adapt<List<ProvinceDto>>());
+                        .FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<ProvinceDto>>());
             }
 
             return (new(), []);
@@ -63,18 +63,17 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
         public async Task<List<ProvinceDto>> Handle(GetProvinceQuery request, CancellationToken cancellationToken)
         {
-            string cacheKey = $"GetProvinceQuery_";
             if (request.RemoveCache)
-                cache.Remove(cacheKey);
+                cache.Remove(CacheKey);
 
-            if (!cache.TryGetValue(cacheKey, out List<Province>? result))
+            List<Province> result = [];
+
+            if (!cache.TryGetValue(CacheKey, out result))
             {
                 result = await unitOfWork.Repository<Province>().Entities
-                    .AsNoTracking()
-                    .Include(x => x.Country)
-                    .ToListAsync(cancellationToken);
-
-                cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                        .Include(x => x.Country)
+                        .ToListAsync(cancellationToken);
+                cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }
 
             if (request.Predicate is not null)
@@ -92,7 +91,13 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             var req = request.ProvinceDto.Adapt<CreateUpdateProvinceDto>();
             var result = await unitOfWork.Repository<Province>().AddAsync(req.Adapt<Province>());
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            cache.Remove("GetProvinceQuery_");
+            cache.Remove(CacheKey);
+
+            await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
+            {
+                Type = EnumTypeReceiveData.Create,
+                Data = result
+            });
 
             return (await Result(result: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item1;
         }
@@ -102,7 +107,13 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             var req = request.ProvinceDtos.Adapt<List<CreateUpdateProvinceDto>>();
             var result = await unitOfWork.Repository<Province>().AddAsync(req.Adapt<List<Province>>());
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            cache.Remove("GetProvinceQuery_");
+            cache.Remove(CacheKey);
+
+            await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
+            {
+                Type = EnumTypeReceiveData.Create,
+                Data = result
+            });
 
             return (await Result(results: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item2;
         }
@@ -116,7 +127,14 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             var req = request.ProvinceDto.Adapt<CreateUpdateProvinceDto>();
             var result = await unitOfWork.Repository<Province>().UpdateAsync(req.Adapt<Province>());
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            cache.Remove("GetProvinceQuery_");
+
+            await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
+            {
+                Type = EnumTypeReceiveData.Update,
+                Data = result
+            });
+
+            cache.Remove(CacheKey);
 
             return (await Result(result: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item1;
 
@@ -127,7 +145,14 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             var req = request.ProvinceDtos.Adapt<CreateUpdateProvinceDto>();
             var result = await unitOfWork.Repository<Province>().UpdateAsync(req.Adapt<List<Province>>());
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            cache.Remove("GetProvinceQuery_");
+            cache.Remove(CacheKey);
+
+            await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
+            {
+                Type = EnumTypeReceiveData.Update,
+                Data = result
+            });
+
 
             return (await Result(results: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item2;
         }
@@ -138,18 +163,39 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
         public async Task<bool> Handle(DeleteProvinceRequest request, CancellationToken cancellationToken)
         {
+            List<Province> deletedCountries = [];
+
             if (request.Id.HasValue)
             {
-                await unitOfWork.Repository<Province>().DeleteAsync(request.Id.GetValueOrDefault());
+                var Province = await unitOfWork.Repository<Province>().Entities.FirstOrDefaultAsync(x => x.Id == request.Id.GetValueOrDefault());
+                if (Province != null)
+                {
+                    deletedCountries.Add(Province);
+                    await unitOfWork.Repository<Province>().DeleteAsync(request.Id.GetValueOrDefault());
+                }
             }
 
             if (request.Ids?.Count > 0)
             {
+                deletedCountries.AddRange(await unitOfWork.Repository<Province>().Entities
+                    .Where(x => request.Ids.Contains(x.Id))
+                    .ToListAsync(cancellationToken));
+
                 await unitOfWork.Repository<Province>().DeleteAsync(x => request.Ids.Contains(x.Id));
             }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
-            cache.Remove("GetProvinceQuery_");
+            cache.Remove(CacheKey);
+
+            if (deletedCountries.Count > 0)
+            {
+                await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
+                {
+                    Type = EnumTypeReceiveData.Delete,
+                    Data = deletedCountries,
+                });
+            }
+
             return true;
         }
 
