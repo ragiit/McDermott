@@ -1,0 +1,26 @@
+﻿  #region Default Variables 
+        private IGrid Grid { get; set; }
+        private bool PanelVisible { get; set; }
+        private int FocusedRowVisibleIndex { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+
+        #endregion
+
+        #region Default Methods
+        private async Task LoadData()
+        {
+
+        }
+        private async Task OnSave()
+        {
+
+        }
+        private async Task OnDelete()
+        {
+
+        }
+        #endregion
+
+        #region Variables
+        private List<GroupDto> Groups { get; set; }
+        #endregion

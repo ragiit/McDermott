@@ -22,16 +22,7 @@ namespace McHealthCare.Persistence.Repositories
         public async Task<T> AddAsync(T entity)
         {
             try
-            {
-                // Ambil properti dengan SetToNullAttribute dari cache
-                var propertiesToSetToNull = PropertyCacheHelper.GetSetToNullProperties<T>();
-
-                // Gunakan loop foreach untuk mengatur nilai properti menjadi null
-                foreach (var property in propertiesToSetToNull)
-                {
-                    property.SetValue(entity, null);
-                }
-
+            { 
                 await _dbContext.Set<T>().AddAsync(entity);
                 return entity;
             }

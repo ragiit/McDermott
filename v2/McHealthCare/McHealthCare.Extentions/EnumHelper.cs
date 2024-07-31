@@ -19,8 +19,22 @@ namespace McHealthCare.Extentions
                             ?.GetName() ?? enumValue.ToString();
         }
 
-        public enum EnumTypeReceiveData
+        public enum EnumPageMode
         {
+
+            [Display(Name = "new")]
+            Create = 1,
+
+            [Display(Name = "edit")]
+            Update = 2,
+
+            [Display(Name = "delete")]
+            Delete = 3,
+        }
+
+        public enum EnumTypeReceiveData
+        { 
+
             [Display(Name = "Create")]
             Create = 1,
 

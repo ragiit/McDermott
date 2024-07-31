@@ -1,4 +1,6 @@
 ﻿@page "/config/countries"
+@inject IToastService toastService
+
 
 <PageTitle>McHealthCare - Countries</PageTitle>
 
@@ -52,11 +54,11 @@
                                 }
                                 <DxFormLayout CssClass="w-100">
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                        <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                        <MyTextBox @bind-Text="@a.Name" NullText="Name" />
                                         <ValidationMessage For="@(()=> a.Name)"   />
                                     </DxFormLayoutItem>
                                     <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Code" ColSpanMd="12">
-                                        <DxTextBox @bind-Text="@a.Code" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Code" />
+                                        <MyTextBox @bind-Text="@a.Code" NullText="Code" />
                                         <ValidationMessage For="@(()=> a.Code)"   />
                                     </DxFormLayoutItem>
                                 </DxFormLayout>

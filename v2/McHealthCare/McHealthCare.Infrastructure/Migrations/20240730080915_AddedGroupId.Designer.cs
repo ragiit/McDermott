@@ -4,6 +4,7 @@ using McHealthCare.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McHealthCare.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240730080915_AddedGroupId")]
+    partial class AddedGroupId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -587,9 +590,9 @@ namespace McHealthCare.Persistence.Migrations
             modelBuilder.Entity("McHealthCare.Domain.Entities.GroupMenu", b =>
                 {
                     b.HasOne("McHealthCare.Domain.Entities.Group", "Group")
-                        .WithMany("GroupMenus")
+                        .WithMany()
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("McHealthCare.Domain.Entities.Menu", "Menu")
@@ -722,11 +725,6 @@ namespace McHealthCare.Persistence.Migrations
             modelBuilder.Entity("McHealthCare.Domain.Entities.Country", b =>
                 {
                     b.Navigation("Provinces");
-                });
-
-            modelBuilder.Entity("McHealthCare.Domain.Entities.Group", b =>
-                {
-                    b.Navigation("GroupMenus");
                 });
 #pragma warning restore 612, 618
         }
