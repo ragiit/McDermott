@@ -12,6 +12,8 @@ using Blazored.Toast;
 using McHealthCare.Application.Services;
 using Microsoft.AspNetCore.SignalR;
 using System.Text.Json.Serialization;
+using McHealthCare.Domain.Entities.Medical;
+using System;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -48,8 +50,16 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddSignInManager()
-    .AddDefaultTokenProviders();
+.AddSignInManager()
+.AddDefaultTokenProviders();
+
+//builder.Services.AddScoped<SignInManager<IdentityUser>>();
+
+//builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => {
+//    options.SignIn.RequireConfirmedAccount = false;
+//})
+//      .AddEntityFrameworkStores<ApplicationDbContext>()
+//      .AddDefaultTokenProviders();
 
 builder.Services.AddMemoryCache();
 

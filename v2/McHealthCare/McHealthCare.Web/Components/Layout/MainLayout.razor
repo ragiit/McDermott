@@ -1,8 +1,12 @@
 ﻿@using Blazored.Toast
-@using Blazored.Toast.Configuration 
+@using Blazored.Toast.Configuration
+@using McHealthCare.Domain.Entities
+@using Microsoft.AspNetCore.Antiforgery
 @using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
+@using System.Reflection.Metadata
 @inject NavigationManager NavigationManager
+@inject SignInManager<ApplicationUser> SignInManager
+
 @inherits LayoutComponentBase
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 
@@ -278,7 +282,26 @@
                             <li><a href="#"><i data-feather="mail"></i><span>Inbox</span></a></li>
                             <li><a href="#"><i data-feather="file-text"></i><span>Taskboard</span></a></li>
                             <li><a href="#"><i data-feather="settings"></i><span>Settings</span></a></li>
-                            <li><a @onclick="OnLogout"><i data-feather="log-out"> </i><span>Log out</span></a></li>
+                            <li>
+                                <form action="Account/Logout" method="post" style="display: inline;">
+                                   <AntiforgeryToken/>
+                                    <input type="hidden" name="ReturnUrl" value="" />
+                                    <button type="submit" class="nav-link" style="background: none; border: none; padding: 0; cursor: pointer;">
+                                        <a><i data-feather="log-out"></i><span>Log Out</span></a>
+                                    </button>
+                                </form>
+                            </li>
+
+                            @*  <li>
+                            <a>
+                            <i data-feather="log-out"></i>
+                            <span>Log out</span>
+                            </a>
+                            <form action="Account/Logout" method="post">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="ReturnUrl" value="/" />
+                            </form>
+                            </li> *@
                         </ul>
                     </li>
                 </ul>
@@ -360,7 +383,7 @@
                                 <i class="fa fa-thumb-tack"></i>
                                 <NavLink class="sidebar-link sidebar-title" Match="NavLinkMatch.All"
                                          href="/helloworld">
-                                    
+
                                     <svg class="fill-icon">
                                         <use href="assets/svg/icon-sprite.svg#fill-home"></use>
                                     </svg><span>Hello World</span>
@@ -373,7 +396,7 @@
                                     <svg class="stroke-icon">
                                         <use href="assets/svg/icon-sprite.svg#stroke-home"></use>
                                     </svg>
-                                    
+
                                     <span>Country</span>
                                 </NavLink>
                             </li>
@@ -436,9 +459,5 @@
 
 @code
 {
-    private async Task OnLogout()
-    {
-        await SignInManager.SignOutAsync();
-        NavigationManager.NavigateTo("/");
-    }
+
 }
