@@ -46,6 +46,7 @@
         public string? MotherNIK { get; set; }
         public long? ReligionId { get; set; }
         public string? MobilePhone { get; set; }
+        public string? CurrentMobile { get; set; }
         public string? HomePhoneNumber { get; set; }
         public string? Npwp { get; set; }
         public string? NoBpjsKs { get; set; }

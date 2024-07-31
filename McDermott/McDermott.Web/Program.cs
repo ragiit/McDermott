@@ -34,7 +34,7 @@ builder.Services.AddHttpClient("ServerAPI", client =>
     client.BaseAddress = new Uri(builder.Configuration["ServerAPI:BaseUrl"] ?? "http://localhost:5001/");
 });
 // Add services to the container.
-builder.WebHost.UseUrls("http://*:5001");
+//builder.WebHost.UseUrls("http://*:5001");
 builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
@@ -117,9 +117,9 @@ using (var scope = app.Services.CreateScope())
     try
     {
         Log.Information("=== ===");
-        //Log.Information("=== Starting Migrate the database. ===");
-        //var context = services.GetRequiredService<ApplicationDbContext>();
-        //context.Database.Migrate();
+        Log.Information("=== Starting Migrate the database. ===");
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate();
     }
     catch (Exception ex)
     {

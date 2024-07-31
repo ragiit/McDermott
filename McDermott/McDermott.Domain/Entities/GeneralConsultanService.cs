@@ -90,6 +90,9 @@
 
         #endregion
 
+        public long? ProjectId {  get; set; }   
+        [SetToNull]
+        public virtual Project? Project { get; set; }
         [SetToNull]
         public virtual Awareness? AwarenessDto { get; set; }
         [SetToNull]

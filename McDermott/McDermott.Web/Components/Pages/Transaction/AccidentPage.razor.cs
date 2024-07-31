@@ -1,6 +1,7 @@
 ﻿using DevExpress.Blazor.RichEdit;
 using System.ComponentModel;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -502,7 +503,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private List<InsurancePolicyDto> InsurancePolicies { get; set; } = [];
         private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
-
+        private UserDto UserForm = new();
         private GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
         private List<GeneralConsultanServiceDto> GeneralConsultanServices { get; set; } = [];
 
@@ -862,6 +863,18 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     RefreshStagingText();
                 }
+
+                var usr = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
+                if (usr is not null)
+                {
+                    if (usr.CurrentMobile != UserForm.CurrentMobile)
+                    {
+                        usr.CurrentMobile = UserForm.CurrentMobile;
+                        await Mediator.Send(new UpdateUserRequest(usr));
+                        Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true && x.IsPatient == true));
+                        Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -986,6 +999,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             SelectedDepartment = e.Department?.Name ?? "-";
             supName = e.Supervisor?.Name ?? "-";
 
+            UserForm = Employees.FirstOrDefault(x => x.Id == e.Id) ?? new();
             GeneralConsultanService.Patient = Employees.FirstOrDefault(x => x.Id == e.Id) ?? new();
 
             await OnChangeInsuracePolicies(e, GeneralConsultanService.Payment);
@@ -1026,6 +1040,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
             Awareness = await Mediator.Send(new GetAwarenessQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());
+            Projects = await Mediator.Send(new GetProjectQuery());
         }
 
         private async Task OnValidSubmitSave()
@@ -1052,9 +1067,25 @@ namespace McDermott.Web.Components.Pages.Transaction
                 //Accident.Employee = Employees.FirstOrDefault(x => x.Id == General);
                 //Accident.Department = Departments.FirstOrDefault(x => x.Id == Accident.DepartmentId);
 
+
+
                 GeneralConsultanService.Patient = Employees.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId);
 
                 RefreshStagingText();
+
+
+                var usr = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
+                if (usr is not null)
+                {
+                    if (usr.CurrentMobile != UserForm.CurrentMobile)
+                    {
+                        usr.CurrentMobile = UserForm.CurrentMobile;
+                        await Mediator.Send(new UpdateUserRequest(usr));
+                        Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true && x.IsPatient == true));
+                        Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
+                    }
+                }
+
 
                 ToastService.ClearInfoToasts();
                 ToastService.ShowSuccess("Saved Successfully");
@@ -1191,6 +1222,67 @@ namespace McDermott.Web.Components.Pages.Transaction
         [SupplyParameterFromQuery]
         public long Id { get; set; }
 
+        private List<ProjectDto> Projects { get; set; } = [];
+        private List<string> InformationFrom =
+        [
+            "Auto Anamnesa",
+            "Allo Anamnesa"
+        ]; private List<string> HumptyDumpty =
+ [
+     "Risiko rendah 0-6",
+     "Risiko sedang 7-11",
+     "Risiko Tinggi >= 12"
+ ];
+        private List<string> Geriati =
+       [
+           "Risiko rendah 0-3",
+       "Risiko Tinggi >= 4"
+       ];
+
+        private List<string> RiskOfFalling =
+        [
+            "Humpty Dumpty",
+            "Morse",
+            "Geriatri",
+        ]; 
+        private List<string> Morse =
+        [
+            "Risiko rendah 0-24",
+            "Risiko sedang 25-44",
+            "Risiko Tinggi >= 45"
+        ]; 
+         
+        private void OnSelectRiskOfFalling(string e)
+        {
+            RiskOfFallingDetail.Clear();
+            GeneralConsultanService.RiskOfFallingDetail = null;
+            if (e is null)
+            {
+                return;
+            }
+
+            if (e == "Humpty Dumpty")
+            {
+                RiskOfFallingDetail = HumptyDumpty.ToList();
+            }
+            else if (e == "Morse")
+            {
+                RiskOfFallingDetail = Morse.ToList();
+            }
+            else
+            {
+                RiskOfFallingDetail = Geriati.ToList();
+
+            }
+        }
+        private List<string> Colors = new List<string>
+        {
+            "Red",
+            "Yellow",
+            "Green",
+            "Black",
+        };
+        private List<string> RiskOfFallingDetail = [];
         private async Task EditItem_Click()
         {
             ShowForm = true;
@@ -1199,6 +1291,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             try
             {
                 GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>().Id))).FirstOrDefault() ?? new();
+                UserForm = GeneralConsultanService.Patient ?? new();
                 //NavigationManager.NavigateTo($"clinic-service/accident?id={GeneralConsultanService.Id}");
                 //Id = GeneralConsultanService.Id;
                 await LoadSelectedData();

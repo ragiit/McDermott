@@ -56,6 +56,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private bool IsReferTo { get; set; } = false;
         private bool IsLoadingFollowUp { get; set; } = false;
         private InsurancePolicyDto SelectedInsurancePolicyFollowUp { get; set; } = new();
+        private UserDto UserForm { get; set; } = new();
         private GeneralConsultanServiceDto FollowUpGeneralConsultanService { get; set; } = new();
         private List<InsurancePolicyDto> FollowUpInsurancePolicies { get; set; } = [];
 
@@ -277,6 +278,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 return;
             }
 
+            UserForm = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
             GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
         }
 
@@ -874,6 +876,18 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
 
                 await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+
+                var usr = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
+                if (usr is not null)
+                {
+                    if (usr.CurrentMobile != UserForm.CurrentMobile)
+                    {
+                        usr.CurrentMobile = UserForm.CurrentMobile;
+                        await Mediator.Send(new UpdateUserRequest(usr));
+                        //Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true && x.IsPatient == true));
+                        Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
+                    }
+                }
             }
             catch (Exception Ex)
             {
@@ -926,6 +940,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             try
             {
                 GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>().Id))).FirstOrDefault() ?? new();
+                UserForm = GeneralConsultanService.Patient ?? new();
                 Physicions = (await Mediator.Send(new GetUserQuery(x => x.DoctorServiceIds != null && x.DoctorServiceIds.Contains(GeneralConsultanService.ServiceId.GetValueOrDefault()))));
                 GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId) ?? new();
                 if (GeneralConsultanService is not null)
@@ -1337,6 +1352,20 @@ namespace McDermott.Web.Components.Pages.Transaction
                         await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
 
                     GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId) ?? new();
+
+
+                    var usr = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
+                    if (usr is not null)
+                    {
+                        if (usr.CurrentMobile != UserForm.CurrentMobile)
+                        {
+                            usr.CurrentMobile = UserForm.CurrentMobile;
+                            await Mediator.Send(new UpdateUserRequest(usr));
+                            Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
+                            Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
+                        }
+                    }
+
 
                     ToastService.ClearSuccessToasts();
                     ToastService.ShowSuccess("Saved Successfully");

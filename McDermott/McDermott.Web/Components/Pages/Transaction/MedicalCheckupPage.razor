@@ -231,6 +231,15 @@
                                                         <DxTextBox @bind-Text="(GeneralConsultanService.Patient.NoId)" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
                                                     </DxFormLayoutItem>
 
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Current Mobile" ColSpanMd="12">
+                                                        <DxMaskedInput @bind-Value="@UserForm.CurrentMobile"
+                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                       NullText="Current Mobile" 
+                                                                       ShowValidationIcon="true">
+                                                        </DxMaskedInput>
+                                                        <ValidationMessage For="@(() => UserForm.MobilePhone)"   />
+                                                    </DxFormLayoutItem>
+
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
                                                         <Template>
                                                             <DxGridLayout>

@@ -8,6 +8,7 @@ using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 using MediatR;
 using DevExpress.Blazor.RichEdit;
 using static McDermott.Web.Components.Pages.Transaction.ProcedureRoomPage;
+using Microsoft.AspNetCore.HttpLogging;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -73,6 +74,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<UserDto> Users = [];
         public byte[]? DocumentContent;
         private SickLeaveDto SickLeaves = new();
+        private UserDto UserForm = new();
         private bool isPrint { get; set; } = false;
 
         private void OnSelectRiskOfFalling(string e)
@@ -1175,6 +1177,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
             GeneralConsultanService.PatientId = e.Id;
+            UserForm = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
 
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && GeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
 
@@ -1612,6 +1615,22 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicy == null || SelectedInsurancePolicy.Id == 0 ? null : SelectedInsurancePolicy.Id;
 
+                if(IsStatus(EnumStatusGeneralConsultantService.Planned) || IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Physician))
+                {
+                    var usr = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
+                    if (usr is not null)
+                    {
+                        if (usr.CurrentMobile != UserForm.CurrentMobile)
+                        {
+                            usr.CurrentMobile = UserForm.CurrentMobile;
+                            await Mediator.Send(new UpdateUserRequest(usr));
+                            Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
+                            Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
+                        }
+                    }
+                }
+
+
                 switch (GeneralConsultanService.Status)
                 {
                     case EnumStatusGeneralConsultantService.Planned:
@@ -1973,6 +1992,18 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicy == null || SelectedInsurancePolicy.Id == 0 ? null : SelectedInsurancePolicy.Id;
 
+                var usr = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
+                if (usr is not null)
+                {
+                    if (usr.CurrentMobile != UserForm.CurrentMobile)
+                    {
+                        usr.CurrentMobile = UserForm.CurrentMobile;
+                        await Mediator.Send(new UpdateUserRequest(usr)); 
+                        Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true)); 
+                        Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
+                    }
+                }
+
                 switch (GeneralConsultanService.Status)
                 {
                     case EnumStatusGeneralConsultantService.Planned:
@@ -2074,14 +2105,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                 ToastService.ShowSuccess("Saved Successfully!");
             }
             catch (Exception x)
-            {
-
-                IsLoading = false;
+            { 
                 x.HandleException(ToastService);
                 throw;
             }
-
-            IsLoading = false;
+            finally
+            { 
+                IsLoading = false;
+            }
         }
 
         private void HandleInvalidSubmit()
@@ -2304,7 +2335,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             try
             {
                 GeneralConsultanService = SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>();
-
+                UserForm = GeneralConsultanService.Patient ?? new();
                 //var targetUrl = NavigationManager.ToAbsoluteUri("/clinic-service/general-consultation-services");
                 //var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(targetUrl.ToString(), "id", GeneralConsultanService.Id.ToString());
                 //NavigationManager.NavigateTo(query);

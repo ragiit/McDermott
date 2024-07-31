@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240731080336_AddedProjectQury")]
+    partial class AddedProjectQury
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2336,9 +2339,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("PratitionerId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("ProjectId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("RR")
                         .HasColumnType("bigint");
 
@@ -2457,8 +2457,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("PatientId");
 
                     b.HasIndex("PratitionerId");
-
-                    b.HasIndex("ProjectId");
 
                     b.HasIndex("ServiceId");
 
@@ -6108,11 +6106,6 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("PratitionerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.Service", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId")
@@ -6129,8 +6122,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Patient");
 
                     b.Navigation("Pratitioner");
-
-                    b.Navigation("Project");
 
                     b.Navigation("Service");
                 });

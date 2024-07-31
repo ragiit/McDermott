@@ -116,7 +116,7 @@
                                                         {
                                                             <DxTab Text="@EnumStatusAccident.HospitalizationReferral.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.HospitalizationReferral)"></DxTab>
                                                         }
-                                                        @if (GeneralConsultanService.Payment is not null &&  GeneralConsultanService.Payment.Equals("BPJS"))
+                                                        @if (GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS"))
                                                         {
                                                             <DxTab Text="@EnumStatusAccident.PatientControlMonitoring.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.PatientControlMonitoring)"></DxTab>
                                                         }
@@ -158,7 +158,7 @@
                                             </div>
                                         }
 
-                                        @if (IsStatus(EnumStatusAccident.Draft))
+                                        @if (!IsStatus(EnumStatusAccident.Done))
                                         {
                                             <div class="card ">
                                                 <div class="card-body">
@@ -200,6 +200,15 @@
                                                             <MyTextBox ReadOnly
                                                                        @bind-Text="SelectedNIP"
                                                                        NullText="Employee No" />
+                                                        </DxFormLayoutItem>
+
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Current Mobile" ColSpanMd="12">
+                                                            <DxMaskedInput @bind-Value="@UserForm.CurrentMobile"
+                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                           NullText="Current Mobile"
+                                                                           ShowValidationIcon="true">
+                                                            </DxMaskedInput>
+                                                            <ValidationMessage For="@(() => UserForm.MobilePhone)"   />
                                                         </DxFormLayoutItem>
 
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Department" ColSpanMd="12">
@@ -369,7 +378,15 @@
                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                        NullText="Area Of Yard" />
                                                             <ValidationMessage For="@(() => Accident.AreaOfYard)" />
+                                                        </DxFormLayoutItem>
 
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Project" ColSpanMd="12">
+                                                            <MyDxComboBox Data="@Projects"
+                                                                          NullText="Select Project..."
+                                                                          ValueFieldName="Id"
+                                                                          TextFieldName="Name"
+                                                                          @bind-Value="@GeneralConsultanService.ProjectId">
+                                                            </MyDxComboBox>
                                                         </DxFormLayoutItem>
 
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sick Leave" ColSpanMd="12">
@@ -425,39 +442,70 @@
                                                                     <div class="row w-100">
                                                                         <div class="col-md-6">
                                                                             <DxFormLayout CssClass="w-100">
+                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Information From" ColSpanMd="12">
+                                                                                    <MyDxComboBox ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))"
+                                                                                                  Data="@InformationFrom"
+                                                                                                  NullText="Select Information From..."
+                                                                                                  @bind-Value="@GeneralConsultanService.InformationFrom">
+                                                                                    </MyDxComboBox>
+                                                                                </DxFormLayoutItem>
+
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Clinic Visit Types" ColSpanMd="12">
-                                                                                    <MyDxComboBox Data="@ClinicVisitTypes"
+                                                                                    <MyDxComboBox ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" Data="@ClinicVisitTypes"
                                                                                                   NullText="Select Clinic Visit Type..."
                                                                                                   @bind-Value="@GeneralConsultanService.ClinicVisitTypes">
                                                                                     </MyDxComboBox>
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weight" ColSpanMd="12">
-                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Weight" NullText="Weight" />
+                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.Weight" NullText="Weight" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Height" ColSpanMd="12">
-                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Height" NullText="Height" />
+                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.Height" NullText="Height" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="RR" ColSpanMd="12">
-                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.RR" NullText="RR" />
+                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.RR" NullText="RR" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="SpO2" ColSpanMd="12">
-                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.SpO2" />
+                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.SpO2" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sistole" ColSpanMd="12">
-                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Sistole" />
+                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.Sistole" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Waist Circumference" ColSpanMd="12">
-                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.WaistCircumference" />
+                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.WaistCircumference" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CssClass="mt-3" CaptionCssClass="normal-caption" Caption="Body Max Index" ColSpanMd="12">
                                                                                     <h3>@GeneralConsultanService.BMIIndexString</h3>
+                                                                                </DxFormLayoutItem>
+
+                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Scrinning Triage Scale" ColSpanMd="12">
+                                                                                    <MyDxComboBox Data="@Colors"
+                                                                                                  Context="oeee"
+                                                                                                  NullText="Scrinning Triage Scale..."
+                                                                                                  @bind-Value="@GeneralConsultanService.ScrinningTriageScale">
+                                                                                        <ItemTemplate>
+                                                                                            @{
+                                                                                                var item = oeee as string;
+                                                                                            }
+                                                                                            <div style="display: flex; align-items: center;">
+                                                                                                <div style="width: 15px; height: 15px; background-color: @(item?.ToLower()); margin-right: 10px;"></div>
+                                                                                                <span>@item</span>
+                                                                                            </div>
+                                                                                        </ItemTemplate>
+                                                                                        <EditBoxTemplate>
+                                                                                            <div style="display: flex; align-items: center;">
+                                                                                                <div style="width: 15px; height: 15px; background-color: @(GeneralConsultanService.ScrinningTriageScale?.ToLower()); margin-right: 10px;"></div>
+                                                                                                <span>@GeneralConsultanService.ScrinningTriageScale</span>
+                                                                                            </div>
+                                                                                        </EditBoxTemplate>
+                                                                                    </MyDxComboBox>
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="text-bold" BeginRow="true" Caption="GCS">
@@ -465,13 +513,13 @@
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" BeginRow="true" Caption="E" ColSpanMd="12">
-                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.E" NullText="E" />
+                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.E" NullText="E" />
                                                                                 </DxFormLayoutItem>
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="V" ColSpanMd="12">
-                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.V" NullText="V" />
+                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.V" NullText="V" />
                                                                                 </DxFormLayoutItem>
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="M" ColSpanMd="12">
-                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.M" NullText="M" />
+                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.M" NullText="M" />
                                                                                 </DxFormLayoutItem>
                                                                             </DxFormLayout>
                                                                         </div>
@@ -479,7 +527,7 @@
                                                                         <div class="col-md-6">
                                                                             <DxFormLayout CssClass="w-100">
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Awareness" ColSpanMd="12">
-                                                                                    <MyDxComboBox Data="@Awareness"
+                                                                                    <MyDxComboBox ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" Data="@Awareness"
                                                                                                   NullText="Select Awareness..."
                                                                                                   TextFieldName="NmSadar"
                                                                                                   ValueFieldName="Id"
@@ -488,10 +536,10 @@
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Temp" ColSpanMd="12">
-                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Temp" NullText="Temp" />
+                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.Temp" NullText="Temp" />
                                                                                 </DxFormLayoutItem>
 
-                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="HR" ColSpanMd="12">
+                                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="HR" ColSpanMd="12">
                                                                                     <Template>
                                                                                         <DxGridLayout>
                                                                                             <Rows>
@@ -504,7 +552,7 @@
                                                                                             <Items>
                                                                                                 <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
                                                                                                     <Template>
-                                                                                                        <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.HR" NullText="HR" />
+                                                                                                        <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.HR" NullText="HR" />
                                                                                                     </Template>
                                                                                                 </DxGridLayoutItem>
                                                                                                 <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
@@ -531,12 +579,12 @@
                                                                                             <Items>
                                                                                                 <DxGridLayoutItem Row="0" Column="0">
                                                                                                     <Template>
-                                                                                                        <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Systolic" />
+                                                                                                        <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.Systolic" />
                                                                                                     </Template>
                                                                                                 </DxGridLayoutItem>
                                                                                                 <DxGridLayoutItem Row="0" Column="2">
                                                                                                     <Template>
-                                                                                                        <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.DiastolicBP" />
+                                                                                                        <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.DiastolicBP" />
                                                                                                     </Template>
                                                                                                 </DxGridLayoutItem>
                                                                                             </Items>
@@ -545,7 +593,7 @@
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pain Scale" ColSpanMd="12">
-                                                                                    <DxSpinEdit MinValue="0" MaxValue="10" @bind-Value="@GeneralConsultanService.PainScale">
+                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" MaxValue="10" @bind-Value="@GeneralConsultanService.PainScale">
                                                                                         <Buttons>
                                                                                             <DxEditorButton IconCssClass="fa-regular fa-face-smile" Click="OnClickPainScalePopUp" />
                                                                                         </Buttons>
@@ -553,26 +601,48 @@
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diastole" ColSpanMd="12">
-                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Diastole" />
+                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.Diastole" />
                                                                                 </DxFormLayoutItem>
 
-                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Upload" ColSpanMd="12">
-                                                                                    <DxMaskedInput @bind-Value="@GeneralConsultanService.AccidentExaminationDocs"
-                                                                                                   ShowValidationIcon="true"
-                                                                                                   ReadOnly="true"
-                                                                                                   MaskMode="MaskMode.RegEx">
-                                                                                        <Buttons>
-                                                                                            <InputFile id="file" OnChange="@SelectFiles" multiple="false" style="display:none" />
-                                                                                            <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" />
-                                                                                            <DxEditorButton Click="DownloadFile" IconCssClass="fa-solid fa-download" />
+                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption=" " ColSpanMd="12">
 
-                                                                                            <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" />
-                                                                                        </Buttons>
-                                                                                    </DxMaskedInput>
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CssClass="mt-3" CaptionCssClass="normal-caption" Caption="BMI State" ColSpanMd="12">
                                                                                     <h3>@GeneralConsultanService.BMIState</h3>
+                                                                                </DxFormLayoutItem>
+
+                                                                                <DxFormLayoutItem Caption="Risk of Falling" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                                    <Template>
+                                                                                        <DxGridLayout ColumnSpacing="8px">
+                                                                                            <Rows>
+                                                                                                <DxGridLayoutRow />
+                                                                                            </Rows>
+                                                                                            <Columns>
+                                                                                                <DxGridLayoutColumn />
+                                                                                                <DxGridLayoutColumn />
+                                                                                            </Columns>
+                                                                                            <Items>
+                                                                                                <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption" ColumnSpan="1">
+                                                                                                    <Template>
+                                                                                                        <MyDxComboBox Data="@RiskOfFalling"
+                                                                                                                      NullText="Risk of Falling..."
+                                                                                                                      SelectedItemChanged="@((string e) => OnSelectRiskOfFalling(e))"
+                                                                                                                      @bind-Value="@GeneralConsultanService.RiskOfFalling">
+                                                                                                        </MyDxComboBox>
+                                                                                                    </Template>
+                                                                                                </DxGridLayoutItem>
+                                                                                                <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption" ColumnSpan="6">
+                                                                                                    <Template>
+                                                                                                        <MyDxComboBox Data="@RiskOfFallingDetail"
+                                                                                                                      NullText="@(GeneralConsultanService.RiskOfFalling)"
+                                                                                                                      @bind-Value="@GeneralConsultanService.RiskOfFallingDetail">
+                                                                                                        </MyDxComboBox>
+                                                                                                    </Template>
+                                                                                                </DxGridLayoutItem>
+                                                                                            </Items>
+                                                                                        </DxGridLayout>
+                                                                                    </Template>
                                                                                 </DxFormLayoutItem>
                                                                             </DxFormLayout>
                                                                         </div>
@@ -614,10 +684,6 @@
                                                                                         </DxMaskedInput>
                                                                                     </DxFormLayoutItem>
 
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Planning" ColSpanMd="12">
-                                                                                        <DxTextBox @bind-Text="@FormInputCPPTGeneralConsultan.Plan" NullText="Planning" />
-                                                                                    </DxFormLayoutItem>
-
                                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis" ColSpanMd="12">
                                                                                         <MyDxComboBox Data="@Diagnoses"
                                                                                                       @bind-Value="@SelectedDiagnosis"
@@ -631,6 +697,10 @@
                                                                                                                     Caption="Name" />
                                                                                             </Columns>
                                                                                         </MyDxComboBox>
+                                                                                    </DxFormLayoutItem>
+
+                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Planning" ColSpanMd="12">
+                                                                                        <DxTextBox @bind-Text="@FormInputCPPTGeneralConsultan.Plan" NullText="Planning" />
                                                                                     </DxFormLayoutItem>
 
                                                                                     @* @if (IsStatusGenSet(EnumStatusGeneralConsultantService.Physician))

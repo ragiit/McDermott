@@ -213,6 +213,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string BMIState { get; set; } = "-";
         public string ClinicVisitTypes { get; set; } = "Sick";
         public string? InformationFrom { get; set; }  
+        public long? ProjectId { get; set; }    
         public long? AwarenessId { get; set; }
         public string? IsFamilyMedicalHistory { get; set; } 
         public string? FamilyMedicalHistory { get; set; }
@@ -234,6 +235,7 @@ namespace McDermott.Application.Dtos.Transaction
         public virtual UserDto? Pratitioner { get; set; }
         public virtual ServiceDto? Service { get; set; }
         public virtual InsurancePolicyDto? InsurancePolicy { get; set; }
+        public virtual ProjectDto? Project { get; set; }    
 
         // Add this property
         [NotMapped]
