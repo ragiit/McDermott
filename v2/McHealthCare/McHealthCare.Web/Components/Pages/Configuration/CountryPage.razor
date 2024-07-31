@@ -52,7 +52,7 @@
                                 @{
                                     var a = (CountryDto)EditFormContext.EditModel;
                                 }
-                                <DxFormLayout CssClass="w-100">
+                                <DxFormLayout CssClass="w-90">
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                         <MyTextBox @bind-Text="@a.Name" NullText="Name" />
                                         <ValidationMessage For="@(()=> a.Name)"   />
