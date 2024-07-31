@@ -1,4 +1,4 @@
-﻿namespace McHealthCare.Domain.Entities
+﻿namespace McHealthCare.Domain.Entities.Configuration
 {
     public partial class Village : BaseAuditableEntity // Kelurahan
     {

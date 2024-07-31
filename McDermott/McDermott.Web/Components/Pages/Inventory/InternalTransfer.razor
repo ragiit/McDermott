@@ -233,7 +233,6 @@
                                                                 AutoExpandAllGroupRows="true"
                                                                 CssClass="ch-480"
                                                                 ShowFilterRow="true"
-                                                                RowDoubleClick="OnRowDoubleClickDetail"
                                                                 TextWrapEnabled="false"
                                                                 CustomizeElement="Grid_CustomizeElement"
                                                                 ShowSearchBox="true"
@@ -242,7 +241,7 @@
                                                             <ToolbarTemplate>
                                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                                     <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="async () => await EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransferStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="async () => await EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransferStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft || FormInternalTransfer.Status == EnumStatusInternalTransfer.Request" />
                                                                     <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransferStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
 
                                                                 </DxToolbar>
@@ -258,25 +257,26 @@
                                                             <EditFormTemplate Context="EditFormContextt">
                                                                 @{
                                                                     TempFormInternalTransfer = (TransferStockProductDto)EditFormContextt.EditModel;
-                                                                    if(TempFormInternalTransfer.Product.TraceAbility == true)
+
+                                                                    if (TempFormInternalTransfer?.Product?.TraceAbility == true)
                                                                     {
                                                                         TempFormInternalTransfer.TraceAvability = true;
-                                                                    }else if(TempFormInternalTransfer.Product.TraceAbility == false)
-                                                                    {
-                                                                        TempFormInternalTransfer.TraceAvability= false;
                                                                     }
-                                                                    else
+                                                                    else if (TempFormInternalTransfer?.Product?.TraceAbility == false)
                                                                     {
                                                                         TempFormInternalTransfer.TraceAvability = false;
                                                                     }
+                                                                   
+
                                                                 }
                                                                 <DxFormLayout CssClass="mt w-100">
-                                                                    <div class="col-md-4">
+                                                                    <div class="col-md-6">
                                                                         <DxFormLayoutItem Caption="Product Name" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                             <DxComboBox Data="@Products"
                                                                                         @bind-Value="@TempFormInternalTransfer.ProductId"
                                                                                         NullText="Select Product.."
                                                                                         TextFieldName="Name"
+                                                                                        ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
                                                                                         ValueFieldName="Id"
                                                                                         FilteringMode="@DataGridFilteringMode.Contains"
                                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -284,7 +284,9 @@
                                                                                         ShowValidationIcon="true"></DxComboBox>
                                                                             <ValidationMessage For="@(()=>TempFormInternalTransfer.ProductId)"></ValidationMessage>
                                                                         </DxFormLayoutItem>
-                                                                         <DxFormLayoutItem Caption="Current Stock " CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <DxFormLayoutItem Caption="Current Stock " CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                             <DxSpinEdit @bind-Value="@currentStocks"
                                                                                         NullText="Input Stock To Be Sent..."
                                                                                         MinValue="0"
@@ -298,7 +300,7 @@
                                                                     </div>
                                                                 </DxFormLayout>
                                                                 <DxFormLayout CssClass="mt w-100">
-                                                                    <div class="col-md-4">                                                                       
+                                                                    <div class="col-md-6">
                                                                         <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                             <DxTextBox @bind-Text="@TempFormInternalTransfer.UomName"
                                                                                        NullText="Unit Of Measure"
@@ -306,6 +308,8 @@
                                                                                        ReadOnly
                                                                                        ShowValidationIcon="true"></DxTextBox>
                                                                         </DxFormLayoutItem>
+                                                                    </div>
+                                                                    <div class="col-md-6">
                                                                         <DxFormLayoutItem Caption="Stock Shipped" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                             <DxSpinEdit Value="TempFormInternalTransfer.QtyStock"
                                                                                         ValueExpression="@(()=>TempFormInternalTransfer.QtyStock)"
@@ -319,28 +323,30 @@
                                                                         </DxFormLayoutItem>
                                                                     </div>
                                                                 </DxFormLayout>
-                                                                @if (TempFormInternalTransfer.TraceAvability == true)
+                                                                @if (TempFormInternalTransfer.TraceAvability != false)
                                                                 {
                                                                     <DxFormLayout CssClass="mt w-100">
-                                                                        <div class="col-md-4">                                                                        
+                                                                        <div class="col-md-6">
                                                                             <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                 <DxComboBox ShowValidationIcon="true"
-                                                                                Data="@Batch"
-                                                                                NullText="Select Batch..."
-                                                                                @bind-Value="@TempFormInternalTransfer.Batch"
-                                                                                ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
-                                                                                SelectedItemChanged="@((string value)=> SelectedBatch(value))"
-                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                FilteringMode="@DataGridFilteringMode.Contains">
+                                                                                            Data="@Batch"
+                                                                                            NullText="Select Batch..."
+                                                                                            @bind-Value="@TempFormInternalTransfer.Batch"
+                                                                                            ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
+                                                                                            SelectedItemChanged="@((string value)=> SelectedBatch(value))"
+                                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                            FilteringMode="@DataGridFilteringMode.Contains">
                                                                                 </DxComboBox>
                                                                                 <ValidationMessage For="@(() => TempFormInternalTransfer.Batch)" />
                                                                             </DxFormLayoutItem>
+                                                                        </div>
+                                                                        <div class="col-md-6">
                                                                             <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                 <DxDateEdit ShowValidationIcon="true"
-                                                                                DisplayFormat="dd MMMM yyyy"
-                                                                                ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
-                                                                                @bind-Date="@TempFormInternalTransfer.ExpiredDate"
-                                                                                NullText="Expired Date">
+                                                                                            DisplayFormat="dd MMMM yyyy"
+                                                                                            ReadOnly="@(FormInternalTransfer.Id != 0 && FormInternalTransfer.Status != EnumStatusInternalTransfer.Draft)"
+                                                                                            @bind-Date="@TempFormInternalTransfer.ExpiredDate"
+                                                                                            NullText="Expired Date">
                                                                                 </DxDateEdit>
                                                                             </DxFormLayoutItem>
 

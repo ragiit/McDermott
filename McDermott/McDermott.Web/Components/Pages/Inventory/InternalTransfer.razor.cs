@@ -435,6 +435,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task OnRowDoubleClickDetail(GridRowClickEventArgs e)
         {
+            
             EditItemDetail_Click(null);
         }
 
@@ -567,10 +568,13 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 TempFormInternalTransfer = context.SelectedDataItem.Adapt<TransferStockProductDto>();
 
-                    var prod = Products.FirstOrDefault(x => x.Id == TempFormInternalTransfer.ProductId);
+                
+
+                 var prod = Products.FirstOrDefault(x => x.Id == TempFormInternalTransfer.ProductId);
                 if (prod.TraceAbility == true)
                 {
                     await SelectedBatch(TempFormInternalTransfer.Batch);
+                    TempFormInternalTransfer.TraceAvability = true;
                 }
                 else
                 {

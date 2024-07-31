@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace McHealthCare.Domain.Entities
+namespace McHealthCare.Domain.Entities.Configuration
 {
     public class Patient
     {

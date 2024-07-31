@@ -2,7 +2,8 @@
 using McHealthCare.Domain.Common.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace McHealthCare.Domain.Entities
+namespace McHealthCare.Domain.Entities.Configuration
+
 {
     public partial class City : BaseAuditableEntity 
     {
