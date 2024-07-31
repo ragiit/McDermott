@@ -3,6 +3,7 @@ using McHealthCare.Application.Dtos.Configuration;
 using McHealthCare.Application.Extentions;
 using McHealthCare.Application.Interfaces;
 using McHealthCare.Domain.Entities;
+using McHealthCare.Domain.Entities.Configuration;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -10,8 +11,6 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
 using System.Threading;
-using static McHealthCare.Application.Features.CommandsQueries.Configuration.CountryCommand;
-using static McHealthCare.Extentions.EnumHelper;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 {

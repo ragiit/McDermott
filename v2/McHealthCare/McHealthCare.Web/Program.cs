@@ -84,6 +84,9 @@ app.UseStaticFiles();
 // Konfigurasi middleware lainnya
 app.UseRouting();
 
+app.UseAuthentication(); // Tambahkan jika menggunakan autentikasi
+app.UseAuthorization();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()

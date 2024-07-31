@@ -1,8 +1,2 @@
-﻿@using Microsoft.AspNetCore.Authorization
- 
-@inject NavigationManager NavigationManager
-
-@attribute [Authorize]
-
-@using Blazored.Toast
-@using Blazored.Toast.Services
+﻿@layout MainLayout
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]

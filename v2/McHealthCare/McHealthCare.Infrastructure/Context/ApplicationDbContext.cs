@@ -1,5 +1,6 @@
 using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities;
+using McHealthCare.Domain.Entities.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

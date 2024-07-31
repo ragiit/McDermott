@@ -2,6 +2,7 @@
 using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Common.Interfaces;
 using McHealthCare.Domain.Entities.Configuration;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace McHealthCare.Application.Dtos.Configuration
@@ -17,7 +18,7 @@ namespace McHealthCare.Application.Dtos.Configuration
 
         public virtual ProvinceDto? Province { get; set; }
 
-        public virtual List<VillageDto>? Villages { get; set; }
+        //public virtual List<VillageDto>? Villages { get; set; }
          
     }
 }

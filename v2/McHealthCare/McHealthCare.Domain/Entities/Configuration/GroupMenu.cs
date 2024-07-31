@@ -11,7 +11,7 @@ namespace McHealthCare.Domain.Entities
         public Guid GroupId { get; set; }
         public Guid MenuId { get; set; }
 
-        public Group Group { get; set; } = new();
-        public Menu Menu { get; set; } = new();
+        public Group? Group { get; set; } 
+        public Menu? Menu { get; set; } 
     }
 }
