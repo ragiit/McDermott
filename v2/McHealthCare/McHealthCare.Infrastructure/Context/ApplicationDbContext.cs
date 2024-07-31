@@ -1,5 +1,7 @@
 using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities;
+using McHealthCare.Domain.Entities.Configuration;
+using McHealthCare.Domain.Entities.Medical;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +27,27 @@ namespace McHealthCare.Context
         public DbSet<GroupMenu> GroupMenus { get; set; }
 
         #endregion Configuration
+        public DbSet<Building> Buildings { get; set; }
+        public DbSet<BuildingLocation> BuildingLocations { get; set; }
+        public DbSet<ChronicCategory> ChronicCategories { get; set; }
+        public DbSet<Diagnosis> Diagnosis { get; set; }
+        public DbSet<DiseaseCategory> DiseaseCategories { get; set; }
+        public DbSet<DoctorSchedule> DoctorSchedules { get; set; }
+        public DbSet<DoctorScheduleDetail> DoctorScheduleDetails { get; set; }
+        public DbSet<DoctorScheduleSlot> DoctorScheduleSlots { get; set; }
+        public DbSet<HealthCenter> HealthCenters { get; set; }
+        public DbSet<Insurance> Insurances { get; set; }
+        public DbSet<LabTest> LabTests { get; set; }
+        public DbSet<LabTestDetail> LabTestDetails { get; set; }
+        public DbSet<LabUom> LabUoms { get; set; }
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<NursingDiagnoses> NursingDiagnoses { get; set; }
+        public DbSet<Procedure> Procedures { get; set; }
+        public DbSet<SampleType> SampleTypes { get; set; }
+        public DbSet<Service> Services { get; set; }
+        public DbSet<Specialist> Specialists { get; set; }
+        #region Medical
+        #endregion
 
         #endregion DbSet
 

@@ -3,6 +3,7 @@ using McHealthCare.Application.Dtos.Configuration;
 using McHealthCare.Application.Extentions;
 using McHealthCare.Application.Interfaces;
 using McHealthCare.Domain.Entities;
+using McHealthCare.Domain.Entities.Configuration;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
