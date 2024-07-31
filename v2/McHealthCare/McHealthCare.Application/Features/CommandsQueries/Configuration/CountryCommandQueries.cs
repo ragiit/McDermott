@@ -11,8 +11,6 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
 using System.Threading;
-using static McHealthCare.Application.Features.CommandsQueries.Configuration.CountryCommand;
-using static McHealthCare.Extentions.EnumHelper;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 {

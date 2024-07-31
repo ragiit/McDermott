@@ -1,5 +1,8 @@
 ﻿@using Blazored.Toast
-@using Blazored.Toast.Configuration
+@using Blazored.Toast.Configuration 
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject NavigationManager NavigationManager
 @inherits LayoutComponentBase
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 
@@ -265,7 +268,7 @@
                             <div class="media-body">
                                 <AuthorizeView>
                                     <span>@context.User.Identity?.Name!</span>
-                                </AuthorizeView> 
+                                </AuthorizeView>
                                 @* <span>Emay Walter</span> *@
                                 <p class="mb-0">Admin <i class="middle fa fa-angle-down"></i></p>
                             </div>
@@ -275,7 +278,7 @@
                             <li><a href="#"><i data-feather="mail"></i><span>Inbox</span></a></li>
                             <li><a href="#"><i data-feather="file-text"></i><span>Taskboard</span></a></li>
                             <li><a href="#"><i data-feather="settings"></i><span>Settings</span></a></li>
-                            <li><a href="#"><i data-feather="log-in"> </i><span>Log in</span></a></li>
+                            <li><a @onclick="OnLogout"><i data-feather="log-out"> </i><span>Log out</span></a></li>
                         </ul>
                     </li>
                 </ul>
@@ -422,4 +425,13 @@
     </CloseButtonContent>
 </BlazoredToasts>
 
- <_Script/>
+<_Script />
+
+@code
+{
+    private async Task OnLogout()
+    {
+        await SignInManager.SignOutAsync();
+        NavigationManager.NavigateTo("/");
+    }
+}

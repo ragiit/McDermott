@@ -18,7 +18,7 @@ namespace McHealthCare.Application.Dtos.Configuration
 
         public virtual ProvinceDto? Province { get; set; }
 
-        public virtual List<VillageDto>? Villages { get; set; }
+        //public virtual List<VillageDto>? Villages { get; set; }
          
     }
 }
