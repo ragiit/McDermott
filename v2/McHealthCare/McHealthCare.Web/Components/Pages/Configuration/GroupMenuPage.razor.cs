@@ -38,6 +38,13 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             Menus = await Mediator.Send(new GetMenuQuery());
             PanelVisible = false;
         }
+        private async Task BackButton()
+        {
+            PanelVisible = true;
+            NavigationManager.NavigateTo(Url);
+            Groups = await Mediator.Send(new GetGroupQuery());
+            PanelVisible = false;
+        }
         private async Task LoadDataById(Guid id)
         {
             Group = (await Mediator.Send(new GetGroupQuery(x => x.Id == id))).FirstOrDefault() ?? new();
@@ -46,9 +53,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             if (Group.Id == Guid.Empty)
             {
                 NavigationManager.NavigateTo(Url);
-            }
-            else
-            {
             }
         }
         private void InitializeNew(bool isParam = false)
@@ -61,9 +65,11 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         }
         private async Task InitializeEdit()
         {
-            NavigationManager.NavigateTo(Url);
-            await LoadDataById(SelectedDataItems[0].Adapt<GroupDto>().Id);
-        } 
+            var id = SelectedDataItems[0].Adapt<GroupDto>().Id;
+            var url = $"{Url}/{EnumPageMode.Update.GetDisplayName()}/{id}";
+            NavigationManager.NavigateTo(url);
+            await LoadDataById(id);
+        }
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             PanelVisible = true;
@@ -128,17 +134,17 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             PanelVisible = true;
             try
             {
-                if (SelectedDataItems is null)
+                if (SelectedDataItemsGroupMenu is null)
                 {
                     await Mediator.Send(new DeleteGroupMenuRequest(((GroupMenuDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<GroupMenuDto>>();
+                    var a = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>();
                     await Mediator.Send(new DeleteGroupMenuRequest(Ids: a.Select(x => x.Id).ToList()));
                 }
-                SelectedDataItems = [];
-                await LoadData();
+                SelectedDataItemsGroupMenu = [];
+                await LoadDataGroupMenu();
             }
             catch (Exception ex)
             {
@@ -209,6 +215,138 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     }
                 }
             }
+        }
+
+        private List<ExportFileData> ExportFileDatasGroupMenus =
+        [
+            new()
+            {
+                Column = "Name",
+                Notes = "Mandatory"
+            }
+        ];
+        private List<ExportFileData> ExportFileDatasGroup =
+        [
+            new()
+            {
+                Column = "Name",
+                Notes = "Mandatory"
+            }
+        ];
+
+        public async Task ImportExcelFileGroupMenu(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = ExportFileDatasGroupMenus.Select(x => x.Column).ToList();
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var gg = new List<GroupMenuDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        bool IsValid = true;
+                        var aa = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                        var menuId = Menus.FirstOrDefault(x => (x.ParentId != null && x.ParentId != Guid.Empty) && x.Name == aa)?.Id ?? Guid.Empty;
+
+                        if (menuId == Guid.Empty)
+                        {
+                            ToastService.ShowErrorImport(row, 1, ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty);
+                            IsValid = false;
+                        }
+
+                        if (!IsValid)
+                            continue;
+
+                        var g = new GroupMenuDto
+                        {
+                            GroupId = Group.Id,
+                            MenuId = menuId
+                        };
+
+                        if (!GroupMenus.Any(x => x.GroupId == g.GroupId && x.MenuId == g.MenuId))
+                            gg.Add(g);
+                    }
+
+                    await Mediator.Send(new CreateListGroupMenuRequest(gg));
+
+                    await LoadDataGroupMenu();
+
+                    ToastService.ShowSuccess("Successfully Imported.");
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+            PanelVisible = false;
+        }
+        public async Task ImportExcelFileGroup(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = ExportFileDatasGroup.Select(x => x.Column).ToList();
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var gg = new List<GroupDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var g = new GroupDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty
+                        };
+
+                        if (!Groups.Any(x => x.Name.Trim().ToLower() == g?.Name?.Trim().ToLower()))
+                            gg.Add(g);
+                    }
+
+                    await Mediator.Send(new CreateListGroupRequest(gg));
+
+                    await LoadData();
+
+                    ToastService.ShowSuccess("Successfully Imported.");
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+            PanelVisible = false;
         }
 
     }

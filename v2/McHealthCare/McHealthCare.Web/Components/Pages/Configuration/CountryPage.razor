@@ -5,25 +5,26 @@
 <PageTitle>McHealthCare - Countries</PageTitle>
 
 
-    <div class="container-fluid">
-        <div class="page-title">
-            <div class="row">
-                <div class="col-6">
-                    <h4>
-                       Country
-                    </h4>
-                </div>
+<div class="container-fluid">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-6">
+                <h4>
+                    Country
+                </h4>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="card">                        
-                        <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
-                        <div class="card-body">
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card main-wrapper">
+                    <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+                    <div class="card-body">
+                        <div >
                             <DxLoadingPanel @bind-Visible="PanelVisible"
                                             IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                             IsContentBlocked="true"
@@ -81,3 +82,12 @@
             </div>
         </div>
     </div>
+</div>
+
+
+<style>
+    .main-wrapper {
+        height: 100vh;
+    }
+
+</style>
