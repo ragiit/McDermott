@@ -60,6 +60,7 @@ namespace McDermott.Application.Dtos.Config
         public string? MobilePhone { get; set; }
 
         //[RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
+        public string? CurrentMobile { get; set; }
         public string? HomePhoneNumber { get; set; }
 
         public string? Npwp { get; set; }

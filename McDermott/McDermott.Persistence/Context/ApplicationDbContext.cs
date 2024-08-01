@@ -70,6 +70,7 @@ namespace McDermott.Persistence.Context
         public DbSet<LabTest> LabTests { get; set; }
         public DbSet<LabUom> LabUoms { get; set; }
         public DbSet<SampleType> SampleTypes { get; set; }
+        public DbSet<Project> Projects { get; set; }
 
         #endregion Medical
 

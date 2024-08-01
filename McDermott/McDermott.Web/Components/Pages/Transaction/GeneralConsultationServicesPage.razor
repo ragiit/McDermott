@@ -304,6 +304,16 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
                                                                     <DxTextBox @bind-Text="(GeneralConsultanService.Patient.NoId)" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
                                                                 </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Current Mobile" ColSpanMd="12">
+                                                                    <DxMaskedInput @bind-Value="@UserForm.CurrentMobile"
+                                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                   NullText="Current Mobile"
+                                                                                   ReadOnly="@(!(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) ||
+                                  GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) ||
+                                  GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician)))" ShowValidationIcon="true">
+                                                                    </DxMaskedInput>
+                                                                    <ValidationMessage For="@(() => UserForm.MobilePhone)"   />
+                                                                </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
                                                                     <Template>
                                                                         <DxGridLayout>
@@ -513,99 +523,99 @@
                                         </div>
                                     </div>
 
-                                  @*   <div class="w-100">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <span class="fw-bolder">Allergy Data</span>
-                                            </div>
+                                    @*   <div class="w-100">
+                            <div class="card">
+                            <div class="card-header">
+                            <span class="fw-bolder">Allergy Data</span>
+                            </div>
 
-                                            <div class="card-body">
-                                                <DxFormLayout CssClass="w-100">
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="12">
-                                                        <div class="row w-100">
-                                                            <div class="col-md-1">
-                                                                <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsWeather" />
-                                                            </div>
-                                                            <div class="col-md-11">
-                                                                @if (PatientAllergy.Weather is not null || GeneralConsultanService.IsWeather)
-                                                                {
-                                                                    <DxTagBox Data="@WeatherAllergies"
-                                                                              NullText="Select Allergy..."
-                                                                              ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
-                                                                              @bind-Values="@SelectedWeatherAllergies"
-                                                                              EditFormat="{1}"
-                                                                              InputId="tbMultiColumn">
-                                                                        <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
-                                                                                            Caption="Code"
-                                                                                            Width="100px" />
-                                                                        <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
-                                                                                            Caption="Name" />
-                                                                        <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
-                                                                                            Caption="Type" />
-                                                                    </DxTagBox>
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    </DxFormLayoutItem>
+                            <div class="card-body">
+                            <DxFormLayout CssClass="w-100">
+                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="12">
+                            <div class="row w-100">
+                            <div class="col-md-1">
+                            <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsWeather" />
+                            </div>
+                            <div class="col-md-11">
+                            @if (PatientAllergy.Weather is not null || GeneralConsultanService.IsWeather)
+                            {
+                            <DxTagBox Data="@WeatherAllergies"
+                            NullText="Select Allergy..."
+                            ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
+                            @bind-Values="@SelectedWeatherAllergies"
+                            EditFormat="{1}"
+                            InputId="tbMultiColumn">
+                            <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                            Caption="Code"
+                            Width="100px" />
+                            <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                            Caption="Name" />
+                            <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                            Caption="Type" />
+                            </DxTagBox>
+                            }
+                            </div>
+                            </div>
+                            </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacology" ColSpanMd="12">
-                                                        <div class="row w-100">
-                                                            <div class="col-md-1">
-                                                                <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsPharmacology" />
-                                                            </div>
-                                                            <div class="col">
-                                                                @if (PatientAllergy.Farmacology is not null || GeneralConsultanService.IsPharmacology)
-                                                                {
-                                                                    <DxTagBox Data="@PharmacologyAllergies"
-                                                                              ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
-                                                                              NullText="Select Allergy..."
-                                                                              @bind-Values="@SelectedPharmacologyAllergies"
-                                                                              EditFormat="{1}"
-                                                                              InputId="tbMultiColumn">
-                                                                        <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
-                                                                                            Caption="Code"
-                                                                                            Width="100px" />
-                                                                        <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
-                                                                                            Caption="Name" />
-                                                                        <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
-                                                                                            Caption="Type" />
-                                                                    </DxTagBox>
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    </DxFormLayoutItem>
+                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacology" ColSpanMd="12">
+                            <div class="row w-100">
+                            <div class="col-md-1">
+                            <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsPharmacology" />
+                            </div>
+                            <div class="col">
+                            @if (PatientAllergy.Farmacology is not null || GeneralConsultanService.IsPharmacology)
+                            {
+                            <DxTagBox Data="@PharmacologyAllergies"
+                            ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
+                            NullText="Select Allergy..."
+                            @bind-Values="@SelectedPharmacologyAllergies"
+                            EditFormat="{1}"
+                            InputId="tbMultiColumn">
+                            <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                            Caption="Code"
+                            Width="100px" />
+                            <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                            Caption="Name" />
+                            <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                            Caption="Type" />
+                            </DxTagBox>
+                            }
+                            </div>
+                            </div>
+                            </DxFormLayoutItem>
 
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="12">
-                                                        <div class="row w-100">
-                                                            <div class="col-md-1">
-                                                                <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsFood" />
-                                                            </div>
-                                                            <div class="col-md-11">
-                                                                @if (PatientAllergy.Food is not null || GeneralConsultanService.IsFood)
-                                                                {
-                                                                    <DxTagBox Data="@FoodAllergies"
-                                                                              NullText="Select Allergy..."
-                                                                              @bind-Values="@SelectedFoodAllergies"
-                                                                              EditFormat="{1}"
-                                                                              ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
-                                                                              InputId="tbMultiColumn">
-                                                                        <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
-                                                                                            Caption="Code"
-                                                                                            Width="100px" />
-                                                                        <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
-                                                                                            Caption="Name" />
-                                                                        <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
-                                                                                            Caption="Type" />
-                                                                    </DxTagBox>
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    </DxFormLayoutItem>
+                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="12">
+                            <div class="row w-100">
+                            <div class="col-md-1">
+                            <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsFood" />
+                            </div>
+                            <div class="col-md-11">
+                            @if (PatientAllergy.Food is not null || GeneralConsultanService.IsFood)
+                            {
+                            <DxTagBox Data="@FoodAllergies"
+                            NullText="Select Allergy..."
+                            @bind-Values="@SelectedFoodAllergies"
+                            EditFormat="{1}"
+                            ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
+                            InputId="tbMultiColumn">
+                            <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                            Caption="Code"
+                            Width="100px" />
+                            <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                            Caption="Name" />
+                            <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                            Caption="Type" />
+                            </DxTagBox>
+                            }
+                            </div>
+                            </div>
+                            </DxFormLayoutItem>
 
-                                                </DxFormLayout>
-                                            </div>
-                                        </div>
-                                    </div> *@
+                            </DxFormLayout>
+                            </div>
+                            </div>
+                            </div> *@
 
                                     <div class="w-100">
                                         <div class="card">
@@ -725,8 +735,7 @@
                                                                             <Items>
                                                                                 <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption" ColumnSpan="1">
                                                                                     <Template>
-                                                                                        <MyDxComboBox 
-                                                                                                      Data="@YesNoOptions"
+                                                                                        <MyDxComboBox Data="@YesNoOptions"
                                                                                                       NullText="Yes/No"
                                                                                                       @bind-Value="@GeneralConsultanService.IsFamilyMedicalHistory">
                                                                                         </MyDxComboBox>
@@ -745,7 +754,7 @@
                                                                     </Template>
                                                                 </DxFormLayoutItem>
 
-                                                                          <DxFormLayoutItem Caption=" " Visible="@(GeneralConsultanService.FamilyMedicalHistory is not null && GeneralConsultanService.FamilyMedicalHistory.Equals("Other"))" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxFormLayoutItem Caption=" " Visible="@(GeneralConsultanService.FamilyMedicalHistory is not null && GeneralConsultanService.FamilyMedicalHistory.Equals("Other"))" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                     <MyTextBox @bind-Text="@GeneralConsultanService.FamilyMedicalHistoryOther"
                                                                                NullText="Family MedicalHistory Other" />
                                                                 </DxFormLayoutItem>
@@ -764,8 +773,7 @@
                                                                             <Items>
                                                                                 <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption" ColumnSpan="1">
                                                                                     <Template>
-                                                                                        <MyDxComboBox 
-                                                                                                      Data="@YesNoOptions"
+                                                                                        <MyDxComboBox Data="@YesNoOptions"
                                                                                                       NullText="Yes/No"
                                                                                                       @bind-Value="@GeneralConsultanService.IsMedicationHistory">
                                                                                         </MyDxComboBox>
@@ -773,7 +781,7 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem Visible="@(GeneralConsultanService.IsMedicationHistory == "Yes")" Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="12">
                                                                                     <Template>
-                                                                                        <MyTextBox @bind-Text="@GeneralConsultanService.MedicationHistory"  
+                                                                                        <MyTextBox @bind-Text="@GeneralConsultanService.MedicationHistory"
                                                                                                    NullText="Medication History" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
@@ -783,8 +791,8 @@
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem Caption="Past Medical History" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                       <MyTextBox @bind-Text="@GeneralConsultanService.PastMedicalHistory" 
-                                                                                                   NullText="Past Medical History" />
+                                                                    <MyTextBox @bind-Text="@GeneralConsultanService.PastMedicalHistory"
+                                                                               NullText="Past Medical History" />
                                                                 </DxFormLayoutItem>
 
 
@@ -1061,10 +1069,6 @@
                                                                                             </DxMaskedInput>
                                                                                         </DxFormLayoutItem>
 
-                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Planning" ColSpanMd="12">
-                                                                                            <DxTextBox @bind-Text="@FormInputCPPTGeneralConsultan.Plan" NullText="Planning" />
-                                                                                        </DxFormLayoutItem>
-
                                                                                         @if (IsStatus(EnumStatusGeneralConsultantService.Physician))
                                                                                         {
                                                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis" ColSpanMd="12">
@@ -1099,6 +1103,11 @@
                                                                                                 </MyDxComboBox>
                                                                                             </DxFormLayoutItem>
                                                                                         }
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Planning" ColSpanMd="12">
+                                                                                            <DxTextBox @bind-Text="@FormInputCPPTGeneralConsultan.Plan" NullText="Planning" />
+                                                                                        </DxFormLayoutItem>
+
 
                                                                                     </DxFormLayout>
                                                                                 </div>

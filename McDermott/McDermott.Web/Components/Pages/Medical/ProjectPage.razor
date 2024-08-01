@@ -1,0 +1,83 @@
+﻿@page "/config/project"
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Projects</PageTitle>
+
+@if (IsAccess)
+{
+    <div class="wrapper">
+
+        <BaseHeaderPage Title="Projects" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+
+                                <MyGrid @ref="Grid"
+                                        Data="Projects"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        EditModelSaving="OnSave"
+                                        DataItemDeleting="OnDelete"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        KeyFieldName="Id">
+
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="ProjectDto"
+                                                         Items="@Projects"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="true"
+                                                         Grid="Grid"
+                                                         ImportFile="ImportFile"
+                                                         ExportToExcel="ExportToExcel"
+                                                         VisibleNew="UserAccessCRUID.Create"
+                                                         VisibleEdit="UserAccessCRUID.Update"
+                                                         VisibleDelete="UserAccessCRUID.Delete" />
+                                    </ToolbarTemplate>
+
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Code" />
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (ProjectDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                <ValidationMessage For="@(()=> a.Name)"   />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Code" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                <ValidationMessage For="@(()=> a.Code)"   />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </MyGrid>
+                            </DxLoadingPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <LoadingIndicatorLayout />
+}

@@ -60,6 +60,7 @@ global using static McDermott.Application.Features.Commands.Medical.SampleTypeCo
 global using static McDermott.Application.Features.Commands.Medical.LabUomCommand;
 global using static McDermott.Application.Features.Commands.Patient.ClassTypeCommand;
 global using static McDermott.Application.Features.Commands.Medical.LocationCommand;
+global using static McDermott.Application.Features.Commands.Medical.ProjectCommand;
 global using static McDermott.Application.Features.Commands.Config.CityCommand;
 global using static McDermott.Application.Features.Commands.Config.CountryCommand;
 global using static McDermott.Application.Features.Commands.Employee.DepartmentCommand;
