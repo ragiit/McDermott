@@ -9,6 +9,8 @@ using MediatR;
 using DevExpress.Blazor.RichEdit;
 using static McDermott.Web.Components.Pages.Transaction.ProcedureRoomPage;
 using Microsoft.AspNetCore.HttpLogging;
+using Mapster;
+using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -524,6 +526,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
         private List<AllergyDto> Allergies = [];
         private List<GeneralConsultanServiceDto> GeneralConsultanServices { get; set; } = [];
+        private List<GeneralConsultanServiceDto> GeneralConsultanServicesHistoricalMR { get; set; } = [];
         private List<InsurancePolicyDto> InsurancePolicies { get; set; } = [];
         private List<InsurancePolicyDto> ReferToInsurancePolicies { get; set; } = [];
         private List<AwarenessDto> Awareness { get; set; } = [];
@@ -1256,8 +1259,17 @@ namespace McDermott.Web.Components.Pages.Transaction
                 var u = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
                 if (u is not null)
                 {
+                    u = UserForm.Adapt<UserDto>();
                     u.PatientAllergyIds = ids;
-                    await Mediator.Send(new UpdateUserRequest(u));
+
+                    if (u.CurrentMobile != UserForm.CurrentMobile)
+                        u.CurrentMobile = UserForm.CurrentMobile;
+
+                    //u.FamilyMedicalHistory = UserForm.FamilyMedicalHistory;
+
+                    await Mediator.Send(new UpdateUserRequest(u)); 
+                    Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
+                    Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
                 }
 
 
@@ -1498,7 +1510,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                     TglDaftar = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
                     KdPoli = Services.FirstOrDefault(x => x.Id == GeneralConsultanService.ServiceId)!.Code,
                     KdSadar = Awareness.FirstOrDefault(x => x.Id == GeneralConsultanService.AwarenessId)!.KdSadar,
-                    Sistole = GeneralConsultanService.Sistole.ToInt32(),
                     Diastole = GeneralConsultanService.Diastole.ToInt32(),
                     BeratBadan = GeneralConsultanService.Weight.ToInt32(),
                     TinggiBadan = GeneralConsultanService.Height.ToInt32(),
@@ -1615,7 +1626,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicy == null || SelectedInsurancePolicy.Id == 0 ? null : SelectedInsurancePolicy.Id;
 
-                if(IsStatus(EnumStatusGeneralConsultantService.Planned) || IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Physician))
+                if (IsStatus(EnumStatusGeneralConsultantService.Planned) || IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Physician))
                 {
                     var usr = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
                     if (usr is not null)
@@ -1789,9 +1800,50 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsAppoimentPendingAlert = true;
         }
 
+        private bool IsHistoricalRecordPatientDetailGC { get; set; } = false;
+        private bool IsHistoricalRecordPatientDetailAccident { get; set; } = false;
+        private GeneralConsultanServiceDto SelectedDetailHistorical { get; set; } = new();
+        private List<GeneralConsultanCPPTDto> SelectedDetailHistoricalGeneralConsultanCPPTs { get; set; } = new();
+        private AccidentDto SelectedAccidentHistorical { get; set; } = new();
+        private async Task OnClickDetailHistoricalRecordPatient(GeneralConsultanServiceDto e)
+        {
+            IsHistoricalRecordPatientDetailGC = false;
+            IsHistoricalRecordPatientDetailAccident = false;
+            SelectedDetailHistorical = new();
+
+            if (e is null)
+                return;
+            SelectedDetailHistorical = e;
+
+            SelectedDetailHistoricalGeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id));
+
+            if (e.TypeRegistration == "General Consultation" || e.TypeRegistration == "Emergency")
+            {
+                IsHistoricalRecordPatientDetailGC = true;
+            }
+            else if (e.TypeRegistration == "Accident")
+            {
+                SelectedAccidentHistorical = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == e.Id))).FirstOrDefault() ?? new();
+                IsHistoricalRecordPatientDetailAccident = true;
+            }
+        }
+
+        private bool IsLoadingHistoricalRecordPatient { get; set; } = false;
         private async Task OnClickPopUpHistoricalMedical()
         {
-            IsHistoricalRecordPatient = true;
+            IsLoadingHistoricalRecordPatient = true;
+            if (GeneralConsultanService.PatientId is null || GeneralConsultanService.PatientId == 0)
+            {
+                ToastService.ShowInfo("Please select the Patient");
+            }
+            else
+            {
+                IsHistoricalRecordPatient = true;
+                IsLoadingHistoricalRecordPatient = true;
+                GeneralConsultanServicesHistoricalMR = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == GeneralConsultanService.PatientId))).OrderBy(x => x.RegistrationDate).ToList();
+                IsLoadingHistoricalRecordPatient = false;
+            }
+            IsLoadingHistoricalRecordPatient = false;
         }
 
         private void OnAppoimentPopUpClick()
@@ -1992,17 +2044,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicy == null || SelectedInsurancePolicy.Id == 0 ? null : SelectedInsurancePolicy.Id;
 
-                var usr = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
-                if (usr is not null)
-                {
-                    if (usr.CurrentMobile != UserForm.CurrentMobile)
-                    {
-                        usr.CurrentMobile = UserForm.CurrentMobile;
-                        await Mediator.Send(new UpdateUserRequest(usr)); 
-                        Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true)); 
-                        Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
-                    }
-                }
+               
 
                 switch (GeneralConsultanService.Status)
                 {
@@ -2105,12 +2147,12 @@ namespace McDermott.Web.Components.Pages.Transaction
                 ToastService.ShowSuccess("Saved Successfully!");
             }
             catch (Exception x)
-            { 
+            {
                 x.HandleException(ToastService);
                 throw;
             }
             finally
-            { 
+            {
                 IsLoading = false;
             }
         }

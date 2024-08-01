@@ -67,8 +67,7 @@
         public long PainScale { get; set; }
         public long Systolic { get; set; }
         public long DiastolicBP { get; set; }
-        public long SpO2 { get; set; }
-        public long Sistole { get; set; }
+        public long SpO2 { get; set; } 
         public long Diastole { get; set; }
         public long WaistCircumference { get; set; }
 

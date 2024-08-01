@@ -101,6 +101,8 @@
                                 <EditForm Model="GeneralConsultanService" Context="EditForm" OnValidSubmit="OnValidSubmitSave" OnInvalidSubmit="OnInvalidSubmitSave">
                                     <DataAnnotationsValidator />
 
+                            
+
                                     <div>
                                         @if (Accident.Id > 0)
                                         {
@@ -126,7 +128,7 @@
                                             </div>
                                         }
 
-                                        @if (Accident.Status != EnumStatusAccident.Done && GeneralConsultanService.Id != 0)
+                                       @*  @if (Accident.Status != EnumStatusAccident.Done && GeneralConsultanService.Id != 0)
                                         {
                                             <div class="card">
                                                 <div class="card-body">
@@ -145,13 +147,6 @@
                                                                       RenderStyleMode="ButtonRenderStyleMode.Outline"
                                                                       RenderStyle=" ButtonRenderStyle.Success">
                                                             </DxButton>
-                                                            @*  <DxButton
-                                                Enabled="!IsLoading"
-                                                IconCssClass="fa-solid fa-xmark"
-                                                Text="Cancel"
-                                                Click="OnCancelStatus"
-                                                RenderStyle="ButtonRenderStyle.Danger">
-                                                </DxButton> *@
                                                         </div>
                                                     </div>
                                                 </div>
@@ -172,7 +167,62 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                        } *@
+
+                                        @if (!IsStatus(EnumStatusAccident.Done))
+                                        {
+                                            <div class="card sticky">
+                                                <div class="card-body">
+                                                    <div class=" row w-100">
+                                                        <div class="col-auto pe-0 ">
+                                                            @if (Accident.Status != EnumStatusAccident.Done && GeneralConsultanService.Id != 0)
+                                                            {
+                                                                <DxButton IconCssClass="fa-solid fa-check"
+                                                                          Text="@StagingText.GetDisplayName()"
+                                                                          Click="OnClickConfirm"
+                                                                          RenderStyle=" ButtonRenderStyle.Primary">
+                                                                </DxButton>
+
+                                                                <DxButton IconCssClass="fa-solid fa-print"
+                                                                          Text="Print"
+                                                                          Visible="GeneralConsultanService.Id > 0"
+                                                                          Click="PrintAccident"
+                                                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                          RenderStyle=" ButtonRenderStyle.Success">
+                                                                </DxButton>
+                                                            }
+                                                        </div>
+
+
+
+                                                        <div class="col-sm align-self-end">
+                                                            <div class="row justify-content-end">
+                                                                <div class="col-auto">
+                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="@(async () => await LoadData())"></DxButton>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
                                         }
+                                    </div>
+
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="w-100">
+                                                <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
+                                                    <Items> 
+                                                        <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
+                                                                       IconCssClass="fa-solid fa-notes-medical"
+                                                                       Click="OnClickPopUpHistoricalMedical"
+                                                                       Text="Historical Medical Record Patient" /> 
+                                                    </Items>
+                                                </DxToolbar>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="card">
@@ -471,10 +521,6 @@
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="SpO2" ColSpanMd="12">
                                                                                     <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.SpO2" />
-                                                                                </DxFormLayoutItem>
-
-                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sistole" ColSpanMd="12">
-                                                                                    <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.Sistole" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Waist Circumference" ColSpanMd="12">

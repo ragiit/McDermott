@@ -737,15 +737,15 @@
                                                                                     <Template>
                                                                                         <MyDxComboBox Data="@YesNoOptions"
                                                                                                       NullText="Yes/No"
-                                                                                                      @bind-Value="@GeneralConsultanService.IsFamilyMedicalHistory">
+                                                                                                      @bind-Value="@UserForm.IsFamilyMedicalHistory">
                                                                                         </MyDxComboBox>
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
-                                                                                <DxGridLayoutItem Row="0" Visible="@(GeneralConsultanService.IsFamilyMedicalHistory == "Yes")" Column="1" CssClass=" normal-caption " ColumnSpan="12">
+                                                                                <DxGridLayoutItem Row="0" Visible="@(UserForm.IsFamilyMedicalHistory == "Yes")" Column="1" CssClass=" normal-caption " ColumnSpan="12">
                                                                                     <Template>
                                                                                         <MyDxComboBox Data="@RiwayatPenyakitKeluarga"
                                                                                                       NullText="Select Family Medical History..."
-                                                                                                      @bind-Value="@GeneralConsultanService.FamilyMedicalHistory">
+                                                                                                      @bind-Value="@UserForm.FamilyMedicalHistory">
                                                                                         </MyDxComboBox>
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
@@ -754,8 +754,8 @@
                                                                     </Template>
                                                                 </DxFormLayoutItem>
 
-                                                                <DxFormLayoutItem Caption=" " Visible="@(GeneralConsultanService.FamilyMedicalHistory is not null && GeneralConsultanService.FamilyMedicalHistory.Equals("Other"))" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                    <MyTextBox @bind-Text="@GeneralConsultanService.FamilyMedicalHistoryOther"
+                                                                <DxFormLayoutItem Caption=" " Visible="@(UserForm.FamilyMedicalHistory is not null && UserForm.FamilyMedicalHistory.Equals("Other"))" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                    <MyTextBox @bind-Text="@UserForm.FamilyMedicalHistoryOther"
                                                                                NullText="Family MedicalHistory Other" />
                                                                 </DxFormLayoutItem>
 
@@ -775,13 +775,13 @@
                                                                                     <Template>
                                                                                         <MyDxComboBox Data="@YesNoOptions"
                                                                                                       NullText="Yes/No"
-                                                                                                      @bind-Value="@GeneralConsultanService.IsMedicationHistory">
+                                                                                                      @bind-Value="@UserForm.IsMedicationHistory">
                                                                                         </MyDxComboBox>
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
-                                                                                <DxGridLayoutItem Visible="@(GeneralConsultanService.IsMedicationHistory == "Yes")" Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="12">
+                                                                                <DxGridLayoutItem Visible="@(UserForm.IsMedicationHistory == "Yes")" Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="12">
                                                                                     <Template>
-                                                                                        <MyTextBox @bind-Text="@GeneralConsultanService.MedicationHistory"
+                                                                                        <MyTextBox @bind-Text="@UserForm.MedicationHistory"
                                                                                                    NullText="Medication History" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
@@ -791,7 +791,7 @@
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem Caption="Past Medical History" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                    <MyTextBox @bind-Text="@GeneralConsultanService.PastMedicalHistory"
+                                                                    <MyTextBox @bind-Text="@UserForm.PastMedicalHistory"
                                                                                NullText="Past Medical History" />
                                                                 </DxFormLayoutItem>
 
@@ -856,10 +856,6 @@
 
                                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="SpO2" ColSpanMd="12">
                                                                                         <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.SpO2" />
-                                                                                    </DxFormLayoutItem>
-
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sistole" ColSpanMd="12">
-                                                                                        <DxSpinEdit ReadOnly="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting))" MinValue="0" @bind-Value="@GeneralConsultanService.Sistole" />
                                                                                     </DxFormLayoutItem>
 
                                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Waist Circumference" ColSpanMd="12">
@@ -1491,19 +1487,22 @@ else
 </DxPopup>
 
 <DxPopup HeaderText="Historical Medical Record Patient" @bind-Visible="@IsHistoricalRecordPatient" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
-    <DxLoadingPanel @bind-Visible="PanelVisible"
+    <DxLoadingPanel @bind-Visible="IsLoadingHistoricalRecordPatient"
                     IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                     IsContentBlocked="true"
                     ApplyBackgroundShading="true"
                     IndicatorAreaVisible="false"
                     Text="Fetching Data...">
         <MyGrid @ref="Grid"
-                Data="GeneralConsultanServices.Where(x => x.PatientId == GeneralConsultanService.PatientId).OrderBy(x => x.RegistrationDate)"
+                Data="GeneralConsultanServicesHistoricalMR"
                 KeyFieldName="Id"
+                AllowSelectRowByClick="false"
+                FocusedRowEnabled="false"
                 @bind-SelectedDataItems="@SelectedDataItems">
 
             <Columns>
-                <DxGridDataColumn FieldName="RegistrationDate" DisplayFormat="ddd, dd MMM yyyy" Caption="Registration Date" />
+                <DxGridDataColumn FieldName="TypeRegistration" Caption="Type Registration" GroupIndex="0"/>
+                <DxGridDataColumn FieldName="RegistrationDate" DisplayFormat="ddd, dd MMM yyyy" Caption="Registration Date" SortIndex="0" />
                 <DxGridDataColumn FieldName="Patient.Name" Caption="Patient" />
                 <DxGridDataColumn FieldName="Payment" Caption="Payment Methode" />
                 <DxGridDataColumn FieldName="Pratitioner.Name" Caption="Doctor" />
@@ -1515,13 +1514,31 @@ else
                         @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
                     </CellDisplayTemplate>
                 </DxGridDataColumn>
+                <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="10px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                    <CellDisplayTemplate>
+                        <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                  Attributes="@(new Dictionary<string, object> {  ["title"] = "Print" })"
+                                  IconCssClass="fa-solid fa-circle-info"
+                                  Click="@(()=> OnClickDetailHistoricalRecordPatient((context.DataItem as GeneralConsultanServiceDto)))"
+                                  CssClass="me-1" /> 
+                    </CellDisplayTemplate>
+                    <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
+                </DxGridDataColumn>
             </Columns>
 
             <GroupSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="StatusName" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="TypeRegistration" />
             </GroupSummary>
         </MyGrid>
     </DxLoadingPanel>
+</DxPopup>
+
+<DxPopup HeaderText="Historical Medical Record Patient Detail" @bind-Visible="@IsHistoricalRecordPatientDetailGC" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+    <_PopUpDetailGeneralConsultationService GeneralConsultanService="SelectedDetailHistorical" GeneralConsultanCPPTs="SelectedDetailHistoricalGeneralConsultanCPPTs" />
+</DxPopup>
+
+<DxPopup HeaderText="Historical Medical Record Patient Detail" @bind-Visible="@IsHistoricalRecordPatientDetailAccident" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+    <_PopUpDetailAccident Accident="SelectedAccidentHistorical" GeneralConsultanService="SelectedDetailHistorical" GeneralConsultanCPPTs="SelectedDetailHistoricalGeneralConsultanCPPTs" />
 </DxPopup>
 
 <DxPopup HeaderText="Pain Scale" @bind-Visible="@IsPopUpPainScale" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
