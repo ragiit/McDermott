@@ -1,0 +1,104 @@
+﻿@inherits LayoutComponentBase
+
+<div class="wrapper"> 
+    <div> 
+        <nav class="main-header navbar navbar-expand navbar-light navbar-light">
+            <ul class="navbar-nav">
+                <li class="nav-item ml-2">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="" class="nav-link">Home</a>
+                </li>
+
+
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="fullscreen" role="button">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </a>
+                </li>
+                <li class="nav-item dropdown mr-2">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="fa fa-user" aria-hidden="true"></i>
+                        <label class="ml-2">ser?.Name</label>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i>
+                            Logout
+                        </a>
+                        <div class="dropdown-divider"></div>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <aside class="main-sidebar sidebar-light-info elevation-4">
+            <a href="/" class="brand-link no-underline">
+                <img src="https://www.ikariera.cz/uploads/companies/file/28129/22192/17871/c1c103e1-56b0-45cf-b02d-f6acbc7276b8/Logo%20-%20mcdermott_symbol_color%20500x500%2C%2050hrana.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="ms-2 brand-text font-weight-bold">McHealthCare</span>
+            </a>
+
+            <div class="sidebar">
+                <nav class="mt-3">
+                    @* <div class="form-inline">
+                    <div class="input-group">
+                    <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search" @bind="searchQuery">
+                    </div>
+                    </div> *@
+
+                    <ul class="mt-3 nav nav-pills nav-sidebar flex-column sidebar-light-info sidebar-light-bg-info" data-widget="treeview" role="menu" data-accordion="false">
+
+                        <li class="nav-item mb-2">
+                            <div class="input-group input-group-sm">
+                            </div>
+                            <NavLink href="" class="nav-link" Match="NavLinkMatch.All">
+                                <i class="nav-icon fa-solid fa-house"></i>
+                                <p>Home Page</p>
+                            </NavLink>
+                        </li>
+
+                        <li class="nav-item">
+
+                            <NavLink class="nav-link" Match="NavLinkMatch.Prefix">
+
+                                <p>MCHEALTH <i class="fas fa-angle-left right"></i></p>
+                            </NavLink>
+
+                            <ul class="nav nav-treeview  ">
+                                <li class="nav-item">
+                                    <NavLink class="nav-link sidebar-light-info sidebar-light-bg-info" Match="NavLinkMatch.All">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p class="ml-3">Name</p>
+                                    </NavLink>
+                                </li>
+                            </ul>
+
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        </aside>
+
+        <div class="content-wrapper layout-fixed">
+            @Body
+        </div>
+
+        <footer class="main-footer">
+            <strong>
+                Copyright &copy; 2024-2029 <a class="no-underline" href="https://www.mcdermott.com/">McHealthCare</a>.
+            </strong>
+            All rights reserved.
+            <div class="float-right d-none d-sm-inline-block">
+                <b>Version</b> 1.0.0
+            </div>
+        </footer>
+
+        <aside class="control-sidebar control-sidebar-light">
+        </aside>
+    </div>
+</div>
