@@ -45,3 +45,22 @@
     });
 
 </script> *@
+<script>
+    window.addEventListener('load', function () {
+        var pageHeader = document.querySelector('.page-header');
+        var pageTitle = document.querySelector('.page-title');
+        var headerHeight = pageHeader.offsetHeight;
+
+        pageTitle.style.top = headerHeight + 'px';
+
+        window.addEventListener('scroll', function () {
+            if (window.pageYOffset >= headerHeight) {
+                pageTitle.classList.add('sticky');
+                pageTitle.style.transform = 'translateY(' + headerHeight + 'px)';
+            } else {
+                pageTitle.classList.remove('sticky');
+                pageTitle.style.transform = 'translateY(0)';
+            }
+        });
+    });
+</script>

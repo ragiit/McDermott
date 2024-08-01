@@ -40,12 +40,13 @@
                     <li class="language-nav">
                         <div class="translate_wrapper">
                             <div class="current_lang">
-                                <div class="lang"><i class="flag-icon flag-icon-us"></i><span class="lang-txt">EN </span></div>
+                                <div class="lang"><i class="flag-icon flag-icon-id"></i><span class="lang-txt">ID </span></div>
                             </div>
                             <div class="more_lang">
-                                <div class="lang selected" data-value="en">
-                                    <i class="flag-icon flag-icon-us"></i><span class="lang-txt">English<span> (US)</span></span>
-                                </div>                                
+                                <div class="lang selected" data-value="id">
+                                    <i class="flag-icon flag-icon-id"></i><span class="lang-txt">Indonesia<span> (ID)</span></span>
+                                </div>
+                                <div class="lang" data-value="de"><i class="flag-icon flag-icon-de"></i><span class="lang-txt">Deutsch</span></div>
                             </div>
                         </div>
                     </li>
@@ -85,12 +86,7 @@
                                                     </div>
                                                 </div>
                                             </li>
-                                            <li class="text-center">
-                                                <a class="flip-btn f-w-700" id="flip-btn" href="javascript:void(0)">
-                                                    Add
-                                                    New Bookmark
-                                                </a>
-                                            </li>
+                                            
                                         </ul>
                                     </div>
                                     <div class="back">
@@ -150,22 +146,80 @@
                                 <p class="mb-0">Admin <i class="middle fa fa-angle-down"></i></p>
                             </div>
                         </div>
-                        <ul class="profile-dropdown onhover-show-div">
-                            <li><a href="#"><i data-feather="user"></i><span>Account </span></a></li>
-                            <li><a href="#"><i data-feather="mail"></i><span>Inbox</span></a></li>
-                            <li><a href="#"><i data-feather="file-text"></i><span>Taskboard</span></a></li>
-                            <li><a href="#"><i data-feather="settings"></i><span>Settings</span></a></li>
-                            <li>
-                                <form action="Account/Logout" method="post" style="display: inline;">
-                                   <AntiforgeryToken/>
-                                    <input type="hidden" name="ReturnUrl" value="" />
-                                    <button type="submit" class="nav-link" style="background: none; border: none; padding: 0; cursor: pointer;">
-                                        <a><i data-feather="log-out"></i><span>Log Out</span></a>
-                                    </button>
-                                </form>
-                            </li>
+                        <div class="onhover-show-div bookmark-flip">
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="front">
+                                        <h6 class="f-18 mb-0 dropdown-title">
+                                            <AuthorizeView>
+                                                <span>@context.User.Identity?.Name!</span>
+                                            </AuthorizeView>
+                                        </h6>
+                                        <ul class="bookmark-dropdown">
+                                            <li>
+                                                <div class="row">
+                                                    <div class="col-4 text-center">
+                                                        <div class="bookmark-content">
+                                                            <div class="bookmark-icon"><i class="fa fa-user"></i></div><span>Profile</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4 text-center">
+                                                        <div class="bookmark-content">
+                                                            <div class="bookmark-icon"><i class="fa fa-lock"></i></div><span>Reset Password</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4 text-center">
+                                                        <div class="bookmark-content">
+                                                            <form action="Account/Logout" method="post" style="display: inline;">
+                                                                <AntiforgeryToken />
+                                                                <input type="hidden" name="ReturnUrl" value="" />
+                                                                <button type="submit" class="nav-link" style="color:black">
+                                                                    <div class="bookmark-icon">
+                                                                        <i class="fa fa-sign-out"></i>
+                                                                    </div><span>Log Out</span>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="text-center">
+                                                <a class="flip-btn f-w-700" id="flip-btn" href="javascript:void(0)">
+                                                    Add
+                                                    New Bookmark
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="back">
+                                        <ul>
+                                            <li>
+                                                <div class="bookmark-dropdown flip-back-content">
+                                                    <input type="text" placeholder="search...">
+                                                </div>
+                                            </li>
+                                            <li><a class="f-w-700 d-block flip-back" id="flip-back" href="javascript:void(0)">Back</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @* <ul class="profile-dropdown onhover-show-div">
+                        <li><a href="#"><i data-feather="user"></i><span>Account </span></a></li>
+                        <li><a href="#"><i data-feather="mail"></i><span>Inbox</span></a></li>
+                        <li><a href="#"><i data-feather="file-text"></i><span>Taskboard</span></a></li>
+                        <li><a href="#"><i data-feather="settings"></i><span>Settings</span></a></li>
+                        <li>
+                        <form action="Account/Logout" method="post" style="display: inline;">
+                        <AntiforgeryToken/>
+                        <input type="hidden" name="ReturnUrl" value="" />
+                        <button type="submit" class="nav-link" style="background: none; border: none; padding: 0; cursor: pointer;">
+                        <a><i data-feather="log-out"></i><span>Log Out</span></a>
+                        </button>
+                        </form>
+                        </li>
 
-                        </ul>
+                        </ul> *@
                     </li>
                 </ul>
             </div>
@@ -201,21 +255,21 @@
                                 <a href="index.html"><img class="img-fluid" src="../assets/images/logo/logo-icon.png" alt=""></a>
                                 <div class="mobile-back text-end"><span>Back</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
                             </li>
-                           
-                            
+
+
                             <li class="sidebar-list">
-                                
+
                                 <a class="sidebar-link sidebar-title" href="#">
-                                    <i class="stroke-icon" data-feather="settings"></i><i class="fill-icon" data-feather="settings"></i> 
+                                    <i class="stroke-icon" data-feather="settings"></i><i class="fill-icon" data-feather="settings"></i>
                                     <span>Configuration          </span>
                                 </a>
                                 <ul class="sidebar-submenu">
-                                    <li><NavLink  href="config/countries">Country</NavLink></li>
-                                    <li><NavLink  href="config/provinces">Province</NavLink></li>
-                                    
+                                    <li><NavLink href="config/countries">Country</NavLink></li>
+                                    <li><NavLink href="config/provinces">Province</NavLink></li>
+
                                 </ul>
                             </li>
-                            
+
                         </ul>
                     </div>
                     <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
