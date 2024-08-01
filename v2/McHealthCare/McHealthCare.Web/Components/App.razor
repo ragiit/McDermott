@@ -16,7 +16,10 @@
     <link rel="shortcut icon" href="assets/images/favicon.png" type="image/x-icon">
     <title>Cuba - Premium Admin Template</title>
 
-   
+    @* Bootstrap 5 *@
+    <link href="_content/DevExpress.Blazor.Themes/blazing-berry.bs5.min.css" rel="stylesheet" />
+    @* Bootstrap 4 *@
+    <link href="_content/DevExpress.Blazor.Themes/blazing-berry.bs4.min.css" rel="stylesheet" />
 
     <HeadOutlet @rendermode="RenderModeForPage" />
 </head>
@@ -39,6 +42,7 @@
 </html>
 
 @code {
+
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
 
