@@ -1,0 +1,49 @@
+﻿@page "/helloworld"
+
+@using System.Collections.ObjectModel
+
+<DxButton Text="Add New Day"
+          Click="(e) => AddNewForecast()" />
+
+<p />
+<DxGrid Data="@WeatherForecastData">
+    <Columns>
+        <DxGridDataColumn FieldName="Date" DisplayFormat="D" />
+        <DxGridDataColumn FieldName="TemperatureC" Caption="@("Temp. (\x2103)")" />
+        <DxGridDataColumn FieldName="TemperatureF" Caption="@("Temp. (\x2109)")" />
+    </Columns>
+</DxGrid>
+
+@code {
+    public class WeatherForecast
+    {
+        public DateTime Date { get; set; }
+        public int TemperatureC { get; set; }
+        public double TemperatureF => Math.Round((TemperatureC * 1.8 + 32), 2);
+        public string Forecast { get; set; }
+        public string CloudCover { get; set; }
+        public bool Precipitation { get; set; }
+    }
+
+    int DayCount { get; set; } = 0;
+    ObservableCollection<WeatherForecast> WeatherForecastData { get; set; }
+    static readonly Random Rnd = new Random();
+
+    protected override void OnInitialized()
+    {
+        WeatherForecastData = new ObservableCollection<WeatherForecast>();
+        foreach (var date in Enumerable.Range(1, 5).Select(i => DateTime.Now.Date.AddDays(i)))
+        {
+            AddNewForecast();
+        }
+    }
+
+    void AddNewForecast()
+    {
+        WeatherForecastData.Add(new WeatherForecast()
+            {
+                Date = DateTime.Now.Date.AddDays(++DayCount),
+                TemperatureC = Rnd.Next(10, 20)
+            });
+    }
+}
