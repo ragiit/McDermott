@@ -481,6 +481,79 @@
                                                         </DxTagBox>
                                                     </DxFormLayoutItem>
 
+                                                    <DxFormLayoutItem Caption="Family Medical History" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                        <Template>
+                                                            <DxGridLayout ColumnSpacing="8px">
+                                                                <Rows>
+                                                                    <DxGridLayoutRow />
+                                                                </Rows>
+                                                                <Columns>
+                                                                    <DxGridLayoutColumn />
+                                                                    <DxGridLayoutColumn />
+                                                                </Columns>
+                                                                <Items>
+                                                                    <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption" ColumnSpan="1">
+                                                                        <Template>
+                                                                            <MyDxComboBox Data="@YesNoOptions"
+                                                                                          NullText="Yes/No"
+                                                                                          @bind-Value="@UserForm.IsFamilyMedicalHistory">
+                                                                            </MyDxComboBox>
+                                                                        </Template>
+                                                                    </DxGridLayoutItem>
+                                                                    <DxGridLayoutItem Row="0" Visible="@(UserForm.IsFamilyMedicalHistory == "Yes")" Column="1" CssClass=" normal-caption " ColumnSpan="12">
+                                                                        <Template>
+                                                                            <MyDxComboBox Data="@RiwayatPenyakitKeluarga"
+                                                                                          NullText="Select Family Medical History..."
+                                                                                          @bind-Value="@UserForm.FamilyMedicalHistory">
+                                                                            </MyDxComboBox>
+                                                                        </Template>
+                                                                    </DxGridLayoutItem>
+                                                                </Items>
+                                                            </DxGridLayout>
+                                                        </Template>
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem Caption=" " Visible="@(UserForm.FamilyMedicalHistory is not null && UserForm.FamilyMedicalHistory.Equals("Other"))" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                        <MyTextBox @bind-Text="@UserForm.FamilyMedicalHistoryOther"
+                                                                   NullText="Family MedicalHistory Other" />
+                                                    </DxFormLayoutItem>
+
+
+                                                    <DxFormLayoutItem Caption="Medication History" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                        <Template>
+                                                            <DxGridLayout ColumnSpacing="8px">
+                                                                <Rows>
+                                                                    <DxGridLayoutRow />
+                                                                </Rows>
+                                                                <Columns>
+                                                                    <DxGridLayoutColumn />
+                                                                    <DxGridLayoutColumn />
+                                                                </Columns>
+                                                                <Items>
+                                                                    <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption" ColumnSpan="1">
+                                                                        <Template>
+                                                                            <MyDxComboBox Data="@YesNoOptions"
+                                                                                          NullText="Yes/No"
+                                                                                          @bind-Value="@UserForm.IsMedicationHistory">
+                                                                            </MyDxComboBox>
+                                                                        </Template>
+                                                                    </DxGridLayoutItem>
+                                                                    <DxGridLayoutItem Visible="@(UserForm.IsMedicationHistory == "Yes")" Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="12">
+                                                                        <Template>
+                                                                            <MyTextBox @bind-Text="@UserForm.MedicationHistory"
+                                                                                       NullText="Medication History" />
+                                                                        </Template>
+                                                                    </DxGridLayoutItem>
+                                                                </Items>
+                                                            </DxGridLayout>
+                                                        </Template>
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem Caption="Past Medical History" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                        <MyTextBox @bind-Text="@UserForm.PastMedicalHistory"
+                                                                   NullText="Past Medical History" />
+                                                    </DxFormLayoutItem>
+
                                                     @*  <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Farmacologi" ColSpanMd="3">
                                         <DxTextBox @bind-Text="@UserForm.PatientAllergy.FarmacologiCode"
                                         ShowValidationIcon="true"

@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240801031652_RemoveSistole")]
+    partial class RemoveSistole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -5352,12 +5355,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("ExpiredId")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("FamilyMedicalHistory")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FamilyMedicalHistoryOther")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<long?>("GenderId")
                         .HasColumnType("bigint");
 
@@ -5403,17 +5400,11 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool?>("IsEmployeeRelation")
                         .HasColumnType("bit");
 
-                    b.Property<string>("IsFamilyMedicalHistory")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsHr")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsMcu")
                         .HasColumnType("bit");
-
-                    b.Property<string>("IsMedicationHistory")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsNurse")
                         .HasColumnType("bit");
@@ -5440,9 +5431,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("MartialStatus")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MedicationHistory")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MobilePhone")
@@ -5481,9 +5469,6 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PastMedicalHistory")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PatientAllergyIds")
