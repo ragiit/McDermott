@@ -5,9 +5,12 @@
 
 <PageTitle>McHealthCare - Groups</PageTitle>
 
+<InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFileGroup" accept=".xlsx" multiple="false"></InputFile>
+<InputFile id="fileInput2" style="display:none" OnChange="@ImportExcelFileGroupMenu" accept=".xlsx" multiple="false"></InputFile>
+
 <div class="wrapper">
 
-    <BaseHeaderPage Title="Groups" OnClickBack="@(async () => await LoadData())" ShowBackButton="@(PageMode == EnumPageMode.Create.GetDisplayName() || PageMode == EnumPageMode.Update.GetDisplayName())" />
+    <BaseHeaderPage Title="Groups" OnClickBack="@(async () => await BackButton())" ShowBackButton="@(PageMode == EnumPageMode.Create.GetDisplayName() || PageMode == EnumPageMode.Update.GetDisplayName())" />
     <div class="container-fluid">
         <div class="row">
             <div class="col">
@@ -27,7 +30,7 @@
                                     <div class="w-100 row">
                                         <div class="col align-self-center">
                                             <div class="col d-flex justify-content-end p-0">
-                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="me-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="CancelItemGroupMenuGrid_Click"></DxButton>
                                             </div>
                                         </div>
@@ -51,7 +54,7 @@
 
                                         @if (Group.Id != Guid.Empty)
                                         {
-                                            <DxFormLayoutGroup Caption="Menus" CssClass="mt-2" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
+                                            <DxFormLayoutGroup Caption="Menus" CssClass="mt-3" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                                                 <Items>
                                                     <MyDxGrid @ref="GridGroupMenu"
                                                               Data="GroupMenus"
@@ -68,9 +71,11 @@
                                                                              NewItem_Click="@(async () => await GridGroupMenu.StartEditNewRowAsync())"
                                                                              EditItem_Click="@(async () =>  await GridGroupMenu.StartEditRowAsync(FocusedRowVisibleIndex2))"
                                                                              DeleteItem_Click="@(() => GridGroupMenu.ShowRowDeleteConfirmation(FocusedRowVisibleIndex2))"
-                                                                             Refresh_Click="@LoadDataGroupMenu"
-                                                                             IsImport="false"
-                                                                             Grid="GridGroupMenu" />
+                                                                             Refresh_Click="@LoadDataGroupMenu" 
+                                                                             Grid="GridGroupMenu"
+                                                                             IsImport="true"
+                                                                             ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput2"))"
+                                                                             ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "group_menu_template.xlsx", ExportFileDatasGroupMenus))" />
                                                         </ToolbarTemplate>
 
                                                         <Columns>
@@ -131,7 +136,9 @@
                                                      DeleteItem_Click="@(() => Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex))"
                                                      Refresh_Click="@(async () => await LoadData())"
                                                      IsImport="true"
-                                                     ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))" />
+                                                     ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))"
+                                                     ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "group_template.xlsx", ExportFileDatasGroup))" />
+                                    
                                 </ToolbarTemplate>
 
                                 <Columns>
