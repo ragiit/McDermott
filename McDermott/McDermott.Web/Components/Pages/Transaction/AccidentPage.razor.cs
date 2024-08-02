@@ -1,4 +1,5 @@
 ﻿using DevExpress.Blazor.RichEdit;
+using McDermott.Domain.Entities;
 using System.ComponentModel;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
@@ -54,6 +55,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                 await LoadComboBox();
                 StateHasChanged();
 
+               
+
                 try
                 {
                     // Retrieve the 'id' query parameter from the URL
@@ -81,11 +84,27 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
 
                 Grid?.SelectRow(0, true);
+
+                
             }
         }
 
+        private void ShowPopup()
+        {
+            isAccident = true;
+        }
+
+        private async Task OnPopupShown()
+        {
+            await JsRuntime.InvokeVoidAsync("initializeCanvas", "MyCanvas");
+        }
+       
         private List<IBrowserFile> BrowserFiles = [];
 
+        private async Task ResetMarkers()
+        {
+            await JsRuntime.InvokeVoidAsync("resetMarkers");
+        }
         private async void SelectFiles(InputFileChangeEventArgs e)
         {
             var file = e.File;
@@ -506,6 +525,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private bool PanelVisible { get; set; } = true;
         private bool ShowForm { get; set; } = false;
+        private bool isAccident { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
 
         private List<UserDto> Physicions { get; set; } = [];
@@ -1124,6 +1144,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 service.Accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == service.Id))).FirstOrDefault() ?? new();
             }
+
+           
 
             GeneralConsultanService = new();
             Accident = new();

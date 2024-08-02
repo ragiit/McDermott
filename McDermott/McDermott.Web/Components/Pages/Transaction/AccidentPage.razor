@@ -690,6 +690,13 @@
                                                                                         </DxGridLayout>
                                                                                     </Template>
                                                                                 </DxFormLayoutItem>
+                                                                                <DxFormLayoutItem CaptionCssClass="text-bold" BeginRow="true" Caption="Apaan ih Gak Tahu">
+                                                                                   <p></p>
+                                                                                </DxFormLayoutItem>
+                                                                                <DxFormLayoutItem BeginRow="true">
+                                                                                    <DxButton Text="Apaan Coba namanya" RenderStyle="ButtonRenderStyle.Primary" Click="ShowPopup"></DxButton>
+                                                                                </DxFormLayoutItem>
+
                                                                             </DxFormLayout>
                                                                         </div>
                                                                     </div>
@@ -1792,4 +1799,16 @@ else
             <DxMailMergeSettings ViewMergedData="true"></DxMailMergeSettings>
         </MailMergeSettings>
     </DxRichEdit>
+</DxPopup>
+<DxPopup Visible="isAccident" Width="900px" Shown="OnPopupShown">
+    <h1>Penanda Lokasi Operasi</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <canvas id="MyCanvas" width="600" height="500" style="border: 1px solid black;"></canvas>
+            <button @onclick="ResetMarkers">Reset</button>
+        </div>
+        <div class="col-md-6">
+            <DxMemo></DxMemo>
+        </div>
+    </div>
 </DxPopup>
