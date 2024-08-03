@@ -312,8 +312,15 @@
                 //     await oLocal.SetItemAsync("dotnet2", new List<string>());
                 // }
 
-                var a = (CustomAuthenticationStateProvider)CustomAuth;
-                await a.UpdateAuthState(encrypt);
+                try
+                {
+                    var a = (CustomAuthenticationStateProvider)CustomAuth;
+                    await a.UpdateAuthState(encrypt);
+                }
+                catch (Exception)
+                {
+                    ToastService.ShowInfo("e");
+                }
 
                 NavigationManager.NavigateTo("", forceLoad: true);
 
@@ -344,6 +351,7 @@
         }
         catch (Exception ex)
         {
+            ToastService.ShowInfo(ex.Message);
             ex.HandleException(ToastService);
         }
     }
