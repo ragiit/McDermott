@@ -2393,9 +2393,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("ServiceId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Sistole")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("SpO2")
                         .HasColumnType("bigint");
 
@@ -5355,6 +5352,12 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("ExpiredId")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("FamilyMedicalHistory")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FamilyMedicalHistoryOther")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long?>("GenderId")
                         .HasColumnType("bigint");
 
@@ -5400,11 +5403,17 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool?>("IsEmployeeRelation")
                         .HasColumnType("bit");
 
+                    b.Property<string>("IsFamilyMedicalHistory")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsHr")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsMcu")
                         .HasColumnType("bit");
+
+                    b.Property<string>("IsMedicationHistory")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsNurse")
                         .HasColumnType("bit");
@@ -5431,6 +5440,9 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("MartialStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MedicationHistory")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MobilePhone")
@@ -5469,6 +5481,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PastMedicalHistory")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PatientAllergyIds")

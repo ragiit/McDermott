@@ -202,8 +202,7 @@ namespace McDermott.Application.Dtos.Transaction
         public long PainScale { get; set; }
         public long Systolic { get; set; }
         public long DiastolicBP { get; set; }
-        public long SpO2 { get; set; }
-        public long Sistole { get; set; }
+        public long SpO2 { get; set; } 
         public long Diastole { get; set; }
         public long WaistCircumference { get; set; }
 
@@ -215,12 +214,6 @@ namespace McDermott.Application.Dtos.Transaction
         public string? InformationFrom { get; set; }  
         public long? ProjectId { get; set; }    
         public long? AwarenessId { get; set; }
-        public string? IsFamilyMedicalHistory { get; set; } 
-        public string? FamilyMedicalHistory { get; set; }
-        public string? FamilyMedicalHistoryOther { get; set; }
-        public string? IsMedicationHistory { get; set; } 
-        public string? MedicationHistory { get; set; } 
-        public string? PastMedicalHistory { get; set; }  
 
         public long E { get; set; } = 4;
         public long V { get; set; } = 5;
@@ -228,7 +221,7 @@ namespace McDermott.Application.Dtos.Transaction
 
         #endregion
 
-        public virtual AwarenessDto? AwarenessDto { get; set; }
+        public virtual AwarenessDto? Awareness { get; set; }
         public virtual KioskQueueDto? KioskQueue { get; set; }
         public virtual ClassTypeDto? ClassType { get; set; }
         public virtual UserDto? Patient { get; set; } = new();

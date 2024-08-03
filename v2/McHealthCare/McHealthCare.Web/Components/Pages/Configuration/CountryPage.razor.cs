@@ -39,6 +39,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             return false;
         }
 
+        private bool shouldAddW100Class = true;
         protected override async Task OnInitializedAsync()
         {
             var aa = NavigationManager.ToAbsoluteUri("/notificationHub");

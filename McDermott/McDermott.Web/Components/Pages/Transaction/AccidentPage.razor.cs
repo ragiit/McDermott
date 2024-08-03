@@ -1,4 +1,5 @@
 ﻿using DevExpress.Blazor.RichEdit;
+using McDermott.Domain.Entities;
 using System.ComponentModel;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
@@ -22,8 +23,18 @@ namespace McDermott.Web.Components.Pages.Transaction
         private bool IsAccess = false;
         private string SelectedRegType { get; set; } = "Accident";
 
-        private string GetNullText(IEnumerable<string> natureOfInjury) =>
+        public static string GetNullText(IEnumerable<string> natureOfInjury) =>
       string.Join(" / ", natureOfInjury);
+
+        private async Task OnClickPopUpHistoricalMedical()
+        {
+            if (GeneralConsultanService.PatientId == 0 || GeneralConsultanService.PatientId is null) 
+            {
+                ToastService.ShowInfo("Please select the Employee");
+                return;
+            }
+
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -43,6 +54,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 await LoadComboBox();
                 StateHasChanged();
+
+               
 
                 try
                 {
@@ -71,11 +84,27 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
 
                 Grid?.SelectRow(0, true);
+
+                
             }
         }
 
+        private void ShowPopup()
+        {
+            isAccident = true;
+        }
+
+        private async Task OnPopupShown()
+        {
+            await JsRuntime.InvokeVoidAsync("initializeCanvas", "MyCanvas");
+        }
+       
         private List<IBrowserFile> BrowserFiles = [];
 
+        private async Task ResetMarkers()
+        {
+            await JsRuntime.InvokeVoidAsync("resetMarkers");
+        }
         private async void SelectFiles(InputFileChangeEventArgs e)
         {
             var file = e.File;
@@ -261,13 +290,13 @@ namespace McDermott.Web.Components.Pages.Transaction
             //RefreshStagingText();
         }
 
-        private IEnumerable<string> NatureOfInjury1 { get; set; } = new List<string>
+        public static IEnumerable<string> NatureOfInjury1 { get; set; } = new List<string>
         {
             "Foreign body",
             "Eye irritation"
         };
 
-        private IEnumerable<string> NatureOfInjury2 { get; set; } = new List<string>
+        public static IEnumerable<string> NatureOfInjury2 { get; set; } = new List<string>
         {
             "Abrasion",
             "Laceration",
@@ -275,39 +304,39 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Scratch"
         };
 
-        private IEnumerable<string> NatureOfInjury3 { get; set; } = new List<string>
+        public static IEnumerable<string> NatureOfInjury3 { get; set; } = new List<string>
         {
             "Bruise",
             "Contussion",
             "Crushing"
         };
 
-        private IEnumerable<string> NatureOfInjury4 { get; set; } = new List<string>
+        public static IEnumerable<string> NatureOfInjury4 { get; set; } = new List<string>
         {
             "Sprain"
         };
 
-        private IEnumerable<string> NatureOfInjury5 { get; set; } = new List<string>
+        public static IEnumerable<string> NatureOfInjury5 { get; set; } = new List<string>
         {
             "Fracture",
             "Dislocation"
         };
 
-        private IEnumerable<string> NatureOfInjury6 { get; set; } = new List<string>
+        public static IEnumerable<string> NatureOfInjury6 { get; set; } = new List<string>
         {
             "Burn",
             "Chemical burn",
             "Electric burn"
         };
 
-        private IEnumerable<string> NatureOfInjury7 { get; set; } = new List<string>
+        public static IEnumerable<string> NatureOfInjury7 { get; set; } = new List<string>
         {
             "Occupational illness",
             "LBP",
             "Dermatitis"
         };
 
-        private IEnumerable<string> NatureOfInjury8 { get; set; } = new List<string>
+        public static IEnumerable<string> NatureOfInjury8 { get; set; } = new List<string>
         {
             "Asphyxia",
             "Intoxication",
@@ -319,128 +348,128 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Part of Body
 
-        private IEnumerable<string> PartOfBody1 { get; set; } = [
+        public static IEnumerable<string> PartOfBody1 { get; set; } = [
             "Head",
             "face",
             "neck"
         ];
 
-        private IEnumerable<string> PartOfBody2 { get; set; } = [
+        public static IEnumerable<string> PartOfBody2 { get; set; } = [
             "Eye"
         ];
 
-        private IEnumerable<string> PartOfBody3 { get; set; } = [
+        public static IEnumerable<string> PartOfBody3 { get; set; } = [
             "Ear"
         ];
 
-        private IEnumerable<string> PartOfBody4 { get; set; } = [
+        public static IEnumerable<string> PartOfBody4 { get; set; } = [
             "Back"
         ];
 
-        private IEnumerable<string> PartOfBody5 { get; set; } = [
+        public static IEnumerable<string> PartOfBody5 { get; set; } = [
             "Trunk (except back and internal)"
         ];
 
-        private IEnumerable<string> PartOfBody6 { get; set; } = [
+        public static IEnumerable<string> PartOfBody6 { get; set; } = [
             "Arm"
         ];
 
-        private IEnumerable<string> PartOfBody7 { get; set; } = [
+        public static IEnumerable<string> PartOfBody7 { get; set; } = [
             "Hand and wrist"
         ];
 
-        private IEnumerable<string> PartOfBody8 { get; set; } = [
+        public static IEnumerable<string> PartOfBody8 { get; set; } = [
             "Fingers"
         ];
 
-        private IEnumerable<string> PartOfBody9 { get; set; } = [
+        public static IEnumerable<string> PartOfBody9 { get; set; } = [
             "Leg"
         ];
 
-        private IEnumerable<string> PartOfBody10 { get; set; } = [
+        public static IEnumerable<string> PartOfBody10 { get; set; } = [
             "Feet and ankles"
         ];
 
-        private IEnumerable<string> PartOfBody11 { get; set; } = [
+        public static IEnumerable<string> PartOfBody11 { get; set; } = [
             "Toes"
         ];
 
-        private IEnumerable<string> PartOfBody12 { get; set; } = [
+        public static IEnumerable<string> PartOfBody12 { get; set; } = [
             "Internal and Others"
         ];
 
-        private IEnumerable<string> EmployeeCauseOfInjury1 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury1 { get; set; } = new[]
         {
             "Falls",
             "Slips",
             "Trips"
         };
 
-        private IEnumerable<string> EmployeeCauseOfInjury2 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury2 { get; set; } = new[]
         {
             "Fire",
             "hot materials"
         };
 
-        private IEnumerable<string> EmployeeCauseOfInjury3 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury3 { get; set; } = new[]
         {
             "Pressurized gas"
         };
 
-        private IEnumerable<string> EmployeeCauseOfInjury4 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury4 { get; set; } = new[]
         {
     "Foreign body"
 };
 
-        private IEnumerable<string> EmployeeCauseOfInjury5 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury5 { get; set; } = new[]
         {
             "Electricity"
         };
 
-        private IEnumerable<string> EmployeeCauseOfInjury6 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury6 { get; set; } = new[]
         {
             "Sandblast"
         };
 
-        private IEnumerable<string> EmployeeCauseOfInjury7 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury7 { get; set; } = new[]
         {
             "Animal",
             "plant"
         };
 
-        private IEnumerable<string> EmployeeCauseOfInjury8 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury8 { get; set; } = new[]
         {
             "Struck",
             "caught (by, against, between) objects"
         };
 
-        private IEnumerable<string> EmployeeCauseOfInjury9 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury9 { get; set; } = new[]
         {
             "Chemicals"
         };
 
-        private IEnumerable<string> EmployeeCauseOfInjury10 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury10 { get; set; } = new[]
         {
             "Welding flash"
         };
 
-        private IEnumerable<string> EmployeeCauseOfInjury11 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury11 { get; set; } = new[]
         {
             "Vehicle accident"
         };
 
-        private IEnumerable<string> EmployeeCauseOfInjury12 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury12 { get; set; } = new[]
         {
             "Overexertion"
         };
 
-        private IEnumerable<string> EmployeeCauseOfInjury13 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury13 { get; set; } = new[]
         {
             "Smoke",
             "gas"
         };
 
-        private IEnumerable<string> EmployeeCauseOfInjury14 { get; set; } = new[]
+        public static IEnumerable<string> EmployeeCauseOfInjury14 { get; set; } = new[]
         {
             "Others"
         };
@@ -449,39 +478,39 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Treatment
 
-        private IEnumerable<string> Treatment1 { get; set; } = [
+        public static IEnumerable<string> Treatment1 { get; set; } = [
             "Cleaning and dressing",
             "Removal of foreign body with cotton wool",
             "Removal of foreign body with needle and magnet"
         ];
 
-        private IEnumerable<string> Treatment2 { get; set; } = [
+        public static IEnumerable<string> Treatment2 { get; set; } = [
             "Stitching"
         ];
 
-        private IEnumerable<string> Treatment3 { get; set; } = [
+        public static IEnumerable<string> Treatment3 { get; set; } = [
             "Splinting"
         ];
 
-        private IEnumerable<string> Treatment4 { get; set; } = [
+        public static IEnumerable<string> Treatment4 { get; set; } = [
             "Antibiotics"
         ];
 
-        private IEnumerable<string> Treatment5 { get; set; } = [
+        public static IEnumerable<string> Treatment5 { get; set; } = [
             "Painkillers"
         ];
 
-        private IEnumerable<string> Treatment6 { get; set; } = [
+        public static IEnumerable<string> Treatment6 { get; set; } = [
             "Tetanus toxoid injection, 0.5 cc"
         ];
 
-        private IEnumerable<string> Treatment7 { get; set; } = [
+        public static IEnumerable<string> Treatment7 { get; set; } = [
             "Others"
         ];
 
         #endregion Treatment
 
-        private IEnumerable<string> EmployeeClass { get; set; } = [
+        public static IEnumerable<string> EmployeeClass { get; set; } = [
            "FA",
            "MTC",
            "RWC",
@@ -496,6 +525,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private bool PanelVisible { get; set; } = true;
         private bool ShowForm { get; set; } = false;
+        private bool isAccident { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
 
         private List<UserDto> Physicions { get; set; } = [];
@@ -1114,6 +1144,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 service.Accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == service.Id))).FirstOrDefault() ?? new();
             }
+
+           
 
             GeneralConsultanService = new();
             Accident = new();

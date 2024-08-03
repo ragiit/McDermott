@@ -37,7 +37,20 @@ namespace McDermott.Web.Components.Pages.Patient
         private GroupMenuDto UserAccessCRUID = new();
         private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
-
+        private List<string> YesNoOptions =
+       [
+           "Yes",
+            "No"
+       ]; private List<string> RiwayatPenyakitKeluarga =
+        [
+            "DM",
+            "Hipertensi",
+            "Cancer",
+            "Jantung",
+            "TBC",
+            "Anemia",
+            "Other",
+        ];
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);

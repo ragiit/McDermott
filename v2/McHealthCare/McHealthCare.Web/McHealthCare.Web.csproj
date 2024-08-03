@@ -23,6 +23,5 @@
     <ProjectReference Include="..\McHealthCare.Application\McHealthCare.Application.csproj" />
     <ProjectReference Include="..\McHealthCare.Infrastructure\McHealthCare.Persistence.csproj" />
   </ItemGroup>
-
-
+ 
 </Project>

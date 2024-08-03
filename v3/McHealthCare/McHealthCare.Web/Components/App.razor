@@ -5,16 +5,34 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
+    @* <link rel="stylesheet" href="bootstrap/bootstrap.min.css" /> *@
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="McHealthCare.Web.styles.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
+
+
+    <!-- Google font-->
+    @* <link href="https://fonts.googleapis.com/css?family=Rubik:400,400i,500,500i,700,700i&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900&amp;display=swap" rel="stylesheet">
+    *@
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="css/templates/css/adminlte.min.css" />
+
+    <link href="fontawesome/css/all.css"/ rel="stylesheet">
+    <link href="css/lumen/bootstrap.min.css" asp-append-version="true" rel="stylesheet" />
+    <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css" />
+
+    @DxResourceManager.RegisterScripts()
+
     <HeadOutlet @rendermode="RenderModeForPage" />
 </head>
 
-<body>
     <Routes @rendermode="RenderModeForPage" />
-    <script src="_framework/blazor.web.js"></script>
+    <script src="_framework/blazor.web.js"></script> 
+    <link href="css/templates/js/adminlte.min.js" />
+    <link href="css/templates/js/bootstrap.bundle.min.js" />
+    <link href="css/templates/js/jquery.min.js" />
 </body>
 
 </html>

@@ -1,4 +1,7 @@
-﻿<!-- latest jquery-->
+﻿
+
+
+<!-- latest jquery-->
 <script src="assets/js/jquery.min.js"></script>
 <!-- Bootstrap js-->
 <script src="assets/js/bootstrap/bootstrap.bundle.min.js"></script>
@@ -24,6 +27,8 @@
 <script src="assets/js/typeahead/typeahead.custom.js"></script>
 <script src="assets/js/typeahead-search/handlebars.js"></script>
 <script src="assets/js/typeahead-search/typeahead-custom.js"></script>
+<script src="assets/js/scrollable/perfect-scrollbar.min.js"></script>
+<script src="assets/js/scrollable/scrollable-custom.js"></script>
 <!-- Plugins JS Ends-->
 <!-- Theme js-->
 <script src="assets/js/script.js"></script>
@@ -42,3 +47,22 @@
     });
 
 </script> *@
+<script>
+    window.addEventListener('load', function () {
+        var pageHeader = document.querySelector('.page-header');
+        var pageTitle = document.querySelector('.page-title');
+        var headerHeight = pageHeader.offsetHeight;
+
+        pageTitle.style.top = headerHeight + 'px';
+
+        window.addEventListener('scroll', function () {
+            if (window.pageYOffset >= headerHeight) {
+                pageTitle.classList.add('sticky');
+                pageTitle.style.transform = 'translateY(' + headerHeight + 'px)';
+            } else {
+                pageTitle.classList.remove('sticky');
+                pageTitle.style.transform = 'translateY(0)';
+            }
+        });
+    });
+</script>

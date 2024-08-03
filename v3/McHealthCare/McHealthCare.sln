@@ -1,15 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{16330E0A-C888-4107-9B46-A1A27E6AC1C3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.Web", "McHealthCare.Web\McHealthCare.Web.csproj", "{7B86F257-994C-4425-B051-0B61EEE8DB56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McHealthCare.AppHost", "McHealthCare.AppHost\McHealthCare.AppHost.csproj", "{AF378713-9DF7-4E1F-AAFE-BC666033A75E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.ServiceDefaults", "McHealthCare.ServiceDefaults\McHealthCare.ServiceDefaults.csproj", "{303F3694-4689-4094-B262-13C4BA29D03A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,27 +12,12 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7B86F257-994C-4425-B051-0B61EEE8DB56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B86F257-994C-4425-B051-0B61EEE8DB56}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B86F257-994C-4425-B051-0B61EEE8DB56}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B86F257-994C-4425-B051-0B61EEE8DB56}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF378713-9DF7-4E1F-AAFE-BC666033A75E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF378713-9DF7-4E1F-AAFE-BC666033A75E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF378713-9DF7-4E1F-AAFE-BC666033A75E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF378713-9DF7-4E1F-AAFE-BC666033A75E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{303F3694-4689-4094-B262-13C4BA29D03A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{303F3694-4689-4094-B262-13C4BA29D03A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{303F3694-4689-4094-B262-13C4BA29D03A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{303F3694-4689-4094-B262-13C4BA29D03A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{7B86F257-994C-4425-B051-0B61EEE8DB56} = {16330E0A-C888-4107-9B46-A1A27E6AC1C3}
-		{AF378713-9DF7-4E1F-AAFE-BC666033A75E} = {16330E0A-C888-4107-9B46-A1A27E6AC1C3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {520BCB06-EAD9-4377-8F7F-D5170492A06F}
 	EndGlobalSection
 EndGlobal

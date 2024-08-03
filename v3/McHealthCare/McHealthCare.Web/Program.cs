@@ -4,8 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using McHealthCare.Web.Components;
 using McHealthCare.Web.Components.Account;
 using McHealthCare.Web.Data;
+using DevExpress.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
+
+DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
+builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
 
 builder.AddServiceDefaults();
 

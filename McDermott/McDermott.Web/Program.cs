@@ -108,6 +108,7 @@ app.MapControllers();
 app.UseStaticFiles();
 app.UseAntiforgery();
 app.MapHub<RealTimeHub>("/realTimeHub");
+//app.UseMiddleware<RateLimitMiddleware>();
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
@@ -137,3 +138,34 @@ using (var scope = app.Services.CreateScope())
 
 
 app.Run();
+
+public class RateLimitMiddleware
+{
+    private static Dictionary<string, DateTime> requestTimes = new Dictionary<string, DateTime>();
+    private static TimeSpan limitPeriod = TimeSpan.FromSeconds(5); // Time period to check requests
+
+    private readonly RequestDelegate _next;
+
+    public RateLimitMiddleware(RequestDelegate next)
+    {
+        _next = next;
+    }
+
+    public async Task Invoke(HttpContext context)
+    {
+        var ipAddress = context.Connection.RemoteIpAddress.ToString();
+
+        if (requestTimes.ContainsKey(ipAddress))
+        {
+            var lastRequestTime = requestTimes[ipAddress];
+            if (DateTime.UtcNow < lastRequestTime.Add(limitPeriod))
+            {
+                context.Response.StatusCode = 429; // Too Many Requests
+                return;
+            }
+        }
+
+        requestTimes[ipAddress] = DateTime.UtcNow;
+        await _next(context);
+    }
+}
