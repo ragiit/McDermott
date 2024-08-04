@@ -1,7 +1,5 @@
 ﻿using McHealthCare.Application.Extentions;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using static McHealthCare.Application.Features.CommandsQueries.Configuration.MenuCommand;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
 {
@@ -175,7 +173,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                         ToastService.ShowInfo("The Excel file does not contain any worksheets.");
                         return;
                     }
-                      
+
                     if (ws.Dimension == null || ws.Dimension.End.Row < 1)
                     {
                         ToastService.ShowInfo("The worksheet is empty.");
@@ -196,7 +194,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        bool IsValid = true; 
+                        bool IsValid = true;
                         var a = this.Menus.FirstOrDefault(x => x.Name == ws.Cells[row, 2].Value?.ToString()?.Trim())?.Id ?? Guid.Empty;
 
                         if (ws.Cells[row, 2].Value?.ToString()?.Trim() is not null)
@@ -206,18 +204,17 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                                 ToastService.ShowErrorImport(row, 1, ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty);
                                 IsValid = false;
                             }
-
                         }
 
                         if (!IsValid)
                             continue;
-                         
+
                         var Menu = new MenuDto
                         {
                             ParentId = a == Guid.Empty ? null : a,
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
                             Sequence = Convert.ToInt64(ws.Cells[row, 3].Value?.ToString()?.Trim()),
-                            Url = ws.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty, 
+                            Url = ws.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty,
                         };
 
                         if (!this.Menus.Any(x => x.Name.Trim().ToLower() == Menu?.Name?.Trim().ToLower() && x.ParentId == Menu.ParentId && x.Sequence == Menu.Sequence && x.Url == Menu.Url))
@@ -235,7 +232,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     ToastService.ShowError(ex.Message);
                 }
                 finally
-                { 
+                {
                     PanelVisible = false;
                 }
             }
@@ -249,5 +246,4 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
         }
     }
-
 }

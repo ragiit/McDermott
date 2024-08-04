@@ -22,7 +22,7 @@ namespace McHealthCare.Persistence.Repositories
         public async Task<T> AddAsync(T entity)
         {
             try
-            { 
+            {
                 await _dbContext.Set<T>().AddAsync(entity);
                 return entity;
             }

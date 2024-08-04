@@ -1,117 +1,193 @@
-﻿using McHealthCare.Domain.Entities;
-using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore.Internal;
-using static McHealthCare.Application.Features.CommandsQueries.Configuration.GroupCommand;
-using static McHealthCare.Application.Features.CommandsQueries.Configuration.GroupMenuCommand;
-using static McHealthCare.Application.Features.CommandsQueries.Configuration.MenuCommand;
-using static McHealthCare.Extentions.EnumHelper;
+﻿using Microsoft.AspNetCore.Components;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
 {
     public partial class GroupMenuPage
     {
-        #region Default Variables 
+        #region Default Variables & Forms
+
         private IGrid Grid { get; set; }
         private IGrid GridGroupMenu { get; set; }
-        private bool PanelVisible { get; set; }
-        private int FocusedRowVisibleIndex { get; set; }
-        private int FocusedRowVisibleIndex2 { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        private IReadOnlyList<object> SelectedDataItemsGroupMenu { get; set; } = [];
+        private bool PanelVisible { get; set; } = false;
+        private int FocusedRowVisibleIndex { get; set; } = -1;
+        private int FocusedRowVisibleIndex2 { get; set; } = -1;
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new List<object>();
+        private IReadOnlyList<object> SelectedDataItemsGroupMenu { get; set; } = new List<object>();
+        private string Url => Helper.URLS.FirstOrDefault(x => x == "configuration/groups") ?? string.Empty;
+        public bool IsLoading { get; set; } = false;
+        private string PageName => new Uri(NavigationManager.Uri).PathAndQuery.Replace(NavigationManager.BaseUri, "/");
 
-        #endregion
+        #endregion Default Variables & Forms
 
         #region Default Methods
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadData();
+            await LoadDataAsync();
         }
-        private async Task LoadDataGroupMenu()
-        {
-            GroupMenus = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id));
-        }
-        private async Task LoadData()
-        {
-            PanelVisible = true;
-            Groups = await Mediator.Send(new GetGroupQuery());
-            Menus = await Mediator.Send(new GetMenuQuery());
-            PanelVisible = false;
-        }
-        private async Task BackButton()
-        {
-            PanelVisible = true;
-            NavigationManager.NavigateTo(Url);
-            Groups = await Mediator.Send(new GetGroupQuery());
-            PanelVisible = false;
-        }
-        private async Task LoadDataById(Guid id)
-        {
-            Group = (await Mediator.Send(new GetGroupQuery(x => x.Id == id))).FirstOrDefault() ?? new();
-            await LoadDataGroupMenu();
 
-            if (Group.Id == Guid.Empty)
-            {
-                NavigationManager.NavigateTo(Url);
-            }
-        }
-        private void InitializeNew(bool isParam = false)
+        private async Task LoadDataAsync()
         {
-            Group = new();
-            GroupMenus = [];
-
-            if (!isParam)
-                NavigationManager.NavigateTo($"{Url}/{EnumPageMode.Create.GetDisplayName()}");
-        }
-        private async Task InitializeEdit()
-        {
-            var id = SelectedDataItems[0].Adapt<GroupDto>().Id;
-            var url = $"{Url}/{EnumPageMode.Update.GetDisplayName()}/{id}";
-            NavigationManager.NavigateTo(url);
-            await LoadDataById(id);
-        }
-        private async Task OnDelete(GridDataItemDeletingEventArgs e)
-        {
-            PanelVisible = true;
             try
             {
-                if (SelectedDataItems is null)
+                SetLoading(true);
+                Groups = await Mediator.Send(new GetGroupQuery());
+                Menus = await Mediator.Send(new GetMenuQuery());
+            }
+            catch (Exception ex)
+            {
+                // Log error or handle it
+                Console.WriteLine($"Error loading data: {ex.Message}");
+            }
+            finally
+            {
+                SetLoading(false);
+            }
+        }
+
+        private async Task LoadDataGroupMenuAsync()
+        {
+            try
+            {
+                GroupMenus = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id));
+                var a = "ad";
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                Console.WriteLine($"Error loading group menu: {ex.Message}");
+            }
+        }
+
+        private async Task LoadDataByIdAsync(Guid id)
+        {
+            try
+            {
+                Group = (await Mediator.Send(new GetGroupQuery(x => x.Id == id))).FirstOrDefault() ?? new GroupDto();
+                await LoadDataGroupMenuAsync();
+
+                if (Group.Id == Guid.Empty)
+                {
+                    NavigateToUrl(Url);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading data by ID: {ex.Message}");
+            }
+        }
+
+        private void NavigateToUrl(string relativeUrl, bool forceLoad = false)
+        {
+            var absoluteUrl = $"{NavigationManager.BaseUri}{relativeUrl}";
+            NavigationManager.NavigateTo(absoluteUrl, forceLoad);
+        }
+
+        private void InitializeNew(bool isParam = false)
+        {
+            Group = new GroupDto();
+            GroupMenus.Clear();
+
+            if (!isParam)
+                NavigateToUrl($"{Url}/{EnumPageMode.Create.GetDisplayName()}");
+        }
+
+        private async Task InitializeEditAsync()
+        {
+            if (SelectedDataItems.Count > 0)
+            {
+                var id = SelectedDataItems[0].Adapt<GroupDto>().Id;
+                NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{id}");
+                await LoadDataByIdAsync(id);
+            }
+        }
+
+        private async Task HandleValidSubmitAsync()
+        {
+            try
+            {
+                Group = Group.Id == Guid.Empty
+                    ? await Mediator.Send(new CreateGroupRequest(Group))
+                    : await Mediator.Send(new UpdateGroupRequest(Group));
+
+                NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error handling valid submit: {ex.Message}");
+            }
+        }
+
+        private async Task HandleInvalidSubmitAsync()
+        {
+            // Handle invalid form submission
+            Console.WriteLine("Form submission is invalid.");
+        }
+
+        private async Task OnDeleteAsync(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                SetLoading(true);
+
+                if (SelectedDataItems == null || !SelectedDataItems.Any())
                 {
                     await Mediator.Send(new DeleteGroupRequest(((GroupDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<GroupDto>>();
-                    await Mediator.Send(new DeleteGroupRequest(Ids: a.Select(x => x.Id).ToList()));
+                    var ids = SelectedDataItems.Adapt<List<GroupDto>>().Select(x => x.Id).ToList();
+                    await Mediator.Send(new DeleteGroupRequest(Ids: ids));
                 }
-                SelectedDataItems = [];
-                await LoadData();
+
+                SelectedDataItems = new List<object>();
+                await LoadDataAsync();
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error deleting item: {ex.Message}");
             }
             finally
             {
-                PanelVisible = false;
+                SetLoading(false);
             }
         }
-        private async Task HandleValidSubmit()
-        {
-            if (Group.Id == Guid.Empty)
-                Group = await Mediator.Send(new CreateGroupRequest(Group));
-            else
-                Group = await Mediator.Send(new UpdateGroupRequest(Group));
 
-            NavigationManager.NavigateTo($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}");
-        }
-        private async Task HandleInvalidSubmit() { }
-        private async Task OnSaveGroupMenu(GridEditModelSavingEventArgs e)
+        private async Task OnDeleteGroupMenuAsync(GridDataItemDeletingEventArgs e)
         {
-            PanelVisible = true;
             try
             {
-                var editModel = (GroupMenuDto)e.EditModel;
+                SetLoading(true);
 
+                if (SelectedDataItemsGroupMenu == null || !SelectedDataItemsGroupMenu.Any())
+                {
+                    await Mediator.Send(new DeleteGroupMenuRequest(((GroupMenuDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var ids = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>().Select(x => x.Id).ToList();
+                    await Mediator.Send(new DeleteGroupMenuRequest(Ids: ids));
+                }
+
+                SelectedDataItemsGroupMenu = [];
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting item: {ex.Message}");
+            }
+            finally
+            {
+                SetLoading(false);
+            }
+        }
+
+        private async Task OnSaveGroupMenuAsync(GridEditModelSavingEventArgs e)
+        {
+            try
+            {
+                SetLoading(true);
+                var editModel = (GroupMenuDto)e.EditModel;
                 editModel.GroupId = Group.Id;
 
                 if (editModel.Id == Guid.Empty)
@@ -119,66 +195,67 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 else
                     await Mediator.Send(new UpdateGroupMenuRequest(editModel));
 
-                await LoadDataGroupMenu();
+                await LoadDataGroupMenuAsync();
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error saving group menu: {ex.Message}");
             }
             finally
             {
-                PanelVisible = false;
+                SetLoading(false);
             }
         }
-        private async Task OnDeleteGroupMenu(GridDataItemDeletingEventArgs e)
+
+        private void SetLoading(bool isLoading)
         {
-            PanelVisible = true;
-            try
-            {
-                if (SelectedDataItemsGroupMenu is null)
-                {
-                    await Mediator.Send(new DeleteGroupMenuRequest(((GroupMenuDto)e.DataItem).Id));
-                }
-                else
-                {
-                    var a = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>();
-                    await Mediator.Send(new DeleteGroupMenuRequest(Ids: a.Select(x => x.Id).ToList()));
-                }
-                SelectedDataItemsGroupMenu = [];
-                await LoadDataGroupMenu();
-            }
-            catch (Exception ex)
-            {
-            }
-            finally
-            {
-                PanelVisible = false;
-            }
+            PanelVisible = isLoading;
         }
+
         private void CancelItemGroupMenuGrid_Click()
         {
-
+            // Implement logic to cancel group menu grid operation
         }
-        private async Task NewItemGroup_Click()
+
+        private async Task NewItemGroup_ClickAsync()
         {
-            GroupMenu = new();
+            GroupMenu = new GroupMenuDto();
             await GridGroupMenu.StartEditNewRowAsync();
         }
-        #endregion
+
+        private async Task BackButtonAsync()
+        {
+            try
+            {
+                SetLoading(true);
+                NavigateToUrl(Url);
+                Groups = await Mediator.Send(new GetGroupQuery());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error navigating back: {ex.Message}");
+            }
+            finally
+            {
+                SetLoading(false);
+            }
+        }
+
+        #endregion Default Methods
 
         #region Variables
-        private string Url => Helper.URLS.FirstOrDefault(x => x == "configuration/groups") ?? "";
-        [Parameter]
-        public Guid? Id { get; set; }
-        [Parameter]
-        public string? PageMode { get; set; }
-        public bool IsLoading { get; set; } = false;
-        private List<GroupDto> Groups { get; set; } = [];
-        private List<GroupMenuDto> GroupMenus { get; set; } = [];
-        private List<MenuDto> Menus { get; set; } = [];
-        private GroupDto Group { get; set; } = new();
-        private GroupMenuDto GroupMenu { get; set; } = new();
-        private string PageName => new Uri(NavigationManager.Uri).PathAndQuery.Replace(NavigationManager.BaseUri, "/");
-        #endregion
+
+        [Parameter] public Guid? Id { get; set; }
+        [Parameter] public string? PageMode { get; set; }
+        private List<GroupDto> Groups { get; set; } = new List<GroupDto>();
+        private List<GroupMenuDto> GroupMenus { get; set; } = new List<GroupMenuDto>();
+        private List<MenuDto> Menus { get; set; } = new List<MenuDto>();
+        private GroupDto Group { get; set; } = new GroupDto();
+        private GroupMenuDto GroupMenu { get; set; } = new GroupMenuDto();
+
+        #endregion Variables
+
+        #region On Import
 
         protected override async Task OnParametersSetAsync()
         {
@@ -206,7 +283,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     // Logika untuk update
                     if (Id.HasValue)
                     {
-                        await LoadDataById(Id.GetValueOrDefault());
+                        await LoadDataByIdAsync(Id.GetValueOrDefault());
                     }
                     else
                     {
@@ -225,6 +302,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 Notes = "Mandatory"
             }
         ];
+
         private List<ExportFileData> ExportFileDatasGroup =
         [
             new()
@@ -287,7 +365,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                     await Mediator.Send(new CreateListGroupMenuRequest(gg));
 
-                    await LoadDataGroupMenu();
+                    await LoadDataGroupMenuAsync();
 
                     ToastService.ShowSuccess("Successfully Imported.");
                 }
@@ -298,6 +376,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
             PanelVisible = false;
         }
+
         public async Task ImportExcelFileGroup(InputFileChangeEventArgs e)
         {
             PanelVisible = true;
@@ -337,7 +416,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                     await Mediator.Send(new CreateListGroupRequest(gg));
 
-                    await LoadData();
+                    await LoadDataAsync();
 
                     ToastService.ShowSuccess("Successfully Imported.");
                 }
@@ -349,5 +428,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             PanelVisible = false;
         }
 
+        #endregion On Import
     }
 }

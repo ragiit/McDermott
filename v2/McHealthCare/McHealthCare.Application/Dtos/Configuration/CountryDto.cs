@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using McHealthCare.Domain.Entities.Configuration;
 using System.ComponentModel.DataAnnotations;
 
 namespace McHealthCare.Application.Dtos.Configuration
@@ -14,7 +13,6 @@ namespace McHealthCare.Application.Dtos.Configuration
 
         [StringLength(5)]
         public string Code { get; set; } = string.Empty;
-         
     }
 
     public class CreateUpdateCountryDto : IMapFrom<Country>

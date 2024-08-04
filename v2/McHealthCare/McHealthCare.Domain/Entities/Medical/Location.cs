@@ -1,7 +1,7 @@
-
-
-namespace McHealthCare.Domain.Entities.Medical{
-    public partial class Location :BaseAuditableEntity{
+namespace McHealthCare.Domain.Entities.Medical
+{
+    public partial class Location : BaseAuditableEntity
+    {
         public Guid? CityId { get; set; }
         public Guid? ProvinceId { get; set; }
         public Guid? CountryId { get; set; }

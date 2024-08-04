@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Mapster;
 using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities.Medical;
@@ -19,11 +18,13 @@ namespace McHealthCare.Application.Dtos.Medical
 
         [SetToNull]
         public LabTestDto? LabTest { get; set; }
+
         [SetToNull]
         public LabUomDto? LabUom { get; set; }
     }
 
-    public class CreateUpdateLabTestDetailDto : IMapFrom<LabTestDetail>{
+    public class CreateUpdateLabTestDetailDto : IMapFrom<LabTestDetail>
+    {
         public Guid? LabTestId { get; set; }
         public Guid? LabUomId { get; set; }
         public string? Name { get; set; }
@@ -36,6 +37,7 @@ namespace McHealthCare.Application.Dtos.Medical
 
         [SetToNull]
         public virtual LabTestDto? LabTest { get; set; }
+
         [SetToNull]
         public virtual LabUomDto? LabUom { get; set; }
     }

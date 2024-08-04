@@ -2,15 +2,10 @@
 using McHealthCare.Application.Dtos.Configuration;
 using McHealthCare.Application.Extentions;
 using McHealthCare.Application.Interfaces;
-using McHealthCare.Domain.Entities;
-using McHealthCare.Domain.Entities.Configuration;
 using MediatR;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
-using System.Threading;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 {
@@ -32,7 +27,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         IRequestHandler<UpdateListCountryRequest, List<CountryDto>>,
         IRequestHandler<DeleteCountryRequest, bool>
     {
-
         private string CacheKey = "GetCountryQuery_";
 
         private async Task<(CountryDto, List<CountryDto>)> Result(Country? result = null, List<Country>? results = null, bool ReturnNewData = false, CancellationToken cancellationToken = default)
@@ -58,7 +52,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         #region GET
 
         public async Task<List<CountryDto>> Handle(GetCountryQuery request, CancellationToken cancellationToken)
-        { 
+        {
             if (request.RemoveCache)
                 cache.Remove(CacheKey);
 
@@ -131,7 +125,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             cache.Remove(CacheKey);
 
             return (await Result(result: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item1;
-
         }
 
         public async Task<List<CountryDto>> Handle(UpdateListCountryRequest request, CancellationToken cancellationToken)
@@ -143,10 +136,9 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
             {
-                Type =  EnumTypeReceiveData.Update,
+                Type = EnumTypeReceiveData.Update,
                 Data = result
             });
-
 
             return (await Result(results: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item2;
         }
@@ -187,7 +179,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                 {
                     Type = EnumTypeReceiveData.Delete,
                     Data = deletedCountries,
-                }); 
+                });
             }
 
             return true;

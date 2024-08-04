@@ -1,11 +1,16 @@
 ﻿@using Blazored.Toast
 @using Blazored.Toast.Configuration
 @using McHealthCare.Domain.Entities
+@using McHealthCare.Web.Components.Account
 @using Microsoft.AspNetCore.Antiforgery
 @using Microsoft.AspNetCore.Identity
 @using System.Reflection.Metadata
+@using System.Security.Claims
 @inject NavigationManager NavigationManager
 @inject SignInManager<ApplicationUser> SignInManager
+@inject IdentityUserAccessor UserAccessor
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 
 @inherits LayoutComponentBase
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
@@ -86,7 +91,7 @@
                                                     </div>
                                                 </div>
                                             </li>
-                                            
+
                                         </ul>
                                     </div>
                                     <div class="back">
@@ -256,20 +261,23 @@
                                 <div class="mobile-back text-end"><span>Back</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
                             </li>
 
+                            @foreach (var parentMenu in ParentMenus)
+                            {
+                                <li class="sidebar-list">
+                                    <a class="sidebar-link sidebar-title">
+                                        <i class="stroke-icon" data-feather="settings"></i><i class="fill-icon" data-feather="settings"></i>
+                                        <span>@parentMenu.ParentName</span>
+                                    </a>
 
-                            <li class="sidebar-list">
+                                        <ul class="sidebar-submenu">
+                                    @foreach (var menu in Menus.Where(x => x.ParentId == parentMenu.ParentId))
+                                    {
+                                            <li><NavLink href="@menu.Url">@menu.Name</NavLink></li>
 
-                                <a class="sidebar-link sidebar-title" href="#">
-                                    <i class="stroke-icon" data-feather="settings"></i><i class="fill-icon" data-feather="settings"></i>
-                                    <span>Configuration          </span>
-                                </a>
-                                <ul class="sidebar-submenu">
-                                    <li><NavLink href="config/countries">Country</NavLink></li>
-                                    <li><NavLink href="config/provinces">Province</NavLink></li>
-
-                                </ul>
-                            </li>
-
+                                        }
+                                    </ul>
+                                </li>
+                            }
                         </ul>
                     </div>
                     <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
@@ -317,5 +325,39 @@
 
 @code
 {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+    private ClaimsPrincipal? user;
 
+    private bool IsLoadingSideBar { get; set; } = false;
+    private List<MenuDto> Menus { get; set; } = [];
+    private List<ParentMenuTemp> ParentMenus { get; set; } = [];
+    private class ParentMenuTemp
+    {
+        public Guid ParentId { get; set; }
+        public string? ParentName { get; set; } = string.Empty;
+        public long? Sequence { get; set; } = 0;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoadingSideBar = true;
+
+        var user = await UserService.GetCurrentUserFromDatabaseAsync();
+
+        var groupMenu = user?.Group?.GroupMenus?.Select(x => x.MenuId) ?? [];
+        Menus = (await Mediator.Send(new GetMenuQuery(x => groupMenu.Contains(x.Id)))).OrderBy(x => x.Sequence).ToList();
+
+        ParentMenus = Menus.Select(x => new ParentMenuTemp
+            {
+                ParentId = x.ParentId.GetValueOrDefault(),
+                ParentName = x.Parent?.Name,
+                Sequence = x.Parent?.Sequence
+            })
+        .DistinctBy(p => new { p.ParentId, p.ParentName, p.Sequence })
+        .OrderBy(x => x.Sequence)
+        .ToList();
+
+        IsLoadingSideBar = false;
+    }
 }

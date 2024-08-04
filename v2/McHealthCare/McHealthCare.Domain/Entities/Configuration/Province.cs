@@ -1,9 +1,4 @@
-﻿using McHealthCare.Domain.Common;
-using McHealthCare.Domain.Common.Interfaces;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace McHealthCare.Domain.Entities.Configuration
+﻿namespace McHealthCare.Domain.Entities.Configuration
 {
     public class Province : BaseAuditableEntity
     {
@@ -16,6 +11,5 @@ namespace McHealthCare.Domain.Entities.Configuration
         public string Code { get; set; } = string.Empty;
 
         public virtual Country? Country { get; set; }
-         
     }
 }

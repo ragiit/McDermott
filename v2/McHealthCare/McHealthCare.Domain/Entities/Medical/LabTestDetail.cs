@@ -1,5 +1,7 @@
-namespace McHealthCare.Domain.Entities.Medical{
-    public partial class LabTestDetail : BaseAuditableEntity{
+namespace McHealthCare.Domain.Entities.Medical
+{
+    public partial class LabTestDetail : BaseAuditableEntity
+    {
         public Guid? LabTestId { get; set; }
         public Guid? LabUomId { get; set; }
         public string? Name { get; set; }
@@ -12,6 +14,7 @@ namespace McHealthCare.Domain.Entities.Medical{
 
         [SetToNull]
         public LabTest? LabTest { get; set; }
+
         [SetToNull]
         public LabUom? LabUom { get; set; }
     }

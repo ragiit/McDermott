@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McHealthCare.Domain.Entities
+﻿namespace McHealthCare.Domain.Entities
 {
     public class GroupMenu : BaseAuditableEntity
-    { 
+    {
         public Guid GroupId { get; set; }
         public Guid MenuId { get; set; }
+        public bool IsCreate { get; set; }
+        public bool IsRead { get; set; }
+        public bool IsUpdate { get; set; }
+        public bool IsDelete { get; set; }
+        public bool IsImport { get; set; }
 
-        public Group? Group { get; set; } 
-        public Menu? Menu { get; set; } 
+        public Group? Group { get; set; }
+        public Menu? Menu { get; set; }
     }
 }

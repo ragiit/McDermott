@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using Mapster;
 using McHealthCare.Domain.Entities.Medical;
+using System.ComponentModel.DataAnnotations;
 
 namespace McHealthCare.Application.Dtos.Medical
 {
@@ -8,6 +8,7 @@ namespace McHealthCare.Application.Dtos.Medical
     {
         [StringLength(200)]
         public string? Name { get; set; }
+
         public string? Description { get; set; }
 
         public virtual List<LabTest>? LabTests { get; set; }
@@ -17,6 +18,7 @@ namespace McHealthCare.Application.Dtos.Medical
     {
         [StringLength(200)]
         public string? Name { get; set; }
+
         public string? Description { get; set; }
 
         public virtual List<LabTest>? LabTests { get; set; }

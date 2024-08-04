@@ -1,15 +1,9 @@
 ﻿using Mapster;
-using McHealthCare.Domain.Entities.Configuration;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McHealthCare.Application.Dtos.Configuration
 {
-    public class VillageDto: IMapFrom<Village>
+    public class VillageDto : IMapFrom<Village>
     {
         public Guid Id { get; set; }
         public Guid ProvinceId { get; set; }

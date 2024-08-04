@@ -1,10 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McHealthCare.Application.Extentions
 {
@@ -16,8 +11,6 @@ namespace McHealthCare.Application.Extentions
             services.AddMemoryCache();  // Menambahkan MemoryCache// Register DataService
             //services.AddScoped<DataService>();
         }
-
-        
 
         private static void AddMediator(this IServiceCollection services)
         {

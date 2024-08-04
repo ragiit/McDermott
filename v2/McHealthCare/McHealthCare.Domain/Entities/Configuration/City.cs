@@ -1,11 +1,7 @@
-﻿using McHealthCare.Domain.Common;
-using McHealthCare.Domain.Common.Interfaces;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace McHealthCare.Domain.Entities.Configuration
+﻿namespace McHealthCare.Domain.Entities.Configuration
 
 {
-    public partial class City : BaseAuditableEntity 
+    public partial class City : BaseAuditableEntity
     {
         public Guid ProvinceId { get; set; }
 
@@ -15,6 +11,5 @@ namespace McHealthCare.Domain.Entities.Configuration
         public virtual Province? Province { get; set; }
 
         public virtual List<Village>? Villages { get; set; }
-         
     }
 }

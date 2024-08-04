@@ -1,5 +1,4 @@
-﻿using DevExpress.Blazor;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 
 namespace McHealthCare.Web.Extentions.Razor
 {
@@ -24,7 +23,7 @@ namespace McHealthCare.Web.Extentions.Razor
             }
         }
 
-        bool _initialParametersSet;
+        private bool _initialParametersSet;
 
         protected override Task SetParametersAsyncCore(ParameterView parameters)
         {
@@ -42,7 +41,7 @@ namespace McHealthCare.Web.Extentions.Razor
                 //PageSizeSelectorAllRowsItemVisible = true;
                 PagerSwitchToInputBoxButtonCount = 10;
                 FocusedRowEnabled = true;
-                
+
                 PagerVisibleNumericButtonCount = 10;
                 ShowGroupPanel = true;
                 AutoExpandAllGroupRows = true;

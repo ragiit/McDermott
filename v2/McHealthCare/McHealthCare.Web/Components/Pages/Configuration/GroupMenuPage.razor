@@ -10,7 +10,7 @@
 
 <div class="wrapper">
 
-    <BaseHeaderPage Title="Groups" OnClickBack="@(async () => await BackButton())" ShowBackButton="@(PageMode == EnumPageMode.Create.GetDisplayName() || PageMode == EnumPageMode.Update.GetDisplayName())" />
+    <BaseHeaderPage Title="Groups" OnClickBack="@(async () => await BackButtonAsync())" ShowBackButton="@(PageMode == EnumPageMode.Create.GetDisplayName() || PageMode == EnumPageMode.Update.GetDisplayName())" />
     <div class="container-fluid">
         <div class="row">
             <div class="col">
@@ -23,7 +23,7 @@
                                     IndicatorAreaVisible="false"
                                     Text="Fetching Data...">
 
-                        <EditForm Model="@Group" Context="EditFormContext22" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                        <EditForm Model="@Group" Context="EditFormContext22" OnValidSubmit="HandleValidSubmitAsync" OnInvalidSubmit="@HandleInvalidSubmitAsync">
                             <DataAnnotationsValidator />
                             <div class="card">
                                 <div class="card-body">
@@ -45,9 +45,7 @@
                                 <div class="card-body">
                                     <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem CaptionPosition="CaptionPosition.Vertical" Caption="Group" CaptionCssClass="normal-caption required-caption" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@Group.Name"
-                                                       ShowValidationIcon="true"
-                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            <MyTextBox @bind-Text="@Group.Name"
                                                        NullText="Group" />
                                             <ValidationMessage For="@(() => Group.Name)"   />
                                         </DxFormLayoutItem>
@@ -61,8 +59,8 @@
                                                               @bind-SelectedDataItems="@SelectedDataItemsGroupMenu"
                                                               KeyFieldName="MenuId"
                                                               FocusedRowChanged="@((GridFocusedRowChangedEventArgs args) => FocusedRowVisibleIndex2 = args.VisibleIndex)"
-                                                              EditModelSaving="OnSaveGroupMenu"
-                                                              DataItemDeleting="OnDeleteGroupMenu">
+                                                              EditModelSaving="OnSaveGroupMenuAsync"
+                                                              DataItemDeleting="OnDeleteGroupMenuAsync">
 
                                                         <ToolbarTemplate>
                                                             <MyDxToolbarBase TItem="GroupMenuDto"
@@ -71,7 +69,7 @@
                                                                              NewItem_Click="@(async () => await GridGroupMenu.StartEditNewRowAsync())"
                                                                              EditItem_Click="@(async () =>  await GridGroupMenu.StartEditRowAsync(FocusedRowVisibleIndex2))"
                                                                              DeleteItem_Click="@(() => GridGroupMenu.ShowRowDeleteConfirmation(FocusedRowVisibleIndex2))"
-                                                                             Refresh_Click="@LoadDataGroupMenu" 
+                                                                             Refresh_Click="@LoadDataGroupMenuAsync"
                                                                              Grid="GridGroupMenu"
                                                                              IsImport="true"
                                                                              ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput2"))"
@@ -81,6 +79,12 @@
                                                         <Columns>
                                                             <DxGridSelectionColumn Width="15px" />
                                                             <DxGridDataColumn MinWidth="200" FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
+                                                            <DxGridDataColumn MinWidth="200" FieldName="Menu.Parent.Name" Caption="Parent Menu" SortIndex="0" />
+                                                            <DxGridDataColumn MinWidth="50"  FieldName="IsCreate" Caption="Create" />
+                                                            <DxGridDataColumn MinWidth="50"  FieldName="IsRead"   Caption="Read"   />
+                                                            <DxGridDataColumn MinWidth="50"  FieldName="IsUpdate" Caption="Update" />
+                                                            <DxGridDataColumn MinWidth="50"  FieldName="IsDelete" Caption="Delete" />
+                                                            <DxGridDataColumn MinWidth="50"  FieldName="IsImport" Caption="Import" />
                                                         </Columns>
                                                         <EditFormTemplate Context="EditFormContext">
                                                             @{
@@ -96,7 +100,26 @@
                                                                     </MyDxComboBox>
                                                                     <ValidationMessage For="@(()=>a.MenuId)" />
                                                                 </DxFormLayoutItem>
-
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Create">
+                                                                    <DxCheckBox @bind-Checked="@a.IsCreate" />
+                                                                    <ValidationMessage For="@(()=> @a.IsCreate)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Read">
+                                                                    <DxCheckBox @bind-Checked="@a.IsRead" />
+                                                                    <ValidationMessage For="@(()=> @a.IsRead)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Update">
+                                                                    <DxCheckBox @bind-Checked="@a.IsUpdate" />
+                                                                    <ValidationMessage For="@(()=> @a.IsUpdate)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Delete">
+                                                                    <DxCheckBox @bind-Checked="@a.IsDelete" />
+                                                                    <ValidationMessage For="@(()=> @a.IsDelete)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Import">
+                                                                    <DxCheckBox @bind-Checked="@a.IsImport" />
+                                                                    <ValidationMessage For="@(()=> @a.IsImport)"   />
+                                                                </DxFormLayoutItem>
                                                             </DxFormLayout>
                                                         </EditFormTemplate>
                                                     </MyDxGrid>
@@ -121,8 +144,8 @@
                             <MyDxGrid @ref="Grid"
                                       Data="Groups"
                                       @bind-SelectedDataItems="@SelectedDataItems"
-                                      RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"  
-                                      DataItemDeleting="OnDelete"
+                                      RowDoubleClick="@(async () => await InitializeEditAsync())"
+                                      DataItemDeleting="OnDeleteAsync"
                                       FocusedRowChanged="@((GridFocusedRowChangedEventArgs args) => FocusedRowVisibleIndex = args.VisibleIndex)"
                                       KeyFieldName="Id">
 
@@ -132,18 +155,18 @@
                                                      Grid="Grid"
                                                      SelectedDataItems="@SelectedDataItems"
                                                      NewItem_Click="@(async () => InitializeNew())"
-                                                     EditItem_Click="@(async () =>  await InitializeEdit())"
+                                                     EditItem_Click="@(async () =>  await InitializeEditAsync())"
                                                      DeleteItem_Click="@(() => Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex))"
-                                                     Refresh_Click="@(async () => await LoadData())"
+                                                     Refresh_Click="@(async () => await LoadDataAsync())"
                                                      IsImport="true"
                                                      ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))"
                                                      ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "group_template.xlsx", ExportFileDatasGroup))" />
-                                    
+
                                 </ToolbarTemplate>
 
                                 <Columns>
-                                    <DxGridSelectionColumn Width="15px" /> 
-                                    <DxGridDataColumn MinWidth="200" FieldName="Name" /> 
+                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="Name" />
                                 </Columns>
                             </MyDxGrid>
                         </DxLoadingPanel>

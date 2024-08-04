@@ -100,7 +100,6 @@
     font-family: 'Roboto';
     font-style: italic;
     font-weight: 700;
-
     src: url('/fonts/Roboto-BoldItalic.ttf') format('truetype');
 }
 
@@ -116,6 +115,24 @@
     font-style: italic;
     font-weight: 900;
     src: url('/fonts/Roboto-BlackItalic.ttf') format('truetype');
+}
+
+.dxbl-row {
+    width: 100% !important;
+}
+
+.sticky {
+    position: sticky;
+    top: 0;
+    z-index: 8;
+}
+
+.invalid {
+    outline: 1px solid #e50000;
+}
+
+.validation-message {
+    color: #e50000 !important;
 }
 
 h1:focus {
@@ -139,6 +156,7 @@ h1:focus {
 .required-caption:hover .pop-warning {
     display: block;
 }
+
 .required-caption:after {
     content: ' *';
     color: red;

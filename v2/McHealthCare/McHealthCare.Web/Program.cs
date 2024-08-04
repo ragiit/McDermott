@@ -1,19 +1,16 @@
+using Blazored.Toast;
+using McHealthCare.Application.Extentions;
+using McHealthCare.Application.Services;
+using McHealthCare.Context;
+using McHealthCare.Domain.Entities;
+using McHealthCare.Persistence.Extentions;
 using McHealthCare.Web.Components;
 using McHealthCare.Web.Components.Account;
+using McHealthCare.Web.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using DevExpress.Blazor;
-using McHealthCare.Context;
-using McHealthCare.Domain.Entities;
-using McHealthCare.Application.Extentions;
-using McHealthCare.Persistence.Extentions;
-using Blazored.Toast;
-using McHealthCare.Application.Services;
-using Microsoft.AspNetCore.SignalR;
 using System.Text.Json.Serialization;
-using McHealthCare.Domain.Entities.Medical;
-using System;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -32,6 +29,8 @@ builder.Services.AddSignalR()
         options.PayloadSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
         options.PayloadSerializerOptions.WriteIndented = true; // optional
     });
+
+builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IFileExportService, FileExportService>();
 builder.Services.AddApplicationLayer();
 
@@ -73,7 +72,6 @@ var app = builder.Build();
 
 //app.UseMiddleware<SessionExpirationMiddleware>();
 
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -104,7 +102,6 @@ app.MapRazorComponents<App>()
 
 app.MapHub<NotificationHub>("notificationHub");
 
-
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
 
@@ -133,21 +130,3 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
-
-public class SessionExpirationMiddleware(RequestDelegate next)
-{
-    public async Task InvokeAsync(HttpContext context)
-    {
-        if (!context.User.Identity.IsAuthenticated)
-        {
-            // If the user is not authenticated, redirect to the login page
-            context.Response.Redirect("/Account/Login");
-        }
-        else
-        {
-            await next(context);
-        }
-    }
-}
-
- 

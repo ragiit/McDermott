@@ -1,16 +1,16 @@
-﻿
-
-namespace McHealthCare.Web.Components.Pages.Configuration
+﻿namespace McHealthCare.Web.Components.Pages.Configuration
 {
     public partial class ProvincePage
     {
         #region Variables
+
         private bool PanelVisible { get; set; } = true;
 
         private List<CountryDto> Countries = [];
         private List<ProvinceDto> Provinces = [];
+
         private List<ExportFileData> ExportFileDatas =
-        [ 
+        [
             new()
             {
                 Column = "Country",
@@ -31,7 +31,8 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private int FocusedRowVisibleIndex { get; set; }
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        #endregion
+
+        #endregion Variables
 
         protected override async Task OnInitializedAsync()
         {
@@ -47,7 +48,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     Grid.SelectRow(0, true);
                     StateHasChanged();
                 }
-
                 catch { }
             }
         }
@@ -71,7 +71,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
             catch (Exception)
             {
-
                 throw;
             }
         }

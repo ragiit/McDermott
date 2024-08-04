@@ -7,6 +7,7 @@ namespace McHealthCare.Application.Dtos.Medical
     public class DiseaseCategoryDto : IMapFrom<DiseaseCategory>
     {
         public Guid Id { get; set; }
+
         [StringLength(300)]
         public string? Name { get; set; }
 
@@ -16,6 +17,7 @@ namespace McHealthCare.Application.Dtos.Medical
     public class CreateUpdateDiseaseCategoryDto : IMapFrom<DiseaseCategory>
     {
         public Guid Id { get; set; }
+
         [StringLength(300)]
         public string? Name { get; set; }
 

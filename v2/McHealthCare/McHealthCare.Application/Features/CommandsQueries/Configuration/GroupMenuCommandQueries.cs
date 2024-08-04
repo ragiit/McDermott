@@ -4,14 +4,10 @@ using McHealthCare.Application.Extentions;
 using McHealthCare.Application.Interfaces;
 using McHealthCare.Domain.Entities;
 using MediatR;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
-using System.Threading;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.GroupMenuCommand;
-using static McHealthCare.Extentions.EnumHelper;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 {
@@ -33,7 +29,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         IRequestHandler<UpdateListGroupMenuRequest, List<GroupMenuDto>>,
         IRequestHandler<DeleteGroupMenuRequest, bool>
     {
-
         private string CacheKey = "GetGroupMenuQuery_";
 
         private async Task<(GroupMenuDto, List<GroupMenuDto>)> Result(GroupMenu? result = null, List<GroupMenu>? results = null, bool ReturnNewData = false, CancellationToken cancellationToken = default)
@@ -43,9 +38,10 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                 if (!ReturnNewData)
                     return (result.Adapt<GroupMenuDto>(), []);
                 else
-                    return ((await unitOfWork.Repository<GroupMenu>().Entities 
+                    return ((await unitOfWork.Repository<GroupMenu>().Entities
                         .Include(x => x.Group)
                         .Include(x => x.Menu)
+                        .Include(x => x.Menu.Parent)
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<GroupMenuDto>(), []);
             }
             else if (results is not null)
@@ -56,6 +52,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                     return (new(), (await unitOfWork.Repository<GroupMenu>().Entities
                         .Include(x => x.Group)
                         .Include(x => x.Menu)
+                        .Include(x => x.Menu.Parent)
                         .FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<GroupMenuDto>>());
             }
 
@@ -65,7 +62,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         #region GET
 
         public async Task<List<GroupMenuDto>> Handle(GetGroupMenuQuery request, CancellationToken cancellationToken)
-        { 
+        {
             if (request.RemoveCache)
                 cache.Remove(CacheKey);
 
@@ -76,6 +73,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                 result = await unitOfWork.Repository<GroupMenu>().Entities
                     .Include(x => x.Group)
                     .Include(x => x.Menu)
+                    .Include(x => x.Menu.Parent)
                     .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }
@@ -93,7 +91,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         public async Task<GroupMenuDto> Handle(CreateGroupMenuRequest request, CancellationToken cancellationToken)
         {
             var req = request.GroupMenuDto.Adapt<CreateUpdateGroupMenuDto>();
-            var result = await unitOfWork.Repository<GroupMenu>().AddAsync(req.Adapt<GroupMenu>()); 
+            var result = await unitOfWork.Repository<GroupMenu>().AddAsync(req.Adapt<GroupMenu>());
             await unitOfWork.SaveChangesAsync(cancellationToken);
             cache.Remove(CacheKey);
 
@@ -141,7 +139,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             cache.Remove(CacheKey);
 
             return (await Result(result: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item1;
-
         }
 
         public async Task<List<GroupMenuDto>> Handle(UpdateListGroupMenuRequest request, CancellationToken cancellationToken)
@@ -153,10 +150,9 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
             {
-                Type =  EnumTypeReceiveData.Update,
+                Type = EnumTypeReceiveData.Update,
                 Data = result
             });
-
 
             return (await Result(results: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item2;
         }
@@ -197,7 +193,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                 {
                     Type = EnumTypeReceiveData.Delete,
                     Data = deletedCountries,
-                }); 
+                });
             }
 
             return true;
