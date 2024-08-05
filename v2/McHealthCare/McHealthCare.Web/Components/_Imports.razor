@@ -1,5 +1,6 @@
 ﻿@using System.Net.Http
-@using System.Net.Http.Json 
+@using System.Net.Http.Json
+@using McHealthCare.Web.Services
 @using MediatR
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
@@ -22,5 +23,6 @@
 @inject IJSRuntime JsRuntime
 @inject IMediator Mediator
 @inject IFileExportService FileExportService
+@inject UserService UserService
 
 @inject NavigationManager NavigationManager

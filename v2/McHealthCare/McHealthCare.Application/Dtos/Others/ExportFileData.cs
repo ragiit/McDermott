@@ -1,6 +1,4 @@
-﻿ 
-
-namespace McHealthCare.Application.Dtos.Others
+﻿namespace McHealthCare.Application.Dtos.Others
 {
     public class ExportFileData
     {

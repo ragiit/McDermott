@@ -21,7 +21,6 @@ namespace McHealthCare.Extentions
 
         public enum EnumPageMode
         {
-
             [Display(Name = "new")]
             Create = 1,
 
@@ -33,8 +32,7 @@ namespace McHealthCare.Extentions
         }
 
         public enum EnumTypeReceiveData
-        { 
-
+        {
             [Display(Name = "Create")]
             Create = 1,
 
@@ -42,7 +40,7 @@ namespace McHealthCare.Extentions
             Update = 2,
 
             [Display(Name = "Delete")]
-            Delete = 3, 
+            Delete = 3,
         }
 
         public enum EnumStatusInventoryAdjustment

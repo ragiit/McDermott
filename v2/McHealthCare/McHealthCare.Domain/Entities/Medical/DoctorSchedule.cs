@@ -1,7 +1,9 @@
-namespace McHealthCare.Domain.Entities.Medical{
-    public partial class DoctorSchedule :BaseAuditableEntity{
+namespace McHealthCare.Domain.Entities.Medical
+{
+    public partial class DoctorSchedule : BaseAuditableEntity
+    {
         [StringLength(200)]
-        public string? Name { get; set; } 
+        public string? Name { get; set; }
 
         public Guid? ServiceId { get; set; }
 

@@ -1,4 +1,4 @@
-﻿@page "/config/countries"
+﻿@page "/configuration/countries"
 @inject IToastService toastService
 
 
@@ -21,7 +21,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <div class="card main-wrapper">
+                <div class="card">
                     <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
                     <div class="card-body">
                         <div >

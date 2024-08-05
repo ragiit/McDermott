@@ -1,6 +1,5 @@
 ﻿using McHealthCare.Application.Extentions;
 using Microsoft.AspNetCore.SignalR.Client;
-using static McHealthCare.Extentions.EnumHelper;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
 {
@@ -32,14 +31,8 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
         #endregion Variables
 
-        private bool asd()
-        {
-            ToastService.ShowInfo("aowjdaowkdoawkdaw");
-
-            return false;
-        }
-
         private bool shouldAddW100Class = true;
+
         protected override async Task OnInitializedAsync()
         {
             var aa = NavigationManager.ToAbsoluteUri("/notificationHub");
@@ -49,7 +42,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
             hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
             {
-                await LoadData(); 
+                await LoadData();
             });
 
             await hubConnection.StartAsync();
@@ -75,7 +68,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             try
             {
                 PanelVisible = true;
-                Countries.Clear(); 
+                Countries.Clear();
                 Countries = await Mediator.Send(new GetCountryQuery());
                 //SelectedDataItems = [];
                 try

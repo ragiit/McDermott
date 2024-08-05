@@ -1,12 +1,12 @@
-using McHealthCare.Domain.Entities.Configuration;
-
-namespace McHealthCare.Domain.Entities.Medical{
-    public partial class HealthCenter : BaseAuditableEntity{
+namespace McHealthCare.Domain.Entities.Medical
+{
+    public partial class HealthCenter : BaseAuditableEntity
+    {
         public Guid? CityId { get; set; }
         public Guid? ProvinceId { get; set; }
         public Guid? CountryId { get; set; }
         public string? Name { get; set; }
-        public string? Type { get; set; } 
+        public string? Type { get; set; }
         public string? Phone { get; set; }
         public string? Mobile { get; set; }
         public string? Email { get; set; }

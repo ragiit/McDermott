@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
 using Mapster;
 using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities.Medical;
+using System.ComponentModel.DataAnnotations;
 
 namespace McHealthCare.Application.Dtos.Medical
 {
@@ -11,6 +11,7 @@ namespace McHealthCare.Application.Dtos.Medical
 
         [StringLength(200)]
         public string? Name { get; set; }
+
         [StringLength(5)]
         public string? Code { get; set; }
 
@@ -18,17 +19,21 @@ namespace McHealthCare.Application.Dtos.Medical
 
         [SetToNull]
         public virtual SampleTypeDto? SampleType { get; set; }
+
         [SetToNull]
         public virtual List<LabTestDetailDto>? LabTestDetail { get; set; }
+
         // [SetToNull]
         // public virtual List<GeneralConsultanMedicalSupportDto>? GeneralConsultanMedicalSupports { get; set; }
     }
 
-    public class CreateUpdateLabTestDto : IMapFrom<LabTest>{
+    public class CreateUpdateLabTestDto : IMapFrom<LabTest>
+    {
         public Guid? SampleTypeId { get; set; }
 
         [StringLength(200)]
         public string? Name { get; set; }
+
         [StringLength(5)]
         public string? Code { get; set; }
 
@@ -36,8 +41,10 @@ namespace McHealthCare.Application.Dtos.Medical
 
         [SetToNull]
         public virtual SampleTypeDto? SampleType { get; set; }
+
         [SetToNull]
         public virtual List<LabTestDetailDto>? LabTestDetail { get; set; }
+
         // [SetToNull]
         // public virtual List<GeneralConsultanMedicalSupportDto>? GeneralConsultanMedicalSupports { get; set; }
     }

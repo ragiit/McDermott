@@ -27,6 +27,7 @@ namespace McHealthCare.Context
         public DbSet<GroupMenu> GroupMenus { get; set; }
 
         #endregion Configuration
+
         public DbSet<Building> Buildings { get; set; }
         public DbSet<BuildingLocation> BuildingLocations { get; set; }
         public DbSet<ChronicCategory> ChronicCategories { get; set; }
@@ -46,8 +47,6 @@ namespace McHealthCare.Context
         public DbSet<SampleType> SampleTypes { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Specialist> Specialists { get; set; }
-        #region Medical
-        #endregion
 
         #endregion DbSet
 

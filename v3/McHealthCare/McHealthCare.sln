@@ -1,15 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{028275B0-8082-4F3D-8587-5D60D50E0F20}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.Web", "McHealthCare.Web\McHealthCare.Web.csproj", "{9F20C161-D1F9-439F-9692-67AAE14E2C41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McHealthCare.AppHost", "McHealthCare.AppHost\McHealthCare.AppHost.csproj", "{A16C57F0-01B8-4988-B637-E1ABDB7AD9D2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McHealthCare.ServiceDefaults", "McHealthCare.ServiceDefaults\McHealthCare.ServiceDefaults.csproj", "{CCB052F9-FA23-41F5-9F7F-005F1E72A23F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,26 +12,12 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9F20C161-D1F9-439F-9692-67AAE14E2C41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9F20C161-D1F9-439F-9692-67AAE14E2C41}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9F20C161-D1F9-439F-9692-67AAE14E2C41}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9F20C161-D1F9-439F-9692-67AAE14E2C41}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A16C57F0-01B8-4988-B637-E1ABDB7AD9D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A16C57F0-01B8-4988-B637-E1ABDB7AD9D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A16C57F0-01B8-4988-B637-E1ABDB7AD9D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A16C57F0-01B8-4988-B637-E1ABDB7AD9D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCB052F9-FA23-41F5-9F7F-005F1E72A23F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCB052F9-FA23-41F5-9F7F-005F1E72A23F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCB052F9-FA23-41F5-9F7F-005F1E72A23F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCB052F9-FA23-41F5-9F7F-005F1E72A23F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{9F20C161-D1F9-439F-9692-67AAE14E2C41} = {028275B0-8082-4F3D-8587-5D60D50E0F20}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {60CB0CCE-3118-46C7-8A03-7927E7203D0B}
 	EndGlobalSection
 EndGlobal

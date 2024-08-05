@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace McHealthCare.Domain.Entities
 {
     public class Employee
     {
         [Key, ForeignKey("ApplicationUser")]
-        public string? ApplicationUserId { get; set; } 
+        public string? ApplicationUserId { get; set; }
+
         public string? NIP { get; set; }
         public string? Legacy { get; set; }
         public string? SAP { get; set; }

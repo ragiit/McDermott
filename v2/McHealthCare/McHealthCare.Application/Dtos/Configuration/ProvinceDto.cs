@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using McHealthCare.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace McHealthCare.Application.Dtos.Configuration

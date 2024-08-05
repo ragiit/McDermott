@@ -2,15 +2,11 @@
 using McHealthCare.Application.Dtos.Configuration;
 using McHealthCare.Application.Extentions;
 using McHealthCare.Application.Interfaces;
-using McHealthCare.Domain.Entities.Configuration;
 using MediatR;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.Linq.Expressions;
-using System.Threading;
-using static McHealthCare.Application.Features.CommandsQueries.Configuration.ProvinceCommand; 
-using static McHealthCare.Extentions.EnumHelper;
+using static McHealthCare.Application.Features.CommandsQueries.Configuration.ProvinceCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 {
@@ -32,7 +28,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         IRequestHandler<UpdateListProvinceRequest, List<ProvinceDto>>,
         IRequestHandler<DeleteProvinceRequest, bool>
     {
-
         private string CacheKey = "GetProvinceQuery_";
 
         private async Task<(ProvinceDto, List<ProvinceDto>)> Result(Province? result = null, List<Province>? results = null, bool ReturnNewData = false, CancellationToken cancellationToken = default)
@@ -137,7 +132,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             cache.Remove(CacheKey);
 
             return (await Result(result: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item1;
-
         }
 
         public async Task<List<ProvinceDto>> Handle(UpdateListProvinceRequest request, CancellationToken cancellationToken)
@@ -152,7 +146,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                 Type = EnumTypeReceiveData.Update,
                 Data = result
             });
-
 
             return (await Result(results: result, ReturnNewData: request.ReturnNewData, cancellationToken: cancellationToken)).Item2;
         }

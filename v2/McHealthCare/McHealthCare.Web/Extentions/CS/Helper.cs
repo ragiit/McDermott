@@ -1,5 +1,4 @@
 ﻿using Blazored.Toast.Services;
-using McHealthCare.Application.Dtos.Others;
 using McHealthCare.Application.Services;
 using Microsoft.JSInterop;
 
@@ -22,7 +21,7 @@ namespace McHealthCare.Web.Extentions.CS
             "queue/kiosk-departments",
             "queue/kiosk-configurations",
 
-            // BPJS 
+            // BPJS
             "bpjs/bpjs-classifications",
             "bpjs/system-parameters",
 

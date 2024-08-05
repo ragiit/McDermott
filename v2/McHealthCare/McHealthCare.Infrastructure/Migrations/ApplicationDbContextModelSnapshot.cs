@@ -88,6 +88,8 @@ namespace McHealthCare.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GroupId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -399,6 +401,21 @@ namespace McHealthCare.Persistence.Migrations
 
                     b.Property<Guid>("GroupId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsCreate")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsImport")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUpdate")
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("MenuId")
                         .HasColumnType("uniqueidentifier");
@@ -1340,6 +1357,16 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.ApplicationUser", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.City", b =>

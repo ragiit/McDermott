@@ -11,7 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
 
-
 builder.AddServiceDefaults();
 
 // Add services to the container.
