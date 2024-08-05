@@ -101,7 +101,7 @@
                                 <EditForm Model="GeneralConsultanService" Context="EditForm" OnValidSubmit="OnValidSubmitSave" OnInvalidSubmit="OnInvalidSubmitSave">
                                     <DataAnnotationsValidator />
 
-                            
+
 
                                     <div>
                                         @if (Accident.Id > 0)
@@ -128,46 +128,46 @@
                                             </div>
                                         }
 
-                                       @*  @if (Accident.Status != EnumStatusAccident.Done && GeneralConsultanService.Id != 0)
-                                        {
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <div class=" row w-100">
-                                                        <div class="col-auto pe-0">
-                                                            <DxButton IconCssClass="fa-solid fa-check"
-                                                                      Text="@StagingText.GetDisplayName()"
-                                                                      Click="OnClickConfirm"
-                                                                      RenderStyle=" ButtonRenderStyle.Primary">
-                                                            </DxButton>
+                                        @*  @if (Accident.Status != EnumStatusAccident.Done && GeneralConsultanService.Id != 0)
+                                {
+                                <div class="card">
+                                <div class="card-body">
+                                <div class=" row w-100">
+                                <div class="col-auto pe-0">
+                                <DxButton IconCssClass="fa-solid fa-check"
+                                Text="@StagingText.GetDisplayName()"
+                                Click="OnClickConfirm"
+                                RenderStyle=" ButtonRenderStyle.Primary">
+                                </DxButton>
 
-                                                            <DxButton IconCssClass="fa-solid fa-print"
-                                                                      Text="Print"
-                                                                      Visible="GeneralConsultanService.Id > 0"
-                                                                      Click="PrintAccident"
-                                                                      RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                                      RenderStyle=" ButtonRenderStyle.Success">
-                                                            </DxButton>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        }
+                                <DxButton IconCssClass="fa-solid fa-print"
+                                Text="Print"
+                                Visible="GeneralConsultanService.Id > 0"
+                                Click="PrintAccident"
+                                RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                RenderStyle=" ButtonRenderStyle.Success">
+                                </DxButton>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                }
 
-                                        @if (!IsStatus(EnumStatusAccident.Done))
-                                        {
-                                            <div class="card ">
-                                                <div class="card-body">
-                                                    <div class="w-100">
-                                                        <div class="row w-100">
-                                                            <div class="col-md-12 align-self-center">
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="@(async () => await LoadData())"></DxButton>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        } *@
+                                @if (!IsStatus(EnumStatusAccident.Done))
+                                {
+                                <div class="card ">
+                                <div class="card-body">
+                                <div class="w-100">
+                                <div class="row w-100">
+                                <div class="col-md-12 align-self-center">
+                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="@(async () => await LoadData())"></DxButton>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                } *@
 
                                         @if (!IsStatus(EnumStatusAccident.Done))
                                         {
@@ -214,11 +214,11 @@
                                         <div class="card-body">
                                             <div class="w-100">
                                                 <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
-                                                    <Items> 
+                                                    <Items>
                                                         <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
                                                                        IconCssClass="fa-solid fa-notes-medical"
                                                                        Click="OnClickPopUpHistoricalMedical"
-                                                                       Text="Historical Medical Record Patient" /> 
+                                                                       Text="Historical Medical Record Patient" />
                                                     </Items>
                                                 </DxToolbar>
                                             </div>
@@ -691,12 +691,11 @@
                                                                                     </Template>
                                                                                 </DxFormLayoutItem>
                                                                                 <DxFormLayoutItem CaptionCssClass="text-bold" BeginRow="true" Caption="Apaan ih Gak Tahu">
-                                                                                   <p></p>
+                                                                                    <p></p>
                                                                                 </DxFormLayoutItem>
                                                                                 <DxFormLayoutItem BeginRow="true">
                                                                                     <DxButton Text="Apaan Coba namanya" RenderStyle="ButtonRenderStyle.Primary" Click="ShowPopup"></DxButton>
                                                                                 </DxFormLayoutItem>
-
                                                                             </DxFormLayout>
                                                                         </div>
                                                                     </div>
@@ -1800,15 +1799,24 @@ else
         </MailMergeSettings>
     </DxRichEdit>
 </DxPopup>
-<DxPopup Visible="isAccident" Width="900px" Shown="OnPopupShown">
-    <h1>Penanda Lokasi Operasi</h1>
-    <div class="row">
-        <div class="col-md-6">
-            <canvas id="MyCanvas" width="600" height="500" style="border: 1px solid black;"></canvas>
-            <button @onclick="ResetMarkers">Reset</button>
-        </div>
-        <div class="col-md-6">
-            <DxMemo></DxMemo>
+
+<DxPopup Visible="isAccident" Width="800px" Shown="OnPopupShown">
+    <div class="card">
+        <div class="card-body">
+            <DxFormLayout CssClass="w-100 justify-content-center">
+                <DxFormLayoutItem Caption="location of the marking points" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
+                    <canvas id="MyCanvas" width="700" height="600" style="border: 1px solid black; align-content:center"></canvas>
+                </DxFormLayoutItem>
+                <DxFormLayoutItem>
+                    <button class="btn btn-sm btn-primary" @onclick="ResetMarkers">Reset</button>
+                    <button class="btn btn-sm btn-success" @onclick="SaveMarkers">Save</button>
+                </DxFormLayoutItem>
+            </DxFormLayout>
+            <DxFormLayout CssClass="w-100">
+                <DxFormLayoutItem Caption="Description" CaptionPosition="CaptionPosition.Vertical">
+                    <DxMemo @bind-Text="description"></DxMemo>
+                </DxFormLayoutItem>
+            </DxFormLayout>
         </div>
     </div>
 </DxPopup>

@@ -1,4 +1,5 @@
 ﻿using DevExpress.Blazor.RichEdit;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using McDermott.Domain.Entities;
 using System.ComponentModel;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
@@ -89,22 +90,38 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private void ShowPopup()
+        private async Task ShowPopup()
         {
             isAccident = true;
         }
+       
 
         private async Task OnPopupShown()
         {
             await JsRuntime.InvokeVoidAsync("initializeCanvas", "MyCanvas");
         }
-       
-        private List<IBrowserFile> BrowserFiles = [];
 
         private async Task ResetMarkers()
         {
             await JsRuntime.InvokeVoidAsync("resetMarkers");
         }
+        private string description { get; set; }
+        private async Task SaveMarkers()
+        {
+
+            var imageData = await JsRuntime.InvokeAsync<string>("getCanvasImageData", "MyCanvas");
+            await savedata(imageData);
+
+        }
+
+        private async Task savedata(string datas)
+        {
+            var asd = datas;
+        }
+       
+        private List<IBrowserFile> BrowserFiles = [];
+
+       
         private async void SelectFiles(InputFileChangeEventArgs e)
         {
             var file = e.File;
