@@ -1,8 +1,8 @@
-﻿@page "/configuration/cities"
+﻿@page "/configuration/sub-districts"
 
-<PageTitle>McHealthCare - City</PageTitle>
+<PageTitle>McHealthCare - Villages</PageTitle>
 
-<BaseHeaderPage Title="City" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+<BaseHeaderPage Title="Villages" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
 @if (!IsLoading && UserAccess.Item1 && UserAccess.Item2.IsRead)
 {
@@ -22,7 +22,7 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
                                     <MyDxGrid @ref="Grid"
-                                              Data="Cities"
+                                              Data="Villages"
                                               @bind-SelectedDataItems="@SelectedDataItems"
                                               RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
                                               EditModelSaving="OnSave"
@@ -31,8 +31,8 @@
                                               KeyFieldName="Id">
 
                                         <ToolbarTemplate>
-                                            <MyDxToolbarBase TItem="CityDto"
-                                                             Items="@Cities"
+                                            <MyDxToolbarBase TItem="VillageDto"
+                                                             Items="@Villages"
                                                              Grid="Grid"
                                                              SelectedDataItems="@SelectedDataItems"
                                                              NewItem_Click="@(async () => await Grid.StartEditNewRowAsync())"
@@ -51,15 +51,22 @@
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Province.Name" Caption="Province" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="District.Name" Caption="District" SortIndex="0" />
                                         </Columns>
+
                                         <EditFormTemplate Context="EditFormContext">
                                             @{
-                                                var a = (CityDto)EditFormContext.EditModel;
+                                                var a = (VillageDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout>
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                     <MyTextBox @bind-Text="@a.Name" NullText="Name" />
                                                     <ValidationMessage For="@(()=> a.Name)"   />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Postal Code" ColSpanMd="12">
+                                                    <MyTextBox @bind-Text="@a.PostalCode" NullText="Postal Code" />
+                                                    <ValidationMessage For="@(()=> a.PostalCode)"   />
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Province" ColSpanMd="12">
                                                     <MyDxComboBox Data="@Provinces"
@@ -69,6 +76,24 @@
                                                                   ValueFieldName="Id">
                                                     </MyDxComboBox>
                                                     <ValidationMessage For="@(()=>a.ProvinceId)" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="City" ColSpanMd="12">
+                                                    <MyDxComboBox Data="@Cities"
+                                                                  NullText="Select City..."
+                                                                  @bind-Value="@a.CityId"
+                                                                  TextFieldName="Name"
+                                                                  ValueFieldName="Id">
+                                                    </MyDxComboBox>
+                                                    <ValidationMessage For="@(()=>a.CityId)" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="District" ColSpanMd="12">
+                                                    <MyDxComboBox Data="@Districts"
+                                                                  NullText="Select District..."
+                                                                  @bind-Value="@a.DistrictId"
+                                                                  TextFieldName="Name"
+                                                                  ValueFieldName="Id">
+                                                    </MyDxComboBox>
+                                                    <ValidationMessage For="@(()=>a.DistrictId)" />
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
                                         </EditFormTemplate>

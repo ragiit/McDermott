@@ -14,6 +14,7 @@
         public string? PostalCode { get; set; }
 
         public virtual Province? Province { get; set; }
+        public virtual District? District { get; set; }
 
         public virtual City? City { get; set; }
     }

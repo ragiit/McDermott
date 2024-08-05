@@ -36,14 +36,18 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                 if (!ReturnNewData)
                     return (result.Adapt<CountryDto>(), []);
                 else
-                    return ((await unitOfWork.Repository<Country>().Entities.FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<CountryDto>(), []);
+                    return ((await unitOfWork.Repository<Country>().Entities
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<CountryDto>(), []);
             }
             else if (results is not null)
             {
                 if (!ReturnNewData)
                     return (new(), results.Adapt<List<CountryDto>>());
                 else
-                    return (new(), (await unitOfWork.Repository<Country>().Entities.FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<CountryDto>>());
+                    return (new(), (await unitOfWork.Repository<Country>().Entities
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<CountryDto>>());
             }
 
             return (new(), []);
@@ -60,7 +64,9 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             if (!cache.TryGetValue(CacheKey, out result))
             {
-                result = await unitOfWork.Repository<Country>().Entities.ToListAsync(cancellationToken);
+                result = await unitOfWork.Repository<Country>().Entities
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }
 

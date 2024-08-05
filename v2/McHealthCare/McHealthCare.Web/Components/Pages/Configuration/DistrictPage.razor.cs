@@ -1,27 +1,39 @@
-﻿using McHealthCare.Application.Extentions;
+﻿using Blazored.Toast.Services;
+using McHealthCare.Application.Extentions;
+using McHealthCare.Web.Services;
+using MediatR;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
 {
-    public partial class CountryPage : IAsyncDisposable
+    public partial class DistrictPage
     {
         #region Variables
+
         private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
-        private HubConnection? hubConnection;
-        private List<CountryDto> Countries = [];
+        private HubConnection? hubConnection; 
+        private List<DistrictDto> Districts = [];
+        private List<ProvinceDto> Provinces = [];
+        private List<CityDto> Cities = [];
 
         private List<ExportFileData> ExportFileDatas =
         [
             new()
             {
-                Column = "Code",
+                Column = "Name",
                 Notes = "Mandatory"
             },
             new()
             {
-                Column = "Name",
+                Column = "Province",
+                Notes = "Mandatory"
+            },
+            new()
+            {
+                Column = "City",
                 Notes = "Mandatory"
             }
         ];
@@ -31,8 +43,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         #endregion Variables
-
-        private bool shouldAddW100Class = true;
 
         protected override async Task OnInitializedAsync()
         {
@@ -53,14 +63,14 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                 await hubConnection.StartAsync();
 
-                await LoadData(); 
-                
                 try
                 {
                     Grid?.SelectRow(0, true);
                     StateHasChanged();
                 }
                 catch { }
+
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -75,7 +85,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             {
                 try
                 {
-                    Grid?.SelectRow(0, true);
+                    Grid.SelectRow(0, true);
                     StateHasChanged();
                 }
                 catch { }
@@ -86,9 +96,11 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         {
             try
             {
-                PanelVisible = true; 
-                Countries.Clear();
-                Countries = await Mediator.Send(new GetCountryQuery());
+                PanelVisible = true;
+                Cities.Clear();
+                Cities = await Mediator.Send(new GetCityQuery());
+                Provinces = await Mediator.Send(new GetProvinceQuery());
+                Districts = await Mediator.Send(new GetDistrictQuery());
                 //SelectedDataItems = [];
                 try
                 {
@@ -100,7 +112,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             {
                 ex.HandleException(ToastService);
             }
-
             PanelVisible = false;
         }
 
@@ -111,12 +122,12 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteCountryRequest(((CountryDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteDistrictRequest(((DistrictDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<CountryDto>>();
-                    await Mediator.Send(new DeleteCountryRequest(Ids: a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<DistrictDto>>();
+                    await Mediator.Send(new DeleteDistrictRequest(Ids: a.Select(x => x.Id).ToList()));
                 }
                 SelectedDataItems = [];
                 await LoadData();
@@ -136,15 +147,12 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             PanelVisible = true;
             try
             {
-                var editModel = (CountryDto)e.EditModel;
-
-                if (string.IsNullOrWhiteSpace(editModel.Name))
-                    return;
+                var editModel = (DistrictDto)e.EditModel; 
 
                 if (editModel.Id == Guid.Empty)
-                    await Mediator.Send(new CreateCountryRequest(editModel));
+                    await Mediator.Send(new CreateDistrictRequest(editModel));
                 else
-                    await Mediator.Send(new UpdateCountryRequest(editModel));
+                    await Mediator.Send(new UpdateDistrictRequest(editModel));
 
                 await LoadData();
             }
@@ -173,7 +181,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Code", "Name" };
+                    var headerNames = ExportFileDatas.Select(x => x.Column).ToList();
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
@@ -182,21 +190,48 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                         return;
                     }
 
-                    var countries = new List<CountryDto>();
+                    var Cities = new List<DistrictDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var country = new CountryDto
+                        bool IsValid = true;
+                        var a = Provinces.FirstOrDefault(x => x.Name == ws.Cells[row, 2].Value?.ToString()?.Trim())?.Id ?? Guid.Empty;
+
+                        if (ws.Cells[row, 2].Value?.ToString()?.Trim() is not null)
                         {
-                            Code = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
-                            Name = ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty,
+                            if (a == Guid.Empty)
+                            {
+                                ToastService.ShowErrorImport(row, 1, ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty);
+                                IsValid = false;
+                            }
+                        }
+
+                        var b = Cities.FirstOrDefault(x => x.Name == ws.Cells[row, 3].Value?.ToString()?.Trim())?.Id ?? Guid.Empty;
+
+                        if (ws.Cells[row, 3].Value?.ToString()?.Trim() is not null)
+                        {
+                            if (a == Guid.Empty)
+                            {
+                                ToastService.ShowErrorImport(row, 1, ws.Cells[row, 3].Value?.ToString()?.Trim() ?? string.Empty);
+                                IsValid = false;
+                            }
+                        }
+
+                        if (!IsValid)
+                            continue;
+
+                        var City = new DistrictDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
+                            ProvinceId = a,
+                            CityId = b,
                         };
 
-                        if (!Countries.Any(x => x.Name.Trim().ToLower() == country?.Name?.Trim().ToLower() && x.Code.Trim().ToLower() == country?.Code?.Trim().ToLower()))
-                            countries.Add(country);
+                        if (!Districts.Any(x => x.Name.Trim().ToLower() == City?.Name?.Trim().ToLower() && x.ProvinceId == City.ProvinceId && x.CityId == City.CityId))
+                            Districts.Add(City);
                     }
 
-                    await Mediator.Send(new CreateListCountryRequest(countries));
+                    await Mediator.Send(new CreateListDistrictRequest(Cities));
 
                     await LoadData();
 

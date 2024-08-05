@@ -7,7 +7,9 @@ namespace McHealthCare.Web.Components.Pages.Configuration
     {
         #region Variables
 
-        private bool PanelVisible { get; set; } = true;
+        private bool PanelVisible { get; set; } = true; 
+        private (bool, GroupMenuDto) UserAccess { get; set; } = new();
+        private bool IsLoading { get; set; } = true;
         private HubConnection? hubConnection;
         private List<MenuDto> Menus = [];
         private List<MenuDto> ParentMenuDto = [];
@@ -39,29 +41,33 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         #endregion Variables
-
-        private bool asd()
-        {
-            ToastService.ShowInfo("aowjdaowkdoawkdaw");
-
-            return false;
-        }
-
+         
         protected override async Task OnInitializedAsync()
         {
-            var aa = NavigationManager.ToAbsoluteUri("/notificationHub");
-            hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"))
-            .Build();
-
-            hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
+            IsLoading = false;
+            try
             {
+                UserAccess = await UserService.GetUserInfo(ToastService);
+
+                var aa = NavigationManager.ToAbsoluteUri("/notificationHub");
+                hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"))
+                .Build();
+
+                hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
+                {
+                    await LoadData();
+                });
+
+                await hubConnection.StartAsync();
+
                 await LoadData();
-            });
-
-            await hubConnection.StartAsync();
-
-            await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            IsLoading = false;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -70,7 +76,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             {
                 try
                 {
-                    Grid.SelectRow(0, true);
+                    Grid?.SelectRow(0, true);
                     StateHasChanged();
                 }
                 catch { }

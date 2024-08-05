@@ -1,8 +1,8 @@
-﻿@page "/configuration/cities"
+﻿@page "/configuration/districts"
 
-<PageTitle>McHealthCare - City</PageTitle>
+<PageTitle>McHealthCare - Districts</PageTitle>
 
-<BaseHeaderPage Title="City" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+<BaseHeaderPage Title="Districts" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
 @if (!IsLoading && UserAccess.Item1 && UserAccess.Item2.IsRead)
 {
@@ -22,7 +22,7 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
                                     <MyDxGrid @ref="Grid"
-                                              Data="Cities"
+                                              Data="Districts"
                                               @bind-SelectedDataItems="@SelectedDataItems"
                                               RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
                                               EditModelSaving="OnSave"
@@ -31,8 +31,8 @@
                                               KeyFieldName="Id">
 
                                         <ToolbarTemplate>
-                                            <MyDxToolbarBase TItem="CityDto"
-                                                             Items="@Cities"
+                                            <MyDxToolbarBase TItem="DistrictDto"
+                                                             Items="@Districts"
                                                              Grid="Grid"
                                                              SelectedDataItems="@SelectedDataItems"
                                                              NewItem_Click="@(async () => await Grid.StartEditNewRowAsync())"
@@ -51,10 +51,12 @@
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Province.Name" Caption="Province" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" SortIndex="0" />
                                         </Columns>
+
                                         <EditFormTemplate Context="EditFormContext">
                                             @{
-                                                var a = (CityDto)EditFormContext.EditModel;
+                                                var a = (DistrictDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout>
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
@@ -69,6 +71,15 @@
                                                                   ValueFieldName="Id">
                                                     </MyDxComboBox>
                                                     <ValidationMessage For="@(()=>a.ProvinceId)" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="City" ColSpanMd="12">
+                                                    <MyDxComboBox Data="@Cities"
+                                                                  NullText="Select City..."
+                                                                  @bind-Value="@a.CityId"
+                                                                  TextFieldName="Name"
+                                                                  ValueFieldName="Id">
+                                                    </MyDxComboBox>
+                                                    <ValidationMessage For="@(()=>a.CityId)" />
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
                                         </EditFormTemplate>

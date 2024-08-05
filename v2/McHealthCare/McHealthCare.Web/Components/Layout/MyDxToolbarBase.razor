@@ -13,7 +13,7 @@
             <DxToolbarItem Text="To XLS" Click="(() => ExportXlsItem_Click(Grid))" />
         </Items>
     </DxToolbarItem>
-    <DxToolbarItem Visible="IsImport" Text="Import" IconCssClass="fa-solid fa-file-import">
+    <DxToolbarItem Visible="VisibleImport" Text="Import" IconCssClass="fa-solid fa-file-import">
         <Items>
             <DxToolbarItem Text="Template" Click="ExportToExcel" />
             <DxToolbarItem Text="Import" Click="ImportFile" />
@@ -48,7 +48,7 @@
     }
 
     [Parameter] public string BtnNewName { get; set; } = "New";
-    [Parameter] public bool IsImport { get; set; } = true;
+    [Parameter] public bool VisibleImport { get; set; } = true;
     [Parameter] public bool EnableDelete { get; set; } = true;
     [Parameter] public bool VisibleNew { get; set; } = true;
     [Parameter] public bool VisibleEdit { get; set; } = true;

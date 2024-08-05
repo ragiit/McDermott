@@ -7,9 +7,11 @@ using McHealthCare.Persistence.Extentions;
 using McHealthCare.Web.Components;
 using McHealthCare.Web.Components.Account;
 using McHealthCare.Web.Services;
+using MediatR;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Text.Json.Serialization;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
@@ -95,6 +97,9 @@ app.UseRouting();
 app.UseAuthentication(); // Tambahkan jika menggunakan autentikasi
 app.UseAuthorization();
 
+app.UseMiddleware<PageTrackingMiddleware>();
+
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
@@ -130,3 +135,39 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+
+public class PageTrackingMiddleware(RequestDelegate _next, IServiceProvider _serviceProvider)
+{
+    public async Task InvokeAsync(HttpContext context)
+    { 
+        if (context.Request.Path.StartsWithSegments("/forbidden"))
+        {
+            await _next(context);
+            return;
+        }
+
+        using (var scope = _serviceProvider.CreateScope())
+        {
+            //var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            //var id = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == id) ?? new();
+            //var groupMenus = await dbContext.GroupMenus.Include(x => x.Menu).Where(x => x.GroupId == user.GroupId).ToListAsync();  
+            //var aa = context.Request.Path.ToString().TrimStart('/');
+            //var bb = groupMenus.FirstOrDefault(x => x.Menu.Url.Contains(aa)) ;
+            //if (bb is null && !aa.Equals("/"))
+            //{
+            //    context.Response.Redirect("/forbidden");
+            //       return;
+            //}
+            //if (!isValidUser)
+            //{
+            //    context.Response.Redirect("/forbidden");  
+            //    return;
+            //}
+        }
+         
+        await _next(context);
+    }
+}

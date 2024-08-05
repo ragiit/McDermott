@@ -38,6 +38,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                     return (result.Adapt<ProvinceDto>(), []);
                 else
                     return ((await unitOfWork.Repository<Province>().Entities
+                        .AsNoTracking()
                         .Include(x => x.Country)
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<ProvinceDto>(), []);
             }
@@ -47,6 +48,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                     return (new(), results.Adapt<List<ProvinceDto>>());
                 else
                     return (new(), (await unitOfWork.Repository<Province>().Entities
+                        .AsNoTracking()
                         .Include(x => x.Country)
                         .FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<ProvinceDto>>());
             }
@@ -66,6 +68,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             if (!cache.TryGetValue(CacheKey, out result))
             {
                 result = await unitOfWork.Repository<Province>().Entities
+                        .AsNoTracking()
                         .Include(x => x.Country)
                         .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));

@@ -34,10 +34,6 @@ namespace McHealthCare.Application.Dtos.Configuration
         public string Name { get; set; } = string.Empty; // Kelurahan
 
         [StringLength(10)]
-        public string? PostalCode { get; set; }
-
-        public virtual Province? Province { get; set; }
-
-        public virtual City? City { get; set; }
+        public string? PostalCode { get; set; } 
     }
 }

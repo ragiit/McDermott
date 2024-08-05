@@ -37,14 +37,20 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                 if (!ReturnNewData)
                     return (result.Adapt<MenuDto>(), []);
                 else
-                    return ((await unitOfWork.Repository<Menu>().Entities.FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<MenuDto>(), []);
+                    return ((await unitOfWork.Repository<Menu>().Entities
+                        .AsNoTracking()
+                        .Include(x => x.Parent)
+                        .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<MenuDto>(), []);
             }
             else if (results is not null)
             {
                 if (!ReturnNewData)
                     return (new(), results.Adapt<List<MenuDto>>());
                 else
-                    return (new(), (await unitOfWork.Repository<Menu>().Entities.FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<MenuDto>>());
+                    return (new(), (await unitOfWork.Repository<Menu>().Entities
+                        .AsNoTracking()
+                        .Include(x => x.Parent)
+                        .FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<MenuDto>>());
             }
 
             return (new(), []);
@@ -61,7 +67,10 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             if (!cache.TryGetValue(CacheKey, out result))
             {
-                result = await unitOfWork.Repository<Menu>().Entities.ToListAsync(cancellationToken);
+                result = await unitOfWork.Repository<Menu>().Entities
+                        .AsNoTracking()
+                        .Include(x => x.Parent)
+                        .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }
 
