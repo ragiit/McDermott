@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace McHealthCare.Context
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) : IdentityDbContext<ApplicationUser>(options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor? httpContextAccessor = null) : IdentityDbContext<ApplicationUser>(options)
     {
         #region DbSet
 
@@ -73,7 +73,7 @@ namespace McHealthCare.Context
                         .Where(e => e.Entity is BaseAuditableEntity &&
                                     (e.State == EntityState.Added || e.State == EntityState.Modified));
 
-            var userId = httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? Guid.Empty.ToString();
+            var userId = httpContextAccessor?.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? Guid.Empty.ToString();
 
             foreach (var entry in entries)
             {
