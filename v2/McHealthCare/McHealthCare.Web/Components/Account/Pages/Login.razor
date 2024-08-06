@@ -238,12 +238,14 @@
         }
         else if (result.IsLockedOut)
         {
+            ToastService.ShowInfo("User account locked out.");
             Logger.LogWarning("User account locked out.");
             RedirectManager.RedirectTo("Account/Lockout");
         }
         else
         {
             errorMessage = "Error: Invalid login attempt.";
+            ToastService.ShowInfo(errorMessage);
         }
     }
 

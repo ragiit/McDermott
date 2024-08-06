@@ -210,7 +210,8 @@ public class SeedData
             }
 
             Guid groupId = Guid.Empty;
-            Guid userId = Guid.Empty;
+            Guid userMenuId = Guid.Empty;
+            Guid groupGroupId = Guid.Empty;
             Guid groupMenuId = Guid.Empty;
 
             if (!await context.Menus.AnyAsync(x => x.Name == "Configuration"))
@@ -244,29 +245,83 @@ public class SeedData
                     IsDefaultData = true
                 });
 
+                var menu = await context.Menus.AddAsync(new Menu
+                {
+                    Name = "Menus",
+                    ParentId = config.Entity.Id,
+                    Sequence = 3,
+                    Url = "configuration/menus",
+                    IsDefaultData = true
+                });
+
                 await context.SaveChangesAsync();
 
-                userId = user.Entity.Id;
-                groupMenuId = group.Entity.Id;
+                userMenuId = user.Entity.Id;
+                groupGroupId = group.Entity.Id;
+                groupMenuId = menu.Entity.Id;
             }
 
-            if (!await context.GroupMenus.AnyAsync(x => x.GroupId == groupId && x.MenuId == groupMenuId))
+            if (userMenuId != Guid.Empty && !await context.GroupMenus.AnyAsync(x => x.GroupId == groupId && x.MenuId == userMenuId))
             {
+                await context.GroupMenus.AddAsync(new GroupMenu
+                {
+                    GroupId = groupId,
+                    MenuId = userMenuId,
+                    IsRead = true,
+                    IsCreate = true,
+                    IsUpdate = true,
+                    IsDelete = true,
+                    IsImport = true,     
+                    IsDefaultData = true
+                });
             }
 
-            // Tambahkan pengguna admin
+            if (groupGroupId != Guid.Empty && !await context.GroupMenus.AnyAsync(x => x.GroupId == groupId && x.MenuId == groupGroupId))
+            {
+                await context.GroupMenus.AddAsync(new GroupMenu
+                {
+                    GroupId = groupId,
+                    MenuId = groupGroupId,
+                    IsRead = true,
+                    IsCreate = true,
+                    IsUpdate = true,
+                    IsDelete = true,
+                    IsImport = true,
+                    IsDefaultData = true
+                });
+            }
+
+            if (groupMenuId != Guid.Empty && !await context.GroupMenus.AnyAsync(x => x.GroupId == groupId && x.MenuId == groupMenuId))
+            {
+                await context.GroupMenus.AddAsync(new GroupMenu
+                {
+                    GroupId = groupId,
+                    MenuId = groupMenuId,
+                    IsRead = true,
+                    IsCreate = true,
+                    IsUpdate = true,
+                    IsDelete = true,
+                    IsImport = true,
+                    IsDefaultData = true
+                });
+            }
+
+            await context.SaveChangesAsync();
+
+            if (groupId == Guid.Empty)
+                groupId = (await context.Groups.FirstOrDefaultAsync(x => x.Name == "Admin")!)!.Id;
+
             var adminUser = new ApplicationUser
             {
-                UserName = "Admin",
+
+                UserName = "admin@example.com",
                 GroupId = groupId,
                 Email = "admin@example.com",
                 EmailConfirmed = true,
                 IsDefaultData = true
             };
-
-            string adminPassword = "123"; // Gunakan password yang lebih aman
-
-            var result = await userManager.CreateAsync(adminUser, adminPassword);
+             
+            var result = await userManager.CreateAsync(adminUser, "P@ssw0rd1123");
             if (result.Succeeded)
             {
                 // Tambahkan pengguna ke peran Admin

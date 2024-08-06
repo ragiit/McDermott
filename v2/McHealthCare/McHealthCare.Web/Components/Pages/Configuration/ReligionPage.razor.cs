@@ -1,39 +1,27 @@
-﻿using Blazored.Toast.Services;
-using McHealthCare.Application.Extentions;
-using McHealthCare.Web.Services;
-using MediatR;
-using Microsoft.AspNetCore.Components;
+﻿using McHealthCare.Application.Extentions;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
 {
-    public partial class DistrictPage
+    public partial class ReligionPage : IAsyncDisposable
     {
         #region Variables
-
         private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
-        private HubConnection? hubConnection; 
-        private List<DistrictDto> Districts = [];
-        private List<ProvinceDto> Provinces = [];
-        private List<CityDto> Cities = [];
+        private HubConnection? hubConnection;
+        private List<ReligionDto> Religions = [];
 
         private List<ExportFileData> ExportFileDatas =
         [
             new()
             {
+                Column = "Code",
+                Notes = "Mandatory"
+            },
+            new()
+            {
                 Column = "Name",
-                Notes = "Mandatory"
-            },
-            new()
-            {
-                Column = "Province",
-                Notes = "Mandatory"
-            },
-            new()
-            {
-                Column = "City",
                 Notes = "Mandatory"
             }
         ];
@@ -43,6 +31,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         #endregion Variables
+         
 
         protected override async Task OnInitializedAsync()
         {
@@ -63,14 +52,14 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                 await hubConnection.StartAsync();
 
+                await LoadData(); 
+                
                 try
                 {
                     Grid?.SelectRow(0, true);
                     StateHasChanged();
                 }
                 catch { }
-
-                await LoadData();
             }
             catch (Exception ex)
             {
@@ -96,11 +85,9 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         {
             try
             {
-                PanelVisible = true;
-                Cities.Clear();
-                Cities = await Mediator.Send(new GetCityQuery());
-                Provinces = await Mediator.Send(new GetProvinceQuery());
-                Districts = await Mediator.Send(new GetDistrictQuery());
+                PanelVisible = true; 
+                Religions.Clear();
+                Religions = await Mediator.Send(new GetReligionQuery());
                 //SelectedDataItems = [];
                 try
                 {
@@ -112,6 +99,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             {
                 ex.HandleException(ToastService);
             }
+
             PanelVisible = false;
         }
 
@@ -122,12 +110,12 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteDistrictRequest(((DistrictDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteReligionRequest(((ReligionDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<DistrictDto>>();
-                    await Mediator.Send(new DeleteDistrictRequest(Ids: a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<ReligionDto>>();
+                    await Mediator.Send(new DeleteReligionRequest(Ids: a.Select(x => x.Id).ToList()));
                 }
                 SelectedDataItems = [];
                 await LoadData();
@@ -147,12 +135,15 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             PanelVisible = true;
             try
             {
-                var editModel = (DistrictDto)e.EditModel; 
+                var editModel = (ReligionDto)e.EditModel;
+
+                if (string.IsNullOrWhiteSpace(editModel.Name))
+                    return;
 
                 if (editModel.Id == Guid.Empty)
-                    await Mediator.Send(new CreateDistrictRequest(editModel));
+                    await Mediator.Send(new CreateReligionRequest(editModel));
                 else
-                    await Mediator.Send(new UpdateDistrictRequest(editModel));
+                    await Mediator.Send(new UpdateReligionRequest(editModel));
 
                 await LoadData();
             }
@@ -181,7 +172,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = ExportFileDatas.Select(x => x.Column).ToList();
+                    var headerNames = new List<string>() { "Code", "Name" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
@@ -190,48 +181,20 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                         return;
                     }
 
-                    var Cities = new List<DistrictDto>();
+                    var r = new List<ReligionDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        bool IsValid = true;
-                        var a = Provinces.FirstOrDefault(x => x.Name == ws.Cells[row, 2].Value?.ToString()?.Trim())?.Id ?? Guid.Empty;
-
-                        if (ws.Cells[row, 2].Value?.ToString()?.Trim() is not null)
-                        {
-                            if (a == Guid.Empty)
-                            {
-                                ToastService.ShowErrorImport(row, 1, ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty);
-                                IsValid = false;
-                            }
-                        }
-
-                        var b = Cities.FirstOrDefault(x => x.Name == ws.Cells[row, 3].Value?.ToString()?.Trim())?.Id ?? Guid.Empty;
-
-                        if (ws.Cells[row, 3].Value?.ToString()?.Trim() is not null)
-                        {
-                            if (a == Guid.Empty)
-                            {
-                                ToastService.ShowErrorImport(row, 1, ws.Cells[row, 3].Value?.ToString()?.Trim() ?? string.Empty);
-                                IsValid = false;
-                            }
-                        }
-
-                        if (!IsValid)
-                            continue;
-
-                        var City = new DistrictDto
-                        {
-                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
-                            ProvinceId = a,
-                            CityId = b,
+                        var Religion = new ReligionDto
+                        { 
+                            Name = ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty,
                         };
 
-                        if (!Districts.Any(x => x.Name.Trim().ToLower() == City?.Name?.Trim().ToLower() && x.ProvinceId == City.ProvinceId && x.CityId == City.CityId))
-                            Districts.Add(City);
+                        if (!Religions.Any(x => x.Name.Trim().ToLower() == Religion?.Name?.Trim().ToLower()))
+                            r.Add(Religion);
                     }
 
-                    await Mediator.Send(new CreateListDistrictRequest(Cities));
+                    await Mediator.Send(new CreateListReligionRequest(r));
 
                     await LoadData();
 

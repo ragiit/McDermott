@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using DevExpress.Data.Helpers;
+using Microsoft.AspNetCore.Components;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
@@ -21,6 +22,24 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         #endregion Default Variables & Forms
 
         #region Default Methods
+
+        private bool IsDeletedMenu { get; set; } = false;
+        private void CanDeleteSelectedItemsMenu(GridFocusedRowChangedEventArgs e)
+        {
+            FocusedRowVisibleIndex2 = e.VisibleIndex;
+
+            if (e.DataItem is not null)
+                IsDeletedMenu = e.DataItem.Adapt<GroupMenuDto>().IsDefaultData;
+        }
+
+        private bool IsDeleted { get; set; } = false;
+        private void CanDeleteSelectedItems(GridFocusedRowChangedEventArgs e)
+        {
+            FocusedRowVisibleIndex = e.VisibleIndex;
+
+            if (e.DataItem is not null)
+                IsDeleted = e.DataItem.Adapt<GroupDto>().IsDefaultData;
+        }
 
         protected override async Task OnInitializedAsync()
         {
@@ -68,7 +87,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         {
             try
             {
-                GroupMenus = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id)); 
+                GroupMenus = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id));
             }
             catch (Exception ex)
             {
@@ -149,11 +168,14 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                 if (SelectedDataItems == null || !SelectedDataItems.Any())
                 {
+                    if (((GroupDto)e.DataItem).IsDefaultData)
+                        return;
+
                     await Mediator.Send(new DeleteGroupRequest(((GroupDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var ids = SelectedDataItems.Adapt<List<GroupDto>>().Select(x => x.Id).ToList();
+                    var ids = SelectedDataItems.Adapt<List<GroupDto>>().Where(x => x.IsDefaultData == false).Select(x => x.Id).ToList();
                     await Mediator.Send(new DeleteGroupRequest(Ids: ids));
                 }
 
@@ -175,18 +197,22 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             try
             {
                 SetLoading(true);
-
                 if (SelectedDataItemsGroupMenu == null || !SelectedDataItemsGroupMenu.Any())
                 {
+                    if (((GroupMenuDto)e.DataItem).IsDefaultData)
+                        return;
+
                     await Mediator.Send(new DeleteGroupMenuRequest(((GroupMenuDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var ids = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>().Select(x => x.Id).ToList();
+                    var ids = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>().Where(x => x.IsDefaultData == false).Select(x => x.Id).ToList();
                     await Mediator.Send(new DeleteGroupMenuRequest(Ids: ids));
                 }
 
                 SelectedDataItemsGroupMenu = [];
+                await UserService.RemoveUserFromCache(); 
+                NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
                 await LoadDataGroupMenuAsync();
             }
             catch (Exception ex)
@@ -207,16 +233,21 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 var editModel = (GroupMenuDto)e.EditModel;
                 editModel.GroupId = Group.Id;
 
+                if (GroupMenus.Any(x => x.GroupId == editModel.GroupId && x.MenuId == editModel.MenuId))
+                    return;
+
                 if (editModel.Id == Guid.Empty)
                     await Mediator.Send(new CreateGroupMenuRequest(editModel));
                 else
                     await Mediator.Send(new UpdateGroupMenuRequest(editModel));
 
+                await UserService.RemoveUserFromCache(); 
+                NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
                 await LoadDataGroupMenuAsync();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error saving group menu: {ex.Message}");
+                ex.HandleException(ToastService);
             }
             finally
             {
@@ -438,6 +469,8 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     }
 
                     await Mediator.Send(new CreateListGroupMenuRequest(gg));
+                    await UserService.RemoveUserFromCache();
+                    NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
 
                     await LoadDataGroupMenuAsync();
 

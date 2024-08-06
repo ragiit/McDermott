@@ -15,3 +15,4 @@ global using static McHealthCare.Application.Features.CommandsQueries.Configurat
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.CityCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.DistrictCommand;
 global using static McHealthCare.Extentions.EnumHelper;
+global using static McHealthCare.Application.Features.CommandsQueries.Configuration.ReligionCommand;

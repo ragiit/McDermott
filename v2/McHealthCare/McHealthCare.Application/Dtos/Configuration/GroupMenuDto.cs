@@ -13,6 +13,7 @@ namespace McHealthCare.Application.Dtos.Configuration
         public bool IsUpdate { get; set; }
         public bool IsDelete { get; set; }
         public bool IsImport { get; set; }
+        public bool IsDefaultData { get; set; } = false;
 
         public GroupDto Group { get; set; } = new();
         public MenuDto Menu { get; set; } = new();

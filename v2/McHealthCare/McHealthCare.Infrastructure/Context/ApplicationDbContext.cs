@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace McHealthCare.Context
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor? httpContextAccessor = null) : IdentityDbContext<ApplicationUser>(options)
+    public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor? httpContextAccessor = null) : IdentityDbContext<ApplicationUser>(options)
     {
         #region DbSet
 
@@ -26,6 +26,8 @@ namespace McHealthCare.Context
         public DbSet<Menu> Menus { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMenu> GroupMenus { get; set; }
+        public DbSet<Religion> Religions { get; set; }
+        public DbSet<Occupational> Occupationals { get; set; }
 
         #endregion Configuration
 

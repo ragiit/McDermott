@@ -79,14 +79,15 @@ namespace McHealthCare.Web.Services
                     .SetAbsoluteExpiration(TimeSpan.FromHours(1));  // Waktu kadaluarsa absolut
 
                 // Simpan data pengguna dalam cache
-                cache.Set(cacheKey, user, cacheEntryOptions);
+                cache.Set(cacheKey, user, cacheEntryOptions); 
             }
 
             return user;
         }
 
-        public void RemoveUserFromCache(Guid userId)
+        public async Task RemoveUserFromCache()
         {
+            var userId = await GetCurrentUserIdAsync();
             string cacheKey = $"{CacheKey.UserCacheKeyPrefix}{userId}";
             cache.Remove(cacheKey);
         }

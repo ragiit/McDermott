@@ -28,7 +28,7 @@
                                       RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
                                       EditModelSaving="OnSave"
                                       DataItemDeleting="OnDelete"
-                                      FocusedRowChanged="@((GridFocusedRowChangedEventArgs args) => FocusedRowVisibleIndex = args.VisibleIndex)"
+                                          FocusedRowChanged="CanDeleteSelectedItemsMenu"
                                       KeyFieldName="Id">
 
                                 <ToolbarTemplate>
@@ -42,6 +42,8 @@
                                                      Refresh_Click="@(async () => await LoadData())"
                                                      ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))"
                                                      ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "menus_template.xlsx", ExportFileDatas))"
+                                                     EnableEdit="!IsDeletedMenu"
+                                                     EnableDelete="!IsDeletedMenu"
                                                      VisibleNew="UserAccess.Item2.IsCreate"
                                                      VisibleEdit="UserAccess.Item2.IsUpdate"
                                                      VisibleDelete="UserAccess.Item2.IsDelete"

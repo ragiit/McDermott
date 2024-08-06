@@ -41,7 +41,17 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         #endregion Variables
-         
+
+        private bool IsDeletedMenu { get; set; } = false;
+        private void CanDeleteSelectedItemsMenu(GridFocusedRowChangedEventArgs e)
+        {
+            FocusedRowVisibleIndex = e.VisibleIndex;
+
+            if (e.DataItem is not null)
+                IsDeletedMenu = e.DataItem.Adapt<MenuDto>().IsDefaultData;
+        }
+
+
         protected override async Task OnInitializedAsync()
         {
             IsLoading = false;
@@ -112,12 +122,15 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             {
                 if (SelectedDataItems is null)
                 {
+                    if (((MenuDto)e.DataItem).IsDefaultData)
+                        return;
+
                     await Mediator.Send(new DeleteMenuRequest(((MenuDto)e.DataItem).Id));
                 }
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<MenuDto>>();
-                    await Mediator.Send(new DeleteMenuRequest(Ids: a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteMenuRequest(Ids: a.Where(x => x.IsDefaultData == false).Select(x => x.Id).ToList()));
                 }
                 SelectedDataItems = [];
                 await LoadData();
@@ -220,7 +233,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                             ParentId = a == Guid.Empty ? null : a,
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
                             Sequence = Convert.ToInt64(ws.Cells[row, 3].Value?.ToString()?.Trim()),
-                            Url = ws.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty,
+                            Url = ws.Cells[row, 4].Value?.ToString()?.Trim() ?? null,
                         };
 
                         if (!this.Menus.Any(x => x.Name.Trim().ToLower() == Menu?.Name?.Trim().ToLower() && x.ParentId == Menu.ParentId && x.Sequence == Menu.Sequence && x.Url == Menu.Url))
