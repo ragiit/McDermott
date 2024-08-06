@@ -6,8 +6,9 @@ namespace McHealthCare.Web.Components.Pages.Configuration
     public partial class CountryPage : IAsyncDisposable
     {
         #region Variables
-
         private bool PanelVisible { get; set; } = true;
+        private (bool, GroupMenuDto) UserAccess { get; set; } = new();
+        private bool IsLoading { get; set; } = true;
         private HubConnection? hubConnection;
         private List<CountryDto> Countries = [];
 
@@ -35,19 +36,37 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
         protected override async Task OnInitializedAsync()
         {
-            var aa = NavigationManager.ToAbsoluteUri("/notificationHub");
-            hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"))
-            .Build();
-
-            hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
+            IsLoading = true;
+            try
             {
-                await LoadData();
-            });
+                UserAccess = await UserService.GetUserInfo(ToastService);
 
-            await hubConnection.StartAsync();
+                var aa = NavigationManager.ToAbsoluteUri("/notificationHub");
+                hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"))
+                .Build();
 
-            await LoadData();
+                hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
+                {
+                    await LoadData();
+                });
+
+                await hubConnection.StartAsync();
+
+                await LoadData(); 
+                
+                try
+                {
+                    Grid?.SelectRow(0, true);
+                    StateHasChanged();
+                }
+                catch { }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            IsLoading = false;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -56,7 +75,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             {
                 try
                 {
-                    Grid.SelectRow(0, true);
+                    Grid?.SelectRow(0, true);
                     StateHasChanged();
                 }
                 catch { }
@@ -67,7 +86,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         {
             try
             {
-                PanelVisible = true;
+                PanelVisible = true; 
                 Countries.Clear();
                 Countries = await Mediator.Send(new GetCountryQuery());
                 //SelectedDataItems = [];
@@ -76,12 +95,13 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     Grid?.SelectRow(0, true);
                 }
                 catch { }
-                PanelVisible = false;
             }
             catch (Exception ex)
             {
-                ToastService.ShowError(ex.Message);
+                ex.HandleException(ToastService);
             }
+
+            PanelVisible = false;
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -103,6 +123,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
             catch (Exception ex)
             {
+                ex.HandleException(ToastService);
             }
             finally
             {
@@ -129,6 +150,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
             catch (Exception ex)
             {
+                ex.HandleException(ToastService);
             }
             finally
             {
@@ -182,7 +204,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 }
                 catch (Exception ex)
                 {
-                    ToastService.ShowError(ex.Message);
+                    ex.HandleException(ToastService);
                 }
             }
             PanelVisible = false;

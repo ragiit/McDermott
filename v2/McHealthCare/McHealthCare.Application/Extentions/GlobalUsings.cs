@@ -2,3 +2,15 @@
 global using Microsoft.AspNetCore.SignalR;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.CountryCommand;
 global using static McHealthCare.Extentions.EnumHelper;
+global using Mapster;
+global using McHealthCare.Application.Dtos.Configuration;
+global using McHealthCare.Application.Extentions;
+global using McHealthCare.Application.Interfaces;
+global using MediatR;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Caching.Memory;
+global using System.Linq.Expressions;
+global using static McHealthCare.Application.Features.CommandsQueries.Configuration.OccupationalCommand;
+global using static McHealthCare.Application.Features.CommandsQueries.Configuration.ReligionCommand;
+global using static McHealthCare.Application.Features.CommandsQueries.Configuration.VillageCommand;
+global using static McHealthCare.Application.Features.CommandsQueries.Configuration.DistrictCommand;

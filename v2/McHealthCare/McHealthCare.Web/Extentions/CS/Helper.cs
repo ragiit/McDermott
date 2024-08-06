@@ -1,5 +1,6 @@
 ﻿using Blazored.Toast.Services;
 using McHealthCare.Application.Services;
+using Microsoft.Data.SqlClient;
 using Microsoft.JSInterop;
 
 namespace McHealthCare.Web.Extentions.CS
@@ -113,6 +114,41 @@ namespace McHealthCare.Web.Extentions.CS
         public static void ShowErrorImport(this IToastService ToastService, int row, int col, string val)
         {
             ToastService.ShowInfo($"Data \"{val}\" in row {row} and column {col} is invalid");
+        }
+
+        public static void HandleException(this Exception ex, IToastService toastService)
+        {
+            string errorMessage = "An error occurred while saving data.";
+
+            if (ex.InnerException is SqlException sqlException)
+            {
+                switch (sqlException.Number)
+                {
+                    case 547:
+                        errorMessage = "Data cannot be deleted because it is associated with another entity.";
+                        break;
+                    // Add more cases as needed for specific SQL error numbers
+                    default:
+                        errorMessage = "An error occurred in the database, Code: " + sqlException.ErrorCode;
+                        break;
+                }
+            }
+            else
+            {
+                errorMessage = "An error occurred";
+            }
+
+            Log.Error(
+                  "\n\n" +
+                  "==================== START ERROR ====================" + "\n" +
+                  "Message =====> " + ex.Message + "\n" +
+                  "Inner Message =====> " + ex.InnerException?.Message + "\n" +
+                  "Stack Trace =====> " + ex.StackTrace?.Trim() + "\n" +
+                  "==================== END ERROR ====================" + "\n"
+                  );
+
+            toastService.ClearErrorToasts();
+            toastService.ShowError(errorMessage);
         }
     }
 }

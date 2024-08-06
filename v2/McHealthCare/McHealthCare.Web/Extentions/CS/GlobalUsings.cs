@@ -5,6 +5,7 @@ global using McHealthCare.Application.Dtos.Others;
 global using Microsoft.AspNetCore.Components.Forms;
 global using OfficeOpenXml;
 global using McHealthCare.Web.Extentions.CS;
+global using Serilog;
 
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.CountryCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.ProvinceCommand;
@@ -12,4 +13,6 @@ global using static McHealthCare.Application.Features.CommandsQueries.Configurat
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.GroupMenuCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.MenuCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.CityCommand;
+global using static McHealthCare.Application.Features.CommandsQueries.Configuration.DistrictCommand;
 global using static McHealthCare.Extentions.EnumHelper;
+global using static McHealthCare.Application.Features.CommandsQueries.Configuration.ReligionCommand;

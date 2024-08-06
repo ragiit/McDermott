@@ -3,13 +3,16 @@ using McHealthCare.Application.Extentions;
 using McHealthCare.Application.Services;
 using McHealthCare.Context;
 using McHealthCare.Domain.Entities;
+using McHealthCare.Domain.Entities.Configuration;
 using McHealthCare.Persistence.Extentions;
 using McHealthCare.Web.Components;
 using McHealthCare.Web.Components.Account;
 using McHealthCare.Web.Services;
+using MediatR;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Text.Json.Serialization;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
@@ -49,9 +52,14 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-.AddSignInManager()
+builder.Services.AddIdentityCore<ApplicationUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
+.AddRoles<IdentityRole>() // Add role support
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddSignInManager<SignInManager<ApplicationUser>>()
+.AddRoleManager<RoleManager<IdentityRole>>() // Register RoleManager
 .AddDefaultTokenProviders();
 
 //builder.Services.AddScoped<SignInManager<IdentityUser>>();
@@ -95,6 +103,8 @@ app.UseRouting();
 app.UseAuthentication(); // Tambahkan jika menggunakan autentikasi
 app.UseAuthorization();
 
+app.UseMiddleware<PageTrackingMiddleware>();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
@@ -114,6 +124,11 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("=== Starting Migrate the database. ===");
         var context = services.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate();
+        Console.WriteLine("=== Success Migrated ===");
+
+        Console.WriteLine("=== Starting Seeding the data. ===");
+        await new SeedData().Initialize(services);
+        Console.WriteLine("=== Success Seeding ===");
     }
     catch (Exception ex)
     {
@@ -130,3 +145,188 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+public class PageTrackingMiddleware(RequestDelegate _next, IServiceProvider _serviceProvider)
+{
+    public async Task InvokeAsync(HttpContext context)
+    {
+        if (context.Request.Path.StartsWithSegments("/forbidden"))
+        {
+            await _next(context);
+            return;
+        }
+
+        using (var scope = _serviceProvider.CreateScope())
+        {
+            //var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            //var id = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == id) ?? new();
+            //var groupMenus = await dbContext.GroupMenus.Include(x => x.Menu).Where(x => x.GroupId == user.GroupId).ToListAsync();
+            //var aa = context.Request.Path.ToString().TrimStart('/');
+            //var bb = groupMenus.FirstOrDefault(x => x.Menu.Url.Contains(aa)) ;
+            //if (bb is null && !aa.Equals("/"))
+            //{
+            //    context.Response.Redirect("/forbidden");
+            //       return;
+            //}
+            //if (!isValidUser)
+            //{
+            //    context.Response.Redirect("/forbidden");
+            //    return;
+            //}
+        }
+
+        await _next(context);
+    }
+}
+
+public class SeedData
+{
+    public async Task Initialize(IServiceProvider serviceProvider)
+    {
+        using var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>());
+        // Periksa apakah ada pengguna admin
+        if (!context.Users.Any())
+        {
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            // Buat peran Admin jika belum ada
+            if (!await roleManager.RoleExistsAsync("Admin"))
+            {
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
+            }
+
+            if (!await context.Groups.AnyAsync(x => x.Name == "Admin"))
+            {
+                await context.Groups.AddAsync(new Group
+                {
+                    Name = "Admin",
+                    IsDefaultData = true
+                });
+
+                await context.SaveChangesAsync();
+            }
+
+            Guid groupId = Guid.Empty;
+            Guid userMenuId = Guid.Empty;
+            Guid groupGroupId = Guid.Empty;
+            Guid groupMenuId = Guid.Empty;
+
+            if (!await context.Menus.AnyAsync(x => x.Name == "Configuration"))
+            {
+                var config = await context.Menus.AddAsync(new Menu
+                {
+                    Name = "Configuration",
+                    Sequence = 10,
+                    IsDefaultData = true
+                });
+
+                await context.SaveChangesAsync();
+
+                groupId = (await context.Groups.FirstOrDefaultAsync(x => x.Name == "Admin")!)!.Id;
+
+                var user = await context.Menus.AddAsync(new Menu
+                {
+                    Name = "Users",
+                    ParentId = config.Entity.Id,
+                    Sequence = 1,
+                    Url = "configuration/users",
+                    IsDefaultData = true
+                });
+
+                var group = await context.Menus.AddAsync(new Menu
+                {
+                    Name = "Groups",
+                    ParentId = config.Entity.Id,
+                    Sequence = 2,
+                    Url = "configuration/groups",
+                    IsDefaultData = true
+                });
+
+                var menu = await context.Menus.AddAsync(new Menu
+                {
+                    Name = "Menus",
+                    ParentId = config.Entity.Id,
+                    Sequence = 3,
+                    Url = "configuration/menus",
+                    IsDefaultData = true
+                });
+
+                await context.SaveChangesAsync();
+
+                userMenuId = user.Entity.Id;
+                groupGroupId = group.Entity.Id;
+                groupMenuId = menu.Entity.Id;
+            }
+
+            if (userMenuId != Guid.Empty && !await context.GroupMenus.AnyAsync(x => x.GroupId == groupId && x.MenuId == userMenuId))
+            {
+                await context.GroupMenus.AddAsync(new GroupMenu
+                {
+                    GroupId = groupId,
+                    MenuId = userMenuId,
+                    IsRead = true,
+                    IsCreate = true,
+                    IsUpdate = true,
+                    IsDelete = true,
+                    IsImport = true,     
+                    IsDefaultData = true
+                });
+            }
+
+            if (groupGroupId != Guid.Empty && !await context.GroupMenus.AnyAsync(x => x.GroupId == groupId && x.MenuId == groupGroupId))
+            {
+                await context.GroupMenus.AddAsync(new GroupMenu
+                {
+                    GroupId = groupId,
+                    MenuId = groupGroupId,
+                    IsRead = true,
+                    IsCreate = true,
+                    IsUpdate = true,
+                    IsDelete = true,
+                    IsImport = true,
+                    IsDefaultData = true
+                });
+            }
+
+            if (groupMenuId != Guid.Empty && !await context.GroupMenus.AnyAsync(x => x.GroupId == groupId && x.MenuId == groupMenuId))
+            {
+                await context.GroupMenus.AddAsync(new GroupMenu
+                {
+                    GroupId = groupId,
+                    MenuId = groupMenuId,
+                    IsRead = true,
+                    IsCreate = true,
+                    IsUpdate = true,
+                    IsDelete = true,
+                    IsImport = true,
+                    IsDefaultData = true
+                });
+            }
+
+            await context.SaveChangesAsync();
+
+            if (groupId == Guid.Empty)
+                groupId = (await context.Groups.FirstOrDefaultAsync(x => x.Name == "Admin")!)!.Id;
+
+            var adminUser = new ApplicationUser
+            {
+
+                UserName = "admin@example.com",
+                GroupId = groupId,
+                Email = "admin@example.com",
+                EmailConfirmed = true,
+                IsDefaultData = true
+            };
+             
+            var result = await userManager.CreateAsync(adminUser, "P@ssw0rd1123");
+            if (result.Succeeded)
+            {
+                // Tambahkan pengguna ke peran Admin
+                await userManager.AddToRoleAsync(adminUser, "Admin");
+            }
+        }
+    }
+}

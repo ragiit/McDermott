@@ -4,8 +4,9 @@
     {
         #region Variables
 
-        private bool PanelVisible { get; set; } = true;
-
+        private bool PanelVisible { get; set; } = true; 
+        private (bool, GroupMenuDto) UserAccess { get; set; } = new();
+        private bool IsLoading { get; set; } = true;
         private List<CountryDto> Countries = [];
         private List<ProvinceDto> Provinces = [];
 
@@ -36,7 +37,17 @@
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadData();
+            IsLoading = true;
+            try
+            {
+                UserAccess = await UserService.GetUserInfo(ToastService);
+                await LoadData(); 
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            IsLoading = false;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -45,7 +56,7 @@
             {
                 try
                 {
-                    Grid.SelectRow(0, true);
+                    Grid?.SelectRow(0, true);
                     StateHasChanged();
                 }
                 catch { }

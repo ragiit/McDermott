@@ -11,6 +11,7 @@ namespace McHealthCare.Application.Dtos.Configuration
         [Required]
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
+        public bool IsDefaultData { get; set; } = false;
     }
 
     public class CreateUpdateGroupDto : IMapFrom<Group>
@@ -19,6 +20,6 @@ namespace McHealthCare.Application.Dtos.Configuration
 
         [Required]
         [StringLength(200)]
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty; 
     }
 }

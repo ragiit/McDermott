@@ -47,6 +47,9 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<Guid?>("GroupId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsDefaultData")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -169,6 +172,45 @@ namespace McHealthCare.Persistence.Migrations
                     b.ToTable("Countries");
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.District", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid>("CityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("ProvinceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("ProvinceId");
+
+                    b.ToTable("Districts");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Menu", b =>
                 {
                     b.Property<Guid>("Id")
@@ -184,6 +226,9 @@ namespace McHealthCare.Persistence.Migrations
 
                     b.Property<string>("Icon")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDefaultData")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -210,6 +255,40 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasIndex("ParentId");
 
                     b.ToTable("Menus");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Occupational", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Occupationals");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Patient", b =>
@@ -264,6 +343,35 @@ namespace McHealthCare.Persistence.Migrations
                     b.ToTable("Provinces");
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Religion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Religions");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Village", b =>
                 {
                     b.Property<Guid>("Id")
@@ -304,6 +412,8 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
+
+                    b.HasIndex("DistrictId");
 
                     b.HasIndex("ProvinceId");
 
@@ -370,6 +480,9 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDefaultData")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -403,6 +516,9 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsCreate")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDefaultData")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDelete")
@@ -1380,6 +1496,25 @@ namespace McHealthCare.Persistence.Migrations
                     b.Navigation("Province");
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.District", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("Province");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Menu", b =>
                 {
                     b.HasOne("McHealthCare.Domain.Entities.Configuration.Menu", "Parent")
@@ -1420,6 +1555,12 @@ namespace McHealthCare.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("McHealthCare.Domain.Entities.Configuration.Province", "Province")
                         .WithMany()
                         .HasForeignKey("ProvinceId")
@@ -1427,6 +1568,8 @@ namespace McHealthCare.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("City");
+
+                    b.Navigation("District");
 
                     b.Navigation("Province");
                 });

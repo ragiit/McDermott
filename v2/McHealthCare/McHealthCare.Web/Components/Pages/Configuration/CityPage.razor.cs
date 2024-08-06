@@ -9,6 +9,8 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         #region Variables
 
         private bool PanelVisible { get; set; } = true;
+        private (bool, GroupMenuDto) UserAccess { get; set; } = new();
+        private bool IsLoading { get; set; } = true;
         private HubConnection? hubConnection;
         private List<CityDto> Cities = [];
         private List<ProvinceDto> Provinces = [];
@@ -37,17 +39,37 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
         protected override async Task OnInitializedAsync()
         {
-            var aa = NavigationManager.ToAbsoluteUri("/notificationHub");
-            hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"))
-            .Build();
-
-            hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
+            IsLoading = true;
+            try
             {
-                await LoadData();
-            });
+                UserAccess = await UserService.GetUserInfo(ToastService);
 
-            await hubConnection.StartAsync();
+                var aa = NavigationManager.ToAbsoluteUri("/notificationHub");
+                hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"))
+                .Build();
+
+                hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
+                {
+                    await LoadData();
+                });
+
+                await hubConnection.StartAsync();
+
+                try
+                {
+                    Grid?.SelectRow(0, true);
+                    StateHasChanged();
+                }
+                catch { }
+
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            IsLoading = false;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -56,7 +78,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             {
                 try
                 {
-                    Grid.SelectRow(0, true);
+                    Grid?.SelectRow(0, true);
                     StateHasChanged();
                 }
                 catch { }

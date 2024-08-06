@@ -1,0 +1,118 @@
+﻿@page "/configuration/sub-districts"
+
+<PageTitle>McHealthCare - Villages</PageTitle>
+
+<BaseHeaderPage Title="Villages" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+
+@if (!IsLoading && UserAccess.Item1 && UserAccess.Item2.IsRead)
+{
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+                        <div class="card-body">
+                            <div>
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <MyDxGrid @ref="Grid"
+                                              Data="Villages"
+                                              @bind-SelectedDataItems="@SelectedDataItems"
+                                              RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
+                                              EditModelSaving="OnSave"
+                                              DataItemDeleting="OnDelete"
+                                              FocusedRowChanged="@((GridFocusedRowChangedEventArgs args) => FocusedRowVisibleIndex = args.VisibleIndex)"
+                                              KeyFieldName="Id">
+
+                                        <ToolbarTemplate>
+                                            <MyDxToolbarBase TItem="VillageDto"
+                                                             Items="@Villages"
+                                                             Grid="Grid"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@(async () => await Grid.StartEditNewRowAsync())"
+                                                             EditItem_Click="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
+                                                             DeleteItem_Click="@(() => Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex))"
+                                                             Refresh_Click="@(async () => await LoadData())"
+                                                             ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))"
+                                                             ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "countries_template.xlsx", ExportFileDatas))"
+                                                             VisibleNew="UserAccess.Item2.IsCreate"
+                                                             VisibleEdit="UserAccess.Item2.IsUpdate"
+                                                             VisibleDelete="UserAccess.Item2.IsDelete"
+                                                             VisibleImport="UserAccess.Item2.IsImport" />
+                                        </ToolbarTemplate>
+
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Province.Name" Caption="Province" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="District.Name" Caption="District" SortIndex="0" />
+                                        </Columns>
+
+                                        <EditFormTemplate Context="EditFormContext">
+                                            @{
+                                                var a = (VillageDto)EditFormContext.EditModel;
+                                            }
+                                            <DxFormLayout>
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                    <MyTextBox @bind-Text="@a.Name" NullText="Name" />
+                                                    <ValidationMessage For="@(()=> a.Name)"   />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Postal Code" ColSpanMd="12">
+                                                    <MyTextBox @bind-Text="@a.PostalCode" NullText="Postal Code" />
+                                                    <ValidationMessage For="@(()=> a.PostalCode)"   />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Province" ColSpanMd="12">
+                                                    <MyDxComboBox Data="@Provinces"
+                                                                  NullText="Select Province..."
+                                                                  @bind-Value="@a.ProvinceId"
+                                                                  TextFieldName="Name"
+                                                                  ValueFieldName="Id">
+                                                    </MyDxComboBox>
+                                                    <ValidationMessage For="@(()=>a.ProvinceId)" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="City" ColSpanMd="12">
+                                                    <MyDxComboBox Data="@Cities"
+                                                                  NullText="Select City..."
+                                                                  @bind-Value="@a.CityId"
+                                                                  TextFieldName="Name"
+                                                                  ValueFieldName="Id">
+                                                    </MyDxComboBox>
+                                                    <ValidationMessage For="@(()=>a.CityId)" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="District" ColSpanMd="12">
+                                                    <MyDxComboBox Data="@Districts"
+                                                                  NullText="Select District..."
+                                                                  @bind-Value="@a.DistrictId"
+                                                                  TextFieldName="Name"
+                                                                  ValueFieldName="Id">
+                                                    </MyDxComboBox>
+                                                    <ValidationMessage For="@(()=>a.DistrictId)" />
+                                                </DxFormLayoutItem>
+                                            </DxFormLayout>
+                                        </EditFormTemplate>
+                                    </MyDxGrid>
+                                </DxLoadingPanel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+else if (UserAccess.Item2 is not null && !UserAccess.Item2.IsRead)
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}

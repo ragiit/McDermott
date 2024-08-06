@@ -39,6 +39,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                     return (result.Adapt<GroupMenuDto>(), []);
                 else
                     return ((await unitOfWork.Repository<GroupMenu>().Entities
+                        .AsNoTracking()
                         .Include(x => x.Group)
                         .Include(x => x.Menu)
                         .Include(x => x.Menu.Parent)
@@ -50,6 +51,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                     return (new(), results.Adapt<List<GroupMenuDto>>());
                 else
                     return (new(), (await unitOfWork.Repository<GroupMenu>().Entities
+                        .AsNoTracking()
                         .Include(x => x.Group)
                         .Include(x => x.Menu)
                         .Include(x => x.Menu.Parent)
@@ -71,6 +73,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             if (!cache.TryGetValue(CacheKey, out result))
             {
                 result = await unitOfWork.Repository<GroupMenu>().Entities
+                    .AsNoTracking()
                     .Include(x => x.Group)
                     .Include(x => x.Menu)
                     .Include(x => x.Menu.Parent)

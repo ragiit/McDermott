@@ -238,12 +238,14 @@
         }
         else if (result.IsLockedOut)
         {
+            ToastService.ShowInfo("User account locked out.");
             Logger.LogWarning("User account locked out.");
             RedirectManager.RedirectTo("Account/Lockout");
         }
         else
         {
             errorMessage = "Error: Invalid login attempt.";
+            ToastService.ShowInfo(errorMessage);
         }
     }
 
@@ -253,8 +255,7 @@
         [EmailAddress]
         public string Email { get; set; } = "";
 
-        [Required]
-        [DataType(DataType.Password)]
+        [Required] 
         public string Password { get; set; } = "";
 
         // [Display(Name = "Remember me?")]

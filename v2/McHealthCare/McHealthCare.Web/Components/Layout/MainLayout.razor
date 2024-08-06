@@ -345,19 +345,27 @@
 
         var user = await UserService.GetCurrentUserFromDatabaseAsync();
 
-        var groupMenu = user?.Group?.GroupMenus?.Select(x => x.MenuId) ?? [];
-        Menus = (await Mediator.Send(new GetMenuQuery(x => groupMenu.Contains(x.Id)))).OrderBy(x => x.Sequence).ToList();
+        List<MenuDto> menus = new List<MenuDto>();
+        if (user?.Group?.GroupMenus != null)
+        {
+            var groupMenu = user.Group.GroupMenus.Select(x => x.MenuId).ToList();
+            menus = (await Mediator.Send(new GetMenuQuery(x => groupMenu.Contains(x.Id)))).OrderBy(x => x.Sequence).ToList();
+        }
 
-        ParentMenus = Menus.Select(x => new ParentMenuTemp
-            {
-                ParentId = x.ParentId.GetValueOrDefault(),
-                ParentName = x.Parent?.Name,
-                Sequence = x.Parent?.Sequence
-            })
-        .DistinctBy(p => new { p.ParentId, p.ParentName, p.Sequence })
-        .OrderBy(x => x.Sequence)
-        .ToList();
+        Menus = menus;
+
+        ParentMenus = Menus
+            .Select(x => new ParentMenuTemp
+                {
+                    ParentId = x.ParentId.GetValueOrDefault(),
+                    ParentName = x.Parent?.Name,
+                    Sequence = x.Parent?.Sequence
+                })
+            .DistinctBy(p => new { p.ParentId, p.ParentName, p.Sequence })
+            .OrderBy(x => x.Sequence)
+            .ToList();
 
         IsLoadingSideBar = false;
+
     }
 }

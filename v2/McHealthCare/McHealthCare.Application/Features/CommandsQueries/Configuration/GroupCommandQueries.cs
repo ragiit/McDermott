@@ -38,14 +38,18 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                 if (!ReturnNewData)
                     return (result.Adapt<GroupDto>(), []);
                 else
-                    return ((await unitOfWork.Repository<Group>().Entities.FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<GroupDto>(), []);
+                    return ((await unitOfWork.Repository<Group>().Entities 
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<GroupDto>(), []);
             }
             else if (results is not null)
             {
                 if (!ReturnNewData)
                     return (new(), results.Adapt<List<GroupDto>>());
                 else
-                    return (new(), (await unitOfWork.Repository<Group>().Entities.FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<GroupDto>>());
+                    return (new(), (await unitOfWork.Repository<Group>().Entities
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<GroupDto>>());
             }
 
             return (new(), []);
@@ -62,7 +66,9 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             if (!cache.TryGetValue(CacheKey, out result))
             {
-                result = await unitOfWork.Repository<Group>().Entities.ToListAsync(cancellationToken);
+                result = await unitOfWork.Repository<Group>().Entities 
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }
 

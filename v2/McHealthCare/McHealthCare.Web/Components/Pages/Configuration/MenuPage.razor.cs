@@ -7,7 +7,9 @@ namespace McHealthCare.Web.Components.Pages.Configuration
     {
         #region Variables
 
-        private bool PanelVisible { get; set; } = true;
+        private bool PanelVisible { get; set; } = true; 
+        private (bool, GroupMenuDto) UserAccess { get; set; } = new();
+        private bool IsLoading { get; set; } = true;
         private HubConnection? hubConnection;
         private List<MenuDto> Menus = [];
         private List<MenuDto> ParentMenuDto = [];
@@ -40,28 +42,42 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
         #endregion Variables
 
-        private bool asd()
+        private bool IsDeletedMenu { get; set; } = false;
+        private void CanDeleteSelectedItemsMenu(GridFocusedRowChangedEventArgs e)
         {
-            ToastService.ShowInfo("aowjdaowkdoawkdaw");
+            FocusedRowVisibleIndex = e.VisibleIndex;
 
-            return false;
+            if (e.DataItem is not null)
+                IsDeletedMenu = e.DataItem.Adapt<MenuDto>().IsDefaultData;
         }
+
 
         protected override async Task OnInitializedAsync()
         {
-            var aa = NavigationManager.ToAbsoluteUri("/notificationHub");
-            hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"))
-            .Build();
-
-            hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
+            IsLoading = false;
+            try
             {
+                UserAccess = await UserService.GetUserInfo(ToastService);
+
+                var aa = NavigationManager.ToAbsoluteUri("/notificationHub");
+                hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"))
+                .Build();
+
+                hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
+                {
+                    await LoadData();
+                });
+
+                await hubConnection.StartAsync();
+
                 await LoadData();
-            });
-
-            await hubConnection.StartAsync();
-
-            await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            IsLoading = false;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -70,7 +86,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             {
                 try
                 {
-                    Grid.SelectRow(0, true);
+                    Grid?.SelectRow(0, true);
                     StateHasChanged();
                 }
                 catch { }
@@ -106,12 +122,15 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             {
                 if (SelectedDataItems is null)
                 {
+                    if (((MenuDto)e.DataItem).IsDefaultData)
+                        return;
+
                     await Mediator.Send(new DeleteMenuRequest(((MenuDto)e.DataItem).Id));
                 }
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<MenuDto>>();
-                    await Mediator.Send(new DeleteMenuRequest(Ids: a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteMenuRequest(Ids: a.Where(x => x.IsDefaultData == false).Select(x => x.Id).ToList()));
                 }
                 SelectedDataItems = [];
                 await LoadData();
@@ -214,7 +233,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                             ParentId = a == Guid.Empty ? null : a,
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
                             Sequence = Convert.ToInt64(ws.Cells[row, 3].Value?.ToString()?.Trim()),
-                            Url = ws.Cells[row, 4].Value?.ToString()?.Trim() ?? string.Empty,
+                            Url = ws.Cells[row, 4].Value?.ToString()?.Trim() ?? null,
                         };
 
                         if (!this.Menus.Any(x => x.Name.Trim().ToLower() == Menu?.Name?.Trim().ToLower() && x.ParentId == Menu.ParentId && x.Sequence == Menu.Sequence && x.Url == Menu.Url))

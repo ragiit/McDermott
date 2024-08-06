@@ -9,6 +9,7 @@ namespace McHealthCare.Domain.Entities
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
         public DateTime? DateOfBirth { get; set; }
+        public bool IsDefaultData { get; set; } = false;
 
         public virtual Group? Group { get; set; }
         public virtual Patient? Patient { get; set; }  // Navigation property

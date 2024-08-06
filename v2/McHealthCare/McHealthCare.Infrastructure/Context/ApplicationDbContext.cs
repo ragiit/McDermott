@@ -9,13 +9,14 @@ using System.Security.Claims;
 
 namespace McHealthCare.Context
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) : IdentityDbContext<ApplicationUser>(options)
+    public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor? httpContextAccessor = null) : IdentityDbContext<ApplicationUser>(options)
     {
         #region DbSet
 
         #region Configuration
 
         public DbSet<City> Cities { get; set; }
+        public DbSet<District> Districts { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<Province> Provinces { get; set; }
         public DbSet<Village> Villages { get; set; }
@@ -25,6 +26,8 @@ namespace McHealthCare.Context
         public DbSet<Menu> Menus { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMenu> GroupMenus { get; set; }
+        public DbSet<Religion> Religions { get; set; }
+        public DbSet<Occupational> Occupationals { get; set; }
 
         #endregion Configuration
 
@@ -72,7 +75,7 @@ namespace McHealthCare.Context
                         .Where(e => e.Entity is BaseAuditableEntity &&
                                     (e.State == EntityState.Added || e.State == EntityState.Modified));
 
-            var userId = httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? Guid.Empty.ToString();
+            var userId = httpContextAccessor?.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? Guid.Empty.ToString();
 
             foreach (var entry in entries)
             {

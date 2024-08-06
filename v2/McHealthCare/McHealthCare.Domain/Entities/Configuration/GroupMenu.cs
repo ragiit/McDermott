@@ -9,7 +9,7 @@
         public bool IsUpdate { get; set; }
         public bool IsDelete { get; set; }
         public bool IsImport { get; set; }
-
+        public bool IsDefaultData { get; set; } = false;
         public Group? Group { get; set; }
         public Menu? Menu { get; set; }
     }

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using DevExpress.Data.Helpers;
+using Microsoft.AspNetCore.Components;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
 {
@@ -21,9 +23,45 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
         #region Default Methods
 
+        private bool IsDeletedMenu { get; set; } = false;
+        private void CanDeleteSelectedItemsMenu(GridFocusedRowChangedEventArgs e)
+        {
+            FocusedRowVisibleIndex2 = e.VisibleIndex;
+
+            if (e.DataItem is not null)
+                IsDeletedMenu = e.DataItem.Adapt<GroupMenuDto>().IsDefaultData;
+        }
+
+        private bool IsDeleted { get; set; } = false;
+        private void CanDeleteSelectedItems(GridFocusedRowChangedEventArgs e)
+        {
+            FocusedRowVisibleIndex = e.VisibleIndex;
+
+            if (e.DataItem is not null)
+                IsDeleted = e.DataItem.Adapt<GroupDto>().IsDefaultData;
+        }
+
         protected override async Task OnInitializedAsync()
         {
-            await LoadDataAsync();
+            IsLoading = true;
+            try
+            {
+                UserAccess = await UserService.GetUserInfo(ToastService);
+
+                await LoadDataAsync();
+
+                try
+                {
+                    Grid?.SelectRow(0, true);
+                    StateHasChanged();
+                }
+                catch { }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            IsLoading = false;
         }
 
         private async Task LoadDataAsync()
@@ -50,12 +88,10 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             try
             {
                 GroupMenus = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id));
-                var a = "ad";
             }
             catch (Exception ex)
             {
-                // Handle exception
-                Console.WriteLine($"Error loading group menu: {ex.Message}");
+                ex.HandleException(ToastService);
             }
         }
 
@@ -132,11 +168,14 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                 if (SelectedDataItems == null || !SelectedDataItems.Any())
                 {
+                    if (((GroupDto)e.DataItem).IsDefaultData)
+                        return;
+
                     await Mediator.Send(new DeleteGroupRequest(((GroupDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var ids = SelectedDataItems.Adapt<List<GroupDto>>().Select(x => x.Id).ToList();
+                    var ids = SelectedDataItems.Adapt<List<GroupDto>>().Where(x => x.IsDefaultData == false).Select(x => x.Id).ToList();
                     await Mediator.Send(new DeleteGroupRequest(Ids: ids));
                 }
 
@@ -158,19 +197,23 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             try
             {
                 SetLoading(true);
-
                 if (SelectedDataItemsGroupMenu == null || !SelectedDataItemsGroupMenu.Any())
                 {
+                    if (((GroupMenuDto)e.DataItem).IsDefaultData)
+                        return;
+
                     await Mediator.Send(new DeleteGroupMenuRequest(((GroupMenuDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var ids = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>().Select(x => x.Id).ToList();
+                    var ids = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>().Where(x => x.IsDefaultData == false).Select(x => x.Id).ToList();
                     await Mediator.Send(new DeleteGroupMenuRequest(Ids: ids));
                 }
 
                 SelectedDataItemsGroupMenu = [];
-                await LoadDataAsync();
+                await UserService.RemoveUserFromCache(); 
+                NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
+                await LoadDataGroupMenuAsync();
             }
             catch (Exception ex)
             {
@@ -190,16 +233,21 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 var editModel = (GroupMenuDto)e.EditModel;
                 editModel.GroupId = Group.Id;
 
+                if (GroupMenus.Any(x => x.GroupId == editModel.GroupId && x.MenuId == editModel.MenuId))
+                    return;
+
                 if (editModel.Id == Guid.Empty)
                     await Mediator.Send(new CreateGroupMenuRequest(editModel));
                 else
                     await Mediator.Send(new UpdateGroupMenuRequest(editModel));
 
+                await UserService.RemoveUserFromCache(); 
+                NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
                 await LoadDataGroupMenuAsync();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error saving group menu: {ex.Message}");
+                ex.HandleException(ToastService);
             }
             finally
             {
@@ -212,11 +260,22 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             PanelVisible = isLoading;
         }
 
-        private void CancelItemGroupMenuGrid_Click()
+        private async Task CancelItemGroupMenuGrid_Click()
         {
-            // Implement logic to cancel group menu grid operation
+            await BackButtonAsync();
         }
-
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                try
+                {
+                    Grid?.SelectRow(0, true);
+                    StateHasChanged();
+                }
+                catch { }
+            }
+        }
         private async Task NewItemGroup_ClickAsync()
         {
             GroupMenu = new GroupMenuDto();
@@ -247,6 +306,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
         [Parameter] public Guid? Id { get; set; }
         [Parameter] public string? PageMode { get; set; }
+        private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private List<GroupDto> Groups { get; set; } = new List<GroupDto>();
         private List<GroupMenuDto> GroupMenus { get; set; } = new List<GroupMenuDto>();
         private List<MenuDto> Menus { get; set; } = new List<MenuDto>();
@@ -298,8 +358,38 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         [
             new()
             {
-                Column = "Name",
+                Column = "Menu",
                 Notes = "Mandatory"
+            },
+            new()
+            {
+                Column = "Parent Menu",
+                Notes = "Mandatory"
+            },
+            new()
+            {
+                Column = "Is Create",
+                Notes = "Select one: Yes/No"
+            },
+            new()
+            {
+                Column = "Is Read",
+                Notes = "Select one: Yes/No"
+            },
+            new()
+            {
+                Column = "Is Update",
+                Notes = "Select one: Yes/No"
+            },
+            new()
+            {
+                Column = "Is Delete",
+                Notes = "Select one: Yes/No"
+            },
+            new()
+            {
+                Column = "Is Import",
+                Notes = "Select one: Yes/No"
             }
         ];
 
@@ -341,8 +431,17 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
                         bool IsValid = true;
+
+                        var ab = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                        var parentId = Menus.FirstOrDefault(x => x.ParentId == null && x.Name == ab)?.Id ?? Guid.Empty;
+                        if (parentId == Guid.Empty)
+                        {
+                            ToastService.ShowErrorImport(row, 2, ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty);
+                            IsValid = false;
+                        }
+
                         var aa = ws.Cells[row, 1].Value?.ToString()?.Trim();
-                        var menuId = Menus.FirstOrDefault(x => (x.ParentId != null && x.ParentId != Guid.Empty) && x.Name == aa)?.Id ?? Guid.Empty;
+                        var menuId = Menus.FirstOrDefault(x => x.ParentId == parentId && x.Name == aa)?.Id ?? Guid.Empty;
 
                         if (menuId == Guid.Empty)
                         {
@@ -356,14 +455,22 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                         var g = new GroupMenuDto
                         {
                             GroupId = Group.Id,
-                            MenuId = menuId
+                            MenuId = menuId,
+                            IsCreate = ws.Cells[row, 3].Value?.ToString()?.Trim() == "Yes" ? true : false,
+                            IsRead = ws.Cells[row, 4].Value?.ToString()?.Trim() == "Yes" ? true : false,
+                            IsUpdate = ws.Cells[row, 5].Value?.ToString()?.Trim() == "Yes" ? true : false,
+                            IsDelete = ws.Cells[row, 6].Value?.ToString()?.Trim() == "Yes" ? true : false,
+                            IsImport = ws.Cells[row, 7].Value?.ToString()?.Trim() == "Yes" ? true : false,
                         };
 
-                        if (!GroupMenus.Any(x => x.GroupId == g.GroupId && x.MenuId == g.MenuId))
+                        if (!GroupMenus.Any(x => x.GroupId == g.GroupId && x.MenuId == g.MenuId && x.IsCreate == g.IsCreate
+                         && x.IsRead == g.IsRead && x.IsUpdate == g.IsUpdate && x.IsDelete == g.IsDelete && x.IsImport == g.IsImport))
                             gg.Add(g);
                     }
 
                     await Mediator.Send(new CreateListGroupMenuRequest(gg));
+                    await UserService.RemoveUserFromCache();
+                    NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
 
                     await LoadDataGroupMenuAsync();
 
