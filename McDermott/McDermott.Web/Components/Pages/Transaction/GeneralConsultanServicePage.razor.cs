@@ -2818,6 +2818,12 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (value.Count > 0)
                 FormRegis = value[0];
         }
+        private async Task ClosePopUp()
+        {
+            isPrint = false;
+            await EditItemVoid();
+            StateHasChanged();
+        }
 
         private async Task OnAppoimentPopUpClick()
         {

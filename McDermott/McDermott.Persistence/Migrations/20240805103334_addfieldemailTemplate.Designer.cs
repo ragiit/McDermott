@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240805103334_addfieldemailTemplate")]
+    partial class addfieldemailTemplate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1726,9 +1729,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<byte[]>("DocumentContent")
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<long?>("EmailFromId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("From")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -1765,8 +1765,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ById");
-
-                    b.HasIndex("EmailFromId");
 
                     b.ToTable("EmailTemplates");
                 });
@@ -6019,14 +6017,7 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.EmailSetting", "EmailFrom")
-                        .WithMany()
-                        .HasForeignKey("EmailFromId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("By");
-
-                    b.Navigation("EmailFrom");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanCPPT", b =>

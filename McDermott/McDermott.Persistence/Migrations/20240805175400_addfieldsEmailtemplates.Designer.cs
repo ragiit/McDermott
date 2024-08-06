@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240805175400_addfieldsEmailtemplates")]
+    partial class addfieldsEmailtemplates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1664,6 +1667,9 @@ namespace McDermott.Persistence.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
+                    b.Property<long?>("EmailTemplateId")
+                        .HasColumnType("bigint");
+
                     b.Property<long?>("Sequence")
                         .HasColumnType("bigint");
 
@@ -1697,6 +1703,8 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmailTemplateId");
 
                     b.ToTable("EmailSettings");
                 });
@@ -1765,8 +1773,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ById");
-
-                    b.HasIndex("EmailFromId");
 
                     b.ToTable("EmailTemplates");
                 });
@@ -6012,6 +6018,14 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("DrugRoute");
                 });
 
+            modelBuilder.Entity("McDermott.Domain.Entities.EmailSetting", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.EmailTemplate", null)
+                        .WithMany("EmailFrom")
+                        .HasForeignKey("EmailTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
             modelBuilder.Entity("McDermott.Domain.Entities.EmailTemplate", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.User", "By")
@@ -6019,14 +6033,7 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.EmailSetting", "EmailFrom")
-                        .WithMany()
-                        .HasForeignKey("EmailFromId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("By");
-
-                    b.Navigation("EmailFrom");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanCPPT", b =>
@@ -7237,6 +7244,8 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.EmailTemplate", b =>
                 {
+                    b.Navigation("EmailFrom");
+
                     b.Navigation("ToPartner");
                 });
 

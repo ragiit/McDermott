@@ -6,6 +6,12 @@
     .my-style {
         width: 800px;
     }
+
+    .custom-editor {
+        width: 100%; /* Atur lebar editor */
+        height: 300px; /* Atur tinggi editor */
+        border: 1px solid #ccc; /* Tambahkan border opsional */
+    }
 </style>
 
 @if (IsAccess)
@@ -62,18 +68,18 @@
                                                     <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && EmailTemplates.Count > 0" />
                                                     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                     <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                    <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
-                                                        <Items>
-                                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                        </Items>
-                                                    </DxToolbarItem>
+                                                    @* <DxToolbarItem Text="Export" IconCssClass="fa-solid fa-file-export">
+                                            <Items>
+                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                            </Items>
+                                            </DxToolbarItem> *@
                                                 </DxToolbar>
                                             </ToolbarTemplate>
                                             <Columns>
                                                 <DxGridSelectionColumn Width="15px" />
-                                                <DxGridDataColumn MinWidth="200" FieldName="From" Caption="From" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="EmailFrom.Smtp_User" Caption="From" />
                                                 <DxGridDataColumn MinWidth="200" FieldName="Subject" Caption="Subject" />
                                                 <DxGridDataColumn MinWidth="200" FieldName="To" Caption="To" />
                                                 <DxGridDataColumn MinWidth="200" FieldName="Status" Caption="Status" />
@@ -95,85 +101,96 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem ColSpanMd="12">
                                                 <label>From</label>
-                                                <DxTextBox @bind-Text="@EmailFormTemplate.From" />
+                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                            Data="@EmailSettings"
+                                                            NullText="Select Partner..."
+                                                            @bind-Value="@EmailFormTemplate.EmailFromId"
+                                                            TextFieldName="Smtp_User"
+                                                            ValueFieldName="Id">
+                                                </DxComboBox>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem ColSpanMd="12">
                                                 <label>To</label>
                                                 <DxTextBox @bind-Text="@EmailFormTemplate.To" NullText="mail@mail.com" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem ColSpanMd="12">
+                                             <DxFormLayoutItem ColSpanMd="12">
                                                 <label>Cc</label>
-                                                <DxTagBox Data="@Cc"
+                                                <DxTagBox Data="@EmailCc"
                                                           NullText="Select Cc..."
+                                                          TData="string"
+                                                          TValue="string"
                                                           FilteringMode="@DataGridFilteringMode.Contains"
-                                                          @bind-Values="@CcBy"
+                                                          AllowCustomTags="true"
+                                                          @bind-Tags="@CcBy"
                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                           CssClass="cw-480"
                                                           InputId="tbCustomTags" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem ColSpanMd="12">
-                                                <label>To Partner</label>
-                                                <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                            Data="@ToPartner"
-                                                            NullText="Select Partner..."
-                                                            @bind-Value="@EmailFormTemplate.ToPartnerId"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id">
-                                                </DxComboBox>
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem ColSpanMd="12">
-                                                <label>Schendule</label>
-                                                <DxDateEdit @bind-Date="@EmailFormTemplate.Schendule" />
-                                            </DxFormLayoutItem>
+                                            </DxFormLayoutItem> 
+                                            @*  <DxFormLayoutItem ColSpanMd="12">
+                                    <label>To Partner</label>
+                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                    Data="@ToPartner"
+                                    NullText="Select Partner..."
+                                    @bind-Value="@EmailFormTemplate.ToPartnerId"
+                                    TextFieldName="Name"
+                                    ValueFieldName="Id">
+                                    </DxComboBox>
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem ColSpanMd="12">
+                                    <label>Schendule</label>
+                                    <DxDateEdit @bind-Date="@EmailFormTemplate.Schendule" />
+                                    </DxFormLayoutItem> *@
                                             <DxFormLayoutItem ColSpanMd="12">
                                                 <label>Body</label>
-                                                <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Enter non HTML format like centering...">
-                                                    <ToolbarContent>
-                                                        <select class="ql-header">
-                                                            <option selected=""></option>
-                                                            <option value="1"></option>
-                                                            <option value="2"></option>
-                                                            <option value="3"></option>
-                                                            <option value="4"></option>
-                                                            <option value="5"></option>
-                                                        </select>
-                                                        <span class="ql-formats">
-                                                            <button class="ql-bold"></button>
-                                                            <button class="ql-italic"></button>
-                                                            <button class="ql-underline"></button>
-                                                            <button class="ql-strike"></button>
-                                                        </span>
-                                                        <span class="ql-formats">
-                                                            <select class="ql-color"></select>
-                                                            <select class="ql-background"></select>
-                                                        </span>
-                                                        <span class="ql-formats">
-                                                            <button class="ql-list" value="ordered"></button>
-                                                            <button class="ql-list" value="bullet"></button>
-                                                        </span>
-                                                        <span class="ql-formats">
-                                                            <button class="ql-image"></button>
-                                                            <button class="ql-video"></button>
-                                                        </span>
-                                                        <span class="ql-formats">
-                                                            <button class="ql-link"></button>
-                                                        </span>
-                                                    </ToolbarContent>
-                                                    <EditorContent>
-                                                        @((MarkupString)@EmailFormTemplate.Message)
-                                                    </EditorContent>
-                                                </BlazoredTextEditor>
+                                                <div class="custom-editor">
+                                                    <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Enter non HTML format like centering...">
+                                                        <ToolbarContent>
+                                                            <select class="ql-header">
+                                                                <option selected=""></option>
+                                                                <option value="1"></option>
+                                                                <option value="2"></option>
+                                                                <option value="3"></option>
+                                                                <option value="4"></option>
+                                                                <option value="5"></option>
+                                                            </select>
+                                                            <span class="ql-formats">
+                                                                <button class="ql-bold"></button>
+                                                                <button class="ql-italic"></button>
+                                                                <button class="ql-underline"></button>
+                                                                <button class="ql-strike"></button>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                                <select class="ql-color"></select>
+                                                                <select class="ql-background"></select>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                                <button class="ql-list" value="ordered"></button>
+                                                                <button class="ql-list" value="bullet"></button>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                                <button class="ql-image"></button>
+                                                                <button class="ql-video"></button>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                                <button class="ql-link"></button>
+                                                            </span>
+                                                        </ToolbarContent>
+                                                        <EditorContent>
+                                                            @((MarkupString)@EmailFormTemplate.Message)
+                                                        </EditorContent>
+                                                    </BlazoredTextEditor>
+                                                </div>
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem ColSpanMd="12">
                                                 <div class="row justify-content-between">
                                                     <div class="col-4">
-                                                        <DxButton SubmitFormOnClick="true" Text="Send" @onclick="@(async()=>await SendEmail())"></DxButton>
+                                                        <DxButton SubmitFormOnClick="true" RenderStyle="ButtonRenderStyle.Success" Text="Send" IconCssClass="fa-solid fa-paper-plane" @onclick="@(async()=>await SendEmail())"></DxButton>
                                                     </div>
-                                                    <div class="col-2">
-                                                        <DxButton SubmitFormOnClick="true" Text="Save" @onclick="@(async()=>await OnSave())"></DxButton>
-                                                        <DxButton SubmitFormOnClick="true" Text="Discard" @onclick="@(async()=>await OnCancle())"></DxButton>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <DxButton SubmitFormOnClick="true" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk"  Text="Save" @onclick="@(async()=>await OnSave())"></DxButton>
+                                                        <DxButton SubmitFormOnClick="true" Text="Discard" IconCssClass="fa-solid fa-xmark" RenderStyle="ButtonRenderStyle.Danger" @onclick="@(async()=>await OnCancle())"></DxButton>
                                                     </div>
                                                 </div>
                                             </DxFormLayoutItem>

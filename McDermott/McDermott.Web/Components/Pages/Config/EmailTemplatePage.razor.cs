@@ -1,4 +1,5 @@
 ﻿using Blazored.TextEditor;
+using DevExpress.Blazor.RichEdit;
 using MailKit.Net.Smtp;
 using MimeKit;
 using MimeKit.Text;
@@ -12,9 +13,10 @@ namespace McDermott.Web.Components.Pages.Config
         #region relation Data
 
         private List<EmailTemplateDto> EmailTemplates = new();
-        private List<EmailSettingDto> EmailSettings = new();
+        private List<EmailSettingDto> EmailSettings = [];
         private EmailTemplateDto EmailFormTemplate = new();
-        private IEnumerable<UserDto> CcBy = [];
+        //private List<string>? CcBy = new List<string>();
+        private IEnumerable<string> CcBy;
         private List<UserDto> ToPartner;
         private User? User = new();
 
@@ -88,11 +90,14 @@ namespace McDermott.Web.Components.Pages.Config
         private string textPopUp = "";
         private DateTime DateTimeValue { get; set; } = DateTime.Now;
 
-        private bool[] DocumentContent;
+        public byte[]? DocumentContent;
 
         private string? userBy;
 
-        private List<string>? Cc;
+        private List<string>? EmailCc;
+        private DxRichEdit richEdit;
+        private DevExpress.Blazor.RichEdit.Document documentAPI;
+
 
         #endregion Variable
 
@@ -130,9 +135,10 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 EmailFormTemplate.Schendule = DateTime.Now;
                 var Partner = await Mediator.Send(new GetUserQuery());
-                Cc = [.. Partner.Select(x => x.Email)];
+                EmailCc = [.. Partner.Select(x => x.Email)];
                 ToPartner = [.. Partner.Where(x => x.IsPatient == true).ToList()];
                 var us = await JsRuntime.GetCookieUserLogin();
+                EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
 
                 userBy = us.Name;
                 EmailFormTemplate.ById = User.Id;
@@ -253,10 +259,19 @@ namespace McDermott.Web.Components.Pages.Config
 
         #endregion function button
 
-        private async Task OnDelete()
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
             {
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteEmailTemplateRequest(((EmailTemplateDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<EmailTemplateDto>>();
+                    await Mediator.Send(new DeleteEmailTemplateRequest(ids: a.Select(x => x.Id).ToList()));
+                }
                 await LoadData();
             }
             catch { }
@@ -275,6 +290,7 @@ namespace McDermott.Web.Components.Pages.Config
                     preview = (MarkupString)await QuillHtml.GetHTML();
                 }
                 EmailFormTemplate.Message = preview.ToString();
+                EmailFormTemplate.Cc = CcBy.ToList();
                 var a = EmailFormTemplate;
                 if (EmailFormTemplate.Id == 0)
                 {
@@ -297,27 +313,36 @@ namespace McDermott.Web.Components.Pages.Config
             try
             {
                 EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
-                var cek = EmailSettings.Where(x => x.Smtp_User == EmailFormTemplate.From).FirstOrDefault();
+                var cek = EmailSettings.FirstOrDefault(x => x.Id == EmailFormTemplate.EmailFromId)!;
                 var host = cek.Smtp_Host;
                 var port = int.Parse(cek.Smtp_Port);
                 var pass = cek.Smtp_Pass;
-                var user = EmailFormTemplate.From;
+                var user = cek.Smtp_User;
 
-                //if (!string.IsNullOrWhiteSpace(await QuillHtml.GetHTML()))
-                //{
-                preview = (MarkupString)await QuillHtml.GetHTML();
-                //}
+                if (!string.IsNullOrWhiteSpace(await QuillHtml.GetHTML()))
+                {
+                    preview = (MarkupString)await QuillHtml.GetHTML();
+                }
+                else
+                {
+                    ToastService.ClearAll();
+                    ToastService.ShowWarning("Body Not Null!!");
+                    return;
+                }
                 EmailFormTemplate.Message = preview.ToString();
                 EmailFormTemplate.Status = "sending";
 
                 var message = new MimeMessage();
-                message.From.Add(MailboxAddress.Parse(EmailFormTemplate.From));
+                message.From.Add(MailboxAddress.Parse(user));
                 message.To.Add(MailboxAddress.Parse(EmailFormTemplate.To));
+                foreach(var EmailCc in CcBy.ToList())
+                {
+                    message.Cc.Add(MailboxAddress.Parse(EmailCc.Trim()));
+                }
                 message.Subject = EmailFormTemplate.Subject;
                 message.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = EmailFormTemplate.Message };
-                //message.Cc.Add(MailboxAddress.Parse(EmailFormTemplate.Cc));
-                //message.Body = new TextPart(TextFormat.Html) { Text = EmailFormTemplate.Message };
-
+                
+               
                 using var smtp = new SmtpClient();
                 if (cek.Smtp_Encryption == "SSL/TLS")
                 {

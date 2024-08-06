@@ -1791,8 +1791,8 @@ else
         </div>
     </div>
 </DxPopup>
-
-<DxPopup Visible="isPrint" Width="874px">
+ 
+<DxPopup Visible="isPrint" Width="874px" CloseOnOutsideClick="false" ShowCloseButton = "true" Closed="ClosePopUp">
     <DxRichEdit @ref="richEdit" ActiveRibbonTabIndex="0" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">
         <MailMergeSettings>
             <DxMailMergeSettings ViewMergedData="true"></DxMailMergeSettings>

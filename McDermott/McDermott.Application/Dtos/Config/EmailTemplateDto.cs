@@ -11,15 +11,20 @@
 
         [StringLength(200)]
         public string? From { get; set; } = string.Empty;
+        public long? EmailFromId { get; set; }
 
         public string? Status { get; set; } = string.Empty;
 
         [StringLength(200)]
         public string? To { get; set; } = string.Empty;
 
-        public string? Cc { get; set; } = string.Empty;
+        public List<string>? Cc { get; set; } = [];
         public string? ReplayTo { get; set; } = string.Empty;
         public DateTime? Schendule { get; set; }
-        public string? Message { get; set; }
+        //public byte[]? DocumentContent { get; set; } = [];
+        //public string? Message => System.Text.Encoding.UTF8.GetString(DocumentContent ?? []);
+        public string? Message { get;set; } = string.Empty;
+
+        public virtual EmailSettingDto? EmailFrom { get; set; }
     }
 }

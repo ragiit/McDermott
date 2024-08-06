@@ -109,12 +109,20 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task SaveMarkers()
         {
 
-            var imageData = await JsRuntime.InvokeAsync<string>("getCanvasImageData", "MyCanvas");
-            await savedata(imageData);
+            try
+            {
+                var imageData = await JsRuntime.InvokeAsync<string>("getCanvasImageData", "MyCanvas");
+                await SaveImageToDatabase(imageData, description);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (you can use any logging framework or just Console for simplicity)
+                Console.WriteLine($"Error in SaveMarkers: {ex.Message}");
+            }
 
         }
 
-        private async Task savedata(string datas)
+        private async Task SaveImageToDatabase(string datas, string descript)
         {
             var asd = datas;
         }
@@ -224,15 +232,15 @@ namespace McDermott.Web.Components.Pages.Transaction
                 isPrint = true;
                 var mergeFields = new Dictionary<string, string>
                 {
-                    {"%EmployeeName%", gen?.Patient?.Name.GetDefaultValue() },
-                    {"%EmployeeNIP%", gen?.Patient?.NIP?.GetDefaultValue() ?? "-"},
-                    {"%EmployeeDepartment%", gen?.Patient?.Department?.Name.GetDefaultValue() ?? "-"},
-                    {"%DateOfOccurence%", accident.DateOfOccurrence.GetValueOrDefault().ToString("dd MMMM yyyy")},
-                    {"%TimeOccurence%", accident.DateOfOccurrence.GetValueOrDefault().ToString("HH:mm:ss")},
-                    {"%DateTreatment%", accident.DateOfFirstTreatment.GetValueOrDefault().ToString("dd MMMM yyyy")},
-                    {"%TimeTreatment%", accident.DateOfFirstTreatment.GetValueOrDefault().ToString("HH:mm:ss")},
-                    {"%AreaOfYard%", accident.AreaOfYard?.GetDefaultValue() ?? "-"},
-                    {"%SupervisorName%", gen?.Patient?.Supervisor?.Name.GetDefaultValue() ?? "-"},
+                    {"<<EmployeeName>>", gen?.Patient?.Name.GetDefaultValue() },
+                    {"<<EmployeeNIP>>", gen?.Patient?.NIP?.GetDefaultValue() ?? "-"},
+                    {"<<EmployeeDepartment>>", gen?.Patient?.Department?.Name.GetDefaultValue() ?? "-"},
+                    {"<<DateOfOccurence>>", accident.DateOfOccurrence.GetValueOrDefault().ToString("dd MMMM yyyy")},
+                    {"<<TimeOccurence>>", accident.DateOfOccurrence.GetValueOrDefault().ToString("HH:mm:ss")},
+                    {"<<DateTreatment>>", accident.DateOfFirstTreatment.GetValueOrDefault().ToString("dd MMMM yyyy")},
+                    {"<<TimeTreatment>>", accident.DateOfFirstTreatment.GetValueOrDefault().ToString("HH:mm:ss")},
+                    {"<<AreaOfYard>>", accident.AreaOfYard?.GetDefaultValue() ?? "-"},
+                    {"<<SupervisorName>>", gen?.Patient?.Supervisor?.Name.GetDefaultValue() ?? "-"},
                 };
 
                 //Field dateField = await documentAPI.Fields.Cr(, "DATE");
@@ -264,6 +272,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             ShowForm = false;
             Accident = new();
             await LoadData();
+        }
+        private async Task ClosePopUp()
+        {
+            isPrint = false;
+            await EditItem_Click();
         }
 
         private List<string> ClassType = new List<string>
@@ -1276,7 +1289,8 @@ namespace McDermott.Web.Components.Pages.Transaction
         [
             "Auto Anamnesa",
             "Allo Anamnesa"
-        ]; private List<string> HumptyDumpty =
+        ]; 
+        private List<string> HumptyDumpty =
  [
      "Risiko rendah 0-6",
      "Risiko sedang 7-11",

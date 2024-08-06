@@ -7,7 +7,7 @@
 
         [StringLength(200)]
         public string? From { get; set; }
-
+        public long? EmailFromId { get; set; }
         public long? ById { get; set; }
 
         [StringLength(200)]
@@ -16,10 +16,11 @@
         public long? ToPartnerId { get; set; }
 
         [StringLength(200)]
-        public string? Cc { get; set; }
+        public List<string>? Cc { get; set; } = [];
 
         public string? ReplayTo { get; set; }
         public DateTime? Schendule { get; set; }
+        public byte[]? DocumentContent { get; set; } = [];
         public string? Message { get; set; }
         public string? Status { get; set; }
 
@@ -28,5 +29,6 @@
 
         [SetToNull]
         public virtual List<User>? ToPartner { get; set; }
+        public virtual EmailSetting? EmailFrom {  get; set; }
     }
 }

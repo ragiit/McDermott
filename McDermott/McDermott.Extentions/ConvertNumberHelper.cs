@@ -15,9 +15,9 @@ namespace McDermott.Extentions
                 return "nol";
             }
 
-            string[] satuan = { "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan" };
-            string[] puluhan = { "sepuluh", "dua puluh", "tiga puluh", "empat puluh", "lima puluh", "enam puluh", "tujuh puluh", "delapan puluh", "sembilan puluh" };
-            string[] ratusan = { "seratus", "dua ratus", "tiga ratus", "empat ratus", "lima ratus", "enam ratus", "tujuh ratus", "delapan ratus", "sembilan ratus" };
+            string[] satuan = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
+            string[] puluhan = { "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety" };
+            string[] ratusan = { "one hundred", "two hundred", "three hundred", "four hundred", "five hundred", "six hundred", "seven hundred", "eight hundred", "nine hundred" };
 
             string hasil = "";
 
@@ -34,33 +34,34 @@ namespace McDermott.Extentions
                     switch (angka % 10)
                     {
                         case 1:
-                            hasil += "sebelas";
+                            hasil += "eleven";
                             break;
                         case 2:
-                            hasil += "dua belas";
+                            hasil += "twelve";
                             break;
                         case 3:
-                            hasil += "tiga belas";
+                            hasil += "thirteen";
                             break;
                         case 4:
-                            hasil += "empat belas";
+                            hasil += "fourteen";
                             break;
                         case 5:
-                            hasil += "lima belas";
+                            hasil += "fifteen";
                             break;
                         case 6:
-                            hasil += "enam belas";
+                            hasil += "sixteen";
                             break;
                         case 7:
-                            hasil += "tujuh belas";
+                            hasil += "seventeen";
                             break;
                         case 8:
-                            hasil += "delapan belas";
+                            hasil += "eighteen";
                             break;
                         case 9:
-                            hasil += "sembilan belas";
+                            hasil += "nineteen";
                             break;
-                            
+
+
                         // Tambahkan kasus untuk angka 13 hingga 19
                         default:
                             hasil += puluhan[angka / 10 - 1] + " " + satuan[angka % 10 - 1];
