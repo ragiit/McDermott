@@ -2477,7 +2477,106 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private void Etiket()
         {
+            try
+            {
+                var queueNumber = "123";
+                var NamePatient = "John Doe";
+                var ServiceKiosk = "Poliklinik Umum";
+                var nameBPJS = "BPJS Kesehatan";
+                var noBPJS = "987654321";
+                var TypeNumber = "Antrian";
+                var numbers = "456";
 
+                // HTML untuk dokumen cetak
+                bool isBlueBackground = true; // Atur kondisi boolean sesuai kebutuhan
+                var backgroundColor = isBlueBackground ? "lightblue" : "white";
+
+
+                var contentToPrint = $@"
+        <!DOCTYPE html>
+        <html lang='en'>
+       <head>
+            <meta charset='UTF-8'>
+            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+            <title>Cetak Antrian</title>
+            <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'>
+            <style>
+                .border {{
+                    border: 1px solid black;
+                    padding: 10px;
+                    width: 100%;
+                    max-width: 600px;
+                    margin: auto;
+                    background-color: {backgroundColor};
+                }}
+                .title {{
+                    text-align: center;
+                    font-weight: bold;
+                    margin-top: 10px;
+                }}
+                .content {{
+                    padding: 15px;
+                }}
+                .row {{
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 10px;
+                }}
+                .column {{
+                    flex: 1;
+                    padding: 5px;
+                }}
+                .bottom-center {{
+                    text-align: center;
+                    margin-top: 20px;
+                    font-weight: bold;
+                }}
+                .logo {{
+                    display: block;
+                    margin: 0 auto 10px;
+                    max-width: 100px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class='border'>
+                <img src='/image/logo.png' alt='Logo' class='logo' />
+                <div class='title'>PT. McDERMOTT INDONESIA</div>
+                <div class='title'>BASE CLINIC</div>
+                <div class='content'>
+                    <div class='row'>
+                        <div class='column'><strong>Nama:</strong> ________________________</div>
+                        <div class='column' style='text-align: right;'><strong>Tgl:</strong> ______</div>
+                    </div>
+                    <div class='row'>
+                        <div class='column'><strong>X Sehari</strong></div>
+                    </div>
+                    <div class='row'>
+                        <div class='column'><strong>Tetes Telinga</strong></div>
+                    </div>
+                    <div class='row'>
+                        <div class='column'><strong>Tetes Mata</strong></div>
+                    </div>
+                    <div class='row'>
+                        <div class='column'><strong>Oles</strong></div>
+                    </div>
+                    <div class='bottom-center'>
+                        <strong>Obat Luar</strong>
+                    </div>
+                </div>
+            </div>
+        </body>
+
+        </html>";
+
+                // Panggil JavaScript Interop untuk memicu pencetakan
+                await JsRuntime.InvokeVoidAsync("printJS", contentToPrint);
+
+            }
+            catch(Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private bool PopUpRecipe { get; set; } = false;
