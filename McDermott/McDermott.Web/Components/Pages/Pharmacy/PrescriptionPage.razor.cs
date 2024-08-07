@@ -246,7 +246,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Pharmacy.PractitionerId = generalConsultantService.FirstOrDefault()!.PratitionerId;
             Pharmacy.ServiceId = generalConsultantService.FirstOrDefault()!.ServiceId;
             Pharmacy.PaymentMethod = generalConsultantService.FirstOrDefault()!.Payment;
-
+            Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
+            allergies = await Mediator.Send(new GetAllergyQuery());
+            allergies.ForEach(x =>
+            {
+                var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+                if (a is not null)
+                    x.TypeString = a.Name;
+            });
             await GetPatientAllergy(Pharmacy.PatientId);
         }
 
