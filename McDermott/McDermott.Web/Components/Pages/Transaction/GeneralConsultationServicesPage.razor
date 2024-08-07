@@ -8,8 +8,8 @@
 @if (IsAccess)
 {
     <div class="wrapper">
-        <BaseHeaderPage Title="General Consultation Service" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
-
+        <BaseHeaderPage Title="General Consultation Service" OnClickBack="OnCancelBack" ShowBackButton="ShowForm" />
+            ``
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -198,7 +198,7 @@
                                                                 <div class="row justify-content-end">
                                                                     <div class="col-auto">
                                                                         <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="@(async () => await LoadData())"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnCancelBack"></DxButton>
                                                                     </div>
                                                                 </div>
                                                             </div>

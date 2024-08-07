@@ -2506,8 +2506,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 string OppositeSex = "";
                 if (patienss.GenderId != null)
                 {
-                    Gender = patienss.Gender.Name == "Male" ? "MALE (L)" : "FEMALE (P)";
-                    OppositeSex = patienss.Gender.Name == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
+                    Gender = patienss.Gender?.Name == "Male" ? "MALE (L)" : "FEMALE (P)";
+                    OppositeSex = patienss.Gender?.Name == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
                 }
 
                 PopUpRecipe = true;
@@ -2519,17 +2519,17 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var mergeFields = new Dictionary<string, string>
                 {
                     {"%NamePatient%", GetDefaultValue(patienss.Name)},
-                    {"%NIP%", GetDefaultValue(patienss.NIP)},
-                    {"%Departement%", GetDefaultValue(patienss.Department.Name)},
-                    {"%NameDoctor%", GetDefaultValue(gc?.Pratitioner?.Name)},
-                    {"%SIPDoctor%", GetDefaultValue(gc?.Pratitioner?.SipNo)},
-                    {"%AddressPatient%", GetDefaultValue(patienss.DomicileAddress1) + GetDefaultValue(patienss.DomicileAddress2)},
+                    {"%NIP%", GetDefaultValue(patienss.NIP ?? "-")},
+                    {"%Departement%", GetDefaultValue(patienss.Department?.Name ?? "-")},
+                    {"%NameDoctor%", GetDefaultValue(gc?.Pratitioner?.Name ?? "-")},
+                    {"%SIPDoctor%", GetDefaultValue(gc?.Pratitioner?.SipNo ?? "-")},
+                    {"%AddressPatient%", GetDefaultValue(patienss.DomicileAddress1 ?? "-") + GetDefaultValue(patienss.DomicileAddress2 ?? "-")},
                     {"%AgePatient%", GetDefaultValue(age.ToString())},
                     //{"%WordDays%", GetDefaultValue(WordDays)},
                     {"%Days%", GetDefaultValue(todays)},
                     //{"%TotalDays%", GetDefaultValue(TotalDays.ToString())},
-                    {"%Dates%", GetDefaultValue(gc?.RegistrationDate.ToString("dd MMMM yyyy"))},
-                    {"%Times%", GetDefaultValue(gc?.RegistrationDate.ToString("H:MM"))},
+                    {"%Dates%", GetDefaultValue(gc?.RegistrationDate.ToString("dd MMMM yyyy") ?? "-")},
+                    {"%Times%", GetDefaultValue(gc?.RegistrationDate.ToString("H:MM")?? "-")},
                     {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")},  // Still no null check needed
                     {"%Genders%", GetDefaultValue(Gender)},
                     {"%OppositeSex%", GetDefaultValue(OppositeSex, "")} // Use empty string if null
