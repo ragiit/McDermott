@@ -9,7 +9,7 @@
     let markers = [];
 
     const img = new Image();
-    img.src = '/image/aciddent.png'; // Replace with the correct image path
+    img.src = 'image/aciddent.png'; // Replace with the correct image path
     img.onload = () => {
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         redrawMarkers();
@@ -38,6 +38,15 @@
         markerCount = 0;
         markers = [];
         redrawMarkers();
+    }
+
+    window.getCanvasImageData = (canvasId) => {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.error("Canvas element not found.");
+            return null;
+        }
+        return canvas.toDataURL("image/png");
     }
 
     function redrawMarkers() {
