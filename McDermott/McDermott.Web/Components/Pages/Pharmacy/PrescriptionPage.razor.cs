@@ -2536,7 +2536,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 };
 
 
-                DocumentContent = await DocumentProvider.GetDocumentAsync("Recipe.docx", mergeFields);
+                DocumentContent = await DocumentProvider.GetDocumentAsync("Recipets.docx", mergeFields);
                
                 // Konversi byte array menjadi base64 string
                 //var base64String = Convert.ToBase64String(DocumentContent);

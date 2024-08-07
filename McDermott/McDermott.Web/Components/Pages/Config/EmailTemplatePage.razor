@@ -197,7 +197,7 @@
                                                             <DxButton SubmitFormOnClick="true" RenderStyle="ButtonRenderStyle.Success" Text="Send" IconCssClass="fa-solid fa-paper-plane" @onclick="@(async()=>await SendEmail())"></DxButton>
                                                         </div> *@
                                                         <div class="col-4 d-flex justify-content-end">
-                                                            <DxButton SubmitFormOnClick="true" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" @onclick="@(async()=>await OnSave())"></DxButton>
+                                                            <DxButton SubmitFormOnClick="true" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" Click="OnSave"></DxButton>
                                                             <DxButton SubmitFormOnClick="true" Text="Discard" IconCssClass="fa-solid fa-xmark" RenderStyle="ButtonRenderStyle.Danger" @onclick="@(async()=>await OnCancle())"></DxButton>
                                                         </div>
                                                     </div>

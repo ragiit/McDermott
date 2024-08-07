@@ -30,6 +30,7 @@
 
         [SetToNull]
         public virtual List<User>? ToPartner { get; set; }
+        [SetToNull]
         public virtual EmailSetting? EmailFrom {  get; set; }
     }
 }

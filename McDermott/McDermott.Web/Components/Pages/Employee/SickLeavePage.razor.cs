@@ -111,7 +111,7 @@ namespace McDermott.Web.Components.Pages.Employee
                     TypeLeaves = item.TypeLeave;
                     var generalConsultans = await Mediator.Send(new GetGeneralConsultanServiceQuery());
                     var BodyCPPT = CPPTs.Where(x => x.GeneralConsultanServiceId == item.GeneralConsultans.Id && x.Title == "Diagnosis").Select(x => x.Body).FirstOrDefault();
-                    
+
                     if (BodyCPPT != null)
                     {
                         diagnosis = Diagnoses.Where(x => BodyCPPT!.Contains(x.Name)).Select(x => x.Name).FirstOrDefault();
@@ -138,7 +138,7 @@ namespace McDermott.Web.Components.Pages.Employee
         #endregion async Data
 
         #region Grid Configuration
- 
+
         private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
         {
             ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
@@ -218,10 +218,10 @@ namespace McDermott.Web.Components.Pages.Employee
                     {"<<days>>", TotalDays.ToString() },
                     {"<<Date>>", DateTime.Now.ToString("dd MMMM yyyy")}
                 };
-             
+
                 DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
                 // Konversi byte array menjadi base64 string
-                 var base64String = Convert.ToBase64String(DocumentContent);
+                var base64String = Convert.ToBase64String(DocumentContent);
 
                 // Panggil JavaScript untuk membuka dan mencetak dokumen
                 await JsRuntime.InvokeVoidAsync("printDocument", base64String);
@@ -233,7 +233,7 @@ namespace McDermott.Web.Components.Pages.Employee
             }
         }
 
-        
+
 
         private async Task SendToEmail()
         {
@@ -292,11 +292,18 @@ namespace McDermott.Web.Components.Pages.Employee
                     //Days
                     var culture = new System.Globalization.CultureInfo("id-ID");
                     string todays = item.GeneralConsultans.RegistrationDate.ToString("dddd", culture);
+                    string GetDefaultValue(string value, string defaultValue = "-")
+                    {
+                        return value ?? defaultValue;
+                    }
 
                     // Create merge fields for document generation
                     var mergeFields = new Dictionary<string, string>
                     {
                         {"%NamePatient%", data?.PatientName},
+                    {"%NIP%", GetDefaultValue(Patientss?.NIP ?? string.Empty) },
+                    {"%Departement%", GetDefaultValue(Patientss?.Department?.Name ?? string.Empty)},
+                    {"%JobPosition%", GetDefaultValue(Patientss?.JobPosition?.Name ?? string.Empty)},
                         {"%startDate%", item?.StartSickLeave?.ToString("dd MMMM yyyy") },
                         {"%endDate%", item?.EndSickLeave?.ToString("dd MMMM yyyy") },
                         {"%NameDoctor%", data?.PhycisianName },
@@ -323,14 +330,14 @@ namespace McDermott.Web.Components.Pages.Employee
 
                     string subject = cekEmailTemplate.Subject;
                     string body = cekEmailTemplate.Message;
-                    foreach(var field in mergeFields)
+                    foreach (var field in mergeFields)
                     {
                         body = body.Replace(field.Key, field.Value);
                     }
 
                     // Get email settings
                     EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
-                    var smtpSettings = EmailSettings.FirstOrDefault(x => x.Id== cekEmailTemplate.EmailFromId);
+                    var smtpSettings = EmailSettings.FirstOrDefault(x => x.Id == cekEmailTemplate.EmailFromId);
                     if (smtpSettings == null) continue;
 
                     // Create email message
@@ -340,7 +347,7 @@ namespace McDermott.Web.Components.Pages.Employee
                     // Add Cc recipients
                     if (cekEmailTemplate.Cc is not null)
                     {
-                        
+
                         foreach (var cc in cekEmailTemplate.Cc)
                         {
                             message.Cc.Add(MailboxAddress.Parse(cc.Trim()));
