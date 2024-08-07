@@ -7,6 +7,8 @@ using Document = DocumentFormat.OpenXml.Wordprocessing.Document;
 using Aspose.Words;
 using Aspose.Words.Saving;
 using DocumentFormat.OpenXml.Packaging;
+using static McDermott.Application.Features.Commands.Config.EmailEmailTemplateCommand;
+using Microsoft.IdentityModel.Tokens;
 
 namespace McDermott.Web.Components.Pages.Employee
 {
@@ -177,6 +179,7 @@ namespace McDermott.Web.Components.Pages.Employee
         {
             try
             {
+                IsLoading = true;
                 var data = SickLeaves.Where(x => x.GeneralConsultans?.PatientId == grid).FirstOrDefault()!;
                 var patienss = Users.Where(x => x.Id == grid).FirstOrDefault();
                 var age = 0;
@@ -201,19 +204,19 @@ namespace McDermott.Web.Components.Pages.Employee
                 int TotalDays = data.EndSickLeave.Value.Day - data.StartSickLeave.Value.Day;
 
                 string WordDays = ConvertNumberHelper.ConvertNumberToWord(TotalDays);
-                //isPrint = true;
+                isPrint = true;
                 var mergeFields = new Dictionary<string, string>
                 {
-                    {"%NamePatient%", patienss?.Name},
-                    {"%startDate%", data?.StartSickLeave?.ToString("dd MMMM yyyy") },
-                    {"%endDate%", data?.EndSickLeave?.ToString("dd MMMM yyyy") },
-                    {"%NameDoctor%", data?.PhycisianName },
-                    {"%SIPDoctor%", data?.SIP },
-                    {"%AddressPatient%", data?.Address },
-                    {"%AgePatient%", age.ToString() },
-                    {"%WordDays%", WordDays },
-                    {"%days%", TotalDays.ToString() },
-                    {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")}
+                    {"<<NamePatient>>", patienss?.Name},
+                    {"<<startDate>>", data?.StartSickLeave?.ToString("dd MMMM yyyy") },
+                    {"<<endDate>>", data?.EndSickLeave?.ToString("dd MMMM yyyy") },
+                    {"<<NameDoctor>>", data?.PhycisianName },
+                    {"<<SIPDoctor>>", data?.SIP },
+                    {"<<AddressPatient>>", data?.Address },
+                    {"<<AgePatient>>", age.ToString() },
+                    {"<<WordDays>>", WordDays },
+                    {"<<days>>", TotalDays.ToString() },
+                    {"<<Date>>", DateTime.Now.ToString("dd MMMM yyyy")}
                 };
              
                 DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
@@ -222,7 +225,7 @@ namespace McDermott.Web.Components.Pages.Employee
 
                 // Panggil JavaScript untuk membuka dan mencetak dokumen
                 await JsRuntime.InvokeVoidAsync("printDocument", base64String);
-
+                IsLoading = false;
             }
             catch (Exception ex)
             {
@@ -236,6 +239,7 @@ namespace McDermott.Web.Components.Pages.Employee
         {
             try
             {
+                IsLoading = true;
                 // Adapt selected data items to SickLeaveDto list
                 List<SickLeaveDto> sickLeavesDtoList = SelectedDataItems.Adapt<List<SickLeaveDto>>();
 
@@ -305,7 +309,7 @@ namespace McDermott.Web.Components.Pages.Employee
                         {"%Dates%", item.GeneralConsultans.RegistrationDate.ToString("dd MMMM yyyy")},
                         {"%Times%", item.GeneralConsultans.RegistrationDate.ToString("H:MM")},
                         {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")},
-                        {"%genders%", Gender},
+                        {"%Genders%", Gender},
                         //{"%oppositeSexs%", OppositeSex},
                     };
 
@@ -314,33 +318,54 @@ namespace McDermott.Web.Components.Pages.Employee
                     if (DocumentContent == null) continue;
 
                     string fileName = $"SickLeave_{data.GeneralConsultans.Patient.Name}_{DateTime.Now:yyyyMMddHHmmss}.docx";
-                    string subject = $"Sick Leave {data.GeneralConsultans.Patient.Name}";
-                    string body = $"Dear {data.GeneralConsultans.Patient.Name},<br/><br/>Please find attached your document.<br/><br/>Best regards,<br/>Your Company";
+
+                    var cekEmailTemplate = (await Mediator.Send(new GetEmailTemplateQuery(x => x.TypeEmail == 1))).FirstOrDefault()!;
+
+                    string subject = cekEmailTemplate.Subject;
+                    string body = cekEmailTemplate.Message;
+                    foreach(var field in mergeFields)
+                    {
+                        body = body.Replace(field.Key, field.Value);
+                    }
 
                     // Get email settings
                     EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
-                    var smtpSettings = EmailSettings.FirstOrDefault(x => x.Smtp_User == "nuralimajid@matrica.co.id");
+                    var smtpSettings = EmailSettings.FirstOrDefault(x => x.Id== cekEmailTemplate.EmailFromId);
                     if (smtpSettings == null) continue;
 
                     // Create email message
                     var message = new MimeMessage();
                     message.From.Add(MailboxAddress.Parse(smtpSettings.Smtp_User));
                     message.To.Add(MailboxAddress.Parse(data.GeneralConsultans.Patient.Email));
-                    message.Subject = subject;
+                    // Add Cc recipients
+                    if (cekEmailTemplate.Cc is not null)
+                    {
+                        
+                        foreach (var cc in cekEmailTemplate.Cc)
+                        {
+                            message.Cc.Add(MailboxAddress.Parse(cc.Trim()));
+                        }
+                    }
 
+                    message.Subject = subject.Replace("%NamePatient%", mergeFields["%NamePatient%"]);
                     var bodyBuilder = new BodyBuilder { HtmlBody = body };
                     bodyBuilder.Attachments.Add(fileName, DocumentContent);
                     message.Body = bodyBuilder.ToMessageBody();
 
                     // Send email
                     using var smtpClient = new MailKit.Net.Smtp.SmtpClient();
-                    if (smtpSettings.Smtp_Encryption == "SSL/TLS")
+
+                    var secureSocketOptions = smtpSettings.Smtp_Encryption switch
                     {
-                        smtpClient.Connect(smtpSettings.Smtp_Host, int.Parse(smtpSettings.Smtp_Port), MailKit.Security.SecureSocketOptions.SslOnConnect);
-                        smtpClient.Authenticate(smtpSettings.Smtp_User, smtpSettings.Smtp_Pass);
-                        smtpClient.Send(message);
-                        smtpClient.Disconnect(true);
-                    }
+                        "SSL/TLS" => MailKit.Security.SecureSocketOptions.SslOnConnect,
+                        "TLS (STARTTLS)" => MailKit.Security.SecureSocketOptions.StartTls,
+                        _ => MailKit.Security.SecureSocketOptions.None
+                    };
+
+                    smtpClient.Connect(smtpSettings.Smtp_Host, int.Parse(smtpSettings.Smtp_Port), secureSocketOptions);
+                    smtpClient.Authenticate(smtpSettings.Smtp_User, smtpSettings.Smtp_Pass);
+                    smtpClient.Send(message);
+                    smtpClient.Disconnect(true);
 
                     item.Status = Application.Extentions.EnumHelper.EnumStatusSickLeave.Send;
                     fSickLeave = item;
@@ -348,7 +373,9 @@ namespace McDermott.Web.Components.Pages.Employee
                     isShow = false;
                     // Show success message
                     await LoadData();
+                    ToastService.ClearAll();
                     ToastService.ShowSuccess("Success Send Email!");
+                    IsLoading = false;
                 }
 
                 await LoadData();

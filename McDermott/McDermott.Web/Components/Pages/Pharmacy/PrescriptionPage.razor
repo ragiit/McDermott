@@ -210,14 +210,14 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="12">
                                                                     <div class="row w-100">
                                                                         <div class="col-md-1">
-                                                                            <DxCheckBox ReadOnly="@(isActive)" @bind-Checked="@Pharmacy.IsWeather" />
+                                                                            <DxCheckBox ReadOnly @bind-Checked="@Pharmacy.IsWeather" />
                                                                         </div>
                                                                         <div class="col-md-11">
                                                                             @if (PatientAllergy.Weather is not null || Pharmacy.IsWeather)
                                                                             {
                                                                                 <DxTagBox Data="@WeatherAllergies"
                                                                                           NullText="Select Allergy..."
-                                                                                          ReadOnly="@(Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)"
+                                                                                          ReadOnly
                                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                           @bind-Values="@SelectedWeatherAllergies"
                                                                                           EditFormat="{1}"
@@ -238,13 +238,13 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacology" ColSpanMd="12">
                                                                     <div class="row w-100">
                                                                         <div class="col-md-1">
-                                                                            <DxCheckBox @bind-Checked="@Pharmacy.IsFarmacologi" ReadOnly="@(isActive)" />
+                                                                            <DxCheckBox @bind-Checked="@Pharmacy.IsFarmacologi" ReadOnly />
                                                                         </div>
                                                                         <div class="col">
                                                                             @if (PatientAllergy.Farmacology is not null || Pharmacy.IsFarmacologi)
                                                                             {
                                                                                 <DxTagBox Data="@PharmacologyAllergies"
-                                                                                          ReadOnly="@(Pharmacy.Status != EnumStatusPharmacy.Draft)"
+                                                                                          ReadOnly
                                                                                           NullText="Select Allergy..."
                                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                           @bind-Values="@SelectedPharmacologyAllergies"
@@ -266,7 +266,7 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="12">
                                                                     <div class="row w-100">
                                                                         <div class="col-md-1">
-                                                                            <DxCheckBox ReadOnly="@(isActive)" @bind-Checked="@Pharmacy.IsFood" />
+                                                                            <DxCheckBox ReadOnly @bind-Checked="@Pharmacy.IsFood" />
                                                                         </div>
                                                                         <div class="col-md-11">
                                                                             @if (PatientAllergy.Food is not null || Pharmacy.IsFood)
@@ -276,7 +276,7 @@
                                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                           @bind-Values="@SelectedFoodAllergies"
                                                                                           EditFormat="{1}"
-                                                                                          ReadOnly="@(isActive)"
+                                                                                          ReadOnly
                                                                                           InputId="tbMultiColumn">
                                                                                     <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
                                                                                                         Caption="Code"
@@ -375,6 +375,12 @@
                                                                             <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItemPrescriptionLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsPrescriptionLines.Count > 0 && Prescriptions.Count > 0 && (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
                                                                             <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemPrescriptionLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsPrescriptionLines.Count > 0 && Prescriptions.Count > 0 &&  (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
                                                                             <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshPrescriptionLines_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                                            <DxToolbarItem Visible="@(NameUser.IsPharmacy == true &&(Pharmacy.Id != 0 || Pharmacy.Status == EnumStatusPharmacy.Received ||Pharmacy.Status == EnumStatusPharmacy.Processed||Pharmacy.Status == EnumStatusPharmacy.Done))" BeginGroup="true" Text="Print"  IconCssClass="fa-solid fa-print" >
+                                                                            <Items>
+                                            <DxToolbarItem Text="Etiket" IconCssClass="fa-solid fa-ticket" Click="ExportCsvItem_Click" />
+                                            <DxToolbarItem Text="Recipe" IconCssClass="fa-solid fa-receipt" Click="Recipe_print" />
+                                            </Items>
+                                            </DxToolbarItem> 
                                                                             <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButtonGridPrescriptionLines_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                                         </DxToolbar>
                                                                     </ToolbarTemplate>
@@ -387,7 +393,7 @@
                                                                                     <DxButton RenderStyle="ButtonRenderStyle.Success"
                                                                                               Attributes="@(new Dictionary<string, object> {  ["title"] = "Select Batch" })"
                                                                                               IconCssClass="fa-solid fa-clipboard-list"
-                                                                                              Enabled="@(NameUser.IsPharmacy == true && (Pharmacy.Status == EnumStatusPharmacy.Received||Pharmacy.Status == EnumStatusPharmacy.Done))"
+                                                                                              Enabled="@(NameUser.IsPharmacy == true && (Pharmacy.Status == EnumStatusPharmacy.Received||Pharmacy.Status == EnumStatusPharmacy.Processed ||Pharmacy.Status == EnumStatusPharmacy.Done))"
                                                                                               Click="@(()=>ShowCutStock((context.DataItem as PrescriptionDto).Id))"
                                                                                               CssClass="me-1" />
                                                                                 </CellDisplayTemplate>
@@ -1260,3 +1266,10 @@ else
     </div>
 </DxPopup>
  
+         <DxPopup Visible="PopUpRecipe" Width="auto">
+    <DxRichEdit @ref="richEdit" ActiveRibbonTabIndex="0" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">
+        <MailMergeSettings>
+            <DxMailMergeSettings ViewMergedData="true"></DxMailMergeSettings>
+        </MailMergeSettings>
+    </DxRichEdit>
+</DxPopup>

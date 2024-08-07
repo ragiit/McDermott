@@ -20,6 +20,8 @@
 
         public List<string>? Cc { get; set; } = [];
         public string? ReplayTo { get; set; } = string.Empty;
+
+        public long? TypeEmail { get; set; }
         public DateTime? Schendule { get; set; }
         //public byte[]? DocumentContent { get; set; } = [];
         //public string? Message => System.Text.Encoding.UTF8.GetString(DocumentContent ?? []);

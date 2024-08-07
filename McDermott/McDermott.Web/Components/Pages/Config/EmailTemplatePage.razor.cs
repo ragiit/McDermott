@@ -1,6 +1,7 @@
 ﻿using Blazored.TextEditor;
 using DevExpress.Blazor.RichEdit;
 using MailKit.Net.Smtp;
+using Microsoft.IdentityModel.Tokens;
 using MimeKit;
 using MimeKit.Text;
 using static McDermott.Application.Features.Commands.Config.EmailEmailTemplateCommand;
@@ -214,6 +215,7 @@ namespace McDermott.Web.Components.Pages.Config
             showForm = true;
             var general = SelectedDataItems[0].Adapt<EmailTemplateDto>();
             EmailFormTemplate = general;
+            CcBy = EmailFormTemplate.Cc;
             textPopUp = "Edit Form Template Email";
         }
 
@@ -233,30 +235,7 @@ namespace McDermott.Web.Components.Pages.Config
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
+       
         #endregion function button
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -281,17 +260,39 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                if (EmailFormTemplate.Status == "")
+                if (EmailFormTemplate == null)
+                {
+                    ToastService.ShowError("Email form template is null.");
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(EmailFormTemplate.Status))
                 {
                     EmailFormTemplate.Status = "draf";
                 }
-                if (!string.IsNullOrWhiteSpace(await QuillHtml.GetHTML()))
+
+                if (QuillHtml == null)
                 {
-                    preview = (MarkupString)await QuillHtml.GetHTML();
+                    ToastService.ShowError("QuillHtml component is not initialized.");
+                    return;
                 }
+
+                var htmlContent = await QuillHtml.GetHTML();
+                if (!string.IsNullOrWhiteSpace(htmlContent))
+                {
+                    preview = (MarkupString)htmlContent;
+                }
+
                 EmailFormTemplate.Message = preview.ToString();
-                EmailFormTemplate.Cc = CcBy.ToList();
-                var a = EmailFormTemplate;
+                EmailFormTemplate.Cc = CcBy?.ToList() ?? new List<string>();
+                EmailFormTemplate.TypeEmail = 1;
+
+                if (Mediator == null)
+                {
+                    ToastService.ShowError("Mediator is not initialized.");
+                    return;
+                }
+
                 if (EmailFormTemplate.Id == 0)
                 {
                     await Mediator.Send(new CreateEmailTemplateRequest(EmailFormTemplate));
@@ -300,7 +301,9 @@ namespace McDermott.Web.Components.Pages.Config
                 {
                     await Mediator.Send(new UpdateEmailTemplateRequest(EmailFormTemplate));
                 }
+
                 await LoadData();
+                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -308,16 +311,27 @@ namespace McDermott.Web.Components.Pages.Config
             }
         }
 
+
         private async Task SendEmail()
         {
             try
             {
+                PanelVisible = true;
                 EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
                 var cek = EmailSettings.FirstOrDefault(x => x.Id == EmailFormTemplate.EmailFromId)!;
+
+                if (cek == null)
+                {
+                    ToastService.ShowError("Email settings not found!");
+                    return;
+                }
+
                 var host = cek.Smtp_Host;
                 var port = int.Parse(cek.Smtp_Port);
                 var pass = cek.Smtp_Pass;
                 var user = cek.Smtp_User;
+
+                var encryptionType = cek.Smtp_Encryption;
 
                 if (!string.IsNullOrWhiteSpace(await QuillHtml.GetHTML()))
                 {
@@ -329,51 +343,56 @@ namespace McDermott.Web.Components.Pages.Config
                     ToastService.ShowWarning("Body Not Null!!");
                     return;
                 }
+
                 EmailFormTemplate.Message = preview.ToString();
                 EmailFormTemplate.Status = "sending";
+                StateHasChanged(); // Notify the component to re-render
 
                 var message = new MimeMessage();
                 message.From.Add(MailboxAddress.Parse(user));
                 message.To.Add(MailboxAddress.Parse(EmailFormTemplate.To));
-                foreach(var EmailCc in CcBy.ToList())
+
+                // Add Cc recipients
+                if (CcBy is not null)
                 {
-                    message.Cc.Add(MailboxAddress.Parse(EmailCc.Trim()));
+                    
+                    foreach (var cc in CcBy.ToList())
+                    {
+                        message.Cc.Add(MailboxAddress.Parse(cc.Trim()));
+                    }
                 }
+
                 message.Subject = EmailFormTemplate.Subject;
                 message.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = EmailFormTemplate.Message };
-                
-               
+
                 using var smtp = new SmtpClient();
-                if (cek.Smtp_Encryption == "SSL/TLS")
+                var secureSocketOptions = encryptionType switch
                 {
-                    smtp.Connect(host, port, MailKit.Security.SecureSocketOptions.SslOnConnect);
-                    smtp.Authenticate(user, pass);
-                    smtp.Send(message);
-                    smtp.Disconnect(true);
-                    ToastService.ShowSuccess("Success Send Email!");
-                }
-                else if (cek.Smtp_Encryption == "TLS (STARTTLS)")
-                {
-                    smtp.Connect(host, port, MailKit.Security.SecureSocketOptions.StartTls);
-                    smtp.Authenticate(user, pass);
-                    smtp.Send(message);
-                    smtp.Disconnect(true);
-                    ToastService.ShowSuccess("Success Send Email!");
-                }
-                else
-                {
-                    smtp.Connect(host, port, MailKit.Security.SecureSocketOptions.None);
-                    smtp.Authenticate(user, pass);
-                    smtp.Send(message);
-                    smtp.Disconnect(true);
-                    EmailFormTemplate.Status = "Send";
-                    ToastService.ShowSuccess("Success Send Email!");
-                }
+                    "SSL/TLS" => MailKit.Security.SecureSocketOptions.SslOnConnect,
+                    "TLS (STARTTLS)" => MailKit.Security.SecureSocketOptions.StartTls,
+                    _ => MailKit.Security.SecureSocketOptions.None
+                };
+
+                smtp.Connect(host, port, secureSocketOptions);
+                smtp.Authenticate(user, pass);
+                smtp.Send(message);
+                smtp.Disconnect(true);
+
+                EmailFormTemplate.Status = "Send";
+                ToastService.ShowSuccess("Success Send Email!");
+                ToastService.ClearAll();
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
-                ToastService.ShowError(ex.Message);
+                EmailFormTemplate.Status = "Failed";
+                ToastService.ShowError($"Failed to send email: {ex.Message}");
+            }
+            finally
+            {
+                StateHasChanged(); // Ensure the component re-renders
             }
         }
+
     }
 }

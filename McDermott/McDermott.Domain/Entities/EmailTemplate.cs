@@ -22,6 +22,7 @@
         public DateTime? Schendule { get; set; }
         public byte[]? DocumentContent { get; set; } = [];
         public string? Message { get; set; }
+        public long? TypeEmail { get; set; }
         public string? Status { get; set; }
 
         [SetToNull]

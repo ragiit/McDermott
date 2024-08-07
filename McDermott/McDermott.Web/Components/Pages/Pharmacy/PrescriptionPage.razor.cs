@@ -1,5 +1,8 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DevExpress.Blazor.RichEdit;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using McDermott.Domain.Entities;
+using McDermott.Extentions;
 using Microsoft.Identity.Client.Extensions.Msal;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
@@ -156,6 +159,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         };
 
         private List<string> Batch = [];
+        public byte[]? DocumentContent;
+        private DxRichEdit richEdit;
+        private DevExpress.Blazor.RichEdit.Document documentAPI;
         private bool PanelVisible { get; set; } = false;
         private bool IsLoading { get; set; } = false;
         private bool isView { get; set; } = false;
@@ -220,7 +226,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #endregion Static Variables
 
         #region change Data
-
+        private List<GeneralConsultanServiceDto> generalConsultantService = [];
         protected override async Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
@@ -228,7 +234,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             if (Id == 0)
                 return;
 
-            var generalConsultantService = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id));
+            generalConsultantService = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id));
             if (generalConsultantService.Count == 0 || generalConsultantService is null)
                 return;
 
@@ -241,7 +247,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Pharmacy.ServiceId = generalConsultantService.FirstOrDefault()!.ServiceId;
             Pharmacy.PaymentMethod = generalConsultantService.FirstOrDefault()!.Payment;
 
-            await GetPatientAllergy();
+            await GetPatientAllergy(Pharmacy.PatientId);
         }
 
         private async Task GetPatientAllergy(long? q = null)
@@ -2309,15 +2315,16 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 PanelVisible = true;
                 var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
                 Pharmacy.Status = EnumStatusPharmacy.SendToPharmacy;
-                await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+                var updates = await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
                 PharmaciesLog.PharmacyId = Pharmacy.Id;
                 PharmaciesLog.UserById = NameUser.Id;
                 PharmaciesLog.status = EnumStatusPharmacy.SendToPharmacy;
 
-                await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
-
                 PanelVisible = false;
+                await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
+                await EditItemPharmacy_Click(updates);
+                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -2330,15 +2337,16 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             PanelVisible = true;
             var checkData = Pharmacies.Where(x => x.Id == Pharmacy.Id).FirstOrDefault();
             Pharmacy.Status = EnumStatusPharmacy.Received;
-            await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
+            var updates = await Mediator.Send(new UpdatePharmacyRequest(Pharmacy));
 
             PharmaciesLog.PharmacyId = Pharmacy.Id;
             PharmaciesLog.UserById = NameUser.Id;
             PharmaciesLog.status = EnumStatusPharmacy.Received;
 
-            await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
-
             PanelVisible = false;
+            await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
+            await EditItemPharmacy_Click(updates);
+            StateHasChanged();
         }
         public async void Received()
         {
@@ -2356,9 +2364,9 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await Mediator.Send(new CreatePharmacyLogRequest(PharmaciesLog));
 
 
+            PanelVisible = false;
             await EditItemPharmacy_Click(updates);
             StateHasChanged();
-            PanelVisible = false;
         }
 
         public async Task ValidateAsync()
@@ -2460,6 +2468,87 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
+        private void Etiket()
+        {
+
+        }
+
+        private bool PopUpRecipe { get; set; } = false;
+        private async Task Recipe_print()
+        {
+            try
+            {
+                DateTime? startSickLeave = null;
+                DateTime? endSickLeave = null;
+                var gc = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x=>x.PatientId == Pharmacy.PatientId))).FirstOrDefault();
+                var culture = new System.Globalization.CultureInfo("id-ID");
+
+                var patienss = Patients.Where(x => x.Id == Pharmacy.PatientId).FirstOrDefault() ?? new();
+                var age = 0;
+                if (patienss.DateOfBirth == null)
+                {
+                    age = 0;
+                }
+                else
+                {
+                    age = DateTime.Now.Year - patienss.DateOfBirth.Value.Year;
+                }
+                string todays = gc.RegistrationDate.ToString("dddd", culture) ?? "-";
+
+                //int TotalDays = endSickLeave.Value.Day - startSickLeave.Value.Day;
+
+                //string WordDays = ConvertNumberHelper.ConvertNumberToWord(TotalDays);
+
+               
+
+                //Gender
+                string Gender = "";
+                string OppositeSex = "";
+                if (patienss.GenderId != null)
+                {
+                    Gender = patienss.Gender.Name == "Male" ? "MALE (L)" : "FEMALE (P)";
+                    OppositeSex = patienss.Gender.Name == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
+                }
+
+                PopUpRecipe = true;
+                string GetDefaultValue(string value, string defaultValue = "-")
+                {
+                    return value ?? defaultValue;
+                }
+
+                var mergeFields = new Dictionary<string, string>
+                {
+                    {"%NamePatient%", GetDefaultValue(patienss.Name)},
+                    {"%NIP%", GetDefaultValue(patienss.NIP)},
+                    {"%Departement%", GetDefaultValue(patienss.Department.Name)},
+                    {"%NameDoctor%", GetDefaultValue(gc?.Pratitioner?.Name)},
+                    {"%SIPDoctor%", GetDefaultValue(gc?.Pratitioner?.SipNo)},
+                    {"%AddressPatient%", GetDefaultValue(patienss.DomicileAddress1) + GetDefaultValue(patienss.DomicileAddress2)},
+                    {"%AgePatient%", GetDefaultValue(age.ToString())},
+                    //{"%WordDays%", GetDefaultValue(WordDays)},
+                    {"%Days%", GetDefaultValue(todays)},
+                    //{"%TotalDays%", GetDefaultValue(TotalDays.ToString())},
+                    {"%Dates%", GetDefaultValue(gc?.RegistrationDate.ToString("dd MMMM yyyy"))},
+                    {"%Times%", GetDefaultValue(gc?.RegistrationDate.ToString("H:MM"))},
+                    {"%Date%", DateTime.Now.ToString("dd MMMM yyyy")},  // Still no null check needed
+                    {"%Genders%", GetDefaultValue(Gender)},
+                    {"%OppositeSex%", GetDefaultValue(OppositeSex, "")} // Use empty string if null
+                };
+
+
+                DocumentContent = await DocumentProvider.GetDocumentAsync("Recipe.docx", mergeFields);
+               
+                // Konversi byte array menjadi base64 string
+                //var base64String = Convert.ToBase64String(DocumentContent);
+
+                //// Panggil JavaScript untuk membuka dan mencetak dokumen
+                //await JsRuntime.InvokeVoidAsync("printDocument", base64String);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
         #endregion Status
 
         #region Delete Grid Config

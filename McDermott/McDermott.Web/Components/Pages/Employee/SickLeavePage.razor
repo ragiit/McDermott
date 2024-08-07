@@ -32,22 +32,22 @@
 
                                 <Columns>
                                     <DxGridSelectionColumn Width="15px" />
-                                    <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="10px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                                   @*  <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="10px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
                                         <CellDisplayTemplate>
                                             <DxButton RenderStyle="ButtonRenderStyle.Success"
                                                       Attributes="@(new Dictionary<string, object> {  ["title"] = "Print" })"
                                                       IconCssClass="fa-solid fa-print"
                                                       Click="@(()=>PrintToLeave((context.DataItem as SickLeaveDto).GeneralConsultans.PatientId))"
-                                                      CssClass="me-1" />
+                                                      CssClass="me-1" /> 
 
-                                            @*  <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                              <DxButton RenderStyle="ButtonRenderStyle.Primary"
                                             Attributes="@(new Dictionary<string, object> {  ["title"] = "Send To Email" })"
                                             IconCssClass="fa-solid fa-paper-plane"
                                             Click="@(()=>SendToEmail((context.DataItem as SickLeaveDto).PatientId))"
-                                            IconPosition="ButtonIconPosition.AfterText" /> *@
-                                        </CellDisplayTemplate>
+                                            IconPosition="ButtonIconPosition.AfterText" />
+                                         </CellDisplayTemplate>
                                         <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
-                                    </DxGridDataColumn>
+                                    </DxGridDataColumn> *@
                                     <DxGridDataColumn MinWidth="200" FieldName="GeneralConsultans.Patient.Name" Caption="Patient Name" />
                                     <DxGridDataColumn MinWidth="150" FieldName="GeneralConsultans.NoRM" Caption="NO RM" />
                                     <DxGridDataColumn MinWidth="150" FieldName="TypeLeave" Caption="Type" />
