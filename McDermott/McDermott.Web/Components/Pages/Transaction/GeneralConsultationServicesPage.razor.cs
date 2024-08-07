@@ -324,7 +324,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     var prev = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x
                         => x.PatientId == GeneralConsultanService.PatientId && x.Id < GeneralConsultanService.Id && x.Status == EnumStatusGeneralConsultantService.Finished)))
-                        .OrderBy(x => x.CreatedDate)
+                        .OrderByDescending(x => x.CreatedDate)
                         .FirstOrDefault() ?? new();
 
                     GeneralConsultanService.Height = prev?.Height ?? 0;
@@ -1270,6 +1270,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                     await Mediator.Send(new UpdateUserRequest(u)); 
                     Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
                     Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
+
+                    GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId) ?? new();
                 }
 
 
@@ -1661,6 +1663,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                         else
                             GeneralConsultanService = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
 
+                        GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId) ?? new();
+
                         await SaveAllergyData();
 
                         StagingText = EnumStatusGeneralConsultantService.NurseStation;
@@ -1669,7 +1673,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     case EnumStatusGeneralConsultantService.Confirmed:
 
-                        GeneralConsultanService.Status = EnumStatusGeneralConsultantService.NurseStation;
+                        GeneralConsultanService.Status = EnumStatusGeneralConsultantService.NurseStation; 
+                        await GetClinicalAssesmentPatientHistory();
                         GeneralConsultanService = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
                         StagingText = EnumStatusGeneralConsultantService.Waiting;
 
@@ -2044,8 +2049,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicy == null || SelectedInsurancePolicy.Id == 0 ? null : SelectedInsurancePolicy.Id;
 
-               
-
                 switch (GeneralConsultanService.Status)
                 {
                     case EnumStatusGeneralConsultantService.Planned:
@@ -2235,6 +2238,11 @@ namespace McDermott.Web.Components.Pages.Transaction
         #endregion Chart
 
         private List<StatusMcuData> statusMcuData = [];
+
+        private void OnCancelBack()
+        {
+            NavigationManager.NavigateTo("clinic-service/general-consultation-service", true);
+        }
 
         private async Task LoadData()
         {
