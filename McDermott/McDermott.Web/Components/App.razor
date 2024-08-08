@@ -8,6 +8,7 @@
 
     @*  < link rel="stylesheet" href="bootstrap/bootstrap.min.css" /> *@
     <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="Etiket.css" />
     @*     <link rel="stylesheet" href="McDermott.styles.css" />
     *@
     <link rel="icon" type="image/png" href="https://www.ikariera.cz/uploads/companies/file/28129/22192/17871/c1c103e1-56b0-45cf-b02d-f6acbc7276b8/Logo%20-%20mcdermott_symbol_color%20500x500%2C%2050hrana.png" />
@@ -393,6 +394,15 @@
             printWindow.print();
             printWindow.close();
         } 
+        function printJSX(contentToPrint) {
+            var printWindow = window.open('', '_blank');
+            printWindow.document.open();
+            printWindow.document.write(contentToPrint);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
+        }
         
         function printJS2(contentToPrint) {
             // Create a Blob object with the HTML content
@@ -545,6 +555,7 @@
     <script src="AdminLTE/dist/js/adminlte.js"></script>
     <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
       <script src="canvasScript.js"></script>  
+      <script src="/CetakEtiket.js"></script>  
 
     @* <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> *@
     @* <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script> *@

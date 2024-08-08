@@ -377,7 +377,7 @@
                                                                             <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshPrescriptionLines_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                                             <DxToolbarItem Visible="@(NameUser.IsPharmacy == true &&(Pharmacy.Id != 0 || Pharmacy.Status == EnumStatusPharmacy.Received ||Pharmacy.Status == EnumStatusPharmacy.Processed||Pharmacy.Status == EnumStatusPharmacy.Done))" BeginGroup="true" Text="Print"  IconCssClass="fa-solid fa-print" >
                                                                             <Items>
-                                            <DxToolbarItem Text="Etiket" IconCssClass="fa-solid fa-ticket" Click="ExportCsvItem_Click" />
+                                            <DxToolbarItem Text="Etiket" IconCssClass="fa-solid fa-ticket" Click="Etiket" />
                                             <DxToolbarItem Text="Recipe" IconCssClass="fa-solid fa-receipt" Click="Recipe_print" />
                                             </Items>
                                             </DxToolbarItem> 
@@ -1266,10 +1266,14 @@ else
     </div>
 </DxPopup>
  
-         <DxPopup Visible="PopUpRecipe" Width="auto">
+<DxPopup Visible="PopUpRecipe" Width="auto">
     <DxRichEdit @ref="richEdit" ActiveRibbonTabIndex="0" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">
         <MailMergeSettings>
             <DxMailMergeSettings ViewMergedData="true"></DxMailMergeSettings>
         </MailMergeSettings>
     </DxRichEdit>
 </DxPopup>
+
+@* Etiket *@
+
+

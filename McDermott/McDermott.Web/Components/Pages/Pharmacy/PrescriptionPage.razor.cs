@@ -1518,7 +1518,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     }
                     else
                     {
-                        SelectedDataItemsPrescriptionLines.Adapt<List<LabTestDetailDto>>().Select(x => x.Id).ToList().ForEach(x =>
+                        SelectedDataItemsPrescriptionLines.Adapt<List<PrescriptionDto>>().Select(x => x.Id).ToList().ForEach(x =>
                         {
                             Prescriptions.Remove(Prescriptions.FirstOrDefault(z => z.Id == x) ?? new());
 
@@ -2479,6 +2479,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
+                var cetakPrescription = await Mediator.Send(new GetPrescriptionQuery(x => x.PharmacyId == Pharmacy.Id));
                 var queueNumber = "123";
                 var NamePatient = "John Doe";
                 var ServiceKiosk = "Poliklinik Umum";
@@ -2570,7 +2571,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         </html>";
 
                 // Panggil JavaScript Interop untuk memicu pencetakan
-                await JsRuntime.InvokeVoidAsync("printJS", contentToPrint);
+                await JsRuntime.InvokeVoidAsync("printJSX", contentToPrint);
 
             }
             catch(Exception ex)
