@@ -1006,7 +1006,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             var concoctionId = Concoctions.Where(x => x.PharmacyId == Pharmacy.Id).FirstOrDefault();
             Products = await Mediator.Send(new GetProductQuery());
             TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-            ConcoctionLines = await Mediator.Send(new GetConcoctionLineQuery(x => x.ConcoctionId == concoctionId.Id));
+            if (concoctionId is not null)
+            {
+                ConcoctionLines = await Mediator.Send(new GetConcoctionLineQuery(x => x.ConcoctionId == concoctionId.Id));
+            }
         }
 
         private void HandleDiscard()
@@ -2280,12 +2283,41 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItemStockOut_Click(IGrid context)
         {
-            //var selected = (StockOutPrescriptionDto)context.SelectedDataItem;
+            var selected = (StockOutPrescriptionDto)context.SelectedDataItem;
+            var data_products = Prescriptions.Where(x => x.Id == selected.PrescriptionId).Select(x => x.ProductId).FirstOrDefault();
+            if (!traceAvailability)
+            {
+                var Qty_stock = TransactionStocks.Where(x => x.ProductId == data_products && x.LocationId == Pharmacy.PrescriptionLocationId).Select(x => x.Quantity).FirstOrDefault();
+                FormStockOutLines.CurrentStock = Qty_stock;
+            }
+
+            var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == data_products && s.LocationId == Pharmacy.PrescriptionLocationId));
+
+            Batch = stockProducts?.Select(x => x.Batch)?.ToList() ?? [];
+            Batch = Batch.Distinct().ToList();
+
+            var firstStockProduct = stockProducts.Where(x => x.Batch == FormStockOutPrescriptions.Batch);
+            UpdateFormInventoryAdjustmentDetail2(firstStockProduct.FirstOrDefault() ?? new(), firstStockProduct.Sum(x => x.Quantity));
             await GridStockOut.StartEditRowAsync(FocusedRowVisibleIndexStockOut);
         }
 
         private async Task EditItemStockOutLines_Click(IGrid context)
         {
+            var selected = (StockOutLinesDto)context.SelectedDataItem;
+            var data_products = ConcoctionLines.Where(x => x.Id == selected.LinesId).Select(x => x.ProductId).FirstOrDefault();
+            if (!traceAvailability)
+            {
+                var Qty_stock = TransactionStocks.Where(x => x.ProductId == data_products && x.LocationId == Pharmacy.PrescriptionLocationId).Select(x => x.Quantity).FirstOrDefault();
+                FormStockOutLines.CurrentStock = Qty_stock;
+            }
+
+            var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == data_products && s.LocationId == Pharmacy.PrescriptionLocationId));
+
+            Batch = stockProducts?.Select(x => x.Batch)?.ToList() ?? [];
+            Batch = Batch.Distinct().ToList();
+
+            var firstStockProduct = stockProducts.Where(x => x.Batch == FormStockOutLines.Batch);
+            UpdateFormInventoryAdjustmentDetail2(firstStockProduct.FirstOrDefault() ?? new(), firstStockProduct.Sum(x => x.Quantity));
             await GridStockOutLines.StartEditRowAsync(FocusedRowVisibleIndexStockOutLines);
         }
         #endregion function Edit Click
