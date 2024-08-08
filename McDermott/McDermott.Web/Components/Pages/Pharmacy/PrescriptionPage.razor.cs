@@ -2475,7 +2475,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        private void Etiket()
+        private async Task Etiket()
         {
             try
             {
