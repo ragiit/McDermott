@@ -1,0 +1,169 @@
+﻿
+
+using DevExpress.Blazor.Internal;
+using McHealthCare.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+namespace McHealthCare.Web.Components.Pages.Configuration
+{
+    public partial class UserPage
+    {
+        #region Default Variables & Forms
+
+        private IGrid Grid { get; set; }
+        private IGrid GridGroupMenu { get; set; }
+        private bool PanelVisible { get; set; } = false;
+        private int FocusedRowVisibleIndex { get; set; } = -1;
+        private int FocusedRowVisibleIndex2 { get; set; } = -1;
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new List<object>();
+        private IReadOnlyList<object> SelectedDataItemsGroupMenu { get; set; } = new List<object>();
+        private string Url => Helper.URLS.FirstOrDefault(x => x == "configuration/groups") ?? string.Empty;
+        public bool IsLoading { get; set; } = false;
+        private string PageName => new Uri(NavigationManager.Uri).PathAndQuery.Replace(NavigationManager.BaseUri, "/");
+        [Parameter]
+        public string? PageMode { get; set; }
+        public bool IsDeleted { get; set; } = false;
+        private (bool, GroupMenuDto) UserAccess { get; set; } = new();
+
+        #endregion Default Variables & Forms
+
+        #region Variables
+        private List<ApplicationUser> Users = [];
+        private ApplicationUser User = new();
+        private UserManager<ApplicationUser> UserManager { get; set; }
+        #endregion
+        private void CanDeleteSelectedItems(GridFocusedRowChangedEventArgs e)
+        {
+            FocusedRowVisibleIndex = e.VisibleIndex;
+
+            if (e.DataItem is not null)
+                IsDeleted = e.DataItem.Adapt<GroupDto>().IsDefaultData;
+        }
+        private async Task BackButtonAsync()
+        {
+            try
+            {
+                NavigationManager.NavigateToUrl(Url);
+                PanelVisible = true;
+                Users = await UserService.GetAllUsers();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
+        }
+        [Parameter] public string? Id { get; set; }
+        protected override async Task OnInitializedAsync()
+        {
+            IsLoading = true;
+            try
+            {
+                UserAccess = await UserService.GetUserInfo(ToastService);
+
+                await LoadDataAsync();
+
+                try
+                {
+                    Grid?.SelectRow(0, true);
+                    StateHasChanged();
+                }
+                catch { }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            IsLoading = false;
+        }
+        private async Task LoadDataAsync()
+        {
+            try
+            {
+                PanelVisible = true;
+
+                Users = await UserService.GetAllUsers(); 
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
+        }
+        private async Task LoadDataByIdAsync(string id)
+        {
+            try
+            {
+                User = await UserService.GetUserId(id);
+
+                if (User is null || string.IsNullOrWhiteSpace(User.Id))
+                {
+                    NavigationManager.NavigateToUrl(Url);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+        private async Task InitializeEditAsync()
+        {
+            if (SelectedDataItems.Count > 0)
+            {
+                var id = SelectedDataItems[0].Adapt<ApplicationUser>().Id;
+                NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{id}");
+                await LoadDataByIdAsync(id);
+            }
+        }
+        private void InitializeNew(bool isParam = false)
+        {
+            User = new (); 
+
+            if (!isParam)
+                NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Create.GetDisplayName()}");
+        }
+        private async Task OnDeleteAsync(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                IsLoading = true;
+                if (SelectedDataItems == null || !SelectedDataItems.Any())
+                {
+                    if (((ApplicationUser)e.DataItem).IsDefaultData)
+                        return;
+
+                    var u = await UserManager.FindByIdAsync(((ApplicationUser)e.DataItem).Id);
+
+                    if (u != null)
+                        await UserManager.DeleteAsync(u); 
+                }
+                else
+                {
+                    var ids = SelectedDataItems.Adapt<List<ApplicationUser>>().Where(x => x.IsDefaultData == false).Select(x => x.Id).ToList();
+                    foreach (var id in ids)
+                    {
+                        var u = await UserManager.FindByIdAsync(id);
+
+                        if (u != null)
+                            await UserManager.DeleteAsync(u);
+                    } 
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            { 
+                IsLoading = false;
+            }
+        }
+    }
+}

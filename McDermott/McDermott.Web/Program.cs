@@ -17,7 +17,12 @@ using Serilog;
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
 var builder = WebApplication.CreateBuilder(args);
-
+//builder.WebHost.ConfigureKestrel((context, options) =>
+//{
+//    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(2);
+//    options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(1);
+//    options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10 MB
+//});
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllers(); // Menambahkan layanan Controllers
 builder.Services.AddControllersWithViews();
@@ -32,7 +37,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient("ServerAPI", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ServerAPI:BaseUrl"] ?? "http://localhost:5001/");
-});
+}); 
 // Add services to the container.
 //builder.WebHost.UseUrls("http://*:5001");
 builder.Services.AddAuthenticationCore();
@@ -97,7 +102,7 @@ else
 }
 
 //app.UsePathBase("/McDermott");
-app.UseMiddleware<AuthorizationMiddleware>();
+//app.UseMiddleware<AuthorizationMiddleware>();
 
 app.UseSerilogRequestLogging();
 app.UseRouting();
@@ -137,6 +142,12 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+//app.UseMiddleware<RequestTimeoutMiddleware>();
+//app.Use(async (context, next) =>
+//{
+//    context.RequestAborted.WaitHandle.WaitOne(TimeSpan.FromMinutes(2)); // Set timeout
+//    await next.Invoke();
+//});
 
 app.Run();
 
@@ -168,5 +179,43 @@ public class RateLimitMiddleware
 
         requestTimes[ipAddress] = DateTime.UtcNow;
         await _next(context);
+    }
+}
+
+public class RequestTimeoutMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly TimeSpan _timeout;
+
+    public RequestTimeoutMiddleware(RequestDelegate next, TimeSpan timeout)
+    {
+        _next = next;
+        _timeout = timeout;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        using (var cts = new CancellationTokenSource(_timeout))
+        {
+            context.RequestAborted.Register(() => cts.Cancel());
+
+            try
+            {
+                await _next(context);
+            }
+            catch (OperationCanceledException) when (cts.IsCancellationRequested)
+            {
+                context.Response.StatusCode = StatusCodes.Status408RequestTimeout;
+                await context.Response.WriteAsync("Request timed out.");
+            }
+        }
+    }
+}
+
+public static class RequestTimeoutMiddlewareExtensions
+{
+    public static IApplicationBuilder UseRequestTimeout(this IApplicationBuilder builder, TimeSpan timeout)
+    {
+        return builder.UseMiddleware<RequestTimeoutMiddleware>(timeout);
     }
 }

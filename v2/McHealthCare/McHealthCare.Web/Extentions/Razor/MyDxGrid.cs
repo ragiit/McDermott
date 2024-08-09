@@ -41,7 +41,9 @@ namespace McHealthCare.Web.Extentions.Razor
                 //PageSizeSelectorAllRowsItemVisible = true;
                 PagerSwitchToInputBoxButtonCount = 10;
                 FocusedRowEnabled = true;
-
+                TextWrapEnabled = false;
+                ValidationEnabled = true;
+                ColumnResizeMode = GridColumnResizeMode.NextColumn;
                 PagerVisibleNumericButtonCount = 10;
                 ShowGroupPanel = true;
                 AutoExpandAllGroupRows = true;

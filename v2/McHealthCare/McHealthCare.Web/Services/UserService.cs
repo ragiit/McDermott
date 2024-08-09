@@ -1,6 +1,7 @@
 ﻿using Blazored.Toast.Services;
 using McHealthCare.Context;
 using McHealthCare.Domain.Entities;
+using McHealthCare.Domain.Entities.Configuration;
 using MediatR;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -11,7 +12,7 @@ using System.Security.Claims;
 
 namespace McHealthCare.Web.Services
 {
-    public class UserService(AuthenticationStateProvider authenticationStateProvider, ApplicationDbContext context, NavigationManager navigationManager, IMemoryCache cache, IMediator mediator)
+    public sealed class UserService(AuthenticationStateProvider authenticationStateProvider, ApplicationDbContext context, NavigationManager navigationManager, IMemoryCache cache, IMediator mediator)
     {
         public async Task<ClaimsPrincipal> GetCurrentUserAsync()
         {
@@ -30,7 +31,7 @@ namespace McHealthCare.Web.Services
         public async Task<(bool, GroupMenuDto)> GetUserInfo(IToastService? toastService = null)
         {
             try
-            {
+            { 
                 var url = navigationManager.Uri.ToLower().Replace(navigationManager.BaseUri.ToLower(), "");
                 var user = await GetCurrentUserFromDatabaseAsync() ?? new();
                 var groups = await mediator.Send(new GetGroupMenuQuery(x => x.GroupId == user.GroupId!)!);
@@ -55,6 +56,82 @@ namespace McHealthCare.Web.Services
                 return (false, new());
             }
 
+        }
+
+        public async Task<List<ApplicationUser>> GetAllUsers()
+        { 
+            string cacheKey = $"{CacheKey.UserCacheKeyPrefix}";
+
+            // Cek apakah data pengguna sudah ada di cache
+            if (!cache.TryGetValue(cacheKey, out List<ApplicationUser>? user))
+            {
+                user = await context.Users
+                                     .Include(u => u.Group)
+                                     .ThenInclude(u => u.GroupMenus)
+                                     .AsNoTracking()
+                                     .ToListAsync();
+
+                // Konfigurasi opsi caching
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(30)) // Waktu kadaluarsa sliding
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));  // Waktu kadaluarsa absolut
+
+                // Simpan data pengguna dalam cache
+                cache.Set(cacheKey, user, cacheEntryOptions);
+            }
+
+            return user ?? [];
+        }
+
+        public async Task<List<Patient>?> GetAllPatients()
+        {
+            string cacheKey = $"{CacheKey.UserCacheKeyPrefix}";
+
+            // Cek apakah data pengguna sudah ada di cache
+            if (!cache.TryGetValue(cacheKey, out List<Patient>? user))
+            {
+                user = await context.Patients 
+                                     .AsNoTracking()
+                                     .ToListAsync();
+
+                // Konfigurasi opsi caching
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(30)) // Waktu kadaluarsa sliding
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));  // Waktu kadaluarsa absolut
+
+                // Simpan data pengguna dalam cache
+                cache.Set(cacheKey, user, cacheEntryOptions);
+            }
+
+            return user ?? [];
+        }
+        public async Task<ApplicationUser> GetUserId(string userId)
+        { 
+            // Kunci cache untuk menyimpan data pengguna
+            string cacheKey = $"{CacheKey.UserCacheKeyPrefix}{userId}";
+
+            // Cek apakah data pengguna sudah ada di cache
+            if (!cache.TryGetValue(cacheKey, out ApplicationUser? user))
+            {
+                var u = await context.Users
+                                     .Include(u => u.Group)
+                                     .ThenInclude(u => u.GroupMenus)
+                                     .AsNoTracking()
+                                     .FirstOrDefaultAsync(u => u.Id == userId.ToString());
+
+                var a = u.Adapt<ApplicationUserDto>();
+                user = a.Adapt<ApplicationUser>();
+
+                // Konfigurasi opsi caching
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(30)) // Waktu kadaluarsa sliding
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));  // Waktu kadaluarsa absolut
+
+                // Simpan data pengguna dalam cache
+                cache.Set(cacheKey, user, cacheEntryOptions);
+            }
+
+            return user ?? new();
         }
 
         public async Task<ApplicationUser?> GetCurrentUserFromDatabaseAsync()
@@ -89,7 +166,9 @@ namespace McHealthCare.Web.Services
         {
             var userId = await GetCurrentUserIdAsync();
             string cacheKey = $"{CacheKey.UserCacheKeyPrefix}{userId}";
+            string cacheKey1 = $"{CacheKey.UserCacheKeyPrefix}";
             cache.Remove(cacheKey);
+            cache.Remove(cacheKey1);
         }
 
         public async Task<string?> GetCurrentUserNameAsync()

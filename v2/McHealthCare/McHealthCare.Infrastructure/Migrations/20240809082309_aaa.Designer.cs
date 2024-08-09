@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McHealthCare.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240805151632_AddedDefaultData")]
-    partial class AddedDefaultData
+    [Migration("20240809082309_aaa")]
+    partial class aaa
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,8 +37,38 @@ namespace McHealthCare.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CurrentMobile")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("DomicileAddress1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DomicileAddress2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("DomicileCityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("DomicileCountryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("DomicileDistrictId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("DomicileProvinceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DomicileRtRw")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("DomicileVillageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long?>("DomicileZip")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -47,10 +77,64 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("EmailTemplateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("EmergencyEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmergencyName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmergencyPhone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmergencyRelation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredId")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("GroupId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("HomePhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdCardAddress1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdCardAddress2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("IdCardCityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("IdCardCountryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("IdCardDistrictId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("IdCardProvinceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("IdCardRtRw")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("IdCardVillageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long?>("IdCardZip")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("IsDefaultData")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsResidenceAddress")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -62,6 +146,16 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<string>("MartialStatus")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MobilePhone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NoId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -69,6 +163,9 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Npwp")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -79,8 +176,17 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Photo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhotoBase64")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PlaceOfBirth")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ReligionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -88,13 +194,38 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<string>("TypeId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DomicileCityId");
+
+                    b.HasIndex("DomicileCountryId");
+
+                    b.HasIndex("DomicileDistrictId");
+
+                    b.HasIndex("DomicileProvinceId");
+
+                    b.HasIndex("DomicileVillageId");
+
+                    b.HasIndex("EmailTemplateId");
+
                     b.HasIndex("GroupId");
+
+                    b.HasIndex("IdCardCityId");
+
+                    b.HasIndex("IdCardCountryId");
+
+                    b.HasIndex("IdCardDistrictId");
+
+                    b.HasIndex("IdCardProvinceId");
+
+                    b.HasIndex("IdCardVillageId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -103,6 +234,8 @@ namespace McHealthCare.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("ReligionId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -139,6 +272,82 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasIndex("ProvinceId");
 
                     b.ToTable("Cities");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Company", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("CityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CountryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CurrencyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Logo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid?>("ProvinceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Street1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Street2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VAT")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Website")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Zip")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("CountryId");
+
+                    b.HasIndex("ProvinceId");
+
+                    b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Country", b =>
@@ -214,6 +423,134 @@ namespace McHealthCare.Persistence.Migrations
                     b.ToTable("Districts");
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.EmailSetting", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<long?>("Sequence")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool?>("Smpt_Debug")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Smtp_Encryption")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Smtp_Host")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Smtp_Pass")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Smtp_Port")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Smtp_User")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmailSettings");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.EmailTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("ById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ById1")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Cc")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("DocumentContent")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<Guid?>("EmailFromId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("From")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReplayTo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Schendule")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subject")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("To")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid?>("ToPartnerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long?>("TypeEmail")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ById1");
+
+                    b.HasIndex("EmailFromId");
+
+                    b.ToTable("EmailTemplates");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Menu", b =>
                 {
                     b.Property<Guid>("Id")
@@ -260,12 +597,64 @@ namespace McHealthCare.Persistence.Migrations
                     b.ToTable("Menus");
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Occupational", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Occupationals");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Patient", b =>
                 {
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("FamilyMedicalHistory")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FamilyMedicalHistoryOther")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IsFamilyMedicalHistory")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IsMedicationHistory")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MedicationHistory")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NoRm")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PastMedicalHistory")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ApplicationUserId");
@@ -310,6 +699,35 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasIndex("CountryId");
 
                     b.ToTable("Provinces");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Religion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Religions");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Village", b =>
@@ -365,16 +783,28 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("DoctorType")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("SipExp")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("SipFile")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("SipFileBase64")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SipNo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("StrExp")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("StrFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StrFileBase64")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StrNo")
@@ -390,11 +820,23 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("EmployeeType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Legacy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NIP")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NoBpjsKs")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NoBpjsTk")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("OccupationalId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Oracle")
                         .HasColumnType("nvarchar(max)");
@@ -402,7 +844,14 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<string>("SAP")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("SupervisorId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("ApplicationUserId");
+
+                    b.HasIndex("OccupationalId");
+
+                    b.HasIndex("SupervisorId");
 
                     b.ToTable("Employees");
                 });
@@ -456,6 +905,9 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsCreate")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDefaultData")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDelete")
@@ -1414,12 +1866,94 @@ namespace McHealthCare.Persistence.Migrations
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.ApplicationUser", b =>
                 {
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.City", "DomicileCity")
+                        .WithMany()
+                        .HasForeignKey("DomicileCityId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Country", "DomicileCountry")
+                        .WithMany()
+                        .HasForeignKey("DomicileCountryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.District", "DomicileDistrict")
+                        .WithMany()
+                        .HasForeignKey("DomicileDistrictId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Province", "DomicileProvince")
+                        .WithMany()
+                        .HasForeignKey("DomicileProvinceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Village", "DomicileVillage")
+                        .WithMany()
+                        .HasForeignKey("DomicileVillageId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.EmailTemplate", null)
+                        .WithMany("ToPartner")
+                        .HasForeignKey("EmailTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("McHealthCare.Domain.Entities.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.City", "IdCardCity")
+                        .WithMany()
+                        .HasForeignKey("IdCardCityId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Country", "IdCardCountry")
+                        .WithMany()
+                        .HasForeignKey("IdCardCountryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.District", "IdCardDistrict")
+                        .WithMany()
+                        .HasForeignKey("IdCardDistrictId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Province", "IdCardProvince")
+                        .WithMany()
+                        .HasForeignKey("IdCardProvinceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Village", "IdCardVillage")
+                        .WithMany()
+                        .HasForeignKey("IdCardVillageId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Religion", "Religion")
+                        .WithMany()
+                        .HasForeignKey("ReligionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("DomicileCity");
+
+                    b.Navigation("DomicileCountry");
+
+                    b.Navigation("DomicileDistrict");
+
+                    b.Navigation("DomicileProvince");
+
+                    b.Navigation("DomicileVillage");
+
                     b.Navigation("Group");
+
+                    b.Navigation("IdCardCity");
+
+                    b.Navigation("IdCardCountry");
+
+                    b.Navigation("IdCardDistrict");
+
+                    b.Navigation("IdCardProvince");
+
+                    b.Navigation("IdCardVillage");
+
+                    b.Navigation("Religion");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.City", b =>
@@ -1429,6 +1963,30 @@ namespace McHealthCare.Persistence.Migrations
                         .HasForeignKey("ProvinceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Province");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Company", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("City");
+
+                    b.Navigation("Country");
 
                     b.Navigation("Province");
                 });
@@ -1450,6 +2008,23 @@ namespace McHealthCare.Persistence.Migrations
                     b.Navigation("City");
 
                     b.Navigation("Province");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.EmailTemplate", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.ApplicationUser", "By")
+                        .WithMany()
+                        .HasForeignKey("ById1")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.EmailSetting", "EmailFrom")
+                        .WithMany()
+                        .HasForeignKey("EmailFromId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("By");
+
+                    b.Navigation("EmailFrom");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Menu", b =>
@@ -1530,7 +2105,21 @@ namespace McHealthCare.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Occupational", "Occupational")
+                        .WithMany()
+                        .HasForeignKey("OccupationalId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Employee", "Supervisor")
+                        .WithMany()
+                        .HasForeignKey("SupervisorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("ApplicationUser");
+
+                    b.Navigation("Occupational");
+
+                    b.Navigation("Supervisor");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.GroupMenu", b =>
@@ -1791,6 +2380,11 @@ namespace McHealthCare.Persistence.Migrations
             modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.Country", b =>
                 {
                     b.Navigation("Provinces");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Configuration.EmailTemplate", b =>
+                {
+                    b.Navigation("ToPartner");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Group", b =>
