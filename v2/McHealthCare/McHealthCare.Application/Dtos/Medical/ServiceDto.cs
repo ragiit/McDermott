@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace McHealthCare.Application.Dtos.Medical
 {
-    public class ServicedDto : IMapFrom<Service>
+    public class ServiceDto : IMapFrom<Service>
     {
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
@@ -20,7 +20,7 @@ namespace McHealthCare.Application.Dtos.Medical
         public Guid? ServicedId { get; set; }
 
         [SetToNull]
-        public virtual ServicedDto? Serviced { get; set; }
+        public virtual ServiceDto? Serviced { get; set; }
     }
 
     public class CreateUpdateServiceDto : IMapFrom<Service>
@@ -38,6 +38,6 @@ namespace McHealthCare.Application.Dtos.Medical
         public Guid? ServicedId { get; set; }
 
         [SetToNull]
-        public virtual ServicedDto? Serviced { get; set; }
+        public virtual ServiceDto? Serviced { get; set; }
     }
 }

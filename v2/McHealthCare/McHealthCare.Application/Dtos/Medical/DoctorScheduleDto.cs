@@ -17,7 +17,7 @@ namespace McHealthCare.Application.Dtos.Medical
         // public List<Guid>? PhysicionIds { get; set; }
 
         [SetToNull]
-        public virtual ServicedDto? Service { get; set; }
+        public virtual ServiceDto? Service { get; set; }
     }
 
     public class CreateUpdateDoctorScheduleDto : IMapFrom<DoctorSchedule>
@@ -32,6 +32,6 @@ namespace McHealthCare.Application.Dtos.Medical
         // public List<Guid>? PhysicionIds { get; set; }
 
         [SetToNull]
-        public virtual ServicedDto? Service { get; set; }
+        public virtual ServiceDto? Service { get; set; }
     }
 }

@@ -13,7 +13,7 @@ namespace McHealthCare.Application.Dtos.Medical
         public string Code { get; set; } = string.Empty;
     }
 
-    public class CreateUpdateLabUom : IMapFrom<LabUom>
+    public class CreateUpdateLabUomDto : IMapFrom<LabUom>
     {
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;

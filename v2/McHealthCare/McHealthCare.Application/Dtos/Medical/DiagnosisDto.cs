@@ -25,7 +25,7 @@ namespace McHealthCare.Application.Dtos.Medical
         public virtual ChronicCategoryDto? ChronicCategory { get; set; }
     }
 
-    public class createUpdateDiagnosisDto : IMapFrom<Diagnosis>
+    public class CreateUpdateDiagnosisDto : IMapFrom<Diagnosis>
     {
         public Guid Id { get; set; }
 
