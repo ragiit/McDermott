@@ -7,8 +7,8 @@
 @typeparam TUser where TUser : ApplicationUserDto
 
 <DxFormLayoutGroup Caption="General Information" ColSpanMd="12">
-    <div class="row w-100">
-        <div class="col-md-6">
+    <div class="row g-0">
+        <div class="col-6">
             <DxFormLayout>
                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                     <DxTextBox @bind-Text="@UserForm.Name"
@@ -64,7 +64,7 @@
                 </DxFormLayoutItem>
             </DxFormLayout>
         </div>
-        <div class="col-md-6">
+        <div class="col-6">
             <DxFormLayout>
                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Mobile" ColSpanMd="12">
                     <DxMaskedInput @bind-Value="@UserForm.MobilePhone"

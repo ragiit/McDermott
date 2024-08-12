@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McHealthCare.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240809082309_aaa")]
-    partial class aaa
+    [Migration("20240812070214_initialmigration")]
+    partial class initialmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,6 +42,9 @@ namespace McHealthCare.Persistence.Migrations
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DoctorScheduleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("DomicileAddress1")
                         .HasColumnType("nvarchar(max)");
@@ -202,6 +205,8 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DoctorScheduleId");
 
                     b.HasIndex("DomicileCityId");
 
@@ -948,8 +953,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnOrder(0);
 
                     b.Property<string>("Code")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -964,8 +968,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1033,8 +1036,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1058,8 +1060,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Code")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1071,8 +1072,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1103,8 +1103,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ParentCategory")
                         .HasColumnType("nvarchar(max)");
@@ -1134,8 +1133,10 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhysicionIds")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("ServiceId")
                         .HasColumnType("uniqueidentifier");
@@ -1167,15 +1168,13 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DayOfWeek")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("DoctorScheduleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Quota")
                         .HasColumnType("int");
@@ -1218,10 +1217,7 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<Guid?>("DoctorScheduleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("PhysicianId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PhysicianId1")
+                    b.Property<string>("PhysicianId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("StartDate")
@@ -1243,7 +1239,7 @@ namespace McHealthCare.Persistence.Migrations
 
                     b.HasIndex("DoctorScheduleId");
 
-                    b.HasIndex("PhysicianId1");
+                    b.HasIndex("PhysicianId");
 
                     b.ToTable("DoctorScheduleSlots");
                 });
@@ -1325,8 +1321,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Code")
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1341,8 +1336,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Percentage")
                         .HasColumnType("int");
@@ -1369,8 +1363,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnOrder(0);
 
                     b.Property<string>("Code")
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1379,8 +1372,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ResultType")
                         .HasColumnType("nvarchar(max)");
@@ -1464,8 +1456,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnOrder(0);
 
                     b.Property<string>("Code")
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1474,8 +1465,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1514,7 +1504,6 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
@@ -1530,7 +1519,6 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdatedBy")
@@ -1591,12 +1579,10 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnOrder(0);
 
                     b.Property<string>("Classification")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Code")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1605,8 +1591,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1636,8 +1621,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1673,8 +1657,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Quota")
                         .HasColumnType("nvarchar(max)");
@@ -1689,8 +1672,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("code")
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1707,8 +1689,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnOrder(0);
 
                     b.Property<string>("Code")
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1717,8 +1698,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -1866,6 +1846,11 @@ namespace McHealthCare.Persistence.Migrations
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.ApplicationUser", b =>
                 {
+                    b.HasOne("McHealthCare.Domain.Entities.Medical.DoctorSchedule", null)
+                        .WithMany("Physicion")
+                        .HasForeignKey("DoctorScheduleId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("McHealthCare.Domain.Entities.Configuration.City", "DomicileCity")
                         .WithMany()
                         .HasForeignKey("DomicileCityId")
@@ -2219,7 +2204,7 @@ namespace McHealthCare.Persistence.Migrations
 
                     b.HasOne("McHealthCare.Domain.Entities.ApplicationUser", "Physician")
                         .WithMany()
-                        .HasForeignKey("PhysicianId1")
+                        .HasForeignKey("PhysicianId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("DoctorSchedule");
@@ -2395,6 +2380,11 @@ namespace McHealthCare.Persistence.Migrations
             modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.Building", b =>
                 {
                     b.Navigation("BuildingLocations");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.DoctorSchedule", b =>
+                {
+                    b.Navigation("Physicion");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.HealthCenter", b =>
