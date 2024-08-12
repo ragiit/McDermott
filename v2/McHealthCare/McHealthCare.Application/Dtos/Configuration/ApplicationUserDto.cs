@@ -1,4 +1,5 @@
 ﻿using McHealthCare.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -14,16 +15,41 @@ namespace McHealthCare.Application.Dtos.Configuration
         public Guid? GroupId { get; set; }
         public Guid? ReligionId { get; set; }
         [Required]
-        public string Name { get; set; } = string.Empty; 
-        public string? Email { get; set; }
+        public string Name { get; set; } = string.Empty;  
+        public string? Password { get; set; }
+        public string? UserName => Email; 
+         
+        public virtual string? NormalizedUserName { get; set; }
+         
+        [ProtectedPersonalData]
+        public virtual string? Email { get; set; } 
+        public virtual string? NormalizedEmail { get; set; }
+         
+        [PersonalData]
+        public virtual bool EmailConfirmed { get; set; } 
+        public virtual string? PasswordHash { get; set; } 
+        public virtual string? SecurityStamp { get; set; } 
+        public string? ConcurrencyStamp { get; set; } = Guid.NewGuid().ToString(); 
+        [ProtectedPersonalData]
         public string? PhoneNumber { get; set; }
+         
+        public bool PhoneNumberConfirmed { get; set; }
+
+        public bool TwoFactorEnabled { get; set; }
+         
+        public  DateTimeOffset? LockoutEnd { get; set; }
+        public bool LockoutEnabled { get; set; }
+         
+        public int AccessFailedCount { get; set; } 
         public string? PlaceOfBirth { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public EnumGender Gender { get; set; }
         public string? NoId { get; set; } 
         public string? TypeId { get; set; } = "KTP"; 
         public string? MartialStatus { get; set; }
+        [Required]
         public string? MobilePhone { get; set; }
+        [Required]
         public string? CurrentMobile { get; set; }
         public string? HomePhoneNumber { get; set; }
         public string? Npwp { get; set; }
@@ -55,17 +81,20 @@ namespace McHealthCare.Application.Dtos.Configuration
         public string? PhotoBase64 { get; set; }
         public DateTime? ExpiredId { get; set; }
 
-        public virtual ReligionDto? Religion { get; set; } 
-        public virtual CountryDto? IdCardCountry { get; set; } 
-        public virtual ProvinceDto? IdCardProvince { get; set; }  
-        public virtual CityDto? IdCardCity { get; set; }  
-        public virtual DistrictDto? IdCardDistrict { get; set; }  
-        public virtual VillageDto? IdCardVillage { get; set; }  
-        public virtual CountryDto? DomicileCountry { get; set; }  
-        public virtual ProvinceDto? DomicileProvince { get; set; }  
-        public virtual CityDto? DomicileCity { get; set; }  
-        public virtual DistrictDto? DomicileDistrict { get; set; } 
-        public virtual VillageDto? DomicileVillage { get; set; }  
-        public virtual GroupDto? Group { get; set; }  
+        public ReligionDto? Religion { get; set; } 
+        public CountryDto? IdCardCountry { get; set; } 
+        public ProvinceDto? IdCardProvince { get; set; }  
+        public CityDto? IdCardCity { get; set; }  
+        public DistrictDto? IdCardDistrict { get; set; }  
+        public VillageDto? IdCardVillage { get; set; }  
+        public CountryDto? DomicileCountry { get; set; }  
+        public ProvinceDto? DomicileProvince { get; set; }  
+        public CityDto? DomicileCity { get; set; }  
+        public DistrictDto? DomicileDistrict { get; set; } 
+        public VillageDto? DomicileVillage { get; set; }  
+        //public GroupDto? Group { get; set; }
+        //public Patient? Patient { get; set; }  // Navigation property
+        //public Employee? Employee { get; set; }  // Navigation property
+        public DoctorDto? Doctor { get; set; }  // Navigation property
     }
 }

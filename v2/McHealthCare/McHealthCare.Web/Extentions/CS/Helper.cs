@@ -8,6 +8,14 @@ namespace McHealthCare.Web.Extentions.CS
 {
     public static class Helper
     {
+        public static List<string> EmployeeTypes = new()
+        {
+            "Employee",
+            "Pre Employee",
+            "Nurse",
+            "Doctor",
+        };
+
         public static readonly List<string> IdentityTypes =
         [
             "KTP",

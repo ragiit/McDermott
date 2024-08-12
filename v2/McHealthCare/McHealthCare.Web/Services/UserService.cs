@@ -105,18 +105,18 @@ namespace McHealthCare.Web.Services
 
             return user ?? [];
         }
-        public async Task<ApplicationUserDto> GetUserId(string userId)
+        public async Task<ApplicationUserDto> GetUserId(string userId, bool removeCache = false)
         { 
             // Kunci cache untuk menyimpan data pengguna
             string cacheKey = $"{CacheKey.UserCacheKeyPrefix}{userId}";
 
             // Cek apakah data pengguna sudah ada di cache
-            if (!cache.TryGetValue(cacheKey, out ApplicationUser? user))
+            if (!cache.TryGetValue(cacheKey, out ApplicationUser? user) || removeCache)
             {
-                var u = await context.Users
+                user = await context.Users
+                                     .AsNoTracking()
                                      .Include(u => u.Group)
                                      .ThenInclude(u => u.GroupMenus)
-                                     .AsNoTracking()
                                      .FirstOrDefaultAsync(u => u.Id == userId.ToString());
                   
 

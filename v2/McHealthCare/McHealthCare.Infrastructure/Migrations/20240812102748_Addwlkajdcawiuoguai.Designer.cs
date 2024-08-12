@@ -4,6 +4,7 @@ using McHealthCare.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McHealthCare.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240812102748_Addwlkajdcawiuoguai")]
+    partial class Addwlkajdcawiuoguai
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -786,12 +789,6 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("DoctorType")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsNurse")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPhysicion")
                         .HasColumnType("bit");
 
                     b.Property<string>("PhysicanCode")
