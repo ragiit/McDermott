@@ -112,9 +112,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 Console.WriteLine($"Error loading data by ID: {ex.Message}");
             }
         }
-
-      
-
+         
         private void InitializeNew(bool isParam = false)
         {
             Group = new GroupDto();
@@ -146,14 +144,13 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error handling valid submit: {ex.Message}");
+                ex.HandleException(ToastService);
             }
         }
 
-        private async Task HandleInvalidSubmitAsync()
+        private void HandleInvalidSubmitAsync()
         {
-            // Handle invalid form submission
-            Console.WriteLine("Form submission is invalid.");
+            ToastService.ShowInfoSubmittingForm();
         }
 
         private async Task OnDeleteAsync(GridDataItemDeletingEventArgs e)
@@ -256,10 +253,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             PanelVisible = isLoading;
         }
 
-        private async Task CancelItemGroupMenuGrid_Click()
-        {
-            await BackButtonAsync();
-        }
+       
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -277,7 +271,10 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             GroupMenu = new GroupMenuDto();
             await GridGroupMenu.StartEditNewRowAsync();
         }
-
+        private async Task CancelItemGroupMenuGrid_Click()
+        {
+            await BackButtonAsync();
+        }
         private async Task BackButtonAsync()
         {
             try

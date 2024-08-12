@@ -58,7 +58,7 @@ namespace McHealthCare.Web.Services
 
         }
 
-        public async Task<List<ApplicationUser>> GetAllUsers()
+        public async Task<List<ApplicationUserDto>> GetAllUsers()
         { 
             string cacheKey = $"{CacheKey.UserCacheKeyPrefix}";
 
@@ -80,7 +80,7 @@ namespace McHealthCare.Web.Services
                 cache.Set(cacheKey, user, cacheEntryOptions);
             }
 
-            return user ?? [];
+            return user.Adapt<List<ApplicationUserDto>>() ?? [];
         }
 
         public async Task<List<Patient>?> GetAllPatients()
@@ -105,7 +105,7 @@ namespace McHealthCare.Web.Services
 
             return user ?? [];
         }
-        public async Task<ApplicationUser> GetUserId(string userId)
+        public async Task<ApplicationUserDto> GetUserId(string userId)
         { 
             // Kunci cache untuk menyimpan data pengguna
             string cacheKey = $"{CacheKey.UserCacheKeyPrefix}{userId}";
@@ -118,9 +118,7 @@ namespace McHealthCare.Web.Services
                                      .ThenInclude(u => u.GroupMenus)
                                      .AsNoTracking()
                                      .FirstOrDefaultAsync(u => u.Id == userId.ToString());
-
-                var a = u.Adapt<ApplicationUserDto>();
-                user = a.Adapt<ApplicationUser>();
+                  
 
                 // Konfigurasi opsi caching
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
@@ -131,7 +129,7 @@ namespace McHealthCare.Web.Services
                 cache.Set(cacheKey, user, cacheEntryOptions);
             }
 
-            return user ?? new();
+            return user.Adapt<ApplicationUserDto>() ?? new();
         }
 
         public async Task<ApplicationUser?> GetCurrentUserFromDatabaseAsync()

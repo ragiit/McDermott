@@ -8,6 +8,14 @@ namespace McHealthCare.Web.Extentions.CS
 {
     public static class Helper
     {
+        public static readonly List<string> IdentityTypes =
+        [
+            "KTP",
+            "Paspor",
+            "SIM",
+            "VISA",
+        ];
+
         public static readonly List<string> MartialStatuss =
         [
             "Single",
@@ -125,6 +133,7 @@ namespace McHealthCare.Web.Extentions.CS
             using var streamRef = new DotNetStreamReference(new MemoryStream(fileContent));
             await jSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
         }
+        public static void ShowInfoSubmittingForm(this IToastService toastService, string message = "Please ensure that all fields marked in red are filled in before submitting the form.") => toastService.ShowInfo(message);
 
         public static void ShowErrorImport(this IToastService ToastService, int row, int col, string val)
         {

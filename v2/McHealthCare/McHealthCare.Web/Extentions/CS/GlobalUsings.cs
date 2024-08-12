@@ -20,3 +20,4 @@ global using static McHealthCare.Application.Features.CommandsQueries.Configurat
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.DistrictCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.CompanyCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.ReligionCommand;
+global using static McHealthCare.Application.Features.CommandsQueries.Configuration.VillageCommand;
