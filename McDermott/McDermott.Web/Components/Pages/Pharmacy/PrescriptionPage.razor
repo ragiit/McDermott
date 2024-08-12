@@ -322,6 +322,7 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption text-center" Caption="Prescription Date" ColSpanMd="12">
                                                                     <DxDateEdit @bind-Date="@Pharmacy.ReceiptDate"
                                                                                 ReadOnly
+                                                                                DisplayFormat="@Helper.DefaultFormatDate"
                                                                                 Enabled="isActiveButton"
                                                                                 TimeSectionVisible="true" />
                                                                 </DxFormLayoutItem>
@@ -404,7 +405,7 @@
                                                                         <DxGridDataColumn MinWidth="200" FieldName="GivenAmount" Caption="Prescription Quantity" />
                                                                         <DxGridDataColumn MinWidth="200" Visible="false" FieldName="ActiveComponentNames" Caption="Active Component" />
                                                                         <DxGridDataColumn MinWidth="200" FieldName="Stock" Caption="Stock" />
-                                                                        <DxGridDataColumn MinWidth="200" FieldName="DosageFrequency" Caption="Dosage/Frequency" />
+                                                                        <DxGridDataColumn MinWidth="200" FieldName="DosageFrequency" Caption="Dosage/Intruction" />
                                                                         @* <DxGridDataColumn MinWidth="200" FieldName="PriceUnit" Caption="Price Unit" /> *@
                                                                         <DxGridDataColumn MinWidth="200" FieldName="DrugRoute.Route" Caption="Route" />
 
@@ -434,6 +435,7 @@
                                                                                           NullText="Select Active Component.."
                                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                           Enabled="isActiveButton"
+                                                                                          ReadOnly
                                                                                           TextFieldName="Name" />
                                                                                 <ValidationMessage For="@(()=> Prescription.ActiveComponentId)" />
                                                                             </DxFormLayoutItem>
@@ -445,13 +447,14 @@
                                                                                             FilteringMode="@DataGridFilteringMode.Contains"
                                                                                             @bind-Value="Prescription.DrugFromId"
                                                                                             Enabled="isActiveButton"
+                                                                                            ReadOnly
                                                                                             TextFieldName="Name"
                                                                                             ValueFieldName="Id">
                                                                                 </DxComboBox>
                                                                                 <ValidationMessage For="@(() => Prescription.DrugFromId)" />
                                                                             </DxFormLayoutItem>
 
-                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Stock" ColSpanMd="6">
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Current Stock" ColSpanMd="6">
                                                                                 <DxSpinEdit @bind-Value="Prescription.Stock"
                                                                                             NullText="Stock..."
                                                                                             ReadOnly
@@ -459,7 +462,7 @@
                                                                                             BindValueMode="BindValueMode.OnInput" />
                                                                                 <ValidationMessage For="@(()=> Prescription.Stock)"   />
                                                                             </DxFormLayoutItem>
-                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Prescription Quantity" ColSpanMd="6">
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Prescription Qty" ColSpanMd="6">
                                                                                 <DxSpinEdit Value="Prescription.GivenAmount"
                                                                                             NullText="Given Amount..."
                                                                                             MinValue="0"
@@ -476,6 +479,7 @@
                                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                             FilteringMode="@DataGridFilteringMode.Contains"
                                                                                             @bind-Value="Prescription.DrugRouteId"
+                                                                                            ReadOnly
                                                                                             TextFieldName="Route"
                                                                                             Enabled="isActiveButton"
                                                                                             ValueFieldName="Id">
@@ -483,7 +487,7 @@
                                                                                 <ValidationMessage For="@(() => Prescription.DrugRouteId)" />
                                                                             </DxFormLayoutItem>
 
-                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Dosage/Frequency" ColSpanMd="6">
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Dosage/Intruction" ColSpanMd="6">
                                                                                 <Template>
                                                                                     <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
                                                                                         <Rows>
@@ -496,16 +500,17 @@
                                                                                         <Items>
                                                                                             <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption">
                                                                                                 <Template>
-                                                                                                    <DxSpinEdit @bind-Value="@Prescription.Dosage" MinValue="0" NullText="Input Dosage..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
+                                                                                                    <DxSpinEdit @bind-Value="@Prescription.Dosage" ReadOnly MinValue="0" NullText="Input Dosage..." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
                                                                                                 </Template>
                                                                                             </DxGridLayoutItem>
                                                                                             <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption">
                                                                                                 <Template>
                                                                                                     <DxComboBox Data="@DrugDosages"
                                                                                                                 @bind-Value="@Prescription.DrugDosageId"
-                                                                                                                NullText="Select Frequency.."
+                                                                                                                NullText="Select Intruction.."
                                                                                                                 TextFieldName="Frequency"
                                                                                                                 ValueFieldName="Id"
+                                                                                                                ReadOnly
                                                                                                                 Enabled="isActiveButton"
                                                                                                                 ShowValidationIcon="true"
                                                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -572,13 +577,9 @@
                                                                     </ToolbarTemplate>
                                                                     <Columns>
                                                                         <DxGridSelectionColumn Width="15px" />
-                                                                        <DxGridDataColumn MinWidth="200" FieldName="MedicamenName" Caption="Medicamen Name" SortIndex="0" />
-                                                                        <DxGridDataColumn MinWidth="200" FieldName="Qty" Caption="Qty Dose" />
-                                                                        <DxGridDataColumn MinWidth="200" FieldName="UomName" Caption="Unit of Dosage" />
+                                                                        <DxGridDataColumn MinWidth="200" FieldName="MedicamenName" Caption="Medicamen Name" SortIndex="0" />                                                                      
                                                                         <DxGridDataColumn MinWidth="200" Visible="false" FieldName="DrugDosageName" Caption="Frequency" />
-                                                                        <DxGridDataColumn MinWidth="200" FieldName="QtyByDay" Caption="Qty Per Day" />
-                                                                        <DxGridDataColumn MinWidth="200" FieldName="Days" Caption="Days" />
-                                                                        <DxGridDataColumn MinWidth="200" FieldName="TotalQty" Caption="Total Qty" />
+                                                                        <DxGridDataColumn MinWidth="200" FieldName="ConcoctionQty" Caption="Total Qty" />
                                                                     </Columns>
                                                                 </DxGrid>
                                                             </DxLoadingPanel>
@@ -666,10 +667,8 @@
                                                                                                             title = "Canceled";
                                                                                                             break;
                                                                                                     }
-
                                                                                                     string html = $"<span class='badge text-white bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span>";
                                                                                                 }
-
                                                                                                 <div class="row w-100">
                                                                                                     <div class="col-md-1">
                                                                                                         Status
@@ -678,15 +677,11 @@
                                                                                                     <div class="col-md-11">
                                                                                                         : @((MarkupString)html)
                                                                                                     </div>
-                                                                                                </div>
-
-
-                                                                                               
+                                                                                                </div>                                                                                               
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
                                                                                 }
-
                                                                                 <div>
                                                                                     <i class="fas fa-clock bg-gray"></i>
                                                                                 </div>
@@ -767,17 +762,23 @@ else
                         <ValidationMessage For="@(() => Concoction.MedicamenName)"   />
                     </DxFormLayoutItem>
 
-                    <DxFormLayoutItem Caption="Unit of Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
-                        <DxComboBox ShowValidationIcon="true"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                    Data="@Uoms"
-                                    NullText="Select UoM..."
-                                    @bind-Value="@Concoction.UomId"
-                                    ReadOnly="@(Pharmacy.Status != EnumStatusPharmacy.Draft)"
-                                    TextFieldName="Name"
+                </DxFormLayout>
+            </div>
+
+            <div class="col-md-6">
+                
+                <DxFormLayout CssClass="mt w-100">
+                     <DxFormLayoutItem Caption="Drug Route" CaptionCssClass="normal-caption" ColSpanMd="12">
+                        <DxComboBox ShowValidationIcon="true" Data="@DrugRoutes"
+                                NullText="Drug Route..."
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    FilteringMode="@DataGridFilteringMode.Contains"
+                                    @bind-Value="Concoction.DrugRouteId"
+                                    TextFieldName="Route"
+                                    Enabled="isActiveButton"
                                     ValueFieldName="Id">
-                        </DxComboBox>
-                        <ValidationMessage For="@(()=> Concoction.UomId)" />
+                         </DxComboBox>
+                        <ValidationMessage For="@(()=> Concoction.DrugRouteId)" />
                     </DxFormLayoutItem>
 
                     <DxFormLayoutItem Caption="Form" CaptionCssClass="normal-caption" ColSpanMd="12">
@@ -792,50 +793,28 @@ else
                         </DxComboBox>
                         <ValidationMessage For="@(()=> Concoction.DrugFormId)" />
                     </DxFormLayoutItem>
-                </DxFormLayout>
-            </div>
-
-            <div class="col-md-6">
-                <DxFormLayout CssClass="mt w-100">
-                    <DxFormLayoutItem Caption="Qty Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
-                        <DxSpinEdit Value="@Concoction.Qty"
-                                    NullText="0"
-                                    MinValue="0"
-                                    ValueExpression="@(()=>Concoction.Qty)"
-                                    ReadOnly="@(Pharmacy.Status != EnumStatusPharmacy.Draft)"
-                                    ValueChanged="((long value)=>OnValueChangedTotalQty(value))"
+                    <DxFormLayoutItem Caption="Intruction" CaptionCssClass="normal-caption" ColSpanMd="12">
+                       <DxComboBox Data="@DrugDosages"
+                                    @bind-Value="@Concoction.DrugDosageId"
+                                    NullText="Select Intruction.."
+                                    TextFieldName="Frequency"
+                                    ValueFieldName="Id"
+                                    Enabled="isActiveButton"
+                                    ShowValidationIcon="true"
                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    ShowValidationIcon="true" />
-                        <ValidationMessage For="@(()=> Concoction.Qty)"   />
+                                    FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
+                        <ValidationMessage For="@(()=> Concoction.DrugDosageId)"   />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Qty Per Day" CaptionCssClass="normal-caption" ColSpanMd="12">
-                        <DxSpinEdit Value="@Concoction.QtyByDay"
-                                    NullText="0"
-                                    ValueExpression="@(() =>Concoction.QtyByDay)"
-                                    ValueChanged="((long value)=>OnValueChangedTotalQtyDays(value))"
-                                    MinValue="0"
-                                    ReadOnly="@(Pharmacy.Status != EnumStatusPharmacy.Draft)"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    ShowValidationIcon="true"></DxSpinEdit>
-                        <ValidationMessage For="@(()=> Concoction.QtyByDay)"   />
-                    </DxFormLayoutItem>
+                   
 
-                    <DxFormLayoutItem Caption="Days" CaptionCssClass="normal-caption" ColSpanMd="12">
-                        <DxSpinEdit @bind-Value="@Concoction.Days"
-                                    NullText="Days..."
-                                    ReadOnly="@(Pharmacy.Status != EnumStatusPharmacy.Draft)"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                        <ValidationMessage For="@(()=> Concoction.Days)"   />
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem Caption="Total Qty" CaptionCssClass="normal-caption" ColSpanMd="12">
-                        <DxSpinEdit Value="@Concoction.TotalQty"
-                                    ValueExpression="@(()=>Concoction.TotalQty)"
+                    <DxFormLayoutItem Caption="Concoction Qty" CaptionCssClass="normal-caption" ColSpanMd="12">
+                        <DxSpinEdit Value="@Concoction.ConcoctionQty"
+                                    ValueExpression="@(()=>Concoction.ConcoctionQty)"
                                     ValueChanged="@((long value) => ChangeTotalQtyInHeader(value))"
                                     NullText="Total Qty..."
                                     ReadOnly="@(Pharmacy.Status != EnumStatusPharmacy.Draft)"
                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                        <ValidationMessage For="@(()=> Concoction.TotalQty)"   />
+                        <ValidationMessage For="@(()=> Concoction.ConcoctionQty)"   />
                     </DxFormLayoutItem>
                 </DxFormLayout>
             </div>
@@ -906,7 +885,7 @@ else
                             <DxGridDataColumn FieldName="ProductName" Caption="Medicine Name" SortIndex="0" />
                             <DxGridDataColumn Visible="false" FieldName="ActiveComponentName" Caption="Active Component" />
                             <DxGridDataColumn FieldName="MedicamentDosage" Caption="MedicineDosage" Visible="false"/>
-                            <DxGridDataColumn FieldName="Qty" Caption="Dosage" />
+                            <DxGridDataColumn FieldName="Dosage" Caption="Dosage" />
                             <DxGridDataColumn FieldName="UomName" Caption="Unit Of Dosage" />
                             <DxGridDataColumn FieldName="TotalQty" Caption="Total Qty" />
                             <DxGridDataColumn FieldName="AvaliableQty" Caption="Avaliable Qty" />
@@ -938,38 +917,17 @@ else
                                                       FilteringMode="@DataGridFilteringMode.Contains"
                                                       @bind-Values="@selectedActiveComponents"
                                                       NullText="Select Active Component.."
+                                                      ReadOnly
                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                       TextFieldName="Name" />
                                             <ValidationMessage For="@(()=> ConcoctionLine.ActiveComponentId)" />
-                                        </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem Caption="Medicine Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                            <DxSpinEdit Value="@ConcoctionLine.MedicamentDosage"
-                                                        NullText="Medicine Unit Of Dosage..."
-                                                        ValueExpression="@(()=>ConcoctionLine.MedicamentDosage)"
-                                                        ValueChanged="@((long value) => changeMedicamentDosage(value))"
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                            <ValidationMessage For="@(()=> ConcoctionLine.MedicamentDosage)"   />
-                                        </DxFormLayoutItem>
-                                    </DxFormLayout>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <DxFormLayout CssClass="mt w-100">
-
-                                        <DxFormLayoutItem Caption="Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                            <DxSpinEdit Value="@ConcoctionLine.Qty"
-                                                        NullText="Qty Dose..."
-                                                        ValueExpression="@(()=>ConcoctionLine.Qty)"
-                                                        ValueChanged="@((long value)=>ChangeTotalQtyMedicament(value))"
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                            <ValidationMessage For="@(()=> ConcoctionLine.Qty)"   />
                                         </DxFormLayoutItem>
 
                                         <DxFormLayoutItem Caption="Unit of Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
                                             <DxComboBox ShowValidationIcon="true"
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                         Data="@Uoms"
+                                                        ReadOnly
                                                         NullText="Select UoM..."
                                                         @bind-Value="@ConcoctionLine.UomId"
                                                         TextFieldName="Name"
@@ -978,15 +936,7 @@ else
                                             <ValidationMessage For="@(()=> ConcoctionLine.UomId)" />
                                         </DxFormLayoutItem>
 
-                                        <DxFormLayoutItem Caption="Total Qty" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                            <DxSpinEdit @bind-Value="@ConcoctionLine.TotalQty"
-                                                        NullText="Total Qty..."
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                        BindValueMode="BindValueMode.OnInput" />
-                                            <ValidationMessage For="@(()=> ConcoctionLine.TotalQty)"   />
-                                        </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem Caption="Available Qty" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                        <DxFormLayoutItem Caption="Current Stock" CaptionCssClass="normal-caption" ColSpanMd="12">
                                             <DxSpinEdit @bind-Value="@ConcoctionLine.AvaliableQty"
                                                         NullText="Available Qty..."
                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -994,6 +944,36 @@ else
                                                         BindValueMode="BindValueMode.OnInput" />
                                             <ValidationMessage For="@(()=> ConcoctionLine.AvaliableQty)"   />
                                         </DxFormLayoutItem>
+                                    </DxFormLayout>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <DxFormLayout CssClass="mt w-100">
+                                        <DxFormLayoutItem Caption="Medicine Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxSpinEdit Value="@ConcoctionLine.MedicamentDosage"
+                                                        NullText="Medicine Unit Of Dosage..."
+                                                        ValueExpression="@(()=>ConcoctionLine.MedicamentDosage)"                                                        
+                                                        ReadOnly
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                            <ValidationMessage For="@(()=> ConcoctionLine.MedicamentDosage)"   />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Dosage" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxSpinEdit Value="@ConcoctionLine.Dosage"
+                                                        NullText="Input Dosage..."
+                                                        ValueExpression="@(()=>ConcoctionLine.Dosage)"
+                                                        ValueChanged="@((long value)=>ChangeTotalQtyMedicament(value))"
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                            <ValidationMessage For="@(()=> ConcoctionLine.Dosage)"   />
+                                        </DxFormLayoutItem>
+                                        
+                                        <DxFormLayoutItem Caption="Total Qty" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxSpinEdit @bind-Value="@ConcoctionLine.TotalQty"
+                                                        NullText="Total Qty..."
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                        BindValueMode="BindValueMode.OnInput" />
+                                            <ValidationMessage For="@(()=> ConcoctionLine.TotalQty)"   />
+                                        </DxFormLayoutItem>
+                                                                                
                                     </DxFormLayout>
                                 </div>
                             </div>

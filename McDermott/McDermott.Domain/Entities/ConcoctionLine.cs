@@ -8,7 +8,7 @@
         public long? UomId { get; set; }
         public long? MedicamentDosage { get; set; }
         public long? MedicamentUnitOfDosage { get; set; }
-        public long? Qty { get; set; }
+        public long? Dosage { get; set; }
         public long? TotalQty { get; set; }
         public long? AvaliableQty { get; set; }
 

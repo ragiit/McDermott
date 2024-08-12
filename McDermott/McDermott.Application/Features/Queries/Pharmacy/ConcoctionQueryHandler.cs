@@ -41,8 +41,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                        .Include(x=>x.Pharmacy)
                        .Include(x => x.MedicamentGroup)
                        .Include(x => x.Practitioner)
-                       .Include(x => x.DruForm)
-                       .Include(x => x.Uom)
+                       .Include(x => x.DrugForm)
                        .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit

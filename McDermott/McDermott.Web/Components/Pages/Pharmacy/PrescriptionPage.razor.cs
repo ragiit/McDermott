@@ -354,18 +354,18 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
                 var checkUom = Uoms.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
 
-                ConcoctionLine.Qty = ChekMedicament?.Dosage ?? 0;
+                ConcoctionLine.Dosage = ChekMedicament?.Dosage ?? 0;
                 ConcoctionLine.MedicamentDosage = ChekMedicament?.Dosage ?? 0;
                 ConcoctionLine.UomId = ChekMedicament?.UomId ?? null;
 
-                if (ConcoctionLine.Qty <= ConcoctionLine.MedicamentDosage)
+                if (ConcoctionLine.Dosage <= ConcoctionLine.MedicamentDosage)
                 {
                     ConcoctionLine.TotalQty = 1;
                 }
                 else
                 {
-                    var temp = (ConcoctionLine.Qty / ConcoctionLine.MedicamentDosage) + (ConcoctionLine.Qty % ConcoctionLine.MedicamentDosage != 0 ? 1 : 0);
-                    ConcoctionLine.TotalQty = temp * Concoction.TotalQty;
+                    var temp = (ConcoctionLine.Dosage / ConcoctionLine.MedicamentDosage) + (ConcoctionLine.Dosage % ConcoctionLine.MedicamentDosage != 0 ? 1 : 0);
+                    ConcoctionLine.TotalQty = temp * Concoction.ConcoctionQty;
                 }
                 selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament != null && ChekMedicament.ActiveComponentId != null && ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
                 var aa = Pharmacy.PrescriptionLocationId;
@@ -378,52 +378,29 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             }
         }
 
-        private void OnValueChangedTotalQtyDays(long value)
-        {
-            Concoction.QtyByDay = value;
-            Concoction.TotalQty = Concoction.Qty * value;
-        }
-
-        private void OnValueChangedTotalQty(long value)
-        {
-            Concoction.Qty = value;
-            Concoction.TotalQty = Concoction.QtyByDay * value;
-        }
-
-        private void changeMedicamentDosage(long value)
-        {
-            ConcoctionLine.MedicamentDosage = value;
-            if (ConcoctionLine.Qty <= value)
-            {
-                ConcoctionLine.TotalQty = 1;
-            }
-            else
-            {
-                var temp = (ConcoctionLine.Qty / value) + (ConcoctionLine.Qty % value != 0 ? 1 : 0);
-                ConcoctionLine.TotalQty = temp * Concoction.TotalQty;
-            }
-        }
+        
 
         private void ChangeTotalQtyInHeader(long value)
         {
-            Concoction.TotalQty = value;
-            if (ConcoctionLine.Qty <= ConcoctionLine.MedicamentDosage)
+            Concoction.ConcoctionQty = value;
+            if (ConcoctionLine.Dosage <= ConcoctionLine.MedicamentDosage)
             {
                 ConcoctionLine.TotalQty = 1;
             }
             else
             {
-                var temp = (ConcoctionLine.Qty / ConcoctionLine.MedicamentDosage) + (ConcoctionLine.Qty % ConcoctionLine.MedicamentDosage != 0 ? 1 : 0);
-                ConcoctionLine.TotalQty = temp * value;
+                double temp = ((double)ConcoctionLine.Dosage / (double)ConcoctionLine.MedicamentDosage) * (double)value;
+                ConcoctionLine.TotalQty = (long)Math.Ceiling(temp);
             }
         }
 
         private void ChangeTotalQtyMedicament(long value)
         {
+            //Convert Variabel
             if (value == 0)
                 return;
 
-            ConcoctionLine.Qty = value;
+            ConcoctionLine.Dosage = value;
             if (value <= ConcoctionLine.MedicamentDosage)
             {
                 ConcoctionLine.TotalQty = 1;
@@ -432,8 +409,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 if (ConcoctionLine.MedicamentDosage != 0)
                 {
-                    var temp = (value / ConcoctionLine.MedicamentDosage) + (value % ConcoctionLine.MedicamentDosage != 0 ? 1 : 1);
-                    ConcoctionLine.TotalQty = temp * Concoction.TotalQty;
+                    double temp = ((double)value / (double)ConcoctionLine.MedicamentDosage) * (double)Concoction.ConcoctionQty;
+                    ConcoctionLine.TotalQty = (long)Math.Ceiling(temp);
                 }
                 else
                 {
@@ -570,7 +547,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 var medicamentGroup = MedicamentGroupsConcoction.Where(x => x.Id == value.Id).FirstOrDefault();
                 Concoction.MedicamenName = medicamentGroup?.Name;
-                Concoction.UomId = medicamentGroup?.UoMId;
                 Concoction.DrugFormId = medicamentGroup?.FormDrugId;
 
                 var a = await Mediator.Send(new GetMedicamentGroupDetailQuery());
@@ -608,18 +584,18 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     newConcoctionLine.Id = Helper.RandomNumber;
                     newConcoctionLine.MedicamentDosage = medicamentData!.Dosage;
                     newConcoctionLine.ActiveComponentId = medicamentData?.ActiveComponentId;
-                    newConcoctionLine.Qty = medicamentData!.Dosage;
+                    newConcoctionLine.Dosage = medicamentData!.Dosage;
                     newConcoctionLine.UomId = medicamentData?.UomId;
                     newConcoctionLine.UomName = medicamentData?.Uom?.Name;
 
-                    if (newConcoctionLine.Qty <= newConcoctionLine.MedicamentDosage)
+                    if (newConcoctionLine.Dosage <= newConcoctionLine.MedicamentDosage)
                     {
                         newConcoctionLine.TotalQty = 1;
                     }
                     else
                     {
-                        var temp = (newConcoctionLine.Qty / newConcoctionLine.MedicamentDosage) + (newConcoctionLine.Qty % newConcoctionLine.MedicamentDosage != 0 ? 1 : 0);
-                        newConcoctionLine.TotalQty = temp * Concoction.TotalQty;
+                        var temp = (newConcoctionLine.Dosage / newConcoctionLine.MedicamentDosage) + (newConcoctionLine.Dosage % newConcoctionLine.MedicamentDosage != 0 ? 1 : 0);
+                        newConcoctionLine.TotalQty = temp * Concoction.ConcoctionQty;
                     }
                     if (stockProduct == 0)
                     {
@@ -1768,7 +1744,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         {
                             Concoction.MedicamenName = Concoction.MedicamenName;
                         }
-                        Concoction.UomName = Uoms.Where(x => x.Id == Concoction.UomId).Select(x => x.Name).FirstOrDefault();
+
                         Concoction.DrugDosageName = DrugDosages.Where(x => x.Id == Concoction.DrugDosageId).Select(x => x.Frequency).FirstOrDefault();
                         Concoctions.Add(Concoction);
                     }
@@ -1825,7 +1801,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     {
                         Cl.MedicamentDosage = product.Dosage;
                         Cl.ProductName = product.Product?.Name;
-                        Cl.Qty = product.Dosage != 0 ? product.Dosage : ConcoctionLine.Qty;
+                        Cl.Dosage = product.Dosage != 0 ? product.Dosage : ConcoctionLine.Dosage;
                         Cl.UomId = product.UomId != null ? product.UomId : ConcoctionLine.UomId;
                         Cl.UomName = Uoms.Where(x => x.Id == Cl.UomId).Select(x => x.Name).FirstOrDefault();
                         Cl.ActiveComponentId = product.ActiveComponentId.Count != 0 ? product.ActiveComponentId : selectedActiveComponents?.Select(x => x.Id).ToList();
@@ -2115,11 +2091,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 return;
             }
             PopUpConcoctionDetail = true;
-            Concoction = new();
-            Concoction.Qty = 1;
-            Concoction.QtyByDay = 1;
-            Concoction.Days = 1;
-            Concoction.TotalQty = 1;
+            Concoction = new();            
+            Concoction.ConcoctionQty = 1;
             ConcoctionLines.Clear();
         }
 
@@ -2606,7 +2579,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 await JsRuntime.InvokeVoidAsync("printJSX", contentToPrint);
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
@@ -2619,7 +2592,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 DateTime? startSickLeave = null;
                 DateTime? endSickLeave = null;
-                var gc = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x=>x.PatientId == Pharmacy.PatientId))).FirstOrDefault();
+                var gc = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == Pharmacy.PatientId))).FirstOrDefault();
                 var culture = new System.Globalization.CultureInfo("id-ID");
 
                 var patienss = Patients.Where(x => x.Id == Pharmacy.PatientId).FirstOrDefault() ?? new();
@@ -2638,7 +2611,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 //string WordDays = ConvertNumberHelper.ConvertNumberToWord(TotalDays);
 
-               
+
 
                 //Gender
                 string Gender = "";
@@ -2676,7 +2649,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
 
                 DocumentContent = await DocumentProvider.GetDocumentAsync("Recipets.docx", mergeFields);
-               
+
                 // Konversi byte array menjadi base64 string
                 //var base64String = Convert.ToBase64String(DocumentContent);
 

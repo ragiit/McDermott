@@ -10,24 +10,18 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long? PrescribingDoctorId { get; set; }
         public long? MedicamentGroupId { get; set; }
         public long? DrugFormId { get; set; }
-        public long? UomId { get; set; }
+        public long? DrugRouteId { get; set; }
         public string? MedicamentName { get; set; }
         public string? MedicamenName { get; set; }
-        public string? UomName { get; set; }
+        
         public string? DrugFormName { get; set; }
         public string? DrugDosageName { get; set; }
+        public long ConcoctionQty { get; set; } = 0;
 
-        [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
-        public long Qty { get; set; } = 0;
-
-        [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "The {0} field must contain only numbers.")]
-        public long QtyByDay { get; set; } = 0;
-
-        public long? Days { get; set; }
-        public long TotalQty { get; set; } = 0;
 
         [SetToNull]
-        public UomDto? Uom { get; set; }
+        public DrugRouteDto? DrugRoute { get; set; }
+        
 
         [SetToNull]
         public DrugDosageDto? DrugDosage { get; set; }
