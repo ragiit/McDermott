@@ -8,14 +8,55 @@
 <BaseHeaderPage Title="Users" OnClickBack="@(async () => await BackButtonAsync())" ShowBackButton="PageMode == EnumPageMode.Create.GetDisplayName() || PageMode == EnumPageMode.Update.GetDisplayName()" />
 
 @if (!IsLoading && UserAccess.Item1 && UserAccess.Item2.IsRead)
-{ 
+{
     <div class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col">
                     @if (PageMode == EnumPageMode.Create.GetDisplayName() || PageMode == EnumPageMode.Update.GetDisplayName())
                     {
-                         
+                        <DxLoadingPanel @bind-Visible="IsLoading"
+                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                        IsContentBlocked="true"
+                                        ApplyBackgroundShading="true"
+                                        IndicatorAreaVisible="false"
+                                        Text="Fetching Data...">
+
+                            <EditForm Model="@User" Context="EditFormContext22" OnValidSubmit="HandleValidSubmitAsync" OnInvalidSubmit="@HandleInvalidSubmitAsync">
+                                <DataAnnotationsValidator />
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="w-100 row">
+                                            <div class="col align-self-center">
+                                                <div class="col d-flex justify-content-end p-0">
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="me-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="CancelItem_Click"></DxButton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="fw-bolder">@(User.Id == Guid.Empty.ToString() ? "Add User" : "Edit User")</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <DxFormLayout>
+                                            <McHealthCare.Web.Extentions.Components.GeneralInformationComponent UserForm="User"
+                                                                                                                TUser="ApplicationUserDto"
+                                                                                                                Cities="Cities"
+                                                                                                                Countries="Countries"
+                                                                                                                Districts="Districts"
+                                                                                                                IdentityTypes="Helper.IdentityTypes"
+                                                                                                                Provinces="Provinces"
+                                                                                                                Religions="Religions"
+                                                                                                                Villages="Villages" />
+                                        </DxFormLayout>
+                                    </div>
+                                </div>
+                            </EditForm>
+                        </DxLoadingPanel>
                     }
                     else
                     {
@@ -36,7 +77,7 @@
                                               KeyFieldName="Id">
 
                                         <ToolbarTemplate>
-                                            <MyDxToolbarBase TItem="ApplicationUser"
+                                            <MyDxToolbarBase TItem="ApplicationUserDto"
                                                              Items="@Users"
                                                              Grid="Grid"
                                                              SelectedDataItems="@SelectedDataItems"
@@ -44,7 +85,7 @@
                                                              EditItem_Click="@(async () =>  await InitializeEditAsync())"
                                                              DeleteItem_Click="@(() => Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex))"
                                                              Refresh_Click="@(async () => await LoadDataAsync())"
-                                                             ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))" 
+                                                             ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))"
                                                              VisibleNew="UserAccess.Item2.IsCreate"
                                                              VisibleEdit="UserAccess.Item2.IsUpdate"
                                                              EnableDelete="!IsDeleted"
@@ -58,10 +99,10 @@
                                             <DxGridDataColumn MinWidth="200" FieldName="@(nameof(ApplicationUser.Name))" />
                                             <DxGridDataColumn MinWidth="200" FieldName="@(nameof(ApplicationUser.Email))" />
                                             <DxGridDataColumn MinWidth="200" FieldName="@(nameof(ApplicationUser.NoId))" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="@(nameof(ApplicationUser.TypeId))" /> 
-                                            <DxGridDataColumn MinWidth="200" FieldName="@(nameof(ApplicationUser.MobilePhone))" /> 
-                                            <DxGridDataColumn MinWidth="200" FieldName="@(nameof(ApplicationUser.PhoneNumber))" /> 
-                                            <DxGridDataColumn MinWidth="200" FieldName="@(nameof(ApplicationUser.MobilePhone))" /> 
+                                            <DxGridDataColumn MinWidth="200" FieldName="@(nameof(ApplicationUser.TypeId))" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="@(nameof(ApplicationUser.MobilePhone))" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="@(nameof(ApplicationUser.PhoneNumber))" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="@(nameof(ApplicationUser.MobilePhone))" />
                                         </Columns>
                                     </MyDxGrid>
                                 </DxLoadingPanel>

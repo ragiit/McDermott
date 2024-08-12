@@ -18,7 +18,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private int FocusedRowVisibleIndex2 { get; set; } = -1;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new List<object>();
         private IReadOnlyList<object> SelectedDataItemsGroupMenu { get; set; } = new List<object>();
-        private string Url => Helper.URLS.FirstOrDefault(x => x == "configuration/groups") ?? string.Empty;
+        private string Url => Helper.URLS.FirstOrDefault(x => x == "configuration/users") ?? string.Empty;
         public bool IsLoading { get; set; } = false;
         private string PageName => new Uri(NavigationManager.Uri).PathAndQuery.Replace(NavigationManager.BaseUri, "/");
         [Parameter]
@@ -29,10 +29,17 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         #endregion Default Variables & Forms
 
         #region Variables
-        private List<ApplicationUser> Users = [];
-        private ApplicationUser User = new();
+        private List<ApplicationUserDto> Users = [];
+        private List<CountryDto> Countries = [];
+        private List<CityDto> Cities = [];
+        private List<DistrictDto> Districts = [];
+        private List<ReligionDto> Religions = [];
+        private List<VillageDto> Villages = [];
+        private List<ProvinceDto> Provinces = [];
+        private ApplicationUserDto User = new();
         private UserManager<ApplicationUser> UserManager { get; set; }
         #endregion
+
         private void CanDeleteSelectedItems(GridFocusedRowChangedEventArgs e)
         {
             FocusedRowVisibleIndex = e.VisibleIndex;
@@ -58,6 +65,15 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
         }
         [Parameter] public string? Id { get; set; }
+        private async Task LoadComboBox()
+        {
+            Countries = await Mediator.Send(new GetCountryQuery());
+            Cities = await Mediator.Send(new GetCityQuery());
+            Districts = await Mediator.Send(new GetDistrictQuery());
+            Religions = await Mediator.Send(new GetReligionQuery());
+            Villages = await Mediator.Send(new GetVillageQuery());
+            Provinces = await Mediator.Send(new GetProvinceQuery());
+        }
         protected override async Task OnInitializedAsync()
         {
             IsLoading = true;
@@ -80,13 +96,35 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
             IsLoading = false;
         }
+
+        private async Task HandleValidSubmitAsync()
+        {
+            try
+            {
+                //User = User.Id == Guid.Empty.ToString()
+                //    ? await Mediator.Send(new CreateGroupRequest(Group))
+                //    : await Mediator.Send(new UpdateGroupRequest(Group));
+
+                NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{User.Id}");
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private void HandleInvalidSubmitAsync()
+        {
+            ToastService.ShowInfoSubmittingForm();
+        }
+
         private async Task LoadDataAsync()
         {
             try
             {
                 PanelVisible = true;
 
-                Users = await UserService.GetAllUsers(); 
+                Users = await UserService.GetAllUsers();
             }
             catch (Exception ex)
             {
@@ -117,14 +155,18 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         {
             if (SelectedDataItems.Count > 0)
             {
-                var id = SelectedDataItems[0].Adapt<ApplicationUser>().Id;
+                var id = SelectedDataItems[0].Adapt<ApplicationUserDto>().Id;
                 NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{id}");
                 await LoadDataByIdAsync(id);
             }
         }
+        private async Task CancelItem_Click()
+        {
+            await BackButtonAsync();
+        }
         private void InitializeNew(bool isParam = false)
         {
-            User = new (); 
+            User = new();
 
             if (!isParam)
                 NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Create.GetDisplayName()}");
@@ -142,7 +184,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     var u = await UserManager.FindByIdAsync(((ApplicationUser)e.DataItem).Id);
 
                     if (u != null)
-                        await UserManager.DeleteAsync(u); 
+                        await UserManager.DeleteAsync(u);
                 }
                 else
                 {
@@ -153,7 +195,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                         if (u != null)
                             await UserManager.DeleteAsync(u);
-                    } 
+                    }
                 }
             }
             catch (Exception ex)
@@ -161,7 +203,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 ex.HandleException(ToastService);
             }
             finally
-            { 
+            {
                 IsLoading = false;
             }
         }

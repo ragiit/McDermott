@@ -328,7 +328,8 @@ public class SeedData
 
             var adminUser = new ApplicationUser
             {
-
+                Name = "Administrator",
+                NoId = "3671052024",
                 UserName = "admin@example.com",
                 GroupId = groupId,
                 Email = "admin@example.com",
