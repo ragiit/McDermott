@@ -17,7 +17,7 @@
 
         [StringLength(200)]
         public string? To { get; set; } = string.Empty;
-
+            
         public List<string>? Cc { get; set; } = [];
         public string? ReplayTo { get; set; } = string.Empty;
 

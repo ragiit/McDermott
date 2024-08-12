@@ -1,6 +1,6 @@
 ﻿namespace McDermott.Application.Features.Commands.Config
 {
-    public class EmailEmailTemplateCommand
+    public sealed class EmailEmailTemplateCommand
     {
         #region GET 
 

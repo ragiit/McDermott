@@ -4,31 +4,46 @@ using McHealthCare.Application.Services;
 using McHealthCare.Context;
 using McHealthCare.Domain.Entities;
 using McHealthCare.Domain.Entities.Configuration;
+using McHealthCare.Domain.Entities.Medical;
 using McHealthCare.Persistence.Extentions;
 using McHealthCare.Web.Components;
 using McHealthCare.Web.Components.Account;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc;
 using McHealthCare.Web.Services;
 using MediatR;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.Security.Claims;
-using System.Text.Json.Serialization;
+using System.Text.Json.Serialization; 
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
+    });
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    });
 
 builder.Services.AddPersistenceLayer(builder.Configuration);
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
-
+    .AddInteractiveServerComponents(); 
 builder.Services.AddSignalR()
     .AddJsonProtocol(options =>
-    {
+    { 
         options.PayloadSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
         options.PayloadSerializerOptions.WriteIndented = true; // optional
     });

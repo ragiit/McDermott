@@ -269,9 +269,9 @@
                                         <span>@parentMenu.ParentName</span>
                                     </a>
 
-                                        <ul class="sidebar-submenu">
-                                    @foreach (var menu in Menus.Where(x => x.ParentId == parentMenu.ParentId))
-                                    {
+                                    <ul class="sidebar-submenu">
+                                        @foreach (var menu in Menus.Where(x => x.ParentId == parentMenu.ParentId))
+                                        {
                                             <li><NavLink href="@menu.Url">@menu.Name</NavLink></li>
 
                                         }

@@ -104,7 +104,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                 if (Group.Id == Guid.Empty)
                 {
-                    NavigateToUrl(Url);
+                    NavigationManager.NavigateToUrl(Url);
                 }
             }
             catch (Exception ex)
@@ -113,11 +113,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
         }
 
-        private void NavigateToUrl(string relativeUrl, bool forceLoad = false)
-        {
-            var absoluteUrl = $"{NavigationManager.BaseUri}{relativeUrl}";
-            NavigationManager.NavigateTo(absoluteUrl, forceLoad);
-        }
+      
 
         private void InitializeNew(bool isParam = false)
         {
@@ -125,7 +121,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             GroupMenus.Clear();
 
             if (!isParam)
-                NavigateToUrl($"{Url}/{EnumPageMode.Create.GetDisplayName()}");
+                NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Create.GetDisplayName()}");
         }
 
         private async Task InitializeEditAsync()
@@ -133,7 +129,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             if (SelectedDataItems.Count > 0)
             {
                 var id = SelectedDataItems[0].Adapt<GroupDto>().Id;
-                NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{id}");
+                NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{id}");
                 await LoadDataByIdAsync(id);
             }
         }
@@ -146,7 +142,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     ? await Mediator.Send(new CreateGroupRequest(Group))
                     : await Mediator.Send(new UpdateGroupRequest(Group));
 
-                NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}");
+                NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}");
             }
             catch (Exception ex)
             {
@@ -212,7 +208,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                 SelectedDataItemsGroupMenu = [];
                 await UserService.RemoveUserFromCache(); 
-                NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
+                NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
                 await LoadDataGroupMenuAsync();
             }
             catch (Exception ex)
@@ -242,7 +238,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     await Mediator.Send(new UpdateGroupMenuRequest(editModel));
 
                 await UserService.RemoveUserFromCache(); 
-                NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
+                NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
                 await LoadDataGroupMenuAsync();
             }
             catch (Exception ex)
@@ -287,7 +283,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             try
             {
                 SetLoading(true);
-                NavigateToUrl(Url);
+                NavigationManager.NavigateToUrl(Url);
                 Groups = await Mediator.Send(new GetGroupQuery());
             }
             catch (Exception ex)
@@ -470,7 +466,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                     await Mediator.Send(new CreateListGroupMenuRequest(gg));
                     await UserService.RemoveUserFromCache();
-                    NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
+                    NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
 
                     await LoadDataGroupMenuAsync();
 

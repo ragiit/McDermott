@@ -1,0 +1,208 @@
+﻿@page "/configuration/email-settings"
+
+<PageTitle>McHealthCare - EmailSettings</PageTitle>
+
+<BaseHeaderPage Title="EmailSettings" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+
+@if (!IsLoading && UserAccess.Item1 && UserAccess.Item2.IsRead)
+{
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div>
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <MyDxGrid @ref="Grid"
+                                              Data="EmailSettings"
+                                              @bind-SelectedDataItems="@SelectedDataItems"
+                                              RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
+                                              EditModelSaving="OnSave"
+                                              DataItemDeleting="OnDelete"
+                                              FocusedRowChanged="@((GridFocusedRowChangedEventArgs args) => FocusedRowVisibleIndex = args.VisibleIndex)"
+                                              KeyFieldName="Id">
+
+                                        <ToolbarTemplate>
+                                            <MyDxToolbarBase TItem="EmailSettingDto"
+                                                             Items="@EmailSettings"
+                                                             Grid="Grid"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@(async () => await Grid.StartEditNewRowAsync())"
+                                                             EditItem_Click="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
+                                                             DeleteItem_Click="@(() => Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex))"
+                                                             Refresh_Click="@(async () => await LoadData())"
+                                                             ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))"
+                                                             ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "Countries_template.xlsx", ExportFileDatas))"
+                                                             VisibleNew="UserAccess.Item2.IsCreate"
+                                                             VisibleEdit="UserAccess.Item2.IsUpdate"
+                                                             VisibleDelete="UserAccess.Item2.IsDelete"
+                                                             VisibleImport="UserAccess.Item2.IsImport" />
+                                        </ToolbarTemplate>
+
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="Sequence" Caption="Priority" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Description" Caption="Description" />
+                                            <DxGridDataColumn FieldName="Smtp_Host" Caption="SMTP Server" />
+                                            <DxGridDataColumn FieldName="Smtp_User" Caption="Username" />
+                                            <DxGridDataColumn FieldName="Smtp_Encryption" Caption="Connection Security" />
+                                            <DxGridDataColumn FieldName="Status" Caption="Status" />
+                                        </Columns>
+                                        <EditFormTemplate Context="EditFormContext">
+                                            @{
+                                                var FormEmails = (EmailSettingDto)EditFormContext.EditModel;
+
+                                                void SelectedItemChanged(string e)
+                                                {
+                                                    if (e is null)
+                                                    {
+                                                        return;
+                                                    }
+                                                    if (e.Equals("TLS (STARTTLS)"))
+                                                    {
+                                                        FormEmails.Smtp_Port = "25";
+                                                    }
+                                                    else if (e.Equals("SSL/TLS"))
+                                                    {
+                                                        FormEmails.Smtp_Port = "465";
+                                                    }
+                                                    else if (e.Equals("none"))
+                                                    {
+                                                        FormEmails.Smtp_Port = "";
+                                                    }
+                                                }
+
+                                                async Task TestConnect()
+                                                {
+                                                    try
+                                                    {
+                                                        var Port = int.Parse(FormEmails.Smtp_Port);
+                                                        isLoading = true;
+                                                        using (var client = new MailKit.Net.Smtp.SmtpClient())
+                                                        {
+                                                            await client.ConnectAsync(FormEmails.Smtp_Host, Port, MailKit.Security.SecureSocketOptions.Auto);
+
+                                                            if (client.IsConnected)
+                                                            {
+                                                                await client.AuthenticateAsync(FormEmails.Smtp_User, FormEmails.Smtp_Pass);
+                                                                IsConnected = true;
+                                                                ToastService.ShowSuccess("Connection Success");
+                                                                FormEmails.Status = "Connected!";
+                                                            }
+                                                        }
+                                                        isLoading = false;
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        isLoading = true;
+                                                        Console.WriteLine(ex.Message);
+                                                        IsConnected = false;
+                                                        ToastService.ShowError("Connection Failed!!!");
+                                                        isLoading = false;
+                                                    }
+                                                }
+                                            }
+                                            <DxFormLayout>
+                                                <DxFormLayoutGroup Caption="Configuration Email" ColSpanLg="12" CssClass="mt-3 mb-2">
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Description:" CaptionCssClass="normal-caption">
+                                                        <DxTextBox @bind-Text="@FormEmails.Description" NullText="Description.." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxTextBox>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Priority:" CaptionCssClass="normal-caption">
+                                                        <DxSpinEdit @bind-Value="@FormEmails.Sequence" NullText="Priority" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayoutGroup>
+                                                <DxFormLayoutGroup Caption="Connection Information" ColSpanMd="12" CssClass="my-2">
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="SMTP Server" CaptionCssClass="required-caption normal-caption">
+                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_Host" NullText="Smtp Server" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" />
+                                                        <ValidationMessage For="@(()=>FormEmails.Smtp_Host)" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="SMTP Port" CaptionCssClass="required-caption normal-caption">
+                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_Port" NullText="Port" ShowValidationIcon="true" />
+                                                        <ValidationMessage For="@(()=>FormEmails.Smtp_Port)" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayoutGroup>
+                                                <DxFormLayoutGroup Caption="Security And Authentication" ColSpanMd="12" CssClass="my-2">
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Conection Security:" CaptionCssClass="required-caption normal-caption">
+                                                        <Template>
+                                                            <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        Data="@Stts_Ecrypt"
+                                                                        NullText="Select Ecrypt..."
+                                                                        AllowUserInput="true"
+                                                                        SelectedItemChanged="@((string city) => SelectedItemChanged(city))"
+                                                                        @bind-Value="@FormEmails.Smtp_Encryption"
+                                                                        ShowValidationIcon="true">
+                                                            </DxComboBox>
+                                                            <ValidationMessage For="@(()=>FormEmails.Smtp_Encryption)" />
+                                                        </Template>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Username" CaptionCssClass="required-caption normal-caption">
+                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_User" NullText="Username" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true" /><ValidationMessage For="@(()=>FormEmails.Smtp_User)" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="12" Caption="Password" CaptionCssClass="required-caption normal-caption">
+                                                        <DxTextBox @bind-Text="@FormEmails.Smtp_Pass"
+                                                                   NullText="Password"
+                                                                   Password="showPassword"
+                                                                   InputId="tbPassword" ShowValidationIcon="true">
+                                                            <Buttons>
+                                                                <DxEditorButton IconCssClass="@showPasswordIcon" Tooltip="show password" Click="@TogglePasswordVisibility" />
+                                                            </Buttons>
+                                                        </DxTextBox>
+                                                        <ValidationMessage For="@(()=>FormEmails.Smtp_Pass)" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="5" CssClass="my-2">
+                                                        <DxButton IconCssClass="fa-solid fa-wifi"
+                                                                  RenderStyleMode="@ButtonRenderStyleMode.Outline"
+                                                                  Text="Test Conenction"
+                                                                  Click="@TestConnect"
+                                                                  CssClass="w-20 ml" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="6" CssClass="my-2">
+                                                        @if (isLoading)
+                                                        {
+                                                            <LoadingIndicatorLayout></LoadingIndicatorLayout>
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (IsConnected == true)
+                                                            {
+                                                                <h6 class="text-success">Connection Successful!</h6>
+                                                            }
+                                                            else if (IsConnected == false)
+                                                            {
+                                                                <h6 class="text-danger">Connection Failed!</h6>
+                                                            }
+                                                            else
+                                                            {
+                                                                <h6 class="text-info">Connection Status Unknown.</h6>
+                                                            }
+
+                                                        }
+
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayoutGroup>
+                                            </DxFormLayout>
+                                        </EditFormTemplate>
+                                    </MyDxGrid>
+                                </DxLoadingPanel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (UserAccess.Item2 is not null && !UserAccess.Item2.IsRead)
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}

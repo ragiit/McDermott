@@ -1854,6 +1854,8 @@ namespace McDermott.Web.Components.Pages.Transaction
         private void OnAppoimentPopUpClick()
         {
             FollowUpGeneralConsultanService = new();
+            FollowUpGeneralConsultanService = GeneralConsultanService.Adapt<GeneralConsultanServiceDto>();
+            FollowUpGeneralConsultanService.Id = 0;
             IsFollowUp = true;
         }
 
@@ -1861,6 +1863,8 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             IsReferTo = true;
 
+            ReferToGeneralConsultanService = GeneralConsultanService.Adapt<GeneralConsultanServiceDto>();
+            ReferToGeneralConsultanService.Id = 0; 
             await SendPCareGetRefrensiKhusus();
             await SendPcareGetSpesialis();
             await SendPcareGetSpesialisSarana();
@@ -1989,7 +1993,43 @@ namespace McDermott.Web.Components.Pages.Transaction
         }
 
         private bool IsLoadingFollowUp { get; set; } = false;
+        private bool IsLoadingReferTo { get; set; } = false;
 
+        private async Task HandleValidSubmitReferTo()
+        {
+            IsLoadingReferTo = true;
+            try
+            {   
+                if (!ReferToGeneralConsultanService.Payment!.Equals("Personal") && (SelectedInsurancePolicyReferTo is null || SelectedInsurancePolicyReferTo.Id == 0))
+                {
+                    IsLoadingFollowUp = false;
+                    ToastService.ShowInfoSubmittingForm();
+                    return;
+                }
+
+                var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != ReferToGeneralConsultanService.Id && x.ServiceId == ReferToGeneralConsultanService.ServiceId && x.PatientId == ReferToGeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+
+                if (patient.Count > 0)
+                {
+                    IsLoadingReferTo = false;
+                    ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
+                    return;
+                }
+
+                ReferToGeneralConsultanService.Status = EnumStatusGeneralConsultantService.Planned;
+
+                if (ReferToGeneralConsultanService.Id == 0)
+                    await Mediator.Send(new CreateGeneralConsultanServiceRequest(ReferToGeneralConsultanService));
+
+                ToastService.ShowSuccess("Successfully Refer Patient");
+                IsReferTo = false;
+            }
+            catch (Exception e)
+            {
+                e.HandleException(ToastService);
+            }
+            IsLoadingReferTo = false;
+        }
         private async Task HandleValidSubmitFollowUp()
         {
             IsLoadingFollowUp = true;

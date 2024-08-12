@@ -1,5 +1,6 @@
 ﻿using Blazored.Toast.Services;
 using McHealthCare.Application.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Data.SqlClient;
 using Microsoft.JSInterop;
 
@@ -7,6 +8,16 @@ namespace McHealthCare.Web.Extentions.CS
 {
     public static class Helper
     {
+        public static readonly List<string> MartialStatuss =
+        [
+            "Single",
+            "Married",
+            "Divorced",
+            "Widowed",
+            "Separated",
+            "Unmarried"
+        ];
+
         public static List<string> URLS =
         [
             // Clinic Services
@@ -102,7 +113,11 @@ namespace McHealthCare.Web.Extentions.CS
             "configuration/religions",
             "configuration/occupationals",
         ];
-
+        public static void NavigateToUrl(this NavigationManager NavigationManager, string relativeUrl, bool forceLoad = false)
+        {
+            var absoluteUrl = $"{NavigationManager.BaseUri}{relativeUrl}";
+            NavigationManager.NavigateTo(absoluteUrl, forceLoad);
+        }
         public static async Task GenerateColumnImportTemplateExcelFileAsync(IJSRuntime jSRuntime, IFileExportService file, string fileName, List<ExportFileData> data, string? name = "downloadFileFromStream")
         {
             var fileContent = await file.GenerateColumnImportTemplateExcelFileAsync(data);

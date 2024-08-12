@@ -5,6 +5,21 @@ namespace McHealthCare.Extentions
 {
     public static class EnumHelper
     {
+        public static List<GenderItem> GenderValues => Enum.GetValues(typeof(EnumGender))
+                .Cast<EnumGender>()
+                .Select(g => new GenderItem
+                {
+                    Id = (int)g,
+                    Name = g.GetDisplayName()
+                })
+                .ToList();
+
+        public class GenderItem
+        {
+            public int Id { get; set; }
+            public string Name { get; set; } = string.Empty;
+        }
+
         public static T EnumGetValue<T>(this Enum enumValue)
         {
             return (T)Convert.ChangeType(enumValue, typeof(T));
@@ -17,6 +32,24 @@ namespace McHealthCare.Extentions
                             .First()
                             .GetCustomAttribute<DisplayAttribute>()
                             ?.GetName() ?? enumValue.ToString();
+        }
+
+        public enum EnumGender
+        {
+            [Display(Name = "Male")]
+            Male = 1,
+
+            [Display(Name = "Female")]
+            Female = 2,
+        }
+
+        public enum EnumDoctorType
+        {
+            [Display(Name = "Physicion")]
+            Physicion = 1,
+
+            [Display(Name = "Nurse")]
+            Nurse = 2,
         }
 
         public enum EnumPageMode

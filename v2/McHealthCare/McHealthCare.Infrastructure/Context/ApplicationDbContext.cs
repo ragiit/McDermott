@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace McHealthCare.Context
 {
@@ -28,6 +29,9 @@ namespace McHealthCare.Context
         public DbSet<GroupMenu> GroupMenus { get; set; }
         public DbSet<Religion> Religions { get; set; }
         public DbSet<Occupational> Occupationals { get; set; }
+        public DbSet<EmailSetting> EmailSettings { get; set; }
+        public DbSet<EmailTemplate> EmailTemplates { get; set; }
+        public DbSet<Company> Companies { get; set; }
 
         #endregion Configuration
 
