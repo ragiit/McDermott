@@ -13,10 +13,25 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Microsoft.AspNetCore.ResponseCompression;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
 var builder = WebApplication.CreateBuilder(args);
+// Tambahkan layanan kompresi respons
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true; // Aktifkan kompresi untuk HTTPS
+    options.Providers.Add<GzipCompressionProvider>(); // Tambahkan provider kompresi Gzip
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" }); // Tambahkan tipe MIME tambahan jika perlu
+});
+
+// Konfigurasi tingkat kompresi (opsional)
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = System.IO.Compression.CompressionLevel.Fastest; // Atur tingkat kompresi
+});
 //builder.WebHost.ConfigureKestrel((context, options) =>
 //{
 //    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(2);
@@ -44,6 +59,13 @@ builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplicationLayer();
+builder.Services.AddRazorPages();
+builder.Services.AddAntiforgery();
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.Secure = CookieSecurePolicy.Always; 
+});
+
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPCareService, PCareService>();
@@ -88,6 +110,9 @@ Log.Logger = new LoggerConfiguration()
 builder.Services.AddSerilog();
 
 var app = builder.Build();
+
+// Gunakan middleware kompresi respons
+app.UseResponseCompression();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
