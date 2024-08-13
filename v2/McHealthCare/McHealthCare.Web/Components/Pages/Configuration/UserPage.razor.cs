@@ -1,8 +1,10 @@
 ﻿
 
 using DevExpress.Blazor.Internal;
+using McHealthCare.Application.Dtos.Medical;
 using McHealthCare.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
@@ -13,6 +15,10 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
         private IGrid Grid { get; set; }
         private IGrid GridGroupMenu { get; set; }
+        [Inject]
+        private UserManager<ApplicationUser> UserManager { get; set; }
+        [Inject]
+        private IUserStore<ApplicationUser> UserStore { get; set; }
         private bool PanelVisible { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; } = -1;
         private int FocusedRowVisibleIndex2 { get; set; } = -1;
@@ -31,13 +37,22 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         #region Variables
         private List<ApplicationUserDto> Users = [];
         private List<CountryDto> Countries = [];
+        private List<GroupDto> Groups = [];
         private List<CityDto> Cities = [];
+        private List<ServiceDto> Services = [];
+        private List<SpecialistDto> Specialists = [];
         private List<DistrictDto> Districts = [];
         private List<ReligionDto> Religions = [];
         private List<VillageDto> Villages = [];
         private List<ProvinceDto> Provinces = [];
-        private ApplicationUserDto User = new();
-        private UserManager<ApplicationUser> UserManager { get; set; }
+        private List<OccupationalDto> Occupationals = [];
+        //private List<JobPo> Provinces = [];
+        //private List<DepartmentDto> Provinces = [];
+        private ApplicationUserDto User { get; set; } = new();
+        private DoctorDto Doctor { get; set; } = new();
+        private EmployeeDto Employee { get; set; } = new();
+
+        private IEnumerable<ServiceDto> SelectedServices { get; set; } = [];
         #endregion
 
         private void CanDeleteSelectedItems(GridFocusedRowChangedEventArgs e)
@@ -66,7 +81,8 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         }
         [Parameter] public string? Id { get; set; }
         private async Task LoadComboBox()
-        {
+        { 
+            Groups = await Mediator.Send(new GetGroupQuery());
             Countries = await Mediator.Send(new GetCountryQuery());
             Cities = await Mediator.Send(new GetCityQuery());
             Districts = await Mediator.Send(new GetDistrictQuery());
@@ -82,6 +98,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 UserAccess = await UserService.GetUserInfo(ToastService);
 
                 await LoadDataAsync();
+                await LoadComboBox();
 
                 try
                 {
@@ -96,6 +113,50 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
             IsLoading = false;
         }
+        private IUserEmailStore<ApplicationUser> GetEmailStore()
+        {
+            if (!UserManager.SupportsUserEmail)
+            {
+                throw new NotSupportedException("The default UI requires a user store with email support.");
+            }
+            return (IUserEmailStore<ApplicationUser>)UserStore;
+        }
+        protected override async Task OnParametersSetAsync()
+        {
+            // Periksa apakah PageMode diatur
+            if (!string.IsNullOrWhiteSpace(PageMode))
+            {
+                // Cek apakah PageMode adalah Create
+                if (PageMode == EnumPageMode.Create.GetDisplayName())
+                {
+                    // Periksa apakah URL saat ini tidak diakhiri dengan mode Create
+                    if (!PageName.EndsWith($"/{EnumPageMode.Create.GetDisplayName()}", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Redirect ke URL dengan mode Create
+                        NavigationManager.NavigateTo($"{Url}/{EnumPageMode.Create.GetDisplayName()}", true);
+                        return; // Pastikan kode berikutnya tidak dieksekusi
+                    }
+                    else
+                    {
+                        InitializeNew(true);
+                    }
+                }
+                // Cek apakah PageMode adalah Update
+                else if (PageMode == EnumPageMode.Update.GetDisplayName())
+                {
+                    // Logika untuk update
+                    if (!string.IsNullOrWhiteSpace(Id))
+                    {
+                        await LoadDataByIdAsync(Id);
+                    }
+                    else
+                    {
+                        NavigationManager.NavigateTo($"{Url}", true);
+                        return; // Pastikan kode berikutnya tidak dieksekusi
+                    }
+                }
+            }
+        }
 
         private async Task HandleValidSubmitAsync()
         {
@@ -105,14 +166,62 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 //    ? await Mediator.Send(new CreateGroupRequest(Group))
                 //    : await Mediator.Send(new UpdateGroupRequest(Group));
 
-                NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{User.Id}");
+                if (PageMode == EnumPageMode.Create.GetDisplayName())
+                {
+                    var result = await UserManager.CreateAsync(User.Adapt<ApplicationUser>(), User?.Password ?? "P@ssRandom!123");
+
+                    if (result.Succeeded)
+                    {
+                        await UserService.RemoveUserFromCache();
+                        await LoadDataByIdAsync(User?.Id ?? string.Empty);
+                        NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{User?.Id}");
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ToastService.ShowError(error.Description);
+                        }
+                    }
+                }
+                else
+                {
+                    var s = await UserManager.FindByIdAsync(User.Id);
+                    User.Adapt(s);
+                    var result = await UserManager.UpdateAsync(s); 
+                    if (result.Succeeded)
+                    {
+                        await UserService.RemoveUserFromCache();
+                        await LoadDataByIdAsync(User?.Id ?? string.Empty);
+                        NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{User?.Id}");
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ToastService.ShowError(error.Description);
+                        }
+                    }
+                }
+
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
         }
-
+        private ApplicationUser CreateUser()
+        {
+            try
+            {
+                return Activator.CreateInstance<ApplicationUser>();
+            }
+            catch
+            {
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                    $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
+            }
+        }
         private void HandleInvalidSubmitAsync()
         {
             ToastService.ShowInfoSubmittingForm();
@@ -137,10 +246,11 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         }
         private async Task LoadDataByIdAsync(string id)
         {
-            try
+            try     
             {
-                User = await UserService.GetUserId(id);
+                //User = await UserService.GetUserId(id);
 
+                User =  await UserService.GetUserId(id, true);
                 if (User is null || string.IsNullOrWhiteSpace(User.Id))
                 {
                     NavigationManager.NavigateToUrl(Url);

@@ -39,12 +39,12 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        <span class="fw-bolder">@(User.Id == Guid.Empty.ToString() ? "Add User" : "Edit User")</span>
+                                        <span class="fw-bolder">General Information</span>
                                     </div>
                                     <div class="card-body">
                                         <DxFormLayout>
                                             <McHealthCare.Web.Extentions.Components.GeneralInformationComponent UserForm="User"
-                                                                                                                TUser="ApplicationUserDto"
+                                                                                                                TUserForm="ApplicationUserDto"
                                                                                                                 Cities="Cities"
                                                                                                                 Countries="Countries"
                                                                                                                 Districts="Districts"
@@ -53,6 +53,224 @@
                                                                                                                 Religions="Religions"
                                                                                                                 Villages="Villages" />
                                         </DxFormLayout>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="fw-bolder">User Setting</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row w-100 g-0">
+                                                <div class="col-md-6">
+                                            <DxFormLayout>
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Password" ColSpanMd="12">
+                                                        <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" Password="true" @bind-Text="@User.Password" NullText="Password" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                                </div>
+                                                <div class="col-md-6">
+                                            <DxFormLayout>
+                                                    <DxFormLayoutItem Caption="Group" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                        <MyDxComboBox Data="@Groups"
+                                                                      NullText="Select Group..."
+                                                                      @bind-Value="@User.GroupId"
+                                                                      TextFieldName="Name"
+                                                                      ValueFieldName="Id">
+                                                        </MyDxComboBox>
+                                                    </DxFormLayoutItem>
+                                            </DxFormLayout>
+                                                </div> 
+                                        </div>
+                                    </div>
+                                </div> 
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="fw-bolder">Practitioner License</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row w-100 g-0">
+                                            <div class="col-md-6">
+                                                <DxFormLayout>
+                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Physicion">
+                                                        <DxCheckBox @bind-Checked="@Doctor.IsPhysicion" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem ColSpanMd="12" Visible="Doctor.IsPhysicion" CaptionCssClass="required-caption normal-caption" Caption="Physician Code">
+                                                        <DxTextBox @bind-Text="@Doctor.PhysicanCode"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                   NullText="Physican Code" /> 
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="required-caption normal-caption" Caption="Sip Number">
+                                                        <DxMaskedInput @bind-Value="@Doctor.SipNo"
+                                                                       NullText="Sip Number"
+                                                                       ShowValidationIcon="true"
+                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                        </DxMaskedInput>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="-caption normal-caption" Caption="Sip File">
+                                                        <DxMaskedInput @bind-Value="@Doctor.SipFile"
+                                                                       ShowValidationIcon="true"
+                                                                       ReadOnly="true"
+                                                                       MaskMode="MaskMode.RegEx">
+                                                            @*   <Buttons>
+                                                    <InputFile id="sipFile" accept=".txt, .pdf, .docx" OnChange="@SelectFiles" multiple="false" style="display:none" />
+                                                    <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" />
+                                                    <DxEditorButton Click="DownloadFile" IconCssClass="fa-solid fa-download" />
+                                                    <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" />
+                                                    </Buttons> *@
+                                                        </DxMaskedInput>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Sip Expired">
+                                                        <DxDateEdit @bind-Date="@Doctor.SipExp" NullText="Sip Expired" Mask="@DateTimeMask.ShortDate" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass=" normal-caption" Caption="Speciality">
+                                                        <Template>
+                                                            <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        Data="@Specialists"
+                                                                        NullText="Select Speciality..."
+                                                                        @bind-Value="@Doctor.SpecialityId"
+                                                                        TextFieldName="Name"
+                                                                        ValueFieldName="Id">
+                                                            </DxComboBox>
+                                                        </Template>
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <DxFormLayout>
+                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Nurse:">
+                                                        <DxCheckBox @bind-Checked="@Doctor.IsNurse" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Str Number">
+                                                        <DxMaskedInput @bind-Value="@Doctor.StrNo"
+                                                                       NullText="Str Number"
+                                                                       ShowValidationIcon="true"
+                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                            <DxTextMaskProperties />
+                                                        </DxMaskedInput>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Str Expired">
+                                                        <DxDateEdit @bind-Date="@Doctor.StrExp" NullText="Str Expired" Mask="@DateTimeMask.ShortDate" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Services">
+                                                        <DxTagBox Data="@Services"
+                                                                  FilteringMode="@DataGridFilteringMode.Contains"
+                                                                  @bind-Values="@SelectedServices"
+                                                                  TextFieldName="Name"
+                                                                  NullText="Select Service"
+                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="fw-bolder">Employee</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row w-100 g-0">
+                                            <div class="col-md-6">
+                                                <DxFormLayout>
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Supervisor" ColSpanMd="12">
+                                                        <MyDxComboBox Data="@(Users.Where(x => x.Id != Employee.ApplicationUserId).AsEnumerable())"
+                                                                      NullText="Select Supervisor..."
+                                                                      TextFieldName="Name"
+                                                                      ValueFieldName="Id"
+                                                                      @bind-Value="Employee.SupervisorId">
+                                                        </MyDxComboBox>
+                                                        <ValidationMessage For="@(() => Employee.SupervisorId)" />
+                                                    </DxFormLayoutItem>
+
+                                                   @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Job Position">
+                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                    Data="@JobPositions"
+                                                                    NullText="Select Job Position..."
+                                                                    @bind-Value="@Employee.JobPositionId"
+                                                                    TextFieldName="Name"
+                                                                    ValueFieldName="Id">
+                                                        </DxComboBox>
+                                                    </DxFormLayoutItem> *@
+                                                   @*  <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Department">
+                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                    Data="@Departments"
+                                                                    NullText="Select Department..."
+                                                                    @bind-Value="@Employee.DepartmentId"
+                                                                    TextFieldName="Name"
+                                                                    ValueFieldName="Id">
+                                                        </DxComboBox>
+                                                    </DxFormLayoutItem> *@
+                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="BPJS KS Number" ColSpanMd="12">
+                                                        <DxMaskedInput @bind-Value="@Employee.NoBpjsKs"
+                                                                       NullText="BPJS KS Number"
+                                                                       ShowValidationIcon="true"
+                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                            
+                                                        </DxMaskedInput>
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Legacy Number" ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="@Employee.Legacy" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Legacy" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="SAP Number" ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="@Employee.SAP" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="SAP" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <DxFormLayout>
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Occupational" ColSpanMd="12">
+                                                        <MyDxComboBox Data="@Occupationals"
+                                                                      NullText="Select Occupational..."
+                                                                      TextFieldName="Name"
+                                                                      ValueFieldName="Id"
+                                                                      @bind-Value="Employee.OccupationalId">
+                                                        </MyDxComboBox>
+                                                        <ValidationMessage For="@(() => Employee.OccupationalId)" />
+                                                    </DxFormLayoutItem>
+
+
+                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="BPJS TK Number" ColSpanMd="12">
+                                                        <DxMaskedInput @bind-Value="@Employee.NoBpjsTk"
+                                                                       NullText="BPJS TK Number"
+                                                                       ShowValidationIcon="true"
+                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                            
+                                                        </DxMaskedInput>
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Join Date" ColSpanMd="12">
+                                                        <DxDateEdit @bind-Date="@Employee.JoinDate" Mask="@DateTimeMask.ShortDate" NullText="Join Date" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="NIP Number" ColSpanMd="12">
+                                                        <DxMaskedInput @bind-Value="@Employee.NIP"
+                                                                       NullText="NIP"
+                                                                       ShowValidationIcon="true"
+                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                            
+                                                        </DxMaskedInput>
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Oracle Number" ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="@Employee.Oracle" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Oracle" />
+                                                    </DxFormLayoutItem>
+
+                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Employee Type" ColSpanMd="12">
+                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                    Data="@Helper.EmployeeTypes" @bind-Value="@Employee.EmployeeType" NullText="Select Employee Type..." />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div> 
+                                        </div>
                                     </div>
                                 </div>
                             </EditForm>

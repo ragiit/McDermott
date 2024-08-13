@@ -30,7 +30,11 @@ namespace McHealthCare.Persistence.Extentions
              ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString), ServiceLifetime.Transient);
+            {
+                options.UseSqlServer(connectionString);
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+
+            });
 
             //services.AddDbContext<ApplicationDbContext>(options =>
             //   options.UseSqlServer(connectionString,

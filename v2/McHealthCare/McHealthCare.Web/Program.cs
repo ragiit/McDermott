@@ -68,7 +68,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
-{
+{ 
     options.SignIn.RequireConfirmedAccount = false;
 })
 .AddRoles<IdentityRole>() // Add role support
@@ -118,7 +118,7 @@ app.UseRouting();
 app.UseAuthentication(); // Tambahkan jika menggunakan autentikasi
 app.UseAuthorization();
 
-app.UseMiddleware<PageTrackingMiddleware>();
+//app.UseMiddleware<PageTrackingMiddleware>();
 
 app.UseAntiforgery();
 
