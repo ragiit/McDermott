@@ -126,6 +126,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
             catch (Exception ex)
             {
+                ex.HandleException(ToastService);
             }
             finally
             {
@@ -152,6 +153,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
             catch (Exception ex)
             {
+                ex.HandleException(ToastService);
             }
             finally
             {

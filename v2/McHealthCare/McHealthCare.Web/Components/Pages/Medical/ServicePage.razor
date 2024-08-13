@@ -1,5 +1,122 @@
-﻿@page "/medical/service"
+﻿@page "/medical/services"
+@using McHealthCare.Application.Dtos.Medical
+
 
 <PageTitle>McHealthCare - Service</PageTitle>
 
 <BaseHeaderPage Title="Service" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+
+@if (!IsLoading && UserAccess.Item1 && UserAccess.Item2.IsRead)
+{
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        @* <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile> *@
+                        <div class="card-body">
+                            <div>
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <MyDxGrid @ref="Grid"
+                                              Data="getService"
+                                              @bind-SelectedDataItems="@SelectedDataItems"
+                                              RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
+                                              EditModelSaving="OnSave"
+                                              DataItemDeleting="OnDelete"
+                                              FocusedRowChanged="@((GridFocusedRowChangedEventArgs args) => FocusedRowVisibleIndex = args.VisibleIndex)"
+                                              KeyFieldName="Id">
+
+                                        <ToolbarTemplate>
+                                            <MyDxToolbarBase TItem="ServiceDto"
+                                                             Items="@getService"
+                                                             Grid="Grid"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@(async () => await Grid.StartEditNewRowAsync())"
+                                                             EditItem_Click="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
+                                                             DeleteItem_Click="@(() => Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex))"
+                                                             Refresh_Click="@(async () => await LoadData())"
+                                                             ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))"
+                                                             ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "countries_template.xlsx", ExportFileDatas))"
+                                                             VisibleNew="UserAccess.Item2.IsCreate"
+                                                             VisibleEdit="UserAccess.Item2.IsUpdate"
+                                                             VisibleDelete="UserAccess.Item2.IsDelete"
+                                                             VisibleImport="UserAccess.Item2.IsImport" />
+                                        </ToolbarTemplate>
+
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="Name" Caption="Name" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Code" Caption="Code"/>
+                                            <DxGridDataColumn FieldName="Quota" Caption="Quota" />
+                                            <DxGridDataColumn FieldName="Flag" Caption="Flag" />
+                                            <DxGridDataColumn FieldName="ServiceCounter" Caption="Service Counter"/>
+                                        </Columns>
+                                        <EditFormTemplate Context="EditFormContext">
+                                            <AntiforgeryToken/>
+                                            @{
+                                                var a = (ServiceDto)EditFormContext.EditModel;
+                                            }
+                                            <DxFormLayout CssClass="w-100">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-captionS" Caption="Service Name" ColSpanMd="12">
+                                                    <MyTextBox @bind-Text="@a.Name" NullText="Service Name..." />
+                                                    <ValidationMessage For="@(()=>a.Name)" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
+                                                    <MyTextBox @bind-Text="@a.Code" NullText="Code..." />
+                                                    <ValidationMessage For="@(()=>a.Code)" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quota:" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.Quota" NullText="Quota Service.." />
+                                                    <ValidationMessage For="@(()=>a.Quota)" />
+                                                </DxFormLayoutItem>                                                
+                                                <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Service Counter" Visible="@Convert.ToBoolean(a.IsPatient)">
+                                                    <MyDxComboBox Data="@getServiceCounter"
+                                                                  @bind-Value="@a.ServicedId"
+                                                                  NullText="select Service Counter.."
+                                                                  TextFieldName="Name"
+                                                                  ValueFieldName="Id"></MyDxComboBox>
+                                                    <ValidationMessage For="@(()=>a.ServicedId)" />
+                                                </DxFormLayoutItem>
+                                                <div class="col-md-4">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient" ColSpanMd="12">
+                                                        <DxCheckBox @bind-Checked="@a.IsPatient" />
+                                                        <ValidationMessage For="@(()=>a.IsPatient)" />
+                                                    </DxFormLayoutItem>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Counter" ColSpanMd="12">
+                                                        <DxCheckBox @bind-Checked="@a.IsKiosk" />
+                                                        <ValidationMessage For="@(()=>a.IsKiosk)" />
+                                                    </DxFormLayoutItem>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="MCU" ColSpanMd="12">
+                                                        <DxCheckBox @bind-Checked="@a.IsMcu" />
+                                                        <ValidationMessage For="@(()=>a.IsMcu)" />
+                                                    </DxFormLayoutItem>
+                                                </div>                                                
+                                            </DxFormLayout>
+                                        </EditFormTemplate>
+                                    </MyDxGrid>
+                                </DxLoadingPanel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (UserAccess.Item2 is not null && !UserAccess.Item2.IsRead)
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}
