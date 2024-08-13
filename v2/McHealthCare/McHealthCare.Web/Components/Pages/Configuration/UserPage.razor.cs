@@ -1,10 +1,12 @@
 ﻿
 
 using DevExpress.Blazor.Internal;
+using DevExpress.Blazor.Popup.Internal;
 using McHealthCare.Application.Dtos.Medical;
 using McHealthCare.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
@@ -17,6 +19,8 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private IGrid GridGroupMenu { get; set; }
         [Inject]
         private UserManager<ApplicationUser> UserManager { get; set; }
+        [Inject]
+        private RoleManager<IdentityRole> RoleManager { get; set; } 
         [Inject]
         private IUserStore<ApplicationUser> UserStore { get; set; }
         private bool PanelVisible { get; set; } = false;
@@ -46,6 +50,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private List<VillageDto> Villages = [];
         private List<ProvinceDto> Provinces = [];
         private List<OccupationalDto> Occupationals = [];
+        private UserRoleDto UserRole { get; set; } = new();
         //private List<JobPo> Provinces = [];
         //private List<DepartmentDto> Provinces = [];
         private ApplicationUserDto User { get; set; } = new();
@@ -95,6 +100,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             IsLoading = true;
             try
             {
+                var a = await RoleManager.Roles.ToListAsync();
                 UserAccess = await UserService.GetUserInfo(ToastService);
 
                 await LoadDataAsync();
@@ -191,6 +197,8 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     var result = await UserManager.UpdateAsync(s); 
                     if (result.Succeeded)
                     {
+                        await UserService.UpdateUserRolesAsync(UserManager, s, UserRole);
+
                         await UserService.RemoveUserFromCache();
                         await LoadDataByIdAsync(User?.Id ?? string.Empty);
                         NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{User?.Id}");
@@ -251,13 +259,16 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 //User = await UserService.GetUserId(id);
 
                 User =  await UserService.GetUserId(id, true);
+
+                UserRole = await UserService.GetUserRolesAsync(UserManager, User.Adapt<ApplicationUser>());
+
                 if (User is null || string.IsNullOrWhiteSpace(User.Id))
                 {
                     NavigationManager.NavigateToUrl(Url);
-                }
+                } 
             }
             catch (Exception ex)
-            {
+            {       
                 ex.HandleException(ToastService);
             }
         }

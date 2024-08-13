@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Security.Claims;
-using System.Text.Json.Serialization; 
+using System.Text.Json.Serialization;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -40,10 +40,10 @@ builder.Services.AddControllers()
 builder.Services.AddPersistenceLayer(builder.Configuration);
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents(); 
+    .AddInteractiveServerComponents();
 builder.Services.AddSignalR()
     .AddJsonProtocol(options =>
-    { 
+    {
         options.PayloadSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
         options.PayloadSerializerOptions.WriteIndented = true; // optional
     });
@@ -68,7 +68,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
-{ 
+{
     options.SignIn.RequireConfirmedAccount = false;
 })
 .AddRoles<IdentityRole>() // Add role support
@@ -208,16 +208,50 @@ public class SeedData
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             // Buat peran Admin jika belum ada
-            if (!await roleManager.RoleExistsAsync("Admin"))
+            if (!await roleManager.RoleExistsAsync(EnumRole.Admin.GetDisplayName()))
             {
-                await roleManager.CreateAsync(new IdentityRole("Admin"));
+                await roleManager.CreateAsync(new IdentityRole(EnumRole.Admin.GetDisplayName()));
+            }
+            if (!await roleManager.RoleExistsAsync(EnumRole.Practitioner.GetDisplayName()))
+            {
+                await roleManager.CreateAsync(new IdentityRole(EnumRole.Practitioner.GetDisplayName()));
             }
 
-            if (!await context.Groups.AnyAsync(x => x.Name == "Admin"))
+            if (!await roleManager.RoleExistsAsync(EnumRole.Patient.GetDisplayName()))
+            {
+                await roleManager.CreateAsync(new IdentityRole(EnumRole.Patient.GetDisplayName()));
+            }
+
+            if (!await roleManager.RoleExistsAsync(EnumRole.Pharmacy.GetDisplayName()))
+            {
+                await roleManager.CreateAsync(new IdentityRole(EnumRole.Pharmacy.GetDisplayName()));
+            }
+
+            if (!await roleManager.RoleExistsAsync(EnumRole.MCU.GetDisplayName()))
+            {
+                await roleManager.CreateAsync(new IdentityRole(EnumRole.MCU.GetDisplayName()));
+            }
+
+            if (!await roleManager.RoleExistsAsync(EnumRole.HR.GetDisplayName()))
+            {
+                await roleManager.CreateAsync(new IdentityRole(EnumRole.HR.GetDisplayName()));
+            }
+
+            if (!await roleManager.RoleExistsAsync(EnumRole.Employee.GetDisplayName()))
+            {
+                await roleManager.CreateAsync(new IdentityRole(EnumRole.Employee.GetDisplayName()));
+            }
+
+            if (!await roleManager.RoleExistsAsync(EnumRole.User.GetDisplayName()))
+            {
+                await roleManager.CreateAsync(new IdentityRole(EnumRole.User.GetDisplayName()));
+            }
+
+            if (!await context.Groups.AnyAsync(x => x.Name == EnumRole.Admin.GetDisplayName()))
             {
                 await context.Groups.AddAsync(new Group
                 {
-                    Name = "Admin",
+                    Name = EnumRole.Admin.GetDisplayName(),
                     IsDefaultData = true
                 });
 
@@ -286,7 +320,7 @@ public class SeedData
                     IsCreate = true,
                     IsUpdate = true,
                     IsDelete = true,
-                    IsImport = true,     
+                    IsImport = true,
                     IsDefaultData = true
                 });
             }
@@ -336,12 +370,22 @@ public class SeedData
                 EmailConfirmed = true,
                 IsDefaultData = true
             };
-             
+
             var result = await userManager.CreateAsync(adminUser, "P@ssw0rd1123");
             if (result.Succeeded)
             {
-                // Tambahkan pengguna ke peran Admin
-                await userManager.AddToRoleAsync(adminUser, "Admin");
+                var roles = Enum.GetValues(typeof(EnumRole)).Cast<EnumRole>();
+                foreach (var role in roles)
+                {
+                    try
+                    {
+                        await userManager.AddToRoleAsync(adminUser, role.GetDisplayName());
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
             }
         }
     }

@@ -5,6 +5,7 @@ using McHealthCare.Domain.Entities.Configuration;
 using MediatR;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.JSInterop;
@@ -113,12 +114,13 @@ namespace McHealthCare.Web.Services
             // Cek apakah data pengguna sudah ada di cache
             if (!cache.TryGetValue(cacheKey, out ApplicationUser? user) || removeCache)
             {
-                user = await context.Users
-                                     .AsNoTracking()
-                                     .Include(u => u.Group)
-                                     .ThenInclude(u => u.GroupMenus)
-                                     .FirstOrDefaultAsync(u => u.Id == userId.ToString());
-                  
+                //user = await context.Users
+                //                     .AsNoTracking()
+                //                     .Include(u => u.Group)
+                //                     .ThenInclude(u => u.GroupMenus)
+                //                     .FirstOrDefaultAsync(u => u.Id == userId.ToString());
+
+                user = await context.Users.FindAsync(userId);
 
                 // Konfigurasi opsi caching
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
@@ -131,6 +133,184 @@ namespace McHealthCare.Web.Services
 
             return user.Adapt<ApplicationUserDto>() ?? new();
         }
+        public async Task UpdateUserRolesAsync(UserManager<ApplicationUser> userManager, ApplicationUser user, UserRoleDto userRoleDto)
+        {
+            var roles = Enum.GetValues(typeof(EnumRole)).Cast<EnumRole>();
+
+            foreach (var role in roles)
+            {
+                string roleName = role.GetDisplayName();
+
+                if (role == EnumRole.User && userRoleDto.IsUser)
+                {
+                    if (!await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.AddToRoleAsync(user, roleName);
+                    }
+                }
+                else if (role == EnumRole.User && !userRoleDto.IsUser)
+                {
+                    if (await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.RemoveFromRoleAsync(user, roleName);
+                    }
+                }
+
+                if (role == EnumRole.Practitioner && userRoleDto.IsPractitioner)
+                {
+                    if (!await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.AddToRoleAsync(user, roleName);
+                    }
+                }
+                else if (role == EnumRole.Practitioner && !userRoleDto.IsPractitioner)
+                {
+                    if (await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.RemoveFromRoleAsync(user, roleName);
+                    }
+                }
+
+                if (role == EnumRole.Patient && userRoleDto.IsPatient)
+                {
+                    if (!await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.AddToRoleAsync(user, roleName);
+                    }
+                }
+                else if (role == EnumRole.Patient && !userRoleDto.IsPatient)
+                {
+                    if (await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.RemoveFromRoleAsync(user, roleName);
+                    }
+                }
+
+                if (role == EnumRole.MCU && userRoleDto.IsMCU)
+                {
+                    if (!await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.AddToRoleAsync(user, roleName);
+                    }
+                }
+                else if (role == EnumRole.MCU && !userRoleDto.IsMCU)
+                {
+                    if (await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.RemoveFromRoleAsync(user, roleName);
+                    }
+                }
+
+                if (role == EnumRole.Employee && userRoleDto.IsEmployee)
+                {
+                    if (!await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.AddToRoleAsync(user, roleName);
+                    }
+                }
+                else if (role == EnumRole.Employee && !userRoleDto.IsEmployee)
+                {
+                    if (await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.RemoveFromRoleAsync(user, roleName);
+                    }
+                }
+
+                if (role == EnumRole.Pharmacy && userRoleDto.IsPharmacy)
+                {
+                    if (!await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.AddToRoleAsync(user, roleName);
+                    }
+                }
+                else if (role == EnumRole.Pharmacy && !userRoleDto.IsPharmacy)
+                {
+                    if (await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.RemoveFromRoleAsync(user, roleName);
+                    }
+                }
+
+                if (role == EnumRole.HR && userRoleDto.IsHR)
+                {
+                    if (!await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.AddToRoleAsync(user, roleName);
+                    }
+                }
+                else if (role == EnumRole.HR && !userRoleDto.IsHR)
+                {
+                    if (await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.RemoveFromRoleAsync(user, roleName);
+                    }
+                }
+
+                if (role == EnumRole.Admin && userRoleDto.IsAdmin)
+                {
+                    if (!await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.AddToRoleAsync(user, roleName);
+                    }
+                }
+                else if (role == EnumRole.Admin && !userRoleDto.IsAdmin)
+                {
+                    if (await userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await userManager.RemoveFromRoleAsync(user, roleName);
+                    }
+                }
+            }
+        }
+
+        public async Task<UserRoleDto> GetUserRolesAsync(UserManager<ApplicationUser> userManager, ApplicationUser user)
+        {
+            // Retrieve roles for the given user
+            var roles = await userManager.GetRolesAsync(user);
+
+            // Initialize UserRoleDto
+            var userRoleDto = new UserRoleDto();
+
+            // Map roles to UserRoleDto properties
+            foreach (var role in roles)
+            {
+                if (role == EnumRole.HR.GetDisplayName())
+                {
+                    userRoleDto.IsHR = true;
+                }
+                else if (role == EnumRole.User.GetDisplayName())
+                {
+                    userRoleDto.IsUser = true;
+                }
+                else if (role == EnumRole.Admin.GetDisplayName())
+                {
+                    userRoleDto.IsAdmin = true;
+                }
+                else if (role == EnumRole.MCU.GetDisplayName())
+                {
+                    userRoleDto.IsMCU = true;
+                }
+                else if (role == EnumRole.Pharmacy.GetDisplayName())
+                {
+                    userRoleDto.IsPharmacy = true;
+                }
+                else if (role == EnumRole.Patient.GetDisplayName())
+                {
+                    userRoleDto.IsPatient = true;
+                }
+                else if (role == EnumRole.Practitioner.GetDisplayName())
+                {
+                    userRoleDto.IsPractitioner = true;
+                }
+                else if (role == EnumRole.Employee.GetDisplayName())
+                {
+                    userRoleDto.IsEmployee = true;
+                }
+            }
+
+            return userRoleDto;
+        }
+
 
         public async Task<ApplicationUser?> GetCurrentUserFromDatabaseAsync()
         {
