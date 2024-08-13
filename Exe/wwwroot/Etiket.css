@@ -1,0 +1,22 @@
+﻿/* MedicationETicket.css */
+.dx-form-layout {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #000;
+    border-radius: 5px;
+}
+
+h3 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h4 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.dx-form-layout-item-caption {
+    font-weight: bold;
+}
