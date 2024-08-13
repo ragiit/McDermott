@@ -1,0 +1,12 @@
+﻿@page "/medical/sample-types"
+
+@using McHealthCare.Application.Dtos.Medical
+
+
+<PageTitle>McHealthCare - Sample Type</PageTitle>
+
+<BaseHeaderPage Title="Sample Type" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+
+@if (!IsLoading && UserAccess.Item1 && UserAccess.Item2.IsRead){
+
+}

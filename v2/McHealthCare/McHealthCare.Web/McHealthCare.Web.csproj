@@ -8,6 +8,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Remove="Components\Pages\Medical\SampleTypePage.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="DevExpress.Blazor" Version="23.2.6" />
 		<PackageReference Include="DevExpress.Blazor.RichEdit" Version="23.2.6" />
 		<PackageReference Include="MailKit" Version="4.7.1.1" />
@@ -29,6 +33,10 @@
 	<ItemGroup>
 		<ProjectReference Include="..\McHealthCare.Application\McHealthCare.Application.csproj" />
 		<ProjectReference Include="..\McHealthCare.Infrastructure\McHealthCare.Persistence.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Components\Pages\Medical\SampleTypePage.razor" />
 	</ItemGroup>
   
 </Project>
