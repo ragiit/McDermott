@@ -1,4 +1,5 @@
 using McHealthCare.Domain.Entities;
+using McHealthCare.Domain.Entities.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 

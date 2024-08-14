@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace McHealthCare.Domain.Entities
+namespace McHealthCare.Domain.Entities.Configuration
 {
     // Add profile data for application users by adding properties to the ApplicationUser class
     public class ApplicationUser : IdentityUser

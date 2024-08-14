@@ -6,6 +6,7 @@ using McHealthCare.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.GroupMenuCommand;
 
@@ -21,7 +22,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         public sealed record DeleteGroupMenuRequest(Guid? Id = null, List<Guid>? Ids = null) : IRequest<bool>;
     }
 
-    public sealed class GroupMenuQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService) :
+    public sealed class GroupMenuQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService, IServiceScopeFactory _scopeFactory) :
         IRequestHandler<GetGroupMenuQuery, List<GroupMenuDto>>,
         IRequestHandler<CreateGroupMenuRequest, GroupMenuDto>,
         IRequestHandler<CreateListGroupMenuRequest, List<GroupMenuDto>>,
@@ -72,6 +73,8 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             if (!cache.TryGetValue(CacheKey, out result))
             {
+                using var scope = _scopeFactory.CreateScope();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 result = await unitOfWork.Repository<GroupMenu>().Entities
                     .AsNoTracking()
                     .Include(x => x.Group)

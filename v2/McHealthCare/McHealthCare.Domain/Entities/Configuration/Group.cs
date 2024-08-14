@@ -1,4 +1,4 @@
-﻿namespace McHealthCare.Domain.Entities
+﻿namespace McHealthCare.Domain.Entities.Configuration
 {
     public class Group : BaseAuditableEntity
     {

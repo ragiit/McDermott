@@ -5,6 +5,7 @@ using McHealthCare.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.CityCommand;
 
@@ -20,7 +21,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         public sealed record DeleteCityRequest(Guid? Id = null, List<Guid>? Ids = null) : IRequest<bool>;
     }
 
-    public sealed class CityQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService) :
+    public sealed class CityQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService, IServiceScopeFactory _scopeFactory) :
         IRequestHandler<GetCityQuery, List<CityDto>>,
         IRequestHandler<CreateCityRequest, CityDto>,
         IRequestHandler<CreateListCityRequest, List<CityDto>>,
@@ -67,6 +68,9 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             if (!cache.TryGetValue(CacheKey, out result))
             {
+                using var scope = _scopeFactory.CreateScope();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
                 result = await unitOfWork.Repository<City>().Entities
                         .AsNoTracking()
                         .Include(x => x.Province)

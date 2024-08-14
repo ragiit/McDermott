@@ -5,6 +5,7 @@ using McHealthCare.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
@@ -19,7 +20,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         public sealed record DeleteCountryRequest(Guid? Id = null, List<Guid>? Ids = null) : IRequest<bool>;
     }
 
-    public sealed class CountryQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService) :
+    public sealed class CountryQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService, IServiceScopeFactory _scopeFactory) :
         IRequestHandler<GetCountryQuery, List<CountryDto>>,
         IRequestHandler<CreateCountryRequest, CountryDto>,
         IRequestHandler<CreateListCountryRequest, List<CountryDto>>,
@@ -64,6 +65,9 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             if (!cache.TryGetValue(CacheKey, out result))
             {
+                using var scope = _scopeFactory.CreateScope();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
                 result = await unitOfWork.Repository<Country>().Entities
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);

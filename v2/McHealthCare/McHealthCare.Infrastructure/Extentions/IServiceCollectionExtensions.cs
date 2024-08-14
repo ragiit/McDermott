@@ -34,7 +34,7 @@ namespace McHealthCare.Persistence.Extentions
                 options.UseSqlServer(connectionString);
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
-            });
+            }, optionsLifetime: ServiceLifetime.Scoped); 
 
             //services.AddDbContext<ApplicationDbContext>(options =>
             //   options.UseSqlServer(connectionString,

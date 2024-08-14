@@ -5,6 +5,7 @@ using McHealthCare.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.MenuCommand;
 
@@ -20,7 +21,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         public sealed record DeleteMenuRequest(Guid? Id = null, List<Guid>? Ids = null) : IRequest<bool>;
     }
 
-    public sealed class MenuQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService) :
+    public sealed class MenuQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService, IServiceScopeFactory _scopeFactory) :
         IRequestHandler<GetMenuQuery, List<MenuDto>>,
         IRequestHandler<CreateMenuRequest, MenuDto>,
         IRequestHandler<CreateListMenuRequest, List<MenuDto>>,
@@ -67,6 +68,8 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             if (!cache.TryGetValue(CacheKey, out result))
             {
+                using var scope = _scopeFactory.CreateScope();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 result = await unitOfWork.Repository<Menu>().Entities
                         .AsNoTracking()
                         .Include(x => x.Parent)

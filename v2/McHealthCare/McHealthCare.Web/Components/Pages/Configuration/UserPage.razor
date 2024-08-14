@@ -231,7 +231,7 @@
                                                 <div class="col-md-6">
                                                     <DxFormLayout>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Supervisor" ColSpanMd="12">
-                                                            <MyDxComboBox Data="@(Users.Where(x => x.Id != Employee.ApplicationUserId).AsEnumerable())"
+                                                            <MyDxComboBox Data="@(Users.Where(x => x.Employee != null && x.Id != Employee.ApplicationUserId).AsEnumerable())"
                                                                           NullText="Select Supervisor..."
                                                                           TextFieldName="Name"
                                                                           ValueFieldName="Id"

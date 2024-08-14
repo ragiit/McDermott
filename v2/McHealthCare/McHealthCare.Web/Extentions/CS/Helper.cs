@@ -8,6 +8,16 @@ namespace McHealthCare.Web.Extentions.CS
 {
     public static class Helper
     {
+        public static List<string> LocationTypes = new()
+        {
+            "Internal Location"
+        };
+        public static List<string> DepartmentCategories = new()
+        {
+            "Department",
+            "Unit",
+        };
+
         public static List<string> EmployeeTypes = new()
         {
             "Employee",
@@ -142,6 +152,8 @@ namespace McHealthCare.Web.Extentions.CS
             await jSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
         }
         public static void ShowInfoSubmittingForm(this IToastService toastService, string message = "Please ensure that all fields marked in red are filled in before submitting the form.") => toastService.ShowInfo(message);
+        public static void ShowSuccessSaved(this IToastService toastService, string entity) => toastService.ShowSuccess($"The {entity} record has been saved successfully.");
+        public static void ShowSuccessUpdated(this IToastService toastService, string entity) => toastService.ShowSuccess($"The {entity} record has been updated successfully.");
 
         public static void ShowErrorImport(this IToastService ToastService, int row, int col, string val)
         {

@@ -1,4 +1,5 @@
 ﻿using Blazored.Toast.Services;
+using McHealthCare.Application.Dtos.Configuration;
 using McHealthCare.Context;
 using McHealthCare.Domain.Entities;
 using McHealthCare.Domain.Entities.Configuration;
@@ -7,13 +8,15 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.JSInterop;
+using System.Numerics;
 using System.Security.Claims;
 
 namespace McHealthCare.Web.Services
 {
-    public sealed class UserService(AuthenticationStateProvider authenticationStateProvider, ApplicationDbContext context, NavigationManager navigationManager, IMemoryCache cache, IMediator mediator)
+    public sealed class UserService(AuthenticationStateProvider authenticationStateProvider, IServiceScopeFactory _scopeFactory, NavigationManager navigationManager, IMemoryCache cache, IMediator mediator)
     {
         public async Task<ClaimsPrincipal> GetCurrentUserAsync()
         {
@@ -32,7 +35,7 @@ namespace McHealthCare.Web.Services
         public async Task<(bool, GroupMenuDto)> GetUserInfo(IToastService? toastService = null)
         {
             try
-            { 
+            {
                 var url = navigationManager.Uri.ToLower().Replace(navigationManager.BaseUri.ToLower(), "");
                 var user = await GetCurrentUserFromDatabaseAsync() ?? new();
                 var groups = await mediator.Send(new GetGroupMenuQuery(x => x.GroupId == user.GroupId!)!);
@@ -60,13 +63,19 @@ namespace McHealthCare.Web.Services
         }
 
         public async Task<List<ApplicationUserDto>> GetAllUsers()
-        { 
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
             string cacheKey = $"{CacheKey.UserCacheKeyPrefix}";
 
             // Cek apakah data pengguna sudah ada di cache
             if (!cache.TryGetValue(cacheKey, out List<ApplicationUser>? user))
             {
                 user = await context.Users
+                    .Include(x => x.Employee)
+                    .Include(x => x.Patient)
+                    .Include(x => x.Doctor)
                                      .Include(u => u.Group)
                                      .ThenInclude(u => u.GroupMenus)
                                      .AsNoTracking()
@@ -82,16 +91,20 @@ namespace McHealthCare.Web.Services
             }
 
             return user.Adapt<List<ApplicationUserDto>>() ?? [];
+
         }
 
         public async Task<List<Patient>?> GetAllPatients()
         {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
             string cacheKey = $"{CacheKey.UserCacheKeyPrefix}";
 
             // Cek apakah data pengguna sudah ada di cache
             if (!cache.TryGetValue(cacheKey, out List<Patient>? user))
             {
-                user = await context.Patients 
+                user = await context.Patients
                                      .AsNoTracking()
                                      .ToListAsync();
 
@@ -107,7 +120,12 @@ namespace McHealthCare.Web.Services
             return user ?? [];
         }
         public async Task<ApplicationUserDto> GetUserId(string userId, bool removeCache = false)
-        { 
+        {
+            //using var dbContext = context.CreateDbContext();
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            return (await context.Users.FindAsync(userId)).Adapt<ApplicationUserDto>();
+
             // Kunci cache untuk menyimpan data pengguna
             string cacheKey = $"{CacheKey.UserCacheKeyPrefix}{userId}";
 
@@ -133,6 +151,97 @@ namespace McHealthCare.Web.Services
 
             return user.Adapt<ApplicationUserDto>() ?? new();
         }
+        public async Task<DoctorDto> GetDoctorByIdAsync(string userId, bool removeCache = false)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            return (await context.Doctors.FindAsync(userId)).Adapt<DoctorDto>();
+            // Kunci cache untuk menyimpan data pengguna
+            string cacheKey = $"{CacheKey.UserCacheKeyPrefix}{userId}";
+
+            // Cek apakah data pengguna sudah ada di cache
+            if (!cache.TryGetValue(cacheKey, out Doctor? user) || removeCache)
+            {
+                //user = await context.Users
+                //                     .AsNoTracking()
+                //                     .Include(u => u.Group)
+                //                     .ThenInclude(u => u.GroupMenus)
+                //                     .FirstOrDefaultAsync(u => u.Id == userId.ToString());
+
+                user = await context.Doctors.FindAsync(userId);
+
+                // Konfigurasi opsi caching
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(30)) // Waktu kadaluarsa sliding
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));  // Waktu kadaluarsa absolut
+
+                // Simpan data pengguna dalam cache
+                cache.Set(cacheKey, user, cacheEntryOptions);
+            }
+
+            return user.Adapt<DoctorDto>() ?? new();
+        }
+        public async Task<EmployeeDto> GetEmployeeByIdAsync(string userId, bool removeCache = false)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            return (await context.Employees.FindAsync(userId)).Adapt<EmployeeDto>();
+            // Kunci cache untuk menyimpan data pengguna
+            string cacheKey = $"{CacheKey.UserCacheKeyPrefix}{userId}";
+
+            // Cek apakah data pengguna sudah ada di cache
+            if (!cache.TryGetValue(cacheKey, out Employee? user) || removeCache)
+            {
+                //user = await context.Users
+                //                     .AsNoTracking()
+                //                     .Include(u => u.Group)
+                //                     .ThenInclude(u => u.GroupMenus)
+                //                     .FirstOrDefaultAsync(u => u.Id == userId.ToString());
+
+                user = await context.Employees.FindAsync(userId);
+
+                // Konfigurasi opsi caching
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(30)) // Waktu kadaluarsa sliding
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));  // Waktu kadaluarsa absolut
+
+                // Simpan data pengguna dalam cache
+                cache.Set(cacheKey, user, cacheEntryOptions);
+            }
+
+            return user.Adapt<EmployeeDto>() ?? new();
+        }
+        public async Task<PatientDto> GetPatientByIdAsync(string userId, bool removeCache = false)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            return (await context.Patients.FindAsync(userId)).Adapt<PatientDto>();
+            // Kunci cache untuk menyimpan data pengguna
+            string cacheKey = $"{CacheKey.UserCacheKeyPrefix}{userId}";
+
+            // Cek apakah data pengguna sudah ada di cache
+            if (!cache.TryGetValue(cacheKey, out Patient? user) || removeCache)
+            {
+                //user = await context.Users
+                //                     .AsNoTracking()
+                //                     .Include(u => u.Group)
+                //                     .ThenInclude(u => u.GroupMenus)
+                //                     .FirstOrDefaultAsync(u => u.Id == userId.ToString());
+
+                user = await context.Patients.FindAsync(userId);
+
+                // Konfigurasi opsi caching
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(30)) // Waktu kadaluarsa sliding
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));  // Waktu kadaluarsa absolut
+
+                // Simpan data pengguna dalam cache
+                cache.Set(cacheKey, user, cacheEntryOptions);
+            }
+
+            return user.Adapt<PatientDto>() ?? new();
+        }
+
         public async Task UpdateUserRolesAsync(UserManager<ApplicationUser> userManager, ApplicationUser user, UserRoleDto userRoleDto)
         {
             var roles = Enum.GetValues(typeof(EnumRole)).Cast<EnumRole>();
@@ -314,6 +423,8 @@ namespace McHealthCare.Web.Services
 
         public async Task<ApplicationUser?> GetCurrentUserFromDatabaseAsync()
         {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var userId = await GetCurrentUserIdAsync();
 
             // Kunci cache untuk menyimpan data pengguna
@@ -334,10 +445,130 @@ namespace McHealthCare.Web.Services
                     .SetAbsoluteExpiration(TimeSpan.FromHours(1));  // Waktu kadaluarsa absolut
 
                 // Simpan data pengguna dalam cache
-                cache.Set(cacheKey, user, cacheEntryOptions); 
+                cache.Set(cacheKey, user);
+            }
+
+            if (user is null)
+            {
+                user = await context.Users
+                                     .Include(u => u.Group)
+                                     .ThenInclude(u => u.GroupMenus)
+                                     .AsNoTracking()
+                                     .FirstOrDefaultAsync(u => u.Id == userId.ToString());
+
+                // Simpan data pengguna dalam cache
+                cache.Set(cacheKey, user);
             }
 
             return user;
+        }
+
+        public async Task RemoveUserDoctor(ApplicationUserDto userDto)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var u = await context.Doctors.FindAsync(userDto.Id);
+            if (u != null)
+            {
+                context.Doctors.Remove(u);
+                await context.SaveChangesAsync();
+                await RemoveUserFromCache();
+            }
+        }
+
+        public async Task RemovePatientDoctor(ApplicationUserDto userDto)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var u = await context.Patients.FindAsync(userDto.Id);
+            if (u != null)
+            {
+                context.Patients.Remove(u);
+                await context.SaveChangesAsync();
+                await RemoveUserFromCache();
+            }
+        }
+
+        public async Task RemoveEmployeeDoctor(ApplicationUserDto userDto)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var u = await context.Employees.FindAsync(userDto.Id);
+            if (u != null)
+            {
+                context.Employees.Remove(u);
+                await context.SaveChangesAsync();
+                await RemoveUserFromCache();
+            }
+        }
+
+        public async Task UpdateDoctorAsync(DoctorDto doctorDto)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var doctor = await context.Doctors.FindAsync(doctorDto.ApplicationUserId);
+            var d = doctorDto.Adapt<CreateUpdateDoctorDto>();
+            if (doctor != null)
+            {
+                // Mapster adaptation
+                d.Adapt(doctor);
+                context.Entry(doctor).State = EntityState.Modified;
+                await context.SaveChangesAsync();
+                await RemoveUserFromCache();
+            }
+            else
+            {
+                var a = d.Adapt<Doctor>();
+                await context.Doctors.AddAsync(a);
+                await context.SaveChangesAsync();
+                await RemoveUserFromCache();
+            }
+        }
+
+        public async Task UpdatePatientAsync(PatientDto patientDto)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var patient = await context.Patients.FindAsync(patientDto.ApplicationUserId);
+            var d = patientDto.Adapt<CreateUpdatePatientDto>();
+            if (patient != null)
+            {
+                // Mapster adaptation
+                d.Adapt(patient);
+                context.Entry(patient).State = EntityState.Modified;
+                await context.SaveChangesAsync();
+                await RemoveUserFromCache();
+            }
+            else
+            {
+                var a = d.Adapt<Patient>();
+                await context.Patients.AddAsync(a);
+                await context.SaveChangesAsync();
+                await RemoveUserFromCache();
+            }
+        }
+
+        public async Task UpdateEmployeeAsync(EmployeeDto employeeDto)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var employee = await context.Employees.FindAsync(employeeDto.ApplicationUserId);
+            var d = employeeDto.Adapt<CreateUpdateEmployeeDto>();
+            if (employee != null)
+            {
+                // Mapster adaptation
+                d.Adapt(employee);
+                context.Entry(employee).State = EntityState.Modified;
+                await context.SaveChangesAsync();
+                await RemoveUserFromCache();
+            }
+            else
+            {
+                var a = d.Adapt<Employee>();
+                await context.Employees.AddAsync(a);
+                await context.SaveChangesAsync();
+                await RemoveUserFromCache();
+            }
         }
 
         public async Task RemoveUserFromCache()

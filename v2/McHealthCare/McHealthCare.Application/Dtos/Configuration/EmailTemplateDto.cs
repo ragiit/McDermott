@@ -8,8 +8,8 @@ namespace McHealthCare.Application.Dtos.Configuration
     public class EmailTemplateDto : IMapFrom<EmailTemplate>
     {
         public Guid Id { get; set; }
-        public Guid? ById { get; set; }
-        public Guid? ToPartnerId { get; set; }
+        public string? ById { get; set; }
+        public string? ToPartnerId { get; set; }
 
         [StringLength(200)]
         public string? Subject { get; set; } = string.Empty;

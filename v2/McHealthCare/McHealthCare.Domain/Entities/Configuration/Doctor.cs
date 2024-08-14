@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace McHealthCare.Domain.Entities
+namespace McHealthCare.Domain.Entities.Configuration
 {
     public class Doctor
     {

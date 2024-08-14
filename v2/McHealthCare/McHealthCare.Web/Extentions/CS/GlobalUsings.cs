@@ -8,6 +8,9 @@ global using McHealthCare.Web.Extentions.CS;
 global using Serilog;
 global using Microsoft.AspNetCore.Components;
 
+global using static McHealthCare.Application.Features.CommandsQueries.Configuration.JobPositionCommand;
+global using McHealthCare.Domain.Entities.Configuration;
+global using static McHealthCare.Application.Features.CommandsQueries.Employee.DepartmentCommand;
 global using McHealthCare.Domain.Entities;
 global using static McHealthCare.Extentions.EnumHelper;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.EmailSettingCommand;

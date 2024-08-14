@@ -23,6 +23,14 @@ DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//TypeAdapterConfig<ApplicationUser, ApplicationUserDto>
+//    .NewConfig()
+//    .PreserveReference(true) // Menghindari pemetaan rekursif
+//    .Ignore(dest => dest.Employee.ApplicationUser) // Mengabaikan properti yang berpotensi rekursif
+//    .Ignore(dest => dest.Doctor)
+//    .Ignore(dest => dest.Patient.ApplicationUser);
+
+
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>

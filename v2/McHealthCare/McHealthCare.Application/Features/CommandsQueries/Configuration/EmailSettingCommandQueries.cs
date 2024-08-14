@@ -1,4 +1,5 @@
-﻿using static McHealthCare.Application.Features.CommandsQueries.Configuration.EmailSettingCommand;
+﻿using Microsoft.Extensions.DependencyInjection;
+using static McHealthCare.Application.Features.CommandsQueries.Configuration.EmailSettingCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 {
@@ -12,7 +13,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         public sealed record DeleteEmailSettingRequest(Guid? Id = null, List<Guid>? Ids = null) : IRequest<bool>;
     }
 
-    public sealed class EmailSettingQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService) :
+    public sealed class EmailSettingQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService, IServiceScopeFactory _scopeFactory) :
         IRequestHandler<GetEmailSettingQuery, List<EmailSettingDto>>,
         IRequestHandler<CreateEmailSettingRequest, EmailSettingDto>,
         IRequestHandler<CreateListEmailSettingRequest, List<EmailSettingDto>>,
@@ -57,6 +58,8 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             if (!cache.TryGetValue(CacheKey, out result))
             {
+                using var scope = _scopeFactory.CreateScope();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 result = await unitOfWork.Repository<EmailSetting>().Entities
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
