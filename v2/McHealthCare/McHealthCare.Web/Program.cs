@@ -115,7 +115,7 @@ builder.Services.AddCors();
 
 var app = builder.Build();
 
-app.UsePathBase("/v2");
+//app.UsePathBase("/v2");
 app.UseResponseCompression();
 
 //app.UseMiddleware<SessionExpirationMiddleware>();

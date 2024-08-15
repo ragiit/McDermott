@@ -13,4 +13,6 @@ global using System.Linq.Expressions;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.OccupationalCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.ReligionCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.VillageCommand;
+global using static McHealthCare.Application.Features.CommandsQueries.Employees.DepartmentCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.DistrictCommand;
+global using McHealthCare.Domain.Entities.Employees;
