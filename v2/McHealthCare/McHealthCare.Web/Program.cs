@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.ResponseCompression;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -30,6 +31,19 @@ var builder = WebApplication.CreateBuilder(args);
 //    .Ignore(dest => dest.Doctor)
 //    .Ignore(dest => dest.Patient.ApplicationUser);
 
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true; // Aktifkan kompresi untuk HTTPS
+    options.Providers.Add<GzipCompressionProvider>(); // Tambahkan provider kompresi Gzip
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" }); // Tambahkan tipe MIME tambahan jika perlu
+});
+
+// Konfigurasi tingkat kompresi (opsional)
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = System.IO.Compression.CompressionLevel.SmallestSize; // Atur tingkat kompresi
+});
 
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
 builder.Services.AddControllers()
@@ -100,6 +114,8 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 builder.Services.AddCors();
 
 var app = builder.Build();
+
+app.UseResponseCompression();
 
 //app.UseMiddleware<SessionExpirationMiddleware>();
 
