@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace McHealthCare.Domain.Entities.Inventory
 {
@@ -14,6 +9,7 @@ namespace McHealthCare.Domain.Entities.Inventory
 
         [NotMapped]
         private string? _type;
+
         public string? Type
         {
             get { return _type; }
@@ -26,12 +22,12 @@ namespace McHealthCare.Domain.Entities.Inventory
                 }
             }
         }
-          
+
         public float? BiggerRatio { get; set; }
 
         public bool Active { get; set; } = true;
-        public float? RoundingPrecision { get; set; }  
+        public float? RoundingPrecision { get; set; }
 
-        public virtual UomCategory? UomCategory { get; set; } 
+        public virtual UomCategory? UomCategory { get; set; }
     }
 }

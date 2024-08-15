@@ -7,10 +7,10 @@
         public long? Qty { get; set; }
         public string? Batch { get; set; }
         public DateTime? ExpiredDate { get; set; }
-         
-        public ReceivingStock? ReceivingStock { get; set; } 
+
+        public ReceivingStock? ReceivingStock { get; set; }
         public Product? Product { get; set; }
-         
+
         public StockProduct? Stock { get; set; }
     }
 }

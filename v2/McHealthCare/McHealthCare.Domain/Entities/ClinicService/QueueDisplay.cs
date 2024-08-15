@@ -5,7 +5,7 @@
         public string? Name { get; set; }
 
         public List<Guid>? CounterIds { get; set; }
-        [SetToNull]
+
         public virtual List<Counter>? Counter { get; set; }
     }
 }

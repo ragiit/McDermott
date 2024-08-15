@@ -1,6 +1,4 @@
-﻿
-
-namespace McHealthCare.Domain.Entities
+﻿namespace McHealthCare.Domain.Entities.Pharmacies
 {
     public class Pharmacy : BaseAuditableEntity
     {
@@ -16,22 +14,16 @@ namespace McHealthCare.Domain.Entities
         public bool IsFood { get; set; } = false;
         public EnumStatusPharmacy? Status { get; set; }
 
-        
         public Location? Location { get; set; }
 
-        
         public MedicamentGroup? MedicamentGroup { get; set; }
 
-        
         public Service? Service { get; set; }
 
-        
         public Patient? Patient { get; set; }
 
-        
         public Doctor? Practitioner { get; set; }
 
-        
         public virtual List<Prescription>? Prescriptions { get; set; }
     }
 }

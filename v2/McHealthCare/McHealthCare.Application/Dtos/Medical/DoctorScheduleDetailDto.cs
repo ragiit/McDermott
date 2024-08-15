@@ -1,7 +1,4 @@
-using Mapster;
-using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities.Medical;
-using System.ComponentModel.DataAnnotations;
 
 namespace McHealthCare.Application.Dtos.Medical
 {
@@ -21,7 +18,6 @@ namespace McHealthCare.Application.Dtos.Medical
         public int? Quota { get; set; }
         public bool? UpdateToBpjs { get; set; }
 
-        [SetToNull]
         public virtual DoctorScheduleDto? DoctorSchedule { get; set; }
     }
 
@@ -41,7 +37,6 @@ namespace McHealthCare.Application.Dtos.Medical
         public int? Quota { get; set; }
         public bool? UpdateToBpjs { get; set; }
 
-        [SetToNull]
         public virtual DoctorScheduleDto? DoctorSchedule { get; set; }
     }
 }

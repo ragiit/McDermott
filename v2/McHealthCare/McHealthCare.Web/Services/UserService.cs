@@ -1,17 +1,10 @@
 ﻿using Blazored.Toast.Services;
-using McHealthCare.Application.Dtos.Configuration;
 using McHealthCare.Context;
-using McHealthCare.Domain.Entities;
-using McHealthCare.Domain.Entities.Configuration;
 using MediatR;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.JSInterop;
-using System.Numerics;
 using System.Security.Claims;
 
 namespace McHealthCare.Web.Services
@@ -52,14 +45,12 @@ namespace McHealthCare.Web.Services
                 navigationManager.NavigateTo("", true);
                 toastService?.ClearErrorToasts();
                 toastService?.ShowError("Unauthorized Access\r\n\r\nYou are not authorized to view this page. If you need access, please contact the administrator.\r\n");
-
             }
             catch (JSDisconnectedException)
             {
                 navigationManager.NavigateTo("", true);
                 return (false, new());
             }
-
         }
 
         public async Task<List<ApplicationUserDto>> GetAllUsers()
@@ -91,7 +82,6 @@ namespace McHealthCare.Web.Services
             }
 
             return user.Adapt<List<ApplicationUserDto>>() ?? [];
-
         }
 
         public async Task<List<Patient>?> GetAllPatients()
@@ -119,6 +109,7 @@ namespace McHealthCare.Web.Services
 
             return user ?? [];
         }
+
         public async Task<ApplicationUserDto> GetUserId(string userId, bool removeCache = false)
         {
             //using var dbContext = context.CreateDbContext();
@@ -151,6 +142,7 @@ namespace McHealthCare.Web.Services
 
             return user.Adapt<ApplicationUserDto>() ?? new();
         }
+
         public async Task<DoctorDto> GetDoctorByIdAsync(string userId, bool removeCache = false)
         {
             using var scope = _scopeFactory.CreateScope();
@@ -181,6 +173,7 @@ namespace McHealthCare.Web.Services
 
             return user.Adapt<DoctorDto>() ?? new();
         }
+
         public async Task<EmployeeDto> GetEmployeeByIdAsync(string userId, bool removeCache = false)
         {
             using var scope = _scopeFactory.CreateScope();
@@ -211,6 +204,7 @@ namespace McHealthCare.Web.Services
 
             return user.Adapt<EmployeeDto>() ?? new();
         }
+
         public async Task<PatientDto> GetPatientByIdAsync(string userId, bool removeCache = false)
         {
             using var scope = _scopeFactory.CreateScope();
@@ -419,7 +413,6 @@ namespace McHealthCare.Web.Services
 
             return userRoleDto;
         }
-
 
         public async Task<ApplicationUser?> GetCurrentUserFromDatabaseAsync()
         {

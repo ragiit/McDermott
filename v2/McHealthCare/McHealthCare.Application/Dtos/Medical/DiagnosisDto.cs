@@ -1,7 +1,4 @@
-using Mapster;
-using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities.Medical;
-using System.ComponentModel.DataAnnotations;
 
 namespace McHealthCare.Application.Dtos.Medical
 {
@@ -18,10 +15,8 @@ namespace McHealthCare.Application.Dtos.Medical
         public Guid? DiseaseCategoryId { get; set; }
         public Guid? ChronicCategoryId { get; set; }
 
-        [SetToNull]
         public virtual DiseaseCategoryDto? DiseaseCategory { get; set; }
 
-        [SetToNull]
         public virtual ChronicCategoryDto? ChronicCategory { get; set; }
     }
 
@@ -38,10 +33,8 @@ namespace McHealthCare.Application.Dtos.Medical
         public Guid? DiseaseCategoryId { get; set; }
         public Guid? ChronicCategoryId { get; set; }
 
-        [SetToNull]
         public virtual DiseaseCategoryDto? DiseaseCategory { get; set; }
 
-        [SetToNull]
         public virtual ChronicCategoryDto? ChronicCategory { get; set; }
     }
 }

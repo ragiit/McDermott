@@ -1,6 +1,4 @@
-﻿
-
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 {
@@ -58,7 +56,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             List<Occupational> result = [];
 
             if (!cache.TryGetValue(CacheKey, out result))
-            { 
+            {
                 using var scope = _scopeFactory.CreateScope();
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
@@ -74,7 +72,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             return result?.Adapt<List<OccupationalDto>>() ?? [];
         }
-
 
         #endregion GET
 

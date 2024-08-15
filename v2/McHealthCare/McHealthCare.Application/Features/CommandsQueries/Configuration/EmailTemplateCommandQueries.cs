@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.EmailTemplateCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration

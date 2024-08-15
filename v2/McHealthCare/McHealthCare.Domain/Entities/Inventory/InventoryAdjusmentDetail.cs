@@ -1,6 +1,4 @@
-﻿using McHealthCare.Domain.Entities.Products;
-
-namespace McHealthCare.Domain.Entities
+﻿namespace McHealthCare.Domain.Entities
 {
     public class InventoryAdjusmentDetail : BaseAuditableEntity
     {
@@ -13,16 +11,12 @@ namespace McHealthCare.Domain.Entities
         public string? Batch { get; set; }
         public long RealQty { get; set; } = 0;
 
-        
         public virtual InventoryAdjusment? InventoryAdjusment { get; set; }
 
-        
         public virtual Product? Product { get; set; }
 
-        
         public virtual StockProduct? StockProduct { get; set; }
 
-        
         public virtual TransactionStock? TransactionStock { get; set; }
     }
 }

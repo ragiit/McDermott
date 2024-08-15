@@ -1,14 +1,5 @@
-﻿using Mapster;
-using McHealthCare.Application.Dtos.Configuration;
-using McHealthCare.Application.Dtos.Employees;
-using McHealthCare.Application.Extentions;
-using McHealthCare.Application.Interfaces;
-using McHealthCare.Domain.Entities.Employees;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
+﻿using McHealthCare.Application.Dtos.Employees;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq.Expressions;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.JobPositionCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration

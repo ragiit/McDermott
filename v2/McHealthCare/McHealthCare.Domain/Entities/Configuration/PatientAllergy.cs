@@ -1,4 +1,4 @@
-﻿namespace McDermott.Domain.Entities
+﻿namespace McHealthCare.Domain.Entities
 {
     public class PatientAllergy : BaseAuditableEntity
     {
@@ -10,7 +10,6 @@
         public string? Food { get; set; }
         public string FoodCode { get; set; } = string.Empty;
 
-        [SetToNull]
         public virtual Patient? Patient { get; set; }
     }
 }

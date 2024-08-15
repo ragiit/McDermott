@@ -1,10 +1,4 @@
-﻿using McHealthCare.Application.Dtos.Medical;
-using McHealthCare.Domain.Entities.Medical;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using McHealthCare.Domain.Entities.Medical;
 using static McHealthCare.Application.Features.CommandsQueries.Medical.ServiceCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Medical
@@ -38,7 +32,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                 else
                     return ((await unitOfWork.Repository<Service>().Entities
                         .AsNoTracking()
-                        .Include(x=>x.Serviced)
+                        .Include(x => x.Serviced)
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<ServiceDto>(), []);
             }
             else if (results is not null)

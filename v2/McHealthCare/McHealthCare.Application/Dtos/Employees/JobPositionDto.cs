@@ -1,12 +1,4 @@
-﻿using McHealthCare.Application.Dtos.Employees;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McHealthCare.Application.Dtos.Employees
+﻿namespace McHealthCare.Application.Dtos.Employees
 {
     public class JobPositionDto : IMapFrom<JobPosition>
     {
@@ -19,12 +11,12 @@ namespace McHealthCare.Application.Dtos.Employees
         public DepartmentDto? Department { get; set; }
     }
 
-    public class CreateUpdateJobPositionDto  
+    public class CreateUpdateJobPositionDto
     {
-        public Guid Id { get; set; }    
+        public Guid Id { get; set; }
         public Guid? DepartmentId { get; set; }
 
         [StringLength(200)]
-        public string Name { get; set; } = string.Empty; 
+        public string Name { get; set; } = string.Empty;
     }
 }

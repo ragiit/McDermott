@@ -1,6 +1,4 @@
-﻿using Blazored.Toast.Services;
-using McHealthCare.Application.Extentions;
-using MediatR;
+﻿using McHealthCare.Application.Extentions;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
@@ -8,6 +6,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
     public partial class EmailSettingPage
     {
         #region Variables
+
         private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
@@ -160,16 +159,19 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 ex.HandleException(ToastService);
             }
         }
+
         private List<string> Stts_Ecrypt = new List<string>
         {
             "none",
             "TLS (STARTTLS)",
             "SSL/TLS"
         }; private bool showPassword = false;
+
         private string showPasswordIcon = "fa-solid fa-eye-slash";
 
         private bool? IsConnected { get; set; }
         private bool isLoading { get; set; }
+
         private void TogglePasswordVisibility()
         {
             showPassword = !showPassword;
@@ -183,7 +185,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 showPasswordIcon = "fa-solid fa-eye-slash";
             }
         }
-        
+
         public async ValueTask DisposeAsync()
         {
             if (hubConnection is not null)

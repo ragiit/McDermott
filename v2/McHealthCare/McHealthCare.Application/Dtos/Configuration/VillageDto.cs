@@ -1,7 +1,4 @@
-﻿using Mapster;
-using System.ComponentModel.DataAnnotations;
-
-namespace McHealthCare.Application.Dtos.Configuration
+﻿namespace McHealthCare.Application.Dtos.Configuration
 {
     public class VillageDto : IMapFrom<Village>
     {
@@ -34,6 +31,6 @@ namespace McHealthCare.Application.Dtos.Configuration
         public string Name { get; set; } = string.Empty; // Kelurahan
 
         [StringLength(10)]
-        public string? PostalCode { get; set; } 
+        public string? PostalCode { get; set; }
     }
 }

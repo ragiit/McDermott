@@ -1,4 +1,4 @@
-﻿namespace McDermott.Domain.Entities
+﻿namespace McHealthCare.Domain.Entities
 {
     public class KioskConfig : BaseAuditableEntity
     {

@@ -7,6 +7,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
     public partial class OccupationalPage : IAsyncDisposable
     {
         #region Variables
+
         private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
@@ -54,8 +55,8 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                 await hubConnection.StartAsync();
 
-                await LoadData(); 
-                
+                await LoadData();
+
                 try
                 {
                     Grid?.SelectRow(0, true);
@@ -87,7 +88,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         {
             try
             {
-                PanelVisible = true; 
+                PanelVisible = true;
                 Occupationals.Clear();
                 Occupationals = await Mediator.Send(new GetOccupationalQuery());
                 //SelectedDataItems = [];
@@ -138,7 +139,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             try
             {
                 var editModel = (OccupationalDto)e.EditModel;
-                 
+
                 if (editModel.Id == Guid.Empty)
                     await Mediator.Send(new CreateOccupationalRequest(editModel));
                 else

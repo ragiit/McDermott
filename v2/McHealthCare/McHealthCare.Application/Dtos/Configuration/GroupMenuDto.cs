@@ -1,7 +1,4 @@
-﻿using Mapster;
-using McHealthCare.Domain.Entities;
-
-namespace McHealthCare.Application.Dtos.Configuration
+﻿namespace McHealthCare.Application.Dtos.Configuration
 {
     public class GroupMenuDto : IMapFrom<GroupMenu>
     {
@@ -12,7 +9,7 @@ namespace McHealthCare.Application.Dtos.Configuration
         public bool IsRead { get; set; }
         public bool IsUpdate { get; set; }
         public bool IsDelete { get; set; }
-        public bool IsImport { get; set; }
+        public bool VisibleImport { get; set; }
         public bool IsDefaultData { get; set; } = false;
 
         public GroupDto Group { get; set; } = new();
@@ -28,6 +25,6 @@ namespace McHealthCare.Application.Dtos.Configuration
         public bool IsRead { get; set; }
         public bool IsUpdate { get; set; }
         public bool IsDelete { get; set; }
-        public bool IsImport { get; set; }
+        public bool VisibleImport { get; set; }
     }
 }

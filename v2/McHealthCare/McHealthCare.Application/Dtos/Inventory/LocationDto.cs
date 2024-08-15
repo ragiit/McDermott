@@ -1,15 +1,3 @@
-using Mapster;
-using McHealthCare.Application.Dtos.Configuration;
-using McHealthCare.Application.Dtos.Medical;
-using McHealthCare.Domain.Common;
-using McHealthCare.Domain.Entities.Inventory;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace McHealthCare.Application.Dtos.Inventory
 {
     public class LocationDto : IMapFrom<Location>

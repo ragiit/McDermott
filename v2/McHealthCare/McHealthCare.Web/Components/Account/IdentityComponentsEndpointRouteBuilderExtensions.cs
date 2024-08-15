@@ -1,4 +1,3 @@
-using McHealthCare.Domain.Entities;
 using McHealthCare.Web.Components.Account.Pages;
 using McHealthCare.Web.Components.Account.Pages.Manage;
 using Microsoft.AspNetCore.Authentication;

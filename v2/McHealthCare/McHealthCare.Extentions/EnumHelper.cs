@@ -43,8 +43,8 @@ namespace McHealthCare.Extentions
             User = 2,
 
             [Display(Name = "Admin")]
-            Admin = 3, 
-            
+            Admin = 3,
+
             [Display(Name = "Employee")]
             Employee = 4,
 

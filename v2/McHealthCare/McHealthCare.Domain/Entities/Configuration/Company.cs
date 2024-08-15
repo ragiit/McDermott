@@ -1,11 +1,4 @@
-﻿using McHealthCare.Domain.Entities.Medical;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McHealthCare.Domain.Entities.Configuration
+﻿namespace McHealthCare.Domain.Entities.Configuration
 {
     public class Company : BaseAuditableEntity
     {
@@ -38,8 +31,8 @@ namespace McHealthCare.Domain.Entities.Configuration
         public long? CurrencyId { get; set; }
         public string? Logo { get; set; }
 
-        public virtual City? City { get; set; } 
-        public virtual Province? Province { get; set; } 
+        public virtual City? City { get; set; }
+        public virtual Province? Province { get; set; }
         public virtual Country? Country { get; set; }
     }
 }

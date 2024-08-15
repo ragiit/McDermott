@@ -1,10 +1,4 @@
-﻿using McHealthCare.Application.Dtos.Medical;
-using McHealthCare.Domain.Entities.Medical;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using McHealthCare.Domain.Entities.Medical;
 using static McHealthCare.Application.Features.CommandsQueries.Medical.HealthCenterCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Medical
@@ -38,10 +32,10 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                 else
                     return ((await unitOfWork.Repository<HealthCenter>().Entities
                         .AsNoTracking()
-                        .Include(x=>x.City)
-                        .Include(x=>x.Province)
-                        .Include(x=>x.Country)
-                        .Include(x=>x.Buildings)
+                        .Include(x => x.City)
+                        .Include(x => x.Province)
+                        .Include(x => x.Country)
+                        .Include(x => x.Buildings)
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<HealthCenterDto>(), []);
             }
             else if (results is not null)

@@ -6,6 +6,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
     public partial class ReligionPage : IAsyncDisposable
     {
         #region Variables
+
         private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
@@ -31,7 +32,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         #endregion Variables
-         
 
         protected override async Task OnInitializedAsync()
         {
@@ -52,8 +52,8 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                 await hubConnection.StartAsync();
 
-                await LoadData(); 
-                
+                await LoadData();
+
                 try
                 {
                     Grid?.SelectRow(0, true);
@@ -85,7 +85,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         {
             try
             {
-                PanelVisible = true; 
+                PanelVisible = true;
                 Religions.Clear();
                 Religions = await Mediator.Send(new GetReligionQuery());
                 //SelectedDataItems = [];
@@ -186,7 +186,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
                         var Religion = new ReligionDto
-                        { 
+                        {
                             Name = ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty,
                         };
 

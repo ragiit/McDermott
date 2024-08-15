@@ -1,14 +1,6 @@
-﻿
-
-using DevExpress.Blazor.Internal;
-using DevExpress.Blazor.Popup.Internal;
-using McHealthCare.Application.Dtos.Medical;
-using McHealthCare.Domain.Entities;
-using McHealthCare.Domain.Entities.Configuration;
+﻿using DevExpress.Blazor.Internal;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
 {
@@ -18,12 +10,16 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
         private IGrid Grid { get; set; }
         private IGrid GridGroupMenu { get; set; }
+
         [Inject]
         private UserManager<ApplicationUser> UserManager { get; set; }
+
         [Inject]
         private RoleManager<IdentityRole> RoleManager { get; set; }
+
         [Inject]
         private IUserStore<ApplicationUser> UserStore { get; set; }
+
         private bool PanelVisible { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; } = -1;
         private int FocusedRowVisibleIndex2 { get; set; } = -1;
@@ -32,14 +28,17 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private string Url => Helper.URLS.FirstOrDefault(x => x == "configuration/users") ?? string.Empty;
         public bool IsLoading { get; set; } = false;
         private string PageName => new Uri(NavigationManager.Uri).PathAndQuery.Replace(NavigationManager.BaseUri, "/");
+
         [Parameter]
         public string? PageMode { get; set; }
+
         public bool IsDeleted { get; set; } = false;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
 
         #endregion Default Variables & Forms
 
         #region Variables
+
         private List<ApplicationUserDto> Users = [];
         private List<CountryDto> Countries = [];
         private List<GroupDto> Groups = [];
@@ -52,14 +51,17 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private List<ProvinceDto> Provinces = [];
         private List<OccupationalDto> Occupationals = [];
         private UserRoleDto UserRole { get; set; } = new();
+
         //private List<JobPo> Provinces = [];
         //private List<DepartmentDto> Provinces = [];
         private ApplicationUserDto User { get; set; } = new();
+
         private DoctorDto Doctor { get; set; } = new();
         private EmployeeDto Employee { get; set; } = new();
 
         private IEnumerable<ServiceDto> SelectedServices { get; set; } = [];
-        #endregion
+
+        #endregion Variables
 
         private void CanDeleteSelectedItems(GridFocusedRowChangedEventArgs e)
         {
@@ -68,6 +70,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             if (e.DataItem is not null)
                 IsDeleted = e.DataItem.Adapt<GroupDto>().IsDefaultData;
         }
+
         private async Task BackButtonAsync()
         {
             try
@@ -85,7 +88,9 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 PanelVisible = false;
             }
         }
+
         [Parameter] public string? Id { get; set; }
+
         private async Task LoadComboBox()
         {
             Groups = await Mediator.Send(new GetGroupQuery());
@@ -96,6 +101,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             Villages = await Mediator.Send(new GetVillageQuery());
             Provinces = await Mediator.Send(new GetProvinceQuery());
         }
+
         protected override async Task OnInitializedAsync()
         {
             IsLoading = true;
@@ -120,6 +126,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
             IsLoading = false;
         }
+
         private IUserEmailStore<ApplicationUser> GetEmailStore()
         {
             if (!UserManager.SupportsUserEmail)
@@ -128,6 +135,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
             return (IUserEmailStore<ApplicationUser>)UserStore;
         }
+
         protected override async Task OnParametersSetAsync()
         {
             // Periksa apakah PageMode diatur
@@ -244,13 +252,13 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
         }
+
         private ApplicationUser CreateUser()
         {
             try
@@ -263,6 +271,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
             }
         }
+
         private void HandleInvalidSubmitAsync()
         {
             ToastService.ShowInfoSubmittingForm();
@@ -285,6 +294,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 PanelVisible = false;
             }
         }
+
         private async Task LoadDataByIdAsync(string id)
         {
             IsLoading = true;
@@ -305,12 +315,9 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 //Doctor = (await UserService.GetDoctorByIdAsync(id, true)) ?? new();
                 //Employee = (await UserService.GetEmployeeByIdAsync(id, true)) ?? new();
 
-                 
-
                 User = await userTask ?? new();
                 Doctor = await doctorTask ?? new();
-                Employee = await employeeTask?? new();
-
+                Employee = await employeeTask ?? new();
 
                 UserRole = await UserService.GetUserRolesAsync(UserManager, User.Adapt<ApplicationUser>());
 
@@ -320,13 +327,14 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 }
             }
             catch (Exception ex)
-            { 
+            {
             }
             finally
             {
                 IsLoading = false;
             }
         }
+
         private async Task InitializeEditAsync()
         {
             if (SelectedDataItems.Count > 0)
@@ -335,15 +343,17 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 UserRole = new();
                 Employee = new();
                 User = new();
-                Doctor = new(); 
+                Doctor = new();
                 NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{id}");
                 await LoadDataByIdAsync(id);
             }
         }
+
         private async Task CancelItem_Click()
         {
             await BackButtonAsync();
         }
+
         private void InitializeNew(bool isParam = false)
         {
             User = new();
@@ -351,6 +361,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             if (!isParam)
                 NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Create.GetDisplayName()}");
         }
+
         private async Task OnDeleteAsync(GridDataItemDeletingEventArgs e)
         {
             try

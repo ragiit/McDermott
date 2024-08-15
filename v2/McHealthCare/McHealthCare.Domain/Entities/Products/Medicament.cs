@@ -1,8 +1,4 @@
-﻿
-
-using McHealthCare.Domain.Entities.Inventory;
-
-namespace McHealthCare.Domain.Entities.Products
+﻿namespace McHealthCare.Domain.Entities.Products
 {
     public class Medicament : BaseAuditableEntity
     {
@@ -19,7 +15,6 @@ namespace McHealthCare.Domain.Entities.Products
         public bool? Cronies { get; set; }
         public string? MontlyMax { get; set; }
         public string? Dosage { get; set; }
-
 
         public Uom? Uom { get; set; }
         public DrugForm? Form { get; set; }

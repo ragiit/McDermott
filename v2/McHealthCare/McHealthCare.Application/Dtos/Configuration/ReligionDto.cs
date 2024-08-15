@@ -1,7 +1,4 @@
-﻿using Mapster;
-using System.ComponentModel.DataAnnotations;
-
-namespace McHealthCare.Application.Dtos.Configuration
+﻿namespace McHealthCare.Application.Dtos.Configuration
 {
     public class ReligionDto : IMapFrom<Religion>
     {
@@ -9,7 +6,7 @@ namespace McHealthCare.Application.Dtos.Configuration
 
         [Required]
         [StringLength(200)]
-        public string Name { get; set; } = string.Empty; 
+        public string Name { get; set; } = string.Empty;
     }
 
     public class CreateUpdateReligionDto : IMapFrom<Religion>
@@ -18,6 +15,6 @@ namespace McHealthCare.Application.Dtos.Configuration
 
         [Required]
         [StringLength(200)]
-        public string Name { get; set; } = string.Empty; 
+        public string Name { get; set; } = string.Empty;
     }
 }

@@ -37,232 +37,11 @@ namespace McHealthCare.Persistence.Migrations
                     b.ToTable("ActiveComponentMedicamentGroupDetail");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.Family", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnOrder(0);
-
-                    b.Property<string>("ChildRelation")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ParentRelation")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Relation")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Families");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.KioskConfig", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnOrder(0);
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ServiceIds")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("KioskConfigs");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.LabResultDetail", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnOrder(0);
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("GeneralConsultanMedicalSupportId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("LabUomId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("NormalRange")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Parameter")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Remark")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Result")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ResultType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ResultValueType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GeneralConsultanMedicalSupportId");
-
-                    b.HasIndex("LabUomId");
-
-                    b.ToTable("LabResultDetails");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.PatientAllergy", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnOrder(0);
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FarmacologiCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Farmacology")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Food")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FoodCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PatientApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Weather")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WeatherCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PatientApplicationUserId");
-
-                    b.ToTable("PatientAllergies");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.PatientFamilyRelation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnOrder(0);
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("FamilyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("FamilyMemberId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("PatientId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Relation")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FamilyId");
-
-                    b.HasIndex("FamilyMemberId");
-
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("PatientFamilyRelations");
-                });
-
             modelBuilder.Entity("McHealthCare.Domain.Entities.Allergy", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
@@ -2640,9 +2419,6 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsImport")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
@@ -2657,6 +2433,9 @@ namespace McHealthCare.Persistence.Migrations
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("VisibleImport")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -3010,6 +2789,45 @@ namespace McHealthCare.Persistence.Migrations
                     b.ToTable("SickLeaves");
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Family", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("ChildRelation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ParentRelation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Relation")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Families");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Inventory.Location", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3232,6 +3050,88 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasIndex("TransactionStockId");
 
                     b.ToTable("InventoryAdjusmentDetails");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.KioskConfig", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ServiceIds")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KioskConfigs");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.LabResultDetail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("GeneralConsultanMedicalSupportId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("LabUomId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("NormalRange")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Parameter")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Result")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResultType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResultValueType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GeneralConsultanMedicalSupportId");
+
+                    b.HasIndex("LabUomId");
+
+                    b.ToTable("LabResultDetails");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.Building", b =>
@@ -3962,6 +3862,104 @@ namespace McHealthCare.Persistence.Migrations
                     b.ToTable("Specialities");
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.PatientAllergy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FarmacologiCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Farmacology")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Food")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FoodCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PatientApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Weather")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WeatherCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PatientApplicationUserId");
+
+                    b.ToTable("PatientAllergies");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.PatientFamilyRelation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("FamilyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FamilyMemberId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PatientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Relation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FamilyId");
+
+                    b.HasIndex("FamilyMemberId");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("PatientFamilyRelations");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacies.ActiveComponent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4290,6 +4288,76 @@ namespace McHealthCare.Persistence.Migrations
                     b.ToTable("MedicamentGroupDetails");
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacies.Pharmacy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsFarmacologi")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFood")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsWeather")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("LocationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("MedicamentGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PatientId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PractitionerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid?>("PrescriptionLocationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ReceiptDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ServiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("MedicamentGroupId");
+
+                    b.HasIndex("PatientId");
+
+                    b.HasIndex("PractitionerId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("Pharmacies");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacies.PharmacyLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4369,76 +4437,6 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasIndex("LocationId");
 
                     b.ToTable("ReorderingRules");
-                });
-
-            modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacy", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnOrder(0);
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsFarmacologi")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsFood")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsWeather")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("LocationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("MedicamentGroupId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PatientId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("PaymentMethod")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PractitionerId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid?>("PrescriptionLocationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ReceiptDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ServiceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LocationId");
-
-                    b.HasIndex("MedicamentGroupId");
-
-                    b.HasIndex("PatientId");
-
-                    b.HasIndex("PractitionerId");
-
-                    b.HasIndex("ServiceId");
-
-                    b.ToTable("Pharmacies");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Prescription", b =>
@@ -5493,60 +5491,6 @@ namespace McHealthCare.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.LabResultDetail", b =>
-                {
-                    b.HasOne("McHealthCare.Domain.Entities.ClinicService.GeneralConsultanMedicalSupport", "GeneralConsultanMedicalSupport")
-                        .WithMany()
-                        .HasForeignKey("GeneralConsultanMedicalSupportId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("McHealthCare.Domain.Entities.Medical.LabUom", "LabUom")
-                        .WithMany()
-                        .HasForeignKey("LabUomId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("GeneralConsultanMedicalSupport");
-
-                    b.Navigation("LabUom");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.PatientAllergy", b =>
-                {
-                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Patient", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientApplicationUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Patient");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.PatientFamilyRelation", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.Family", "Family")
-                        .WithMany()
-                        .HasForeignKey("FamilyId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Patient", "FamilyMember")
-                        .WithMany()
-                        .HasForeignKey("FamilyMemberId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Patient", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Family");
-
-                    b.Navigation("FamilyMember");
-
-                    b.Navigation("Patient");
-                });
-
             modelBuilder.Entity("McHealthCare.Domain.Entities.BPJSIntegration", b =>
                 {
                     b.HasOne("McHealthCare.Domain.Entities.ClinicService.InsurancePolicy", "InsurancePolicy")
@@ -6255,6 +6199,24 @@ namespace McHealthCare.Persistence.Migrations
                     b.Navigation("TransactionStock");
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.LabResultDetail", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.ClinicService.GeneralConsultanMedicalSupport", "GeneralConsultanMedicalSupport")
+                        .WithMany()
+                        .HasForeignKey("GeneralConsultanMedicalSupportId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("McHealthCare.Domain.Entities.Medical.LabUom", "LabUom")
+                        .WithMany()
+                        .HasForeignKey("LabUomId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("GeneralConsultanMedicalSupport");
+
+                    b.Navigation("LabUom");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.Building", b =>
                 {
                     b.HasOne("McHealthCare.Domain.Entities.Medical.HealthCenter", "HealthCenter")
@@ -6397,6 +6359,42 @@ namespace McHealthCare.Persistence.Migrations
                     b.Navigation("Serviced");
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.PatientAllergy", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.PatientFamilyRelation", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.Family", "Family")
+                        .WithMany()
+                        .HasForeignKey("FamilyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Patient", "FamilyMember")
+                        .WithMany()
+                        .HasForeignKey("FamilyMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Family");
+
+                    b.Navigation("FamilyMember");
+
+                    b.Navigation("Patient");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacies.ActiveComponent", b =>
                 {
                     b.HasOne("McHealthCare.Domain.Entities.Pharmacies.ConcoctionLine", null)
@@ -6444,7 +6442,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasForeignKey("MedicamentGroupId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McHealthCare.Domain.Entities.Pharmacy", "Pharmacy")
+                    b.HasOne("McHealthCare.Domain.Entities.Pharmacies.Pharmacy", "Pharmacy")
                         .WithMany()
                         .HasForeignKey("PharmacyId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -6553,41 +6551,7 @@ namespace McHealthCare.Persistence.Migrations
                     b.Navigation("UnitOfDosage");
                 });
 
-            modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacies.PharmacyLog", b =>
-                {
-                    b.HasOne("McHealthCare.Domain.Entities.Pharmacy", "Pharmacy")
-                        .WithMany()
-                        .HasForeignKey("PharmacyId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("McHealthCare.Domain.Entities.Configuration.ApplicationUser", "UserBy")
-                        .WithMany()
-                        .HasForeignKey("UserById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Pharmacy");
-
-                    b.Navigation("UserBy");
-                });
-
-            modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacies.ReorderingRule", b =>
-                {
-                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("McHealthCare.Domain.Entities.Inventory.Location", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Company");
-
-                    b.Navigation("Location");
-                });
-
-            modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacy", b =>
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacies.Pharmacy", b =>
                 {
                     b.HasOne("McHealthCare.Domain.Entities.Inventory.Location", "Location")
                         .WithMany()
@@ -6625,6 +6589,40 @@ namespace McHealthCare.Persistence.Migrations
                     b.Navigation("Service");
                 });
 
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacies.PharmacyLog", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.Pharmacies.Pharmacy", "Pharmacy")
+                        .WithMany()
+                        .HasForeignKey("PharmacyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.ApplicationUser", "UserBy")
+                        .WithMany()
+                        .HasForeignKey("UserById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Pharmacy");
+
+                    b.Navigation("UserBy");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacies.ReorderingRule", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.Configuration.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McHealthCare.Domain.Entities.Inventory.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Location");
+                });
+
             modelBuilder.Entity("McHealthCare.Domain.Entities.Prescription", b =>
                 {
                     b.HasOne("McHealthCare.Domain.Entities.Products.DrugDosage", "DrugDosage")
@@ -6647,7 +6645,7 @@ namespace McHealthCare.Persistence.Migrations
                         .HasForeignKey("MedicamentGroupId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McHealthCare.Domain.Entities.Pharmacy", "Pharmacy")
+                    b.HasOne("McHealthCare.Domain.Entities.Pharmacies.Pharmacy", "Pharmacy")
                         .WithMany("Prescriptions")
                         .HasForeignKey("PharmacyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -7111,7 +7109,7 @@ namespace McHealthCare.Persistence.Migrations
                     b.Navigation("ActiveComponent");
                 });
 
-            modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacy", b =>
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacies.Pharmacy", b =>
                 {
                     b.Navigation("Prescriptions");
                 });

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McHealthCare.Domain.Entities.ClinicService
+﻿namespace McHealthCare.Domain.Entities.ClinicService
 {
     public class GeneralConsultationLog : BaseAuditableEntity
     {
@@ -15,7 +9,6 @@ namespace McHealthCare.Domain.Entities.ClinicService
 
         public GeneralConsultanService? GeneralConsultanService { get; set; }
         public GeneralConsultanMedicalSupport? ProcedureRoom { get; set; }
-        public ApplicationUser? UserBy {  get; set; }
-        
+        public ApplicationUser? UserBy { get; set; }
     }
 }

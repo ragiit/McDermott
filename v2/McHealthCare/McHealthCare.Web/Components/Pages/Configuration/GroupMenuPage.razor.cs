@@ -1,8 +1,4 @@
-﻿using DevExpress.Data.Helpers;
-using Microsoft.AspNetCore.Components;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-namespace McHealthCare.Web.Components.Pages.Configuration
+﻿namespace McHealthCare.Web.Components.Pages.Configuration
 {
     public partial class GroupMenuPage
     {
@@ -24,6 +20,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         #region Default Methods
 
         private bool IsDeletedMenu { get; set; } = false;
+
         private void CanDeleteSelectedItemsMenu(GridFocusedRowChangedEventArgs e)
         {
             FocusedRowVisibleIndex2 = e.VisibleIndex;
@@ -33,6 +30,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         }
 
         private bool IsDeleted { get; set; } = false;
+
         private void CanDeleteSelectedItems(GridFocusedRowChangedEventArgs e)
         {
             FocusedRowVisibleIndex = e.VisibleIndex;
@@ -112,7 +110,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 Console.WriteLine($"Error loading data by ID: {ex.Message}");
             }
         }
-         
+
         private void InitializeNew(bool isParam = false)
         {
             Group = new GroupDto();
@@ -204,7 +202,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 }
 
                 SelectedDataItemsGroupMenu = [];
-                await UserService.RemoveUserFromCache(); 
+                await UserService.RemoveUserFromCache();
                 NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
                 await LoadDataGroupMenuAsync();
             }
@@ -234,7 +232,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 else
                     await Mediator.Send(new UpdateGroupMenuRequest(editModel));
 
-                await UserService.RemoveUserFromCache(); 
+                await UserService.RemoveUserFromCache();
                 NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{Group.Id}", true);
                 await LoadDataGroupMenuAsync();
             }
@@ -253,7 +251,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             PanelVisible = isLoading;
         }
 
-       
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -266,15 +263,18 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 catch { }
             }
         }
+
         private async Task NewItemGroup_ClickAsync()
         {
             GroupMenu = new GroupMenuDto();
             await GridGroupMenu.StartEditNewRowAsync();
         }
+
         private async Task CancelItemGroupMenuGrid_Click()
         {
             await BackButtonAsync();
         }
+
         private async Task BackButtonAsync()
         {
             try
@@ -453,11 +453,11 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                             IsRead = ws.Cells[row, 4].Value?.ToString()?.Trim() == "Yes" ? true : false,
                             IsUpdate = ws.Cells[row, 5].Value?.ToString()?.Trim() == "Yes" ? true : false,
                             IsDelete = ws.Cells[row, 6].Value?.ToString()?.Trim() == "Yes" ? true : false,
-                            IsImport = ws.Cells[row, 7].Value?.ToString()?.Trim() == "Yes" ? true : false,
+                            VisibleImport = ws.Cells[row, 7].Value?.ToString()?.Trim() == "Yes" ? true : false,
                         };
 
                         if (!GroupMenus.Any(x => x.GroupId == g.GroupId && x.MenuId == g.MenuId && x.IsCreate == g.IsCreate
-                         && x.IsRead == g.IsRead && x.IsUpdate == g.IsUpdate && x.IsDelete == g.IsDelete && x.IsImport == g.IsImport))
+                         && x.IsRead == g.IsRead && x.IsUpdate == g.IsUpdate && x.IsDelete == g.IsDelete && x.VisibleImport == g.VisibleImport))
                             gg.Add(g);
                     }
 

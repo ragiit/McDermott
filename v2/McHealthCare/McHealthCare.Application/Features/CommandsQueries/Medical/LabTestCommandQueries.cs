@@ -1,11 +1,4 @@
-﻿using Mapster;
-using McHealthCare.Application.Dtos.Medical;
-using McHealthCare.Domain.Entities.Medical;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using McHealthCare.Domain.Entities.Medical;
 using static McHealthCare.Application.Features.CommandsQueries.Medical.LabTestCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Medical
@@ -39,8 +32,8 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                 else
                     return ((await unitOfWork.Repository<LabTest>().Entities
                         .AsNoTracking()
-                        .Include(x=>x.SampleType)
-                        .Include(x=>x.LabTestDetails)
+                        .Include(x => x.SampleType)
+                        .Include(x => x.LabTestDetails)
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<LabTestDto>(), []);
             }
             else if (results is not null)
@@ -50,8 +43,8 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                 else
                     return (new(), (await unitOfWork.Repository<LabTest>().Entities
                         .AsNoTracking()
-                        .Include(x=>x.SampleType)
-                        .Include(x=>x.LabTestDetails)
+                        .Include(x => x.SampleType)
+                        .Include(x => x.LabTestDetails)
                         .FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<LabTestDto>>());
             }
 
@@ -71,8 +64,8 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
             {
                 result = await unitOfWork.Repository<LabTest>().Entities
                         .AsNoTracking()
-                        .Include(x=>x.SampleType)
-                        .Include(x=>x.LabTestDetails)
+                        .Include(x => x.SampleType)
+                        .Include(x => x.LabTestDetails)
                         .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }

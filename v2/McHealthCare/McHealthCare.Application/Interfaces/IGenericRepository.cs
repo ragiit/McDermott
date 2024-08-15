@@ -1,5 +1,4 @@
 ﻿using McHealthCare.Domain.Common.Interfaces;
-using System.Linq.Expressions;
 
 namespace McHealthCare.Application.Interfaces
 {

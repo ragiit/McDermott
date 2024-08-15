@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McHealthCare.Application.Dtos.Configuration
+﻿namespace McHealthCare.Application.Dtos.Configuration
 {
     public class EmailSettingDto : IMapFrom<EmailSetting>
     {
         public Guid Id { get; set; }
+
         [StringLength(300)]
         public string? Description { get; set; }
 
@@ -32,8 +26,10 @@ namespace McHealthCare.Application.Dtos.Configuration
     public class CreateUpdateEmailSettingDto
     {
         public Guid Id { get; set; }
+
         [StringLength(300)]
-        public string? Description { get; set; } 
+        public string? Description { get; set; }
+
         public long? Sequence { get; set; }
         public bool? Smpt_Debug { get; set; }
         public string? Smtp_Encryption { get; set; }

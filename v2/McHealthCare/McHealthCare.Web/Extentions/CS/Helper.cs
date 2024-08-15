@@ -1,17 +1,20 @@
 ﻿using Blazored.Toast.Services;
 using McHealthCare.Application.Services;
-using Microsoft.AspNetCore.Components;
 using Microsoft.Data.SqlClient;
-using Microsoft.JSInterop;
 
 namespace McHealthCare.Web.Extentions.CS
 {
     public static class Helper
     {
+        public static string DefaultFormatDate => "dd MMMM yyyy";
+        public static string DefaultFormatDateTime => "dd MMMM yyyy HH:mm:ss";
+        public static string APP_NAME = "McHealthCare";
+
         public static List<string> LocationTypes = new()
         {
             "Internal Location"
         };
+
         public static List<string> DepartmentCategories = new()
         {
             "Department",
@@ -61,6 +64,7 @@ namespace McHealthCare.Web.Extentions.CS
         {
             "Clinic"
         };
+
         public static List<string> URLS =
         [
             // Clinic Services
@@ -115,6 +119,7 @@ namespace McHealthCare.Web.Extentions.CS
             "inventory/uoms",
             "inventory/locations",
             "inventory/reporting-inventories",
+            "inventory/stock-moves",
 
             // Employees
             "employee/employees",
@@ -158,11 +163,13 @@ namespace McHealthCare.Web.Extentions.CS
             "configuration/religions",
             "configuration/occupationals",
         ];
+
         public static void NavigateToUrl(this NavigationManager NavigationManager, string relativeUrl, bool forceLoad = false)
         {
             var absoluteUrl = $"{NavigationManager.BaseUri}{relativeUrl}";
             NavigationManager.NavigateTo(absoluteUrl, forceLoad);
         }
+
         public static async Task GenerateColumnImportTemplateExcelFileAsync(IJSRuntime jSRuntime, IFileExportService file, string fileName, List<ExportFileData> data, string? name = "downloadFileFromStream")
         {
             var fileContent = await file.GenerateColumnImportTemplateExcelFileAsync(data);
@@ -170,8 +177,11 @@ namespace McHealthCare.Web.Extentions.CS
             using var streamRef = new DotNetStreamReference(new MemoryStream(fileContent));
             await jSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
         }
+
         public static void ShowInfoSubmittingForm(this IToastService toastService, string message = "Please ensure that all fields marked in red are filled in before submitting the form.") => toastService.ShowInfo(message);
+
         public static void ShowSuccessSaved(this IToastService toastService, string entity) => toastService.ShowSuccess($"The {entity} record has been saved successfully.");
+
         public static void ShowSuccessUpdated(this IToastService toastService, string entity) => toastService.ShowSuccess($"The {entity} record has been updated successfully.");
 
         public static void ShowErrorImport(this IToastService ToastService, int row, int col, string val)

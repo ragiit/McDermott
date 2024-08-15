@@ -1,11 +1,4 @@
-﻿using McHealthCare.Domain.Entities.Medical;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McHealthCare.Domain.Entities.ClinicService
+﻿namespace McHealthCare.Domain.Entities.ClinicService
 {
     public class GeneralConsultanService : BaseAuditableEntity
     {
@@ -37,9 +30,9 @@ namespace McHealthCare.Domain.Entities.ClinicService
         public TimeSpan? WorkTo { get; set; }
         public string? SerialNo { get; set; } // NoUrut
 
-
         /// <BPJS Rujukan>
         public string? ReferVerticalKhususCategoryName { get; set; }
+
         public string? ReferVerticalKhususCategoryCode { get; set; }
         public string? ReferVerticalSpesialisParentSpesialisName { get; set; }
         public string? ReferVerticalSpesialisParentSpesialisCode { get; set; }
@@ -52,8 +45,10 @@ namespace McHealthCare.Domain.Entities.ClinicService
         public string? PPKRujukanName { get; set; }
         public string? PPKRujukanCode { get; set; }
         public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
+
         /// </BPJS Rujukan>
         public string? MedexType { get; set; }
+
         public bool IsMcu { get; set; } = false;
         public bool IsBatam { get; set; }
         public bool IsOutsideBatam { get; set; }
@@ -64,7 +59,8 @@ namespace McHealthCare.Domain.Entities.ClinicService
         public string? AccidentExaminationDocs { get; set; }
         public string? AccidentExaminationBase64 { get; set; }
 
-        #region Clinical Assesment 
+        #region Clinical Assesment
+
         public string? ScrinningTriageScale { get; set; }
         public string? RiskOfFalling { get; set; }
         public string? RiskOfFallingDetail { get; set; }
@@ -85,34 +81,28 @@ namespace McHealthCare.Domain.Entities.ClinicService
 
         public string BMIState { get; set; } = "-";
         public string ClinicVisitTypes { get; set; } = "Sick";
-        public string? InformationFrom { get; set; } 
+        public string? InformationFrom { get; set; }
 
         public long E { get; set; } = 4;
         public long V { get; set; } = 5;
         public long M { get; set; } = 6;
 
-        #endregion
+        #endregion Clinical Assesment
 
-        
         public virtual ClassType? ClassType { get; set; }
-        
+
         public virtual Project? Project { get; set; }
-        
+
         public virtual Awareness? AwarenessDto { get; set; }
-        
+
         public virtual KioskQueue? KioskQueue { get; set; }
 
-        
         public virtual Patient? Patient { get; set; }
 
-        
         public virtual Doctor? Pratitioner { get; set; }
 
-
-        
         public virtual Service? Service { get; set; }
 
-        
         public virtual InsurancePolicy? InsurancePolicy { get; set; }
     }
 }

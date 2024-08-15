@@ -17,7 +17,7 @@
 <h3>Manage email</h3>
 
 <StatusMessage Message="@message"/>
-<div class="row">
+<div class="row g-0">
     <div class="col-md-6">
         <form @onsubmit="OnSendEmailVerificationAsync" @formname="send-verification" id="send-verification-form" method="post">
             <AntiforgeryToken />

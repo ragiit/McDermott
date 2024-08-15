@@ -1,32 +1,31 @@
-﻿ 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McHealthCare.Domain.Entities.ClinicService
+﻿namespace McHealthCare.Domain.Entities.ClinicService
 {
     public class Accident : BaseAuditableEntity
     {
         public Guid GeneralConsultanServiceId { get; set; }
         public string SafetyPersonnelId { get; set; } = string.Empty;
+
         [Display(Name = "Date Of Occurrence")]
         [Required]
         public DateTime? DateOfOccurrence { get; set; }
+
         [Required]
         public DateTime? DateOfFirstTreatment { get; set; }
+
         public bool RibbonSpecialCase { get; set; } = false;
         public string? Sent { get; set; }
         public string? EmployeeClass { get; set; }
+
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? EstimatedDisability { get; set; }
+
         public string? AreaOfYard { get; set; }
         public EnumStatusAccident Status { get; set; } = EnumStatusAccident.Draft;
         public string? EmployeeDescription { get; set; }
         public string AccidentLocation { get; set; } = "Inside";
 
         #region Employee Cause Of Injury
+
         public List<string> SelectedEmployeeCauseOfInjury1 { get; set; } = [];
         public List<string> SelectedEmployeeCauseOfInjury2 { get; set; } = [];
         public List<string> SelectedEmployeeCauseOfInjury3 { get; set; } = [];
@@ -57,7 +56,7 @@ namespace McHealthCare.Domain.Entities.ClinicService
         public string? EmployeeCauseOfInjury13 { get; set; }
         public string? EmployeeCauseOfInjury14 { get; set; }
 
-        #endregion
+        #endregion Employee Cause Of Injury
 
         #region Nature Of Injury
 
@@ -78,7 +77,7 @@ namespace McHealthCare.Domain.Entities.ClinicService
         public string? NatureOfInjury7 { get; set; }
         public string? NatureOfInjury8 { get; set; }
 
-        #endregion
+        #endregion Nature Of Injury
 
         #region Part Of Body
 
@@ -95,7 +94,6 @@ namespace McHealthCare.Domain.Entities.ClinicService
         public List<string> SelectedPartOfBody11 { get; set; } = [];
         public List<string> SelectedPartOfBody12 { get; set; } = [];
 
-
         public string? PartOfBody1 { get; set; }
         public string? PartOfBody2 { get; set; }
         public string? PartOfBody3 { get; set; }
@@ -109,9 +107,10 @@ namespace McHealthCare.Domain.Entities.ClinicService
         public string? PartOfBody11 { get; set; }
         public string? PartOfBody12 { get; set; }
 
-        #endregion
+        #endregion Part Of Body
 
         #region Treatment
+
         public List<string> SelectedTreatment1 { get; set; } = [];
         public List<string> SelectedTreatment2 { get; set; } = [];
         public List<string> SelectedTreatment3 { get; set; } = [];
@@ -126,11 +125,12 @@ namespace McHealthCare.Domain.Entities.ClinicService
         public string? Treatment5 { get; set; }
         public string? Treatment6 { get; set; }
         public string? Treatment7 { get; set; }
-        #endregion
-         
-        public virtual GeneralConsultanService? GeneralConsultanService { get; set; } 
-        public virtual Employee? Employee { get; set; } 
-        public virtual Department? Department { get; set; } 
+
+        #endregion Treatment
+
+        public virtual GeneralConsultanService? GeneralConsultanService { get; set; }
+        public virtual Employee? Employee { get; set; }
+        public virtual Department? Department { get; set; }
         public virtual ApplicationUser? SafetyPersonnel { get; set; }
     }
 }

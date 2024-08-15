@@ -1,5 +1,3 @@
-using McDermott.Domain.Entities;
-using McHealthCare.Application.Features.CommandsQueries.Employees;
 using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities;
 using McHealthCare.Domain.Entities.ClinicService;
@@ -39,15 +37,15 @@ namespace McHealthCare.Context
 
         public DbSet<City> Cities { get; set; }
         public DbSet<Country> Countries { get; set; }
-        public DbSet<District> Districts { get; set; } 
+        public DbSet<District> Districts { get; set; }
         public DbSet<Province> Provinces { get; set; }
         public DbSet<Religion> Religions { get; set; }
         public DbSet<Village> Villages { get; set; }
-        public DbSet<Company> Companies { get; set; } 
+        public DbSet<Company> Companies { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<JobPosition> JobPositions { get; set; }
         public DbSet<Speciality> Specialities { get; set; }
-        public DbSet<Occupational> Occupationals { get; set; }  
+        public DbSet<Occupational> Occupationals { get; set; }
         public DbSet<Menu> Menus { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMenu> GroupMenus { get; set; }
@@ -97,7 +95,7 @@ namespace McHealthCare.Context
 
         public DbSet<Accident> Accidents { get; set; }
         public DbSet<LabResultDetail> LabResultDetails { get; set; }
-        public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; } 
+        public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
         public DbSet<GeneralConsultanCPPT> GeneralConsultanCPPTs { get; set; }
         public DbSet<GeneralConsultanMedicalSupport> GeneralConsultanMedicalSupports { get; set; }
 
@@ -157,9 +155,6 @@ namespace McHealthCare.Context
         #endregion MyRegion
 
         #endregion DbSet
-
-
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

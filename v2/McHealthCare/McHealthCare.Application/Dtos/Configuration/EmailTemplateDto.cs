@@ -1,8 +1,4 @@
-﻿using Mapster;
-using McHealthCare.Domain.Entities;
-using System.ComponentModel.DataAnnotations;
-
-namespace McHealthCare.Application.Dtos.Configuration
+﻿namespace McHealthCare.Application.Dtos.Configuration
 
 {
     public class EmailTemplateDto : IMapFrom<EmailTemplate>
@@ -16,6 +12,7 @@ namespace McHealthCare.Application.Dtos.Configuration
 
         [StringLength(200)]
         public string? From { get; set; } = string.Empty;
+
         public Guid? EmailFromId { get; set; }
 
         public string? Status { get; set; } = string.Empty;
@@ -28,6 +25,7 @@ namespace McHealthCare.Application.Dtos.Configuration
 
         public long? TypeEmail { get; set; }
         public DateTime? Schendule { get; set; }
+
         //public byte[]? DocumentContent { get; set; } = [];
         //public string? Message => System.Text.Encoding.UTF8.GetString(DocumentContent ?? []);
         public string? Message { get; set; } = string.Empty;
@@ -37,12 +35,14 @@ namespace McHealthCare.Application.Dtos.Configuration
 
     public class CreateUpdateEmailTemplateDto : IMapFrom<EmailTemplate>
     {
-        public Guid Id { get; set; } 
+        public Guid Id { get; set; }
+
         [StringLength(200)]
         public string? Subject { get; set; }
 
         [StringLength(200)]
         public string? From { get; set; }
+
         public Guid? EmailFromId { get; set; }
         public Guid? ById { get; set; }
 
@@ -60,6 +60,5 @@ namespace McHealthCare.Application.Dtos.Configuration
         public string? Message { get; set; }
         public long? TypeEmail { get; set; }
         public string? Status { get; set; }
-
     }
 }

@@ -5,13 +5,15 @@ namespace McHealthCare.Domain.Entities.Configuration
     // Add profile data for application users by adding properties to the ApplicationUser class
     public class ApplicationUser : IdentityUser
     {
-        public Guid? GroupId { get; set; } 
+        public Guid? GroupId { get; set; }
         public Guid? ReligionId { get; set; }
+
         [Required]
-        public string Name { get; set; } = string.Empty; 
+        public string Name { get; set; } = string.Empty;
+
         public string? PlaceOfBirth { get; set; }
         public DateTime? DateOfBirth { get; set; }
-        public EnumGender Gender { get; set; }  
+        public EnumGender Gender { get; set; }
         public string? NoId { get; set; } // No Identitas // KTP
         public string? TypeId { get; set; } = "KTP"; // Jenis Identitas
         public string? MartialStatus { get; set; }
@@ -47,16 +49,16 @@ namespace McHealthCare.Domain.Entities.Configuration
         public string? PhotoBase64 { get; set; }
         public DateTime? ExpiredId { get; set; }
 
-        public virtual Religion? Religion { get; set; }     
-        public virtual Country? IdCardCountry { get; set; } // KTP Negara 
-        public virtual Province? IdCardProvince { get; set; } // KTP Province 
-        public virtual City? IdCardCity { get; set; } // KTP Negara 
-        public virtual District? IdCardDistrict { get; set; } // KTP Negara 
-        public virtual Village? IdCardVillage { get; set; } // KTP Negara 
-        public virtual Country? DomicileCountry { get; set; } // Domisili Negara 
-        public virtual Province? DomicileProvince { get; set; } // Domisili Province 
-        public virtual City? DomicileCity { get; set; } // Domisili City 
-        public virtual District? DomicileDistrict { get; set; } // Domisili District 
+        public virtual Religion? Religion { get; set; }
+        public virtual Country? IdCardCountry { get; set; } // KTP Negara
+        public virtual Province? IdCardProvince { get; set; } // KTP Province
+        public virtual City? IdCardCity { get; set; } // KTP Negara
+        public virtual District? IdCardDistrict { get; set; } // KTP Negara
+        public virtual Village? IdCardVillage { get; set; } // KTP Negara
+        public virtual Country? DomicileCountry { get; set; } // Domisili Negara
+        public virtual Province? DomicileProvince { get; set; } // Domisili Province
+        public virtual City? DomicileCity { get; set; } // Domisili City
+        public virtual District? DomicileDistrict { get; set; } // Domisili District
         public virtual Village? DomicileVillage { get; set; } // Domisili Village
         public virtual Group? Group { get; set; }
         public virtual Patient? Patient { get; set; }  // Navigation property

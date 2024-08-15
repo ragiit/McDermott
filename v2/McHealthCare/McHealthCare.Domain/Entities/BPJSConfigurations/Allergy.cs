@@ -4,7 +4,8 @@ namespace McHealthCare.Domain.Entities
 {
     public class Allergy : BaseAuditableEntity
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
+
         [JsonPropertyName("kdAllergy")]
         public string KdAllergy { get; set; } = string.Empty;
 

@@ -1,13 +1,4 @@
-﻿using Mapster;
-using McHealthCare.Application.Dtos.Configuration;
-using McHealthCare.Application.Extentions;
-using McHealthCare.Application.Interfaces;
-using McHealthCare.Domain.Entities;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
-using System.Linq.Expressions;
+﻿using Microsoft.Extensions.DependencyInjection;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.GroupCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
@@ -39,7 +30,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                 if (!ReturnNewData)
                     return (result.Adapt<GroupDto>(), []);
                 else
-                    return ((await unitOfWork.Repository<Group>().Entities 
+                    return ((await unitOfWork.Repository<Group>().Entities
                         .AsNoTracking()
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<GroupDto>(), []);
             }
@@ -69,7 +60,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             {
                 using var scope = _scopeFactory.CreateScope();
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                result = await unitOfWork.Repository<Group>().Entities 
+                result = await unitOfWork.Repository<Group>().Entities
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));

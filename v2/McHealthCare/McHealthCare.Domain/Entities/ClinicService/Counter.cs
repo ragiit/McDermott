@@ -9,9 +9,8 @@
         public Guid? PhysicianId { get; set; }
         public string? Status { get; set; }
 
-
-        public virtual Service? Service { get; set; } 
-        public virtual Service? ServiceK { get; set; } 
+        public virtual Service? Service { get; set; }
+        public virtual Service? ServiceK { get; set; }
         public virtual Doctor? Physician { get; set; }
     }
 }

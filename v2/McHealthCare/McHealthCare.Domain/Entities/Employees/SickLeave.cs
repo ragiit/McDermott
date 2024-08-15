@@ -1,11 +1,4 @@
-﻿using McHealthCare.Domain.Entities.ClinicService;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McHealthCare.Domain.Entities.Employees
+﻿namespace McHealthCare.Domain.Entities.Employees
 {
     public class SickLeave : BaseAuditableEntity
     {

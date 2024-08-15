@@ -4,7 +4,7 @@
     {
         #region Variables
 
-        private bool PanelVisible { get; set; } = true; 
+        private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
         private List<CountryDto> Countries = [];
@@ -41,7 +41,7 @@
             try
             {
                 UserAccess = await UserService.GetUserInfo(ToastService);
-                await LoadData(); 
+                await LoadData();
             }
             catch (Exception ex)
             {

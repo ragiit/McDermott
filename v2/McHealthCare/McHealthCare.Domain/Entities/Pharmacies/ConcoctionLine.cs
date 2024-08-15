@@ -12,16 +12,12 @@
         public long? TotalQty { get; set; }
         public long? AvaliableQty { get; set; }
 
-        
         public Product? Product { get; set; }
 
-        
         public List<ActiveComponent>? ActiveComponent { get; set; }
 
-        
         public Concoction? Concoction { get; set; }
 
-        
         public Uom? Uom { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace McDermott.Domain.Entities
+﻿namespace McHealthCare.Domain.Entities
 {
     public class LabResultDetail : BaseAuditableEntity
     {
@@ -11,12 +11,10 @@
         public string? ResultValueType { get; set; }
         public string? Remark { get; set; }
 
-        //[SetToNull]
+        //
         //public LabTestDetail? LabTestDetail { get; set; } = new();
 
-
-      
-        public LabUom? LabUom { get; set; } 
+        public LabUom? LabUom { get; set; }
         public GeneralConsultanMedicalSupport? GeneralConsultanMedicalSupport { get; set; }
     }
 }

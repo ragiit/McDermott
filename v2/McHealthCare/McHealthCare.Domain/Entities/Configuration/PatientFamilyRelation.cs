@@ -1,4 +1,4 @@
-﻿namespace McDermott.Domain.Entities
+﻿namespace McHealthCare.Domain.Entities
 {
     public class PatientFamilyRelation : BaseAuditableEntity
     {
@@ -7,13 +7,10 @@
         public Guid? FamilyId { get; set; }
         public string? Relation { get; set; }
 
-        [SetToNull]
         public virtual Family? Family { get; set; }
 
-        [SetToNull]
         public virtual Patient? Patient { get; set; }
 
-        [SetToNull]
         public virtual Patient? FamilyMember { get; set; }
     }
 }

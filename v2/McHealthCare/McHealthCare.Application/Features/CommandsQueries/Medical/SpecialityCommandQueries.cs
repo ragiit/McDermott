@@ -1,11 +1,4 @@
-﻿using Mapster;
-using McHealthCare.Application.Dtos.Medical;
-using McHealthCare.Domain.Entities.Medical;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using McHealthCare.Domain.Entities.Medical;
 using static McHealthCare.Application.Features.CommandsQueries.Medical.SpecialityCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Medical
@@ -38,7 +31,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                     return (result.Adapt<SpecialityDto>(), []);
                 else
                     return ((await unitOfWork.Repository<Speciality>().Entities
-                        .AsNoTracking()                        
+                        .AsNoTracking()
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<SpecialityDto>(), []);
             }
             else if (results is not null)
@@ -47,7 +40,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                     return (new(), results.Adapt<List<SpecialityDto>>());
                 else
                     return (new(), (await unitOfWork.Repository<Speciality>().Entities
-                        .AsNoTracking()                        
+                        .AsNoTracking()
                         .FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<SpecialityDto>>());
             }
 
@@ -66,7 +59,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
             if (!cache.TryGetValue(CacheKey, out result))
             {
                 result = await unitOfWork.Repository<Speciality>().Entities
-                        .AsNoTracking()                        
+                        .AsNoTracking()
                         .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }

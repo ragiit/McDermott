@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McHealthCare.Application.Dtos.Configuration
+﻿namespace McHealthCare.Application.Dtos.Configuration
 {
     public class UserRoleDto
     {
@@ -12,9 +6,9 @@ namespace McHealthCare.Application.Dtos.Configuration
         public bool IsPractitioner { get; set; }
         public bool IsPatient { get; set; }
         public bool IsMCU { get; set; }
-        public bool IsEmployee { get; set; } 
+        public bool IsEmployee { get; set; }
         public bool IsPharmacy { get; set; }
-        public bool IsHR { get; set; } 
-        public bool IsAdmin { get; set; } 
+        public bool IsHR { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

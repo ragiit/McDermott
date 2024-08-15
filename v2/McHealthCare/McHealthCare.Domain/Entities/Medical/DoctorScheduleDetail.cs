@@ -10,7 +10,6 @@ namespace McHealthCare.Domain.Entities.Medical
         public int? Quota { get; set; }
         public bool? UpdateToBpjs { get; set; }
 
-        [SetToNull]
         public virtual DoctorSchedule? DoctorSchedule { get; set; }
     }
 }

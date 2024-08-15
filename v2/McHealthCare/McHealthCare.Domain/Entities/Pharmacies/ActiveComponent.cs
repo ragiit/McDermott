@@ -1,6 +1,4 @@
-﻿
-
-namespace McHealthCare.Domain.Entities.Pharmacies
+﻿namespace McHealthCare.Domain.Entities.Pharmacies
 {
     public class ActiveComponent : BaseAuditableEntity
     {
@@ -8,7 +6,6 @@ namespace McHealthCare.Domain.Entities.Pharmacies
         public string Name { get; set; } = string.Empty;
         public string? AmountOfComponent { get; set; }
 
-        [SetToNull]
         public virtual Uom? Uom { get; set; }
 
         public virtual List<MedicamentGroupDetail>? MedicamentGroupDetails { get; set; }
