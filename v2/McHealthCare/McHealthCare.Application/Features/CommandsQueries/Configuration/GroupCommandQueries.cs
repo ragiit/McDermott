@@ -6,6 +6,7 @@ using McHealthCare.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.GroupCommand;
 
@@ -21,7 +22,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         public sealed record DeleteGroupRequest(Guid? Id = null, List<Guid>? Ids = null) : IRequest<bool>;
     }
 
-    public sealed class GroupQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService) :
+    public sealed class GroupQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService, IServiceScopeFactory _scopeFactory) :
         IRequestHandler<GetGroupQuery, List<GroupDto>>,
         IRequestHandler<CreateGroupRequest, GroupDto>,
         IRequestHandler<CreateListGroupRequest, List<GroupDto>>,
@@ -66,6 +67,8 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             if (!cache.TryGetValue(CacheKey, out result))
             {
+                using var scope = _scopeFactory.CreateScope();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 result = await unitOfWork.Repository<Group>().Entities 
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);

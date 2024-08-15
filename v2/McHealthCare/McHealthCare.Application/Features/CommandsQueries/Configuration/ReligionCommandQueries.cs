@@ -5,6 +5,7 @@ using McHealthCare.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
@@ -19,7 +20,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         public sealed record DeleteReligionRequest(Guid? Id = null, List<Guid>? Ids = null) : IRequest<bool>;
     }
 
-    public sealed class ReligionQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService) :
+    public sealed class ReligionQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService, IServiceScopeFactory _scopeFactory) :
         IRequestHandler<GetReligionQuery, List<ReligionDto>>,
         IRequestHandler<CreateReligionRequest, ReligionDto>,
         IRequestHandler<CreateListReligionRequest, List<ReligionDto>>,
@@ -64,6 +65,9 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             if (!cache.TryGetValue(CacheKey, out result))
             {
+                using var scope = _scopeFactory.CreateScope();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
                 result = await unitOfWork.Repository<Religion>().Entities
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);

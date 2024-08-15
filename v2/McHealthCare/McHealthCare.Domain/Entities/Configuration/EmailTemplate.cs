@@ -14,12 +14,12 @@ namespace McHealthCare.Domain.Entities.Configuration
         [StringLength(200)]
         public string? From { get; set; }
         public Guid? EmailFromId { get; set; }
-        public Guid? ById { get; set; }
+        public string? ById { get; set; }
 
         [StringLength(200)]
         public string? To { get; set; }
 
-        public Guid? ToPartnerId { get; set; }
+        public string? ToPartnerId { get; set; }
 
         [StringLength(200)]
         public List<string>? Cc { get; set; } = [];

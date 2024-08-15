@@ -1,31 +1,23 @@
-using McHealthCare.Domain.Entities.Medical;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace McHealthCare.Domain.Entities.Inventory
 {
-    public partial class Location : BaseAuditableEntity
+    public class Location : BaseAuditableEntity
     {
-        public Guid? CityId { get; set; }
-        public Guid? ProvinceId { get; set; }
-        public Guid? CountryId { get; set; }
-        public string? Name { get; set; }
-        public string? Type { get; set; }
-        public string? Phone { get; set; }
-        public string? Mobile { get; set; }
-        public string? Email { get; set; }
-        public string? Street1 { get; set; }
-        public string? Street2 { get; set; }
-        public string? WebsiteLink { get; set; }
+        public Guid? ParentLocationId { get; set; }
+        public Guid? CompanyId { get; set; }
 
-        [SetToNull]
-        public virtual City? City { get; set; }
+        [StringLength(200)]
+        public string Name { get; set; } = string.Empty;
 
-        [SetToNull]
-        public virtual Province? Province { get; set; }
+        [StringLength(200)]
+        public string Type { get; set; } = string.Empty;
 
-        [SetToNull]
-        public virtual Country? Country { get; set; }
-
-        [SetToNull]
-        public virtual List<Building>? Buildings { get; set; }
+        public virtual Location? ParentLocation { get; set; }
+        public virtual Company? Company { get; set; }
     }
 }

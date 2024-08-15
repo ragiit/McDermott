@@ -29,7 +29,7 @@ namespace McHealthCare.Application.Dtos.Configuration
         public virtual bool EmailConfirmed { get; set; } 
         public virtual string? PasswordHash { get; set; } 
         public virtual string? SecurityStamp { get; set; } 
-        public string? ConcurrencyStamp { get; set; } = Guid.NewGuid().ToString(); 
+        public string? ConcurrencyStamp { get; set; }
         [ProtectedPersonalData]
         public string? PhoneNumber { get; set; }
          
@@ -91,10 +91,10 @@ namespace McHealthCare.Application.Dtos.Configuration
         public ProvinceDto? DomicileProvince { get; set; }  
         public CityDto? DomicileCity { get; set; }  
         public DistrictDto? DomicileDistrict { get; set; } 
-        public VillageDto? DomicileVillage { get; set; }  
-        //public GroupDto? Group { get; set; }
-        //public Patient? Patient { get; set; }  // Navigation property
-        //public Employee? Employee { get; set; }  // Navigation property
+        public VillageDto? DomicileVillage { get; set; }
+        public GroupDto? Group { get; set; } 
+        public PatientDto? Patient { get; set; }    
+        public EmployeeDto? Employee { get; set; }  // Navigation property
         public DoctorDto? Doctor { get; set; }  // Navigation property
     }
 }

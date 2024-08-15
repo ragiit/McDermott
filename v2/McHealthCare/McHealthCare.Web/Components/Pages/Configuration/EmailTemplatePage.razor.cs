@@ -99,7 +99,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 EmailSettings = await Mediator.Send(new GetEmailSettingQuery());
 
                 userBy = await UserService.GetCurrentUserNameAsync();
-                EmailFormTemplate.ById = Guid.Parse(User.Id);
+                EmailFormTemplate.ById = User.Id;
                 //_isInitComplete = true;
             }
             catch

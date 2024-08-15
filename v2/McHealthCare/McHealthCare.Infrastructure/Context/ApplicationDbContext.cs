@@ -1,6 +1,9 @@
+using McHealthCare.Application.Features.CommandsQueries.Employee;
 using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities;
+using McHealthCare.Domain.Entities.ClinicService;
 using McHealthCare.Domain.Entities.Configuration;
+using McHealthCare.Domain.Entities.Employee;
 using McHealthCare.Domain.Entities.Inventory;
 using McHealthCare.Domain.Entities.Medical;
 using Microsoft.AspNetCore.Http;
@@ -49,7 +52,7 @@ namespace McHealthCare.Context
         public DbSet<Insurance> Insurances { get; set; }
         public DbSet<LabTest> LabTests { get; set; }
         public DbSet<LabTestDetail> LabTestDetails { get; set; }
-        public DbSet<LabUom> LabUoms { get; set; }
+        public DbSet<LabUom> LabUoms { get; set; } 
         public DbSet<NursingDiagnoses> NursingDiagnoses { get; set; }
         public DbSet<Procedure> Procedures { get; set; }
         public DbSet<SampleType> SampleTypes { get; set; }
@@ -63,6 +66,25 @@ namespace McHealthCare.Context
         #endregion
 
         #endregion DbSet
+
+
+        #region Employee
+        public DbSet<SickLeave> SickLeaves { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<JobPosition> JobPositions { get; set; }
+        #endregion
+
+        #region Clinic Service
+        public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
+
+        #endregion
+
+        #region Inventory
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<Uom> Uoms { get; set; }
+        public DbSet<UomCategory> UomCategories { get; set; }
+        #endregion
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

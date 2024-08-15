@@ -3,62 +3,41 @@ using McHealthCare.Application.Dtos.Configuration;
 using McHealthCare.Application.Dtos.Medical;
 using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities.Inventory;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace McHealthCare.Application.Dtos.Inventory
 {
     public class LocationDto : IMapFrom<Location>
     {
         public Guid Id { get; set; }
-        public Guid? CityId { get; set; }
-        public Guid? ProvinceId { get; set; }
-        public Guid? CountryId { get; set; }
+        public Guid? ParentLocationId { get; set; }
+        public Guid? CompanyId { get; set; }
+
+        [StringLength(200)]
         public string Name { get; set; } = string.Empty;
+
+        [StringLength(200)]
         public string Type { get; set; } = string.Empty;
-        public string? Phone { get; set; }
-        public string? Mobile { get; set; }
-        public string? Email { get; set; }
-        public string? Street1 { get; set; }
-        public string? Street2 { get; set; }
-        public string? WebsiteLink { get; set; }
 
-        [SetToNull]
-        public virtual CityDto? City { get; set; }
-
-        [SetToNull]
-        public virtual ProvinceDto? Province { get; set; }
-
-        [SetToNull]
-        public virtual CountryDto? Country { get; set; }
-
-        [SetToNull]
-        public virtual List<BuildingDto>? Buildings { get; set; }
+        public virtual LocationDto? ParentLocation { get; set; }
+        public virtual CompanyDto? Company { get; set; }
     }
 
-    public class CreateUpdateLocationDto : IMapFrom<Location>
+    public class CreateUpdateLocationDto
     {
         public Guid Id { get; set; }
-        public Guid? CityId { get; set; }
-        public Guid? ProvinceId { get; set; }
-        public Guid? CountryId { get; set; }
+        public Guid? ParentLocationId { get; set; }
+        public Guid? CompanyId { get; set; }
+
+        [StringLength(200)]
         public string Name { get; set; } = string.Empty;
+
+        [StringLength(200)]
         public string Type { get; set; } = string.Empty;
-        public string? Phone { get; set; }
-        public string? Mobile { get; set; }
-        public string? Email { get; set; }
-        public string? Street1 { get; set; }
-        public string? Street2 { get; set; }
-        public string? WebsiteLink { get; set; }
-
-        [SetToNull]
-        public virtual CityDto? City { get; set; }
-
-        [SetToNull]
-        public virtual ProvinceDto? Province { get; set; }
-
-        [SetToNull]
-        public virtual CountryDto? Country { get; set; }
-
-        [SetToNull]
-        public virtual List<BuildingDto>? Buildings { get; set; }
     }
 }

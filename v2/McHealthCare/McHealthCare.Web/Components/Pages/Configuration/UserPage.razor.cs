@@ -1,10 +1,13 @@
 ﻿
 
 using DevExpress.Blazor.Internal;
+using DevExpress.Blazor.Popup.Internal;
 using McHealthCare.Application.Dtos.Medical;
 using McHealthCare.Domain.Entities;
+using McHealthCare.Domain.Entities.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
@@ -17,6 +20,8 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private IGrid GridGroupMenu { get; set; }
         [Inject]
         private UserManager<ApplicationUser> UserManager { get; set; }
+        [Inject]
+        private RoleManager<IdentityRole> RoleManager { get; set; }
         [Inject]
         private IUserStore<ApplicationUser> UserStore { get; set; }
         private bool PanelVisible { get; set; } = false;
@@ -46,6 +51,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private List<VillageDto> Villages = [];
         private List<ProvinceDto> Provinces = [];
         private List<OccupationalDto> Occupationals = [];
+        private UserRoleDto UserRole { get; set; } = new();
         //private List<JobPo> Provinces = [];
         //private List<DepartmentDto> Provinces = [];
         private ApplicationUserDto User { get; set; } = new();
@@ -81,7 +87,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         }
         [Parameter] public string? Id { get; set; }
         private async Task LoadComboBox()
-        { 
+        {
             Groups = await Mediator.Send(new GetGroupQuery());
             Countries = await Mediator.Send(new GetCountryQuery());
             Cities = await Mediator.Send(new GetCityQuery());
@@ -95,6 +101,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             IsLoading = true;
             try
             {
+                var a = await RoleManager.Roles.ToListAsync();
                 UserAccess = await UserService.GetUserInfo(ToastService);
 
                 await LoadDataAsync();
@@ -168,12 +175,31 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                 if (PageMode == EnumPageMode.Create.GetDisplayName())
                 {
+                    User.Id = Guid.NewGuid().ToString();
                     var result = await UserManager.CreateAsync(User.Adapt<ApplicationUser>(), User?.Password ?? "P@ssRandom!123");
 
                     if (result.Succeeded)
                     {
                         await UserService.RemoveUserFromCache();
+
+                        var s = await UserManager.FindByIdAsync(User.Id);
+                        await UserService.UpdateUserRolesAsync(UserManager, s, UserRole);
+
+                        Doctor.ApplicationUserId = User.Id;
+                        Employee.ApplicationUserId = User.Id;
+
+                        if (!UserRole.IsPractitioner)
+                            await UserService.RemoveUserDoctor(User);
+                        else
+                            await UserService.UpdateDoctorAsync(Doctor);
+
+                        if (!UserRole.IsEmployee)
+                            await UserService.RemoveEmployeeDoctor(User);
+                        else
+                            await UserService.UpdateEmployeeAsync(Employee);
+
                         await LoadDataByIdAsync(User?.Id ?? string.Empty);
+                        ToastService.ShowSuccessSaved("User");
                         NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{User?.Id}");
                     }
                     else
@@ -188,11 +214,26 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 {
                     var s = await UserManager.FindByIdAsync(User.Id);
                     User.Adapt(s);
-                    var result = await UserManager.UpdateAsync(s); 
+                    var result = await UserManager.UpdateAsync(s);
                     if (result.Succeeded)
                     {
-                        await UserService.RemoveUserFromCache();
+                        await UserService.UpdateUserRolesAsync(UserManager, s, UserRole);
+
+                        Doctor.ApplicationUserId = User.Id;
+                        Employee.ApplicationUserId = User.Id;
+
+                        if (!UserRole.IsPractitioner)
+                            await UserService.RemoveUserDoctor(User);
+                        else
+                            await UserService.UpdateDoctorAsync(Doctor);
+
+                        if (!UserRole.IsEmployee)
+                            await UserService.RemoveEmployeeDoctor(User);
+                        else
+                            await UserService.UpdateEmployeeAsync(Employee);
+
                         await LoadDataByIdAsync(User?.Id ?? string.Empty);
+                        ToastService.ShowSuccessUpdated("User");
                         NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{User?.Id}");
                     }
                     else
@@ -246,19 +287,44 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         }
         private async Task LoadDataByIdAsync(string id)
         {
-            try     
+            IsLoading = true;
+            try
             {
                 //User = await UserService.GetUserId(id);
 
-                User =  await UserService.GetUserId(id, true);
+                var userTask = UserService.GetUserId(id, true);
+                var doctorTask = UserService.GetDoctorByIdAsync(id, true);
+                var employeeTask = UserService.GetEmployeeByIdAsync(id, true);
+
+                //// Await tasks
+                //User = await userTask;
+                //Doctor = await doctorTask;
+                //Employee = await employeeTask;
+
+                //User = (await UserService.GetUserId(id, true)) ?? new();
+                //Doctor = (await UserService.GetDoctorByIdAsync(id, true)) ?? new();
+                //Employee = (await UserService.GetEmployeeByIdAsync(id, true)) ?? new();
+
+                 
+
+                User = await userTask ?? new();
+                Doctor = await doctorTask ?? new();
+                Employee = await employeeTask?? new();
+
+
+                UserRole = await UserService.GetUserRolesAsync(UserManager, User.Adapt<ApplicationUser>());
+
                 if (User is null || string.IsNullOrWhiteSpace(User.Id))
                 {
                     NavigationManager.NavigateToUrl(Url);
                 }
             }
             catch (Exception ex)
+            { 
+            }
+            finally
             {
-                ex.HandleException(ToastService);
+                IsLoading = false;
             }
         }
         private async Task InitializeEditAsync()
@@ -266,6 +332,10 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             if (SelectedDataItems.Count > 0)
             {
                 var id = SelectedDataItems[0].Adapt<ApplicationUserDto>().Id;
+                UserRole = new();
+                Employee = new();
+                User = new();
+                Doctor = new(); 
                 NavigationManager.NavigateToUrl($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{id}");
                 await LoadDataByIdAsync(id);
             }
@@ -294,7 +364,10 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                     var u = await UserManager.FindByIdAsync(((ApplicationUser)e.DataItem).Id);
 
                     if (u != null)
+                    {
                         await UserManager.DeleteAsync(u);
+                        await UserService.RemoveUserFromCache();
+                    }
                 }
                 else
                 {
@@ -304,9 +377,13 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                         var u = await UserManager.FindByIdAsync(id);
 
                         if (u != null)
+                        {
                             await UserManager.DeleteAsync(u);
+                            await UserService.RemoveUserFromCache();
+                        }
                     }
                 }
+                await LoadDataAsync();
             }
             catch (Exception ex)
             {

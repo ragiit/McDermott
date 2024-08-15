@@ -34,6 +34,33 @@ namespace McHealthCare.Extentions
                             ?.GetName() ?? enumValue.ToString();
         }
 
+        public enum EnumRole
+        {
+            [Display(Name = "HR")]
+            HR = 1,
+
+            [Display(Name = "User")]
+            User = 2,
+
+            [Display(Name = "Admin")]
+            Admin = 3, 
+            
+            [Display(Name = "Employee")]
+            Employee = 4,
+
+            [Display(Name = "MCU")]
+            MCU = 5,
+
+            [Display(Name = "Pharmacy")]
+            Pharmacy = 6,
+
+            [Display(Name = "Patient")]
+            Patient = 7,
+
+            [Display(Name = "Practitioner")]
+            Practitioner = 8,
+        }
+
         public enum EnumGender
         {
             [Display(Name = "Male")]

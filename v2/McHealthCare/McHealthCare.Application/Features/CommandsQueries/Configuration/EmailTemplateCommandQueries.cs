@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.Extensions.DependencyInjection;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.EmailTemplateCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
@@ -13,7 +14,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         public sealed record DeleteEmailTemplateRequest(Guid? Id = null, List<Guid>? Ids = null) : IRequest<bool>;
     }
 
-    public sealed class EmailTemplateQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService) :
+    public sealed class EmailTemplateQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService, IServiceScopeFactory _scopeFactory) :
         IRequestHandler<GetEmailTemplateQuery, List<EmailTemplateDto>>,
         IRequestHandler<CreateEmailTemplateRequest, EmailTemplateDto>,
         IRequestHandler<CreateListEmailTemplateRequest, List<EmailTemplateDto>>,
@@ -62,6 +63,8 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             if (!cache.TryGetValue(CacheKey, out result))
             {
+                using var scope = _scopeFactory.CreateScope();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 result = await unitOfWork.Repository<EmailTemplate>().Entities
                         .AsNoTracking()
                         .Include(x => x.By)

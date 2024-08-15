@@ -1,5 +1,7 @@
 ﻿
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 {
     public sealed class OccupationalCommand
@@ -12,7 +14,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
         public sealed record DeleteOccupationalRequest(Guid? Id = null, List<Guid>? Ids = null) : IRequest<bool>;
     }
 
-    public sealed class OccupationalQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService) :
+    public sealed class OccupationalQueryHandler(IUnitOfWork unitOfWork, IMemoryCache cache, IHubContext<NotificationHub, INotificationClient> dataService, IServiceScopeFactory _scopeFactory) :
         IRequestHandler<GetOccupationalQuery, List<OccupationalDto>>,
         IRequestHandler<CreateOccupationalRequest, OccupationalDto>,
         IRequestHandler<CreateListOccupationalRequest, List<OccupationalDto>>,
@@ -56,10 +58,14 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
             List<Occupational> result = [];
 
             if (!cache.TryGetValue(CacheKey, out result))
-            {
+            { 
+                using var scope = _scopeFactory.CreateScope();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
                 result = await unitOfWork.Repository<Occupational>().Entities
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
+
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }
 
@@ -68,6 +74,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
 
             return result?.Adapt<List<OccupationalDto>>() ?? [];
         }
+
 
         #endregion GET
 
