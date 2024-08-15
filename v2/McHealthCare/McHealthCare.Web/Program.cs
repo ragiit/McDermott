@@ -115,6 +115,7 @@ builder.Services.AddCors();
 
 var app = builder.Build();
 
+app.UsePathBase("/v2");
 app.UseResponseCompression();
 
 //app.UseMiddleware<SessionExpirationMiddleware>();
@@ -132,7 +133,6 @@ else
 }
 
 app.UseCors(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
-app.UsePathBase("/v2");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
