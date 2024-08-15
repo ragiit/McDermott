@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace McHealthCare.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class initialmigration : Migration
+    public partial class Refresh : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -237,6 +237,23 @@ namespace McHealthCare.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Projects",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Projects", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Religions",
                 columns: table => new
                 {
@@ -275,7 +292,7 @@ namespace McHealthCare.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Quota = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsPatient = table.Column<bool>(type: "bit", nullable: false),
                     IsKiosk = table.Column<bool>(type: "bit", nullable: false),
@@ -312,6 +329,23 @@ namespace McHealthCare.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Specialists", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UomCategories",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UomCategories", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -475,6 +509,55 @@ namespace McHealthCare.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GeneralConsultanServices",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GeneralConsultanServices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultanServices_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Uoms",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UomCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BiggerRatio = table.Column<float>(type: "real", nullable: true),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    RoundingPrecision = table.Column<float>(type: "real", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Uoms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Uoms_UomCategories_UomCategoryId",
+                        column: x => x.UomCategoryId,
+                        principalTable: "UomCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Cities",
                 columns: table => new
                 {
@@ -557,6 +640,30 @@ namespace McHealthCare.Persistence.Migrations
                         name: "FK_DoctorScheduleDetails_DoctorSchedules_DoctorScheduleId",
                         column: x => x.DoctorScheduleId,
                         principalTable: "DoctorSchedules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SickLeaves",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GeneralConsultanServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    TypeLeave = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SickLeaves", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SickLeaves_GeneralConsultanServices_GeneralConsultanServiceId",
+                        column: x => x.GeneralConsultanServiceId,
+                        principalTable: "GeneralConsultanServices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -686,17 +793,10 @@ namespace McHealthCare.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ProvinceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Mobile = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Street1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Street2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WebsiteLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ParentLocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -706,21 +806,15 @@ namespace McHealthCare.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_Locations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Locations_Cities_CityId",
-                        column: x => x.CityId,
-                        principalTable: "Cities",
+                        name: "FK_Locations_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Locations_Countries_CountryId",
-                        column: x => x.CountryId,
-                        principalTable: "Countries",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Locations_Provinces_ProvinceId",
-                        column: x => x.ProvinceId,
-                        principalTable: "Provinces",
+                        name: "FK_Locations_Locations_ParentLocationId",
+                        column: x => x.ParentLocationId,
+                        principalTable: "Locations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -771,7 +865,6 @@ namespace McHealthCare.Persistence.Migrations
                     HealthCenterId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -784,12 +877,6 @@ namespace McHealthCare.Persistence.Migrations
                         name: "FK_Buildings_HealthCenters_HealthCenterId",
                         column: x => x.HealthCenterId,
                         principalTable: "HealthCenters",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Buildings_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1036,11 +1123,53 @@ namespace McHealthCare.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Departments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ParentDepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ManagerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    DepartmentCategory = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Departments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Departments_AspNetUsers_ManagerId",
+                        column: x => x.ManagerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Departments_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Departments_Departments_ParentDepartmentId",
+                        column: x => x.ParentDepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Doctors",
                 columns: table => new
                 {
                     ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SpecialityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DoctorType = table.Column<bool>(type: "bit", nullable: false),
+                    IsPhysicion = table.Column<bool>(type: "bit", nullable: false),
+                    IsNurse = table.Column<bool>(type: "bit", nullable: false),
+                    PhysicanCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SipNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SipFile = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SipFileBase64 = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -1101,9 +1230,9 @@ namespace McHealthCare.Persistence.Migrations
                     Subject = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     From = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     EmailFromId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ById = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     To = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    ToPartnerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ToPartnerId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Cc = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     ReplayTo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Schendule = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1111,7 +1240,6 @@ namespace McHealthCare.Persistence.Migrations
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TypeEmail = table.Column<long>(type: "bigint", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ById1 = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -1121,8 +1249,8 @@ namespace McHealthCare.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_EmailTemplates", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EmailTemplates_AspNetUsers_ById1",
-                        column: x => x.ById1,
+                        name: "FK_EmailTemplates_AspNetUsers_ById",
+                        column: x => x.ById,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -1147,7 +1275,8 @@ namespace McHealthCare.Persistence.Migrations
                     Legacy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SAP = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Oracle = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EmployeeType = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    EmployeeType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    JoinDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1192,6 +1321,29 @@ namespace McHealthCare.Persistence.Migrations
                         name: "FK_Patients_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JobPositions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobPositions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_JobPositions_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1321,11 +1473,6 @@ namespace McHealthCare.Persistence.Migrations
                 column: "HealthCenterId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Buildings_LocationId",
-                table: "Buildings",
-                column: "LocationId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Cities_ProvinceId",
                 table: "Cities",
                 column: "ProvinceId");
@@ -1344,6 +1491,21 @@ namespace McHealthCare.Persistence.Migrations
                 name: "IX_Companies_ProvinceId",
                 table: "Companies",
                 column: "ProvinceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Departments_CompanyId",
+                table: "Departments",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Departments_ManagerId",
+                table: "Departments",
+                column: "ManagerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Departments_ParentDepartmentId",
+                table: "Departments",
+                column: "ParentDepartmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Diagnosis_ChronicCategoryId",
@@ -1386,9 +1548,9 @@ namespace McHealthCare.Persistence.Migrations
                 column: "PhysicianId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmailTemplates_ById1",
+                name: "IX_EmailTemplates_ById",
                 table: "EmailTemplates",
-                column: "ById1");
+                column: "ById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmailTemplates_EmailFromId",
@@ -1404,6 +1566,11 @@ namespace McHealthCare.Persistence.Migrations
                 name: "IX_Employees_SupervisorId",
                 table: "Employees",
                 column: "SupervisorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultanServices_ServiceId",
+                table: "GeneralConsultanServices",
+                column: "ServiceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GroupMenus_GroupId",
@@ -1431,6 +1598,11 @@ namespace McHealthCare.Persistence.Migrations
                 column: "ProvinceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_JobPositions_DepartmentId",
+                table: "JobPositions",
+                column: "DepartmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LabTestDetails_LabTestId",
                 table: "LabTestDetails",
                 column: "LabTestId");
@@ -1446,19 +1618,14 @@ namespace McHealthCare.Persistence.Migrations
                 column: "SampleTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Locations_CityId",
+                name: "IX_Locations_CompanyId",
                 table: "Locations",
-                column: "CityId");
+                column: "CompanyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Locations_CountryId",
+                name: "IX_Locations_ParentLocationId",
                 table: "Locations",
-                column: "CountryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Locations_ProvinceId",
-                table: "Locations",
-                column: "ProvinceId");
+                column: "ParentLocationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Menus_ParentId",
@@ -1474,6 +1641,16 @@ namespace McHealthCare.Persistence.Migrations
                 name: "IX_Services_ServicedId",
                 table: "Services",
                 column: "ServicedId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SickLeaves_GeneralConsultanServiceId",
+                table: "SickLeaves",
+                column: "GeneralConsultanServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Uoms_UomCategoryId",
+                table: "Uoms",
+                column: "UomCategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Villages_CityId",
@@ -1527,7 +1704,7 @@ namespace McHealthCare.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_EmailTemplates_AspNetUsers_ById1",
+                name: "FK_EmailTemplates_AspNetUsers_ById",
                 table: "EmailTemplates");
 
             migrationBuilder.DropTable(
@@ -1547,9 +1724,6 @@ namespace McHealthCare.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "BuildingLocations");
-
-            migrationBuilder.DropTable(
-                name: "Companies");
 
             migrationBuilder.DropTable(
                 name: "Diagnosis");
@@ -1573,6 +1747,9 @@ namespace McHealthCare.Persistence.Migrations
                 name: "Insurances");
 
             migrationBuilder.DropTable(
+                name: "JobPositions");
+
+            migrationBuilder.DropTable(
                 name: "LabTestDetails");
 
             migrationBuilder.DropTable(
@@ -1585,13 +1762,25 @@ namespace McHealthCare.Persistence.Migrations
                 name: "Procedures");
 
             migrationBuilder.DropTable(
+                name: "Projects");
+
+            migrationBuilder.DropTable(
+                name: "SickLeaves");
+
+            migrationBuilder.DropTable(
                 name: "Specialists");
+
+            migrationBuilder.DropTable(
+                name: "Uoms");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Buildings");
+
+            migrationBuilder.DropTable(
+                name: "Locations");
 
             migrationBuilder.DropTable(
                 name: "ChronicCategories");
@@ -1606,16 +1795,25 @@ namespace McHealthCare.Persistence.Migrations
                 name: "Menus");
 
             migrationBuilder.DropTable(
+                name: "Departments");
+
+            migrationBuilder.DropTable(
                 name: "LabTests");
 
             migrationBuilder.DropTable(
                 name: "LabUoms");
 
             migrationBuilder.DropTable(
+                name: "GeneralConsultanServices");
+
+            migrationBuilder.DropTable(
+                name: "UomCategories");
+
+            migrationBuilder.DropTable(
                 name: "HealthCenters");
 
             migrationBuilder.DropTable(
-                name: "Locations");
+                name: "Companies");
 
             migrationBuilder.DropTable(
                 name: "SampleTypes");
