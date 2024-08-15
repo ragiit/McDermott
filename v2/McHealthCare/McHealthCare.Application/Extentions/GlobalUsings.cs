@@ -19,6 +19,8 @@ global using static McHealthCare.Application.Features.Commands.Bpjs.BpjsClassifi
 
 global using McHealthCare.Application.Dtos.ClinicServices;
 
+global using McHealthCare.Application.Dtos.BpjsIntegration;
+global using static McHealthCare.Application.Features.CommandsQueries.Bpjs.AllergyCommand;
 global using McHealthCare.Domain.Entities.Employees;
 global using McHealthCare.Domain.Entities;
 global using McHealthCare.Domain.Entities.Products;

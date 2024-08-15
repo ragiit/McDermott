@@ -63,7 +63,32 @@ namespace McHealthCare.Web.Extentions.CS
         public static List<string> TypesHealthCare = new List<string>
         {
             "Clinic"
-        };
+        }; 
+        
+        public class AllergyType
+        {
+            public string Code { get; set; } = string.Empty;
+            public string Name { get; set; } = string.Empty;
+        }
+
+        public static List<AllergyType> _allergyTypes = [
+            new()
+            {
+                Code = "01",
+                Name = "Makanan"
+            },
+            new()
+            {
+                Code = "02",
+                Name = "Udara"
+            },
+            new()
+            {
+                Code = "03",
+                Name = "Obat"
+            },
+        ];
+
 
         public static List<string> URLS =
         [

@@ -63,6 +63,10 @@ builder.Services.AddSignalR()
     });
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IPCareService, PCareService>();
 builder.Services.AddScoped<IFileExportService, FileExportService>();
 builder.Services.AddApplicationLayer();
 

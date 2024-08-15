@@ -1,0 +1,126 @@
+﻿@page "/bpjs-integration/allergies"
+@using static McHealthCare.Web.Extentions.CS.Helper
+
+<PageTitle>McHealthCare - Allergy</PageTitle>
+
+@if (!IsLoading)
+{
+    <div class="wrapper"> 
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <DxFormLayout CssClass="w-100">
+                                    <DxFormLayoutItem Caption="Type" CaptionCssClass="normal-caption required-caption" ColSpanMd="6">
+                                        <DxComboBox Data="@Helper._allergyTypes"
+                                                    NullText="Select Allergy Type..."
+                                                    ShowValidationIcon="true"
+                                                    FilteringMode="@DataGridFilteringMode.Contains"
+                                                    SelectedItemChanged="@((AllergyType req)=> SelectChangeAllergyType(req))"
+                                                    @bind-Value="@SelectedCodeAllergyType"
+                                                    TextFieldName="Name"
+                                                    ValueFieldName="Code">
+                                        </DxComboBox>
+                                    </DxFormLayoutItem>
+
+                                    <DxFormLayoutItem Context="ItemContexxt" ColSpanMd="12">
+                                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                        IsContentBlocked="true"
+                                                        ApplyBackgroundShading="true"
+                                                        IndicatorAreaVisible="false"
+                                                        Text="Fetching Data...">
+                                            <DxGrid @ref="Grid"
+                                                    Data="@_allergies"
+                                                    PagerVisible="true"
+                                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                                    KeyFieldName="Id"
+                                                    PagerNavigationMode="PagerNavigationMode.InputBox"
+                                                    TextWrapEnabled="false"
+                                                    EditorRenderMode="GridEditorRenderMode.Detached"
+                                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                    PageSizeSelectorVisible="true"
+                                                    EditModelSaving="OnSave"
+                                                    DataItemDeleting="OnDelete"
+                                                    PagerPosition="GridPagerPosition.Bottom"
+                                                    PageIndex="@parameter1"
+                                                    PageSize="@parameter2"
+                                                    ShowGroupPanel="true" 
+                                                    AutoExpandAllGroupRows="true"
+                                                    ShowFilterRow="true"
+                                                    KeyboardNavigationEnabled="true"
+                                                    ShowSearchBox="true"
+                                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                                    PageIndexChanged="HandlePageIndexChanged"
+                                                    PageSizeChanged="HandlePageSizeChanged">
+                                                <ToolbarTemplate>
+                                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                        <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                        <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && _allergies.Count > 0" />
+                                                        <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && _allergies.Count > 0"/>
+                                                        <DxToolbarItem BeginGroup="true" Text="Refresh" Click="LoadData" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                        <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                        <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                            <Items>
+                                                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                            </Items>
+                                                        </DxToolbarItem>
+                                                    </DxToolbar>
+                                                </ToolbarTemplate>
+                                                <Columns>
+                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(AllergyDto.KdAllergy)" Caption="Code" />
+                                                    <DxGridDataColumn MinWidth="200" FieldName="@nameof(AllergyDto.NmAllergy)" Caption="Allergy" />
+                                                </Columns>
+                                                <EditFormTemplate Context="EditFormContext">
+                                                    @{
+                                                        var a = (AllergyDto)EditFormContext.EditModel;
+                                                    }
+                                                    <DxFormLayout CssClass="w-100">
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Name" ColSpanMd="12">
+                                                            <DxTextBox @bind-Text="@a.NmAllergy" NullText="Name" InputCssClass="fw-normal" />
+                                                            <ValidationMessage For="@(() => a.NmAllergy)" />
+                                                        </DxFormLayoutItem>
+
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
+                                                            <DxTextBox @bind-Text="@a.KdAllergy" NullText="Code" InputCssClass="fw-normal" />
+                                                            <ValidationMessage For="@(() => a.KdAllergy)" />
+                                                        </DxFormLayoutItem>
+
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Type" ColSpanMd="12">
+                                                            <DxComboBox Data="@_allergyTypes"
+                                                                        NullText="Select Allergy Type..."
+                                                                        ShowValidationIcon="true"
+                                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        @bind-Value="@a.Type"
+                                                                        TextFieldName="Name"
+                                                                        ValueFieldName="Code">
+                                                            </DxComboBox>
+                                                            <ValidationMessage For="@(() => a.Type)" />
+                                                        </DxFormLayoutItem>
+                                                    </DxFormLayout>
+                                                </EditFormTemplate>
+                                            </DxGrid>
+                                        </DxLoadingPanel>
+                                    </DxFormLayoutItem>
+                                </DxFormLayout>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <div class="wrapper"> 
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    </div>
+}
