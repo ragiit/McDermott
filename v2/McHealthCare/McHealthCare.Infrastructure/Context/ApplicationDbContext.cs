@@ -61,13 +61,6 @@ namespace McHealthCare.Context
         public DbSet<Project> Projects { get; set; }
         #endregion
 
-        #region Inventory
-        public DbSet<Location> Locations { get; set; }
-        #endregion
-
-        #endregion DbSet
-
-
         #region Employee
         public DbSet<SickLeave> SickLeaves { get; set; }
         public DbSet<Department> Departments { get; set; }
@@ -84,6 +77,10 @@ namespace McHealthCare.Context
         public DbSet<Uom> Uoms { get; set; }
         public DbSet<UomCategory> UomCategories { get; set; }
         #endregion
+
+        #endregion DbSet
+
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
