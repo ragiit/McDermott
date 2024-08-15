@@ -1,8 +1,6 @@
 ﻿using McHealthCare.Application.Dtos.Employee;
 using McHealthCare.Application.Extentions;
 using Microsoft.AspNetCore.SignalR.Client;
-using static McHealthCare.Application.Features.CommandsQueries.Employee.DepartmentCommand;
-
 namespace McHealthCare.Web.Components.Pages.Employee
 {
     public partial class DepartmentPage : IAsyncDisposable

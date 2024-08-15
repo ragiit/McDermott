@@ -61,12 +61,8 @@ namespace McHealthCare.Context
         public DbSet<Project> Projects { get; set; }
         #endregion
 
-        #region Inventory
-        public DbSet<Location> Locations { get; set; }
-        #endregion
 
         #endregion DbSet
-
 
         #region Employee
         public DbSet<SickLeave> SickLeaves { get; set; }

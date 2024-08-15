@@ -39,10 +39,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Inventory
                 else
                     return ((await unitOfWork.Repository<Location>().Entities
                         .AsNoTracking()
-                        .Include(x => x.City)
-                        .Include(x => x.Province)
-                        .Include(x => x.Country)
-                        .Include(x => x.Buildings)
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<LocationDto>(), []);
             }
             else if (results is not null)
@@ -71,10 +67,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Inventory
             {
                 result = await unitOfWork.Repository<Location>().Entities
                         .AsNoTracking()
-                        .Include(x => x.City)
-                        .Include(x => x.Province)
-                        .Include(x => x.Country)
-                        .Include(x => x.Buildings)
                         .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }

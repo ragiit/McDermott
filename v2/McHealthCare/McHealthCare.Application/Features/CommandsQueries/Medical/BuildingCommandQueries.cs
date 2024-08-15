@@ -39,6 +39,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                 else
                     return ((await unitOfWork.Repository<Building>().Entities
                         .AsNoTracking()
+                        .Include(x=>x.HealthCenter)
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<BuildingDto>(), []);
             }
             else if (results is not null)
@@ -48,6 +49,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                 else
                     return (new(), (await unitOfWork.Repository<Building>().Entities
                         .AsNoTracking()
+                        .Include(x => x.HealthCenter)
                         .FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<BuildingDto>>());
             }
 
@@ -67,6 +69,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
             {
                 result = await unitOfWork.Repository<Building>().Entities
                         .AsNoTracking()
+                        .Include(x => x.HealthCenter)
                         .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }

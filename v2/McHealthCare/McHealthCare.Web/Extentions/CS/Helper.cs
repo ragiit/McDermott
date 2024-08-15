@@ -141,6 +141,7 @@ namespace McHealthCare.Web.Extentions.CS
             "medical/sample-types",
             "medical/lab-uoms",
             "medical/projects",
+            "medical/buildings",
 
             // Configurations
             "configuration/users",
