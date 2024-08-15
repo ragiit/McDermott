@@ -1,4 +1,4 @@
-﻿using McHealthCare.Application.Dtos.Employee;
+﻿using McHealthCare.Application.Dtos.Employees;
 using McHealthCare.Application.Extentions;
 using Microsoft.AspNetCore.SignalR.Client;
 

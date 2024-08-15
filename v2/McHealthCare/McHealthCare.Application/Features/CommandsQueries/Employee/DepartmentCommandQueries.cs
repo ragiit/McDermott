@@ -1,17 +1,16 @@
 ﻿using Mapster;
 using McHealthCare.Application.Dtos.Configuration;
-using McHealthCare.Application.Dtos.Employee;
+using McHealthCare.Application.Dtos.Employees;
 using McHealthCare.Application.Extentions;
 using McHealthCare.Application.Interfaces;
-using McHealthCare.Domain.Entities.Employee;
+using McHealthCare.Domain.Entities.Employees;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq.Expressions;
-using static McHealthCare.Application.Features.CommandsQueries.Employee.DepartmentCommand;
+using System.Linq.Expressions; 
 
-namespace McHealthCare.Application.Features.CommandsQueries.Employee
+namespace McHealthCare.Application.Features.CommandsQueries.Employees
 {
     public sealed class DepartmentCommand
     {

@@ -1,0 +1,142 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using McHealthCare.Domain.Entities.Configuration;
+using McHealthCare.Domain.Entities.Medical;
+
+namespace McHealthCare.Domain.Entities.ClinicService
+{
+    public class GeneralConsultanMedicalSupport : BaseAuditableEntity
+    {
+        public Guid? GeneralConsultanServiceId { get; set; }
+        public string? PractitionerLabEximinationId { get; set; }
+        public string? LabEximinationName { get; set; }
+        public Guid? LabResulLabExaminationtId { get; set; }
+        public List<Guid>? LabResulLabExaminationtIds { get; set; }
+        public string? LabEximinationAttachment { get; set; }
+        public string? PractitionerRadiologyEximinationId { get; set; }
+        public string? RadiologyEximinationName { get; set; }
+        public string? RadiologyEximinationAttachment { get; set; }
+        public string? PractitionerAlcoholEximinationId { get; set; }
+        public string? AlcoholEximinationName { get; set; }
+        public string? AlcoholEximinationAttachment { get; set; }
+        public bool? AlcoholNegative { get; set; }
+        public bool? AlcoholPositive { get; set; }
+        public string? PractitionerDrugEximinationId { get; set; }
+        public string? DrugEximinationName { get; set; }
+        public string? DrugEximinationAttachment { get; set; }
+        public bool? DrugNegative { get; set; }
+        public bool? DrugPositive { get; set; }
+        public bool? AmphetaminesNegative { get; set; }
+        public bool? AmphetaminesPositive { get; set; }
+        public bool? BenzodiazepinesNegative { get; set; }
+        public bool? BenzodiazepinesPositive { get; set; }
+        public bool? CocaineMetabolitesNegative { get; set; }
+        public bool? CocaineMetabolitesPositive { get; set; }
+        public bool? OpiatesNegative { get; set; }
+        public bool? OpiatesPositive { get; set; }
+        public bool? MethamphetaminesNegative { get; set; }
+        public bool? MethamphetaminesPositive { get; set; }
+        public bool? THCCannabinoidMarijuanaNegative { get; set; }
+        public bool? THCCannabinoidMarijuanaPositive { get; set; }
+        public string? OtherExaminationAttachment { get; set; }
+        public string? ECGAttachment { get; set; }
+        public bool IsOtherExaminationECG { get; set; } = false;
+        public string? OtherExaminationTypeECG { get; set; }
+        public string? OtherExaminationRemarkECG { get; set; }
+        public long? PractitionerECGId { get; set; }
+        public bool IsNormalRestingECG { get; set; } = false;
+        public bool IsSinusRhythm { get; set; } = false;
+        public bool IsSinusBradycardia { get; set; } = false;
+        public bool IsSinusTachycardia { get; set; } = false;
+
+        #region Confined Space
+        public string? EmployeeId { get; set; }
+        public bool IsFirstTimeEnteringConfinedSpace { get; set; } = false;
+        public long EnteringConfinedSpaceCount { get; set; } = 0;
+        public bool IsDefectiveSenseOfSmell { get; set; } = false;
+        public bool IsAsthmaOrLungAilment { get; set; } = false;
+        public bool IsBackPainOrLimitationOfMobility { get; set; } = false;
+        public bool IsClaustrophobia { get; set; } = false;
+        public bool IsDiabetesOrHypoglycemia { get; set; } = false;
+        public bool IsEyesightProblem { get; set; } = false;
+        public bool IsFaintingSpellOrSeizureOrEpilepsy { get; set; } = false;
+        public bool IsHearingDisorder { get; set; } = false;
+        public bool IsHeartDiseaseOrDisorder { get; set; } = false;
+        public bool IsHighBloodPressure { get; set; } = false;
+        public bool IsLowerLimbsDeformity { get; set; } = false;
+        public bool IsMeniereDiseaseOrVertigo { get; set; } = false;
+        public string? RemarksMedicalHistory { get; set; }
+        public DateTime? DateMedialHistory { get; set; }
+        public string? SignatureEmployeeId { get; set; }
+        public byte[]? SignatureEmployeeImagesMedicalHistory { get; set; } = [];
+        public string? SignatureEmployeeImagesMedicalHistoryBase64 { get; set; }
+
+        public long? Wt { get; set; }
+        public long? Bp { get; set; }
+        public long? Height { get; set; }
+        public long? Pulse { get; set; }
+        public long? ChestCircumference { get; set; }
+        public long? AbdomenCircumference { get; set; }
+        public long? RespiratoryRate { get; set; }
+        public long? Temperature { get; set; }
+        public bool IsConfinedSpace { get; set; } = false;
+
+        public string? Eye { get; set; }
+        public string? EarNoseThroat { get; set; }
+        public string? Cardiovascular { get; set; }
+        public string? Respiratory { get; set; }
+        public string? Abdomen { get; set; }
+        public string? Extremities { get; set; }
+        public string? Musculoskeletal { get; set; }
+        public string? Neurologic { get; set; }
+        public string? SpirometryTest { get; set; }
+        public string? RespiratoryFitTest { get; set; }
+        public long? Size { get; set; }
+        public string? Comment { get; set; }
+        public List<string> Recommendeds { get; set; } = [];
+        public DateTime? DateEximinedbyDoctor { get; set; }
+        public byte[]? SignatureEximinedDoctor { get; set; }
+        public string? SignatureEximinedDoctorBase64 { get; set; }
+        public string? Recommended { get; set; }
+        public string? ExaminedPhysicianId { get; set; }
+        #endregion
+
+        public long HR { get; set; }
+        //public bool IsVentriculatExtraSystole { get; set; } = false;
+        //public bool IsSupraventricularExtraSystole { get; set; } = false;
+        public bool IsOtherECG { get; set; } = false;
+        public string? OtherDesc { get; set; }
+
+        public EnumStatusGeneralConsultantServiceProcedureRoom? Status { get; set; } = EnumStatusGeneralConsultantServiceProcedureRoom.Draft;
+        [NotMapped]
+        public string StatusName => Status.GetDisplayName();
+        public Guid? LabTestId { get; set; }
+
+        
+        public McHealthCare.Domain.Entities.Configuration.Employee? Employee { get; set; }
+
+        
+        public LabTest? LabTest { get; set; }
+
+         // Tandai properti yang harus diatur ke null
+        public GeneralConsultanService? GeneralConsultanService { get; set; }
+
+        
+        public Doctor? PractitionerLabEximination { get; set; }
+
+        
+        public Doctor? PractitionerRadiologyEximination { get; set; }
+
+        
+        public Doctor? PractitionerAlcoholEximination { get; set; }
+
+        
+        public Doctor? PractitionerDrugEximination { get; set; }
+
+        
+        public Doctor? PractitionerECG { get; set; }
+
+        
+        public LabTestDetail? LabResulLabExaminationt { get; set; }
+         
+    }
+}
