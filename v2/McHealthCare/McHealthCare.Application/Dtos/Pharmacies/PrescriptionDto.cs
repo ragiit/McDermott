@@ -2,16 +2,16 @@
 {
     public class PrescriptionDto : IMapFrom<Prescription>
     {
-        public long Id { get; set; }
-        public long PharmacyId { get; set; }
-        public long? DrugFromId { get; set; }
-        public long? DrugRouteId { get; set; }
-        public long? DrugDosageId { get; set; }
-        public long? ProductId { get; set; }
-        public long? UomId { get; set; }
+        public Guid Id { get; set; }
+        public Guid PharmacyId { get; set; }
+        public Guid? DrugFromId { get; set; }
+        public Guid? DrugRouteId { get; set; }
+        public Guid? DrugDosageId { get; set; }
+        public Guid? ProductId { get; set; }
+        public Guid? UomId { get; set; }
         public string? ProductName { get; set; }
         public string? DosageFrequency { get; set; }
-        public List<long>? ActiveComponentId { get; set; } = [];
+        public List<Guid>? ActiveComponentId { get; set; } = [];
         public string? ActiveComponentNames { get; set; }
         public string? DrugRoutName { get; set; }
         public string? DrugDosageName { get; set; }

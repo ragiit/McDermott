@@ -5,10 +5,10 @@
         public Guid Id { get; set; }
 
         [Required]
-        public Guid? PatientId { get; set; }
+        public string? PatientId { get; set; }
 
         [Required]
-        public Guid? PractitionerId { get; set; }
+        public string? PractitionerId { get; set; }
 
         [Required]
         public Guid? PrescriptionLocationId { get; set; }

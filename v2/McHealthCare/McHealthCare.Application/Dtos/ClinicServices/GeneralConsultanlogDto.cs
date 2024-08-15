@@ -2,9 +2,9 @@
 {
     public class GeneralConsultanlogDto : IMapFrom<GeneralConsultationLog>
     {
-        public long? GeneralConsultanServiceId { get; set; }
-        public long? ProcedureRoomId { get; set; }
-        public long? UserById { get; set; }
+        public Guid? GeneralConsultanServiceId { get; set; }
+        public Guid? ProcedureRoomId { get; set; }
+        public string? UserById { get; set; }
         public string? Status { get; set; }
 
         public GeneralConsultanServiceDto? GeneralConsultanService { get; set; }

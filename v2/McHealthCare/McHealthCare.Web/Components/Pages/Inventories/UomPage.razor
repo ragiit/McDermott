@@ -1,0 +1,228 @@
+﻿@page "/inventory/uoms"
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Master Data Unit of Measure</PageTitle>
+
+@if (IsAccess)
+{
+    <div class="wrapper">
+
+        
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="true"
+                                                Text="Fetching Data...">
+
+                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                            Data="Uoms"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            EditModelSaving="OnSave"
+                                            DataItemDeleting="OnDelete"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
+                                            EditMode="GridEditMode.PopupEditForm"
+                                            PopupEditFormCssClass="pw-800"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            AllowSelectRowByClick="true"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            FocusedRowEnabled="true"
+                                            PagerVisibleNumericButtonCount="10"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            CssClass="ch-480"
+                                            ShowFilterRow="true"
+                                            TextWrapEnabled="false"
+                                            CustomizeElement="Grid_CustomizeElement"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem  Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem  Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Uoms.Count > 0" />
+                                                <DxToolbarItem  Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Uoms.Count > 0" />
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                                <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="Name" MinWidth="200" Caption="Unit of Measure" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="UomCategory.Name" MinWidth="200" Caption="Category" />
+                                            <DxGridDataColumn FieldName="BiggerRatio" MinWidth="200" Caption="Bigger Ratio" />
+                                            <DxGridDataColumn FieldName="Type" MinWidth="200" />
+                                            <DxGridDataColumn FieldName="Active" MinWidth="200" />
+
+                                        </Columns>
+                                        <EditFormTemplate Context="EditFormContext">
+                                            @{
+                                                var a = (UomDto)EditFormContext.EditModel;
+                                            }
+                                            <DxFormLayout CssClass="w-100">
+                                                @*  <div class="row w-100">
+                                            <div class="col-6">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@a.Name"
+                                            ShowValidationIcon="true"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            NullText="Name" />
+                                            <ValidationMessage For="@(()=> a.Name)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Category" ColSpanMd="12">
+                                            <DxComboBox ShowValidationIcon="true"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                            Data="@UomCategories"
+                                            NullText="Select UoM Category..."
+                                            @bind-Value="@a.UomCategoryId"
+                                            TextFieldName="Name"
+                                            ValueFieldName="Id">
+                                            </DxComboBox>
+                                            <ValidationMessage For="@(()=>a.UomCategoryId)" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Type" ColSpanMd="12">
+                                            <DxComboBox ShowValidationIcon="true"
+                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                            Data="@Types"
+                                            NullText="Select Type..."
+                                            @bind-Value="@a.Type">
+                                            </DxComboBox>
+                                            <ValidationMessage For="@(()=>a.Type)" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem Visible="@(!a.Type.Equals("Reference Unit of Measure for this category"))" CaptionCssClass="normal-caption" Caption="Ratio" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@a.BiggerRatio"
+                                            ShowValidationIcon="true"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            NullText="Ratio" />
+                                            <ValidationMessage For="@(()=> a.BiggerRatio)"   />
+                                            </DxFormLayoutItem>
+                                            </div>
+
+                                            <div class="col-6">
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Active" ColSpanMd="12">
+                                            <DxCheckBox @bind-Checked="@a.Active" />
+                                            <ValidationMessage For="@(()=> a.Active)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Multiple" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@a.Multiple"
+                                            ShowValidationIcon="true"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            NullText="Multiple" />
+                                            <ValidationMessage For="@(()=> a.Multiple)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="RoundingPrecision" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@a.RoundingPrecision"
+                                            ShowValidationIcon="true"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            NullText="RoundingPrecision" />
+                                            <ValidationMessage For="@(()=> a.RoundingPrecision)"   />
+                                            </DxFormLayoutItem>
+                                            </div>
+                                            </div> *@
+
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.Name"
+                                                               ShowValidationIcon="true"
+                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                               NullText="Name" />
+                                                    <ValidationMessage For="@(()=> a.Name)"   />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Category" ColSpanMd="12">
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                Data="@UomCategories"
+                                                                NullText="Select UoM Category..."
+                                                                @bind-Value="@a.UomCategoryId"
+                                                                TextFieldName="Name"
+                                                                ValueFieldName="Id">
+                                                    </DxComboBox>
+                                                    <ValidationMessage For="@(()=>a.UomCategoryId)" />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Type" ColSpanMd="12">
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                FilteringMode="@DataGridFilteringMode.Contains"
+                                                                Data="@Types"
+                                                                NullText="Select Type..."
+                                                                @bind-Value="@a.Type">
+                                                    </DxComboBox>
+                                                    <ValidationMessage For="@(()=>a.Type)" />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem Visible="@(!a.Type.Equals("Reference Unit of Measure for this category"))" CaptionCssClass="normal-caption" Caption="Ratio" ColSpanMd="12">
+                                                    <DxSpinEdit @bind-Value="@a.BiggerRatio"
+                                                                NullText="Ratio..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                BindValueMode="BindValueMode.OnInput" />
+                                                    <ValidationMessage For="@(()=> a.BiggerRatio)"   />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Active" ColSpanMd="12">
+                                                    <DxCheckBox @bind-Checked="@a.Active" />
+                                                    <ValidationMessage For="@(()=> a.Active)"   />
+                                                </DxFormLayoutItem>
+
+                                                @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Multiple" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@a.Multiple"
+                                            ShowValidationIcon="true"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            NullText="Multiple" />
+                                            <ValidationMessage For="@(()=> a.Multiple)"   />
+                                            </DxFormLayoutItem> *@
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Rounding Precision" ColSpanMd="12">
+                                                    <DxSpinEdit @bind-Value="@a.RoundingPrecision"
+                                                                NullText="Rounding Precision..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                BindValueMode="BindValueMode.OnInput" />
+                                                    <ValidationMessage For="@(()=> a.RoundingPrecision)"   />
+                                                </DxFormLayoutItem>
+
+                                            </DxFormLayout>
+                                        </EditFormTemplate>
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Unit of Measure" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    </div>
+}

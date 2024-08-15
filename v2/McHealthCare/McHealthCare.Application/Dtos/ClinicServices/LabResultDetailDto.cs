@@ -2,11 +2,11 @@
 {
     public class LabResultDetailDto : IMapFrom<LabResultDetail>
     {
-        public long Id { get; set; }
-        public long GeneralConsultanMedicalSupportId { get; set; }
+        public Guid Id { get; set; }
+        public Guid GeneralConsultanMedicalSupportId { get; set; }
         public string? Parameter { get; set; }
         public string? NormalRange { get; set; } = string.Empty;
-        public long? LabUomId { get; set; }
+        public Guid? LabUomId { get; set; }
         public string? Result { get; set; }
         public string? ResultType { get; set; }
         public string? ResultValueType { get; set; }

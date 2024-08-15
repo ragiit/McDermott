@@ -4,7 +4,7 @@ namespace McHealthCare.Application.Dtos.BpjsIntegration
 {
     public class AllergyDto : IMapFrom<Allergy>
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
 
         [JsonPropertyName("kdAllergy")]
         public string KdAllergy { get; set; } = string.Empty;

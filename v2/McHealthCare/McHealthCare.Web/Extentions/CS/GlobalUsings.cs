@@ -24,7 +24,7 @@ global using static McHealthCare.Application.Features.CommandsQueries.Configurat
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.CompanyCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.ReligionCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.VillageCommand;
-
+global using static McHealthCare.Application.Features.CommandsQueries.Inventory.UomCategoryCommand;
 global using McHealthCare.Application.Dtos.Inventory;
 global using McHealthCare.Application.Dtos.Transaction;
 global using McHealthCare.Application.Dtos.ClinicServices;

@@ -4,7 +4,7 @@ namespace McHealthCare.Application.Dtos.BpjsIntegration
 {
     public class AwarenessDto : IMapFrom<Awareness>
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
 
         [JsonPropertyName("kdSadar")]
         public string KdSadar { get; set; } = string.Empty;

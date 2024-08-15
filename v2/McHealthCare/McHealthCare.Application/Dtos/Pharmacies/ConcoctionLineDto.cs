@@ -6,7 +6,7 @@
         public Guid? ConcoctionId { get; set; }
         public Guid? ProductId { get; set; }
         public string? ProductName { get; set; }
-        public List<long>? ActiveComponentId { get; set; } = [];
+        public List<Guid>? ActiveComponentId { get; set; } = [];
         public string? ActiveComponentName { get; set; }
         public Guid? UomId { get; set; }
         public string? UomName { get; set; }

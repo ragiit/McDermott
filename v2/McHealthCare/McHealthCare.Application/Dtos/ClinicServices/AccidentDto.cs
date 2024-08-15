@@ -4,9 +4,9 @@ namespace McHealthCare.Application.Dtos.Transaction
 {
     public class AccidentDto : IMapFrom<Accident>
     {
-        public long Id { get; set; }
-        public long GeneralConsultanServiceId { get; set; }
-        public long SafetyPersonnelId { get; set; }
+        public Guid Id { get; set; }
+        public Guid GeneralConsultanServiceId { get; set; }
+        public Guid SafetyPersonnelId { get; set; }
 
         [Display(Name = "Date Of Occurrence")]
         [Required]

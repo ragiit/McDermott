@@ -5,21 +5,21 @@ namespace McHealthCare.Application.Dtos.Transaction
 {
     public partial class GeneralConsultanServiceDto : IMapFrom<GeneralConsultanService>
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
 
-        public long? KioskQueueId { get; set; }
+        public Guid? KioskQueueId { get; set; }
 
         //[Required(ErrorMessage = "The Patient field is required.")]
-        public long? PatientId { get; set; }
+        public string? PatientId { get; set; }
 
-        public long? InsurancePolicyId { get; set; }
+        public Guid? InsurancePolicyId { get; set; }
 
         //[Required(ErrorMessage = "The Service field is required.")]
-        public long? ServiceId { get; set; }
+        public Guid? ServiceId { get; set; }
 
-        public long? PratitionerId { get; set; }
+        public string? PratitionerId { get; set; }
 
-        public long? ClassTypeId { get; set; }
+        public Guid? ClassTypeId { get; set; }
         public EnumStatusGeneralConsultantService Status { get; set; } = EnumStatusGeneralConsultantService.Planned;
 
         [NotMapped]

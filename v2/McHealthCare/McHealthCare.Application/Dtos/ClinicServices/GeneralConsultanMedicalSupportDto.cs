@@ -2,18 +2,18 @@
 {
     public class GeneralConsultanMedicalSupportDto : IMapFrom<GeneralConsultanMedicalSupport>
     {
-        public long Id { get; set; }
-        public long? GeneralConsultanServiceId { get; set; }
-        public long? PractitionerLabEximinationId { get; set; }
+        public Guid Id { get; set; }
+        public Guid? GeneralConsultanServiceId { get; set; }
+        public Guid? PractitionerLabEximinationId { get; set; }
         public string? LabEximinationName { get; set; }
-        public long? LabResulLabExaminationtId { get; set; }
-        public List<long>? LabResulLabExaminationtIds { get; set; }
+        public Guid? LabResulLabExaminationtId { get; set; }
+        public List<Guid>? LabResulLabExaminationtIds { get; set; }
         public string? LabEximinationAttachment { get; set; }
-        public long? PractitionerRadiologyEximinationId { get; set; }
+        public string? PractitionerRadiologyEximinationId { get; set; }
         public string? RadiologyEximinationName { get; set; }
         public string? RadiologyEximinationAttachment { get; set; }
 
-        public long? PractitionerAlcoholEximinationId { get; set; }
+        public Guid? PractitionerAlcoholEximinationId { get; set; }
         public string? AlcoholEximinationName { get; set; }
         public string? AlcoholEximinationAttachment { get; set; }
 
