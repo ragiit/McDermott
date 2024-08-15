@@ -24,13 +24,13 @@ builder.Services.AddResponseCompression(options =>
     options.EnableForHttps = true; // Aktifkan kompresi untuk HTTPS
     options.Providers.Add<GzipCompressionProvider>(); // Tambahkan provider kompresi Gzip
     options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-        new[] { "application/octet-stream" }); // Tambahkan tipe MIME tambahan jika perlu
+        ["application/octet-stream"]); // Tambahkan tipe MIME tambahan jika perlu
 });
 
 // Konfigurasi tingkat kompresi (opsional)
 builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 {
-    options.Level = System.IO.Compression.CompressionLevel.Fastest; // Atur tingkat kompresi
+    options.Level = System.IO.Compression.CompressionLevel.SmallestSize; // Atur tingkat kompresi
 });
 //builder.WebHost.ConfigureKestrel((context, options) =>
 //{
