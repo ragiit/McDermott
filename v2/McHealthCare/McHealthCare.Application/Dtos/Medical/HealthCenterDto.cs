@@ -29,8 +29,7 @@ namespace McHealthCare.Application.Dtos.Medical
         [SetToNull]
         public virtual CountryDto? Country { get; set; }
 
-        [SetToNull]
-        public virtual List<BuildingDto>? Buildings { get; set; }
+        
     }
 
     public class CreateUpdateHealthCenterDto : IMapFrom<HealthCenter>
@@ -57,7 +56,6 @@ namespace McHealthCare.Application.Dtos.Medical
         [SetToNull]
         public virtual CountryDto? Country { get; set; }
 
-        [SetToNull]
-        public virtual List<BuildingDto>? Buildings { get; set; }
+     
     }
 }

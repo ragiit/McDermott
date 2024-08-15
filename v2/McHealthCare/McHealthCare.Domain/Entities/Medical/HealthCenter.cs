@@ -23,7 +23,5 @@ namespace McHealthCare.Domain.Entities.Medical
         [SetToNull]
         public virtual Country? Country { get; set; }
 
-        [SetToNull]
-        public virtual List<Building>? Buildings { get; set; }
     }
 }

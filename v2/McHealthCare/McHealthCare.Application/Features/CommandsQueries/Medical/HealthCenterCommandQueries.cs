@@ -41,7 +41,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                         .Include(x=>x.City)
                         .Include(x=>x.Province)
                         .Include(x=>x.Country)
-                        .Include(x=>x.Buildings)
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<HealthCenterDto>(), []);
             }
             else if (results is not null)
@@ -54,7 +53,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                         .Include(x => x.City)
                         .Include(x => x.Province)
                         .Include(x => x.Country)
-                        .Include(x => x.Buildings)
                         .FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<HealthCenterDto>>());
             }
 
@@ -77,7 +75,6 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                         .Include(x => x.City)
                         .Include(x => x.Province)
                         .Include(x => x.Country)
-                        .Include(x => x.Buildings)
                         .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }

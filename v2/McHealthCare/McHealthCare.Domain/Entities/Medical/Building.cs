@@ -8,7 +8,6 @@ namespace McHealthCare.Domain.Entities.Medical
 
         [SetToNull]
         public virtual HealthCenter? HealthCenter { get; set; }
-        [SetToNull]
-        public virtual List<BuildingLocation>? BuildingLocations { get; set; }
+        
     }
 }
