@@ -1,11 +1,10 @@
-﻿@page "/medical/sample-types"
-
+﻿@page "/medical/projects"
 @using McHealthCare.Application.Dtos.Medical
 
 
-<PageTitle>McHealthCare - Sample Type</PageTitle>
+<PageTitle>McHealthCare - Project</PageTitle>
 
-<BaseHeaderPage Title="Sample Type" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+<BaseHeaderPage Title="Project" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
 @if (!IsLoading && UserAccess.Item1 && UserAccess.Item2.IsRead)
 {
@@ -21,7 +20,7 @@
                                         IndicatorAreaVisible="false"
                                         Text="Fetching Data...">
                             <MyDxGrid @ref="Grid"
-                                      Data="getSampleType"
+                                      Data="getProject"
                                       @bind-SelectedDataItems="@SelectedDataItems"
                                       RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
                                       EditModelSaving="OnSave"
@@ -30,8 +29,8 @@
                                       KeyFieldName="Id">
 
                                 <ToolbarTemplate>
-                                    <MyDxToolbarBase TItem="SampleTypeDto"
-                                                     Items="@getSampleType"
+                                    <MyDxToolbarBase TItem="ProjectDto"
+                                                     Items="@getProject"
                                                      Grid="Grid"
                                                      SelectedDataItems="@SelectedDataItems"
                                                      NewItem_Click="@(async () => await Grid.StartEditNewRowAsync())"
@@ -49,19 +48,23 @@
                                 <Columns>
                                     <DxGridSelectionColumn Width="15px" />
                                     <DxGridDataColumn FieldName="Name" Caption="Name" SortIndex="0" />
-                                    @* <DxGridDataColumn FieldName="Code" Caption="Code" /> *@
+                                    <DxGridDataColumn FieldName="Code" Caption="Code" /> 
                                 </Columns>
                                 <EditFormTemplate Context="EditFormContext">
                                     <AntiforgeryToken />
                                     @{
-                                        var a = (SampleTypeDto)EditFormContext.EditModel;
+                                        var a = (ProjectDto)EditFormContext.EditModel;
                                     }
                                     <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Sample Type" ColSpanMd="12">
-                                            <MyTextBox @bind-Text="@a.Name" NullText="Sample Type..." />
+                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                            <MyTextBox @bind-Text="@a.Name" NullText="Name..." />
                                             <ValidationMessage For="@(()=>a.Name)" />
                                         </DxFormLayoutItem>
-                                       
+                                        <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Code" ColSpanMd="12">
+                                            <MyTextBox @bind-Text="@a.Code" NullText="Code..." />
+                                            <ValidationMessage For="@(()=>a.Code)" />
+                                        </DxFormLayoutItem>
+
                                     </DxFormLayout>
                                 </EditFormTemplate>
                             </MyDxGrid>
@@ -80,3 +83,4 @@ else
 {
     <LoadingIndicatorLayout />
 }
+

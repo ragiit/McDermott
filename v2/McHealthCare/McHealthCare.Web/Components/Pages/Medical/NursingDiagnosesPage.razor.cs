@@ -1,18 +1,19 @@
-﻿
-
+﻿using Blazored.Toast.Services;
 using McHealthCare.Application.Dtos.Medical;
 using McHealthCare.Application.Extentions;
+using McHealthCare.Web.Services;
+using MediatR;
 using Microsoft.AspNetCore.SignalR.Client;
+using static McHealthCare.Application.Features.CommandsQueries.Medical.NursingDiagnosesCommand;
 using static McHealthCare.Application.Features.CommandsQueries.Medical.SampleTypeCommand;
-using static McHealthCare.Application.Features.CommandsQueries.Medical.ServiceCommand;
 
 namespace McHealthCare.Web.Components.Pages.Medical
 {
-    public partial class SampleTypePage
+    public partial class NursingDiagnosesPage
     {
         #region Relation Data
-        private List<SampleTypeDto> getSampleType = [];
-        private SampleTypeDto postSampleType = new();
+        private List<NursingDiagnosesDto> getNursingDiagnoses = [];
+        private NursingDiagnosesDto postNursingDiagnoses = new();
         #endregion
         #region Variabel
         private bool PanelVisible { get; set; } = false;
@@ -87,9 +88,9 @@ namespace McHealthCare.Web.Components.Pages.Medical
             try
             {
                 PanelVisible = true;
-                getSampleType.Clear();
-                getSampleType = await Mediator.Send(new GetSampleTypeQuery());
-                                
+                getNursingDiagnoses.Clear();
+                getNursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
+
             }
             catch (Exception ex)
             {
@@ -109,12 +110,12 @@ namespace McHealthCare.Web.Components.Pages.Medical
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteSampleTypeRequest(((SampleTypeDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteNursingDiagnosesRequest(((NursingDiagnosesDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<SampleTypeDto>>();
-                    await Mediator.Send(new DeleteSampleTypeRequest(Ids: a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<NursingDiagnosesDto>>();
+                    await Mediator.Send(new DeleteNursingDiagnosesRequest(Ids: a.Select(x => x.Id).ToList()));
                 }
                 SelectedDataItems = [];
                 await LoadData();
@@ -135,15 +136,15 @@ namespace McHealthCare.Web.Components.Pages.Medical
             PanelVisible = true;
             try
             {
-                var editModel = (SampleTypeDto)e.EditModel;
+                var editModel = (NursingDiagnosesDto)e.EditModel;
 
-                if (string.IsNullOrWhiteSpace(editModel.Name))
+                if (string.IsNullOrWhiteSpace(editModel.Problem))
                     return;
 
                 if (editModel.Id == Guid.Empty)
-                    await Mediator.Send(new CreateSampleTypeRequest(editModel));
+                    await Mediator.Send(new CreateNursingDiagnosesRequest(editModel));
                 else
-                    await Mediator.Send(new UpdateSampleTypeRequest(editModel));
+                    await Mediator.Send(new UpdateNursingDiagnosesRequest(editModel));
 
                 await LoadData();
             }

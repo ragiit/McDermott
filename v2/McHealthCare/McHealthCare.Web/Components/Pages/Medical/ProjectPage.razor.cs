@@ -1,18 +1,15 @@
-﻿
-
-using McHealthCare.Application.Dtos.Medical;
+﻿using McHealthCare.Application.Dtos.Medical;
 using McHealthCare.Application.Extentions;
 using Microsoft.AspNetCore.SignalR.Client;
-using static McHealthCare.Application.Features.CommandsQueries.Medical.SampleTypeCommand;
-using static McHealthCare.Application.Features.CommandsQueries.Medical.ServiceCommand;
+using static McHealthCare.Application.Features.CommandsQueries.Medical.ProjectCommand;
 
 namespace McHealthCare.Web.Components.Pages.Medical
 {
-    public partial class SampleTypePage
+    public partial class ProjectPage
     {
         #region Relation Data
-        private List<SampleTypeDto> getSampleType = [];
-        private SampleTypeDto postSampleType = new();
+        private List<ProjectDto> getProject = [];
+        private ProjectDto postProject = new();
         #endregion
         #region Variabel
         private bool PanelVisible { get; set; } = false;
@@ -87,9 +84,9 @@ namespace McHealthCare.Web.Components.Pages.Medical
             try
             {
                 PanelVisible = true;
-                getSampleType.Clear();
-                getSampleType = await Mediator.Send(new GetSampleTypeQuery());
-                                
+                getProject.Clear();
+                getProject = await Mediator.Send(new GetProjectQuery());
+
             }
             catch (Exception ex)
             {
@@ -109,12 +106,12 @@ namespace McHealthCare.Web.Components.Pages.Medical
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteSampleTypeRequest(((SampleTypeDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteProjectRequest(((ProjectDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<SampleTypeDto>>();
-                    await Mediator.Send(new DeleteSampleTypeRequest(Ids: a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<ProjectDto>>();
+                    await Mediator.Send(new DeleteProjectRequest(Ids: a.Select(x => x.Id).ToList()));
                 }
                 SelectedDataItems = [];
                 await LoadData();
@@ -135,15 +132,15 @@ namespace McHealthCare.Web.Components.Pages.Medical
             PanelVisible = true;
             try
             {
-                var editModel = (SampleTypeDto)e.EditModel;
+                var editModel = (ProjectDto)e.EditModel;
 
                 if (string.IsNullOrWhiteSpace(editModel.Name))
                     return;
 
                 if (editModel.Id == Guid.Empty)
-                    await Mediator.Send(new CreateSampleTypeRequest(editModel));
+                    await Mediator.Send(new CreateProjectRequest(editModel));
                 else
-                    await Mediator.Send(new UpdateSampleTypeRequest(editModel));
+                    await Mediator.Send(new UpdateProjectRequest(editModel));
 
                 await LoadData();
             }

@@ -1,11 +1,9 @@
-﻿@page "/medical/sample-types"
-
+﻿@page "/medical/specialities"
 @using McHealthCare.Application.Dtos.Medical
 
+<PageTitle>McHealthCare - Speciality</PageTitle>
 
-<PageTitle>McHealthCare - Sample Type</PageTitle>
-
-<BaseHeaderPage Title="Sample Type" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+<BaseHeaderPage Title="Speciality" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
 @if (!IsLoading && UserAccess.Item1 && UserAccess.Item2.IsRead)
 {
@@ -21,7 +19,7 @@
                                         IndicatorAreaVisible="false"
                                         Text="Fetching Data...">
                             <MyDxGrid @ref="Grid"
-                                      Data="getSampleType"
+                                      Data="getSpeciality"
                                       @bind-SelectedDataItems="@SelectedDataItems"
                                       RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
                                       EditModelSaving="OnSave"
@@ -30,8 +28,8 @@
                                       KeyFieldName="Id">
 
                                 <ToolbarTemplate>
-                                    <MyDxToolbarBase TItem="SampleTypeDto"
-                                                     Items="@getSampleType"
+                                    <MyDxToolbarBase TItem="SpecialityDto"
+                                                     Items="@getSpeciality"
                                                      Grid="Grid"
                                                      SelectedDataItems="@SelectedDataItems"
                                                      NewItem_Click="@(async () => await Grid.StartEditNewRowAsync())"
@@ -54,11 +52,11 @@
                                 <EditFormTemplate Context="EditFormContext">
                                     <AntiforgeryToken />
                                     @{
-                                        var a = (SampleTypeDto)EditFormContext.EditModel;
+                                        var a = (SpecialityDto)EditFormContext.EditModel;
                                     }
                                     <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Sample Type" ColSpanMd="12">
-                                            <MyTextBox @bind-Text="@a.Name" NullText="Sample Type..." />
+                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Speciality Name" ColSpanMd="12">
+                                            <MyTextBox @bind-Text="@a.Name" NullText="Speciality Name..." />
                                             <ValidationMessage For="@(()=>a.Name)" />
                                         </DxFormLayoutItem>
                                        
@@ -80,3 +78,4 @@ else
 {
     <LoadingIndicatorLayout />
 }
+

@@ -1,3 +1,5 @@
+using McHealthCare.Domain.Entities.Inventory;
+
 namespace McHealthCare.Domain.Entities.Medical
 {
     public partial class BuildingLocation : BaseAuditableEntity

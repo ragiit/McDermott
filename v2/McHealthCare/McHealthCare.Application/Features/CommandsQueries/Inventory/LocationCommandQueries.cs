@@ -1,14 +1,14 @@
 ﻿using Mapster;
-using McHealthCare.Application.Dtos.Medical;
-using McHealthCare.Domain.Entities.Medical;
+using McHealthCare.Application.Dtos.Inventory;
+using McHealthCare.Domain.Entities.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static McHealthCare.Application.Features.CommandsQueries.Medical.LocationCommand;
+using static McHealthCare.Application.Features.CommandsQueries.Inventory.LocationCommand;
 
-namespace McHealthCare.Application.Features.CommandsQueries.Medical
+namespace McHealthCare.Application.Features.CommandsQueries.Inventory
 {
     public sealed class LocationCommand
     {
@@ -71,10 +71,10 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
             {
                 result = await unitOfWork.Repository<Location>().Entities
                         .AsNoTracking()
-                        .Include(x=>x.City)
-                        .Include(x=>x.Province)
-                        .Include(x=>x.Country)
-                        .Include(x=>x.Buildings)
+                        .Include(x => x.City)
+                        .Include(x => x.Province)
+                        .Include(x => x.Country)
+                        .Include(x => x.Buildings)
                         .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }

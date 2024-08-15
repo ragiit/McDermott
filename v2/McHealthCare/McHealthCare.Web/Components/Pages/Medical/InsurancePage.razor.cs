@@ -1,18 +1,19 @@
-﻿
-
+﻿using Blazored.Toast.Services;
 using McHealthCare.Application.Dtos.Medical;
 using McHealthCare.Application.Extentions;
+using McHealthCare.Web.Services;
+using MediatR;
 using Microsoft.AspNetCore.SignalR.Client;
+using static McHealthCare.Application.Features.CommandsQueries.Medical.InsuranceCommand;
 using static McHealthCare.Application.Features.CommandsQueries.Medical.SampleTypeCommand;
-using static McHealthCare.Application.Features.CommandsQueries.Medical.ServiceCommand;
 
 namespace McHealthCare.Web.Components.Pages.Medical
 {
-    public partial class SampleTypePage
+    public partial class InsurancePage
     {
         #region Relation Data
-        private List<SampleTypeDto> getSampleType = [];
-        private SampleTypeDto postSampleType = new();
+        private List<InsuranceDto> getInsurance = [];
+        private InsuranceDto postInsurance = new();
         #endregion
         #region Variabel
         private bool PanelVisible { get; set; } = false;
@@ -87,9 +88,9 @@ namespace McHealthCare.Web.Components.Pages.Medical
             try
             {
                 PanelVisible = true;
-                getSampleType.Clear();
-                getSampleType = await Mediator.Send(new GetSampleTypeQuery());
-                                
+                getInsurance.Clear();
+                getInsurance = await Mediator.Send(new GetInsuranceQuery());
+
             }
             catch (Exception ex)
             {
@@ -109,12 +110,12 @@ namespace McHealthCare.Web.Components.Pages.Medical
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteSampleTypeRequest(((SampleTypeDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteInsuranceRequest(((InsuranceDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<SampleTypeDto>>();
-                    await Mediator.Send(new DeleteSampleTypeRequest(Ids: a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<InsuranceDto>>();
+                    await Mediator.Send(new DeleteInsuranceRequest(Ids: a.Select(x => x.Id).ToList()));
                 }
                 SelectedDataItems = [];
                 await LoadData();
@@ -135,15 +136,15 @@ namespace McHealthCare.Web.Components.Pages.Medical
             PanelVisible = true;
             try
             {
-                var editModel = (SampleTypeDto)e.EditModel;
+                var editModel = (InsuranceDto)e.EditModel;
 
                 if (string.IsNullOrWhiteSpace(editModel.Name))
                     return;
 
                 if (editModel.Id == Guid.Empty)
-                    await Mediator.Send(new CreateSampleTypeRequest(editModel));
+                    await Mediator.Send(new CreateInsuranceRequest(editModel));
                 else
-                    await Mediator.Send(new UpdateSampleTypeRequest(editModel));
+                    await Mediator.Send(new UpdateInsuranceRequest(editModel));
 
                 await LoadData();
             }

@@ -1,6 +1,7 @@
 using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities;
 using McHealthCare.Domain.Entities.Configuration;
+using McHealthCare.Domain.Entities.Inventory;
 using McHealthCare.Domain.Entities.Medical;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -35,6 +36,7 @@ namespace McHealthCare.Context
 
         #endregion Configuration
 
+        #region Medical
         public DbSet<Building> Buildings { get; set; }
         public DbSet<BuildingLocation> BuildingLocations { get; set; }
         public DbSet<ChronicCategory> ChronicCategories { get; set; }
@@ -48,12 +50,17 @@ namespace McHealthCare.Context
         public DbSet<LabTest> LabTests { get; set; }
         public DbSet<LabTestDetail> LabTestDetails { get; set; }
         public DbSet<LabUom> LabUoms { get; set; }
-        public DbSet<Location> Locations { get; set; }
         public DbSet<NursingDiagnoses> NursingDiagnoses { get; set; }
         public DbSet<Procedure> Procedures { get; set; }
         public DbSet<SampleType> SampleTypes { get; set; }
         public DbSet<Service> Services { get; set; }
-        public DbSet<Specialist> Specialists { get; set; }
+        public DbSet<Speciality> Specialists { get; set; }
+        public DbSet<Project> Projects { get; set; }
+        #endregion
+
+        #region Inventory
+        public DbSet<Location> Locations { get; set; }
+        #endregion
 
         #endregion DbSet
 

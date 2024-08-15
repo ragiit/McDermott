@@ -1,11 +1,9 @@
-﻿@page "/medical/sample-types"
-
+﻿@page "/medical/nursing-diagnoses"
 @using McHealthCare.Application.Dtos.Medical
 
+<PageTitle>McHealthCare - Nursing Diagnoses</PageTitle>
 
-<PageTitle>McHealthCare - Sample Type</PageTitle>
-
-<BaseHeaderPage Title="Sample Type" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+<BaseHeaderPage Title="Nursing Diagnoses" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
 @if (!IsLoading && UserAccess.Item1 && UserAccess.Item2.IsRead)
 {
@@ -21,7 +19,7 @@
                                         IndicatorAreaVisible="false"
                                         Text="Fetching Data...">
                             <MyDxGrid @ref="Grid"
-                                      Data="getSampleType"
+                                      Data="getNursingDiagnoses"
                                       @bind-SelectedDataItems="@SelectedDataItems"
                                       RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
                                       EditModelSaving="OnSave"
@@ -30,8 +28,8 @@
                                       KeyFieldName="Id">
 
                                 <ToolbarTemplate>
-                                    <MyDxToolbarBase TItem="SampleTypeDto"
-                                                     Items="@getSampleType"
+                                    <MyDxToolbarBase TItem="NursingDiagnosesDto"
+                                                     Items="@getNursingDiagnoses"
                                                      Grid="Grid"
                                                      SelectedDataItems="@SelectedDataItems"
                                                      NewItem_Click="@(async () => await Grid.StartEditNewRowAsync())"
@@ -48,20 +46,24 @@
 
                                 <Columns>
                                     <DxGridSelectionColumn Width="15px" />
-                                    <DxGridDataColumn FieldName="Name" Caption="Name" SortIndex="0" />
-                                    @* <DxGridDataColumn FieldName="Code" Caption="Code" /> *@
+                                    <DxGridDataColumn FieldName="Problem" Caption="Problem" SortIndex="0" />
+                                     <DxGridDataColumn FieldName="Code" Caption="Code" /> 
                                 </Columns>
                                 <EditFormTemplate Context="EditFormContext">
                                     <AntiforgeryToken />
                                     @{
-                                        var a = (SampleTypeDto)EditFormContext.EditModel;
+                                        var a = (NursingDiagnosesDto)EditFormContext.EditModel;
                                     }
                                     <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Sample Type" ColSpanMd="12">
-                                            <MyTextBox @bind-Text="@a.Name" NullText="Sample Type..." />
-                                            <ValidationMessage For="@(()=>a.Name)" />
+                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Problem" ColSpanMd="12">
+                                            <MyTextBox @bind-Text="@a.Problem" NullText="Problem...." />
+                                            <ValidationMessage For="@(()=>a.Problem)" />
                                         </DxFormLayoutItem>
-                                       
+                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Code" ColSpanMd="12">
+                                            <MyTextBox @bind-Text="@a.Code" NullText="Code...." />
+                                            <ValidationMessage For="@(()=>a.Code)" />
+                                        </DxFormLayoutItem>
+
                                     </DxFormLayout>
                                 </EditFormTemplate>
                             </MyDxGrid>

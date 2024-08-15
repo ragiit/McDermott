@@ -1,0 +1,167 @@
+﻿@page "/medical/health-centers"
+@using McHealthCare.Application.Dtos.Medical
+<PageTitle>McHealthCare - Health Center</PageTitle>
+
+<BaseHeaderPage Title="Health Center" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+
+@if (!IsLoading && UserAccess.Item1 && UserAccess.Item2.IsRead)
+{
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            @* <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile> *@
+
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <MyDxGrid @ref="Grid"
+                                          Data="getHealthCenter"
+                                          @bind-SelectedDataItems="@SelectedDataItems"
+                                          EditModelSaving="OnSave"
+                                          DataItemDeleting="OnDelete"
+                                          RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
+                                          FocusedRowChanged="@((GridFocusedRowChangedEventArgs args) => FocusedRowVisibleIndex = args.VisibleIndex)"
+                                          KeyFieldName="Id">
+
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="HealthCenterDto"
+                                                         Items="@getHealthCenter"
+                                                         Grid="Grid"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@(async () => await Grid.StartEditNewRowAsync())"
+                                                         EditItem_Click="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
+                                                         DeleteItem_Click="@(() => Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex))"
+                                                         Refresh_Click="@(async () => await LoadData())"
+                                                         ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))"
+                                                         ExportToExcel="@(async () => await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "Companies_template.xlsx", ExportFileDatas))"
+                                                         VisibleNew="UserAccess.Item2.IsCreate"
+                                                         VisibleEdit="UserAccess.Item2.IsUpdate"
+                                                         VisibleDelete="UserAccess.Item2.IsDelete"
+                                                         VisibleImport="UserAccess.Item2.IsImport" />
+                                    </ToolbarTemplate>
+
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Type" />
+                                        <DxGridDataColumn FieldName="Phone" />
+                                        <DxGridDataColumn FieldName="Email" />
+                                        <DxGridDataColumn Visible="false" FieldName="WebsiteLink" />
+                                        <DxGridDataColumn Visible="false" FieldName="Street1" />
+                                        <DxGridDataColumn Visible="false" FieldName="Street2" />
+                                        <DxGridDataColumn FieldName="Country.Name" Caption="Country" />
+                                        <DxGridDataColumn FieldName="Province.Name" Caption="Province" />
+                                        <DxGridDataColumn FieldName="City.Name" Caption="City" />
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var postHealthCenter = (HealthCenterDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="mt">
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" caption="Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@postHealthCenter.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name Company" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Type" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                <MyDxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                              Data="@Helper.TypesHealthCare"
+                                                              NullText="Select Type..."
+                                                              @bind-Value="@postHealthCenter.Type">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" caption="Email" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@postHealthCenter.Email" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Email Company" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" caption="Phone" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@postHealthCenter.Phone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Phone Company" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" caption="Website" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@postHealthCenter.WebsiteLink" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Website Company" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Address" ColSpanMd="12">
+                                                <Template>
+                                                    <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
+                                                        <Rows>
+                                                            <DxGridLayoutRow />
+                                                            <DxGridLayoutRow />
+                                                            <DxGridLayoutRow />
+                                                            <DxGridLayoutRow />
+                                                        </Rows>
+                                                        <Columns>
+                                                            <DxGridLayoutColumn />
+                                                            <DxGridLayoutColumn />
+                                                        </Columns>
+                                                        <Items>
+                                                            <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
+                                                                <Template>
+                                                                    <MyTextBox @bind-Text="@postHealthCenter.Street1" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Street 1" />
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
+                                                                <Template>
+                                                                    <MyTextBox @bind-Text="@postHealthCenter.Street2" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Street 2" />
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
+                                                                <Template>
+                                                                    <MyDxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                  Data="@getProvince"
+                                                                                  NullText="Select Province..."
+                                                                                  @bind-Value="@postHealthCenter.ProvinceId"
+                                                                                  TextFieldName="Name"
+                                                                                  ValueFieldName="Id">
+                                                                    </MyDxComboBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
+                                                                <Template>
+                                                                    <MyDxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                  Data="@getCity.Where(x => x.ProvinceId == postHealthCenter.ProvinceId)"
+                                                                                  NullText="Select City..."
+                                                                                  @bind-Value="@postHealthCenter.CityId"
+                                                                                  TextFieldName="Name"
+                                                                                  ValueFieldName="Id">
+                                                                    </MyDxComboBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="3" Column="0" CssClass="mt">
+                                                                <Template>
+                                                                    <MyDxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                  Data="@getCountry.Where(x => postHealthCenter.ProvinceId == null || x.Id == getProvince.FirstOrDefault(z => z.Id == postHealthCenter.ProvinceId)?.CountryId)"
+                                                                                  NullText="Select Country..."
+                                                                                  @bind-Value="@postHealthCenter.CountryId"
+                                                                                  TextFieldName="Name"
+                                                                                  ValueFieldName="Id">
+                                                                    </MyDxComboBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+
+                                                        </Items>
+                                                    </DxGridLayout>
+                                                </Template>
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </MyDxGrid>
+                            </DxLoadingPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (UserAccess.Item2 is not null && !UserAccess.Item2.IsRead)
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}

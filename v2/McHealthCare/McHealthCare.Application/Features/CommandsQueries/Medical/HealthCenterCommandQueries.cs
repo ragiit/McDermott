@@ -51,6 +51,10 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                 else
                     return (new(), (await unitOfWork.Repository<HealthCenter>().Entities
                         .AsNoTracking()
+                        .Include(x => x.City)
+                        .Include(x => x.Province)
+                        .Include(x => x.Country)
+                        .Include(x => x.Buildings)
                         .FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<HealthCenterDto>>());
             }
 
@@ -70,6 +74,10 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
             {
                 result = await unitOfWork.Repository<HealthCenter>().Entities
                         .AsNoTracking()
+                        .Include(x => x.City)
+                        .Include(x => x.Province)
+                        .Include(x => x.Country)
+                        .Include(x => x.Buildings)
                         .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }

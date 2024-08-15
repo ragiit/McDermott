@@ -1,18 +1,22 @@
-﻿
-
+﻿using Blazored.Toast.Services;
 using McHealthCare.Application.Dtos.Medical;
 using McHealthCare.Application.Extentions;
+using McHealthCare.Web.Services;
+using MediatR;
 using Microsoft.AspNetCore.SignalR.Client;
-using static McHealthCare.Application.Features.CommandsQueries.Medical.SampleTypeCommand;
-using static McHealthCare.Application.Features.CommandsQueries.Medical.ServiceCommand;
+using static McHealthCare.Application.Features.CommandsQueries.Medical.HealthCenterCommand;
 
 namespace McHealthCare.Web.Components.Pages.Medical
 {
-    public partial class SampleTypePage
+    public partial class HealthCenterPage
     {
         #region Relation Data
-        private List<SampleTypeDto> getSampleType = [];
-        private SampleTypeDto postSampleType = new();
+        private List<HealthCenterDto> getHealthCenter = [];
+        private List<ProvinceDto> getProvince = [];
+        private List<CityDto> getCity = [];
+        private List<CountryDto> getCountry = [];
+        private List<BuildingDto> getbuilds = [];
+        private HealthCenterDto postHealthCenter = new();
         #endregion
         #region Variabel
         private bool PanelVisible { get; set; } = false;
@@ -87,9 +91,12 @@ namespace McHealthCare.Web.Components.Pages.Medical
             try
             {
                 PanelVisible = true;
-                getSampleType.Clear();
-                getSampleType = await Mediator.Send(new GetSampleTypeQuery());
-                                
+                getHealthCenter.Clear();
+                getHealthCenter = await Mediator.Send(new GetHealthCenterQuery());
+                getProvince = await Mediator.Send(new GetProvinceQuery());
+                getCity = await Mediator.Send(new GetCityQuery());
+                getCountry = await Mediator.Send(new GetCountryQuery());
+
             }
             catch (Exception ex)
             {
@@ -109,12 +116,12 @@ namespace McHealthCare.Web.Components.Pages.Medical
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteSampleTypeRequest(((SampleTypeDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteHealthCenterRequest(((HealthCenterDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<SampleTypeDto>>();
-                    await Mediator.Send(new DeleteSampleTypeRequest(Ids: a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<HealthCenterDto>>();
+                    await Mediator.Send(new DeleteHealthCenterRequest(Ids: a.Select(x => x.Id).ToList()));
                 }
                 SelectedDataItems = [];
                 await LoadData();
@@ -135,15 +142,15 @@ namespace McHealthCare.Web.Components.Pages.Medical
             PanelVisible = true;
             try
             {
-                var editModel = (SampleTypeDto)e.EditModel;
+                var editModel = (HealthCenterDto)e.EditModel;
 
                 if (string.IsNullOrWhiteSpace(editModel.Name))
                     return;
 
                 if (editModel.Id == Guid.Empty)
-                    await Mediator.Send(new CreateSampleTypeRequest(editModel));
+                    await Mediator.Send(new CreateHealthCenterRequest(editModel));
                 else
-                    await Mediator.Send(new UpdateSampleTypeRequest(editModel));
+                    await Mediator.Send(new UpdateHealthCenterRequest(editModel));
 
                 await LoadData();
             }

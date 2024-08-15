@@ -35,45 +35,54 @@ namespace McHealthCare.Web.Components.Pages.Medical
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         #endregion
 
-    
+
         protected override async Task OnInitializedAsync()
         {
             IsLoading = true;
             try
             {
                 UserAccess = await UserService.GetUserInfo(ToastService);
-                ConfigureHubConnection();
+
+                var aa = NavigationManager.ToAbsoluteUri("/notificationHub");
+                hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"))
+                .Build();
+
+                hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
+                {
+                    await LoadData();
+                });
+
                 await hubConnection.StartAsync();
-                SelectFirstRow();
-                await LoadData();
+
+                try
+                {
+                    Grid?.SelectRow(0, true);
+                    StateHasChanged();
+                }
+                catch { }
+
+                //await LoadData();
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-            finally
+            IsLoading = false;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
             {
-                IsLoading = false;
+                try
+                {
+                    Grid?.SelectRow(0, true);
+                    StateHasChanged();
+                }
+                catch { }
             }
         }
-
-        private void ConfigureHubConnection()
-        {
-            hubConnection = new HubConnectionBuilder()
-                .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"), options =>
-                {
-                    options.Transports = HttpTransportType.WebSockets; // Memastikan penggunaan WebSockets
-                    options.SkipNegotiation = true; // Menghindari negosiasi transportasi untuk efisiensi
-                })
-                .WithAutomaticReconnect() // Menyambungkan kembali secara otomatis jika koneksi terputus
-                .Build();
-
-            hubConnection.On<ReceiveDataDto>("ReceiveNotification", async message =>
-            {
-                await LoadData();
-            });
-        }
-
         private async Task LoadData()
         {
             try
@@ -88,7 +97,6 @@ namespace McHealthCare.Web.Components.Pages.Medical
                     service.ServiceCounter = GetServiceCounter(service);
                 }
 
-                SelectFirstRow();
             }
             catch (Exception ex)
             {
@@ -114,14 +122,6 @@ namespace McHealthCare.Web.Components.Pages.Medical
                 : "-";
         }
 
-        private void SelectFirstRow()
-        {
-            try
-            {
-                Grid?.SelectRow(0, true);
-            }
-            catch { }
-        }
 
         #region Delete
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -165,7 +165,7 @@ namespace McHealthCare.Web.Components.Pages.Medical
                 if (editModel.Id == Guid.Empty)
                     await Mediator.Send(new CreateServiceRequest(editModel));
                 else
-                    await Mediator.Send(new CreateServiceRequest(editModel));
+                    await Mediator.Send(new UpdateServiceRequest(editModel));
 
                 await LoadData();
             }

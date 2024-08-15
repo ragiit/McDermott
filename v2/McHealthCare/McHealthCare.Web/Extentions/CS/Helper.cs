@@ -34,6 +34,23 @@ namespace McHealthCare.Web.Extentions.CS
             "Unmarried"
         ];
 
+        public static List<string> Classification = new()
+        {
+            "Easy",
+            "Medium",
+            "Hard"
+        };
+
+        public static List<string> TypesInsurance = new List<string>
+        {
+            "Swasta",
+            "Negeri",
+        };
+
+        public static List<string> TypesHealthCare = new List<string>
+        {
+            "Clinic"
+        };
         public static List<string> URLS =
         [
             // Clinic Services
@@ -112,7 +129,8 @@ namespace McHealthCare.Web.Extentions.CS
             "medical/nursing-diagnoses",
             "medical/lab-tests",
             "medical/sample-types",
-            "medical/uom-labs",
+            "medical/lab-uoms",
+            "medical/projects",
 
             // Configurations
             "configuration/users",

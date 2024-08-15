@@ -1,9 +1,10 @@
 using Mapster;
 using McHealthCare.Application.Dtos.Configuration;
+using McHealthCare.Application.Dtos.Medical;
 using McHealthCare.Domain.Common;
-using McHealthCare.Domain.Entities.Medical;
+using McHealthCare.Domain.Entities.Inventory;
 
-namespace McHealthCare.Application.Dtos.Medical
+namespace McHealthCare.Application.Dtos.Inventory
 {
     public class LocationDto : IMapFrom<Location>
     {

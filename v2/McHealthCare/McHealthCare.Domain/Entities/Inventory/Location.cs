@@ -1,4 +1,6 @@
-namespace McHealthCare.Domain.Entities.Medical
+using McHealthCare.Domain.Entities.Medical;
+
+namespace McHealthCare.Domain.Entities.Inventory
 {
     public partial class Location : BaseAuditableEntity
     {

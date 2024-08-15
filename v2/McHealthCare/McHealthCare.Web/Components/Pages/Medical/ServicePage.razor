@@ -62,7 +62,7 @@
                                                 var a = (ServiceDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-captionS" Caption="Service Name" ColSpanMd="12">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service Name" ColSpanMd="12">
                                                     <MyTextBox @bind-Text="@a.Name" NullText="Service Name..." />
                                                     <ValidationMessage For="@(()=>a.Name)" />
                                                 </DxFormLayoutItem>
