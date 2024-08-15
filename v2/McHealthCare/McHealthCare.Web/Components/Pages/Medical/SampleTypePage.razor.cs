@@ -1,18 +1,18 @@
-﻿using McHealthCare.Application.Dtos.Medical;
+﻿
+
+using McHealthCare.Application.Dtos.Medical;
 using McHealthCare.Application.Extentions;
-using McHealthCare.Domain.Entities.Medical;
-using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
+using static McHealthCare.Application.Features.CommandsQueries.Medical.SampleTypeCommand;
 using static McHealthCare.Application.Features.CommandsQueries.Medical.ServiceCommand;
 
 namespace McHealthCare.Web.Components.Pages.Medical
 {
-    public partial class ServicePage
+    public partial class SampleTypePage
     {
         #region Relation Data
-        private List<ServiceDto> getService = [];
-        private List<ServiceDto> getServiceCounter = [];
-        private ServiceDto postService = new();
+        private List<SampleTypeDto> getSampleType = [];
+        private SampleTypeDto postSampleType = new();
         #endregion
         #region Variabel
         private bool PanelVisible { get; set; } = false;
@@ -27,14 +27,13 @@ namespace McHealthCare.Web.Components.Pages.Medical
                 Column = "Name",
                 Notes = "Mandatory"
             },
-            
+
         ];
 
         private int FocusedRowVisibleIndex { get; set; }
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         #endregion
-
 
         protected override async Task OnInitializedAsync()
         {
@@ -88,15 +87,9 @@ namespace McHealthCare.Web.Components.Pages.Medical
             try
             {
                 PanelVisible = true;
-                getService.Clear();
-                getService = await Mediator.Send(new GetServiceQuery());
-
-                foreach (var service in getService)
-                {
-                    service.Flag = GetServiceFlag(service);
-                    service.ServiceCounter = GetServiceCounter(service);
-                }
-
+                getSampleType.Clear();
+                getSampleType = await Mediator.Send(new GetSampleTypeQuery());
+                                
             }
             catch (Exception ex)
             {
@@ -108,21 +101,6 @@ namespace McHealthCare.Web.Components.Pages.Medical
             }
         }
 
-        private string GetServiceFlag(ServiceDto service)
-        {
-            return service.IsKiosk && service.IsPatient ? "Patient, Counter" :
-                   service.IsKiosk ? "Counter" :
-                   service.IsPatient ? "Patient" : "-";
-        }
-
-        private string GetServiceCounter(ServiceDto service)
-        {
-            return service.ServicedId != null
-                ? getService.FirstOrDefault(x => x.Id == service.ServicedId)?.Name ?? "-"
-                : "-";
-        }
-
-
         #region Delete
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
@@ -131,12 +109,12 @@ namespace McHealthCare.Web.Components.Pages.Medical
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteServiceRequest(((ServiceDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteSampleTypeRequest(((SampleTypeDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<ServiceDto>>();
-                    await Mediator.Send(new DeleteServiceRequest(Ids: a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<SampleTypeDto>>();
+                    await Mediator.Send(new DeleteSampleTypeRequest(Ids: a.Select(x => x.Id).ToList()));
                 }
                 SelectedDataItems = [];
                 await LoadData();
@@ -157,15 +135,15 @@ namespace McHealthCare.Web.Components.Pages.Medical
             PanelVisible = true;
             try
             {
-                var editModel = (ServiceDto)e.EditModel;
+                var editModel = (SampleTypeDto)e.EditModel;
 
                 if (string.IsNullOrWhiteSpace(editModel.Name))
                     return;
 
                 if (editModel.Id == Guid.Empty)
-                    await Mediator.Send(new CreateServiceRequest(editModel));
+                    await Mediator.Send(new CreateSampleTypeRequest(editModel));
                 else
-                    await Mediator.Send(new UpdateServiceRequest(editModel));
+                    await Mediator.Send(new UpdateSampleTypeRequest(editModel));
 
                 await LoadData();
             }

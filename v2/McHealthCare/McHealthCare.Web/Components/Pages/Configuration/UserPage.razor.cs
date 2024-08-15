@@ -45,7 +45,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private List<GroupDto> Groups = [];
         private List<CityDto> Cities = [];
         private List<ServiceDto> Services = [];
-        private List<SpecialistDto> Specialists = [];
+        private List<SpecialityDto> Specialists = [];
         private List<DistrictDto> Districts = [];
         private List<ReligionDto> Religions = [];
         private List<VillageDto> Villages = [];

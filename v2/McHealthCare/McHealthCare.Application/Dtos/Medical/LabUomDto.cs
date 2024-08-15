@@ -6,6 +6,7 @@ namespace McHealthCare.Application.Dtos.Medical
 {
     public class LabUomDto : IMapFrom<LabUom>
     {
+        public Guid Id { get; set; }
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
 
@@ -15,6 +16,7 @@ namespace McHealthCare.Application.Dtos.Medical
 
     public class CreateUpdateLabUomDto : IMapFrom<LabUom>
     {
+        public Guid Id { get; set; }
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
 

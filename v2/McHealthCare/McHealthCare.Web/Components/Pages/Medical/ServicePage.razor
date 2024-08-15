@@ -37,7 +37,7 @@
                                                              Grid="Grid"
                                                              SelectedDataItems="@SelectedDataItems"
                                                              NewItem_Click="@(async () => await Grid.StartEditNewRowAsync())"
-                                                             EditItem_Click="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
+                                                             EditItem_Click="@(async () => await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
                                                              DeleteItem_Click="@(() => Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex))"
                                                              Refresh_Click="@(async () => await LoadData())"
                                                              ImportFile="@(async () => await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput"))"
@@ -62,7 +62,7 @@
                                                 var a = (ServiceDto)EditFormContext.EditModel;
                                             }
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-captionS" Caption="Service Name" ColSpanMd="12">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service Name" ColSpanMd="12">
                                                     <MyTextBox @bind-Text="@a.Name" NullText="Service Name..." />
                                                     <ValidationMessage For="@(()=>a.Name)" />
                                                 </DxFormLayoutItem>

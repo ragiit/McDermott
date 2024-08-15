@@ -4,8 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace McHealthCare.Application.Dtos.Medical
 {
-    public class SpecialistDto : IMapFrom<Specialist>
+    public class SpecialityDto : IMapFrom<Speciality>
     {
+        public Guid Id { get; set; }
         [StringLength(200)]
         public string? Name { get; set; }
 
@@ -13,8 +14,9 @@ namespace McHealthCare.Application.Dtos.Medical
         public string? Code { get; set; }
     }
 
-    public class CreateUpdateSpecialistDto : IMapFrom<Specialist>
+    public class CreateUpdateSpecialityDto : IMapFrom<Speciality>
     {
+        public Guid Id { get; set; }
         [StringLength(200)]
         public string? Name { get; set; }
 

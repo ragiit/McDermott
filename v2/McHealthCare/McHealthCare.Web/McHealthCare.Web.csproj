@@ -7,6 +7,7 @@
 		<UserSecretsId>aspnet-McHealthCare.Web-3a62188a-7ce1-4f6c-93c0-4a009b5851f8</UserSecretsId>
 	</PropertyGroup>
 
+	
 	<ItemGroup>
 		<PackageReference Include="DevExpress.Blazor" Version="23.2.6" />
 		<PackageReference Include="DevExpress.Blazor.RichEdit" Version="23.2.6" />
@@ -31,5 +32,6 @@
 		<ProjectReference Include="..\McHealthCare.Application\McHealthCare.Application.csproj" />
 		<ProjectReference Include="..\McHealthCare.Infrastructure\McHealthCare.Persistence.csproj" />
 	</ItemGroup>
-  
+
+	  
 </Project>
