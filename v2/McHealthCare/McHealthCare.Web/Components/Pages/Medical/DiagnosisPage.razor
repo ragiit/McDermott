@@ -1,9 +1,9 @@
-﻿@page "/medical/insurances"
+﻿@page "/medical/diagnoses"
 @using McHealthCare.Application.Dtos.Medical
 
-<PageTitle>McHealthCare - Insurance</PageTitle>
+<PageTitle>McHealthCare - Diagnosis</PageTitle>
 
-<BaseHeaderPage Title="Insurance" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+<BaseHeaderPage Title="Diagnosis" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
 @if (!IsLoading && UserAccess.Item1 && UserAccess.Item2.IsRead)
 {
@@ -19,7 +19,7 @@
                                         IndicatorAreaVisible="false"
                                         Text="Fetching Data...">
                             <MyDxGrid @ref="Grid"
-                                      Data="getInsurance"
+                                      Data="getDiagnosis"
                                       @bind-SelectedDataItems="@SelectedDataItems"
                                       RowDoubleClick="@(async () =>  await Grid.StartEditRowAsync(FocusedRowVisibleIndex))"
                                       EditModelSaving="OnSave"
@@ -28,8 +28,8 @@
                                       KeyFieldName="Id">
 
                                 <ToolbarTemplate>
-                                    <MyDxToolbarBase TItem="InsuranceDto"
-                                                     Items="@getInsurance"
+                                    <MyDxToolbarBase TItem="DiagnosisDto"
+                                                     Items="@getDiagnosis"
                                                      Grid="Grid"
                                                      SelectedDataItems="@SelectedDataItems"
                                                      NewItem_Click="@(async () => await Grid.StartEditNewRowAsync())"
@@ -47,18 +47,14 @@
                                 <Columns>
                                     <DxGridSelectionColumn Width="15px" />
                                     <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                    <DxGridDataColumn MinWidth="200" FieldName="Code" Visible="false" />
-                                    <DxGridDataColumn MinWidth="50" FieldName="IsBPJSKesehatan" Caption="BPJS KS" />
-                                    <DxGridDataColumn MinWidth="50" FieldName="IsBPJSTK" Caption="BPJS TK" />
-                                    <DxGridDataColumn MinWidth="100" FieldName="Type" Visible="false" />
-                                    <DxGridDataColumn MinWidth="100" FieldName="Presentase" />
-                                    <DxGridDataColumn MinWidth="150" FieldName="AdminFee" Caption="Admin Fee %" />
-                                    <DxGridDataColumn MinWidth="150" FieldName="AdminFeeMax" Caption="Admin Fee Max" />
+                                    <DxGridDataColumn MinWidth="100" FieldName="Code"  />
+                                    <DxGridDataColumn MinWidth="200" FieldName="DiseaseCategory.Name" Caption="Disease Category" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="ChronicCategory.Name" Caption="Chronic Category" />
                                 </Columns>
 
                                 <EditFormTemplate Context="EditFormContext">
                                     @{
-                                        var a = (InsuranceDto)EditFormContext.EditModel;
+                                        var a = (DiagnosisDto)EditFormContext.EditModel;
                                     }
                                     <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem Caption="Name" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
@@ -73,50 +69,25 @@
                                             <ValidationMessage For="@(() => a.Code)"   />
                                         </DxFormLayoutItem>
 
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Payment Method" ColSpanMd="12">
-                                            <MyDxComboBox Data="@Helper.TypesInsurance"
-                                                          NullText="Select Type..."
-                                                          @bind-Value="a.Type">
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Disease Category" ColSpanMd="12">
+                                            <MyDxComboBox Data="@getDiseaseCategory"
+                                                          NullText="Select Disease..."
+                                                          @bind-Value="a.DiseaseCategoryId"
+                                                          ValueFieldName="Id"
+                                                          TextFieldName="Name">
                                             </MyDxComboBox>
-                                            <ValidationMessage For="@(() => a.Type)" />
+                                            <ValidationMessage For="@(() => a.DiseaseCategoryId)" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Chronic Category" ColSpanMd="12">
+                                            <MyDxComboBox Data="@getChronicCategory"
+                                                          NullText="Select Chronic..."
+                                                          @bind-Value="a.ChronicCategoryId"
+                                                          ValueFieldName="Id"
+                                                          TextFieldName="Name">
+                                            </MyDxComboBox>
+                                            <ValidationMessage For="@(() => a.ChronicCategoryId)" />
                                         </DxFormLayoutItem>
 
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Admin Fee" ColSpanMd="12">
-                                            <DxSpinEdit ShowValidationIcon="true"
-                                                        MinValue="0"
-                                                        @bind-Value="@a.AdminFee"
-                                                        NullText="AdminFee"
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                            <ValidationMessage For="@(()=> a.AdminFee)"   />
-                                        </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Presentase %" ColSpanMd="12">
-                                            <DxSpinEdit ShowValidationIcon="true"
-                                                        MinValue="0"
-                                                        @bind-Value="@a.Percentage"
-                                                        NullText="Presentase %"
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                            <ValidationMessage For="@(()=> a.Percentage)"   />
-                                        </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Admin Fee Max" ColSpanMd="12">
-                                            <DxSpinEdit ShowValidationIcon="true"
-                                                        MinValue="0"
-                                                        @bind-Value="@a.AdminFeeMax"
-                                                        NullText="Admin Fee Max"
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                            <ValidationMessage For="@(()=> a.AdminFeeMax)"   />
-                                        </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption"
-                                                          Caption="BPJS Kesehatan" ColSpanMd="3">
-                                            <DxCheckBox @bind-Checked="a.IsBPJSKesehatan" />
-                                        </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption"
-                                                          Caption="BPJS TK" ColSpanMd="3">
-                                            <DxCheckBox @bind-Checked="a.IsBPJSTK" />
-                                        </DxFormLayoutItem>
                                     </DxFormLayout>
                                 </EditFormTemplate>
                             </MyDxGrid>

@@ -61,7 +61,7 @@ namespace McHealthCare.Context
         public DbSet<DiseaseCategory> DiseaseCategories { get; set; }
         public DbSet<NursingDiagnoses> NursingDiagnoses { get; set; }
         public DbSet<Procedure> Procedures { get; set; }
-        public DbSet<CronisCategory> CronisCategories { get; set; }
+        public DbSet<ChronicCategory> CronisCategories { get; set; }
         public DbSet<Diagnosis> Diagnoses { get; set; }
         public DbSet<HealthCenter> HealthCenters { get; set; }
         public DbSet<Building> Buildings { get; set; }

@@ -18,8 +18,8 @@ namespace McHealthCare.Application.Dtos.Medical
         public bool IsPatient { get; set; }
         public bool IsKiosk { get; set; }
         public bool IsMcu { get; set; } = false;
-        public string ServiceCounter { get; set; } = string.Empty;
-        public string Flag { get; set; } = string.Empty;
+        public string? ServiceCounter { get; set; }
+        public string? Flag { get; set; }
         public Guid? ServicedId { get; set; }
 
         [SetToNull]
@@ -33,12 +33,14 @@ namespace McHealthCare.Application.Dtos.Medical
         public string Name { get; set; } = string.Empty;
 
         [StringLength(5)]
-        public string code { get; set; } = string.Empty;
+        public string Code { get; set; } = string.Empty;
 
         public string Quota { get; set; } = string.Empty;
         public bool IsPatient { get; set; }
         public bool IsKiosk { get; set; }
         public bool IsMcu { get; set; } = false;
+        public string? ServiceCounter { get; set; }
+        public string? Flag { get; set; }
         public Guid? ServicedId { get; set; }
 
         [SetToNull]

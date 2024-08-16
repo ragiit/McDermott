@@ -1,4 +1,5 @@
 ﻿using McHealthCare.Application.Dtos.Medical;
+using McHealthCare.Application.Interfaces;
 using McHealthCare.Domain.Entities.Medical;
 using System;
 using System.Collections.Generic;
@@ -158,36 +159,32 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
 
         public async Task<bool> Handle(DeleteServiceRequest request, CancellationToken cancellationToken)
         {
-            List<Service> deletedCountries = [];
+            List<Service> deleteData = [];
 
             if (request.Id.HasValue)
             {
                 var Service = await unitOfWork.Repository<Service>().Entities.FirstOrDefaultAsync(x => x.Id == request.Id.GetValueOrDefault());
                 if (Service != null)
                 {
-                    deletedCountries.Add(Service);
+                    deleteData.Add(Service);
                     await unitOfWork.Repository<Service>().DeleteAsync(request.Id.GetValueOrDefault());
                 }
             }
 
             if (request.Ids?.Count > 0)
             {
-                deletedCountries.AddRange(await unitOfWork.Repository<Service>().Entities
-                    .Where(x => request.Ids.Contains(x.Id))
-                    .ToListAsync(cancellationToken));
-
                 await unitOfWork.Repository<Service>().DeleteAsync(x => request.Ids.Contains(x.Id));
             }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
             cache.Remove(CacheKey);
 
-            if (deletedCountries.Count > 0)
+            if (deleteData.Count > 0)
             {
                 await dataService.Clients.All.ReceiveNotification(new ReceiveDataDto
                 {
                     Type = EnumTypeReceiveData.Delete,
-                    Data = deletedCountries,
+                    Data = deleteData,
                 });
             }
 
