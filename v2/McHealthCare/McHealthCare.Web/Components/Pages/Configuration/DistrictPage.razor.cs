@@ -1,8 +1,5 @@
-﻿using Blazored.Toast.Services;
-using McHealthCare.Application.Extentions;
+﻿using McHealthCare.Application.Extentions;
 using McHealthCare.Web.Services;
-using MediatR;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
@@ -14,7 +11,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
-        private HubConnection? hubConnection; 
+        private HubConnection? hubConnection;
         private List<DistrictDto> Districts = [];
         private List<ProvinceDto> Provinces = [];
         private List<CityDto> Cities = [];
@@ -147,7 +144,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             PanelVisible = true;
             try
             {
-                var editModel = (DistrictDto)e.EditModel; 
+                var editModel = (DistrictDto)e.EditModel;
 
                 if (editModel.Id == Guid.Empty)
                     await Mediator.Send(new CreateDistrictRequest(editModel));

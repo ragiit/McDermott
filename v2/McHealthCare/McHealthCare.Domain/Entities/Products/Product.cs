@@ -1,6 +1,4 @@
-﻿using McHealthCare.Domain.Entities.Inventory;
-
-namespace McHealthCare.Domain.Entities.Products
+﻿namespace McHealthCare.Domain.Entities.Products
 {
     public class Product : BaseAuditableEntity
     {
@@ -26,28 +24,20 @@ namespace McHealthCare.Domain.Entities.Products
         public bool IsTopicalMedication { get; set; }
         public bool IsOralMedication { get; set; }
 
-        [SetToNull]
         public BpjsClassification? BpjsClassification { get; set; }
 
-        [SetToNull]
         public Uom? Uom { get; set; }
 
-        [SetToNull]
         public Uom? PurchaseUom { get; set; }
 
-        [SetToNull]
         public ProductCategory? ProductCategory { get; set; }
 
-        [SetToNull]
         public Company? Company { get; set; }
 
-        [SetToNull]
         public List<Medicament>? Medicaments { get; set; }
 
-        [SetToNull]
         public StockProduct? StockProduct { get; set; }
 
-        [SetToNull]
         public List<ReceivingStockProduct>? ReceivingStockProduct { get; set; }
     }
 }

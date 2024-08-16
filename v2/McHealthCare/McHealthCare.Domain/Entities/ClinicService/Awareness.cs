@@ -9,6 +9,5 @@ namespace McHealthCare.Domain.Entities.ClinicService
 
         [JsonPropertyName("nmSadar")]
         public string NmSadar { get; set; } = string.Empty;
-         
     }
 }

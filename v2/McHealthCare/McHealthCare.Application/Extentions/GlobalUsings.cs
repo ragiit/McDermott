@@ -15,4 +15,27 @@ global using static McHealthCare.Application.Features.CommandsQueries.Configurat
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.VillageCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Employees.DepartmentCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.DistrictCommand;
+global using static McHealthCare.Application.Features.Commands.Bpjs.BpjsClassificationCommand;
+
+global using McHealthCare.Application.Dtos.ClinicServices;
+
+global using McHealthCare.Application.Dtos.BpjsIntegration;
+global using static McHealthCare.Application.Features.CommandsQueries.Bpjs.AllergyCommand;
 global using McHealthCare.Domain.Entities.Employees;
+global using McHealthCare.Domain.Entities;
+global using McHealthCare.Domain.Entities.Products;
+global using McHealthCare.Domain.Entities.Inventory;
+global using System.ComponentModel.DataAnnotations.Schema;
+global using System.ComponentModel.DataAnnotations;
+global using McHealthCare.Application.Dtos.Inventory;
+global using static McHealthCare.Application.Features.Commands.Inventory.InventoryAdjusmentDetailCommand;
+global using static McHealthCare.Application.Features.Commands.Inventory.InventoryAdjusmentCommand;
+global using McHealthCare.Domain.Entities.Pharmacies;
+global using McHealthCare.Application.Dtos.Pharmacies;
+global using McHealthCare.Domain.Entities.ClinicService;
+global using McHealthCare.Application.Dtos.Bpjs;
+global using static McHealthCare.Application.Features.Commands.Bpjs.SystemParameterCommand;
+global using McHealthCare.Application.Dtos.Transaction;
+global using static McHealthCare.Application.Features.Commands.ClinicServices.GeneralConsultanMedicalSupportCommand;
+global using static McHealthCare.Application.Features.Commands.ClinicServices.GeneralConsultanCPPTCommand;
+global using McHealthCare.Application.Dtos.Medical;

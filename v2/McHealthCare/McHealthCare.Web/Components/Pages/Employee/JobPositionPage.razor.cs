@@ -7,12 +7,13 @@ namespace McHealthCare.Web.Components.Pages.Employee
     public partial class JobPositionPage : IAsyncDisposable
     {
         #region Variables
+
         private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
         private HubConnection? hubConnection;
         private List<JobPositionDto> JobPositions = [];
-        private List<DepartmentDto> Departments = []; 
+        private List<DepartmentDto> Departments = [];
 
         private List<ExportFileData> ExportFileDatas =
         [
@@ -35,10 +36,12 @@ namespace McHealthCare.Web.Components.Pages.Employee
         #endregion Variables
 
         private bool shouldAddW100Class = true;
+
         private async Task LoadCombobox()
         {
-            Departments = await Mediator.Send(new GetDepartmentQuery()); 
+            Departments = await Mediator.Send(new GetDepartmentQuery());
         }
+
         protected override async Task OnInitializedAsync()
         {
             IsLoading = true;

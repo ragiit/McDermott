@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using McHealthCare.Domain.Entities.Configuration;
-using McHealthCare.Domain.Entities.Medical;
 
 namespace McHealthCare.Domain.Entities.ClinicService
 {
@@ -49,6 +47,7 @@ namespace McHealthCare.Domain.Entities.ClinicService
         public bool IsSinusTachycardia { get; set; } = false;
 
         #region Confined Space
+
         public string? EmployeeId { get; set; }
         public bool IsFirstTimeEnteringConfinedSpace { get; set; } = false;
         public long EnteringConfinedSpaceCount { get; set; } = 0;
@@ -98,45 +97,41 @@ namespace McHealthCare.Domain.Entities.ClinicService
         public string? SignatureEximinedDoctorBase64 { get; set; }
         public string? Recommended { get; set; }
         public string? ExaminedPhysicianId { get; set; }
-        #endregion
+
+        #endregion Confined Space
 
         public long HR { get; set; }
+
         //public bool IsVentriculatExtraSystole { get; set; } = false;
         //public bool IsSupraventricularExtraSystole { get; set; } = false;
         public bool IsOtherECG { get; set; } = false;
+
         public string? OtherDesc { get; set; }
 
         public EnumStatusGeneralConsultantServiceProcedureRoom? Status { get; set; } = EnumStatusGeneralConsultantServiceProcedureRoom.Draft;
+
         [NotMapped]
         public string StatusName => Status.GetDisplayName();
+
         public Guid? LabTestId { get; set; }
 
-        
         public McHealthCare.Domain.Entities.Configuration.Employee? Employee { get; set; }
 
-        
         public LabTest? LabTest { get; set; }
 
-         // Tandai properti yang harus diatur ke null
+        // Tandai properti yang harus diatur ke null
         public GeneralConsultanService? GeneralConsultanService { get; set; }
 
-        
         public Doctor? PractitionerLabEximination { get; set; }
 
-        
         public Doctor? PractitionerRadiologyEximination { get; set; }
 
-        
         public Doctor? PractitionerAlcoholEximination { get; set; }
 
-        
         public Doctor? PractitionerDrugEximination { get; set; }
 
-        
         public Doctor? PractitionerECG { get; set; }
 
-        
         public LabTestDetail? LabResulLabExaminationt { get; set; }
-         
     }
 }

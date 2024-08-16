@@ -1,11 +1,4 @@
-﻿using McHealthCare.Domain.Entities.Inventory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McHealthCare.Domain.Entities.Products
+﻿namespace McHealthCare.Domain.Entities.Products
 {
     public class StockProduct : BaseAuditableEntity
     {
@@ -20,20 +13,18 @@ namespace McHealthCare.Domain.Entities.Products
         public string? SerialNumber { get; set; }
         public DateTime? Expired { get; set; }
 
-
-       
         public Product? Product { get; set; }
-       
+
         public Location? Source { get; set; }
-       
+
         public Location? Destinance { get; set; }
-       
+
         public Uom? Uom { get; set; }
-       
+
         public List<TransferStock>? TransactionStocks { get; set; }
-       
+
         public List<ReceivingStockProduct>? ReceivingStockProduct { get; set; }
-       
-        public List<StockOutPrescription>? StockOutPrescriptions {  get; set; }
+
+        public List<StockOutPrescription>? StockOutPrescriptions { get; set; }
     }
 }

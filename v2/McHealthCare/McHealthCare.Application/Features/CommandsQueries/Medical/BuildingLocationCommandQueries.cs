@@ -1,11 +1,4 @@
-﻿using Mapster;
-using McHealthCare.Application.Dtos.Medical;
-using McHealthCare.Domain.Entities.Medical;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using McHealthCare.Domain.Entities.Medical;
 using static McHealthCare.Application.Features.CommandsQueries.Medical.BuildingLocationCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Medical
@@ -39,8 +32,8 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                 else
                     return ((await unitOfWork.Repository<BuildingLocation>().Entities
                         .AsNoTracking()
-                        .Include(x=>x.Building)
-                        .Include(x=>x.Location)
+                        .Include(x => x.Building)
+                        .Include(x => x.Location)
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<BuildingLocationDto>(), []);
             }
             else if (results is not null)

@@ -1,11 +1,4 @@
-﻿using Mapster;
-using McHealthCare.Application.Dtos.Medical;
-using McHealthCare.Domain.Entities.Medical;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using McHealthCare.Domain.Entities.Medical;
 using static McHealthCare.Application.Features.CommandsQueries.Medical.DiagnosisCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Medical
@@ -39,8 +32,8 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                 else
                     return ((await unitOfWork.Repository<Diagnosis>().Entities
                         .AsNoTracking()
-                        .Include(x=>x.ChronicCategory)
-                        .Include(x=>x.DiseaseCategory)
+                        .Include(x => x.ChronicCategory)
+                        .Include(x => x.DiseaseCategory)
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<DiagnosisDto>(), []);
             }
             else if (results is not null)

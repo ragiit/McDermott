@@ -1,13 +1,4 @@
-﻿using Mapster;
-using McHealthCare.Application.Dtos.Configuration;
-using McHealthCare.Application.Extentions;
-using McHealthCare.Application.Interfaces;
-using McHealthCare.Domain.Entities;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
-using System.Linq.Expressions;
+﻿using Microsoft.Extensions.DependencyInjection;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.GroupMenuCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration

@@ -2,23 +2,15 @@ using Blazored.Toast;
 using McHealthCare.Application.Extentions;
 using McHealthCare.Application.Services;
 using McHealthCare.Context;
-using McHealthCare.Domain.Entities;
-using McHealthCare.Domain.Entities.Configuration;
-using McHealthCare.Domain.Entities.Medical;
 using McHealthCare.Persistence.Extentions;
 using McHealthCare.Web.Components;
 using McHealthCare.Web.Components.Account;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Mvc;
 using McHealthCare.Web.Services;
-using MediatR;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System.Security.Claims;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -71,6 +63,10 @@ builder.Services.AddSignalR()
     });
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IPCareService, PCareService>();
 builder.Services.AddScoped<IFileExportService, FileExportService>();
 builder.Services.AddApplicationLayer();
 
@@ -344,7 +340,7 @@ public class SeedData
                     IsCreate = true,
                     IsUpdate = true,
                     IsDelete = true,
-                    IsImport = true,
+                    VisibleImport = true,
                     IsDefaultData = true
                 });
             }
@@ -359,7 +355,7 @@ public class SeedData
                     IsCreate = true,
                     IsUpdate = true,
                     IsDelete = true,
-                    IsImport = true,
+                    VisibleImport = true,
                     IsDefaultData = true
                 });
             }
@@ -374,7 +370,7 @@ public class SeedData
                     IsCreate = true,
                     IsUpdate = true,
                     IsDelete = true,
-                    IsImport = true,
+                    VisibleImport = true,
                     IsDefaultData = true
                 });
             }

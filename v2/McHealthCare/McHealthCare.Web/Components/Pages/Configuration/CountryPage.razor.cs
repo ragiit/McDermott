@@ -6,6 +6,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
     public partial class CountryPage : IAsyncDisposable
     {
         #region Variables
+
         private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
@@ -53,8 +54,8 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
                 await hubConnection.StartAsync();
 
-                await LoadData(); 
-                
+                await LoadData();
+
                 try
                 {
                     Grid?.SelectRow(0, true);
@@ -86,7 +87,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         {
             try
             {
-                PanelVisible = true; 
+                PanelVisible = true;
                 Countries.Clear();
                 Countries = await Mediator.Send(new GetCountryQuery());
                 //SelectedDataItems = [];

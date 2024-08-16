@@ -1,7 +1,4 @@
-﻿using Mapster;
-using System.ComponentModel.DataAnnotations;
-
-namespace McHealthCare.Application.Dtos.Configuration
+﻿namespace McHealthCare.Application.Dtos.Configuration
 {
     public class CountryDto : IMapFrom<Country>
     {

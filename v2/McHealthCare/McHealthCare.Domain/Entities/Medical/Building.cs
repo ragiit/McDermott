@@ -6,7 +6,6 @@ namespace McHealthCare.Domain.Entities.Medical
         public string? Name { get; set; }
         public string? Code { get; set; }
 
-        [SetToNull]
         public virtual HealthCenter? HealthCenter { get; set; }
         
     }

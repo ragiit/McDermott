@@ -1,11 +1,4 @@
-﻿using Mapster;
-using McHealthCare.Application.Dtos.Medical;
-using McHealthCare.Domain.Entities.Medical;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using McHealthCare.Domain.Entities.Medical;
 using static McHealthCare.Application.Features.CommandsQueries.Medical.DoctorScheduleCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Medical
@@ -39,7 +32,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                 else
                     return ((await unitOfWork.Repository<DoctorSchedule>().Entities
                         .AsNoTracking()
-                        .Include(x=>x.Service)
+                        .Include(x => x.Service)
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<DoctorScheduleDto>(), []);
             }
             else if (results is not null)
@@ -49,7 +42,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
                 else
                     return (new(), (await unitOfWork.Repository<DoctorSchedule>().Entities
                         .AsNoTracking()
-                        .Include(x=>x.Service)
+                        .Include(x => x.Service)
                         .FirstOrDefaultAsync(x => results.Select(z => z.Id).Contains(x.Id), cancellationToken: cancellationToken)).Adapt<List<DoctorScheduleDto>>());
             }
 
@@ -69,7 +62,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
             {
                 result = await unitOfWork.Repository<DoctorSchedule>().Entities
                         .AsNoTracking()
-                        .Include(x=>x.Service)
+                        .Include(x => x.Service)
                         .ToListAsync(cancellationToken);
                 cache.Set(CacheKey, result, TimeSpan.FromMinutes(10));
             }

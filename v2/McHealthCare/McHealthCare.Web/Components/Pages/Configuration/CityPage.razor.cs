@@ -1,5 +1,4 @@
 ﻿using McHealthCare.Application.Extentions;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace McHealthCare.Web.Components.Pages.Configuration

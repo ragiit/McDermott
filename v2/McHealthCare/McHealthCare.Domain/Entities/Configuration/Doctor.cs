@@ -4,9 +4,11 @@ namespace McHealthCare.Domain.Entities.Configuration
 {
     public class Doctor
     {
-        public Guid? SpecialityId { get; set; } 
+        public Guid? SpecialityId { get; set; }
+
         [Key, ForeignKey("ApplicationUser")]
-        public string? ApplicationUserId { get; set; }  
+        public string? ApplicationUserId { get; set; }
+
         public bool DoctorType { get; set; }
         public bool IsPhysicion { get; set; } = false;
         public bool IsNurse { get; set; } = false;
@@ -18,7 +20,7 @@ namespace McHealthCare.Domain.Entities.Configuration
         public string? StrNo { get; set; }
         public string? StrFile { get; set; }
         public string? StrFileBase64 { get; set; }
-        public DateTime? StrExp { get; set; } 
+        public DateTime? StrExp { get; set; }
 
         public virtual ApplicationUser? ApplicationUser { get; set; }
     }

@@ -1,0 +1,64 @@
+﻿@page "/inventory/stock-moves"
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Stock Moves</PageTitle>
+
+<div class="wrapper">
+    <BaseHeaderPage Title="Stock Moves" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row g-0">
+                <div class="col">
+                    <div class="card">
+                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                        IsContentBlocked="true"
+                                        ApplyBackgroundShading="true"
+                                        IndicatorAreaVisible="false"
+                                        Text="Fetching Data...">
+                            <MyDxGrid @ref="Grid"
+                                      Data="TransactionStocks"
+                                      FocusedRowEnabled="false"
+                                      CustomGroup="Grid_CustomSummary"
+                                      ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                                      AutoCollapseDetailRow="true"
+                                      KeyFieldName="Id"
+                                      AllowSelectRowByClick="false">
+
+                                <ToolbarTemplate>
+                                    <MyDxToolbarBase TItem="TransactionStockDto"
+                                                     Items="@TransactionStocks"
+                                                     Refresh_Click="@LoadData"
+                                                     VisibleImport="false"
+                                                     Grid="Grid"
+                                                     EnableDelete="false"
+                                                     VisibleNew="false"
+                                                     VisibleEdit="false"
+                                                     VisibleDelete="false" />
+                                </ToolbarTemplate>
+
+                                <Columns>
+                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridDataColumn FieldName="Product.Name" Caption="Product" GroupIndex="0" />
+                                    <DxGridDataColumn FieldName="CreatedDate" DisplayFormat="@Helper.DefaultFormatDateTime" Caption="Date" />
+                                    <DxGridDataColumn FieldName="Reference" Caption="Reference" />
+                                    <DxGridDataColumn FieldName="Batch" Caption="Batch" />
+                                    <DxGridDataColumn FieldName="ExpiredDate" DisplayFormat="@Helper.DefaultFormatDate" Caption="Expired Date" />
+                                    <DxGridDataColumn FieldName="Uom.Name" Caption="Uom" />
+                                    <DxGridDataColumn FieldName="Quantity" Caption="Quantity" />
+                                    <DxGridDataColumn FieldName="Validate" Caption="Validate" />
+                                </Columns>
+                                <GroupSummary>
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Reference" DisplayText="Product" />
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Quantity" />
+                                </GroupSummary>
+                            </MyDxGrid>
+                        </DxLoadingPanel>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

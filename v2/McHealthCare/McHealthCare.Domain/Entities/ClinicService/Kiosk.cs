@@ -1,6 +1,4 @@
-﻿using McHealthCare.Domain.Entities.Medical;
-
-namespace McHealthCare.Domain.Entities.ClinicService
+﻿namespace McHealthCare.Domain.Entities.ClinicService
 {
     public partial class Kiosk : BaseAuditableEntity
     {
@@ -12,9 +10,7 @@ namespace McHealthCare.Domain.Entities.ClinicService
         public string? BPJS { get; set; }
         public bool? StageBpjs { get; set; }
 
-
         public virtual Service? Service { get; set; }
-
 
         public virtual Patient? Patient { get; set; }
         public virtual Doctor? Physician { get; set; }

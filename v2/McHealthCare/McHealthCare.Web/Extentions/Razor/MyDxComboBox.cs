@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-
-namespace McHealthCare.Web.Extentions.Razor
+﻿namespace McHealthCare.Web.Extentions.Razor
 {
     public class MyDxComboBox<TData, TValue> : DxComboBox<TData, TValue>
     {

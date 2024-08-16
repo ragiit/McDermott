@@ -7,7 +7,7 @@ namespace McHealthCare.Domain.Entities.Configuration
         [Key, ForeignKey("ApplicationUser")]
         public string? ApplicationUserId { get; set; }  // Primary key and foreign key
 
-        public string? NoRm { get; set; } = "-"; 
+        public string? NoRm { get; set; } = "-";
         public string? IsFamilyMedicalHistory { get; set; }
         public string? FamilyMedicalHistory { get; set; }
         public string? FamilyMedicalHistoryOther { get; set; }

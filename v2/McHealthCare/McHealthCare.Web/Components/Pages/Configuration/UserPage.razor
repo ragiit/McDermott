@@ -11,7 +11,7 @@
 {
     <div class="content">
         <div class="container-fluid">
-            <div class="row">
+            <div class="row g-0">
                 <div class="col">
                     @if (PageMode == EnumPageMode.Create.GetDisplayName() || PageMode == EnumPageMode.Update.GetDisplayName())
                     {
@@ -360,7 +360,7 @@
                                                              VisibleEdit="UserAccess.Item2.IsUpdate"
                                                              EnableDelete="!IsDeleted"
                                                              VisibleDelete="UserAccess.Item2.IsDelete"
-                                                             VisibleImport="UserAccess.Item2.IsImport" />
+                                                             VisibleImport="UserAccess.Item2.VisibleImport" />
 
                                         </ToolbarTemplate>
 

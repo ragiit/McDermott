@@ -1,4 +1,4 @@
-﻿namespace McDermott.Domain.Entities
+﻿namespace McHealthCare.Domain.Entities
 {
     public partial class Family : BaseAuditableEntity
     {

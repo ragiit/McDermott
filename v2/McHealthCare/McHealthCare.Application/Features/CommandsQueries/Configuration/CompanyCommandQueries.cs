@@ -1,12 +1,4 @@
-﻿using Mapster;
-using McHealthCare.Application.Dtos.Configuration;
-using McHealthCare.Application.Extentions;
-using McHealthCare.Application.Interfaces;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
-using System.Linq.Expressions;
+﻿using Microsoft.Extensions.DependencyInjection;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.CompanyCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Configuration
@@ -40,7 +32,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Configuration
                 else
                     return ((await unitOfWork.Repository<Company>().Entities
                         .Include(x => x.City)
-                        .Include(x => x.Country)    
+                        .Include(x => x.Country)
                         .Include(x => x.Province)
                         .AsNoTracking()
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<CompanyDto>(), []);

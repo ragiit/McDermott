@@ -1,0 +1,83 @@
+﻿@page "/inventory/product-categories"
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Product Category</PageTitle>
+
+@if (IsAccess)
+{
+    <div class="wrapper">
+
+        <BaseHeaderPage Title="Product Category" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row g-0">
+                    <div class="col">
+                        <div class="card">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="true"
+                                            Text="Fetching Data...">
+
+                                <MyDxGrid @ref="Grid"
+                                        Data="ProductCategories"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        EditModelSaving="OnSave"
+                                        DataItemDeleting="OnDelete"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        KeyFieldName="Id">
+
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="ProductCategoryDto"
+                                                         Items="@ProductCategories"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         VisibleImport="false"
+                                                         Grid="Grid" />
+                                    </ToolbarTemplate>
+
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Code" Caption="Code" />
+                                    </Columns>
+
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (ProductCategoryDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Name"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Name" />
+                                                <ValidationMessage For="@(()=> a.Name)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Code" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Code"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Code" />
+                                                <ValidationMessage For="@(()=> a.Code)"   />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </MyDxGrid>
+                            </DxLoadingPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <LoadingIndicatorLayout />
+}

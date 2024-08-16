@@ -1,7 +1,4 @@
-using Mapster;
-using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities.Medical;
-using System.ComponentModel.DataAnnotations;
 
 namespace McHealthCare.Application.Dtos.Medical
 {
@@ -17,13 +14,11 @@ namespace McHealthCare.Application.Dtos.Medical
 
         public string? ResultType { get; set; }
 
-        [SetToNull]
         public virtual SampleTypeDto? SampleType { get; set; }
 
-        [SetToNull]
         public virtual List<LabTestDetailDto>? LabTestDetail { get; set; }
 
-        // [SetToNull]
+        //
         // public virtual List<GeneralConsultanMedicalSupportDto>? GeneralConsultanMedicalSupports { get; set; }
     }
 
@@ -39,13 +34,11 @@ namespace McHealthCare.Application.Dtos.Medical
 
         public string? ResultType { get; set; }
 
-        [SetToNull]
         public virtual SampleTypeDto? SampleType { get; set; }
 
-        [SetToNull]
         public virtual List<LabTestDetailDto>? LabTestDetail { get; set; }
 
-        // [SetToNull]
+        //
         // public virtual List<GeneralConsultanMedicalSupportDto>? GeneralConsultanMedicalSupports { get; set; }
     }
 }

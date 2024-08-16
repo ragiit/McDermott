@@ -1,11 +1,4 @@
-﻿using McHealthCare.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McHealthCare.Application.Dtos.Configuration
+﻿namespace McHealthCare.Application.Dtos.Configuration
 {
     public class DoctorDto : IMapFrom<Doctor>
     {
@@ -40,6 +33,7 @@ namespace McHealthCare.Application.Dtos.Configuration
                 }
             }
         }
+
         public string? PhysicanCode { get; set; }
         public string? SipNo { get; set; }
         public string? SipFile { get; set; }
@@ -48,12 +42,13 @@ namespace McHealthCare.Application.Dtos.Configuration
         public string? StrNo { get; set; }
         public string? StrFile { get; set; }
         public string? StrFileBase64 { get; set; }
-        public DateTime? StrExp { get; set; } 
+        public DateTime? StrExp { get; set; }
     }
-    public class CreateUpdateDoctorDto  
+
+    public class CreateUpdateDoctorDto
     {
         public Guid? SpecialityId { get; set; }
-        public string? ApplicationUserId { get; set; } = Guid.NewGuid().ToString(); 
+        public string? ApplicationUserId { get; set; } = Guid.NewGuid().ToString();
         public bool DoctorType { get; set; }
         private bool _isPhysicion = false;
         private bool _isNurse = false;
@@ -83,6 +78,7 @@ namespace McHealthCare.Application.Dtos.Configuration
                 }
             }
         }
+
         public string? PhysicanCode { get; set; }
         public string? SipNo { get; set; }
         public string? SipFile { get; set; }
@@ -91,6 +87,6 @@ namespace McHealthCare.Application.Dtos.Configuration
         public string? StrNo { get; set; }
         public string? StrFile { get; set; }
         public string? StrFileBase64 { get; set; }
-        public DateTime? StrExp { get; set; } 
+        public DateTime? StrExp { get; set; }
     }
 }

@@ -6,7 +6,5 @@
         public Guid? ServicekId { get; set; }
         public Guid? ServiceId { get; set; }
         public long? NumberQueue { get; set; }
-
-
     }
 }

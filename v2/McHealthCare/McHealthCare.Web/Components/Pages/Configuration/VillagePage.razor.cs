@@ -1,10 +1,6 @@
-﻿using Blazored.Toast.Services;
-using McHealthCare.Application.Extentions;
+﻿using McHealthCare.Application.Extentions;
 using McHealthCare.Web.Services;
-using MediatR;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
-using static McHealthCare.Application.Features.CommandsQueries.Configuration.VillageCommand;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
 {
@@ -15,7 +11,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
-        private HubConnection? hubConnection; 
+        private HubConnection? hubConnection;
         private List<VillageDto> Villages = [];
         private List<DistrictDto> Districts = [];
         private List<ProvinceDto> Provinces = [];
@@ -156,7 +152,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             PanelVisible = true;
             try
             {
-                var editModel = (VillageDto)e.EditModel; 
+                var editModel = (VillageDto)e.EditModel;
 
                 if (editModel.Id == Guid.Empty)
                     await Mediator.Send(new CreateVillageRequest(editModel));
@@ -245,7 +241,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
                             ProvinceId = a,
                             CityId = b,
-                            DistrictId = c, 
+                            DistrictId = c,
                         };
 
                         if (!Villages.Any(x => x.Name.Trim().ToLower() == City?.Name?.Trim().ToLower() && x.ProvinceId == City.ProvinceId && x.CityId == City.CityId && x.DistrictId == City.DistrictId))

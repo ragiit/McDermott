@@ -15,31 +15,22 @@
         public long? GivenAmount { get; set; } // jumlah yg diberikan
         public long? PriceUnit { get; set; }
 
-        
         public DrugForm? DrugForm { get; set; }
 
-        
         public Pharmacy? Pharmacy { get; set; }
 
-        
         public Product? Product { get; set; }
 
-        
         public Signa? Signa { get; set; }
 
-        
         public DrugRoute? DrugRoute { get; set; }
 
-        
         public DrugDosage? DrugDosage { get; set; }
 
-        
         public MedicamentGroup? MedicamentGroup { get; set; }
 
-        
         public List<ActiveComponent>? ActiveComponent { get; set; }
 
-        
-        public List<StockOutPrescription>? StockOutPrescription { get;set; }
+        public List<StockOutPrescription>? StockOutPrescription { get; set; }
     }
 }

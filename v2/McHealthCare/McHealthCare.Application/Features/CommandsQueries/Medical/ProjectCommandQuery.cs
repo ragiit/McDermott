@@ -1,11 +1,4 @@
-﻿using Mapster;
-using McHealthCare.Application.Dtos.Medical;
-using McHealthCare.Domain.Entities.Medical;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using McHealthCare.Domain.Entities.Medical;
 using static McHealthCare.Application.Features.CommandsQueries.Medical.ProjectCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Medical
@@ -13,6 +6,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Medical
     public class ProjectCommandQuery
     {
     }
+
     public sealed class ProjectCommand
     {
         public sealed record GetProjectQuery(Expression<Func<Project, bool>>? Predicate = null, bool RemoveCache = false) : IRequest<List<ProjectDto>>;

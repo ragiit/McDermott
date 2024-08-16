@@ -15,8 +15,7 @@ namespace McHealthCare.Persistence.Migrations
                 name: "Allergies",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     KdAllergy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NmAllergy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -704,7 +703,7 @@ namespace McHealthCare.Persistence.Migrations
                     IsRead = table.Column<bool>(type: "bit", nullable: false),
                     IsUpdate = table.Column<bool>(type: "bit", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false),
-                    IsImport = table.Column<bool>(type: "bit", nullable: false),
+                    VisibleImport = table.Column<bool>(type: "bit", nullable: false),
                     IsDefaultData = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),

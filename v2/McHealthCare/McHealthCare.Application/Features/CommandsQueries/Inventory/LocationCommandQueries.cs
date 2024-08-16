@@ -1,12 +1,4 @@
-﻿using Mapster;
-using McHealthCare.Application.Dtos.Inventory;
-using McHealthCare.Domain.Entities.Inventory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static McHealthCare.Application.Features.CommandsQueries.Inventory.LocationCommand;
+﻿using static McHealthCare.Application.Features.CommandsQueries.Inventory.LocationCommand;
 
 namespace McHealthCare.Application.Features.CommandsQueries.Inventory
 {
@@ -40,7 +32,7 @@ namespace McHealthCare.Application.Features.CommandsQueries.Inventory
                     return ((await unitOfWork.Repository<Location>().Entities
                         .AsNoTracking()
                         .Include(x => x.ParentLocation)
-                        .Include(x => x.Company) 
+                        .Include(x => x.Company)
                         .FirstOrDefaultAsync(x => x.Id == result.Id, cancellationToken: cancellationToken)).Adapt<LocationDto>(), []);
             }
             else if (results is not null)

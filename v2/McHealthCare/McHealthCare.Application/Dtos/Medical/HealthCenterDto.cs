@@ -1,6 +1,3 @@
-using Mapster;
-using McHealthCare.Application.Dtos.Configuration;
-using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities.Medical;
 
 namespace McHealthCare.Application.Dtos.Medical
@@ -20,13 +17,10 @@ namespace McHealthCare.Application.Dtos.Medical
         public string? Street2 { get; set; }
         public string? WebsiteLink { get; set; }
 
-        [SetToNull]
         public virtual CityDto? City { get; set; }
 
-        [SetToNull]
         public virtual ProvinceDto? Province { get; set; }
 
-        [SetToNull]
         public virtual CountryDto? Country { get; set; }
 
         
@@ -47,13 +41,10 @@ namespace McHealthCare.Application.Dtos.Medical
         public string? Street2 { get; set; }
         public string? WebsiteLink { get; set; }
 
-        [SetToNull]
         public virtual CityDto? City { get; set; }
 
-        [SetToNull]
         public virtual ProvinceDto? Province { get; set; }
 
-        [SetToNull]
         public virtual CountryDto? Country { get; set; }
 
      

@@ -1,11 +1,11 @@
-﻿
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace McHealthCare.Domain.Entities
 {
     public class BPJSIntegration : BaseAuditableEntity
     {
         public Guid? InsurancePolicyId { get; set; }
+
         [JsonPropertyName("noKartu")]
         public string? NoKartu { get; set; }
 
@@ -50,6 +50,7 @@ namespace McHealthCare.Domain.Entities
 
         [JsonPropertyName("tunggakan")]
         public int Tunggakan { get; set; }
+
         public string? KdProviderPstKdProvider { get; set; }
         public string? KdProviderPstNmProvider { get; set; }
 
@@ -64,7 +65,6 @@ namespace McHealthCare.Domain.Entities
         public string? AsuransiNoAsuransi { get; set; }
         public bool AsuransiCob { get; set; }
 
-        [SetToNull]
         public InsurancePolicy? InsurancePolicy { get; set; }
     }
 }

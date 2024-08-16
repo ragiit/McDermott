@@ -1,0 +1,80 @@
+﻿@page "/bpjs-integration/services"
+@rendermode InteractiveAuto
+
+<PageTitle>McHealthCare - Poli</PageTitle>
+
+@if (!IsLoading)
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Poli" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <DxGrid @ref="Grid"
+                                            Data="@_poliBPJSIntegrationTemp"
+                                            PagerVisible="true"
+                                            KeyFieldName="Code"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
+                                            PagerNavigationMode="PagerNavigationMode.InputBox"
+                                            TextWrapEnabled="false"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageIndex="@parameter1"
+                                            PageSize="@parameter2"
+                                            ShowAllRows="true"
+                                            ShowGroupPanel="true"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true" 
+                                            AutoExpandAllGroupRows="true"
+                                            ShowFilterRow="true"
+                                            KeyboardNavigationEnabled="true"
+                                            ShowSearchBox="true"
+                                            PageIndexChanged="HandlePageIndexChanged"
+                                            PageSizeChanged="HandlePageSizeChanged">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="LoadData" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(PoliBPJSIntegrationTemp.KdPoli)" Caption="Code" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(PoliBPJSIntegrationTemp.NmPoli)" Caption="Poli" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="@nameof(PoliBPJSIntegrationTemp.PoliSakit)" Caption="Sick Poli" />
+                                        </Columns>
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Poli" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    </div>
+}

@@ -1,6 +1,3 @@
-using Mapster;
-using McHealthCare.Domain.Common;
-using McHealthCare.Domain.Entities;
 using McHealthCare.Domain.Entities.Medical;
 
 namespace McHealthCare.Application.Dtos.Medical
@@ -15,10 +12,8 @@ namespace McHealthCare.Application.Dtos.Medical
 
         public TimeSpan? WorkTo { get; set; }
 
-        [SetToNull]
         public virtual DoctorScheduleDto? DoctorSchedule { get; set; }
 
-        [SetToNull]
         public virtual ApplicationUser? Physician { get; set; }
     }
 
@@ -32,10 +27,8 @@ namespace McHealthCare.Application.Dtos.Medical
 
         public TimeSpan? WorkTo { get; set; }
 
-        [SetToNull]
         public virtual DoctorScheduleDto? DoctorSchedule { get; set; }
 
-        [SetToNull]
         public virtual ApplicationUser? Physician { get; set; }
     }
 }

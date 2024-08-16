@@ -1,17 +1,15 @@
-﻿
-
-namespace McHealthCare.Web.Components.Pages.Configuration
+﻿namespace McHealthCare.Web.Components.Pages.Configuration
 {
     public partial class CompanyPage
     {
         #region Variables
 
-        private bool PanelVisible { get; set; } = true; 
+        private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
         private List<CompanyDto> Companies = [];
-        private List<CountryDto> Countries = []; 
-        private List<ProvinceDto> Provinces = []; 
+        private List<CountryDto> Countries = [];
+        private List<ProvinceDto> Provinces = [];
         private List<CityDto> Cities = [];
 
         private List<ExportFileData> ExportFileDatas =
@@ -45,7 +43,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             try
             {
                 UserAccess = await UserService.GetUserInfo(ToastService);
-                await LoadData(); 
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -75,7 +73,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 Companies = await Mediator.Send(new GetCompanyQuery());
                 Provinces = await Mediator.Send(new GetProvinceQuery());
                 Countries = await Mediator.Send(new GetCountryQuery());
-                Cities = await Mediator.Send(new GetCityQuery()); 
+                Cities = await Mediator.Send(new GetCityQuery());
                 SelectedDataItems = [];
 
                 try
@@ -146,7 +144,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
 
         public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
-             
         }
     }
 }

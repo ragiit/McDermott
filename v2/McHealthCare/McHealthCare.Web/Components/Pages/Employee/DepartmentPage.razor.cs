@@ -1,13 +1,13 @@
-﻿
-using McHealthCare.Application.Dtos.Employees;
+﻿using McHealthCare.Application.Dtos.Employees;
 using McHealthCare.Application.Extentions;
 using Microsoft.AspNetCore.SignalR.Client;
-using static McHealthCare.Application.Features.CommandsQueries.Employees.DepartmentCommand;
+
 namespace McHealthCare.Web.Components.Pages.Employee
 {
     public partial class DepartmentPage : IAsyncDisposable
     {
         #region Variables
+
         private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
@@ -37,11 +37,13 @@ namespace McHealthCare.Web.Components.Pages.Employee
         #endregion Variables
 
         private bool shouldAddW100Class = true;
+
         private async Task LoadCombobox()
         {
             Companies = await Mediator.Send(new GetCompanyQuery());
             Users = (await UserService.GetAllUsers()).Where(x => x.Employee != null).ToList();
         }
+
         protected override async Task OnInitializedAsync()
         {
             IsLoading = true;
@@ -62,7 +64,7 @@ namespace McHealthCare.Web.Components.Pages.Employee
                 await hubConnection.StartAsync();
 
                 await LoadCombobox();
-                
+
                 try
                 {
                     Grid?.SelectRow(0, true);
@@ -94,9 +96,9 @@ namespace McHealthCare.Web.Components.Pages.Employee
         {
             try
             {
-                PanelVisible = true; 
+                PanelVisible = true;
                 Departments.Clear();
-                Departments = await Mediator.Send(new GetDepartmentQuery()); 
+                Departments = await Mediator.Send(new GetDepartmentQuery());
                 try
                 {
                     Grid?.SelectRow(0, true);
@@ -144,7 +146,7 @@ namespace McHealthCare.Web.Components.Pages.Employee
             try
             {
                 var editModel = (DepartmentDto)e.EditModel;
-                  
+
                 if (editModel.Id == Guid.Empty)
                     await Mediator.Send(new CreateDepartmentRequest(editModel));
                 else
@@ -191,7 +193,7 @@ namespace McHealthCare.Web.Components.Pages.Employee
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
                         var Department = new DepartmentDto
-                        { 
+                        {
                             Name = ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty,
                         };
 

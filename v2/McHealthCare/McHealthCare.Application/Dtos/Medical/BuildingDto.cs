@@ -1,7 +1,4 @@
-using Mapster;
-using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities.Medical;
-using System.ComponentModel.DataAnnotations;
 
 namespace McHealthCare.Application.Dtos.Medical
 {
@@ -15,7 +12,6 @@ namespace McHealthCare.Application.Dtos.Medical
         [StringLength(200)]
         public string? Code { get; set; }
 
-        [SetToNull]
         public virtual HealthCenterDto? HealthCenter { get; set; }
         [SetToNull]
         public virtual List<BuildingLocationDto>? BuildingLocations { get; set; }
@@ -33,10 +29,8 @@ namespace McHealthCare.Application.Dtos.Medical
         [StringLength(200)]
         public string? Code { get; set; }
 
-        [SetToNull]
         public virtual HealthCenterDto? HealthCenter { get; set; }
 
-        [SetToNull]
         public virtual List<BuildingLocationDto>? BuildingLocations { get; set; }
     }
 }

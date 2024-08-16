@@ -1,4 +1,3 @@
-using Mapster;
 using McHealthCare.Domain.Entities.Medical;
 
 namespace McHealthCare.Application.Dtos.Medical

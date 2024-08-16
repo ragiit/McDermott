@@ -1,12 +1,7 @@
 ﻿using Blazored.TextEditor;
 using DevExpress.Blazor.RichEdit;
 using MailKit.Net.Smtp;
-using McHealthCare.Domain.Entities;
-using McHealthCare.Domain.Entities.Configuration;
-using Microsoft.AspNetCore.Components;
-using Microsoft.IdentityModel.Tokens;
 using MimeKit;
-using MimeKit.Text;
 using static McHealthCare.Application.Features.CommandsQueries.Configuration.EmailTemplateCommand;
 
 namespace McHealthCare.Web.Components.Pages.Configuration
@@ -18,8 +13,10 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private List<EmailTemplateDto> EmailTemplates = new();
         private List<EmailSettingDto> EmailSettings = [];
         private EmailTemplateDto EmailFormTemplate = new();
+
         //private List<string>? CcBy = new List<string>();
         private IEnumerable<string> CcBy = [];
+
         private List<Patient> ToPartner = [];
         private ApplicationUser? User = new();
 
@@ -28,9 +25,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         #region grid configuration
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-     
-
-     
 
         public IGrid Grid { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
@@ -40,7 +34,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         #region Variable
 
         private bool EditItemsEnabled { get; set; }
-        private bool IsAccess { get; set; } = false; 
+        private bool IsAccess { get; set; } = false;
         private bool IsLoading { get; set; } = true;
         private bool showForm { get; set; } = false;
         private bool PanelVisible { get; set; } = true;
@@ -56,7 +50,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private DxRichEdit richEdit;
         private DevExpress.Blazor.RichEdit.Document documentAPI;
 
-
         #endregion Variable
 
         #region BlazoredTextEditor
@@ -67,7 +60,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         private BlazoredTextEditor QuillHtml;
         private BlazoredTextEditor QuillNative;
         private BlazoredTextEditor QuillReadOnly;
-        private MarkupString preview; 
+        private MarkupString preview;
         private string QuillHTMLContent;
         private string QuillContent;
 
@@ -79,11 +72,13 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         #endregion BlazoredTextEditor
 
         #region Async Data
+
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
+
         protected override async Task OnInitializedAsync()
         {
             IsLoading = true;
-            UserAccess = await UserService.GetUserInfo(ToastService); 
+            UserAccess = await UserService.GetUserInfo(ToastService);
             await LoadData();
             IsLoading = false;
         }
@@ -193,7 +188,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-
         #endregion function button
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -269,7 +263,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             }
         }
 
-
         private async Task SendEmail()
         {
             try
@@ -313,7 +306,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 // Add Cc recipients
                 if (CcBy is not null)
                 {
-
                     foreach (var cc in CcBy.ToList())
                     {
                         message.Cc.Add(MailboxAddress.Parse(cc.Trim()));
@@ -351,6 +343,5 @@ namespace McHealthCare.Web.Components.Pages.Configuration
                 StateHasChanged(); // Ensure the component re-renders
             }
         }
-
     }
 }

@@ -1,6 +1,4 @@
-﻿using McHealthCare.Domain.Entities.Medical;
-
-namespace McHealthCare.Domain.Entities.ClinicService
+﻿namespace McHealthCare.Domain.Entities.ClinicService
 {
     public class InsurancePolicy : BaseAuditableEntity
     {
@@ -86,11 +84,8 @@ namespace McHealthCare.Domain.Entities.ClinicService
         [StringLength(200)]
         public string? ProviderName { get; set; }
 
-        [SetToNull]
         public virtual Insurance? Insurance { get; set; }
 
-        [SetToNull]
         public virtual ApplicationUser? User { get; set; }
-
     }
 }

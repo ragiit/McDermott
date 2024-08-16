@@ -7,7 +7,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
     {
         #region Variables
 
-        private bool PanelVisible { get; set; } = true; 
+        private bool PanelVisible { get; set; } = true;
         private (bool, GroupMenuDto) UserAccess { get; set; } = new();
         private bool IsLoading { get; set; } = true;
         private HubConnection? hubConnection;
@@ -43,6 +43,7 @@ namespace McHealthCare.Web.Components.Pages.Configuration
         #endregion Variables
 
         private bool IsDeletedMenu { get; set; } = false;
+
         private void CanDeleteSelectedItemsMenu(GridFocusedRowChangedEventArgs e)
         {
             FocusedRowVisibleIndex = e.VisibleIndex;
@@ -50,7 +51,6 @@ namespace McHealthCare.Web.Components.Pages.Configuration
             if (e.DataItem is not null)
                 IsDeletedMenu = e.DataItem.Adapt<MenuDto>().IsDefaultData;
         }
-
 
         protected override async Task OnInitializedAsync()
         {

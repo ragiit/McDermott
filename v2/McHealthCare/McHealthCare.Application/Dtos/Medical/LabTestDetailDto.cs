@@ -1,5 +1,3 @@
-using Mapster;
-using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities.Medical;
 
 namespace McHealthCare.Application.Dtos.Medical
@@ -16,10 +14,8 @@ namespace McHealthCare.Application.Dtos.Medical
         public string? ResultValueType { get; set; }
         public string? Remark { get; set; }
 
-        [SetToNull]
         public LabTestDto? LabTest { get; set; }
 
-        [SetToNull]
         public LabUomDto? LabUom { get; set; }
     }
 
@@ -35,10 +31,8 @@ namespace McHealthCare.Application.Dtos.Medical
         public string? ResultValueType { get; set; }
         public string? Remark { get; set; }
 
-        [SetToNull]
         public virtual LabTestDto? LabTest { get; set; }
 
-        [SetToNull]
         public virtual LabUomDto? LabUom { get; set; }
     }
 }

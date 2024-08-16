@@ -24,3 +24,37 @@ global using static McHealthCare.Application.Features.CommandsQueries.Configurat
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.CompanyCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.ReligionCommand;
 global using static McHealthCare.Application.Features.CommandsQueries.Configuration.VillageCommand;
+global using static McHealthCare.Application.Features.CommandsQueries.Inventory.UomCategoryCommand;
+global using McHealthCare.Application.Dtos.Inventory;
+global using McHealthCare.Application.Dtos.Transaction; 
+global using OfficeOpenXml.Style;
+global using Microsoft.JSInterop;
+global using McHealthCare.Application.Dtos.Medical;
+global using McHealthCare.Domain.Entities.Products;
+global using DevExpress.Data.XtraReports.Native;
+global using McHealthCare.Application.Dtos.BpjsIntegration;
+global using static McHealthCare.Application.Features.CommandsQueries.Bpjs.AllergyCommand;
+global using static McHealthCare.Application.Features.Commands.Inventory.InventoryAdjusmentCommand;
+global using static McHealthCare.Application.Features.Commands.Inventory.InventoryAdjusmentDetailCommand;
+global using static McHealthCare.Application.Features.Commands.Inventory.ProductCommand;
+global using static McHealthCare.Application.Features.Commands.Inventory.ProductCategoryCommand;
+global using static McHealthCare.Application.Features.Commands.Inventory.UomCommand;
+global using static McHealthCare.Application.Features.Commands.Inventory.StockProductCommand;
+global using static McHealthCare.Application.Features.Commands.Inventory.TransactionStockCommand;
+global using static McHealthCare.Application.Features.Commands.ClinicServices.GeneralConsultanServiceCommand;
+global using static McHealthCare.Application.Features.Commands.Inventory.ReceivingCommand;
+global using static McHealthCare.Application.Features.Commands.Inventory.TransferStockCommand;
+global using static McHealthCare.Application.Features.CommandsQueries.Inventory.LocationCommand;
+global using McHealthCare.Application.Dtos.Bpjs;
+global using Newtonsoft.Json;
+global using System.Text.Json.Serialization; 
+global using McHealthCare.Application.Dtos.Pharmacies;
+global using System.Globalization;
+global using static McHealthCare.Application.Features.Commands.Bpjs.BpjsClassificationCommand;
+ 
+
+global using static McHealthCare.Application.Features.Commands.Pharmacies.ActiveComponentCommand;
+global using static McHealthCare.Application.Features.Commands.Pharmacies.DrugDosageCommand;
+global using static McHealthCare.Application.Features.Commands.Pharmacies.DrugRouteCommand;
+global using static McHealthCare.Application.Features.Commands.Pharmacies.FormDrugCommand;
+global using static McHealthCare.Application.Features.Commands.Pharmacies.MedicamentCommand;

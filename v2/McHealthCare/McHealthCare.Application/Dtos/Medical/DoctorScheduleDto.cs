@@ -1,7 +1,4 @@
-using Mapster;
-using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities.Medical;
-using System.ComponentModel.DataAnnotations;
 
 namespace McHealthCare.Application.Dtos.Medical
 {
@@ -16,7 +13,6 @@ namespace McHealthCare.Application.Dtos.Medical
 
         // public List<Guid>? PhysicionIds { get; set; }
 
-        [SetToNull]
         public virtual ServiceDto? Service { get; set; }
     }
 
@@ -31,7 +27,6 @@ namespace McHealthCare.Application.Dtos.Medical
 
         // public List<Guid>? PhysicionIds { get; set; }
 
-        [SetToNull]
         public virtual ServiceDto? Service { get; set; }
     }
 }

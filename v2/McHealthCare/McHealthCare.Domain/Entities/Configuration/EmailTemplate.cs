@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McHealthCare.Domain.Entities.Configuration
+﻿namespace McHealthCare.Domain.Entities.Configuration
 {
     public class EmailTemplate : BaseAuditableEntity
     {
@@ -13,6 +7,7 @@ namespace McHealthCare.Domain.Entities.Configuration
 
         [StringLength(200)]
         public string? From { get; set; }
+
         public Guid? EmailFromId { get; set; }
         public string? ById { get; set; }
 
@@ -30,9 +25,9 @@ namespace McHealthCare.Domain.Entities.Configuration
         public string? Message { get; set; }
         public long? TypeEmail { get; set; }
         public string? Status { get; set; }
-         
-        public virtual ApplicationUser? By { get; set; } 
-        public virtual List<ApplicationUser>? ToPartner { get; set; } 
+
+        public virtual ApplicationUser? By { get; set; }
+        public virtual List<ApplicationUser>? ToPartner { get; set; }
         public virtual EmailSetting? EmailFrom { get; set; }
     }
 }
