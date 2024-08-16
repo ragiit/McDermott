@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace EsemkaHeHo.Models;
 
@@ -22,6 +21,5 @@ public partial class Project
 
     public virtual User ProjectManager { get; set; } = null!;
 
-    [JsonIgnore]
     public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
 }

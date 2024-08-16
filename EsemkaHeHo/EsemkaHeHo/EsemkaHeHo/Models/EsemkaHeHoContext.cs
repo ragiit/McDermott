@@ -31,9 +31,9 @@ public partial class EsemkaHeHoContext : DbContext
     {
         modelBuilder.Entity<Department>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Departme__3214EC07631B0F35");
+            entity.HasKey(e => e.Id).HasName("PK__Departme__3214EC0711C3225D");
 
-            entity.HasIndex(e => e.Name, "UQ__Departme__737584F6B69BE706").IsUnique();
+            entity.HasIndex(e => e.Name, "UQ__Departme__737584F62EEE808D").IsUnique();
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreatedDate)
@@ -48,7 +48,7 @@ public partial class EsemkaHeHoContext : DbContext
 
         modelBuilder.Entity<Project>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Projects__3214EC0789752C48");
+            entity.HasKey(e => e.Id).HasName("PK__Projects__3214EC07DF4A1947");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Description).HasColumnType("text");
@@ -66,7 +66,7 @@ public partial class EsemkaHeHoContext : DbContext
 
         modelBuilder.Entity<Task>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Tasks__3214EC072F76DBAE");
+            entity.HasKey(e => e.Id).HasName("PK__Tasks__3214EC078A411559");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Description).HasColumnType("text");
@@ -93,23 +93,20 @@ public partial class EsemkaHeHoContext : DbContext
                         .HasConstraintName("FK__AssignedT__TaskI__45F365D3"),
                     j =>
                     {
-                        j.HasKey("TaskId", "UserId").HasName("PK__Assigned__AD11C575BA2700B4");
+                        j.HasKey("TaskId", "UserId").HasName("PK__Assigned__AD11C575CAF5E86A");
                         j.ToTable("AssignedTasks");
                     });
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC0770F03833");
+            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC074480D800");
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534EF65BF4E").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534DD313FF0").IsUnique();
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Address)
                 .HasMaxLength(255)
-                .IsUnicode(false);
-            entity.Property(e => e.Department)
-                .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
@@ -129,7 +126,7 @@ public partial class EsemkaHeHoContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.Salary).HasColumnType("decimal(18, 2)");
 
-            entity.HasOne(d => d.DepartmentNavigation).WithMany(p => p.Users)
+            entity.HasOne(d => d.Department).WithMany(p => p.Users)
                 .HasForeignKey(d => d.DepartmentId)
                 .HasConstraintName("FK__Users__Departmen__3C69FB99");
         });

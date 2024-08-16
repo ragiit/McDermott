@@ -22,10 +22,22 @@ namespace EsemkaHeHo.Controllers
 
         // GET: api/Projects
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Project>>> GetProjects()
+        public async Task<ActionResult<IEnumerable<Project>>> GetProjects([FromQuery] string? name)
         {
-            return await _context.Projects.ToListAsync();
+            // Start with the base query
+            IQueryable<Project> query = _context.Projects.Include(x => x.ProjectManager);
+
+            // Apply the filtering if 'name' is provided
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(p => p.ProjectManager.FullName.Contains(name));
+            }
+
+            // Execute the query and return the results
+            var projects = await query.ToListAsync();
+            return Ok(projects);
         }
+
 
         // GET: api/Projects/5
         [HttpGet("{id}")]
