@@ -1,6 +1,6 @@
 ﻿using McHealthCare.Application.Dtos.BpjsIntegration;
 using Newtonsoft.Json;
-using static McDermott.Application.Features.Commands.BpjsIntegration.AwarenessCommand;
+using static McHealthCare.Application.Features.Commands.BpjsIntegration.AwarenessCommand;
 
 namespace McHealthCare.Web.Components.Pages.BpjsIntegration
 {

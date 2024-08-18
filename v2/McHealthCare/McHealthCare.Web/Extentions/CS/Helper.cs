@@ -63,8 +63,10 @@ namespace McHealthCare.Web.Extentions.CS
         public static List<string> TypesHealthCare = new List<string>
         {
             "Clinic"
-        }; 
-        
+        };
+
+        public static int ToInt32(this object o) => Convert.ToInt32(o);
+        public static long ToLong(this object o) => Convert.ToInt64(o);
         public class AllergyType
         {
             public string Code { get; set; } = string.Empty;

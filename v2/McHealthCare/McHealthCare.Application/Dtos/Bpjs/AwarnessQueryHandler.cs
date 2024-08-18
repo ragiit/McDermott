@@ -1,6 +1,6 @@
-﻿using static McDermott.Application.Features.Commands.BpjsIntegration.AwarenessCommand;
+﻿using static McHealthCare.Application.Features.Commands.BpjsIntegration.AwarenessCommand;
 
-namespace McDermott.Application.Features.Queries.BpjsIntegration
+namespace McHealthCare.Application.Features.Queries.BpjsIntegration
 {
     public class AwarenessQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetAwarenessQuery, List<AwarenessDto>>,

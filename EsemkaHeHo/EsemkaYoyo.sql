@@ -1,6 +1,6 @@
-CREATE DATABASE EsemkaHeHo;
+CREATE DATABASE EsemkaYoyo;
 GO 
-USE EsemkaHeHo;
+USE EsemkaYoyo;
 GO
 
 CREATE TABLE Departments (

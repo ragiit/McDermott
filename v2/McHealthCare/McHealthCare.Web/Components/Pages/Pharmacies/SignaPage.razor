@@ -1,0 +1,105 @@
+﻿@page "/pharmacy/signa"
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Master Data Signa </PageTitle>
+
+@if (IsAccess)
+{
+    <div class="wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Signa</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item" @onclick="LoadData"><a href="/pharmacy/signa">Signa</a></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                            Data="Signas"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            EditModelSaving="OnSave"
+                                            DataItemDeleting="OnDelete"
+                                            AllowSelectRowByClick="true"
+                                            EditMode="GridEditMode.PopupEditForm"
+                                            PopupEditFormCssClass="pw-800"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            FocusedRowEnabled="true"
+                                            PagerVisibleNumericButtonCount="10"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            ShowFilterRow="true"
+                                            CustomizeElement="Grid_CustomizeElement"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                <DxToolbarItem  Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem  Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Signas.Count > 0" />
+                                                <DxToolbarItem  Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Signas.Count > 0" />
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="Name" Caption="Signa" SortIndex="0" />
+                                        </Columns>
+                                        <EditFormTemplate Context="EditFormContext">
+                                            <DxFormLayout CssClass="w-100">
+                                                <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                                    <div class="pop-warning">
+                                                        @EditFormContext.GetEditor("Name")
+                                                    </div>
+                                                </DxFormLayoutItem>
+                                            </DxFormLayout>
+                                        </EditFormTemplate>
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Signa" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    </div>
+}

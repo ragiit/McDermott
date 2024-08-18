@@ -12,8 +12,7 @@ namespace McHealthCare.Application.Dtos.Medical
         [StringLength(200)]
         public string? Code { get; set; }
 
-        public virtual HealthCenterDto? HealthCenter { get; set; }
-        [SetToNull]
+        public virtual HealthCenterDto? HealthCenter { get; set; } 
         public virtual List<BuildingLocationDto>? BuildingLocations { get; set; }
     }
 
